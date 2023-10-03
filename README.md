@@ -1,11 +1,10 @@
-<img alt="react-native-unistyles" src="assets/banner.png">
+[<img alt="react-native-unistyles" src="assets/banner.png">](https://codemask.com)
+
 
 <picture>
  <source media="(prefers-color-scheme: dark)" srcset="assets/uni-dark.svg">
  <img alt="react-native-unistyles" src="assets/uni-light.svg">
 </picture>
-
-<hr />
 
 ## Features
 - ⚡ Blazing fast, adds around ~5ms on top of StyleSheet*
@@ -205,7 +204,7 @@ For more advanced usage and pixel perfect designs you can also use a custom medi
 ```ts
 :w[200, 500] - with upper and lower bounds, it translates to width from 200-500px
 :w[, 800] - with upper bound only, it's equal to width from 0-800px
-:h[400] - upper bound only, it means height from 400px
+:h[400] - lower bound only, it means height from 400px
 :h[200, 300]:w[500] - combined queries for both width and height
 ```
 
@@ -222,7 +221,7 @@ const stylesheet = createStyles(theme => ({
        },
        backgroundColor: {
           xs: theme.colors.background,
-          ':w[601,]': theme.colors.barbie
+          ':w[600]': theme.colors.barbie
        }
     },
     text: {
