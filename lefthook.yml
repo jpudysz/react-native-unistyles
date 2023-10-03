@@ -5,10 +5,14 @@ pre-commit:
       files: git diff --name-only @{push}
       glob: "*.{js,ts,jsx,tsx}"
       run: npx eslint {files}
-    types:
+    tsc:
       files: git diff --name-only @{push}
       glob: "*.{js,ts, jsx, tsx}"
       run: npx tsc --noEmit
+    test:
+      files: git diff --name-only @{push}
+      glob: "*.{js,ts, jsx, tsx}"
+      run: npx jest
 commit-msg:
   parallel: true
   commands:
