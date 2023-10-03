@@ -230,6 +230,10 @@ const stylesheet = createStyles(theme => ({
 }))
 ```
 
+## Example
+
+In order to check out working example go to [example/](./example).
+
 ## Blog post
 
 For more detailed explanation please refer to my blog post [here](https://www.reactnativecrossroads.com/posts/level-up-react-native-styles).
