@@ -230,6 +230,43 @@ const stylesheet = createStyles(theme => ({
 }))
 ```
 
+## Dynamic functions
+
+Every style can be transformed to dynamic function to take additional parameters from JSX:
+
+```tsx
+export const ExampleUnistyles = () => {
+    const { styles } = useStyles(stylesheet)
+    return (
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+            {posts.map((post, index) => (
+                <View
+                    key={post.key}
+                    // call it as regular functions
+                    style={styles.post(index)}
+                >
+                    <Text>
+                        {post.title}
+                    </Text>
+                </View>
+            ))}
+        </ScrollView>
+    )
+}
+
+const stylesheet = createStyles({
+    scrollContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    // dynamic function
+    post: (index: number) => ({
+        backgroundColor: index % 2 === 0 ? 'gold' : 'silver',
+    })
+})
+```
+
 ## Example
 
 In order to check out working example go to [example/](./example).
