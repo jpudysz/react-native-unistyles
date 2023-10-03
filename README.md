@@ -237,12 +237,13 @@ Every style can be transformed to dynamic function to take additional parameters
 ```tsx
 export const ExampleUnistyles = () => {
     const { styles } = useStyles(stylesheet)
+
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
             {posts.map((post, index) => (
                 <View
                     key={post.key}
-                    // call it as regular functions
+                    // call it as regular function
                     style={styles.post(index)}
                 >
                     <Text>
