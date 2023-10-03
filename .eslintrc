@@ -1,0 +1,14 @@
+{
+    "root": true,
+    "extends": [
+        "codemask"
+    ],
+    "rules": {
+        "jsdoc/newline-after-description": 0,
+        "@typescript-eslint/no-explicit-any": 0,
+        "@typescript-eslint/no-unused-vars": 0,
+        "@typescript-eslint/ban-types": 0,
+        "no-duplicate-imports": 0,
+        "functional/immutable-data": 0
+    }
+}
