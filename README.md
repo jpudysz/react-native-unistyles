@@ -7,7 +7,7 @@
 </picture>
 
 ## Features
-- ⚡ Blazing fast, adds around ~5ms on top of StyleSheet*
+- ⚡ Blazing fast, adds around ~3ms on top of StyleSheet*
 - 🎳 Share up to 100% of your styles across platforms in monorepo
 - 🎯 Doesn't introduce new components
 - 🖥️ Supports custom breakpoints and css-like media queries
