@@ -4,10 +4,6 @@ import { getValueForBreakpoint } from './breakpoints'
 /**
  * Proxies a function to parse its return value for custom media queries or breakpoints.
  *
- * If the function's string representation contains a custom media query or a defined breakpoint,
- * the returned function will be proxied to parse its return value based on the provided screen size and breakpoints.
- * If neither is found, the original function is returned.
- *
  * @template B - An object type where keys represent breakpoint names and values represent breakpoint values.
  *
  * @param {Function} fn - The function to be proxified.
@@ -15,7 +11,7 @@ import { getValueForBreakpoint } from './breakpoints'
  * @param {ScreenSize} screenSize - An object representing the screen size to be checked against the media queries.
  * @param {B} breakpoints - An object representing the defined breakpoints.
  *
- * @returns {Function} Returns the proxified function or the original function if no custom media query or breakpoint is found in its string representation.
+ * @returns {Function} Returns the proxified function
  *
  * @example
  *
@@ -30,22 +26,10 @@ export const proxifyFunction = <B extends Record<string, number>>(
     fn: Function, breakpoint: keyof B & string,
     screenSize: ScreenSize,
     breakpoints: B
-): Function => {
-    const stringifiedFunction = fn.toString()
-    const hasCustomMediaQuery = stringifiedFunction.includes(':w[') || stringifiedFunction.includes(':h[')
-    const hasBreakpoint = Object
-        .keys(breakpoints)
-        .some(bp => stringifiedFunction.includes(bp))
-
-    if (!hasCustomMediaQuery && !hasBreakpoint) {
-        return fn
-    }
-
-    return new Proxy(fn, {
-        apply: (target, thisArg, argumentsList) =>
-            parseStyle(target.apply(thisArg, argumentsList), breakpoint, screenSize, breakpoints)
-    })
-}
+): Function => new Proxy(fn, {
+    apply: (target, thisArg, argumentsList) =>
+        parseStyle(target.apply(thisArg, argumentsList), breakpoint, screenSize, breakpoints)
+})
 
 /**
  * Parses a style object to resolve custom media queries or breakpoints based on the provided screen size and breakpoints.
