@@ -3790,7 +3790,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*":
+"@types/node@npm:*, @types/node@npm:^20.8.2":
   version: 20.8.2
   resolution: "@types/node@npm:20.8.2"
   checksum: 3da73e25d821bfcdb7de98589027e08bb4848e55408671c4a83ec0341e124b5313a0b20e1e4b4eff1168ea17a86f622ad73fcb04b761abd77496b9a27cbd5de5
@@ -15171,6 +15171,7 @@ __metadata:
   dependencies:
     "@babel/core": 7.23.0
     "@expo/webpack-config": 19.0.0
+    "@types/node": ^20.8.2
     babel-loader: 9.1.3
     babel-plugin-module-resolver: 5.0.0
     expo: 49.0.13
