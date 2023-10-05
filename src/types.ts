@@ -1,33 +1,83 @@
-import type { ImageStyle, TextStyle, TransformsStyle, ViewStyle } from 'react-native'
-import type { CSSProperties } from 'react'
+import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
+import type {
+    MatrixTransform,
+    PerpectiveTransform,
+    RotateTransform,
+    RotateXTransform,
+    RotateYTransform,
+    RotateZTransform,
+    ScaleTransform,
+    ScaleXTransform,
+    ScaleYTransform,
+    SkewXTransform,
+    SkewYTransform,
+    TranslateXTransform,
+    TranslateYTransform
+} from 'react-native/Libraries/StyleSheet/StyleSheetTypes'
 
 export type ScreenSize = {
     width: number,
     height: number
 }
 
-export type CreateStylesFactory<T, Theme> = (theme: Theme) => T
+export type CreateStylesFactory<T, Theme> = ((theme: Theme) => T) | T
 
 type StyleProperty<T, B extends Record<string, number>> = {
-    [key in keyof T]?: {
-        [innerKey in keyof B]?: T[key]
+    [K in keyof T]: {
+        [innerKey in keyof B]?: T[K]
     } | {
-        [innerKey in `:w${string}` | `:h${string}`]?: T[key]
-    } | T[key]
+        [innerKey in string]?: T[K]
+    } | T[K]
 }
+
+type ShadowOffsetProps<B extends Record<string, number>> = {
+    shadowOffset: {
+        width: number | {
+            [innerKey in keyof B]?: number
+        },
+        height: number | {
+            [innerKey in keyof B]?: number
+        }
+    }
+}
+
+type TransformStyles<B extends Record<string, number>> =
+    PerpectiveTransform | StyleProperty<PerpectiveTransform, B>
+    | RotateTransform | StyleProperty<RotateTransform, B>
+    | RotateXTransform | StyleProperty<RotateXTransform, B>
+    | RotateYTransform | StyleProperty<RotateYTransform, B>
+    | RotateZTransform | StyleProperty<RotateZTransform, B>
+    | ScaleTransform | StyleProperty<ScaleTransform, B>
+    | ScaleXTransform | StyleProperty<ScaleXTransform, B>
+    | ScaleYTransform | StyleProperty<ScaleYTransform, B>
+    | TranslateXTransform | StyleProperty<TranslateXTransform, B>
+    | TranslateYTransform | StyleProperty<TranslateYTransform, B>
+    | SkewXTransform | StyleProperty<SkewXTransform, B>
+    | SkewYTransform | StyleProperty<SkewYTransform, B>
+    | MatrixTransform | StyleProperty<MatrixTransform, B>
+
+type TransformProps<B extends Record<string, number>> = {
+    transform: Array<TransformStyles<B>>
+}
+
+type UnistyleView = Omit<Omit<ViewStyle, 'shadowOffset'>, 'transform'>
+type UnistyleText = Omit<Omit<TextStyle, 'shadowOffset'>, 'transform'>
+type UnistyleImage = Omit<Omit<ImageStyle, 'shadowOffset'>, 'transform'>
 
 export type CustomNamedStyles<T, B extends Record<string, number>> = {
     [P in keyof T]:
-    | ViewStyle
-    | TextStyle
-    | ImageStyle
-    | TransformsStyle
-    | CSSProperties
-    | StyleProperty<ViewStyle, B>
-    | StyleProperty<ImageStyle, B>
-    | StyleProperty<TextStyle, B>
+    | (UnistyleView| StyleProperty<UnistyleView, B>)
+    | (UnistyleText | StyleProperty<UnistyleText, B>)
+    | (UnistyleImage | StyleProperty<UnistyleImage, B>)
+    | ShadowOffsetProps<B>
+    | TransformProps<B>
     | (
-        (...args: Array<never>) => ViewStyle | TextStyle | ImageStyle | TransformsStyle | CSSProperties | StyleProperty<ViewStyle, B> | StyleProperty<ImageStyle, B> | StyleProperty<TextStyle, B>
+        (...args: Array<never>) =>
+        | (UnistyleView| StyleProperty<UnistyleView, B>)
+        | (UnistyleText | StyleProperty<UnistyleText, B>)
+        | (UnistyleImage | StyleProperty<UnistyleImage, B>)
+        | ShadowOffsetProps<B>
+        | TransformProps<B>
     )
 }
 
