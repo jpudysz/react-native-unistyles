@@ -61,19 +61,40 @@ export const parseStyle = <T, B extends Record<string, number>>(
     breakpoint: keyof B & string,
     screenSize: ScreenSize,
     breakpoints: B
-) => Object
-    .fromEntries(Object
-        .entries(style)
-        .map(([key, value]) => {
-            const isDynamicFunction = typeof value === 'function'
-            const isValidStyle = typeof value !== 'object' || key === 'transform'
+): T => {
+    const entries = Object.entries(style) as [[keyof T, CustomNamedStyles<T, B>]]
 
-            if (isDynamicFunction || isValidStyle) {
-                return [key, value]
-            }
+    return Object
+        .fromEntries(entries
+            .map(([key, value]) => {
+                const isNestedStyle = key === 'shadowOffset'
 
-            const valueWithBreakpoint = value as Record<keyof B & string, string | number>
+                if (isNestedStyle) {
+                    return [
+                        key,
+                        parseStyle(value, breakpoint, screenSize, breakpoints)
+                    ]
+                }
 
-            return [key, getValueForBreakpoint<B>(valueWithBreakpoint, breakpoint, screenSize, breakpoints)]
-        })
-    )
+                const isTransform = key === 'transform'
+
+                if (isTransform && Array.isArray(value)) {
+                    return [
+                        key,
+                        value.map(value => parseStyle(value, breakpoint, screenSize, breakpoints))
+                    ]
+                }
+
+                const isDynamicFunction = typeof value === 'function'
+                const isValidStyle = typeof value !== 'object'
+
+                if (isDynamicFunction || isValidStyle) {
+                    return [key, value]
+                }
+
+                const valueWithBreakpoint = value as Record<keyof B & string, string | number>
+
+                return [key, getValueForBreakpoint<B>(valueWithBreakpoint, breakpoint, screenSize, breakpoints)]
+            })
+        )
+}
