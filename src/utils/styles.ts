@@ -23,13 +23,21 @@ import { getValueForBreakpoint } from './breakpoints'
  * proxifiedFunction() // parsed style based on screenSize and breakpoints
  */
 export const proxifyFunction = <B extends Record<string, number>>(
-    fn: Function, breakpoint: keyof B & string,
+    fn: Function,
+    breakpoint: keyof B & string,
     screenSize: ScreenSize,
     breakpoints: B
-): Function => new Proxy(fn, {
-    apply: (target, thisArg, argumentsList) =>
-        parseStyle(target.apply(thisArg, argumentsList), breakpoint, screenSize, breakpoints)
-})
+): Function =>
+    new Proxy(fn, {
+        apply: (target, thisArg, argumentsList) =>
+            parseStyle(target.apply(thisArg, argumentsList), breakpoint, screenSize, breakpoints)
+    })
+
+const OBJECT_STYLE_KEYS = {
+    transform: true,
+    transformOrigin: true,
+    shadowOffset: true
+} as Record<string, boolean>
 
 /**
  * Parses a style object to resolve custom media queries or breakpoints based on the provided screen size and breakpoints.
@@ -61,12 +69,11 @@ export const parseStyle = <T, B extends Record<string, number>>(
     breakpoint: keyof B & string,
     screenSize: ScreenSize,
     breakpoints: B
-) => Object
-    .fromEntries(Object
-        .entries(style)
-        .map(([key, value]) => {
+) =>
+    Object.fromEntries(
+        Object.entries(style).map(([key, value]) => {
             const isDynamicFunction = typeof value === 'function'
-            const isValidStyle = typeof value !== 'object' || key === 'transform'
+            const isValidStyle = typeof value !== 'object' || OBJECT_STYLE_KEYS[key]
 
             if (isDynamicFunction || isValidStyle) {
                 return [key, value]
