@@ -110,5 +110,79 @@ describe('styles', () => {
                 fontWeight: 'bold'
             })
         })
+
+        it('should correctly parse transform styles', () => {
+            const screenSize: ScreenSize = {
+                width: 400,
+                height: 800
+            }
+            const breakpoint = 'sm'
+            const breakpoints = {
+                xs: 0,
+                sm: 400,
+                md: 800
+            }
+            const style = {
+                transform: [
+                    {
+                        translateX: {
+                            sm: 120,
+                            md: 200
+                        },
+                        translateY: 200
+                    }
+                ]
+            }
+
+            expect(parseStyle(style as CustomNamedStyles<typeof style, typeof breakpoints>, breakpoint, screenSize, breakpoints)).toEqual({
+                transform: [
+                    {
+                        translateX: 120,
+                        translateY: 200
+                    }
+                ]
+            })
+        })
+
+        it('should correctly parse shadowOffset styles', () => {
+            const screenSize: ScreenSize = {
+                width: 400,
+                height: 800
+            }
+            const breakpoint = 'sm'
+            const breakpoints = {
+                xs: 0,
+                sm: 400,
+                md: 800
+            }
+            const style = {
+                shadowOffset: {
+                    width: 0,
+                    height: 4
+                }
+            }
+            const styleWithBreakpoints = {
+                shadowOffset: {
+                    width: 0,
+                    height: {
+                        sm: 10,
+                        md: 20
+                    }
+                }
+            }
+
+            expect(parseStyle(style as CustomNamedStyles<typeof style, typeof breakpoints>, breakpoint, screenSize, breakpoints)).toEqual({
+                shadowOffset: {
+                    width: 0,
+                    height: 4
+                }
+            })
+            expect(parseStyle(styleWithBreakpoints as CustomNamedStyles<typeof style, typeof breakpoints>, breakpoint, screenSize, breakpoints)).toEqual({
+                shadowOffset: {
+                    width: 0,
+                    height: 10
+                }
+            })
+        })
     })
 })
