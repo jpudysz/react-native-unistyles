@@ -1,8 +1,8 @@
 import { useContext } from 'react'
-import { useWindowDimensions } from 'react-native'
 import type { CreateStylesFactory, CustomNamedStyles, ScreenSize, ExtractBreakpoints, RemoveKeysWithPrefix } from './types'
 import { UnistylesContext } from './UnistylesTheme'
 import { getBreakpointFromScreenWidth, proxifyFunction, parseStyle, sortAndValidateBreakpoints } from './utils'
+import { useDimensions } from './hooks'
 
 export const createUnistyles = <B extends Record<string, number>, T = {}>(breakpoints: B) => {
     const sortedBreakpoints = sortAndValidateBreakpoints(breakpoints) as B
@@ -11,7 +11,7 @@ export const createUnistyles = <B extends Record<string, number>, T = {}>(breakp
         createStyles: <S extends CustomNamedStyles<S, B>>(styles: S | CreateStylesFactory<S, T>) => styles as S,
         useStyles: <ST extends CustomNamedStyles<ST, B>>(stylesheet?: ST | CreateStylesFactory<ST, T>) => {
             const theme = useContext(UnistylesContext) as T
-            const dimensions = useWindowDimensions()
+            const dimensions = useDimensions()
             const breakpoint = getBreakpointFromScreenWidth<B>(dimensions.width, sortedBreakpoints)
             const screenSize: ScreenSize = {
                 width: dimensions.width,
