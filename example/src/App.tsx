@@ -1,10 +1,27 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { UnistylesTheme } from 'react-native-unistyles'
 import * as Examples from './examples'
-import { theme } from './styles'
+import { darkTheme, lightTheme } from './styles'
 
-export const App: React.FunctionComponent = () => (
-    <UnistylesTheme theme={theme}>
-        <Examples.Extreme />
-    </UnistylesTheme>
-)
+enum Theme {
+    Light = 'light',
+    Dark = 'dark'
+}
+
+export const App: React.FunctionComponent = () => {
+    const [theme, setTheme] = useState<Theme>(Theme.Light)
+    const appTheme = theme === Theme.Light
+        ? lightTheme
+        : darkTheme
+
+    return (
+        <UnistylesTheme theme={appTheme}>
+            <Examples.Extreme
+                onToggleTheme={() => setTheme(prevState => prevState === Theme.Light
+                    ? Theme.Dark
+                    : Theme.Light
+                )}
+            />
+        </UnistylesTheme>
+    )
+}
