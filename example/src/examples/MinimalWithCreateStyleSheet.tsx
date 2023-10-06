@@ -1,21 +1,21 @@
 import React from 'react'
 import { Text, View } from 'react-native'
-import { createStyles, useStyles } from '../styles'
+import { createStyleSheet, useStyles } from '../styles'
 
-// createStyles with StyleSheet.create compatible Object
-export const MinimalWithCreateStyles: React.FunctionComponent = () => {
+// createStyleSheet with StyleSheet.create compatible Object
+export const MinimalWithCreateStyleSheet: React.FunctionComponent = () => {
     const { styles } = useStyles(stylesheet)
 
     return (
         <View style={styles.container}>
             <Text style={styles.text}>
-                I'm just a minimal example with createStyles
+                I'm just a minimal example with createStyleSheet
             </Text>
         </View>
     )
 }
 
-const stylesheet = createStyles({
+const stylesheet = createStyleSheet({
     container: {
         flex: 1,
         justifyContent: 'center',
