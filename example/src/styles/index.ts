@@ -1,9 +1,15 @@
 import { createUnistyles } from 'react-native-unistyles'
 import { breakpoints } from './breakpoints'
-import { theme } from './theme'
+import type { AppTheme } from './theme'
+import { lightTheme, darkTheme } from './theme'
 
-export const { useStyles, createStyleSheet } = createUnistyles<typeof breakpoints, typeof theme>(breakpoints)
+export const { useStyles, createStyleSheet } = createUnistyles<typeof breakpoints, AppTheme>(breakpoints)
 
 export {
-    theme
+    lightTheme,
+    darkTheme
+}
+
+export type {
+    AppTheme
 }

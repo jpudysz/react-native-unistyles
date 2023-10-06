@@ -28,7 +28,6 @@ Suggestions, ideas, and potential improvements are always welcome!
 
 ## Setup
 
-
 **1. Install library**
 
 ```cmd
@@ -38,6 +37,26 @@ yarn add react-native-unistyles
 **2. Define your theme**
 
 You don't have to follow a specific format. Just make an object and add any keys/values you like.
+
+```ts
+// theme.ts
+export const theme = {
+  colors: {
+    blood: '#eb4d4b',
+    barbie: '#e056fd',
+    pumpkin: '#f0932b',
+    background: '#ffffff'
+  },
+  margins: {
+    sm: 2,
+    md: 4,
+    lg: 8,
+    xl: 12
+  }
+}
+```
+
+or something more advanced with nested objects / functions:
 
 ```ts
 // theme.ts
@@ -126,9 +145,9 @@ export const {
 
 ## Basic Usage
 
-Library gives you two functions from the factory:
+After the initial setup, you only need to focus on two functions responsible for your styles:
 - `createStyleSheet` which replaces `StyleSheet.create`
-- `useStyles` which parses your styles based on screen height, width and theme
+- `useStyles` which parses your styles and ensures TypeScript compatibility with media queries and breakpoints
 
 ```tsx
 import React from 'react'
@@ -161,16 +180,74 @@ const stylesheet = createStyleSheet(theme => ({
 }))
 ```
 
-`createStyleSheet` takes an object like `StyleSheet.create` or function that injects your theme
+## createStyleSheet
 
-`useStyles` hook takes a `stylesheet` and returns an object with two keys:
-- `styles` - parsed styles that can be used directly in React Native components
-- `theme` - your app's theme that can be used in JSX
+`createStyleSheet` is interchangeable with `StyleSheet.create`. You can use objects, and it will function identically to its React Native counterpart.
 
-You can also skip `stylesheet` if you just want to access `theme`:
+```ts
+const stylesheet = createStyleSheet({
+    container: {
+       flex: 1,
+       justifyContent: 'center',
+       alignItems: 'center',
+    },
+})
+```
+The difference is that you can now use breakpoints and media queries:
+
+```ts
+const stylesheet = createStyleSheet({
+    container: {
+       flex: 1,
+       justifyContent: 'center',
+       alignItems: 'center',
+       flexDirection: {
+           xs: 'row',
+           sm: 'column',
+           ':w[800]': 'row'
+       }
+    },
+})
+```
+
+`createStyleSheet` also accepts a function, to which the library will inject your theme:
+
+```ts
+const stylesheet = createStyleSheet(theme => ({
+    container: {
+       flex: 1,
+       justifyContent: 'center',
+       alignItems: 'center',
+       flexDirection: {
+           xs: 'row',
+           sm: 'column',
+           ':w[800]': 'row'
+       },
+       backgroundColor: theme.colors.background
+    },
+}))
+```
+
+Importantly, you'll receive the same TypeScript hints as with `StyleSheet.create`!
+
+## useStyles
+
+`useStyle` ties everything together and handles the heavy lifting. Without `useStyles`, you can't utilize features like:
+- breakpoints
+- media queries
+- themes
+
+_useStyles_ allows you to skip the `stylesheet` if you only want to access the `theme`:
 
 ```tsx
 const { theme } = useStyles()
+```
+
+For more advanced usage, pass your `stylesheet` generated with `createStyleSheet`:
+
+```tsx
+// you can still access theme
+const { styles, theme } = useStyles(stylesheet)
 ```
 
 ## Breakpoints
@@ -191,6 +268,33 @@ const stylesheet = createStyleSheet(theme => ({
     },
     text: {
        color: theme.colors.typography
+    }
+}))
+```
+
+You can even use it with nested objects like `transform` or `shadowOffset`:
+
+```ts
+const stylesheet = createStyleSheet(theme => ({
+    container: {
+       flex: 1,
+       justifyContent: 'center',
+       alignItems: 'center',
+       backgroundColor: {
+         xs: theme.colors.background,
+         sm: theme.colors.barbie
+       },
+       transform: [
+           {
+               translateX: 100
+           },
+           {
+               scale: {
+                   xs: 1.5,
+                   ':w[500]': 1
+               }
+           }
+       ]
     }
 }))
 ```
@@ -220,7 +324,8 @@ const stylesheet = createStyleSheet(theme => ({
           sm: 'row',
        },
        backgroundColor: {
-          xs: theme.colors.background,
+          md: theme.colors.background,
+          // even though md might overlap with >600px, lib will use 'barbie'
           ':w[600]': theme.colors.barbie
        }
     },
@@ -267,6 +372,211 @@ const stylesheet = createStyleSheet({
     })
 })
 ```
+If you use a dynamic function, library will wrap it in a `Proxy` to make sure the correct values of breakpoints will be used:
+
+```ts
+const stylesheet = createStyleSheet(theme => ({
+    scrollContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    post: (index: number) => ({
+        // breakpoints and media queries works with dynamic function
+        backgroundColor: {
+            xs: index % 2 === 0
+                ? theme.colors.gold
+                : theme.colors.silver,
+            sm: theme.colors.red
+        }
+    })
+}))
+```
+
+## Dynamic themes
+
+You can incorporate as many themes as you desire in your application. While there's flexibility in how you structure your theme, it's essential to maintain consistency with the TypeScript type:
+
+To promote reusability and maintainability, it's a good practice to share as many values between themes as possible:
+
+```ts
+// move shared colors to object
+const sharedColors = {
+    barbie: '#ff9ff3',
+    oak: '#1dd1a1',
+    sky: '#48dbfb',
+    fog: '#c8d6e5',
+    aloes: '#00d2d3'
+}
+
+export const lightTheme = {
+    colors: {
+        // reuse or override them
+        ...sharedColors,
+        backgroundColor: '#ffffff',
+        typography: '#000000'
+    }
+    // other keys in common with lightTheme
+}
+
+export const darkTheme = {
+    colors: {
+        // reuse or override them
+        ...sharedColors,
+        backgroundColor: '#000000',
+        typography: '#ffffff'
+    }
+    // other keys in common with lightTheme
+}
+
+// export type that will be used to describe your theme
+export type AppTheme = typeof lightTheme | typeof darkTheme
+```
+
+With the themes set up, modify your  `createUnistyles` to consume your `AppTheme` type:
+
+```ts
+export const { useStyles, createStyleSheet } = createUnistyles<typeof breakpoints, AppTheme>(breakpoints)
+```
+
+The final step is to switch your theme based on certain states, persisted values, databases, etc.:
+
+```tsx
+export const App: React.FunctionComponent = () => {
+    // obtain here your dark or light theme. It can be storage, state, mmkv, or whateber you use
+    // const [yourAppTheme] = useState(lightTheme)
+    // const [yourAppTheme] = useYourStorage()
+    // const [yourAppTheme] = useMMKVObject<AppTheme>(Theme)
+
+    // switching theme will re-render your stylesheets automatically
+    return (
+        <UnistylesTheme theme={yourAppTheme}>
+            <Examples.Extreme />
+        </UnistylesTheme>
+    )
+}
+```
+
+## Variants
+
+`react-native-unistyles` isn't a UI/component library, so you're in charge of designing variants. With no restrictions and using your creativity, you can easily create variants for your components.
+
+Let's examine variants for the `Text` component. Imagine you want to create several variants for your `Typography` components:
+- Heading
+- Regular
+- Thin
+
+To achieve this, add variants to your theme:
+
+```ts
+export const lightTheme = {
+    colors: {
+        ...sharedColors,
+        backgroundColor: '#ffffff',
+        typography: '#000000'
+    },
+    components: {
+        typography: {
+            base: {
+                fontFamily: 'Roboto',
+                fontSize: 12,
+            },
+            heading: {
+                fontFamily: 'Roboto-Medium',
+                fontSize: 24,
+            },
+            regular: {
+                fontFamily: 'Roboto',
+                fontSize: 12,
+            },
+            thin: {
+                fontFamily: 'Roboto-Thin',
+                fontSize: 12,
+            },
+            bold: {
+                fontWeight: 'bold'
+            }
+        }
+    }
+}
+```
+Next, create a base component:
+
+```tsx
+import React from 'react'
+import type { PropsWithChildren } from 'react'
+import { Text, TextStyle } from 'react-native'
+import { createStyleSheet, useStyles } from 'lib/styles'
+
+interface BaseTextProps extends PropsWithChildren {
+    bold: boolean,
+    style: TextStyle
+}
+
+export const BaseText: React.FunctionComponent<BaseTextProps> = ({
+    children,
+    bold = false,
+    style = {}
+}) => {
+    const {styles} = useStyles(stylesheet)
+
+    return (
+        <Text
+            style={{
+                ...styles.baseText,
+                ...bold
+                    ? styles.baseText
+                    : {},
+                // pass other styles via props
+                ...style
+            }}
+        >
+            {children}
+        </Text>
+    )
+}
+
+const stylesheet = createStyleSheet(theme => ({
+    baseText: {
+        ...theme.components.typography.base
+    },
+    bold: {
+        ...theme.components.typography.bold
+    }
+}))
+```
+
+Now, let's create another variant, e.g., Heading:
+
+```tsx
+import React from 'react'
+import type { PropsWithChildren } from 'react'
+import { Text, TextStyle } from 'react-native'
+import { createStyleSheet, useStyles } from 'lib/styles'
+import { BaseText } from 'lib/components'
+
+interface BaseTextProps extends PropsWithChildren {
+    bold: boolean,
+    text: string
+}
+
+export const Heading: React.FunctionComponent<BaseTextProps> = ({
+    text,
+    bold = false
+}) => {
+    const { theme } = useStyles()
+
+    return (
+        <BaseText
+            bold={bold}
+            style={theme.components.typography.heading}
+        >
+            {text}
+        </BaseText>
+    )
+}
+```
+And so on...
 
 ## Migrate from StyleSheet
 
@@ -294,21 +604,7 @@ export const ExampleUnistyles = () => {
 }
 ```
 
-With the hook in place, you can now use `breakpoints` and `media-queries`.
-
-Additionally, to access the `theme` use a function instead of an  `object`:
-
-```diff
--const stylesheet = createStyleSheet({
-+const stylesheet = createStyleSheet(theme => ({
-    scrollContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: theme.colors.background
-    }
-}))
-```
+With the hook in place, you can now use all the features.
 
 ## Example
 
@@ -317,6 +613,17 @@ In order to check out working example go to [example/](./example).
 ## Blog post
 
 For more detailed explanation please refer to my blog post [here](https://www.reactnativecrossroads.com/posts/level-up-react-native-styles).
+
+
+## Sponsor my work
+
+If you found the `react-native-unistyles` time-saving and valuable, please consider sponsoring my work. Your support enables me to continue creating libraries with a fresh approach.
+
+Github: https://github.com/sponsors/jpudysz
+
+Ko-fi: https://ko-fi.com/jpudysz
+
+Your support is greatly appreciated and helps me dedicate more time and resources to creating quality libraries. Thank you for all the support!
 
 ## License
 
