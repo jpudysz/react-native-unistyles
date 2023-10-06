@@ -1,5 +1,5 @@
 import { throwError } from './common'
-import type { ScreenSize } from '../types'
+import type { Breakpoints, ScreenSize, SortedBreakpointEntries } from '../types'
 import { getKeyForCustomMediaQuery, isMediaQuery } from './mediaQueries'
 
 /**
@@ -21,7 +21,7 @@ import { getKeyForCustomMediaQuery, isMediaQuery } from './mediaQueries'
  * const input = { md: 768, lg: 1024, sm: 0 }
  * sortAndValidateBreakpoints(input) // returns { sm: 0, md: 768, lg: 1024 }
  */
-export const sortAndValidateBreakpoints = <B extends Record<string, number>>(breakpoints: B): B => {
+export const sortAndValidateBreakpoints = <B extends Breakpoints>(breakpoints: B): B => {
     const sortedPairs = Object
         .entries(breakpoints)
         .sort((breakpoint1, breakpoint2) => {
@@ -54,16 +54,15 @@ export const sortAndValidateBreakpoints = <B extends Record<string, number>>(bre
  *
  * @template B - An object type where keys are strings and values are numbers representing screen widths.
  * @param {number} width - The screen width to determine the breakpoint for.
- * @param {B} breakpoints - The breakpoints object to use for determination.
+ * @param breakpointEntries - sorted pairs of breakpoints
  * @returns {keyof B & string} The key of the breakpoint that the screen width falls into.
  *
  * @example
  * const breakpoints = { sm: 0, md: 768, lg: 1024 }
  * getBreakpointFromScreenWidth(800, breakpoints) // returns 'md'
  */
-export const getBreakpointFromScreenWidth = <B extends Record<string, number>>(width: number, breakpoints: B): keyof B & string => {
-    const [key] = Object
-        .entries(breakpoints)
+export const getBreakpointFromScreenWidth = <B extends Breakpoints>(width: number, breakpointEntries: SortedBreakpointEntries<B>): keyof B & string => {
+    const [key] = breakpointEntries
         .find(([, value], index, otherBreakpoints) => {
             const minVal = value
             const maxVal = otherBreakpoints[index + 1]?.[1]
@@ -90,7 +89,7 @@ export const getBreakpointFromScreenWidth = <B extends Record<string, number>>(w
  * @param {Record<keyof B & string, string | number>} value - An object containing values associated with breakpoints or custom media queries.
  * @param {keyof B & string} breakpoint - The breakpoint name to check against.
  * @param {ScreenSize} screenSize - An object representing the screen size to be checked against the media queries.
- * @param {B} breakpoints - An object representing the defined breakpoints.
+ * @param breakpointPairs - sorted pairs of breakpoints
  *
  * @returns {string | number | undefined} Returns the value associated with the matching breakpoint or custom media query, or `undefined` if no match is found.
  *
@@ -102,7 +101,12 @@ export const getBreakpointFromScreenWidth = <B extends Record<string, number>>(w
  *
  * getValueForBreakpoint(values, 'sm', screenSize, breakpoints); // 'value1'
  */
-export const getValueForBreakpoint = <B extends Record<string, number>>(value: Record<keyof B & string, string | number | undefined>, breakpoint: keyof B & string, screenSize: ScreenSize, breakpoints: B) => {
+export const getValueForBreakpoint = <B extends Breakpoints>(
+    value: Record<keyof B & string, string | number | undefined>,
+    breakpoint: keyof B & string,
+    screenSize: ScreenSize,
+    breakpointPairs: SortedBreakpointEntries<B>
+): string | number | undefined => {
     // the highest priority is for custom media queries
     const customMediaQueries = Object
         .entries(value)
@@ -123,18 +127,14 @@ export const getValueForBreakpoint = <B extends Record<string, number>>(value: R
     }
 
     // there is no direct hit for breakpoint nor media-query, so let's simulate CSS cascading
-    const allBreakpoints = Object
-        .entries(breakpoints)
-        .map(([key, bpValue]) => [key.toLowerCase(), bpValue])
-
-    const currentBreakpoint = allBreakpoints
+    const currentBreakpoint = breakpointPairs
         .findIndex(([key]) => key === unifiedKey)
 
-    const availableBreakpoints = allBreakpoints
+    const availableBreakpoints = breakpointPairs
         .filter(([key], index) => index < currentBreakpoint && key && key in value)
         .map(([key]) => key)
 
-    return allBreakpoints.length > 0
+    return breakpointPairs.length > 0
         ? value[availableBreakpoints[availableBreakpoints.length - 1] as keyof B & string]
         : undefined
 }
