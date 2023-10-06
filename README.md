@@ -416,7 +416,7 @@ export const lightTheme = {
         backgroundColor: '#ffffff',
         typography: '#000000'
     }
-    // other keys in common with lightTheme
+    // other keys in common with darkTheme
 }
 
 export const darkTheme = {
