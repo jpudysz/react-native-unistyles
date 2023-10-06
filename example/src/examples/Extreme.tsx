@@ -1,9 +1,13 @@
 import React from 'react'
-import { Text, View } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 import { createStyleSheet, useStyles } from '../styles'
 
+type ExtremeProps = {
+    onToggleTheme: VoidFunction
+}
+
 // Edge cases
-export const Extreme: React.FunctionComponent = () => {
+export const Extreme: React.FunctionComponent<ExtremeProps> = ({ onToggleTheme }) => {
     const { styles } = useStyles(stylesheet)
 
     return (
@@ -11,6 +15,11 @@ export const Extreme: React.FunctionComponent = () => {
             <Text style={styles.text}>
                 Edge cases
             </Text>
+            <Pressable onPress={onToggleTheme}>
+                <Text style={styles.text}>
+                    Change theme
+                </Text>
+            </Pressable>
         </View>
     )
 }
@@ -21,16 +30,26 @@ const stylesheet = createStyleSheet(theme => ({
         flex,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: {
-            xs: theme.colors.oak,
-            md: theme.colors.sky
+        backgroundColor: theme.colors.backgroundColor,
+        transform: [
+            {
+                scale: {
+                    xs: 2,
+                    md: 1
+                }
+            }
+        ],
+        shadowOffset: {
+            width: 1,
+            height: {
+                xs: 1,
+                md: 5
+            }
         }
     }),
     text: {
         height: 100,
-        shadowOpacity: {
-            xs: 20
-        },
+        color: theme.colors.typography,
         transform: [
             {
                 scale: 2
