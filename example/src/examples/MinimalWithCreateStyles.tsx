@@ -26,6 +26,10 @@ const stylesheet = createStyles({
     text: {
         borderWidth: 1,
         borderColor: 'purple',
-        padding: 20
+        padding: 20,
+        flex: {
+            xs: 2,
+            md: 1
+        }
     }
 })

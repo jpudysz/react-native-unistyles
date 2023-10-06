@@ -20,7 +20,7 @@ export type ScreenSize = {
     height: number
 }
 
-export type CreateStylesFactory<T, Theme> = (theme: Theme) => T
+export type CreateStylesFactory<ST, Theme> = (theme: Theme) => ST
 
 type StyleProperty<T, B extends Record<string, number>> = {
     [K in keyof T]: {
