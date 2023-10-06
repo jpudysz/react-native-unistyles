@@ -38,7 +38,8 @@ const stylesheet = createStyles(theme => ({
             },
             {
                 translateX: {
-                    sm: 10
+                    sm: 10,
+                    md: 20
                 }
             }
         ]

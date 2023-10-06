@@ -8,7 +8,13 @@ export const createUnistyles = <B extends Record<string, number>, T = {}>(breakp
     const sortedBreakpoints = sortAndValidateBreakpoints(breakpoints)
 
     return {
-        createStyles: <S extends CustomNamedStyles<S, B>>(styles: S | CustomNamedStyles<S, B> | CreateStylesFactory<S, T>) => styles as S,
+        createStyles: <S extends CustomNamedStyles<S, B>, X>(styles: S | CustomNamedStyles<S, B> | X | ((theme: T) => X | CustomNamedStyles<X, B>)): S | X => {
+            if (typeof styles === 'function') {
+                return styles as X
+            }
+
+            return styles as S
+        },
         useStyles: <ST extends CustomNamedStyles<ST, B>>(stylesheet?: ST | CreateStylesFactory<ST, T>) => {
             const theme = useContext(UnistylesContext) as T
             const dimensions = useDimensions()
