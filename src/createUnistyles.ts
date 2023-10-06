@@ -1,11 +1,20 @@
 import { useContext } from 'react'
-import type { CreateStylesFactory, CustomNamedStyles, ScreenSize, ExtractBreakpoints, RemoveKeysWithPrefix } from './types'
+import type {
+    Breakpoints,
+    CreateStylesFactory,
+    CustomNamedStyles,
+    ExtractBreakpoints,
+    RemoveKeysWithPrefix,
+    SortedBreakpointEntries
+} from './types'
 import { UnistylesContext } from './UnistylesTheme'
-import { getBreakpointFromScreenWidth, proxifyFunction, parseStyle, sortAndValidateBreakpoints } from './utils'
 import { useDimensions } from './hooks'
+import { getBreakpointFromScreenWidth, proxifyFunction, parseStyle, sortAndValidateBreakpoints } from './utils'
 
-export const createUnistyles = <B extends Record<string, number>, T = {}>(breakpoints: B) => {
+export const createUnistyles = <B extends Breakpoints, T = {}>(breakpoints: B) => {
     const sortedBreakpoints = sortAndValidateBreakpoints(breakpoints)
+    const sortedBreakpointEntries = Object
+        .entries(sortedBreakpoints) as SortedBreakpointEntries<B>
 
     return {
         /**
@@ -27,12 +36,7 @@ export const createUnistyles = <B extends Record<string, number>, T = {}>(breakp
         },
         useStyles: <ST extends CustomNamedStyles<ST, B>>(stylesheet?: ST | CreateStylesFactory<ST, T>) => {
             const theme = useContext(UnistylesContext) as T
-            const dimensions = useDimensions()
-            const breakpoint = getBreakpointFromScreenWidth<B>(dimensions.width, sortedBreakpoints)
-            const screenSize: ScreenSize = {
-                width: dimensions.width,
-                height: dimensions.height
-            }
+            const screenSize = useDimensions()
 
             if (!stylesheet) {
                 return {
@@ -44,22 +48,23 @@ export const createUnistyles = <B extends Record<string, number>, T = {}>(breakp
             const parsedStyles = typeof stylesheet === 'function'
                 ? stylesheet(theme)
                 : stylesheet
+            const breakpoint = getBreakpointFromScreenWidth<B>(screenSize.width, sortedBreakpointEntries)
 
             const dynamicStyleSheet = Object
                 .entries(parsedStyles)
                 .reduce((acc, [key, value]) => {
-                    const x = value as CustomNamedStyles<ST, B>
+                    const style = value as CustomNamedStyles<ST, B>
 
                     if (typeof value === 'function') {
                         return {
                             ...acc,
-                            [key]: proxifyFunction<B>(value, breakpoint, screenSize, sortedBreakpoints)
+                            [key]: proxifyFunction<B>(value, breakpoint, screenSize, sortedBreakpointEntries)
                         }
                     }
 
                     return {
                         ...acc,
-                        [key]: parseStyle<ST, B>(x, breakpoint, screenSize, sortedBreakpoints)
+                        [key]: parseStyle<ST, B>(style, breakpoint, screenSize, sortedBreakpointEntries)
                     }
                 }, {} as ST)
 
