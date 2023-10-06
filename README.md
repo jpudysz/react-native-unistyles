@@ -106,7 +106,7 @@ export const App: React.FunctionComponent = () => (
 )
 ```
 
-**5. Access createStyles and useStyles with a factory**
+**5. Access createStyleSheet and useStyles with a factory**
 
 ```ts
 // styles.ts
@@ -119,7 +119,7 @@ import { breakpoints } from './breakpoints'
 import { theme } from './theme'
 
 export const {
-    createStyles,
+    createStyleSheet,
     useStyles,
 } = createUnistyles<typeof breakpoints, typeof theme>(breakpoints)
 ```
@@ -127,14 +127,14 @@ export const {
 ## Basic Usage
 
 Library gives you two functions from the factory:
-- `createStyles` which replaces `StyleSheet.create`
+- `createStyleSheet` which replaces `StyleSheet.create`
 - `useStyles` which parses your styles based on screen height, width and theme
 
 ```tsx
 import React from 'react'
 import { View, Text } from 'react-native'
-// access createStyles and useStyles exported from factory
-import { createStyles, useStyles } from 'lib/styles'
+// access createStyleSheet and useStyles exported from factory
+import { createStyleSheet, useStyles } from 'lib/styles'
 
 export const ExampleUnistyles = () => {
     const { styles } = useStyles(stylesheet)
@@ -148,7 +148,7 @@ export const ExampleUnistyles = () => {
     )
 }
 
-const stylesheet = createStyles(theme => ({
+const stylesheet = createStyleSheet(theme => ({
     container: {
        flex: 1,
        justifyContent: 'center',
@@ -161,7 +161,7 @@ const stylesheet = createStyles(theme => ({
 }))
 ```
 
-`createStyles` takes an object like `StyleSheet.create` or function that injects your theme
+`createStyleSheet` takes an object like `StyleSheet.create` or function that injects your theme
 
 `useStyles` hook takes a `stylesheet` and returns an object with two keys:
 - `styles` - parsed styles that can be used directly in React Native components
@@ -178,7 +178,7 @@ const { theme } = useStyles()
 Any style can change based on breakpoints. To do this, change a value to an object:
 
 ```ts
-const stylesheet = createStyles(theme => ({
+const stylesheet = createStyleSheet(theme => ({
     container: {
        flex: 1,
        justifyContent: 'center',
@@ -211,7 +211,7 @@ For more advanced usage and pixel perfect designs you can also use a custom medi
 Media queries can be mixed with breakpoints, but have a bigger priority:
 
 ```tsx
-const stylesheet = createStyles(theme => ({
+const stylesheet = createStyleSheet(theme => ({
     container: {
        justifyContent: 'center',
        alignItems: 'center',
@@ -255,7 +255,7 @@ export const ExampleUnistyles = () => {
     )
 }
 
-const stylesheet = createStyles({
+const stylesheet = createStyleSheet({
     scrollContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -272,11 +272,11 @@ const stylesheet = createStyles({
 
 `react-native-unistyles` embraces the simplicity of `StyleSheet`, making it easy to integrate into your project.
 
-You can replace `StyleSheet.create` with `createStyles` and it will work exactly the same:
+You can replace `StyleSheet.create` with `createStyleSheet` and it will work exactly the same:
 
 ```diff
 -const styles = StyleSheet.create({
-+const styles = createStyles({
++const styles = createStyleSheet({
     scrollContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -299,8 +299,8 @@ With the hook in place, you can now use `breakpoints` and `media-queries`.
 Additionally, to access the `theme` use a function instead of an  `object`:
 
 ```diff
--const stylesheet = createStyles({
-+const stylesheet = createStyles(theme => ({
+-const stylesheet = createStyleSheet({
++const stylesheet = createStyleSheet(theme => ({
     scrollContainer: {
         flex: 1,
         justifyContent: 'center',

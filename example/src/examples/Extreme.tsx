@@ -1,6 +1,6 @@
 import React from 'react'
 import { Text, View } from 'react-native'
-import { createStyles, useStyles } from '../styles'
+import { createStyleSheet, useStyles } from '../styles'
 
 // Edge cases
 export const Extreme: React.FunctionComponent = () => {
@@ -15,7 +15,7 @@ export const Extreme: React.FunctionComponent = () => {
     )
 }
 
-const stylesheet = createStyles(theme => ({
+const stylesheet = createStyleSheet(theme => ({
     // dynamic function with hints
     dynamicContainer: (flex: number) => ({
         flex,

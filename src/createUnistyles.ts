@@ -8,7 +8,17 @@ export const createUnistyles = <B extends Record<string, number>, T = {}>(breakp
     const sortedBreakpoints = sortAndValidateBreakpoints(breakpoints)
 
     return {
+        /**
+         * @deprecated The method should not be used, proposed version by the community is createStyleSheet, will be removed in RC
+         */
         createStyles: <S extends CustomNamedStyles<S, B>, X>(styles: S | CustomNamedStyles<S, B> | X | ((theme: T) => X | CustomNamedStyles<X, B>)): S | X => {
+            if (typeof styles === 'function') {
+                return styles as X
+            }
+
+            return styles as S
+        },
+        createStyleSheet: <S extends CustomNamedStyles<S, B>, X>(styles: S | CustomNamedStyles<S, B> | X | ((theme: T) => X | CustomNamedStyles<X, B>)): S | X => {
             if (typeof styles === 'function') {
                 return styles as X
             }

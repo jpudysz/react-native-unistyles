@@ -1,6 +1,6 @@
 import React from 'react'
 import { Text, View } from 'react-native'
-import { createStyles, useStyles } from '../styles'
+import { createStyleSheet, useStyles } from '../styles'
 
 // Media queries
 export const MediaQueries: React.FunctionComponent = () => {
@@ -18,7 +18,7 @@ export const MediaQueries: React.FunctionComponent = () => {
     )
 }
 
-const stylesheet = createStyles(theme => ({
+const stylesheet = createStyleSheet(theme => ({
     dynamicContainer: {
         flex: 1,
         justifyContent: 'center',
