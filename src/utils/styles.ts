@@ -1,4 +1,4 @@
-import type { CustomNamedStyles, ScreenSize } from '../types'
+import type { Breakpoints, CustomNamedStyles, ScreenSize, SortedBreakpointEntries } from '../types'
 import { getValueForBreakpoint } from './breakpoints'
 
 /**
@@ -9,7 +9,7 @@ import { getValueForBreakpoint } from './breakpoints'
  * @param {Function} fn - The function to be proxified.
  * @param {keyof B & string} breakpoint - The breakpoint name to check against.
  * @param {ScreenSize} screenSize - An object representing the screen size to be checked against the media queries.
- * @param {B} breakpoints - An object representing the defined breakpoints.
+ * @param breakpointPairs - sorted pairs of breakpoints
  *
  * @returns {Function} Returns the proxified function
  *
@@ -22,13 +22,13 @@ import { getValueForBreakpoint } from './breakpoints'
  * const proxifiedFunction = proxifyFunction(myFunction, 'sm', screenSize, breakpoints)
  * proxifiedFunction() // parsed style based on screenSize and breakpoints
  */
-export const proxifyFunction = <B extends Record<string, number>>(
+export const proxifyFunction = <B extends Breakpoints>(
     fn: Function, breakpoint: keyof B & string,
     screenSize: ScreenSize,
-    breakpoints: B
+    breakpointPairs: SortedBreakpointEntries<B>
 ): Function => new Proxy(fn, {
     apply: (target, thisArg, argumentsList) =>
-        parseStyle(target.apply(thisArg, argumentsList), breakpoint, screenSize, breakpoints)
+        parseStyle(target.apply(thisArg, argumentsList), breakpoint, screenSize, breakpointPairs)
 })
 
 /**
@@ -43,7 +43,7 @@ export const proxifyFunction = <B extends Record<string, number>>(
  * @param {CustomNamedStyles<T, B>} style - The style object to be parsed.
  * @param {keyof B & string} breakpoint - The breakpoint name to check against.
  * @param {ScreenSize} screenSize - An object representing the screen size to be checked against the media queries.
- * @param {B} breakpoints - An object representing the defined breakpoints.
+ * @param breakpointPairs - sorted pairs of breakpoints
  *
  * @returns {Record<string, string | number | Function>} Returns the parsed style object with resolved custom media queries or breakpoints.
  *
@@ -56,11 +56,11 @@ export const proxifyFunction = <B extends Record<string, number>>(
  * const parsedStyle = parseStyle(style, 'sm', screenSize, breakpoints)
  * // { fontSize: '12px' }
  */
-export const parseStyle = <T, B extends Record<string, number>>(
+export const parseStyle = <T, B extends Breakpoints>(
     style: CustomNamedStyles<T, B>,
     breakpoint: keyof B & string,
     screenSize: ScreenSize,
-    breakpoints: B
+    breakpointPairs: SortedBreakpointEntries<B>
 ): T => {
     const entries = Object.entries(style) as [[
         keyof T,
@@ -75,7 +75,7 @@ export const parseStyle = <T, B extends Record<string, number>>(
                 if (isNestedStyle) {
                     return [
                         key,
-                        parseStyle(value as CustomNamedStyles<T, B>, breakpoint, screenSize, breakpoints)
+                        parseStyle(value as CustomNamedStyles<T, B>, breakpoint, screenSize, breakpointPairs)
                     ]
                 }
 
@@ -84,7 +84,7 @@ export const parseStyle = <T, B extends Record<string, number>>(
                 if (isTransform && Array.isArray(value)) {
                     return [
                         key,
-                        value.map(value => parseStyle(value, breakpoint, screenSize, breakpoints))
+                        value.map(value => parseStyle(value, breakpoint, screenSize, breakpointPairs))
                     ]
                 }
 
@@ -101,7 +101,7 @@ export const parseStyle = <T, B extends Record<string, number>>(
                         value as Record<keyof B & string, string | number | undefined>,
                         breakpoint,
                         screenSize,
-                        breakpoints
+                        breakpointPairs
                     )
                 ]
             })

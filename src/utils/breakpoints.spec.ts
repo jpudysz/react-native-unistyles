@@ -1,5 +1,5 @@
 import { getBreakpointFromScreenWidth, getValueForBreakpoint, sortAndValidateBreakpoints } from './breakpoints'
-import type { ScreenSize } from '../types'
+import type { ScreenSize, SortedBreakpointEntries } from '../types'
 
 describe('breakpoints', () => {
     describe('sortAndValidateBreakpoints', () => {
@@ -64,18 +64,20 @@ describe('breakpoints', () => {
                 md: 500,
                 xl: 1200
             }
+            const breakpointPairs = Object
+                .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
 
-            expect(getBreakpointFromScreenWidth(0, breakpoints)).toEqual('xs')
-            expect(getBreakpointFromScreenWidth(20, breakpoints)).toEqual('xs')
-            expect(getBreakpointFromScreenWidth(100, breakpoints)).toEqual('xs')
-            expect(getBreakpointFromScreenWidth(101, breakpoints)).toEqual('xs')
-            expect(getBreakpointFromScreenWidth(250, breakpoints)).toEqual('xs')
-            expect(getBreakpointFromScreenWidth(300, breakpoints)).toEqual('sm')
-            expect(getBreakpointFromScreenWidth(499, breakpoints)).toEqual('sm')
-            expect(getBreakpointFromScreenWidth(500, breakpoints)).toEqual('md')
-            expect(getBreakpointFromScreenWidth(799, breakpoints)).toEqual('md')
-            expect(getBreakpointFromScreenWidth(1200, breakpoints)).toEqual('xl')
-            expect(getBreakpointFromScreenWidth(2000, breakpoints)).toEqual('xl')
+            expect(getBreakpointFromScreenWidth(0, breakpointPairs)).toEqual('xs')
+            expect(getBreakpointFromScreenWidth(20, breakpointPairs)).toEqual('xs')
+            expect(getBreakpointFromScreenWidth(100, breakpointPairs)).toEqual('xs')
+            expect(getBreakpointFromScreenWidth(101, breakpointPairs)).toEqual('xs')
+            expect(getBreakpointFromScreenWidth(250, breakpointPairs)).toEqual('xs')
+            expect(getBreakpointFromScreenWidth(300, breakpointPairs)).toEqual('sm')
+            expect(getBreakpointFromScreenWidth(499, breakpointPairs)).toEqual('sm')
+            expect(getBreakpointFromScreenWidth(500, breakpointPairs)).toEqual('md')
+            expect(getBreakpointFromScreenWidth(799, breakpointPairs)).toEqual('md')
+            expect(getBreakpointFromScreenWidth(1200, breakpointPairs)).toEqual('xl')
+            expect(getBreakpointFromScreenWidth(2000, breakpointPairs)).toEqual('xl')
         })
     })
 
@@ -87,6 +89,8 @@ describe('breakpoints', () => {
                 sm: 200,
                 md: 500
             }
+            const breakpointPairs = Object
+                .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
             const style: Record<string, string> = {
                 ':w[, 200]': 'green',
                 ':w[201]': 'orange',
@@ -97,7 +101,7 @@ describe('breakpoints', () => {
                 height: 800
             }
 
-            expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpoints)).toEqual('green')
+            expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpointPairs)).toEqual('green')
         })
     })
 
@@ -108,6 +112,8 @@ describe('breakpoints', () => {
             sm: 200,
             md: 500
         }
+        const breakpointPairs = Object
+            .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
         const style: Record<string, string> = {
             ':w[, 200]': 'green',
             ':w[201, 499]': 'orange',
@@ -119,7 +125,7 @@ describe('breakpoints', () => {
             height: 1200
         }
 
-        expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpoints)).toEqual('red')
+        expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpointPairs)).toEqual('red')
     })
 
     it('should match breakpoint even if value is undefined', () => {
@@ -129,6 +135,8 @@ describe('breakpoints', () => {
             sm: 200,
             md: 500
         }
+        const breakpointPairs = Object
+            .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
         const style: Record<string, string | undefined> = {
             ':w[, 200]': 'green',
             ':w[201, 499]': 'orange',
@@ -140,7 +148,7 @@ describe('breakpoints', () => {
             height: 1200
         }
 
-        expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpoints)).toEqual(undefined)
+        expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpointPairs)).toEqual(undefined)
     })
 
     it('should match lower breakpoint to match css cascading', () => {
@@ -151,6 +159,8 @@ describe('breakpoints', () => {
             md: 500,
             xl: 600
         }
+        const breakpointPairs = Object
+            .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
         const style: Record<string, string | undefined> = {
             ':w[, 200]': 'green',
             ':w[201, 499]': 'orange',
@@ -162,6 +172,6 @@ describe('breakpoints', () => {
             height: 1200
         }
 
-        expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpoints)).toEqual('red')
+        expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpointPairs)).toEqual('red')
     })
 })
