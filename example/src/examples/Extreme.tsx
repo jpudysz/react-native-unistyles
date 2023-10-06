@@ -24,8 +24,7 @@ const stylesheet = createStyles(theme => ({
         backgroundColor: {
             xs: theme.colors.oak,
             md: theme.colors.sky
-        },
-        shadowOpacity: 20
+        }
     }),
     text: {
         height: 100,

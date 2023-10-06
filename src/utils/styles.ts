@@ -62,7 +62,10 @@ export const parseStyle = <T, B extends Record<string, number>>(
     screenSize: ScreenSize,
     breakpoints: B
 ): T => {
-    const entries = Object.entries(style) as [[keyof T, CustomNamedStyles<T, B>]]
+    const entries = Object.entries(style) as [[
+        keyof T,
+        CustomNamedStyles<T, B> | Record<keyof B & string, string | number | undefined>]
+    ]
 
     return Object
         .fromEntries(entries
@@ -72,7 +75,7 @@ export const parseStyle = <T, B extends Record<string, number>>(
                 if (isNestedStyle) {
                     return [
                         key,
-                        parseStyle(value, breakpoint, screenSize, breakpoints)
+                        parseStyle(value as CustomNamedStyles<T, B>, breakpoint, screenSize, breakpoints)
                     ]
                 }
 
@@ -92,9 +95,15 @@ export const parseStyle = <T, B extends Record<string, number>>(
                     return [key, value]
                 }
 
-                const valueWithBreakpoint = value as Record<keyof B & string, string | number>
-
-                return [key, getValueForBreakpoint<B>(valueWithBreakpoint, breakpoint, screenSize, breakpoints)]
+                return [
+                    key,
+                    getValueForBreakpoint<B>(
+                        value as Record<keyof B & string, string | number | undefined>,
+                        breakpoint,
+                        screenSize,
+                        breakpoints
+                    )
+                ]
             })
         )
 }

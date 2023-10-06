@@ -64,23 +64,17 @@ type UnistyleView = Omit<Omit<ViewStyle, 'shadowOffset'>, 'transform'>
 type UnistyleText = Omit<Omit<TextStyle, 'shadowOffset'>, 'transform'>
 type UnistyleImage = Omit<Omit<ImageStyle, 'shadowOffset'>, 'transform'>
 
-export type CustomNamedStyles<T, B extends Record<string, number>> = {
-    [P in keyof T]:
-    | (UnistyleView| StyleProperty<UnistyleView, B>)
+export type StaticStyles<B extends Record<string, number>> =
+    | (UnistyleView | StyleProperty<UnistyleView, B>)
     | (UnistyleText | StyleProperty<UnistyleText, B>)
     | (UnistyleImage | StyleProperty<UnistyleImage, B>)
-    | ShadowOffsetProps<B>
-    | TransformProps<B>
-    | (
-        (...args: Array<never>) =>
-        | (UnistyleView| StyleProperty<UnistyleView, B>)
-        | (UnistyleText | StyleProperty<UnistyleText, B>)
-        | (UnistyleImage | StyleProperty<UnistyleImage, B>)
-        | ShadowOffsetProps<B>
-        | TransformProps<B>
-    )
-}
+    & TransformProps<B> & ShadowOffsetProps<B>
 
+export type CustomNamedStyles<T, B extends Record<string, number>> = {
+    [K in keyof T]: T[K] extends (...args: infer A) => unknown
+        ? (...args: A) => StaticStyles<B>
+        : StaticStyles<B>
+}
 export type ExtractBreakpoints<T, B extends Record<string, number>> = T extends Partial<Record<keyof B & string, infer V>>
     ? V
     : T extends (...args: infer A) => infer R
