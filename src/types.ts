@@ -79,8 +79,11 @@ export type CustomNamedStyles<T, B extends Breakpoints> = {
         ? (...args: A) => StaticStyles<B>
         : StaticStyles<B>
 }
+
+type WithEmptyObject<V> = keyof V extends never ? {} : V
+
 export type ExtractBreakpoints<T, B extends Breakpoints> = T extends Partial<Record<keyof B & string, infer V>>
-    ? V
+    ? WithEmptyObject<V>
     : T extends (...args: infer A) => infer R
         ? (...args: A) => ExtractBreakpoints<R, B>
         : {
