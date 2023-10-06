@@ -1,8 +1,8 @@
 import React from 'react'
 import { Text, View } from 'react-native'
-import { createStyles, useStyles } from '../styles'
+import { createStyleSheet, useStyles } from '../styles'
 
-// Injected theme to createStyles
+// Injected theme to createStyleSheet
 export const Theme: React.FunctionComponent = () => {
     const { styles } = useStyles(stylesheet)
 
@@ -15,7 +15,7 @@ export const Theme: React.FunctionComponent = () => {
     )
 }
 
-const stylesheet = createStyles(theme => ({
+const stylesheet = createStyleSheet(theme => ({
     container: {
         flex: 1,
         justifyContent: 'center',
