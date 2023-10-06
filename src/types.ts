@@ -15,6 +15,10 @@ import type {
     TranslateYTransform
 } from 'react-native/Libraries/StyleSheet/StyleSheetTypes'
 
+export type Breakpoints = Record<string, number>
+
+export type SortedBreakpointEntries<B extends Breakpoints> = [[keyof B & string, number]]
+
 export type ScreenSize = {
     width: number,
     height: number
@@ -22,7 +26,7 @@ export type ScreenSize = {
 
 export type CreateStylesFactory<ST, Theme> = (theme: Theme) => ST
 
-type StyleProperty<T, B extends Record<string, number>> = {
+type StyleProperty<T, B extends Breakpoints> = {
     [K in keyof T]: {
         [innerKey in keyof B]?: T[K]
     } | {
@@ -30,7 +34,7 @@ type StyleProperty<T, B extends Record<string, number>> = {
     } | T[K]
 }
 
-type ShadowOffsetProps<B extends Record<string, number>> = {
+type ShadowOffsetProps<B extends Breakpoints> = {
     shadowOffset: {
         width: number | {
             [innerKey in keyof B]?: number
@@ -41,7 +45,7 @@ type ShadowOffsetProps<B extends Record<string, number>> = {
     }
 }
 
-type TransformStyles<B extends Record<string, number>> =
+type TransformStyles<B extends Breakpoints> =
     PerpectiveTransform | StyleProperty<PerpectiveTransform, B>
     | RotateTransform | StyleProperty<RotateTransform, B>
     | RotateXTransform | StyleProperty<RotateXTransform, B>
@@ -56,7 +60,7 @@ type TransformStyles<B extends Record<string, number>> =
     | SkewYTransform | StyleProperty<SkewYTransform, B>
     | MatrixTransform | StyleProperty<MatrixTransform, B>
 
-type TransformProps<B extends Record<string, number>> = {
+type TransformProps<B extends Breakpoints> = {
     transform: Array<TransformStyles<B>>
 }
 
@@ -64,18 +68,18 @@ type UnistyleView = Omit<Omit<ViewStyle, 'shadowOffset'>, 'transform'>
 type UnistyleText = Omit<Omit<TextStyle, 'shadowOffset'>, 'transform'>
 type UnistyleImage = Omit<Omit<ImageStyle, 'shadowOffset'>, 'transform'>
 
-export type StaticStyles<B extends Record<string, number>> =
+export type StaticStyles<B extends Breakpoints> =
     | (UnistyleView | StyleProperty<UnistyleView, B>)
     | (UnistyleText | StyleProperty<UnistyleText, B>)
     | (UnistyleImage | StyleProperty<UnistyleImage, B>)
     & TransformProps<B> & ShadowOffsetProps<B>
 
-export type CustomNamedStyles<T, B extends Record<string, number>> = {
+export type CustomNamedStyles<T, B extends Breakpoints> = {
     [K in keyof T]: T[K] extends (...args: infer A) => unknown
         ? (...args: A) => StaticStyles<B>
         : StaticStyles<B>
 }
-export type ExtractBreakpoints<T, B extends Record<string, number>> = T extends Partial<Record<keyof B & string, infer V>>
+export type ExtractBreakpoints<T, B extends Breakpoints> = T extends Partial<Record<keyof B & string, infer V>>
     ? V
     : T extends (...args: infer A) => infer R
         ? (...args: A) => ExtractBreakpoints<R, B>
@@ -87,7 +91,7 @@ export type ExtractBreakpoints<T, B extends Record<string, number>> = T extends 
                     : T[K]
         }
 
-export type RemoveKeysWithPrefix<T, B extends Record<string, number>> = T extends (...args: Array<any>) => infer R
+export type RemoveKeysWithPrefix<T, B extends Breakpoints> = T extends (...args: Array<any>) => infer R
     ? (...args: Parameters<T>) => RemoveKeysWithPrefix<R, B>
     : T extends object
         ? T extends Record<string, infer _V>
