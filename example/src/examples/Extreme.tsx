@@ -45,7 +45,10 @@ const stylesheet = createStyleSheet(theme => ({
                 xs: 1,
                 md: 5
             }
-        }
+        },
+        shadowOpacity: 1,
+        shadowRadius: 4,
+        shadowColor: theme.colors.sky
     }),
     text: {
         height: 100,
@@ -60,6 +63,12 @@ const stylesheet = createStyleSheet(theme => ({
                     md: 20
                 }
             }
-        ]
+        ],
+        textShadowRadius: 3,
+        textShadowColor: theme.colors.oak,
+        textShadowOffset: {
+            width: 3,
+            height: 3
+        }
     }
 }))
