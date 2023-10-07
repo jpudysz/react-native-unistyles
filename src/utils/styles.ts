@@ -1,5 +1,6 @@
 import type { Breakpoints, CustomNamedStyles, ScreenSize, SortedBreakpointEntries } from '../types'
 import { getValueForBreakpoint } from './breakpoints'
+import { normalizeStyles } from './normalizeStyles'
 
 /**
  * Proxies a function to parse its return value for custom media queries or breakpoints.
@@ -67,12 +68,12 @@ export const parseStyle = <T, B extends Breakpoints>(
         CustomNamedStyles<T, B> | Record<keyof B & string, string | number | undefined>]
     ]
 
-    return Object
+    const parsedStyles = Object
         .fromEntries(entries
             .map(([key, value]) => {
-                const isNestedStyle = key === 'shadowOffset'
+                const hasNestedProperties = key === 'shadowOffset' || key === 'textShadowOffset'
 
-                if (isNestedStyle) {
+                if (hasNestedProperties) {
                     return [
                         key,
                         parseStyle(value as CustomNamedStyles<T, B>, breakpoint, screenSize, breakpointPairs)
@@ -106,4 +107,6 @@ export const parseStyle = <T, B extends Breakpoints>(
                 ]
             })
         )
+
+    return normalizeStyles(parsedStyles)
 }

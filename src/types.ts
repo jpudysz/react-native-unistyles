@@ -45,6 +45,17 @@ type ShadowOffsetProps<B extends Breakpoints> = {
     }
 }
 
+type TextShadowOffsetProps<B extends Breakpoints> = {
+    textShadowOffset: {
+        width: number | {
+            [innerKey in keyof B]?: number
+        },
+        height: number | {
+            [innerKey in keyof B]?: number
+        }
+    }
+}
+
 type TransformStyles<B extends Breakpoints> =
     PerpectiveTransform | StyleProperty<PerpectiveTransform, B>
     | RotateTransform | StyleProperty<RotateTransform, B>
@@ -64,15 +75,15 @@ type TransformProps<B extends Breakpoints> = {
     transform: Array<TransformStyles<B>>
 }
 
-type UnistyleView = Omit<Omit<ViewStyle, 'shadowOffset'>, 'transform'>
-type UnistyleText = Omit<Omit<TextStyle, 'shadowOffset'>, 'transform'>
-type UnistyleImage = Omit<Omit<ImageStyle, 'shadowOffset'>, 'transform'>
+type UnistyleView = Omit<Omit<Omit<ViewStyle, 'shadowOffset'>, 'transform'>, 'textShadowOffset'>
+type UnistyleText = Omit<Omit<Omit<TextStyle, 'shadowOffset'>, 'transform'>, 'textShadowOffset'>
+type UnistyleImage = Omit<Omit<Omit<ImageStyle, 'shadowOffset'>, 'transform'>, 'textShadowOffset'>
 
 export type StaticStyles<B extends Breakpoints> =
     | (UnistyleView | StyleProperty<UnistyleView, B>)
     | (UnistyleText | StyleProperty<UnistyleText, B>)
     | (UnistyleImage | StyleProperty<UnistyleImage, B>)
-    & TransformProps<B> & ShadowOffsetProps<B>
+    & TransformProps<B> & ShadowOffsetProps<B> & TextShadowOffsetProps<B>
 
 export type CustomNamedStyles<T, B extends Breakpoints> = {
     [K in keyof T]: T[K] extends (...args: infer A) => unknown
