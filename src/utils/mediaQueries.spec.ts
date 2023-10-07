@@ -234,7 +234,10 @@ describe('utils', () => {
                 '',
                 'x',
                 '>300',
-                ']]w200[['
+                ']]w200[[',
+                ':w[ 100]',
+                ':w[ , 300]',
+                ':w[ ,    200]:h[ 200 , 400]'
             ]
 
             incorrectMediaQueries.forEach(query => {

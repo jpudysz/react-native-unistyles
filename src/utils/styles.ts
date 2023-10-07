@@ -1,6 +1,7 @@
 import type { Breakpoints, CustomNamedStyles, ScreenSize, SortedBreakpointEntries } from '../types'
 import { getValueForBreakpoint } from './breakpoints'
 import { normalizeStyles } from './normalizeStyles'
+import { isWeb } from './common'
 
 /**
  * Proxies a function to parse its return value for custom media queries or breakpoints.
@@ -108,5 +109,7 @@ export const parseStyle = <T, B extends Breakpoints>(
             })
         )
 
-    return normalizeStyles(parsedStyles)
+    return isWeb()
+        ? normalizeStyles(parsedStyles)
+        : parsedStyles
 }
