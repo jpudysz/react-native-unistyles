@@ -1,4 +1,5 @@
 import { useContext } from 'react'
+import { StyleSheet } from 'react-native'
 import type {
     Breakpoints,
     CreateStylesFactory,
@@ -62,10 +63,10 @@ export const createUnistyles = <B extends Breakpoints, T = {}>(breakpoints: B) =
                         }
                     }
 
-                    return {
+                    return StyleSheet.create({
                         ...acc,
                         [key]: parseStyle<ST, B>(style, breakpoint, screenSize, sortedBreakpointEntries)
-                    }
+                    })
                 }, {} as ST)
 
             return {
