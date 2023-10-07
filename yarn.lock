@@ -15218,20 +15218,20 @@ __metadata:
     react: 18.2.0
     react-native: 0.72.5
     react-native-builder-bob: 0.23.0
-    react-native-web: ^0.19.9
+    react-native-web: 0.19.9
     release-it: 16.2.1
     typescript: 5.2.2
   peerDependencies:
     react: "*"
     react-native: "*"
-    react-native-web: ^18.0.0
+    react-native-web: "*"
   peerDependenciesMeta:
     react-native-web:
       optional: true
   languageName: unknown
   linkType: soft
 
-"react-native-web@npm:0.19.9, react-native-web@npm:^0.19.9":
+"react-native-web@npm:0.19.9":
   version: 0.19.9
   resolution: "react-native-web@npm:0.19.9"
   dependencies:
