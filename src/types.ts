@@ -14,6 +14,7 @@ import type {
     TranslateXTransform,
     TranslateYTransform
 } from 'react-native/Libraries/StyleSheet/StyleSheetTypes'
+import type { MediaQueries } from './mediaQueries'
 
 export type Breakpoints = Record<string, number>
 
@@ -30,17 +31,36 @@ type StyleProperty<T, B extends Breakpoints> = {
     [K in keyof T]: {
         [innerKey in keyof B]?: T[K]
     } | {
-        [innerKey in string]?: T[K]
+        [innerKey in MediaQueries]?: T[K]
     } | T[K]
 }
 
-type ShadowOffsetProps<B extends Breakpoints> = {
+type ShadowOffsetProps<B> = {
     shadowOffset: {
         width: number | {
             [innerKey in keyof B]?: number
+        } | {
+            [innerKey in MediaQueries]: number
         },
         height: number | {
             [innerKey in keyof B]?: number
+        } | {
+            [innerKey in MediaQueries]: number
+        }
+    }
+}
+
+type TextShadowOffsetProps<B> = {
+    textShadowOffset: {
+        width: number | {
+            [innerKey in keyof B]?: number
+        } | {
+            [innerKey in MediaQueries]: number
+        },
+        height: number | {
+            [innerKey in keyof B]?: number
+        } | {
+            [innerKey in MediaQueries]: number
         }
     }
 }
@@ -64,15 +84,15 @@ type TransformProps<B extends Breakpoints> = {
     transform: Array<TransformStyles<B>>
 }
 
-type UnistyleView = Omit<Omit<ViewStyle, 'shadowOffset'>, 'transform'>
-type UnistyleText = Omit<Omit<TextStyle, 'shadowOffset'>, 'transform'>
-type UnistyleImage = Omit<Omit<ImageStyle, 'shadowOffset'>, 'transform'>
+type UnistyleView = Omit<Omit<Omit<ViewStyle, 'shadowOffset'>, 'transform'>, 'textShadowOffset'>
+type UnistyleText = Omit<Omit<Omit<TextStyle, 'shadowOffset'>, 'transform'>, 'textShadowOffset'>
+type UnistyleImage = Omit<Omit<Omit<ImageStyle, 'shadowOffset'>, 'transform'>, 'textShadowOffset'>
 
 export type StaticStyles<B extends Breakpoints> =
     | (UnistyleView | StyleProperty<UnistyleView, B>)
     | (UnistyleText | StyleProperty<UnistyleText, B>)
     | (UnistyleImage | StyleProperty<UnistyleImage, B>)
-    & TransformProps<B> & ShadowOffsetProps<B>
+    & TransformProps<B> & ShadowOffsetProps<B> & TextShadowOffsetProps<B>
 
 export type CustomNamedStyles<T, B extends Breakpoints> = {
     [K in keyof T]: T[K] extends (...args: infer A) => unknown
@@ -98,6 +118,6 @@ export type RemoveKeysWithPrefix<T, B extends Breakpoints> = T extends (...args:
     ? (...args: Parameters<T>) => RemoveKeysWithPrefix<R, B>
     : T extends object
         ? T extends Record<string, infer _V>
-            ? { [K in keyof T as K extends `:w${string}` | `:h${string}` ? keyof B & string : K]: RemoveKeysWithPrefix<T[K], B> }
+            ? { [K in keyof T as K extends MediaQueries ? keyof B & string : K]: RemoveKeysWithPrefix<T[K], B> }
             : { [K in keyof T]: RemoveKeysWithPrefix<T[K], B> }
         : T
