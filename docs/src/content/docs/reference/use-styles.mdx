@@ -1,0 +1,21 @@
+---
+title: useStyles
+---
+
+`useStyle` ties everything together and handles the heavy lifting. Without `useStyles`, you can't utilize features like:
+- breakpoints
+- media queries
+- themes
+
+_useStyles_ allows you to skip the `stylesheet` if you only want to access the `theme`:
+
+```tsx
+const { theme } = useStyles()
+```
+
+For more advanced usage, pass your `stylesheet` generated with `createStyleSheet`:
+
+```tsx
+// you can still access theme
+const { styles, theme } = useStyles(stylesheet)
+```

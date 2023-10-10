@@ -1,0 +1,29 @@
+---
+title: Migrate from StyleSheet
+---
+
+`react-native-unistyles` embraces the simplicity of `StyleSheet`, making it easy to integrate into your project.
+
+You can replace `StyleSheet.create` with `createStyleSheet` and it will work exactly the same:
+
+```diff
+-const styles = StyleSheet.create({
++const styles = createStyleSheet({
+    scrollContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    }
+})
+```
+
+If you need additional functionalities such as `breakpoints`, `media-queries` or `theme` you can incrementally pass `style(sheet)` into the `useStyles` hook:
+
+```ts
+export const ExampleUnistyles = () => {
+  const { styles } = useStyles(stylesheet)
+  // ... your component code
+}
+```
+
+With the hook in place, you can now use all the features.

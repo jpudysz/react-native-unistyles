@@ -1,0 +1,51 @@
+---
+title: createStyleSheet
+---
+
+`createStyleSheet` is interchangeable with `StyleSheet.create`. You can use objects, and it will function identically to its React Native counterpart.
+
+```ts
+const stylesheet = createStyleSheet({
+    container: {
+       flex: 1,
+       justifyContent: 'center',
+       alignItems: 'center',
+    },
+})
+```
+The difference is that you can now use breakpoints and media queries:
+
+```ts
+const stylesheet = createStyleSheet({
+    container: {
+       flex: 1,
+       justifyContent: 'center',
+       alignItems: 'center',
+       flexDirection: {
+           xs: 'row',
+           sm: 'column',
+           ':w[800]': 'row'
+       }
+    },
+})
+```
+
+`createStyleSheet` also accepts a function, to which the library will inject your theme:
+
+```ts
+const stylesheet = createStyleSheet(theme => ({
+    container: {
+       flex: 1,
+       justifyContent: 'center',
+       alignItems: 'center',
+       flexDirection: {
+           xs: 'row',
+           sm: 'column',
+           ':w[800]': 'row'
+       },
+       backgroundColor: theme.colors.background
+    },
+}))
+```
+
+Importantly, you'll receive the same TypeScript hints as with `StyleSheet.create`!
