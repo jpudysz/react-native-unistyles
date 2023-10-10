@@ -83,7 +83,8 @@
     }
   },
   "workspaces": [
-    "example"
+    "example",
+    "docs"
   ],
   "packageManager": "yarn@3.6.1",
   "engines": {
@@ -93,6 +94,7 @@
     "preset": "react-native",
     "modulePathIgnorePatterns": [
       "<rootDir>/example/node_modules",
+      "<rootDir>/docs/node_modules",
       "<rootDir>/lib/"
     ]
   },
