@@ -1,6 +1,5 @@
 {
-  "name": "vigorous-venus",
-  "type": "module",
+  "name": "react-native-unistyles-docs",
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
