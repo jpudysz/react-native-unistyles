@@ -16,12 +16,7 @@ export const App: React.FunctionComponent = () => {
 
     return (
         <UnistylesTheme theme={appTheme}>
-            <Examples.Extreme
-                onToggleTheme={() => setTheme(prevState => prevState === Theme.Light
-                    ? Theme.Dark
-                    : Theme.Light
-                )}
-            />
+            <Examples.Memoization />
         </UnistylesTheme>
     )
 }
