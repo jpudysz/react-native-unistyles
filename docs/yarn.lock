@@ -87,7 +87,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@astrojs/sitemap@npm:^3.0.0, @astrojs/sitemap@npm:^3.0.1":
+"@astrojs/sitemap@npm:3.0.1, @astrojs/sitemap@npm:^3.0.0":
   version: 3.0.1
   resolution: "@astrojs/sitemap@npm:3.0.1"
   dependencies:
@@ -4675,7 +4675,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "react-native-unistyles-docs@workspace:."
   dependencies:
-    "@astrojs/sitemap": ^3.0.1
+    "@astrojs/sitemap": 3.0.1
     "@astrojs/starlight": 0.11.0
     astro: 3.2.3
     astro-seo: 0.8.0
