@@ -15,9 +15,8 @@ hero:
       icon: external
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
-
-[<p class="center-image"><img alt="react-native-unistyles" src="https://raw.githubusercontent.com/jpudysz/react-native-unistyles/main/assets/banner.png" /></p>](https://codemask.com)
+import { Card, CardGrid } from '@astrojs/starlight/components'
+import Codemask from '../../components/Codemask.astro'
 
 <Card
     title="Features"
@@ -33,8 +32,13 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
     - ⚔️ No 3rd party dependencies
 
     *-based on this [benchmark](https://github.com/efstathiosntonas/react-native-style-libraries-benchmark)
+</Card>
 
-    For more detailed explanation please refer to my blog post [here](https://www.reactnativecrossroads.com/posts/level-up-react-native-styles).
+<Card
+    title="Blog"
+    icon="pencil"
+>
+    Read about what drove me to create this library in this blog post [here](https://www.reactnativecrossroads.com/posts/level-up-react-native-styles).
 </Card>
 
 <Card
@@ -50,5 +54,4 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
   Your support is greatly appreciated and helps me dedicate more time and resources to creating quality libraries. Thank you for all the support!
 </Card>
 
-#### License
-  MIT
+<Codemask />
