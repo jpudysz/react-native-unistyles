@@ -8,6 +8,10 @@
     --sl-logo-brightness: brightness(0%)
 }
 
+.site-title {
+    gap: 5px;
+}
+
 select {
     outline: none;
 }
