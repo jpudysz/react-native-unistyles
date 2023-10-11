@@ -5,12 +5,14 @@ import starlight from '@astrojs/starlight'
 export default defineConfig({
     integrations: [starlight({
         title: 'Unistyles',
+        description: "React Native StyleSheet 2.0",
         customCss: ['./src/styles/custom.css'],
         logo: {
             src: './src/assets/logo.svg'
         },
         social: {
-            github: 'https://github.com/jpudysz/react-native-unistyles'
+            github: 'https://github.com/jpudysz/react-native-unistyles',
+            'x.com': 'https://x.com/jpudysz'
         },
         sidebar: [{
             label: 'Start here',
@@ -22,13 +24,13 @@ export default defineConfig({
                 link: '/start/basic-usage/'
             }, {
                 label: 'Migration from StyleSheet',
-                link: '/start/migration-from-style-sheet/'
+                link: '/start/migration-from-stylesheet/'
             }]
         }, {
             label: 'Reference',
             items: [{
                 label: 'createStyleSheet',
-                link: '/reference/create-style-sheet/'
+                link: '/reference/create-stylesheet/'
             }, {
                 label: 'useStyles',
                 link: '/reference/use-styles/'
