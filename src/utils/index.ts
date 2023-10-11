@@ -1,3 +1,11 @@
 export { normalizeStyles } from './normalizeStyles'
-export { getBreakpointFromScreenWidth, sortAndValidateBreakpoints } from './breakpoints'
+export { getBreakpointFromScreenWidth, sortAndValidateBreakpoints, getValueForBreakpoint } from './breakpoints'
 export { proxifyFunction, parseStyle } from './styles'
+export {
+    extractValues,
+    getKeyForCustomMediaQuery,
+    isMediaQuery,
+    isWithinTheHeight,
+    isWithinTheWidth,
+    isWithinTheWidthAndHeight
+} from './mediaQueries'

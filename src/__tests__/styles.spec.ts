@@ -1,4 +1,4 @@
-import { parseStyle, proxifyFunction } from './styles'
+import { parseStyle, proxifyFunction } from '../utils'
 import type { CustomNamedStyles, ScreenSize } from '../types'
 import type { SortedBreakpointEntries } from '../types'
 
