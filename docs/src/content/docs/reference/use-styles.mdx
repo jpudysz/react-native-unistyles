@@ -2,20 +2,30 @@
 title: useStyles
 ---
 
-`useStyle` ties everything together and handles the heavy lifting. Without `useStyles`, you can't utilize features like:
-- breakpoints
-- media queries
-- themes
+import Seo from '../../../components/Seo.astro'
 
-_useStyles_ allows you to skip the `stylesheet` if you only want to access the `theme`:
+<Seo
+    seo={{
+        title: 'useStyles',
+        description: 'How to use useStyles hook from react-native-unistyles'
+    }}
+>
+    `useStyle` ties everything together and handles the heavy lifting. Without `useStyles`, you can't utilize features like:
+    - breakpoints
+    - media queries
+    - themes
 
-```tsx
-const { theme } = useStyles()
-```
+    _useStyles_ allows you to skip the `stylesheet` if you only want to access the `theme`:
 
-For more advanced usage, pass your `stylesheet` generated with `createStyleSheet`:
+    ```tsx
+    const { theme } = useStyles()
+    ```
 
-```tsx
-// you can still access theme
-const { styles, theme } = useStyles(stylesheet)
-```
+    For more advanced usage, pass your `stylesheet` generated with `createStyleSheet`:
+
+    ```tsx
+    // you can still access theme
+    const { styles, theme } = useStyles(stylesheet)
+    ```
+
+</Seo>

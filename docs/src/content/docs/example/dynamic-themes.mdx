@@ -2,6 +2,15 @@
 title: Dynamic themes
 ---
 
+import Seo from '../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Theming',
+        description: 'How to use themes with react-native-unistyles'
+    }}
+>
+
 You can incorporate as many themes as you desire in your application. While there's flexibility in how you structure your theme, it's essential to maintain consistency with the TypeScript type:
 
 To promote reusability and maintainability, it's a good practice to share as many values between themes as possible:
@@ -63,3 +72,5 @@ export const App: React.FunctionComponent = () => {
     )
 }
 ```
+
+</Seo>
