@@ -1,4 +1,4 @@
-import { getBreakpointFromScreenWidth, getValueForBreakpoint, sortAndValidateBreakpoints } from './breakpoints'
+import { getBreakpointFromScreenWidth, getValueForBreakpoint, sortAndValidateBreakpoints } from '../utils'
 import type { ScreenSize, SortedBreakpointEntries } from '../types'
 
 describe('breakpoints', () => {

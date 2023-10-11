@@ -5,7 +5,7 @@ import {
     isWithinTheHeight,
     isWithinTheWidth,
     isWithinTheWidthAndHeight
-} from './mediaQueries'
+} from '../utils'
 import type { ScreenSize } from '../types'
 
 describe('utils', () => {
