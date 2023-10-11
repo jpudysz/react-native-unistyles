@@ -24,10 +24,10 @@
 yarn add react-native-unistyles
 ```
 
-## [Documentation](https://unistyles-docs.vercel.app/)
-- [Start here](https://unistyles-docs.vercel.app/start/setup/)
-- [References](https://unistyles-docs.vercel.app/reference/create-style-sheet/)
-- [Examples](https://unistyles-docs.vercel.app/example/breakpoints/)
+## [Documentation](https://reactnativeunistyles.vercel.app/)
+- [Start here](https://reactnativeunistyles.vercel.app/start/setup/)
+- [References](https://reactnativeunistyles.vercel.app/reference/create-stylesheet/)
+- [Examples](https://reactnativeunistyles.vercel.app/example/breakpoints/)
 
 ## Blog post
 
