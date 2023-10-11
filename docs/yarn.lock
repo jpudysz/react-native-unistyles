@@ -87,7 +87,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@astrojs/sitemap@npm:^3.0.0":
+"@astrojs/sitemap@npm:^3.0.0, @astrojs/sitemap@npm:^3.0.1":
   version: 3.0.1
   resolution: "@astrojs/sitemap@npm:3.0.1"
   dependencies:
@@ -1241,6 +1241,13 @@ __metadata:
   bin:
     astring: bin/astring
   checksum: 6f034d2acef1dac8bb231e7cc26c573d3c14e1975ea6e04f20312b43d4f462f963209bc64187d25d477a182dc3c33277959a0156ab7a3617aa79b1eac4d88e1f
+  languageName: node
+  linkType: hard
+
+"astro-seo@npm:0.8.0":
+  version: 0.8.0
+  resolution: "astro-seo@npm:0.8.0"
+  checksum: ed79c09293e620f323afa17a3e86913143cd3e3955dce5cc1b8e9890e1f00abff9eefeac6c0ae7f5c4848b57158b67c67db262c018aa7e94070418773cf993d2
   languageName: node
   linkType: hard
 
@@ -4668,8 +4675,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "react-native-unistyles-docs@workspace:."
   dependencies:
+    "@astrojs/sitemap": ^3.0.1
     "@astrojs/starlight": 0.11.0
     astro: 3.2.3
+    astro-seo: 0.8.0
     sharp: 0.32.5
   languageName: unknown
   linkType: soft

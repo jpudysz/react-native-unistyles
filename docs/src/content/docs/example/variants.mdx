@@ -2,6 +2,15 @@
 title: Variants
 ---
 
+import Seo from '../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Variants',
+        description: 'How to use variants with react-native-unistyles'
+    }}
+>
+
 `react-native-unistyles` isn't a UI/component library, so you're in charge of designing variants. With no restrictions and using your creativity, you can easily create variants for your components.
 
 Let's examine variants for the `Text` component. Imagine you want to create several variants for your `Typography` components:
@@ -120,3 +129,5 @@ export const Heading: React.FunctionComponent<BaseTextProps> = ({
 }
 ```
 And so on...
+
+</Seo>

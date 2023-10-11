@@ -3,131 +3,141 @@ title: Setup
 ---
 
 import { Card } from '@astrojs/starlight/components'
+import Seo from '../../../components/Seo.astro'
 
-<Card
-    title="RC"
-    icon="warning"
+<Seo
+    seo={{
+        title: 'Setup',
+        description: 'How to Setup react-native-unistyles'
+    }}
 >
-    This project is currently in its Release Candidate phase. While it hasn't reached version 1.0.0 yet, it's been tested and proven in a large-scale application, performing flawlessly across hundreds screens and components.
 
-    I'm looking for testers to check the typings, scalability and overall usability for your monorepo projects.
+    <Card
+        title="RC"
+        icon="warning"
+    >
+        This project is currently in its Release Candidate phase. While it hasn't reached version 1.0.0 yet, it's been tested and proven in a large-scale application, performing flawlessly across hundreds screens and components.
 
-    Suggestions, ideas, and potential improvements are always welcome!
-</Card>
+        I'm looking for testers to check the typings, scalability and overall usability for your monorepo projects.
 
-### Install library
+        Suggestions, ideas, and potential improvements are always welcome!
+    </Card>
 
-```cmd
-yarn add react-native-unistyles
-```
+    ### Install library
+
+    ```cmd
+    yarn add react-native-unistyles
+    ```
 
 
-### Define your theme
+    ### Define your theme
 
-You don't have to follow a specific format. Just make an object and add any keys/values you like.
+    You don't have to follow a specific format. Just make an object and add any keys/values you like.
 
-```ts
-// theme.ts
-export const theme = {
-  colors: {
-    blood: '#eb4d4b',
-    barbie: '#e056fd',
-    pumpkin: '#f0932b',
-    background: '#ffffff'
-  },
-  margins: {
-    sm: 2,
-    md: 4,
-    lg: 8,
-    xl: 12
-  }
-}
-```
-
-or something more advanced with nested objects / functions:
-
-```ts
-// theme.ts
-export const theme = {
-  colors: {
-    blood: '#eb4d4b',
-    barbie: '#e056fd',
-    pumpkin: '#f0932b',
-    background: '#ffffff'
-  },
-  components: {
-    typography: {
-      bold: {
-        fontWeight: 'bold'
+    ```ts
+    // theme.ts
+    export const theme = {
+      colors: {
+        blood: '#eb4d4b',
+        barbie: '#e056fd',
+        pumpkin: '#f0932b',
+        background: '#ffffff'
       },
-      thin: {
-        fontWeight: '300'
+      margins: {
+        sm: 2,
+        md: 4,
+        lg: 8,
+        xl: 12
       }
     }
-  },
-  margins: {
-    sm: 2,
-    md: 4,
-    lg: 8,
-    xl: 12
-  },
-  utils: {
-    hexToRGBA: (hex: string, opacity: number) => {
-      const rgb = hex
-        .replace('#', '')
-        .split(/(?=(?:..)*$)/)
-        .map(x => parseInt(x, 16))
-      return `rgba(${rgb.at(0)}, ${rgb.at(1)}, ${rgb.at(2)}, ${opacity})`
+    ```
+
+    or something more advanced with nested objects / functions:
+
+    ```ts
+    // theme.ts
+    export const theme = {
+      colors: {
+        blood: '#eb4d4b',
+        barbie: '#e056fd',
+        pumpkin: '#f0932b',
+        background: '#ffffff'
+      },
+      components: {
+        typography: {
+          bold: {
+            fontWeight: 'bold'
+          },
+          thin: {
+            fontWeight: '300'
+          }
+        }
+      },
+      margins: {
+        sm: 2,
+        md: 4,
+        lg: 8,
+        xl: 12
+      },
+      utils: {
+        hexToRGBA: (hex: string, opacity: number) => {
+          const rgb = hex
+            .replace('#', '')
+            .split(/(?=(?:..)*$)/)
+            .map(x => parseInt(x, 16))
+          return `rgba(${rgb.at(0)}, ${rgb.at(1)}, ${rgb.at(2)}, ${opacity})`
+        }
+      }
     }
-  }
-}
-```
+    ```
 
-### Create breakpoints
+    ### Create breakpoints
 
-There are no predefined breakpoints. You can name them anything. Just make an object with string keys and number values.
+    There are no predefined breakpoints. You can name them anything. Just make an object with string keys and number values.
 
-```ts
-// breakpoints.ts
-export const breakpoints = {
-    xs: 0,
-    sm: 576,
-    md: 768,
-    lg: 992,
-    xl: 1200,
-    superLarge: 2000,
-    tvLike: 4000
-}
-```
+    ```ts
+    // breakpoints.ts
+    export const breakpoints = {
+        xs: 0,
+        sm: 576,
+        md: 768,
+        lg: 992,
+        xl: 1200,
+        superLarge: 2000,
+        tvLike: 4000
+    }
+    ```
 
-### Wrap your app with UnistylesTheme to inject theme
+    ### Wrap your app with UnistylesTheme to inject theme
 
-```tsx
-import React from 'react'
-import { UnistylesTheme } from 'react-native-unistyles'
-import { theme } from './theme'
+    ```tsx
+    import React from 'react'
+    import { UnistylesTheme } from 'react-native-unistyles'
+    import { theme } from './theme'
 
-export const App: React.FunctionComponent = () => (
-  <UnistylesTheme theme={theme}>
-    // Your App
-  </UnistylesTheme>
-)
-```
+    export const App: React.FunctionComponent = () => (
+      <UnistylesTheme theme={theme}>
+        // Your App
+      </UnistylesTheme>
+    )
+    ```
 
-### Access createStyleSheet and useStyles with a factory
+    ### Access createStyleSheet and useStyles with a factory
 
-```ts
-// styles.ts
+    ```ts
+    // styles.ts
 
-// import library factory
-import { createUnistyles } from 'react-native-unistyles'
-// import your breakpoints, add whatever keys and numeric values you want
-import { breakpoints } from './breakpoints'
-// import your app's theme TypeScript type, or simply use 'typeof theme'
-import { theme } from './theme'
+    // import library factory
+    import { createUnistyles } from 'react-native-unistyles'
+    // import your breakpoints, add whatever keys and numeric values you want
+    import { breakpoints } from './breakpoints'
+    // import your app's theme TypeScript type, or simply use 'typeof theme'
+    import { theme } from './theme'
 
-export const {
-    createStyleSheet,
-    useStyles,
-} = createUnistyles<typeof breakpoints, typeof theme>(breakpoints)
-```
+    export const {
+        createStyleSheet,
+        useStyles,
+    } = createUnistyles<typeof breakpoints, typeof theme>(breakpoints)
+    ```
+
+</Seo>

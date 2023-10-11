@@ -3,43 +3,51 @@ title: Basic Usage
 ---
 
 import { Card } from '@astrojs/starlight/components'
+import Seo from '../../../components/Seo.astro'
 
-<Card
-    icon="document"
-    title="Requirements"
+<Seo
+    seo={{
+        title: 'Basic Usage',
+        description: 'How to use react-native-unistyles'
+    }}
 >
-  After the initial setup, you only need to focus on two functions responsible for your styles:
-  - `createStyleSheet` which replaces `StyleSheet.create`
-  - `useStyles` which parses your styles and ensures TypeScript compatibility with media queries and breakpoints
-</Card>
+    <Card
+        icon="document"
+        title="Requirements"
+    >
+      After the initial setup, you only need to focus on two functions responsible for your styles:
+      - `createStyleSheet` which replaces `StyleSheet.create`
+      - `useStyles` which parses your styles and ensures TypeScript compatibility with media queries and breakpoints
+    </Card>
 
-```tsx
-import React from 'react'
-import { View, Text } from 'react-native'
-// access createStyleSheet and useStyles exported from factory
-import { createStyleSheet, useStyles } from 'lib/styles'
+    ```tsx
+    import React from 'react'
+    import { View, Text } from 'react-native'
+    // access createStyleSheet and useStyles exported from factory
+    import { createStyleSheet, useStyles } from 'lib/styles'
 
-export const ExampleUnistyles = () => {
-    const { styles } = useStyles(stylesheet)
+    export const ExampleUnistyles = () => {
+        const { styles } = useStyles(stylesheet)
 
-    return (
-        <View style={styles.container}>
-            <Text style={styles.text}>
-                Unistyles example
-            </Text>
-        </View>
-    )
-}
-
-const stylesheet = createStyleSheet(theme => ({
-    container: {
-       flex: 1,
-       justifyContent: 'center',
-       alignItems: 'center',
-       backgroundColor: theme.colors.background
-    },
-    text: {
-       color: theme.colors.typography
+        return (
+            <View style={styles.container}>
+                <Text style={styles.text}>
+                    Unistyles example
+                </Text>
+            </View>
+        )
     }
-}))
+
+    const stylesheet = createStyleSheet(theme => ({
+        container: {
+           flex: 1,
+           justifyContent: 'center',
+           alignItems: 'center',
+           backgroundColor: theme.colors.background
+        },
+        text: {
+           color: theme.colors.typography
+        }
+    }))
 ```
+</Seo>
