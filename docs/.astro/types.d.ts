@@ -227,9 +227,9 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
-"reference/create-style-sheet.mdx": {
-	id: "reference/create-style-sheet.mdx";
-  slug: "reference/create-style-sheet";
+"reference/create-stylesheet.mdx": {
+	id: "reference/create-stylesheet.mdx";
+  slug: "reference/create-stylesheet";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">
@@ -248,9 +248,9 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
-"start/migration-from-style-sheet.mdx": {
-	id: "start/migration-from-style-sheet.mdx";
-  slug: "start/migration-from-style-sheet";
+"start/migration-from-stylesheet.mdx": {
+	id: "start/migration-from-stylesheet.mdx";
+  slug: "start/migration-from-stylesheet";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">

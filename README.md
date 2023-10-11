@@ -29,14 +29,9 @@ yarn add react-native-unistyles
 - [References](https://unistyles-docs.vercel.app/reference/create-style-sheet/)
 - [Examples](https://unistyles-docs.vercel.app/example/breakpoints/)
 
-## Example
-
-In order to check out working example go to [example/](./example).
-
 ## Blog post
 
-For more detailed explanation please refer to my blog post [here](https://www.reactnativecrossroads.com/posts/level-up-react-native-styles).
-
+Read about what drove me to create this library in this blog post [here](https://www.reactnativecrossroads.com/posts/level-up-react-native-styles).
 
 ## Sponsor my work
 
