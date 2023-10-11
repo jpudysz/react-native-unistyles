@@ -1,0 +1,35 @@
+---
+title: Media queries
+---
+
+For more advanced usage and pixel perfect designs you can also use a custom media queries. Library supports 4 types of media queries (w-width, h-height):
+
+```ts
+:w[200, 500] - with upper and lower bounds, it translates to width from 200-500px
+:w[, 800] - with upper bound only, it's equal to width from 0-800px
+:h[400] - lower bound only, it means height from 400px
+:h[200, 300]:w[500] - combined queries for both width and height
+```
+
+Media queries can be mixed with breakpoints, but have a bigger priority:
+
+```tsx
+const stylesheet = createStyleSheet(theme => ({
+    container: {
+       justifyContent: 'center',
+       alignItems: 'center',
+       flexDirection: {
+          xs: 'column',
+          sm: 'row',
+       },
+       backgroundColor: {
+          md: theme.colors.background,
+          // even though md might overlap with >600px, lib will use 'barbie'
+          ':w[600]': theme.colors.barbie
+       }
+    },
+    text: {
+       color: theme.colors.typography
+    }
+}))
+```
