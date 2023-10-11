@@ -1070,7 +1070,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vercel/analytics@npm:^1.1.0":
+"@vercel/analytics@npm:1.1.0":
   version: 1.1.0
   resolution: "@vercel/analytics@npm:1.1.0"
   dependencies:
@@ -4686,7 +4686,7 @@ __metadata:
   dependencies:
     "@astrojs/sitemap": 3.0.1
     "@astrojs/starlight": 0.11.0
-    "@vercel/analytics": ^1.1.0
+    "@vercel/analytics": 1.1.0
     astro: 3.2.3
     astro-seo: 0.8.0
     sharp: 0.32.5
