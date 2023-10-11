@@ -15244,7 +15244,7 @@ __metadata:
     react-native: 0.72.5
     react-native-builder-bob: 0.23.1
     react-native-web: 0.19.9
-    react-test-renderer: ^18.2.0
+    react-test-renderer: 18.2.0
     release-it: 16.2.1
     typescript: 5.2.2
   peerDependencies:
@@ -15343,7 +15343,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-test-renderer@npm:^18.2.0":
+"react-test-renderer@npm:18.2.0":
   version: 18.2.0
   resolution: "react-test-renderer@npm:18.2.0"
   dependencies:
