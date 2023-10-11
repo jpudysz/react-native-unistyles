@@ -1,0 +1,122 @@
+---
+title: Variants
+---
+
+`react-native-unistyles` isn't a UI/component library, so you're in charge of designing variants. With no restrictions and using your creativity, you can easily create variants for your components.
+
+Let's examine variants for the `Text` component. Imagine you want to create several variants for your `Typography` components:
+- Heading
+- Regular
+- Thin
+
+To achieve this, add variants to your theme:
+
+```ts
+export const lightTheme = {
+    colors: {
+        ...sharedColors,
+        backgroundColor: '#ffffff',
+        typography: '#000000'
+    },
+    components: {
+        typography: {
+            base: {
+                fontFamily: 'Roboto',
+                fontSize: 12,
+            },
+            heading: {
+                fontFamily: 'Roboto-Medium',
+                fontSize: 24,
+            },
+            regular: {
+                fontFamily: 'Roboto',
+                fontSize: 12,
+            },
+            thin: {
+                fontFamily: 'Roboto-Thin',
+                fontSize: 12,
+            },
+            bold: {
+                fontWeight: 'bold'
+            }
+        }
+    }
+}
+```
+Next, create a base component:
+
+```tsx
+import React from 'react'
+import type { PropsWithChildren } from 'react'
+import { Text, TextStyle } from 'react-native'
+import { createStyleSheet, useStyles } from 'lib/styles'
+
+interface BaseTextProps extends PropsWithChildren {
+    bold: boolean,
+    style: TextStyle
+}
+
+export const BaseText: React.FunctionComponent<BaseTextProps> = ({
+    children,
+    bold = false,
+    style = {}
+}) => {
+    const {styles} = useStyles(stylesheet)
+
+    return (
+        <Text
+            style={{
+                ...styles.baseText,
+                ...bold
+                    ? styles.baseText
+                    : {},
+                // pass other styles via props
+                ...style
+            }}
+        >
+            {children}
+        </Text>
+    )
+}
+
+const stylesheet = createStyleSheet(theme => ({
+    baseText: {
+        ...theme.components.typography.base
+    },
+    bold: {
+        ...theme.components.typography.bold
+    }
+}))
+```
+
+Now, let's create another variant, e.g., Heading:
+
+```tsx
+import React from 'react'
+import type { PropsWithChildren } from 'react'
+import { Text, TextStyle } from 'react-native'
+import { createStyleSheet, useStyles } from 'lib/styles'
+import { BaseText } from 'lib/components'
+
+interface BaseTextProps extends PropsWithChildren {
+    bold: boolean,
+    text: string
+}
+
+export const Heading: React.FunctionComponent<BaseTextProps> = ({
+    text,
+    bold = false
+}) => {
+    const { theme } = useStyles()
+
+    return (
+        <BaseText
+            bold={bold}
+            style={theme.components.typography.heading}
+        >
+            {text}
+        </BaseText>
+    )
+}
+```
+And so on...

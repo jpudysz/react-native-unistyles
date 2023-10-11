@@ -1,0 +1,12 @@
+:root {
+    --sl-color-text-accent: #ee42b2;
+}
+
+:root[data-theme='light'] {
+    --sl-color-text-accent: #db33a0;
+}
+
+.center-image {
+    display: flex;
+    justify-content: center;
+}
