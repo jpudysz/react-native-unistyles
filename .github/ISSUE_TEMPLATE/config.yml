@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question
+    url: https://github.com/jpudysz/react-native-unistyles/discussions/categories/q-a
+    about: Please ask and answer questions here.
+  - name: Feature Request
+    url: https://github.com/jpudysz/react-native-unistyles/discussions/categories/ideas
+    about: Please submit feature requests / suggestions here.
