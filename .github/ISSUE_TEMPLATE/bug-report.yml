@@ -1,0 +1,143 @@
+name: Bug report
+description: Report an issue with react-native-unistyles here.
+labels: 'Needs review'
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+
+        Before you proceed:
+
+        - Make sure to check whether there are similar issues in the repository
+  - type: markdown
+    attributes:
+      value: |
+        ## Required information
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please provide a clear, concise and descriptive explanation of what the bug is. Include screenshots or a video if needed. Tell us what were you expecting to happen instead of what is happening now.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Provide a detailed list of steps that reproduce the issue.
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: input
+    id: repro
+    attributes:
+      label: Snack or a link to a repository
+      description: |
+        Please provide a Snack (https://snack.expo.io/) or a link to a repository on GitHub under your username that reproduces the issue.
+        Here are some tips for providing a minimal example: https://stackoverflow.com/help/mcve.
+        Issues without a reproduction are likely to stale.
+      placeholder: Link to a Snack or a GitHub repository
+
+  - type: input
+    id: unistyles-version
+    attributes:
+      label: Unistyles version
+      description: What version of react-native-unistyles are you using?
+      placeholder: 1.0.0
+    validations:
+      required: true
+
+  - type: input
+    id: react-native-version
+    attributes:
+      label: React Native version
+      description: What version of react-native are you using?
+      placeholder: 0.72.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platforms
+    attributes:
+      label: Platforms
+      description: On what platform your application is running on?
+      multiple: true
+      options:
+        - Android
+        - iOS
+        - Web
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Additional information
+
+        Providing as much information as possible greatly helps us with reproducting the issues.
+
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: JavaScript runtime
+      description: What runtime is your application using?
+      options:
+        - JSC
+        - Hermes
+        - V8
+
+  - type: dropdown
+    id: workflow
+    attributes:
+      label: Workflow
+      description: How is your application managed?
+      options:
+        - React Native
+        - Expo Go
+        - Expo Dev Client
+
+  - type: dropdown
+    id: architecture
+    attributes:
+      label: Architecture
+      description: What React Native architecture your application is running on? Currently, the default architecture on React Native is Paper so if you haven't changed it in your application select this option.
+      options:
+        - Paper (Old Architecture)
+        - Fabric (New Architecture)
+
+  - type: dropdown
+    id: build-type
+    attributes:
+      label: Build type
+      description: What mode your application is running?
+      multiple: true
+      options:
+        - Debug mode
+        - Release mode
+
+  - type: dropdown
+    id: emulator
+    attributes:
+      label: Device
+      description: How are you running your application?
+      multiple: true
+      options:
+        - iOS simulator
+        - Android emulator
+        - Real device
+
+  - type: dropdown
+    id: acknowledgements
+    attributes:
+      label: Acknowledgements
+      description: I searched for similar issues in the repository.
+      options:
+        - 'Yes'
+    validations:
+      required: true
