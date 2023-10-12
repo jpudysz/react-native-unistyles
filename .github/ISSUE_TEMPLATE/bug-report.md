@@ -20,7 +20,7 @@ A clear and concise description of what is the bug.
 
 ### Related to
 
-- [ ] Components
+- [ ] Unistyles core
 - [ ] Demo
 - [ ] Docs
 - [ ] Typings
