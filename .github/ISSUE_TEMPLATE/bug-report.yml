@@ -9,7 +9,10 @@ body:
 
         Before you proceed:
 
-        - Make sure to check whether there are similar issues in the repository
+         Before submitting a new bug/issue, please check the links below to see if there is a solution or question posted there already:
+         -  Issues tab: https://github.com/jpudysz/react-native-unistyles/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc
+         -  Closed issues tab: https://github.com/jpudysz/react-native-unistyles/issues?q=is%3Aissue+is%3Aclosed
+         -  Discussions tab: https://github.com/jpudysz/react-native-unistyles/discussions
   - type: markdown
     attributes:
       value: |
