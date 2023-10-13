@@ -28,10 +28,12 @@ export const createUnistyles = <B extends Breakpoints, T = {}>(breakpoints: B) =
         useStyles: <ST extends CustomNamedStyles<ST, B>>(stylesheet?: ST | CreateStylesFactory<ST, T>) => {
             const theme = useContext(UnistylesContext) as T
             const screenSize = useDimensions()
+            const breakpoint = getBreakpointFromScreenWidth<B>(screenSize.width, sortedBreakpointEntries)
 
             if (!stylesheet) {
                 return {
                     theme,
+                    breakpoint,
                     styles: {} as ExtractBreakpoints<RemoveKeysWithPrefix<ST, B>, B>
                 }
             }
@@ -39,8 +41,6 @@ export const createUnistyles = <B extends Breakpoints, T = {}>(breakpoints: B) =
             const parsedStyles = useMemo(() => typeof stylesheet === 'function'
                 ? stylesheet(theme)
                 : stylesheet, [theme, stylesheet])
-
-            const breakpoint = getBreakpointFromScreenWidth<B>(screenSize.width, sortedBreakpointEntries)
 
             const dynamicStyleSheet = useMemo(() => Object
                 .entries(parsedStyles)
@@ -62,6 +62,7 @@ export const createUnistyles = <B extends Breakpoints, T = {}>(breakpoints: B) =
 
             return {
                 theme,
+                breakpoint,
                 styles: dynamicStyleSheet as ExtractBreakpoints<RemoveKeysWithPrefix<ST, B>, B>
             }
         }
