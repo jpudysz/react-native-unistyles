@@ -19,7 +19,7 @@ body:
     id: description
     attributes:
       label: Description
-      description: Please provide a clear, concise and descriptive explanation of what the bug is. Include screenshots or a video if needed by drag and dropping them to the box above.
+      description: Please provide a clear, concise and descriptive explanation of what the bug is. Include screenshots or a video if needed by drag and dropping them to the box below.
     validations:
       required: true
 
@@ -59,7 +59,7 @@ body:
     attributes:
       label: React Native version
       description: What version of react-native are you using?
-      placeholder: 0.72.0
+      placeholder: 0.73.0
     validations:
       required: true
 
@@ -72,16 +72,6 @@ body:
       options:
         - Android
         - iOS
-        - Web
-    validations:
-      required: true
-
-  - type: dropdown
-    id: acknowledgements
-    attributes:
-      label: Acknowledgements
-      description: I searched for similar issues in the repository.
-      options:
-        - 'Yes'
+        - React Native Web
     validations:
       required: true
