@@ -28,4 +28,70 @@ import Seo from '../../../components/Seo.astro'
     const { styles, theme } = useStyles(stylesheet)
     ```
 
+    You can also access the current `breakpoint` to manipulate the JSX or dynamically select your styles:
+
+    ```tsx
+    // access breakpoint
+    const { styles, breakpoint } = useStyles(stylesheet)
+
+    // The breakpoint is always defined and is a string. It can be values like sm, md, lg, etc.
+    ```
+
+    Show or hide components based on breakpoint (with your own implementation of Visible/Hidden components):
+
+    ```tsx
+    export const Example = () => {
+      const { styles, breakpoint } = useStyles(stylesheet)
+
+      return (
+        <View style={styles.container}>
+            <Hidden
+               from="xs"
+               to="md"
+               breakpoint={breakpoint}
+            >
+              <MobileSidebar />
+            </Hidden>
+            <Visible
+              from="md"
+              breakpoint={breakpoint}
+            >
+              <WebSidebar />
+            </Hidden>
+        </View>
+      )
+    }
+    ```
+
+    Access styles based on breakpoint (may be helpful for variants):
+
+    ```tsx
+    export const Example = () => {
+      const { styles, breakpoint } = useStyles(stylesheet)
+
+      return (
+        <View
+          style={{
+             ...styles.container,
+             ...styles[`variant-${breakpoint}`]
+          }}
+        />
+      )
+    }
+
+    const stylesheet = createStyleSheet(theme => ({
+      container: {
+        flex: 1,
+        justifyContent: 'center'
+      },
+      'variant-xs': {
+        // some xs styles
+      },
+      'variant-sm': {
+        // some md styles
+      },
+      // etc.
+    }))
+    ```
+
 </Seo>

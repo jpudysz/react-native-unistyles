@@ -154,5 +154,39 @@ describe('createUnistyles', () => {
                 alignItems: 'row'
             })
         })
+
+        it ('should return breakpoint even if no stylesheet has been provided', () => {
+            const breakpoints = {
+                xs: 0,
+                sm: 200,
+                md: 500,
+                lg: 1000
+            }
+
+            const { useStyles } = createUnistyles<typeof breakpoints, {}>(breakpoints)
+            const { result } = renderHook(() => useStyles())
+
+            expect(result.current.breakpoint).toEqual('md')
+        })
+
+        it ('should return breakpoint for stylesheet', () => {
+            const breakpoints = {
+                xs: 0,
+                sm: 200,
+                lg: 1000
+            }
+
+            const { useStyles, createStyleSheet } = createUnistyles<typeof breakpoints, {}>(breakpoints)
+            const stylesheet = createStyleSheet({
+                container: {
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }
+            })
+            const { result } = renderHook(() => useStyles(stylesheet as CustomNamedStyles<typeof stylesheet, typeof breakpoints>))
+
+            expect(result.current.breakpoint).toEqual('sm')
+        })
     })
 })
