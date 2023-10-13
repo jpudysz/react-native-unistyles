@@ -6,6 +6,13 @@
  <img alt="react-native-unistyles" src="assets/uni-light.svg">
 </picture>
 
+[![npm version](https://img.shields.io/npm/v/react-native-unistyles.svg?style=for-the-badge)](https://www.npmjs.com/package/react-native-unistyles)
+[![npm downloads](https://img.shields.io/npm/dm/react-native-unistyles.svg?style=for-the-badge)](https://www.npmjs.com/package/react-native-unistyles)
+[![npm](https://img.shields.io/npm/dt/react-native-unistyles.svg?style=for-the-badge)](https://www.npmjs.com/package/react-native-unistyles)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/jpudysz/react-native-unistyles?style=for-the-badge)
+![Platform - Android and iOS](https://img.shields.io/badge/platform-Android%20%7C%20iOS%20%7C%20RNWeb-blue.svg?style=for-the-badge)
+
 ## Features
 - ⚡ Blazing fast, adds around ~3ms on top of StyleSheet*
 - 🎳 Share up to 100% of your styles across platforms in monorepo
