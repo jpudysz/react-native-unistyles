@@ -1,13 +1,11 @@
 name: Bug report
-description: Report an issue with react-native-unistyles here.
+description: Report an issue with react-native-unistyles.
 labels: 'Needs review'
 body:
   - type: markdown
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
-
-        Before you proceed:
 
          Before submitting a new bug/issue, please check the links below to see if there is a solution or question posted there already:
          -  Issues tab: https://github.com/jpudysz/react-native-unistyles/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc
@@ -21,7 +19,7 @@ body:
     id: description
     attributes:
       label: Description
-      description: Please provide a clear, concise and descriptive explanation of what the bug is. Include screenshots or a video if needed by drag and dropping them to this box. Tell us what were you expecting to happen instead of what is happening now.
+      description: Please provide a clear, concise and descriptive explanation of what the bug is. Include screenshots or a video if needed by drag and dropping them to the box above.
     validations:
       required: true
 
@@ -40,7 +38,7 @@ body:
   - type: input
     id: repro
     attributes:
-      label: Snack or a link to a repository
+      label: Snack or a link to a repository (optional)
       description: |
         Please provide a Snack (https://snack.expo.io/) or a link to a repository on GitHub under your username that reproduces the issue.
         Here are some tips for providing a minimal example: https://stackoverflow.com/help/mcve.
@@ -77,63 +75,6 @@ body:
         - Web
     validations:
       required: true
-
-  - type: markdown
-    attributes:
-      value: |
-        ## Additional information
-
-        Providing as much information as possible greatly helps us with reproducting the issues.
-
-  - type: dropdown
-    id: runtime
-    attributes:
-      label: JavaScript runtime
-      description: What runtime is your application using?
-      options:
-        - JSC
-        - Hermes
-        - V8
-
-  - type: dropdown
-    id: workflow
-    attributes:
-      label: Workflow
-      description: How is your application managed?
-      options:
-        - React Native
-        - Expo Go
-        - Expo Dev Client
-
-  - type: dropdown
-    id: architecture
-    attributes:
-      label: Architecture
-      description: What React Native architecture your application is running on? Currently, the default architecture on React Native is Paper so if you haven't changed it in your application select this option.
-      options:
-        - Paper (Old Architecture)
-        - Fabric (New Architecture)
-
-  - type: dropdown
-    id: build-type
-    attributes:
-      label: Build type
-      description: What mode your application is running?
-      multiple: true
-      options:
-        - Debug mode
-        - Release mode
-
-  - type: dropdown
-    id: emulator
-    attributes:
-      label: Device
-      description: How are you running your application?
-      multiple: true
-      options:
-        - iOS simulator
-        - Android emulator
-        - Real device
 
   - type: dropdown
     id: acknowledgements
