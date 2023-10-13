@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useMemo } from 'react'
 import { StyleSheet } from 'react-native'
 import type {
     Breakpoints,
@@ -36,12 +36,13 @@ export const createUnistyles = <B extends Breakpoints, T = {}>(breakpoints: B) =
                 }
             }
 
-            const parsedStyles = typeof stylesheet === 'function'
+            const parsedStyles = useMemo(() => typeof stylesheet === 'function'
                 ? stylesheet(theme)
-                : stylesheet
+                : stylesheet, [theme, stylesheet])
+
             const breakpoint = getBreakpointFromScreenWidth<B>(screenSize.width, sortedBreakpointEntries)
 
-            const dynamicStyleSheet = Object
+            const dynamicStyleSheet = useMemo(() => Object
                 .entries(parsedStyles)
                 .reduce((acc, [key, value]) => {
                     const style = value as CustomNamedStyles<ST, B>
@@ -57,7 +58,7 @@ export const createUnistyles = <B extends Breakpoints, T = {}>(breakpoints: B) =
                         ...acc,
                         [key]: parseStyle<ST, B>(style, breakpoint, screenSize, sortedBreakpointEntries)
                     })
-                }, {} as ST)
+                }, {} as ST), [breakpoint, screenSize, parsedStyles])
 
             return {
                 theme,
