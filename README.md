@@ -26,7 +26,7 @@
 ## Installation
 
 ```cmd
-yarn add react-native-unistyles@rc
+yarn add react-native-unistyles
 ```
 
 ## [Documentation](https://reactnativeunistyles.vercel.app/)
