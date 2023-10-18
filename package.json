@@ -1,15 +1,14 @@
 {
   "name": "react-native-unistyles",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Level up your React Native StyleSheet",
   "scripts": {
     "test": "jest",
     "tsc": "node_modules/typescript/bin/tsc --noEmit",
     "lint": "eslint . --ext .ts,.tsx",
-    "clean": "del-cli lib",
     "prepare": "husky install && bob build",
     "precommit": "concurrently 'yarn tsc' 'yarn lint' 'yarn test'",
-    "release": "release-it"
+    "release": "release-it patch --preRelease=alpha --npm.tag=next"
   },
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -40,9 +39,9 @@
   "devDependencies": {
     "@commitlint/config-conventional": "17.8.0",
     "@react-native/eslint-config": "0.74.0",
-    "@release-it/conventional-changelog": "5.1.1",
+    "@release-it/conventional-changelog": "7.0.2",
     "@testing-library/react-hooks": "8.0.1",
-    "@types/jest": "29.5.5",
+    "@types/jest": "29.5.6",
     "@types/react": "18.2.28",
     "@types/react-native": "0.72.3",
     "@typescript-eslint/eslint-plugin": "6.8.0",
@@ -50,7 +49,6 @@
     "@typescript-eslint/parser": "6.8.0",
     "commitlint": "17.8.0",
     "concurrently": "8.2.1",
-    "del-cli": "5.1.0",
     "eslint": "8.51.0",
     "eslint-config-codemask": "1.1.7",
     "eslint-plugin-functional": "6.0.0",
@@ -117,7 +115,9 @@
     },
     "plugins": {
       "@release-it/conventional-changelog": {
-        "preset": "angular"
+        "preset": {
+          "name": "angular"
+        }
       }
     }
   },

@@ -11,6 +11,7 @@
 ![Platform - Android and iOS](https://img.shields.io/badge/platform-Android%20%7C%20iOS%20%7C%20RNWeb-blue.svg?style=for-the-badge)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
+
 ## Features
 - ⚡ Blazing fast, adds around ~3ms on top of StyleSheet*
 - 🎳 Share up to 100% of your styles across platforms in monorepo
@@ -33,6 +34,18 @@ yarn add react-native-unistyles
 - [Start here](https://reactnativeunistyles.vercel.app/start/setup/)
 - [References](https://reactnativeunistyles.vercel.app/reference/create-stylesheet/)
 - [Examples](https://reactnativeunistyles.vercel.app/example/breakpoints/)
+
+## Faster, better and simpler - v.2.0 🚀
+
+There is ongoing work on branch [2.0](https://github.com/jpudysz/react-native-unistyles/tree/2.0).
+
+---
+
+Join early testers and discussion [here](https://github.com/jpudysz/react-native-unistyles/discussions/41)
+
+```cmd
+yarn add react-native-unistyles@next
+```
 
 ## Blog post
 
