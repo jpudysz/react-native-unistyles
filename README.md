@@ -34,6 +34,18 @@ yarn add react-native-unistyles
 - [References](https://reactnativeunistyles.vercel.app/reference/create-stylesheet/)
 - [Examples](https://reactnativeunistyles.vercel.app/example/breakpoints/)
 
+## Faster, better and simpler - v.2.0 🚀
+
+There is ongoing work on branch [2.0](https://github.com/jpudysz/react-native-unistyles/tree/2.0).
+
+---
+
+Join early testers and discussion [here](https://github.com/jpudysz/react-native-unistyles/discussions/41).
+
+```cmd
+yarn add react-native-unistyles@next
+```
+
 ## Blog post
 
 Read about what drove me to create this library in this blog post [here](https://www.reactnativecrossroads.com/posts/level-up-react-native-styles).
