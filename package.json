@@ -4,6 +4,7 @@
   "description": "Level up your React Native StyleSheet",
   "scripts": {
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "tsc": "node_modules/typescript/bin/tsc --noEmit",
     "lint": "eslint . --ext .ts,.tsx",
     "prepare": "husky install && bob build",
@@ -95,7 +96,8 @@
       "<rootDir>/example/node_modules",
       "<rootDir>/docs/node_modules",
       "<rootDir>/lib/"
-    ]
+    ],
+    "coverageReporters": ["html"]
   },
   "commitlint": {
     "extends": [
