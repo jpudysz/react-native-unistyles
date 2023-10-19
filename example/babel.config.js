@@ -7,6 +7,7 @@ module.exports = function (api) {
     return {
         presets: ['babel-preset-expo'],
         plugins: [
+            '../src/unistyles-babel.js',
             [
                 'module-resolver',
                 {
