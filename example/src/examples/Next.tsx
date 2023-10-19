@@ -1,9 +1,8 @@
 import React from 'react'
 import { Text, View, StyleSheet } from 'react-native'
-import { useStyles } from '../styles'
 
 export const Next: React.FunctionComponent = () => {
-    const { styles } = useStyles(stylesheet)
+    // const { styles } = useStyles(stylesheet)
 
     return (
         <View style={styles.container}>
@@ -14,7 +13,7 @@ export const Next: React.FunctionComponent = () => {
     )
 }
 
-const stylesheet = StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
