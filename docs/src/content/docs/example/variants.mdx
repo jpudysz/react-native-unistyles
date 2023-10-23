@@ -76,9 +76,9 @@ export const BaseText: React.FunctionComponent<BaseTextProps> = ({
         <Text
             style={{
                 ...styles.baseText,
-                ...bold
-                    ? styles.baseText
-                    : {},
+                ...(bold
+                    ? styles.bold
+                    : {}),
                 // pass other styles via props
                 ...style
             }}
