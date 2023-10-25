@@ -1,3 +1,4 @@
+export * from './normalizer'
 export type { CustomNamedStyles } from './core'
 export type {
     ScreenSize,

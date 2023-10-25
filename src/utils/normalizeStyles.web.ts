@@ -1,29 +1,8 @@
 import { warn } from './common'
+import { preprocessor } from './normalizer'
+import type { NormalizedBoxShadow, NormalizedTextShadow, BoxShadow, TextShadow, Transforms } from '../types'
 
-const preprocessor: Preprocessor = require('react-native-web/src/exports/StyleSheet/preprocess.js')
-
-type Preprocessor = {
-    createTextShadowValue<T>(styles: any): T,
-    createBoxShadowValue<T>(styles: any): T,
-    createTransformValue<T>(transforms: any): T,
-}
-
-type NormalizedBoxShadow = {
-    shadowColor: undefined,
-    shadowOffset: undefined,
-    shadowOpacity: undefined,
-    shadowRadius: undefined,
-    boxShadow?: string
-}
-
-type NormalizedTextShadow = {
-    textShadowColor: undefined
-    textShadowOffset: undefined
-    textShadowRadius: undefined,
-    textShadow?: string
-}
-
-const normalizeBoxShadow = <T extends {}>(styles: T): NormalizedBoxShadow => {
+const normalizeBoxShadow = <T extends BoxShadow>(style: T): NormalizedBoxShadow => {
     const requiredBoxShadowProperties = [
         'shadowColor',
         'shadowOffset',
@@ -31,7 +10,7 @@ const normalizeBoxShadow = <T extends {}>(styles: T): NormalizedBoxShadow => {
         'shadowRadius'
     ]
 
-    if (!requiredBoxShadowProperties.every(prop => prop in styles)) {
+    if (!requiredBoxShadowProperties.every(prop => prop in style)) {
         warn(`can't apply box shadow as you miss at least one of these properties: ${requiredBoxShadowProperties.join(', ')}`)
 
         return {
@@ -43,7 +22,7 @@ const normalizeBoxShadow = <T extends {}>(styles: T): NormalizedBoxShadow => {
     }
 
     return {
-        boxShadow: preprocessor.createBoxShadowValue(styles),
+        boxShadow: preprocessor.createBoxShadowValue(style),
         shadowColor: undefined,
         shadowOffset: undefined,
         shadowOpacity: undefined,
@@ -51,14 +30,14 @@ const normalizeBoxShadow = <T extends {}>(styles: T): NormalizedBoxShadow => {
     }
 }
 
-const normalizeTextShadow = <T extends {}>(styles: T): NormalizedTextShadow => {
+const normalizeTextShadow = <T extends TextShadow>(style: T): NormalizedTextShadow => {
     const requiredTextShadowProperties = [
         'textShadowColor',
         'textShadowOffset',
         'textShadowRadius'
     ]
 
-    if (!requiredTextShadowProperties.every(prop => prop in styles)) {
+    if (!requiredTextShadowProperties.every(prop => prop in style)) {
         warn(`can't apply text shadow as you miss at least one of these properties: ${requiredTextShadowProperties.join(', ')}`)
 
         return {
@@ -69,33 +48,33 @@ const normalizeTextShadow = <T extends {}>(styles: T): NormalizedTextShadow => {
     }
 
     return {
-        textShadow: preprocessor.createTextShadowValue(styles),
+        textShadow: preprocessor.createTextShadowValue(style),
         textShadowColor: undefined,
         textShadowOffset: undefined,
         textShadowRadius: undefined
     }
 }
 
-export const normalizeStyles = <T extends {}>(styles: T): T => {
-    const normalizedTransform = ('transform' in styles && Array.isArray(styles.transform))
-        ? { transform: preprocessor.createTransformValue(styles.transform) }
+export const normalizeStyles = <T extends BoxShadow | TextShadow | Transforms>(style: T): T => {
+    const normalizedTransform = ('transform' in style && Array.isArray(style.transform))
+        ? { transform: preprocessor.createTransformValue(style.transform) }
         : {}
 
     const normalizedBoxShadow = (
-        'shadowColor' in styles ||
-        'shadowOffset' in styles ||
-        'shadowOpacity' in styles ||
-        'shadowRadius' in styles
-    ) ? normalizeBoxShadow(styles) : {}
+        'shadowColor' in style ||
+        'shadowOffset' in style ||
+        'shadowOpacity' in style ||
+        'shadowRadius' in style
+    ) ? normalizeBoxShadow(style as BoxShadow) : {}
 
     const normalizedTextShadow = (
-        'textShadowColor' in styles ||
-        'textShadowOffset' in styles ||
-        'textShadowRadius' in styles
-    ) ? normalizeTextShadow(styles) : {}
+        'textShadowColor' in style ||
+        'textShadowOffset' in style ||
+        'textShadowRadius' in style
+    ) ? normalizeTextShadow(style as TextShadow) : {}
 
     return {
-        ...styles,
+        ...style,
         ...normalizedTransform,
         ...normalizedBoxShadow,
         ...normalizedTextShadow
