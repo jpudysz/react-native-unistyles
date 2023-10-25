@@ -9,3 +9,4 @@ export const warn = (message: string) => {
 }
 
 export const isWeb = () => Platform.OS === 'web'
+export const isServer = () => typeof window === 'undefined'
