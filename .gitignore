@@ -80,3 +80,4 @@ example/.yarn
 
 #docs
 docs/.yarn
+coverage

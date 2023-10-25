@@ -8,7 +8,7 @@
 
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/jpudysz/react-native-unistyles?style=for-the-badge)
 [![npm downloads](https://img.shields.io/npm/dm/react-native-unistyles.svg?style=for-the-badge)](https://www.npmjs.com/package/react-native-unistyles)
-![Platform - Android and iOS](https://img.shields.io/badge/platform-Android%20%7C%20iOS%20%7C%20RNWeb-blue.svg?style=for-the-badge)
+![Platform - Android and iOS](https://img.shields.io/badge/platform-Android%20%7C%20IOS%20%7C%20SSR%20%7C%20Web-blue.svg?style=for-the-badge)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 ## Features
@@ -18,7 +18,8 @@
 - 🖥️ Supports custom breakpoints and css-like media queries
 - 🎨 Access theme in your StyleSheets and components
 - 🪄 Supports dynamic functions to access values from JSX
-- 🥳 Compatible with Expo, Expo Go, Bare React Native and React Native Web
+- 🥳 Compatible with Expo, Expo Go, Bare React Native, React Native Web and SSR
+- 🛡️ ~99% Test coverage
 - ⚔️ No 3rd party dependencies
 
 *-based on this [benchmark](https://github.com/efstathiosntonas/react-native-style-libraries-benchmark)

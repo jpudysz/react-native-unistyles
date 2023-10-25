@@ -55,7 +55,7 @@ const normalizeTextShadow = <T extends TextShadow>(style: T): NormalizedTextShad
     }
 }
 
-export const normalizeStyles = <T extends BoxShadow | TextShadow | Transforms>(style: T): T => {
+export const normalizeStyles = <T extends BoxShadow | TextShadow | { transform: Transforms }>(style: T): T => {
     const normalizedTransform = ('transform' in style && Array.isArray(style.transform))
         ? { transform: preprocessor.createTransformValue(style.transform) }
         : {}
