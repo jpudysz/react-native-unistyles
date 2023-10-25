@@ -1,0 +1,24 @@
+{
+  "dependencies": {
+    "expo": "49.0.16",
+    "next": "13.5.6",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-native": "0.72.6",
+    "react-native-web": "0.19.9"
+  },
+  "devDependencies": {
+    "@babel/core": "7.23.2",
+    "@expo/next-adapter": "5.0.2",
+    "typescript": "5.2.2"
+  },
+  "resolutions": {
+    "@types/react": "17.0.38"
+  },
+  "scripts": {
+    "start": "yarn next"
+  },
+  "name": "ssr",
+  "version": "1.0.0",
+  "private": true
+}
