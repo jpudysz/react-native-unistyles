@@ -8,5 +8,5 @@ export const warn = (message: string) => {
     console.warn(`🦄 [react-native-unistyles]: ${message}`)
 }
 
-export const isWeb = () => Platform.OS === 'web'
-export const isServer = () => typeof window === 'undefined'
+export const isWeb = Platform.OS === 'web'
+export const isServer = typeof window === 'undefined'

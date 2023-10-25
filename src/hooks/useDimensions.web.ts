@@ -3,7 +3,7 @@ import type { ScreenSize } from '../types'
 import { isServer } from '../utils'
 
 export const useDimensions = (): ScreenSize => {
-    if (isServer()) {
+    if (isServer) {
         return {
             width: 0,
             height: 0

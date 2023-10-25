@@ -1,5 +1,6 @@
-import { preprocessor, normalizeNumericValue, normalizeColor } from '../utils'
+import { preprocessor, normalizeNumericValue, normalizeColor, normalizeStyles } from '../utils'
 import type { BoxShadow, TextShadow, Transforms } from '../types'
+import { normalizeStyles as normalizeStylesWeb } from '../utils/normalizeStyles.web'
 
 describe('Normalizer', () => {
     describe('Box Shadow', () => {
@@ -342,6 +343,113 @@ describe('Normalizer', () => {
                 expect(normalizeColor(value)).toEqual(results[index])
             })
         })
+    })
 
+    describe('normalizeStyles', () => {
+        it('should do nothing to styles object', () => {
+            const styles = {
+                container: {
+                    flex: 1,
+                    transform: [
+                        {
+                            translateX: 30
+                        }
+                    ]
+                }
+            }
+
+            expect(normalizeStyles({})).toEqual({})
+            expect(normalizeStyles(styles)).toEqual(styles)
+        })
+    })
+
+    describe('normalizeStylesWeb', () => {
+        beforeEach(() => {
+            console.warn = jest.fn()
+        })
+
+        afterEach(() => {
+            jest.restoreAllMocks()
+        })
+
+        it('should transform translations for web', () => {
+            const styles = {
+                transform: [
+                    {
+                        translateX: 30
+                    },
+                    {
+                        scale: 2
+                    },
+                    {
+                        rotate: '20deg'
+                    }
+                ]
+            }
+            expect(normalizeStylesWeb(styles)).toEqual({
+                transform: 'translateX(30px) scale(2) rotate(20deg)'
+            })
+        })
+
+        it('should transform box shadow for web and clear out old values', () => {
+            const styles: BoxShadow = {
+                shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 0
+                },
+                shadowOpacity: 1,
+                shadowRadius: 5
+            }
+            expect(normalizeStylesWeb(styles)).toEqual({
+                boxShadow: '0 0 5px rgba(0,0,0,1)',
+                shadowColor: undefined,
+                shadowOffset: undefined,
+                shadowOpacity: undefined,
+                shadowRadius: undefined
+            })
+        })
+
+        it('should transform text shadow for web and clear out old values', () => {
+            const styles: TextShadow = {
+                textShadowColor: '#fff',
+                textShadowOffset: {
+                    width: -5,
+                    height: 0
+                },
+                textShadowRadius: 12
+            }
+            expect(normalizeStylesWeb(styles)).toEqual({
+                textShadow: '-5px 0 12px rgba(255,255,255,1)',
+                textShadowColor: undefined,
+                textShadowOffset: undefined,
+                textShadowRadius: undefined
+            })
+        })
+
+        it('should warn if box shadow for web is missing some props', () => {
+            const styles = {
+                shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 0
+                }
+            }
+
+            normalizeStylesWeb(styles as BoxShadow)
+
+            expect(console.warn).toBeCalled()
+        })
+
+        it('should warn if text shadow for web is missing some props', () => {
+            const styles = {
+                textShadowColor: '#000',
+                textShadowRadius: 12
+            }
+
+            normalizeStylesWeb(styles as TextShadow)
+
+            expect(console.warn).toBeCalled()
+        })
     })
 })
