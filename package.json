@@ -86,7 +86,6 @@
   },
   "workspaces": [
     "examples/expo",
-    "examples/ssr",
     "docs"
   ],
   "packageManager": "yarn@3.6.1",
