@@ -3,17 +3,10 @@ import type { ScreenSize } from '../types'
 import { isServer } from '../utils'
 
 export const useDimensions = (): ScreenSize => {
-    if (isServer) {
-        return {
-            width: 0,
-            height: 0
-        }
-    }
-
     const timerRef = useRef<ReturnType<typeof setTimeout>>()
     const [screenSize, setScreenSize] = useState<ScreenSize>({
-        width: window.innerWidth,
-        height: window.innerHeight
+        width: isServer ? 0 : window.innerWidth,
+        height: isServer ? 0 : window.innerHeight
     })
 
     useEffect(() => {
