@@ -4,6 +4,7 @@
   "description": "Level up your React Native StyleSheet",
   "scripts": {
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "tsc": "node_modules/typescript/bin/tsc --noEmit",
     "lint": "eslint . --ext .ts,.tsx",
     "clean": "del-cli lib",
@@ -84,7 +85,7 @@
     }
   },
   "workspaces": [
-    "example",
+    "examples/expo",
     "docs"
   ],
   "packageManager": "yarn@3.6.1",
@@ -94,9 +95,13 @@
   "jest": {
     "preset": "react-native",
     "modulePathIgnorePatterns": [
-      "<rootDir>/example/node_modules",
+      "<rootDir>/examples/expo/node_modules",
+      "<rootDir>/examples/ssr/node_modules",
       "<rootDir>/docs/node_modules",
       "<rootDir>/lib/"
+    ],
+    "coverageReporters": [
+      "html"
     ]
   },
   "commitlint": {
