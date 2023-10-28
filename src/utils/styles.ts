@@ -109,7 +109,7 @@ export const parseStyle = <T, B extends Breakpoints>(
             })
         )
 
-    return isWeb()
+    return isWeb
         ? normalizeStyles(parsedStyles)
         : parsedStyles
 }

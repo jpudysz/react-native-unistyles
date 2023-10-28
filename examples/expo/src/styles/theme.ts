@@ -1,5 +1,3 @@
-import { Unistyles } from 'react-native-unistyles'
-
 const sharedColors = {
     barbie: '#ff9ff3',
     oak: '#1dd1a1',
@@ -8,7 +6,7 @@ const sharedColors = {
     aloes: '#00d2d3'
 }
 
-const lightTheme = {
+export const lightTheme = {
     colors: {
         ...sharedColors,
         backgroundColor: '#ffffff',
@@ -17,7 +15,7 @@ const lightTheme = {
     // add any keys/functions/objects/arrays you want!
 }
 
-const darkTheme = {
+export const darkTheme = {
     colors: {
         ...sharedColors,
         backgroundColor: '#000000',
@@ -26,16 +24,13 @@ const darkTheme = {
     // add any keys/functions/objects/arrays you want!
 }
 
-const customTheme = {
+export const premiumTheme = {
     colors: {
         ...sharedColors,
-        backgroundColor: '#111111',
-        typography: '#cccccc'
+        backgroundColor: '#cccccc',
+        typography: '#15659b'
     }
+    // add any keys/functions/objects/arrays you want!
 }
 
-Unistyles.Static.registerThemes({
-    light: lightTheme,
-    dark: darkTheme,
-    custom: customTheme
-})
+export type AppTheme = typeof lightTheme | typeof darkTheme | typeof premiumTheme

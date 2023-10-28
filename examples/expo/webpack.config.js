@@ -2,7 +2,7 @@ const path = require('path')
 const createExpoWebpackConfigAsync = require('@expo/webpack-config')
 const { resolver } = require('./metro.config')
 
-const root = path.resolve(__dirname, '..')
+const root = path.resolve(__dirname, '../..')
 const modules = path.join(__dirname, 'node_modules')
 
 module.exports = async (env, argv) => {
