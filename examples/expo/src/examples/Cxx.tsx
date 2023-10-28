@@ -1,18 +1,9 @@
-import React, { useEffect } from 'react'
-import { View, Text } from 'react-native'
-import { UnistylesRuntime } from 'react-native-unistyles'
-import { breakpoints, darkTheme, lightTheme, premiumTheme } from '../styles'
-
-UnistylesRuntime
-    .registerBreakpoints(breakpoints)
-    .registerTheme('light', lightTheme)
-    .registerTheme('dark', darkTheme)
-    .registerTheme('premium', premiumTheme)
+import React from 'react'
+import { View, Text, Button } from 'react-native'
+import { UnistylesRuntime, useUnistyles } from 'react-native-unistyles'
 
 export const Cxx: React.FunctionComponent = () => {
-    useEffect(() => {
-        console.log(UnistylesRuntime.getCurrentBreakpoint())
-    }, [])
+    useUnistyles()
 
     return (
         <View
@@ -22,9 +13,33 @@ export const Cxx: React.FunctionComponent = () => {
                 alignItems: 'center'
             }}
         >
-            <Text>
-                Cxx Styles example
+            <Text
+                style={{
+                    color: 'orange',
+                    fontWeight: 'bold',
+                    marginBottom: 20
+                }}
+            >
+                C++ unistyles example
             </Text>
+            <Text>
+                Current breakpoint: {UnistylesRuntime.getCurrentBreakpoint()}
+            </Text>
+            <Text>
+                Current theme: {UnistylesRuntime.getCurrentTheme()}
+            </Text>
+            <Button
+                title="Change theme"
+                onPress={() => {
+                    const currentTheme = UnistylesRuntime.getCurrentTheme()
+                    const nextTheme = currentTheme === 'light'
+                        ? 'dark'
+                        : currentTheme === 'dark'
+                            ? 'premium'
+                            : 'light'
+                    UnistylesRuntime.useTheme(nextTheme)
+                }}
+            />
         </View>
     )
 }

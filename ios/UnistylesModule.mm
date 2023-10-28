@@ -6,9 +6,41 @@
 
 @implementation UnistylesModule
 
+BOOL hasListeners;
+
 using namespace facebook;
 
 RCT_EXPORT_MODULE(Unistyles)
+
+- (instancetype)init {
+    if ((self = [super init])) {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(handleOrientationChange:)
+                                                     name:UIDeviceOrientationDidChangeNotification
+                                                   object:nil];
+    }
+    return self;
+}
+
+- (void)handleOrientationChange:(NSNotification *)notification {
+    CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+    CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
+
+    NSDictionary *body = @{
+        @"type": @"size",
+        @"payload": @{
+            @"width": @(screenWidth),
+            @"height": @(screenHeight)
+        }
+    };
+
+    [self emitEvent:@"onChange" withBody:body];
+}
+
++ (BOOL)requiresMainQueueSetup
+{
+  return YES;
+}
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 {
@@ -37,6 +69,52 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
     return @true;
 }
 
+- (NSArray<NSString *> *)supportedEvents {
+    return @[@"onChange"];
+}
+
+- (void)startObserving
+{
+    hasListeners = YES;
+}
+
+- (void)stopObserving
+{
+    hasListeners = NO;
+}
+
+- (void)emitEvent:(NSString *)eventName withBody:(NSDictionary *)body {
+    if (hasListeners) {
+        [self sendEventWithName:@"onChange" body:body];
+    }
+}
+
+- (NSString *)getCurrentBreakpoint:(CGFloat) screenWidth {
+    NSString *currentBreakpointKey = nil;
+
+    for (NSInteger index = 0; index < self.sortedBreakpointEntries.count; index++) {
+        NSString *breakpointKey = [self.sortedBreakpointEntries objectAtIndex:index];
+        NSNumber *minValNum = [self.breakpoints objectForKey:breakpointKey];
+        CGFloat minVal = minValNum.floatValue;
+
+        CGFloat maxVal;
+        if (index + 1 < self.sortedBreakpointEntries.count) {
+            NSString *nextBreakpointKey = [self.sortedBreakpointEntries objectAtIndex:index + 1];
+            NSNumber *maxValNum = [self.breakpoints objectForKey:nextBreakpointKey];
+            maxVal = maxValNum.floatValue;
+        } else {
+            maxVal = CGFLOAT_MAX;
+        }
+
+        if (screenWidth >= minVal && screenWidth < maxVal) {
+            currentBreakpointKey = breakpointKey;
+            break;
+        }
+    }
+
+    return currentBreakpointKey;
+}
+
 void registerUnistylesMethods(jsi::Runtime &runtime, UnistylesModule* weakSelf) {
     auto addBreakpoints = jsi::Function::createFromHostFunction(
         runtime,
@@ -48,7 +126,11 @@ void registerUnistylesMethods(jsi::Runtime &runtime, UnistylesModule* weakSelf) 
                 NSDictionary *breakpointsDict = JSIObjectToNSDictionary(runtime, breakpointsObj);
                 [weakSelf setBreakpoints:breakpointsDict];
 
-                NSArray *sortedBreakpointEntries = [[weakSelf.breakpoints allKeys] sortedArrayUsingSelector:@selector(compare:)];
+                NSArray *sortedBreakpointEntries = [weakSelf.breakpoints keysSortedByValueUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+                    NSNumber *num1 = (NSNumber *)obj1;
+                    NSNumber *num2 = (NSNumber *)obj2;
+                    return [num1 compare:num2];
+                }];
                 [weakSelf setSortedBreakpointEntries:sortedBreakpointEntries];
             }
 
@@ -79,27 +161,7 @@ void registerUnistylesMethods(jsi::Runtime &runtime, UnistylesModule* weakSelf) 
 
             CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
 
-            NSString *currentBreakpointKey = nil;
-
-            for (NSInteger index = 0; index < weakSelf.sortedBreakpointEntries.count; index++) {
-                NSString *breakpointKey = [weakSelf.sortedBreakpointEntries objectAtIndex:index];
-                NSNumber *minValNum = [weakSelf.breakpoints objectForKey:breakpointKey];
-                CGFloat minVal = minValNum.floatValue;
-
-                CGFloat maxVal;
-                if (index + 1 < weakSelf.sortedBreakpointEntries.count) {
-                    NSString *nextBreakpointKey = [weakSelf.sortedBreakpointEntries objectAtIndex:index + 1];
-                    NSNumber *maxValNum = [weakSelf.breakpoints objectForKey:nextBreakpointKey];
-                    maxVal = maxValNum.floatValue;
-                } else {
-                    maxVal = CGFLOAT_MAX;
-                }
-
-                if (screenWidth >= minVal && screenWidth < maxVal) {
-                    currentBreakpointKey = breakpointKey;
-                    break;
-                }
-            }
+            NSString *currentBreakpointKey = [weakSelf getCurrentBreakpoint:screenWidth];
 
             if (currentBreakpointKey) {
                 return jsi::String::createFromUtf8(runtime, currentBreakpointKey.UTF8String);
@@ -111,10 +173,47 @@ void registerUnistylesMethods(jsi::Runtime &runtime, UnistylesModule* weakSelf) 
 
     auto addTheme = jsi::Function::createFromHostFunction(runtime,
         jsi::PropNameID::forAscii(runtime, "addTheme"),
-        2,
-        [](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
+        1,
+        [weakSelf](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
             std::string themeName = arguments[0].asString(runtime).utf8(runtime);
-            jsiConsoleLog(runtime, "Theme name: " + themeName);
+            NSString *themeNameNS = [NSString stringWithUTF8String:themeName.c_str()];
+
+            [weakSelf.themes addObject:themeNameNS];
+
+            return jsi::Value::undefined();
+        }
+    );
+
+    auto useTheme = jsi::Function::createFromHostFunction(runtime,
+        jsi::PropNameID::forAscii(runtime, "useTheme"),
+        1,
+        [weakSelf](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
+            if (count > 0 && arguments[0].isString()) {
+                std::string themeName = arguments[0].asString(runtime).utf8(runtime);
+                NSString *themeNameNS = [NSString stringWithUTF8String:themeName.c_str()];
+
+                weakSelf.currentTheme = themeNameNS;
+
+                NSDictionary *body = @{
+                    @"type": @"theme",
+                    @"payload": @{
+                        @"currentTheme": themeNameNS
+                    }
+                };
+                [weakSelf emitEvent:@"onChange" withBody:body];
+            }
+
+            return jsi::Value::undefined();
+        }
+    );
+
+    auto getCurrentTheme = jsi::Function::createFromHostFunction(runtime,
+        jsi::PropNameID::forAscii(runtime, "getCurrentTheme"),
+        0,
+        [weakSelf](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
+            if (weakSelf.currentTheme) {
+                return jsi::String::createFromUtf8(runtime, weakSelf.currentTheme.UTF8String);
+            }
 
             return jsi::Value::undefined();
         }
@@ -122,9 +221,11 @@ void registerUnistylesMethods(jsi::Runtime &runtime, UnistylesModule* weakSelf) 
 
     jsi::Object unistyles(runtime);
     unistyles.setProperty(runtime, "addTheme", addTheme);
+    unistyles.setProperty(runtime, "useTheme", useTheme);
     unistyles.setProperty(runtime, "addBreakpoints", addBreakpoints);
     unistyles.setProperty(runtime, "getBreakpoints", getBreakpoints);
     unistyles.setProperty(runtime, "getCurrentBreakpoint", getCurrentBreakpoint);
+    unistyles.setProperty(runtime, "getCurrentTheme", getCurrentTheme);
 
     runtime.global().setProperty(runtime, "__UNISTYLES__", unistyles);
 }
