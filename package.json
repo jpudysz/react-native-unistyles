@@ -20,7 +20,10 @@
   "files": [
     "src",
     "lib",
+    "ios",
+    "react-native-unistyles.podspec",
     "!**/*.spec.ts",
+    "!**/*.spec.tsx",
     "!**/.*"
   ],
   "keywords": [

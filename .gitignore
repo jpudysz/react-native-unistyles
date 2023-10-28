@@ -81,3 +81,5 @@ example/expo/.yarn
 #docs
 docs/.yarn
 coverage
+examples/expo/ios
+examples/expo/android
