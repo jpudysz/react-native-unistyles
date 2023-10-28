@@ -24,4 +24,13 @@ export const darkTheme = {
     // add any keys/functions/objects/arrays you want!
 }
 
-export type AppTheme = typeof lightTheme | typeof darkTheme
+export const premiumTheme = {
+    colors: {
+        ...sharedColors,
+        backgroundColor: '#cccccc',
+        typography: '#15659b'
+    }
+    // add any keys/functions/objects/arrays you want!
+}
+
+export type AppTheme = typeof lightTheme | typeof darkTheme | typeof premiumTheme
