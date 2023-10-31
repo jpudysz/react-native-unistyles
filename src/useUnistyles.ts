@@ -6,9 +6,9 @@ import { CxxUnistylesEventTypes, UnistylesRuntime } from './CxxUnistyles'
 const unistylesEvents = new NativeEventEmitter(NativeModules.Unistyles)
 
 export const useUnistyles = () => {
-    const [, setTheme] = useState(UnistylesRuntime.getCurrentTheme())
-    const [, setBreakpoint] = useState(UnistylesRuntime.getCurrentBreakpoint())
-    const [, screenSize] = useState({
+    const [theme, setTheme] = useState(UnistylesRuntime.themes[UnistylesRuntime.getCurrentTheme() as string])
+    const [breakpoint, setBreakpoint] = useState(UnistylesRuntime.getCurrentBreakpoint())
+    const [screenSize, setScreenSize] = useState({
         width: 0,
         height: 0
     })
@@ -21,14 +21,14 @@ export const useUnistyles = () => {
                     case CxxUnistylesEventTypes.Theme: {
                         const themeEvent = event as CxxUnistylesThemeEvent
 
-                        setTheme(themeEvent.payload.currentTheme)
+                        setTheme(UnistylesRuntime.themes[themeEvent.payload.currentTheme])
 
                         return
                     }
                     case CxxUnistylesEventTypes.Size: {
                         const sizeEvent = event as CxxUnistylesSizeEvent
 
-                        screenSize({
+                        setScreenSize({
                             width: sizeEvent.payload.width,
                             height: sizeEvent.payload.height
                         })
@@ -44,4 +44,10 @@ export const useUnistyles = () => {
 
         return subscription.remove
     }, [])
+
+    return {
+        theme,
+        breakpoint,
+        screenSize
+    }
 }

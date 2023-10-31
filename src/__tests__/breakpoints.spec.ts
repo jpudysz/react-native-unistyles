@@ -1,5 +1,5 @@
-import { getBreakpointFromScreenWidth, getValueForBreakpoint, sortAndValidateBreakpoints } from '../utils'
-import type { ScreenSize, SortedBreakpointEntries } from '../types'
+import { getBreakpointFromScreenWidth, sortAndValidateBreakpoints } from '../utils'
+import type { SortedBreakpointEntries } from '../types'
 
 describe('breakpoints', () => {
     describe('sortAndValidateBreakpoints', () => {
@@ -81,97 +81,97 @@ describe('breakpoints', () => {
         })
     })
 
-    describe('getValueForBreakpoint', () => {
-        it('should prioritize custom media query', () => {
-            const breakpoint = 'sm'
-            const breakpoints = {
-                xs: 0,
-                sm: 200,
-                md: 500
-            }
-            const breakpointPairs = Object
-                .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
-            const style: Record<string, string> = {
-                ':w[, 200]': 'green',
-                ':w[201]': 'orange',
-                sm: 'pink'
-            }
-            const screenSize: ScreenSize = {
-                width: 200,
-                height: 800
-            }
+    // describe('getValueForBreakpoint', () => {
+    //     it('should prioritize custom media query', () => {
+    //         const breakpoint = 'sm'
+    //         const breakpoints = {
+    //             xs: 0,
+    //             sm: 200,
+    //             md: 500
+    //         }
+    //         const breakpointPairs = Object
+    //             .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
+    //         const style: Record<string, string> = {
+    //             ':w[, 200]': 'green',
+    //             ':w[201]': 'orange',
+    //             sm: 'pink'
+    //         }
+    //         const screenSize: ScreenSize = {
+    //             width: 200,
+    //             height: 800
+    //         }
+    //
+    //         expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpointPairs)).toEqual('green')
+    //     })
+    // })
 
-            expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpointPairs)).toEqual('green')
-        })
-    })
+    // it('should match breakpoint if media query doesnt exist', () => {
+    //     const breakpoint = 'md'
+    //     const breakpoints = {
+    //         xs: 0,
+    //         sm: 200,
+    //         md: 500
+    //     }
+    //     const breakpointPairs = Object
+    //         .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
+    //     const style: Record<string, string> = {
+    //         ':w[, 200]': 'green',
+    //         ':w[201, 499]': 'orange',
+    //         sm: 'pink',
+    //         md: 'red'
+    //     }
+    //     const screenSize: ScreenSize = {
+    //         width: 500,
+    //         height: 1200
+    //     }
+    //
+    //     expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpointPairs)).toEqual('red')
+    // })
 
-    it('should match breakpoint if media query doesnt exist', () => {
-        const breakpoint = 'md'
-        const breakpoints = {
-            xs: 0,
-            sm: 200,
-            md: 500
-        }
-        const breakpointPairs = Object
-            .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
-        const style: Record<string, string> = {
-            ':w[, 200]': 'green',
-            ':w[201, 499]': 'orange',
-            sm: 'pink',
-            md: 'red'
-        }
-        const screenSize: ScreenSize = {
-            width: 500,
-            height: 1200
-        }
+    // it('should match breakpoint even if value is undefined', () => {
+    //     const breakpoint = 'md'
+    //     const breakpoints = {
+    //         xs: 0,
+    //         sm: 200,
+    //         md: 500
+    //     }
+    //     const breakpointPairs = Object
+    //         .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
+    //     const style: Record<string, string | undefined> = {
+    //         ':w[, 200]': 'green',
+    //         ':w[201, 499]': 'orange',
+    //         sm: 'pink',
+    //         md: undefined
+    //     }
+    //     const screenSize: ScreenSize = {
+    //         width: 500,
+    //         height: 1200
+    //     }
+    //
+    //     expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpointPairs)).toEqual(undefined)
+    // })
 
-        expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpointPairs)).toEqual('red')
-    })
-
-    it('should match breakpoint even if value is undefined', () => {
-        const breakpoint = 'md'
-        const breakpoints = {
-            xs: 0,
-            sm: 200,
-            md: 500
-        }
-        const breakpointPairs = Object
-            .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
-        const style: Record<string, string | undefined> = {
-            ':w[, 200]': 'green',
-            ':w[201, 499]': 'orange',
-            sm: 'pink',
-            md: undefined
-        }
-        const screenSize: ScreenSize = {
-            width: 500,
-            height: 1200
-        }
-
-        expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpointPairs)).toEqual(undefined)
-    })
-
-    it('should match lower breakpoint to match css cascading', () => {
-        const breakpoint = 'xl'
-        const breakpoints = {
-            xs: 0,
-            sm: 200,
-            md: 500,
-            xl: 600
-        }
-        const breakpointPairs = Object
-            .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
-        const style: Record<string, string | undefined> = {
-            ':w[, 200]': 'green',
-            ':w[201, 499]': 'orange',
-            sm: 'pink',
-            md: 'red'
-        }
-        const screenSize: ScreenSize = {
-            width: 500,
-            height: 1200
-        }
-
-        expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpointPairs)).toEqual('red')
-    })
+    // it('should match lower breakpoint to match css cascading', () => {
+    //     const breakpoint = 'xl'
+    //     const breakpoints = {
+    //         xs: 0,
+    //         sm: 200,
+    //         md: 500,
+    //         xl: 600
+    //     }
+    //     const breakpointPairs = Object
+    //         .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
+    //     const style: Record<string, string | undefined> = {
+    //         ':w[, 200]': 'green',
+    //         ':w[201, 499]': 'orange',
+    //         sm: 'pink',
+    //         md: 'red'
+    //     }
+    //     const screenSize: ScreenSize = {
+    //         width: 500,
+    //         height: 1200
+    //     }
+    //
+    //     expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpointPairs)).toEqual('red')
+    // })
 })

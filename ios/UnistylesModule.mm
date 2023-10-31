@@ -138,15 +138,28 @@ void registerUnistylesMethods(jsi::Runtime &runtime, UnistylesModule* weakSelf) 
         }
     );
 
-    auto getBreakpoints = jsi::Function::createFromHostFunction(
+    auto getBreakpointPairs = jsi::Function::createFromHostFunction(
         runtime,
-        jsi::PropNameID::forAscii(runtime, "getBreakpoints"),
+        jsi::PropNameID::forAscii(runtime, "getBreakpointPairs"),
         0,
         [weakSelf](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
-            NSDictionary* breakpointsDict = [weakSelf breakpoints];
-            jsi::Object resultObj = NSDictionaryToJSIObject(runtime, breakpointsDict);
-
-            return resultObj;
+            NSArray* breakpointPairs = [weakSelf sortedBreakpointEntries];
+                    
+            jsi::Array jsArray = jsi::Array(runtime, breakpointPairs.count);
+            
+            for (NSUInteger i = 0; i < breakpointPairs.count; i++) {
+                NSArray *pair = [breakpointPairs objectAtIndex:i];
+                NSString *key = pair[0];
+                NSNumber *value = pair[1];
+                
+                jsi::Array jsPair = jsi::Array(runtime, 2);
+                jsPair.setValueAtIndex(runtime, 0, jsi::String::createFromUtf8(runtime, key.UTF8String));
+                jsPair.setValueAtIndex(runtime, 1, jsi::Value(value.doubleValue));
+                
+                jsArray.setValueAtIndex(runtime, i, jsPair);
+            }
+            
+            return jsArray;
         }
     );
 
@@ -223,7 +236,7 @@ void registerUnistylesMethods(jsi::Runtime &runtime, UnistylesModule* weakSelf) 
     unistyles.setProperty(runtime, "addTheme", addTheme);
     unistyles.setProperty(runtime, "useTheme", useTheme);
     unistyles.setProperty(runtime, "addBreakpoints", addBreakpoints);
-    unistyles.setProperty(runtime, "getBreakpoints", getBreakpoints);
+    unistyles.setProperty(runtime, "getBreakpointPairs", getBreakpointPairs);
     unistyles.setProperty(runtime, "getCurrentBreakpoint", getCurrentBreakpoint);
     unistyles.setProperty(runtime, "getCurrentTheme", getCurrentTheme);
 
@@ -254,19 +267,6 @@ NSDictionary* JSIObjectToNSDictionary(jsi::Runtime &runtime, const jsi::Object &
     }
 
     return resultDict;
-}
-
-jsi::Object NSDictionaryToJSIObject(jsi::Runtime &runtime, NSDictionary *dict) {
-    jsi::Object resultObj(runtime);
-
-    for (NSString* key in dict) {
-        NSNumber* value = [dict objectForKey:key];
-        if ([value isKindOfClass:[NSNumber class]]) {
-            resultObj.setProperty(runtime, key.UTF8String, jsi::Value(value.doubleValue));
-        }
-    }
-
-    return resultObj;
 }
 
 @end
