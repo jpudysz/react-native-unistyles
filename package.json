@@ -43,8 +43,8 @@
   "devDependencies": {
     "@commitlint/config-conventional": "17.8.0",
     "@react-native/eslint-config": "0.74.0",
-    "@release-it/conventional-changelog": "7.0.2",
     "@react-native/normalize-colors": "0.74.1",
+    "@release-it/conventional-changelog": "7.0.2",
     "@testing-library/react-hooks": "8.0.1",
     "@types/jest": "29.5.6",
     "@types/react": "18.2.28",

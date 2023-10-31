@@ -116,9 +116,9 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 }
 
 void registerUnistylesMethods(jsi::Runtime &runtime, UnistylesModule* weakSelf) {
-    auto addBreakpoints = jsi::Function::createFromHostFunction(
+    auto registerBreakpoints = jsi::Function::createFromHostFunction(
         runtime,
-        jsi::PropNameID::forAscii(runtime, "addBreakpoints"),
+        jsi::PropNameID::forAscii(runtime, "registerBreakpoints"),
         1,
         [weakSelf](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
             if (arguments[0].isObject()) {
@@ -142,7 +142,7 @@ void registerUnistylesMethods(jsi::Runtime &runtime, UnistylesModule* weakSelf) 
         runtime,
         jsi::PropNameID::forAscii(runtime, "getBreakpointPairs"),
         0,
-        [weakSelf](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
+        [weakSelf](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
             NSArray* breakpointPairs = [weakSelf sortedBreakpointEntries];
                     
             jsi::Array jsArray = jsi::Array(runtime, breakpointPairs.count);
@@ -184,8 +184,8 @@ void registerUnistylesMethods(jsi::Runtime &runtime, UnistylesModule* weakSelf) 
         }
     );
 
-    auto addTheme = jsi::Function::createFromHostFunction(runtime,
-        jsi::PropNameID::forAscii(runtime, "addTheme"),
+    auto registerThemes = jsi::Function::createFromHostFunction(runtime,
+        jsi::PropNameID::forAscii(runtime, "registerThemes"),
         1,
         [weakSelf](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
             std::string themeName = arguments[0].asString(runtime).utf8(runtime);
@@ -233,9 +233,9 @@ void registerUnistylesMethods(jsi::Runtime &runtime, UnistylesModule* weakSelf) 
     );
 
     jsi::Object unistyles(runtime);
-    unistyles.setProperty(runtime, "addTheme", addTheme);
+    unistyles.setProperty(runtime, "registerThemes", registerThemes);
     unistyles.setProperty(runtime, "useTheme", useTheme);
-    unistyles.setProperty(runtime, "addBreakpoints", addBreakpoints);
+    unistyles.setProperty(runtime, "registerBreakpoints", registerBreakpoints);
     unistyles.setProperty(runtime, "getBreakpointPairs", getBreakpointPairs);
     unistyles.setProperty(runtime, "getCurrentBreakpoint", getCurrentBreakpoint);
     unistyles.setProperty(runtime, "getCurrentTheme", getCurrentTheme);

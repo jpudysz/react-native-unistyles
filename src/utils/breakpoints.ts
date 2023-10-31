@@ -1,4 +1,4 @@
-import { UnistylesRuntime } from 'react-native-unistyles'
+import { unistyles } from '../Unistyles'
 import { throwError } from './common'
 import type { Breakpoints, ScreenSize, SortedBreakpointEntries } from '../types'
 import { getKeyForCustomMediaQuery, isMediaQuery } from './mediaQueries'
@@ -127,7 +127,7 @@ export const getValueForBreakpoint = <B extends Breakpoints>(
     }
 
     // there is no direct hit for breakpoint nor media-query, so let's simulate CSS cascading
-    const breakpointPairs = UnistylesRuntime.getBreakpointPairs()
+    const breakpointPairs = unistyles.runtime.sortedBreakpoints
     const currentBreakpoint = breakpointPairs
         .findIndex(([key]) => key === unifiedKey)
 
