@@ -3917,7 +3917,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native/normalize-colors@npm:*":
+"@react-native/normalize-colors@npm:*, @react-native/normalize-colors@npm:0.74.1":
   version: 0.74.1
   resolution: "@react-native/normalize-colors@npm:0.74.1"
   checksum: a8625a2ed4f2595c9e1a0b0877ca8ab02dab243ced6bf98c82c328c2c125ca31dd3afd1f2940f2c114af2c309b28ad24da98aa9519a761a2df796c6968c055ec
@@ -18017,6 +18017,7 @@ __metadata:
   dependencies:
     "@commitlint/config-conventional": 17.8.0
     "@react-native/eslint-config": 0.74.0
+    "@react-native/normalize-colors": 0.74.1
     "@release-it/conventional-changelog": 5.1.1
     "@testing-library/react-hooks": 8.0.1
     "@types/jest": 29.5.5
@@ -18050,6 +18051,7 @@ __metadata:
     release-it: 16.2.1
     typescript: 5.2.2
   peerDependencies:
+    "@react-native/normalize-colors": "*"
     react: "*"
     react-native: "*"
     react-native-web: "*"

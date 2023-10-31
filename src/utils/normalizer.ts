@@ -1,5 +1,6 @@
 // based on react-native-web normalizer
 // https://github.com/necolas/react-native-web
+import normalizeColors from '@react-native/normalize-colors'
 import type { TextShadow, Transforms, BoxShadow } from '../types'
 
 type Preprocessor = {
@@ -8,38 +9,31 @@ type Preprocessor = {
     createTransformValue(transforms: Required<Transforms>): string,
 }
 
-// for now supports
-// hex colors (3, 6, 8) chars
-// colors like orange red etc.
 export const normalizeColor = (color: string, opacity: number = 1) => {
-    if (!color.startsWith('#')) {
+    // If the opacity is 1 there's no need to normalize the color
+    if (opacity === 1) {
         return color
     }
 
-    if (color.length === 9) {
-        const [r, g, b, a] = color
-            .slice(1)
+    const integer = normalizeColors(color) as number | null
+
+    // If the colour is an unknown format, the return value is null
+    if (integer === null) {
+        return color
+    }
+
+    const hex = integer.toString(16).padStart(8, '0')
+
+    if (hex.length === 8) {
+        const [r = 0, g = 0, b = 0, a = 1] = hex
             .split(/(?=(?:..)*$)/)
             .map(x => parseInt(x, 16))
             .filter(num => !isNaN(num))
 
-        return `rgba(${r},${g},${b},${(a as number) / 255})`
+        return `rgba(${r},${g},${b},${((a as number) / 255) * opacity})`
     }
 
-    const sanitizedHex = color.length === 4
-        ? color
-            .slice(1)
-            .split('')
-            .map(char => `${char}${char}`)
-            .join('')
-        : color.slice(1)
-
-    return sanitizedHex
-        .split(/(?=(?:..)*$)/)
-        .map(x => parseInt(x, 16))
-        .filter(num => !isNaN(num))
-        .reduce((acc, color) => `${acc}${color},`, 'rgba(')
-        .concat(`${opacity})`)
+    return color
 }
 
 export const normalizeNumericValue = (value: number) => value ? `${value}px` : value
