@@ -1,6 +1,7 @@
 import { useRef } from 'react'
-import { UnistylesRuntime } from './CxxUnistyles'
+import { unistyles } from './Unistyles'
+import type { UnistylesThemes } from './global'
 
-export const useInitialTheme = (forName: string) => {
-    useRef(UnistylesRuntime.useTheme(forName))
+export const useInitialTheme = (forName: keyof UnistylesThemes) => {
+    useRef(unistyles.runtime.setTheme(forName))
 }

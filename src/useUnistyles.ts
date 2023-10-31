@@ -1,13 +1,14 @@
 import { NativeEventEmitter, NativeModules } from 'react-native'
 import { useEffect, useState } from 'react'
-import type { CxxUnistylesSizeEvent, CxxUnistylesThemeEvent, UnistylesEvents } from './CxxUnistyles'
-import { CxxUnistylesEventTypes, UnistylesRuntime } from './CxxUnistyles'
+import type { CxxUnistylesSizeEvent, CxxUnistylesThemeEvent, UnistylesEvents } from './types'
+import { CxxUnistylesEventTypes } from './types'
+import { unistyles } from './Unistyles'
 
 const unistylesEvents = new NativeEventEmitter(NativeModules.Unistyles)
 
 export const useUnistyles = () => {
-    const [theme, setTheme] = useState(UnistylesRuntime.themes[UnistylesRuntime.getCurrentTheme() as string])
-    const [breakpoint, setBreakpoint] = useState(UnistylesRuntime.getCurrentBreakpoint())
+    const [theme, setTheme] = useState(unistyles.runtime.getTheme(unistyles.runtime.theme))
+    const [breakpoint, setBreakpoint] = useState(unistyles.runtime.currentBreakpoint)
     const [screenSize, setScreenSize] = useState({
         width: 0,
         height: 0
@@ -21,7 +22,7 @@ export const useUnistyles = () => {
                     case CxxUnistylesEventTypes.Theme: {
                         const themeEvent = event as CxxUnistylesThemeEvent
 
-                        setTheme(UnistylesRuntime.themes[themeEvent.payload.currentTheme])
+                        setTheme(unistyles.runtime.getTheme(themeEvent.payload.currentTheme))
 
                         return
                     }
@@ -32,7 +33,7 @@ export const useUnistyles = () => {
                             width: sizeEvent.payload.width,
                             height: sizeEvent.payload.height
                         })
-                        setBreakpoint(UnistylesRuntime.getCurrentBreakpoint())
+                        setBreakpoint(unistyles.runtime.currentBreakpoint)
 
                         return
                     }

@@ -36,5 +36,3 @@ export const premiumTheme = {
     }
     // add any keys/functions/objects/arrays you want!
 }
-
-export type AppTheme = typeof lightTheme | typeof darkTheme | typeof premiumTheme
