@@ -68,16 +68,26 @@ describe('Normalizer', () => {
                         height: -10
                     },
                     shadowOpacity: 0.5
+                },
+                {
+                    shadowRadius: 3,
+                    shadowColor: 'blue',
+                    shadowOffset: {
+                        width: 0,
+                        height: -10
+                    },
+                    shadowOpacity: 0.5
                 }
             ]
             const results: Array<string> = [
                 '3px 2px 3px rgba(0,0,0,0.4)',
-                '0 0 1px rgba(171,202,188,1)',
+                '0 0 1px #abcabc',
                 '0 1px 0 rgba(127,17,224,0.3)',
                 '-4px -3px 3px rgba(255,87,51,0.5)',
                 '0 0 0 rgba(0,0,0,0)',
                 '50px 50px 20px orange',
-                '0 -10px 3px rgba(255,87,51,0.8)'
+                '0 -10px 3px rgba(255,87,51,0.4)',
+                '0 -10px 3px rgba(0,0,255,0.5)'
             ]
 
             styles.forEach((style, index) => {
@@ -131,11 +141,11 @@ describe('Normalizer', () => {
                 }
             ]
             const results: Array<string> = [
-                '4px 5px 2px rgba(255,255,255,1)',
-                '3px 4px 5px rgba(0,0,0,1)',
-                '-1px -1px 0 rgba(255,87,51,1)',
+                '4px 5px 2px #fff',
+                '3px 4px 5px #000000',
+                '-1px -1px 0 #FF5733',
                 '0 0 0 red',
-                '-5px -5px 0 rgba(255,87,51,0.8)'
+                '-5px -5px 0 #FF5733CC'
             ]
 
             styles.forEach((style, index) => {
@@ -237,8 +247,15 @@ describe('Normalizer', () => {
     })
 
     describe('normalizeColor', () => {
-        it('should not normalize string colors', () => {
+        it('should not normalize string colors when no opacity is defined', () => {
             const values: Array<string> = [
+                'red',
+                'orange',
+                'pink',
+                'purple',
+                'black'
+            ]
+            const results: Array<string> = [
                 'red',
                 'orange',
                 'pink',
@@ -247,7 +264,28 @@ describe('Normalizer', () => {
             ]
 
             values.forEach((value, index) => {
-                expect(normalizeColor(value)).toEqual(values[index])
+                expect(normalizeColor(value)).toEqual(results[index])
+            })
+        })
+
+        it('should normalize string colors when opacity is defined', () => {
+            const values: Array<string> = [
+                'red',
+                'orange',
+                'pink',
+                'purple',
+                'black'
+            ]
+            const results: Array<string> = [
+                'rgba(255,0,0,0.5)',
+                'rgba(255,165,0,0.5)',
+                'rgba(255,192,203,0.5)',
+                'rgba(128,0,128,0.5)',
+                'rgba(0,0,0,0.5)'
+            ]
+
+            values.forEach((value, index) => {
+                expect(normalizeColor(value, 0.5)).toEqual(results[index])
             })
         })
 
@@ -265,20 +303,20 @@ describe('Normalizer', () => {
                 '#456'
             ]
             const results: Array<string> = [
-                'rgba(255,0,0,1)',
-                'rgba(0,255,0,1)',
-                'rgba(0,0,255,1)',
-                'rgba(255,255,0,1)',
-                'rgba(255,0,255,1)',
-                'rgba(0,255,255,1)',
-                'rgba(255,255,255,1)',
-                'rgba(170,187,204,1)',
-                'rgba(17,34,51,1)',
-                'rgba(68,85,102,1)'
+                'rgba(255,0,0,0.2)',
+                'rgba(0,255,0,0.2)',
+                'rgba(0,0,255,0.2)',
+                'rgba(255,255,0,0.2)',
+                'rgba(255,0,255,0.2)',
+                'rgba(0,255,255,0.2)',
+                'rgba(255,255,255,0.2)',
+                'rgba(170,187,204,0.2)',
+                'rgba(17,34,51,0.2)',
+                'rgba(68,85,102,0.2)'
             ]
 
             values.forEach((value, index) => {
-                expect(normalizeColor(value)).toEqual(results[index])
+                expect(normalizeColor(value, 0.2)).toEqual(results[index])
             })
         })
 
@@ -296,20 +334,20 @@ describe('Normalizer', () => {
                 '#445566'
             ]
             const results: Array<string> = [
-                'rgba(255,0,0,1)',
-                'rgba(0,255,0,1)',
-                'rgba(0,0,255,1)',
-                'rgba(255,255,0,1)',
-                'rgba(255,0,255,1)',
-                'rgba(0,255,255,1)',
-                'rgba(255,255,255,1)',
-                'rgba(170,187,204,1)',
-                'rgba(17,34,51,1)',
-                'rgba(68,85,102,1)'
+                'rgba(255,0,0,0.99)',
+                'rgba(0,255,0,0.99)',
+                'rgba(0,0,255,0.99)',
+                'rgba(255,255,0,0.99)',
+                'rgba(255,0,255,0.99)',
+                'rgba(0,255,255,0.99)',
+                'rgba(255,255,255,0.99)',
+                'rgba(170,187,204,0.99)',
+                'rgba(17,34,51,0.99)',
+                'rgba(68,85,102,0.99)'
             ]
 
             values.forEach((value, index) => {
-                expect(normalizeColor(value)).toEqual(results[index])
+                expect(normalizeColor(value, 0.99)).toEqual(results[index])
             })
         })
 
@@ -327,20 +365,20 @@ describe('Normalizer', () => {
                 '#44556677'
             ]
             const results: Array<string> = [
-                'rgba(255,0,0,1)',
-                'rgba(0,255,0,1)',
-                'rgba(0,0,255,1)',
-                'rgba(255,255,0,1)',
-                'rgba(255,0,255,1)',
-                'rgba(0,255,255,1)',
-                'rgba(255,255,255,1)',
-                'rgba(170,187,204,0.8666666666666667)',
-                'rgba(17,34,51,0.26666666666666666)',
-                'rgba(68,85,102,0.4666666666666667)'
+                'rgba(255,0,0,0.1)',
+                'rgba(0,255,0,0.1)',
+                'rgba(0,0,255,0.1)',
+                'rgba(255,255,0,0.1)',
+                'rgba(255,0,255,0.1)',
+                'rgba(0,255,255,0.1)',
+                'rgba(255,255,255,0.1)',
+                'rgba(170,187,204,0.08666666666666667)',
+                'rgba(17,34,51,0.02666666666666667)',
+                'rgba(68,85,102,0.04666666666666667)'
             ]
 
             values.forEach((value, index) => {
-                expect(normalizeColor(value)).toEqual(results[index])
+                expect(normalizeColor(value, 0.1)).toEqual(results[index])
             })
         })
     })
@@ -398,11 +436,11 @@ describe('Normalizer', () => {
                     width: 0,
                     height: 0
                 },
-                shadowOpacity: 1,
+                shadowOpacity: 0.5,
                 shadowRadius: 5
             }
             expect(normalizeStylesWeb(styles)).toEqual({
-                boxShadow: '0 0 5px rgba(0,0,0,1)',
+                boxShadow: '0 0 5px rgba(0,0,0,0.5)',
                 shadowColor: undefined,
                 shadowOffset: undefined,
                 shadowOpacity: undefined,
@@ -420,7 +458,7 @@ describe('Normalizer', () => {
                 textShadowRadius: 12
             }
             expect(normalizeStylesWeb(styles)).toEqual({
-                textShadow: '-5px 0 12px rgba(255,255,255,1)',
+                textShadow: '-5px 0 12px #fff',
                 textShadowColor: undefined,
                 textShadowOffset: undefined,
                 textShadowRadius: undefined
