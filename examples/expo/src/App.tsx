@@ -11,7 +11,7 @@ UnistylesRuntime
     .useTheme('light')
 
 export const App: React.FunctionComponent = () => {
-    useInitialTheme('dark')
+    useInitialTheme('light')
 
     return (
         <Cxx />

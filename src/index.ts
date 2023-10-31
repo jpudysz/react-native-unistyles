@@ -1,5 +1,6 @@
 export { UnistylesTheme } from './UnistylesTheme'
-export { createUnistyles } from './createUnistyles'
 export * from './CxxUnistyles'
 export { useInitialTheme } from './useInitialTheme'
 export { useUnistyles } from './useUnistyles'
+export { useStyles } from './useStyles'
+export { createStyleSheet } from './createStyleSheet'

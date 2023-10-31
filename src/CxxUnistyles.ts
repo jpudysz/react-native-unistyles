@@ -4,16 +4,11 @@ type CxxUnistylesNativeModule = {
     install(): void
 }
 
-type AllowedTypes = string | number | boolean | null | undefined
-type Theme = {
-    [key: string]: AllowedTypes | Array<AllowedTypes> | Theme
-}
-
 type GlobalUnistyles = {
     addTheme(name: string): void,
     useTheme(name: string): void,
     addBreakpoints(breakpoints: Record<string, number>): void,
-    getBreakpoints(): Record<string, number>,
+    getBreakpointPairs(): Array<[string, number]>,
     getCurrentBreakpoint(): string | undefined,
     getCurrentTheme(): string | undefined,
 }
@@ -44,10 +39,10 @@ const CxxUnistyles = NativeModules.Unistyles as CxxUnistylesNativeModule
 
 CxxUnistyles.install()
 
-class CxxUnistylesRuntime {
+class CxxUnistylesRuntime<T extends {}> {
+    public themes: Record<string, T> = {}
     private cxxUnistyles: GlobalUnistyles
-    private themes: Record<string, Theme> = {}
-    private breakpoints: Record<string, number> = {}
+    private sortedBreakpointPairs: Array<[string, number]> | null = null
 
     constructor() {
         CxxUnistyles.install()
@@ -59,12 +54,11 @@ class CxxUnistylesRuntime {
 
     public registerBreakpoints(breakpoints: Record<string, number>) {
         this.cxxUnistyles.addBreakpoints(breakpoints)
-        this.breakpoints = breakpoints
 
         return this
     }
 
-    public registerTheme(forName: string, theme: Theme) {
+    public registerTheme(forName: string, theme: T) {
         this.cxxUnistyles.addTheme(forName)
         this.themes[forName] = theme
 
@@ -81,8 +75,16 @@ class CxxUnistylesRuntime {
         return false
     }
 
-    public getBreakpoints() {
-        return this.breakpoints
+    public getBreakpointPairs() {
+        if (this.sortedBreakpointPairs) {
+            return this.sortedBreakpointPairs
+        }
+
+        const pairs = this.cxxUnistyles.getBreakpointPairs()
+
+        this.sortedBreakpointPairs = pairs
+
+        return pairs
     }
 
     public getCurrentBreakpoint() {

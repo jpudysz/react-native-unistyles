@@ -1,4 +1,4 @@
-import type { Breakpoints, CustomNamedStyles, ScreenSize, SortedBreakpointEntries } from '../types'
+import type { Breakpoints, CustomNamedStyles, ScreenSize } from '../types'
 import { getValueForBreakpoint } from './breakpoints'
 import { normalizeStyles } from './normalizeStyles'
 import { isWeb } from './common'
@@ -26,11 +26,10 @@ import { isWeb } from './common'
  */
 export const proxifyFunction = <B extends Breakpoints>(
     fn: Function, breakpoint: keyof B & string,
-    screenSize: ScreenSize,
-    breakpointPairs: SortedBreakpointEntries<B>
+    screenSize: ScreenSize
 ): Function => new Proxy(fn, {
     apply: (target, thisArg, argumentsList) =>
-        parseStyle(target.apply(thisArg, argumentsList), breakpoint, screenSize, breakpointPairs)
+        parseStyle(target.apply(thisArg, argumentsList), breakpoint, screenSize)
 })
 
 /**
@@ -61,8 +60,7 @@ export const proxifyFunction = <B extends Breakpoints>(
 export const parseStyle = <T, B extends Breakpoints>(
     style: CustomNamedStyles<T, B>,
     breakpoint: keyof B & string,
-    screenSize: ScreenSize,
-    breakpointPairs: SortedBreakpointEntries<B>
+    screenSize: ScreenSize
 ): T => {
     const entries = Object.entries(style) as [[
         keyof T,
@@ -77,7 +75,7 @@ export const parseStyle = <T, B extends Breakpoints>(
                 if (hasNestedProperties) {
                     return [
                         key,
-                        parseStyle(value as CustomNamedStyles<T, B>, breakpoint, screenSize, breakpointPairs)
+                        parseStyle(value as CustomNamedStyles<T, B>, breakpoint, screenSize)
                     ]
                 }
 
@@ -86,7 +84,7 @@ export const parseStyle = <T, B extends Breakpoints>(
                 if (isTransform && Array.isArray(value)) {
                     return [
                         key,
-                        value.map(value => parseStyle(value, breakpoint, screenSize, breakpointPairs))
+                        value.map(value => parseStyle(value, breakpoint, screenSize))
                     ]
                 }
 
@@ -102,8 +100,7 @@ export const parseStyle = <T, B extends Breakpoints>(
                     getValueForBreakpoint<B>(
                         value as Record<keyof B & string, string | number | undefined>,
                         breakpoint,
-                        screenSize,
-                        breakpointPairs
+                        screenSize
                     )
                 ]
             })
