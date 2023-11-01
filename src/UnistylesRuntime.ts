@@ -46,9 +46,7 @@ export class UnistylesRuntime {
         return false
     }
 
-    public hasTheme = (name: keyof UnistylesThemes) => {
-        return name in this.registry.themes
-    }
+    public hasTheme = (name: keyof UnistylesThemes) => name in this.registry.themes
 
     public getTheme = (forName: keyof UnistylesThemes) => {
         if (!this.hasTheme(forName)) {
