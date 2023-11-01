@@ -119,7 +119,7 @@ export const getValueForBreakpoint = (
     }
 
     // if no custom media query, or didn't match, proceed with defined breakpoints
-    const unifiedKey = breakpoint.toLowerCase() as keyof typeof value
+    const unifiedKey = breakpoint?.toLowerCase() as keyof typeof value
     const directBreakpoint = value[unifiedKey]
 
     // if there is a direct key like 'sm' or 'md', or value for this key exists but its undefined

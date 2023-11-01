@@ -1,6 +1,5 @@
 import type { UnistylesBridge, UnistylesConfig } from './types'
 import type { UnistylesThemes, UnistylesBreakpoints } from './global'
-import { UnistylesError } from './types'
 
 export class UnistyleRegistry {
     public isClosed = false
@@ -9,37 +8,22 @@ export class UnistyleRegistry {
     public sortedBreakpointPairs: Array<[keyof UnistylesBreakpoints, UnistylesBreakpoints[keyof UnistylesBreakpoints]]> = []
     public config: UnistylesConfig = {}
 
-    constructor(private unistylesBridge: UnistylesBridge) {
-        this.unistylesBridge = unistylesBridge
-    }
+    constructor(private unistylesBridge: UnistylesBridge) {}
 
-    public addThemes(themes: UnistylesThemes) {
-        if (this.isClosed) {
-            throw new Error(UnistylesError.RegistryClosed)
-        }
-
+    public addThemes = (themes: UnistylesThemes) => {
         this.themes = themes
-        this.unistylesBridge.registerThemes(Object.keys(themes))
 
         return this
     }
 
-    public addBreakpoints(breakpoints: UnistylesBreakpoints) {
-        if (this.isClosed) {
-            throw new Error(UnistylesError.RegistryClosed)
-        }
-
-        this.unistylesBridge.registerBreakpoints(breakpoints)
+    public addBreakpoints = (breakpoints: UnistylesBreakpoints) => {
+        this.unistylesBridge.useBreakpoints(breakpoints)
         this.sortedBreakpointPairs = this.unistylesBridge.sortedBreakpointPairs
 
         return this
     }
 
-    public addConfig(config: UnistylesConfig) {
-        if (this.isClosed) {
-            throw new Error(UnistylesError.RegistryClosed)
-        }
-
+    public addConfig = (config: UnistylesConfig) => {
         this.config = config
 
         if (config.featureFlags && config.featureFlags.length > 0) {
