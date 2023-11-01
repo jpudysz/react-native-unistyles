@@ -11,6 +11,7 @@ export type UnistylesConfig = {
     featureFlags?: Array<string>
 }
 
+// todo align JSI
 export type UnistylesBridge = {
     // accessors
     theme: keyof UnistylesThemes
