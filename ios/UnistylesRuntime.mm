@@ -1,5 +1,19 @@
 #import "UnistylesRuntime.h"
 
+std::string UnistylesRuntime::getBreakpointFromScreenWidth(double width, const std::vector<std::pair<std::string, double>>& sortedBreakpointEntries) {
+    for (size_t i = 0; i < sortedBreakpointEntries.size(); ++i) {
+        const auto& [key, value] = sortedBreakpointEntries[i];
+        const double maxVal = (i + 1 < sortedBreakpointEntries.size()) ? sortedBreakpointEntries[i + 1].second : std::numeric_limits<double>::infinity();
+
+        if (width >= value && width < maxVal) {
+            return key;
+        }
+    }
+    
+    return sortedBreakpointEntries.empty() ? "" : sortedBreakpointEntries.back().first;
+}
+
+
 std::vector<jsi::PropNameID> UnistylesRuntime::getPropertyNames(jsi::Runtime& rt) {
     std::vector<jsi::PropNameID> properties;
 
@@ -82,8 +96,14 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                 });
 
                 this->sortedBreakpointEntries = sortedBreakpointEntriesVec;
+                
+               float floatValue = static_cast<float>(this->getScreenWidth());
+               
+               std::string breakpoint = this->getBreakpointFromScreenWidth(floatValue, sortedBreakpointEntriesVec);
 
-                return jsi::Value::undefined();
+               this->breakpoint = breakpoint;
+
+               return jsi::Value::undefined();
            }
          );
     }
@@ -94,8 +114,17 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
             1,
             [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
                 std::string themeName = arguments[0].asString(runtime).utf8(runtime);
+                NSString *currentTheme = [NSString stringWithUTF8String:themeName.c_str()];
             
                 this->theme = themeName;
+            
+                NSDictionary *body = @{
+                    @"type": @"theme",
+                    @"payload": @{
+                        @"currentTheme": currentTheme
+                    }
+                };
+                this->eventHandler(body);
 
                 return jsi::Value::undefined();
             }
@@ -137,7 +166,6 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
 
                 this->featureFlags = featureFlags;
             
-                
                 return jsi::Value::undefined();
             }
         );

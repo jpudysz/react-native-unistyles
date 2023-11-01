@@ -27,7 +27,8 @@ export type UnistylesBridge = {
 
 export enum CxxUnistylesEventTypes {
     Theme = 'theme',
-    Size = 'size'
+    Size = 'size',
+    Breakpoint = 'breakpoint'
 }
 
 export type CxxUnistylesThemeEvent = {
@@ -45,7 +46,14 @@ export type CxxUnistylesSizeEvent = {
     }
 }
 
-export type UnistylesEvents = CxxUnistylesThemeEvent | CxxUnistylesSizeEvent
+export type CxxUnistylesBreakpointEvent = {
+    type: CxxUnistylesEventTypes.Breakpoint,
+    payload: {
+        currentBreakpoint: keyof UnistylesBreakpoints
+    }
+}
+
+export type UnistylesEvents = CxxUnistylesThemeEvent | CxxUnistylesSizeEvent | CxxUnistylesBreakpointEvent
 
 export enum UnistylesError {
     RuntimeUnavailable = 'UNISTYLES_ERROR_RUNTIME_UNAVAILABLE',

@@ -91,7 +91,13 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 }
 
 void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSelf) {
-    auto unistylesRuntime = std::make_shared<UnistylesRuntime>();
+    UnistylesEventHandler eventHandler = ^(NSDictionary *body) {
+        [weakSelf emitEvent:@"onChange" withBody:body];
+    };
+    ScreenWidth getScreenWidth = ^() {
+        return [UIScreen mainScreen].bounds.size.width;
+    };
+    auto unistylesRuntime = std::make_shared<UnistylesRuntime>(eventHandler, getScreenWidth);
     auto hostObject = jsi::Object::createFromHostObject(runtime, unistylesRuntime);
  
     runtime.global().setProperty(runtime, "__UNISTYLES__", std::move(hostObject));
