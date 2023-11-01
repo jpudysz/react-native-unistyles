@@ -1,6 +1,11 @@
 import { NativeEventEmitter, NativeModules } from 'react-native'
 import { useEffect, useState } from 'react'
-import type { CxxUnistylesSizeEvent, CxxUnistylesThemeEvent, UnistylesEvents } from './types'
+import type {
+    CxxUnistylesBreakpointEvent,
+    CxxUnistylesSizeEvent,
+    CxxUnistylesThemeEvent,
+    UnistylesEvents
+} from './types'
 import { CxxUnistylesEventTypes } from './types'
 import { unistyles } from './Unistyles'
 
@@ -33,7 +38,15 @@ export const useUnistyles = () => {
                             width: sizeEvent.payload.width,
                             height: sizeEvent.payload.height
                         })
-                        setBreakpoint(unistyles.runtime.currentBreakpoint)
+                        // todo
+                        // setBreakpoint(unistyles.runtime.currentBreakpoint)
+
+                        return
+                    }
+                    case CxxUnistylesEventTypes.Breakpoint: {
+                        const breakpointEvent = event as CxxUnistylesBreakpointEvent
+
+                        setBreakpoint(breakpointEvent.payload.currentBreakpoint)
 
                         return
                     }

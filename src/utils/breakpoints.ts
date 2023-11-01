@@ -30,7 +30,7 @@ export const sortAndValidateBreakpoints = (breakpoints: UnistylesBreakpoints): U
             const [, value1] = breakpoint1
             const [, value2] = breakpoint2
 
-            return value1 - value2
+            return (value1 as number) - (value2 as number)
         })
 
     const sortedBreakpoints =  Object.freeze(Object.fromEntries(sortedPairs)) as UnistylesBreakpoints
