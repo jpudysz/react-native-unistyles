@@ -2,7 +2,6 @@ import React from 'react'
 import { View, Text, Button } from 'react-native'
 import { UnistylesRuntime, createStyleSheet, useStyles } from 'react-native-unistyles'
 
-// todo, for now TypeScript is broken
 export const Cxx = () => {
     const { styles, theme } = useStyles(stylesheet)
 
@@ -16,7 +15,7 @@ export const Cxx = () => {
                     Current breakpoint:
                 </Text>
                 <Text style={styles.bold}>
-                    {` ${UnistylesRuntime.getCurrentBreakpoint()}`}
+                    {` ${UnistylesRuntime.currentBreakpoint}`}
                 </Text>
             </View>
             <View style={styles.row}>
@@ -24,20 +23,20 @@ export const Cxx = () => {
                     Theme:
                 </Text>
                 <Text style={styles.bold}>
-                    {` ${UnistylesRuntime.getCurrentTheme()}`}
+                    {` ${UnistylesRuntime.theme}`}
                 </Text>
             </View>
             <Button
                 color={theme.colors.accent}
                 title="Change theme"
                 onPress={() => {
-                    const currentTheme = UnistylesRuntime.getCurrentTheme()
+                    const currentTheme = UnistylesRuntime.theme
                     const nextTheme = currentTheme === 'light'
                         ? 'dark'
                         : currentTheme === 'dark'
                             ? 'premium'
                             : 'light'
-                    UnistylesRuntime.useTheme(nextTheme)
+                    UnistylesRuntime.setTheme(nextTheme)
                 }}
             />
             <View style={styles.boxes}>

@@ -1,7 +1,8 @@
-import type { Breakpoints, CustomNamedStyles, ScreenSize } from '../types'
+import type { CustomNamedStyles, ScreenSize } from '../types'
 import { getValueForBreakpoint } from './breakpoints'
 import { normalizeStyles } from './normalizeStyles'
 import { isWeb } from './common'
+import type { UnistylesBreakpoints } from '../global'
 
 /**
  * Proxies a function to parse its return value for custom media queries or breakpoints.
@@ -24,8 +25,8 @@ import { isWeb } from './common'
  * const proxifiedFunction = proxifyFunction(myFunction, 'sm', screenSize, breakpoints)
  * proxifiedFunction() // parsed style based on screenSize and breakpoints
  */
-export const proxifyFunction = <B extends Breakpoints>(
-    fn: Function, breakpoint: keyof B & string,
+export const proxifyFunction = (
+    fn: Function, breakpoint: keyof UnistylesBreakpoints & string,
     screenSize: ScreenSize
 ): Function => new Proxy(fn, {
     apply: (target, thisArg, argumentsList) =>
@@ -57,14 +58,14 @@ export const proxifyFunction = <B extends Breakpoints>(
  * const parsedStyle = parseStyle(style, 'sm', screenSize, breakpoints)
  * // { fontSize: '12px' }
  */
-export const parseStyle = <T, B extends Breakpoints>(
-    style: CustomNamedStyles<T, B>,
-    breakpoint: keyof B & string,
+export const parseStyle = <T>(
+    style: CustomNamedStyles<T>,
+    breakpoint: keyof UnistylesBreakpoints & string,
     screenSize: ScreenSize
 ): T => {
     const entries = Object.entries(style) as [[
         keyof T,
-        CustomNamedStyles<T, B> | Record<keyof B & string, string | number | undefined>]
+        CustomNamedStyles<T> | Record<keyof UnistylesBreakpoints & string, string | number | undefined>]
     ]
 
     const parsedStyles = Object
@@ -75,7 +76,7 @@ export const parseStyle = <T, B extends Breakpoints>(
                 if (hasNestedProperties) {
                     return [
                         key,
-                        parseStyle(value as CustomNamedStyles<T, B>, breakpoint, screenSize)
+                        parseStyle(value as CustomNamedStyles<T>, breakpoint, screenSize)
                     ]
                 }
 
@@ -97,8 +98,8 @@ export const parseStyle = <T, B extends Breakpoints>(
 
                 return [
                     key,
-                    getValueForBreakpoint<B>(
-                        value as Record<keyof B & string, string | number | undefined>,
+                    getValueForBreakpoint(
+                        value as Record<keyof UnistylesBreakpoints & string, string | number | undefined>,
                         breakpoint,
                         screenSize
                     )

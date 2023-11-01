@@ -3,19 +3,19 @@ import { StyleSheet } from 'react-native'
 import { parseStyle, proxifyFunction } from './utils'
 import type { CreateStylesFactory, CustomNamedStyles, ExtractBreakpoints, RemoveKeysWithPrefix } from './types'
 import { useUnistyles } from './useUnistyles'
+import type { UnistylesThemes } from './global'
 
 // todo types
-type T = {}
-type B = Record<string, number>
+type T = UnistylesThemes[keyof UnistylesThemes]
 
-export const useStyles = <ST extends CustomNamedStyles<ST, B>>(stylesheet?: ST | CreateStylesFactory<ST, T>) => {
+export const useStyles = <ST extends CustomNamedStyles<ST>>(stylesheet?: ST | CreateStylesFactory<ST, T>) => {
     const { theme, breakpoint, screenSize } = useUnistyles()
 
     if (!stylesheet) {
         return {
             theme,
             breakpoint,
-            styles: {} as ExtractBreakpoints<RemoveKeysWithPrefix<ST, B>, B>
+            styles: {} as ExtractBreakpoints<RemoveKeysWithPrefix<ST>>
         }
     }
 
@@ -26,24 +26,24 @@ export const useStyles = <ST extends CustomNamedStyles<ST, B>>(stylesheet?: ST |
     const dynamicStyleSheet = useMemo(() => Object
         .entries(parsedStyles)
         .reduce((acc, [key, value]) => {
-            const style = value as CustomNamedStyles<ST, B>
+            const style = value as CustomNamedStyles<ST>
 
             if (typeof value === 'function') {
                 return {
                     ...acc,
-                    [key]: proxifyFunction<B>(value, breakpoint!, screenSize)
+                    [key]: proxifyFunction(value, breakpoint!, screenSize)
                 }
             }
 
             return StyleSheet.create({
                 ...acc,
-                [key]: parseStyle<ST, B>(style, breakpoint!, screenSize)
+                [key]: parseStyle<ST>(style, breakpoint!, screenSize)
             })
         }, {} as ST), [breakpoint, screenSize, parsedStyles])
 
     return {
         theme,
         breakpoint,
-        styles: dynamicStyleSheet as ExtractBreakpoints<RemoveKeysWithPrefix<ST, B>, B>
+        styles: dynamicStyleSheet as ExtractBreakpoints<RemoveKeysWithPrefix<ST>>
     }
 }
