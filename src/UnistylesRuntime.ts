@@ -4,10 +4,7 @@ import { UnistylesColorScheme, UnistylesError } from './types'
 import type { UnistylesThemes } from './global'
 
 export class UnistylesRuntime {
-    constructor(private unistylesBridge: UnistylesBridge, private registry: UnistyleRegistry) {
-        this.unistylesBridge = unistylesBridge
-        this.registry = registry
-    }
+    constructor(private unistylesBridge: UnistylesBridge, private registry: UnistyleRegistry) {}
 
     public get colorScheme() {
         return this.unistylesBridge.colorScheme
@@ -26,30 +23,20 @@ export class UnistylesRuntime {
     }
 
     public get theme() {
-        const currentTheme = this.unistylesBridge.theme
-
-        if (!currentTheme) {
-            throw new Error(UnistylesError.ThemeNotSet)
-        }
-
-        return currentTheme
+        return this.unistylesBridge.theme
     }
 
     public get currentBreakpoint() {
         return this.unistylesBridge.breakpoint
     }
 
-    public setColorScheme(scheme: UnistylesColorScheme) {
+    public setColorScheme = (scheme: UnistylesColorScheme) => {
         if (scheme !== this.colorScheme) {
             this.unistylesBridge.useColorScheme(scheme)
         }
     }
 
-    public setTheme(name: keyof UnistylesThemes) {
-        if (!this.registry.isClosed) {
-            this.registry.isClosed = true
-        }
-
+    public setTheme = (name: keyof UnistylesThemes) => {
         if (name !== this.theme && this.hasTheme(name)) {
             this.unistylesBridge.useTheme(name)
 
@@ -59,11 +46,11 @@ export class UnistylesRuntime {
         return false
     }
 
-    public hasTheme(name: keyof UnistylesThemes) {
+    public hasTheme = (name: keyof UnistylesThemes) => {
         return name in this.registry.themes
     }
 
-    public getTheme(forName: keyof UnistylesThemes) {
+    public getTheme = (forName: keyof UnistylesThemes) => {
         if (!this.hasTheme(forName)) {
             throw new Error(UnistylesError.ThemeNotFound)
         }

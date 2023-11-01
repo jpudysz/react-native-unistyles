@@ -18,7 +18,6 @@ class Unistyles {
             throw new Error(UnistylesError.RuntimeUnavailable)
         }
 
-        // todo add typings to global
         // @ts-ignore
         this._bridge = global.__UNISTYLES__ as UnistylesBridge
         this._registry = new UnistyleRegistry(this._bridge)

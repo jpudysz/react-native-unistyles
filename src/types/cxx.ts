@@ -11,19 +11,15 @@ export type UnistylesConfig = {
     featureFlags?: Array<string>
 }
 
-// todo align JSI
 export type UnistylesBridge = {
-    // accessors
+    // getters
     theme: keyof UnistylesThemes
     breakpoint: keyof UnistylesBreakpoints,
     colorScheme: UnistylesColorScheme,
     sortedBreakpointPairs: Array<[keyof UnistylesBreakpoints, UnistylesBreakpoints[keyof UnistylesBreakpoints]]>
 
-    // registration
-    registerBreakpoints(breakpoints: UnistylesBreakpoints): void,
-    registerThemes(forNames: Array<string>): void,
-
-    // actions
+    // setters
+    useBreakpoints(breakpoints: UnistylesBreakpoints): void,
     useTheme(name: keyof UnistylesThemes): void,
     useColorScheme(scheme: UnistylesColorScheme): void,
     useFeatureFlags(flags: Array<string>): void
@@ -53,7 +49,5 @@ export type UnistylesEvents = CxxUnistylesThemeEvent | CxxUnistylesSizeEvent
 
 export enum UnistylesError {
     RuntimeUnavailable = 'UNISTYLES_ERROR_RUNTIME_UNAVAILABLE',
-    RegistryClosed = 'UNISTYLES_ERROR_REGISTRY_CLOSED',
-    ThemeNotFound = 'UNISTYLES_ERROR_THEME_NOT_FOUND',
-    ThemeNotSet = 'UNISTYLES_ERROR_THEME_NOT_SET',
+    ThemeNotFound = 'UNISTYLES_ERROR_THEME_NOT_FOUND'
 }
