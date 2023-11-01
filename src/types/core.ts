@@ -14,8 +14,8 @@ import type {
     TranslateYTransform
 } from 'react-native/Libraries/StyleSheet/StyleSheetTypes'
 import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
-import type { Breakpoints } from './breakpoints'
 import type { MediaQueries } from './mediaQueries'
+import type { UnistylesBreakpoints } from '../global'
 
 type ShadowOffset = {
     width: number,
@@ -60,14 +60,14 @@ type UnistyleView<B> = DeepUniStyle<Omit<ViewStyle, NestedTypes>, B>
 type UnistyleText<B> = DeepUniStyle<Omit<TextStyle, NestedTypes>, B>
 type UnistyleImage<B> = DeepUniStyle<Omit<ImageStyle, NestedTypes>, B>
 
-export type StaticStyles<B extends Breakpoints> =
+export type StaticStyles<B> =
     | UnistyleView<B>
     | UnistyleText<B>
     | UnistyleImage<B>
     & UnistyleNested<B>
 
-export type CustomNamedStyles<T, B extends Breakpoints> = {
-    [K in keyof T]: T[K] extends (...args: infer A) => StaticStyles<B>
-        ? (...args: A) => StaticStyles<B>
-        : StaticStyles<B>
+export type CustomNamedStyles<T> = {
+    [K in keyof T]: T[K] extends (...args: infer A) => StaticStyles<UnistylesBreakpoints>
+        ? (...args: A) => StaticStyles<UnistylesBreakpoints>
+        : StaticStyles<UnistylesBreakpoints>
 }

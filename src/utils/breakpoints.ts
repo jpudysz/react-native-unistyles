@@ -1,7 +1,8 @@
 import { unistyles } from '../Unistyles'
 import { throwError } from './common'
-import type { Breakpoints, ScreenSize, SortedBreakpointEntries } from '../types'
+import type { ScreenSize, MediaQueries } from '../types'
 import { getKeyForCustomMediaQuery, isMediaQuery } from './mediaQueries'
+import type { UnistylesBreakpoints } from '../global'
 
 /**
  * Sorts the breakpoints object based on its numeric values in ascending order and validates them.
@@ -22,7 +23,7 @@ import { getKeyForCustomMediaQuery, isMediaQuery } from './mediaQueries'
  * const input = { md: 768, lg: 1024, sm: 0 }
  * sortAndValidateBreakpoints(input) // returns { sm: 0, md: 768, lg: 1024 }
  */
-export const sortAndValidateBreakpoints = <B extends Breakpoints>(breakpoints: B): B => {
+export const sortAndValidateBreakpoints = (breakpoints: UnistylesBreakpoints): UnistylesBreakpoints => {
     const sortedPairs = Object
         .entries(breakpoints)
         .sort((breakpoint1, breakpoint2) => {
@@ -32,7 +33,7 @@ export const sortAndValidateBreakpoints = <B extends Breakpoints>(breakpoints: B
             return value1 - value2
         })
 
-    const sortedBreakpoints =  Object.freeze(Object.fromEntries(sortedPairs)) as B
+    const sortedBreakpoints =  Object.freeze(Object.fromEntries(sortedPairs)) as UnistylesBreakpoints
     const breakpointValues = Object.values(sortedBreakpoints)
     const [firstBreakpoint] = breakpointValues
 
@@ -62,7 +63,7 @@ export const sortAndValidateBreakpoints = <B extends Breakpoints>(breakpoints: B
  * const breakpoints = { sm: 0, md: 768, lg: 1024 }
  * getBreakpointFromScreenWidth(800, breakpoints) // returns 'md'
  */
-export const getBreakpointFromScreenWidth = <B extends Breakpoints>(width: number, breakpointEntries: SortedBreakpointEntries<B>): keyof B & string => {
+export const getBreakpointFromScreenWidth = (width: number, breakpointEntries: Array<[keyof UnistylesBreakpoints, UnistylesBreakpoints[keyof UnistylesBreakpoints]]>): keyof UnistylesBreakpoints & string => {
     const [key] = breakpointEntries
         .find(([, value], index, otherBreakpoints) => {
             const minVal = value
@@ -73,7 +74,7 @@ export const getBreakpointFromScreenWidth = <B extends Breakpoints>(width: numbe
             }
 
             return width >= minVal && width < maxVal
-        }) as [keyof B & string, number]
+        }) as [keyof UnistylesBreakpoints & string, number]
 
     return key
 }
@@ -102,23 +103,23 @@ export const getBreakpointFromScreenWidth = <B extends Breakpoints>(width: numbe
  *
  * getValueForBreakpoint(values, 'sm', screenSize, breakpoints); // 'value1'
  */
-export const getValueForBreakpoint = <B extends Breakpoints>(
-    value: Record<keyof B & string, string | number | undefined>,
-    breakpoint: keyof B & string,
+export const getValueForBreakpoint = (
+    value: Record<keyof UnistylesBreakpoints | MediaQueries, string | number | undefined>,
+    breakpoint: keyof UnistylesBreakpoints,
     screenSize: ScreenSize
 ): string | number | undefined => {
     // the highest priority is for custom media queries
     const customMediaQueries = Object
         .entries(value)
         .filter(([key]) => isMediaQuery(key))
-    const customMediaQueryKey = getKeyForCustomMediaQuery(customMediaQueries, screenSize)
+    const customMediaQueryKey = getKeyForCustomMediaQuery(customMediaQueries, screenSize) as keyof typeof value
 
     if (customMediaQueryKey && customMediaQueryKey in value) {
         return value[customMediaQueryKey]
     }
 
     // if no custom media query, or didn't match, proceed with defined breakpoints
-    const unifiedKey = breakpoint.toLowerCase()
+    const unifiedKey = breakpoint.toLowerCase() as keyof typeof value
     const directBreakpoint = value[unifiedKey]
 
     // if there is a direct key like 'sm' or 'md', or value for this key exists but its undefined
@@ -136,6 +137,6 @@ export const getValueForBreakpoint = <B extends Breakpoints>(
         .map(([key]) => key)
 
     return breakpointPairs.length > 0
-        ? value[availableBreakpoints[availableBreakpoints.length - 1] as keyof B & string]
+        ? value[availableBreakpoints[availableBreakpoints.length - 1] as keyof UnistylesBreakpoints & string]
         : undefined
 }
