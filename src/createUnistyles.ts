@@ -6,7 +6,8 @@ import type {
     CustomNamedStyles,
     ExtractBreakpoints,
     RemoveKeysWithPrefix,
-    SortedBreakpointEntries
+    SortedBreakpointEntries,
+    ScreenSize
 } from './types'
 import { UnistylesContext } from './UnistylesTheme'
 import { useDimensions } from './hooks'
@@ -18,7 +19,7 @@ export const createUnistyles = <B extends Breakpoints, T = {}>(breakpoints: B) =
         .entries(sortedBreakpoints) as SortedBreakpointEntries<B>
 
     return {
-        createStyleSheet: <S extends CustomNamedStyles<S, B>, X>(styles: S | CustomNamedStyles<S, B> | X | ((theme: T) => X | CustomNamedStyles<X, B>)): S | X => {
+        createStyleSheet: <S extends CustomNamedStyles<S, B>, X>(styles: S | CustomNamedStyles<S, B> | X | ((theme: T, screenSize: ScreenSize) => X | CustomNamedStyles<X, B>)): S | X => {
             if (typeof styles === 'function') {
                 return styles as X
             }
@@ -39,8 +40,8 @@ export const createUnistyles = <B extends Breakpoints, T = {}>(breakpoints: B) =
             }
 
             const parsedStyles = useMemo(() => typeof stylesheet === 'function'
-                ? stylesheet(theme)
-                : stylesheet, [theme, stylesheet])
+                ? stylesheet(theme, screenSize)
+                : stylesheet, [theme, screenSize, stylesheet])
 
             const dynamicStyleSheet = useMemo(() => Object
                 .entries(parsedStyles)

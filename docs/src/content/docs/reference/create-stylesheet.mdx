@@ -41,7 +41,7 @@ import Seo from '../../../components/Seo.astro'
     `createStyleSheet` also accepts a function, to which the library will inject your theme:
 
     ```ts
-    const stylesheet = createStyleSheet(theme => ({
+    const stylesheet = createStyleSheet((theme, screenSize) => ({
         container: {
            flex: 1,
            justifyContent: 'center',

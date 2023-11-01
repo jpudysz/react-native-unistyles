@@ -8,7 +8,7 @@ export type ScreenSize = {
     height: number
 }
 
-export type CreateStylesFactory<ST, Theme> = (theme: Theme) => ST
+export type CreateStylesFactory<ST, Theme> = (theme: Theme, screenSize: ScreenSize) => ST
 
 type WithEmptyObject<V> = keyof V extends never ? {} : V
 

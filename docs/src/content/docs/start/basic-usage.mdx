@@ -38,7 +38,12 @@ import Seo from '../../../components/Seo.astro'
         )
     }
 
-    const stylesheet = createStyleSheet(theme => ({
+    const stylesheet = createStyleSheet((theme, screenSize) => ({
+        box:{
+            with: screenSize.width / 3,
+            height: screenSize.with / 3,
+            backgroundColor: theme.colors.redBox
+        },
         container: {
            flex: 1,
            justifyContent: 'center',
