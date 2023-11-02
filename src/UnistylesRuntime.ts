@@ -30,6 +30,13 @@ export class UnistylesRuntime {
         return this.unistylesBridge.breakpoint
     }
 
+    public get screen() {
+        return {
+            width: this.unistylesBridge.screenWidth,
+            height: this.unistylesBridge.screenHeight
+        }
+    }
+
     public setColorScheme = (scheme: UnistylesColorScheme) => {
         if (scheme !== this.colorScheme) {
             this.unistylesBridge.useColorScheme(scheme)

@@ -13,6 +13,8 @@ export type UnistylesConfig = {
 
 export type UnistylesBridge = {
     // getters
+    screenWidth: number,
+    screenHeight: number,
     theme: keyof UnistylesThemes
     breakpoint: keyof UnistylesBreakpoints,
     colorScheme: UnistylesColorScheme,

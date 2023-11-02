@@ -26,6 +26,14 @@ export const Cxx = () => {
                     {` ${UnistylesRuntime.theme}`}
                 </Text>
             </View>
+            <View style={styles.row}>
+                <Text style={styles.title}>
+                    Screen size:
+                </Text>
+                <Text style={styles.bold}>
+                    {` ${UnistylesRuntime.screen.width}x${UnistylesRuntime.screen.height}`}
+                </Text>
+            </View>
             <Button
                 color={theme.colors.accent}
                 title="Change theme"
