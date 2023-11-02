@@ -28,7 +28,7 @@ RCT_EXPORT_MODULE(Unistyles)
         CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
         CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
 
-        ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChangeWithWidth(screenWidth, screenHeight);
+        ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange(screenWidth, screenHeight);
     });
 }
 

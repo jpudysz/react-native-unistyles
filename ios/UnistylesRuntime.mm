@@ -4,6 +4,8 @@ std::vector<jsi::PropNameID> UnistylesRuntime::getPropertyNames(jsi::Runtime& rt
     std::vector<jsi::PropNameID> properties;
 
     // getters
+    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("screenWidth")));
+    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("screenHeight")));
     properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("theme")));
     properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("breakpoint")));
     properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("colorScheme")));
@@ -21,6 +23,18 @@ std::vector<jsi::PropNameID> UnistylesRuntime::getPropertyNames(jsi::Runtime& rt
 
 jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& propNameId) {
     std::string propName = propNameId.utf8(runtime);
+    
+    if (propName == "screenWidth") {
+        int width = this->screenWidth;
+        
+        return jsi::Value(width);
+    }
+
+    if (propName == "screenHeight") {
+        int width = this->screenHeight;
+        
+        return jsi::Value(width);
+    }
     
     if (propName == "theme") {
         return !this->theme.empty()
@@ -171,7 +185,15 @@ std::string UnistylesRuntime::getBreakpointFromScreenWidth(double width, const s
     return sortedBreakpointEntries.empty() ? "" : sortedBreakpointEntries.back().first;
 }
 
-void UnistylesRuntime::handleScreenSizeChangeWithWidth(CGFloat width, CGFloat height) {
+void UnistylesRuntime::handleScreenSizeChange(CGFloat width, CGFloat height) {
+    if (width != this->screenWidth) {
+        this->screenWidth = width;
+    }
+    
+    if (height != this->screenHeight) {
+        this->screenHeight = height;
+    }
+    
     std::string currentBreakpoint = this->breakpoint;
     std::string nextBreakpoint = this->getBreakpointFromScreenWidth(width, this->sortedBreakpointEntries);
     
