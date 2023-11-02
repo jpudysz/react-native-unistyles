@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Text, Button } from 'react-native'
-import { UnistylesRuntime, createStyleSheet, useStyles } from 'react-native-unistyles'
+import { UnistylesRuntime, createStyleSheet, useStyles, ScreenOrientation, UnistylesColorScheme } from 'react-native-unistyles'
 
 export const Cxx = () => {
     const { styles, theme } = useStyles(stylesheet)
@@ -32,6 +32,39 @@ export const Cxx = () => {
                 </Text>
                 <Text style={styles.bold}>
                     {` ${UnistylesRuntime.screen.width}x${UnistylesRuntime.screen.height}`}
+                </Text>
+            </View>
+            <View style={styles.row}>
+                <Text style={styles.title}>
+                    Orientation:
+                </Text>
+                <Text style={styles.bold}>
+                    {` ${UnistylesRuntime.orientation === ScreenOrientation.Portrait
+                        ? 'portrait'
+                        : 'landscape'}
+                    `}
+                </Text>
+            </View>
+            <Button
+                color={theme.colors.accent}
+                title="Change color scheme"
+                onPress={() => {
+                    const currentColorScheme = UnistylesRuntime.colorScheme
+                    const nextScheme = currentColorScheme === UnistylesColorScheme.Manual
+                        ? UnistylesColorScheme.System
+                        : UnistylesColorScheme.Manual
+                    UnistylesRuntime.setColorScheme(nextScheme)
+                }}
+            />
+            <View style={styles.row}>
+                <Text style={styles.title}>
+                    Color scheme:
+                </Text>
+                <Text style={styles.bold}>
+                    {` ${UnistylesRuntime.colorScheme === UnistylesColorScheme.Manual
+                        ? 'manual'
+                        : 'system'}
+                    `}
                 </Text>
             </View>
             <Button

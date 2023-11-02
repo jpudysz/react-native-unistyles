@@ -11,11 +11,17 @@ export type UnistylesConfig = {
     featureFlags?: Array<string>
 }
 
+export enum ScreenOrientation {
+    Portrait = 1,
+    Landscape = 2
+}
+
 export type UnistylesBridge = {
     // getters
     screenWidth: number,
     screenHeight: number,
-    theme: keyof UnistylesThemes
+    theme: keyof UnistylesThemes,
+    themes: Array<keyof UnistylesThemes>,
     breakpoint: keyof UnistylesBreakpoints,
     colorScheme: UnistylesColorScheme,
     sortedBreakpointPairs: Array<[keyof UnistylesBreakpoints, UnistylesBreakpoints[keyof UnistylesBreakpoints]]>

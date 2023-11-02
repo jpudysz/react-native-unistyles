@@ -1,6 +1,6 @@
 import type { UnistylesBridge } from './types'
 import type { UnistyleRegistry } from './UnistyleRegistry'
-import { UnistylesColorScheme, UnistylesError } from './types'
+import { ScreenOrientation, UnistylesColorScheme, UnistylesError } from './types'
 import type { UnistylesThemes } from './global'
 
 export class UnistylesRuntime {
@@ -10,16 +10,8 @@ export class UnistylesRuntime {
         return this.unistylesBridge.colorScheme
     }
 
-    public get breakpoints() {
-        return this.registry.breakpoints
-    }
-
     public get sortedBreakpoints() {
         return this.registry.sortedBreakpointPairs
-    }
-
-    public get config() {
-        return this.registry.config
     }
 
     public get theme() {
@@ -35,6 +27,16 @@ export class UnistylesRuntime {
             width: this.unistylesBridge.screenWidth,
             height: this.unistylesBridge.screenHeight
         }
+    }
+
+    public get orientation() {
+        const { width, height } = this.screen
+
+        if (width > height) {
+            return ScreenOrientation.Landscape
+        }
+
+        return ScreenOrientation.Portrait
     }
 
     public setColorScheme = (scheme: UnistylesColorScheme) => {
@@ -53,8 +55,6 @@ export class UnistylesRuntime {
         return false
     }
 
-    public hasTheme = (name: keyof UnistylesThemes) => name in this.registry.themes
-
     public getTheme = (forName: keyof UnistylesThemes) => {
         if (!this.hasTheme(forName)) {
             throw new Error(UnistylesError.ThemeNotFound)
@@ -62,4 +62,6 @@ export class UnistylesRuntime {
 
         return this.registry.themes[forName]
     }
+
+    private hasTheme = (name: keyof UnistylesThemes) => name in this.registry.themes
 }

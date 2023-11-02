@@ -10,13 +10,14 @@ std::vector<jsi::PropNameID> UnistylesRuntime::getPropertyNames(jsi::Runtime& rt
     properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("breakpoint")));
     properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("colorScheme")));
     properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("sortedBreakpointPairs")));
-
+    
     // setters
     properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("useBreakpoints")));
     properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("useTheme")));
     properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("useColorScheme")));
     properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("useFeatureFlags")));
-
+    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("themes")));
+    
     return properties;
 }
 
@@ -39,7 +40,7 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
     if (propName == "theme") {
         return !this->theme.empty()
             ? jsi::Value(jsi::String::createFromUtf8(runtime, this->theme))
-            : jsi::Value::undefined();
+            : this->getThemeOrFail(runtime);
     }
     
     if (propName == "breakpoint") {
@@ -53,7 +54,7 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
             ? jsi::Value(jsi::String::createFromUtf8(runtime, this->colorScheme))
             : jsi::Value::undefined();
     }
-    
+
     if (propName == "sortedBreakpointPairs") {
         std::unique_ptr<jsi::Array> sortedBreakpointEntriesArray = std::make_unique<jsi::Array>(runtime, this->sortedBreakpointEntries.size());
             
@@ -137,6 +138,13 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                 std::string colorScheme = arguments[0].asString(runtime).utf8(runtime);
 
                 this->colorScheme = colorScheme;
+            
+                if (colorScheme == "manual" || !this->supportsAutomaticColorScheme) {
+                    return jsi::Value::undefined();
+                }
+                
+                // todo
+                // switch to dark/light mode now!
 
                 return jsi::Value::undefined();
             }
@@ -168,8 +176,37 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
             }
         );
     }
-   
+       
     return jsi::Value::undefined();
+}
+
+void UnistylesRuntime::set(jsi::Runtime& runtime, const jsi::PropNameID& propNameId, const jsi::Value& value) {
+    std::string propName = propNameId.utf8(runtime);
+    
+    if (propName == "themes" && value.isObject()) {
+        jsi::Array themes = value.asObject(runtime).asArray(runtime);
+        std::vector<std::string> themesVector;
+        size_t length = themes.size(runtime);
+        
+        for (size_t i = 0; i < length; ++i) {
+            jsi::Value element = themes.getValueAtIndex(runtime, i);
+
+            if (element.isString()) {
+                std::string theme = element.asString(runtime).utf8(runtime);
+                themesVector.push_back(theme);
+            }
+        }
+        
+        this->themes = themesVector;
+        this->hasSingleTheme = themesVector.size() == 1;
+        
+        bool hasLightTheme = std::find(themesVector.begin(), themesVector.end(), "light") != themesVector.end();
+        bool hasDarkTheme = std::find(themesVector.begin(), themesVector.end(), "dark") != themesVector.end();
+        
+        this->supportsAutomaticColorScheme = hasLightTheme && hasDarkTheme;
+        
+        return;
+    }
 }
 
 std::string UnistylesRuntime::getBreakpointFromScreenWidth(double width, const std::vector<std::pair<std::string, double>>& sortedBreakpointEntries) {
@@ -210,4 +247,20 @@ void UnistylesRuntime::handleScreenSizeChange(CGFloat width, CGFloat height) {
         
         this->eventHandler(body);
     }
+}
+
+jsi::Value UnistylesRuntime::getThemeOrFail(jsi::Runtime& runtime) {
+    if (this->supportsAutomaticColorScheme && this->colorScheme == "system") {
+        // todo set theme to dark/light
+        
+        return jsi::Value().undefined();
+    }
+    
+    if (this->hasSingleTheme) {
+        std::string themeName = this->themes.at(0);
+        
+        return jsi::String::createFromUtf8(runtime, themeName);
+    }
+    
+    return jsi::Value().undefined();
 }
