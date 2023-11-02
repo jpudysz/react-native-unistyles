@@ -2,8 +2,9 @@
 #import <React/RCTEventEmitter.h>
 
 typedef void(^UnistylesEventHandler)(NSDictionary *);
-typedef CGFloat(^ScreenWidth)();
 
 @interface UnistylesModule : RCTEventEmitter<RCTBridgeModule>
+
+@property (nonatomic, assign) void* unistylesRuntime;
 
 @end

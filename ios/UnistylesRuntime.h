@@ -7,12 +7,14 @@
 using namespace facebook;
 
 class JSI_EXPORT UnistylesRuntime : public jsi::HostObject {
+private:
     UnistylesEventHandler eventHandler;
-    ScreenWidth getScreenWidth;
+    float screenWidth;
+    float screenHeight;
 
 public:
-    UnistylesRuntime(UnistylesEventHandler handler, ScreenWidth getScreenWidth) :
-    eventHandler(handler), getScreenWidth(getScreenWidth) {}
+    UnistylesRuntime(UnistylesEventHandler handler, CGFloat screenWidth, CGFloat screenHeight)
+    : eventHandler(handler), screenWidth(screenWidth), screenHeight(screenHeight) {}
 
     std::string theme;
     std::string breakpoint;
@@ -22,5 +24,7 @@ public:
 
     jsi::Value get(jsi::Runtime&, const jsi::PropNameID& name) override;
     std::vector<jsi::PropNameID> getPropertyNames(jsi::Runtime& rt) override;
+
+    void handleScreenSizeChangeWithWidth(CGFloat width, CGFloat height);
     std::string getBreakpointFromScreenWidth(double width, const std::vector<std::pair<std::string, double>>& sortedBreakpointEntries);
 };
