@@ -1,19 +1,5 @@
 #import "UnistylesRuntime.h"
 
-std::string UnistylesRuntime::getBreakpointFromScreenWidth(double width, const std::vector<std::pair<std::string, double>>& sortedBreakpointEntries) {
-    for (size_t i = 0; i < sortedBreakpointEntries.size(); ++i) {
-        const auto& [key, value] = sortedBreakpointEntries[i];
-        const double maxVal = (i + 1 < sortedBreakpointEntries.size()) ? sortedBreakpointEntries[i + 1].second : std::numeric_limits<double>::infinity();
-
-        if (width >= value && width < maxVal) {
-            return key;
-        }
-    }
-    
-    return sortedBreakpointEntries.empty() ? "" : sortedBreakpointEntries.back().first;
-}
-
-
 std::vector<jsi::PropNameID> UnistylesRuntime::getPropertyNames(jsi::Runtime& rt) {
     std::vector<jsi::PropNameID> properties;
 
@@ -97,9 +83,7 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
 
                 this->sortedBreakpointEntries = sortedBreakpointEntriesVec;
                 
-               float floatValue = static_cast<float>(this->getScreenWidth());
-               
-               std::string breakpoint = this->getBreakpointFromScreenWidth(floatValue, sortedBreakpointEntriesVec);
+               std::string breakpoint = this->getBreakpointFromScreenWidth(this->screenWidth, sortedBreakpointEntriesVec);
 
                this->breakpoint = breakpoint;
 
@@ -172,4 +156,36 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
     }
    
     return jsi::Value::undefined();
+}
+
+std::string UnistylesRuntime::getBreakpointFromScreenWidth(double width, const std::vector<std::pair<std::string, double>>& sortedBreakpointEntries) {
+    for (size_t i = 0; i < sortedBreakpointEntries.size(); ++i) {
+        const auto& [key, value] = sortedBreakpointEntries[i];
+        const double maxVal = (i + 1 < sortedBreakpointEntries.size()) ? sortedBreakpointEntries[i + 1].second : std::numeric_limits<double>::infinity();
+
+        if (width >= value && width < maxVal) {
+            return key;
+        }
+    }
+    
+    return sortedBreakpointEntries.empty() ? "" : sortedBreakpointEntries.back().first;
+}
+
+void UnistylesRuntime::handleScreenSizeChangeWithWidth(CGFloat width, CGFloat height) {
+    std::string currentBreakpoint = this->breakpoint;
+    std::string nextBreakpoint = this->getBreakpointFromScreenWidth(width, this->sortedBreakpointEntries);
+    
+    if (currentBreakpoint != nextBreakpoint) {
+        this->breakpoint = nextBreakpoint;
+
+        NSString *breakpoint = [NSString stringWithUTF8String:nextBreakpoint.c_str()];
+        NSDictionary *body = @{
+            @"type": @"breakpoint",
+            @"payload": @{
+                @"currentBreakpoint": breakpoint
+            }
+        };
+        
+        this->eventHandler(body);
+    }
 }

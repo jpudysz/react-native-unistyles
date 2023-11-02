@@ -24,18 +24,17 @@ RCT_EXPORT_MODULE(Unistyles)
 }
 
 - (void)handleOrientationChange:(NSNotification *)notification {
-    CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
-    CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+        CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
 
-    NSDictionary *body = @{
-        @"type": @"size",
-        @"payload": @{
-            @"width": @(screenWidth),
-            @"height": @(screenHeight)
-        }
-    };
+        ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChangeWithWidth(screenWidth, screenHeight);
+    });
+}
 
-    [self emitEvent:@"onChange" withBody:body];
+- (void)dealloc {
+    delete (UnistylesRuntime*)self.unistylesRuntime;
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 + (BOOL)requiresMainQueueSetup
@@ -91,13 +90,16 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 }
 
 void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSelf) {
+    CGFloat initialScreenWidth = [UIScreen mainScreen].bounds.size.width;
+    CGFloat initialScreenHeight = [UIScreen mainScreen].bounds.size.height;
     UnistylesEventHandler eventHandler = ^(NSDictionary *body) {
         [weakSelf emitEvent:@"onChange" withBody:body];
     };
-    ScreenWidth getScreenWidth = ^() {
-        return [UIScreen mainScreen].bounds.size.width;
-    };
-    auto unistylesRuntime = std::make_shared<UnistylesRuntime>(eventHandler, getScreenWidth);
+    
+    auto unistylesRuntime = std::make_shared<UnistylesRuntime>(eventHandler, initialScreenWidth, initialScreenHeight);
+    
+    weakSelf.unistylesRuntime = unistylesRuntime.get();
+
     auto hostObject = jsi::Object::createFromHostObject(runtime, unistylesRuntime);
  
     runtime.global().setProperty(runtime, "__UNISTYLES__", std::move(hostObject));
