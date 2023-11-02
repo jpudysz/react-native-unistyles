@@ -12,6 +12,7 @@ export class UnistyleRegistry {
 
     public addThemes = (themes: UnistylesThemes) => {
         this.themes = themes
+        this.unistylesBridge.themes = Object.keys(themes) as Array<keyof UnistylesThemes>
 
         return this
     }
