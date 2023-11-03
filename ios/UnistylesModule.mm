@@ -35,25 +35,34 @@ RCT_EXPORT_MODULE(Unistyles)
         CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
         CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
 
-        ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange(screenWidth, screenHeight);
+        ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange((int)screenWidth, (int)screenHeight);
     });
 }
 
 - (void)appearanceChanged:(NSNotification *)notification
 {
-  NSDictionary *userInfo = [notification userInfo];
+  std::string colorScheme = [self getColorScheme];
 
-  if (userInfo) {
-      UITraitCollection *traitCollection = userInfo[RCTUserInterfaceStyleDidChangeNotificationTraitCollectionKey];
-      NSString *newColorScheme = RCTColorSchemePreference(traitCollection);
-      std::string colorScheme = [newColorScheme UTF8String];
-      
-      ((UnistylesRuntime*)self.unistylesRuntime)->handleAppearanceChange(colorScheme);
-  }
+  ((UnistylesRuntime*)self.unistylesRuntime)->handleAppearanceChange(colorScheme);
+}
+
+- (std::string)getColorScheme {
+    UIUserInterfaceStyle colorScheme = [UIScreen mainScreen].traitCollection.userInterfaceStyle;
+    
+    // todo enums
+    switch (colorScheme) {
+        case UIUserInterfaceStyleLight:
+            return "light";
+        case UIUserInterfaceStyleDark:
+            return "dark";
+        case UIUserInterfaceStyleUnspecified:
+        default:
+            return "";
+    }
 }
 
 - (void)dealloc {
-    delete (UnistylesRuntime*)self.unistylesRuntime;
+//    delete (UnistylesRuntime*)self.unistylesRuntime;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -112,13 +121,37 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSelf) {
     CGFloat initialScreenWidth = [UIScreen mainScreen].bounds.size.width;
     CGFloat initialScreenHeight = [UIScreen mainScreen].bounds.size.height;
-    UIUserInterfaceStyle style = [UIScreen mainScreen].traitCollection.userInterfaceStyle;
-    UnistylesEventHandler eventHandler = ^(NSDictionary *body) {
+    std::string initalColorScheme = [weakSelf getColorScheme];
+    UnistylesThemeChangeEvent onThemeChange = ^(std::string theme) {
+        NSString *nextTheme = [NSString stringWithUTF8String:theme.c_str()];
+        NSDictionary *body = @{
+            @"type": @"theme",
+            @"payload": @{
+                @"themeName": nextTheme
+            }
+        };
+        
+        [weakSelf emitEvent:@"onChange" withBody:body];
+    };
+    UnistylesBreakpointChangeEvent onBreakpointChange = ^(std::string breakpoint) {
+        NSString *nextBreakpoint = [NSString stringWithUTF8String:breakpoint.c_str()];
+        NSDictionary *body = @{
+            @"type": @"breakpoint",
+            @"payload": @{
+                @"breakpoint": nextBreakpoint
+            }
+        };
+        
         [weakSelf emitEvent:@"onChange" withBody:body];
     };
     
-    // todo share initial style with C++
-    auto unistylesRuntime = std::make_shared<UnistylesRuntime>(eventHandler, initialScreenWidth, initialScreenHeight);
+    auto unistylesRuntime = std::make_shared<UnistylesRuntime>(
+        onThemeChange,
+        onBreakpointChange,
+        (int)initialScreenWidth,
+        (int)initialScreenHeight,
+        initalColorScheme
+    );
     
     weakSelf.unistylesRuntime = unistylesRuntime.get();
 

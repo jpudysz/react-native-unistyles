@@ -1,6 +1,6 @@
 import type { UnistylesBridge } from './types'
 import type { UnistyleRegistry } from './UnistyleRegistry'
-import { ScreenOrientation, UnistylesColorScheme, UnistylesError } from './types'
+import { ScreenOrientation, UnistylesError } from './types'
 import type { UnistylesThemes } from './global'
 
 export class UnistylesRuntime {
@@ -10,15 +10,19 @@ export class UnistylesRuntime {
         return this.unistylesBridge.colorScheme
     }
 
+    public get hasAdaptiveThemes() {
+        return this.unistylesBridge.hasAdaptiveThemes
+    }
+
     public get sortedBreakpoints() {
         return this.registry.sortedBreakpointPairs
     }
 
-    public get theme() {
+    public get themeName() {
         return this.unistylesBridge.theme
     }
 
-    public get currentBreakpoint() {
+    public get breakpoint() {
         return this.unistylesBridge.breakpoint
     }
 
@@ -39,14 +43,8 @@ export class UnistylesRuntime {
         return ScreenOrientation.Portrait
     }
 
-    public setColorScheme = (scheme: UnistylesColorScheme) => {
-        if (scheme !== this.colorScheme) {
-            this.unistylesBridge.useColorScheme(scheme)
-        }
-    }
-
     public setTheme = (name: keyof UnistylesThemes) => {
-        if (name !== this.theme && this.hasTheme(name)) {
+        if (name !== this.themeName && this.hasTheme(name)) {
             this.unistylesBridge.useTheme(name)
 
             return true
@@ -61,6 +59,10 @@ export class UnistylesRuntime {
         }
 
         return this.registry.themes[forName]
+    }
+
+    public setAdaptiveThemes = (enable: boolean) => {
+        this.unistylesBridge.useAdaptiveThemes(enable)
     }
 
     private hasTheme = (name: keyof UnistylesThemes) => name in this.registry.themes

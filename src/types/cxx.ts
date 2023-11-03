@@ -1,14 +1,10 @@
 import type { UnistylesThemes, UnistylesBreakpoints } from '../global'
 
 export type Nullable<T> = T | null
-export enum UnistylesColorScheme {
-    System = 'system',
-    Manual = 'manual'
-}
+export type ColorSchemeName = 'light' | 'dark' | undefined
 
 export type UnistylesConfig = {
-    colorScheme?: UnistylesColorScheme,
-    featureFlags?: Array<string>
+    adaptiveThemes?: boolean
 }
 
 export enum ScreenOrientation {
@@ -20,17 +16,17 @@ export type UnistylesBridge = {
     // getters
     screenWidth: number,
     screenHeight: number,
+    hasAdaptiveThemes: boolean,
     theme: keyof UnistylesThemes,
-    themes: Array<keyof UnistylesThemes>,
     breakpoint: keyof UnistylesBreakpoints,
-    colorScheme: UnistylesColorScheme,
-    sortedBreakpointPairs: Array<[keyof UnistylesBreakpoints, UnistylesBreakpoints[keyof UnistylesBreakpoints]]>
+    colorScheme: ColorSchemeName,
+    sortedBreakpointPairs: Array<[keyof UnistylesBreakpoints, UnistylesBreakpoints[keyof UnistylesBreakpoints]]>,
 
     // setters
+    themes: Array<keyof UnistylesThemes>,
     useBreakpoints(breakpoints: UnistylesBreakpoints): void,
     useTheme(name: keyof UnistylesThemes): void,
-    useColorScheme(scheme: UnistylesColorScheme): void,
-    useFeatureFlags(flags: Array<string>): void
+    useAdaptiveThemes(enable: boolean): void,
 }
 
 export enum CxxUnistylesEventTypes {
@@ -42,7 +38,7 @@ export enum CxxUnistylesEventTypes {
 export type CxxUnistylesThemeEvent = {
     type: CxxUnistylesEventTypes.Theme,
     payload: {
-        currentTheme: keyof UnistylesThemes
+        themeName: keyof UnistylesThemes
     }
 }
 
@@ -57,7 +53,7 @@ export type CxxUnistylesSizeEvent = {
 export type CxxUnistylesBreakpointEvent = {
     type: CxxUnistylesEventTypes.Breakpoint,
     payload: {
-        currentBreakpoint: keyof UnistylesBreakpoints
+        breakpoint: keyof UnistylesBreakpoints
     }
 }
 

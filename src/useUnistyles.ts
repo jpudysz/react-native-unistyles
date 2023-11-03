@@ -12,8 +12,8 @@ import { unistyles } from './Unistyles'
 const unistylesEvents = new NativeEventEmitter(NativeModules.Unistyles)
 
 export const useUnistyles = () => {
-    const [theme, setTheme] = useState(unistyles.runtime.getTheme(unistyles.runtime.theme))
-    const [breakpoint, setBreakpoint] = useState(unistyles.runtime.currentBreakpoint)
+    const [theme, setTheme] = useState(unistyles.runtime.getTheme(unistyles.runtime.themeName))
+    const [breakpoint, setBreakpoint] = useState(unistyles.runtime.breakpoint)
     const [screenSize, setScreenSize] = useState({
         width: 0,
         height: 0
@@ -27,10 +27,11 @@ export const useUnistyles = () => {
                     case CxxUnistylesEventTypes.Theme: {
                         const themeEvent = event as CxxUnistylesThemeEvent
 
-                        setTheme(unistyles.runtime.getTheme(themeEvent.payload.currentTheme))
+                        setTheme(unistyles.runtime.getTheme(themeEvent.payload.themeName))
 
                         return
                     }
+                    // this event is not available on mobile
                     case CxxUnistylesEventTypes.Size: {
                         const sizeEvent = event as CxxUnistylesSizeEvent
 
@@ -38,15 +39,13 @@ export const useUnistyles = () => {
                             width: sizeEvent.payload.width,
                             height: sizeEvent.payload.height
                         })
-                        // todo
-                        // setBreakpoint(unistyles.runtime.currentBreakpoint)
 
                         return
                     }
                     case CxxUnistylesEventTypes.Breakpoint: {
                         const breakpointEvent = event as CxxUnistylesBreakpointEvent
 
-                        setBreakpoint(breakpointEvent.payload.currentBreakpoint)
+                        setBreakpoint(breakpointEvent.payload.breakpoint)
 
                         return
                     }

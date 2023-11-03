@@ -1,7 +1,9 @@
 #import <React/RCTBridgeModule.h>
 #import <React/RCTEventEmitter.h>
+#import <string>
 
-typedef void(^UnistylesEventHandler)(NSDictionary *);
+typedef void(^UnistylesThemeChangeEvent)(std::string);
+typedef void(^UnistylesBreakpointChangeEvent)(std::string);
 
 @interface UnistylesModule : RCTEventEmitter<RCTBridgeModule>
 
