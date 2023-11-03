@@ -249,6 +249,10 @@ void UnistylesRuntime::handleScreenSizeChange(CGFloat width, CGFloat height) {
     }
 }
 
+void UnistylesRuntime::handleAppearanceChange(std::string colorScheme) {
+    // todo implement me
+}
+
 jsi::Value UnistylesRuntime::getThemeOrFail(jsi::Runtime& runtime) {
     if (this->supportsAutomaticColorScheme && this->colorScheme == "system") {
         // todo set theme to dark/light
