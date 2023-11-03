@@ -8,30 +8,41 @@ using namespace facebook;
 
 class JSI_EXPORT UnistylesRuntime : public jsi::HostObject {
 private:
-    UnistylesEventHandler eventHandler;
-    float screenWidth;
-    float screenHeight;
+    UnistylesThemeChangeEvent onThemeChange;
+    UnistylesBreakpointChangeEvent onBreakpointChange;
+
+    int screenWidth;
+    int screenHeight;
+    std::string colorScheme;
 
 public:
-    UnistylesRuntime(UnistylesEventHandler handler, CGFloat screenWidth, CGFloat screenHeight)
-    : eventHandler(handler), screenWidth(screenWidth), screenHeight(screenHeight) {}
+    UnistylesRuntime(
+        UnistylesThemeChangeEvent onThemeChange,
+        UnistylesBreakpointChangeEvent onBreakpointChange,
+        float screenWidth,
+        float screenHeight,
+        std::string colorScheme
+    ): onThemeChange(onThemeChange),
+       onBreakpointChange(onBreakpointChange),
+       screenWidth(screenWidth),
+       screenHeight(screenHeight),
+       colorScheme(colorScheme) {}
 
+    bool hasAdaptiveThemes;
     bool supportsAutomaticColorScheme;
-    bool hasSingleTheme;
-    std::vector<std::string> themes;
 
     std::string theme;
     std::string breakpoint;
-    std::string colorScheme;
-    std::vector<std::string> featureFlags;
+    std::vector<std::string> themes;
     std::vector<std::pair<std::string, double>> sortedBreakpointEntries;
 
     jsi::Value get(jsi::Runtime&, const jsi::PropNameID& name) override;
     void set(jsi::Runtime& runtime, const jsi::PropNameID& propNameId, const jsi::Value& value) override;
-    std::vector<jsi::PropNameID> getPropertyNames(jsi::Runtime& rt) override;
+    std::vector<jsi::PropNameID> getPropertyNames(jsi::Runtime& runtime) override;
+
+    void handleScreenSizeChange(int width, int height);
+    void handleAppearanceChange(std::string colorScheme);
 
     jsi::Value getThemeOrFail(jsi::Runtime&);
-    void handleScreenSizeChange(CGFloat width, CGFloat height);
-    void handleAppearanceChange(std::string colorScheme);
     std::string getBreakpointFromScreenWidth(double width, const std::vector<std::pair<std::string, double>>& sortedBreakpointEntries);
 };

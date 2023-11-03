@@ -6,17 +6,17 @@ std::vector<jsi::PropNameID> UnistylesRuntime::getPropertyNames(jsi::Runtime& rt
     // getters
     properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("screenWidth")));
     properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("screenHeight")));
+    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("hasAdaptiveThemes")));
     properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("theme")));
     properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("breakpoint")));
     properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("colorScheme")));
     properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("sortedBreakpointPairs")));
     
     // setters
+    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("themes")));
     properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("useBreakpoints")));
     properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("useTheme")));
-    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("useColorScheme")));
-    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("useFeatureFlags")));
-    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("themes")));
+    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("useAdaptiveThemes")));
     
     return properties;
 }
@@ -26,15 +26,15 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
     std::string propName = propNameId.utf8(runtime);
     
     if (propName == "screenWidth") {
-        int width = this->screenWidth;
-        
-        return jsi::Value(width);
+        return jsi::Value(this->screenWidth);
     }
 
     if (propName == "screenHeight") {
-        int width = this->screenHeight;
-        
-        return jsi::Value(width);
+        return jsi::Value(this->screenHeight);
+    }
+    
+    if (propName == "hasAdaptiveThemes") {
+        return jsi::Value(this->hasAdaptiveThemes);
     }
     
     if (propName == "theme") {
@@ -50,9 +50,7 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
     }
     
     if (propName == "colorScheme") {
-        return !this->colorScheme.empty()
-            ? jsi::Value(jsi::String::createFromUtf8(runtime, this->colorScheme))
-            : jsi::Value::undefined();
+        return jsi::Value(jsi::String::createFromUtf8(runtime, this->colorScheme));
     }
 
     if (propName == "sortedBreakpointPairs") {
@@ -116,67 +114,34 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                 NSString *currentTheme = [NSString stringWithUTF8String:themeName.c_str()];
             
                 this->theme = themeName;
-            
-                NSDictionary *body = @{
-                    @"type": @"theme",
-                    @"payload": @{
-                        @"currentTheme": currentTheme
-                    }
-                };
-                this->eventHandler(body);
+                this->onThemeChange(themeName);
 
                 return jsi::Value::undefined();
             }
         );
     }
     
-    if (propName == "useColorScheme") {
+    if (propName == "useAdaptiveThemes") {
         return jsi::Function::createFromHostFunction(runtime,
-            jsi::PropNameID::forAscii(runtime, "useColorScheme"),
+            jsi::PropNameID::forAscii(runtime, "useAdaptiveThemes"),
             1,
             [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
-                std::string colorScheme = arguments[0].asString(runtime).utf8(runtime);
+                bool enableAdaptiveThemes = arguments[0].asBool();
 
-                this->colorScheme = colorScheme;
+                this->hasAdaptiveThemes = enableAdaptiveThemes;
             
-                if (colorScheme == "manual" || !this->supportsAutomaticColorScheme) {
+                if (!enableAdaptiveThemes || !this->supportsAutomaticColorScheme) {
                     return jsi::Value::undefined();
                 }
-                
-                // todo
-                // switch to dark/light mode now!
+
+                this->theme = this->colorScheme;
+//                this->onThemeChange(this->theme);
 
                 return jsi::Value::undefined();
             }
         );
     }
     
-    if (propName == "useFeatureFlags") {
-        return jsi::Function::createFromHostFunction(runtime,
-            jsi::PropNameID::forAscii(runtime, "useFeatureFlags"),
-            1,
-            [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
-                jsi::Array featureFlagsArray = arguments[0].asObject(runtime).asArray(runtime);
-                size_t length = featureFlagsArray.size(runtime);
-                std::vector<std::string> featureFlags;
-                featureFlags.reserve(length);
-                    
-                for (size_t i = 0; i < length; ++i) {
-                    jsi::Value element = featureFlagsArray.getValueAtIndex(runtime, i);
-
-                    if (element.isString()) {
-                        std::string featureFlag = element.asString(runtime).utf8(runtime);
-                        featureFlags.push_back(featureFlag);
-                    }
-                }
-
-                this->featureFlags = featureFlags;
-            
-                return jsi::Value::undefined();
-            }
-        );
-    }
-       
     return jsi::Value::undefined();
 }
 
@@ -198,7 +163,6 @@ void UnistylesRuntime::set(jsi::Runtime& runtime, const jsi::PropNameID& propNam
         }
         
         this->themes = themesVector;
-        this->hasSingleTheme = themesVector.size() == 1;
         
         bool hasLightTheme = std::find(themesVector.begin(), themesVector.end(), "light") != themesVector.end();
         bool hasDarkTheme = std::find(themesVector.begin(), themesVector.end(), "dark") != themesVector.end();
@@ -222,7 +186,7 @@ std::string UnistylesRuntime::getBreakpointFromScreenWidth(double width, const s
     return sortedBreakpointEntries.empty() ? "" : sortedBreakpointEntries.back().first;
 }
 
-void UnistylesRuntime::handleScreenSizeChange(CGFloat width, CGFloat height) {
+void UnistylesRuntime::handleScreenSizeChange(int width, int height) {
     if (width != this->screenWidth) {
         this->screenWidth = width;
     }
@@ -236,32 +200,26 @@ void UnistylesRuntime::handleScreenSizeChange(CGFloat width, CGFloat height) {
     
     if (currentBreakpoint != nextBreakpoint) {
         this->breakpoint = nextBreakpoint;
-
-        NSString *breakpoint = [NSString stringWithUTF8String:nextBreakpoint.c_str()];
-        NSDictionary *body = @{
-            @"type": @"breakpoint",
-            @"payload": @{
-                @"currentBreakpoint": breakpoint
-            }
-        };
-        
-        this->eventHandler(body);
+        this->onBreakpointChange(nextBreakpoint);
     }
 }
 
 void UnistylesRuntime::handleAppearanceChange(std::string colorScheme) {
-    // todo implement me
+    this->colorScheme = colorScheme;
+    
+    if (!this->supportsAutomaticColorScheme || !this->hasAdaptiveThemes) {
+        return;
+    }
+    
+    this->theme = this->colorScheme;
+    this->onThemeChange(this->theme);
 }
 
 jsi::Value UnistylesRuntime::getThemeOrFail(jsi::Runtime& runtime) {
-    if (this->supportsAutomaticColorScheme && this->colorScheme == "system") {
-        // todo set theme to dark/light
-        
-        return jsi::Value().undefined();
-    }
-    
-    if (this->hasSingleTheme) {
+    if (this->themes.size() == 1) {
         std::string themeName = this->themes.at(0);
+
+        this->theme = themeName;
         
         return jsi::String::createFromUtf8(runtime, themeName);
     }

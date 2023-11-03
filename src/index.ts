@@ -1,6 +1,6 @@
 import { unistyles } from './Unistyles'
 import type { UnistylesThemes, UnistylesBreakpoints } from './global'
-import { UnistylesColorScheme, ScreenOrientation } from './types'
+import { ScreenOrientation } from './types'
 
 export { useInitialTheme } from './useInitialTheme'
 
@@ -21,7 +21,6 @@ export {
 }
 
 export {
-    UnistylesColorScheme,
     ScreenOrientation
 }
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import { useInitialTheme, UnistylesRegistry, UnistylesColorScheme } from 'react-native-unistyles'
+import { useInitialTheme, UnistylesRegistry } from 'react-native-unistyles'
 import { Cxx } from './examples'
 import { breakpoints, darkTheme, lightTheme, premiumTheme } from './styles'
 
@@ -11,7 +11,7 @@ UnistylesRegistry
     })
     .addBreakpoints(breakpoints)
     .addConfig({
-        colorScheme: UnistylesColorScheme.System
+        adaptiveThemes: true
     })
 
 export const App: React.FunctionComponent = () => {

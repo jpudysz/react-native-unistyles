@@ -1,29 +1,32 @@
 import React from 'react'
 import { View, Text, Button } from 'react-native'
-import { UnistylesRuntime, createStyleSheet, useStyles, ScreenOrientation, UnistylesColorScheme } from 'react-native-unistyles'
+import { UnistylesRuntime, createStyleSheet, useStyles, ScreenOrientation } from 'react-native-unistyles'
 
 export const Cxx = () => {
     const { styles, theme } = useStyles(stylesheet)
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>
-                C++ Unistyles Example 🦄
+            <Text style={styles.unicorn}>
+                🦄
+            </Text>
+            <Text style={styles.header}>
+                C++ Unistyles Example
             </Text>
             <View style={styles.row}>
                 <Text style={styles.title}>
-                    Current breakpoint:
+                     Breakpoint:
                 </Text>
                 <Text style={styles.bold}>
-                    {` ${UnistylesRuntime.currentBreakpoint}`}
+                    {` ${UnistylesRuntime.breakpoint}`}
                 </Text>
             </View>
             <View style={styles.row}>
                 <Text style={styles.title}>
-                    Theme:
+                    Theme name:
                 </Text>
                 <Text style={styles.bold}>
-                    {` ${UnistylesRuntime.theme}`}
+                    {` ${UnistylesRuntime.themeName}`}
                 </Text>
             </View>
             <View style={styles.row}>
@@ -41,45 +44,17 @@ export const Cxx = () => {
                 <Text style={styles.bold}>
                     {` ${UnistylesRuntime.orientation === ScreenOrientation.Portrait
                         ? 'portrait'
-                        : 'landscape'}
-                    `}
+                        : 'landscape'}`}
                 </Text>
             </View>
-            <Button
-                color={theme.colors.accent}
-                title="Change color scheme"
-                onPress={() => {
-                    const currentColorScheme = UnistylesRuntime.colorScheme
-                    const nextScheme = currentColorScheme === UnistylesColorScheme.Manual
-                        ? UnistylesColorScheme.System
-                        : UnistylesColorScheme.Manual
-                    UnistylesRuntime.setColorScheme(nextScheme)
-                }}
-            />
             <View style={styles.row}>
                 <Text style={styles.title}>
-                    Color scheme:
+                    System color scheme:
                 </Text>
                 <Text style={styles.bold}>
-                    {` ${UnistylesRuntime.colorScheme === UnistylesColorScheme.Manual
-                        ? 'manual'
-                        : 'system'}
-                    `}
+                    {` ${UnistylesRuntime.colorScheme}`}
                 </Text>
             </View>
-            <Button
-                color={theme.colors.accent}
-                title="Change theme"
-                onPress={() => {
-                    const currentTheme = UnistylesRuntime.theme
-                    const nextTheme = currentTheme === 'light'
-                        ? 'dark'
-                        : currentTheme === 'dark'
-                            ? 'premium'
-                            : 'light'
-                    UnistylesRuntime.setTheme(nextTheme)
-                }}
-            />
             <View style={styles.boxes}>
                 {Array.from(new Array(3)).map((_, index) => (
                     <View
@@ -88,11 +63,41 @@ export const Cxx = () => {
                     />
                 ))}
             </View>
+            <View style={styles.actions}>
+                <Button
+                    color={theme.colors.accent}
+                    title="Change theme"
+                    onPress={() => {
+                        const currentTheme = UnistylesRuntime.themeName
+                        const nextTheme = currentTheme === 'light'
+                            ? 'dark'
+                            : currentTheme === 'dark'
+                                ? 'premium'
+                                : 'light'
+                        UnistylesRuntime.setTheme(nextTheme)
+                    }}
+                />
+            </View>
         </View>
     )
 }
 
 const stylesheet = createStyleSheet(theme => ({
+    unicorn: {
+        fontSize: {
+            sm: 100,
+            lg: 50
+        }
+    },
+    header: {
+        fontSize: {
+            sm: 20,
+            lg: 16
+        },
+        fontWeight: 'bold',
+        marginBottom: 20,
+        color: theme.colors.typography
+    },
     container: {
         flex: 1,
         justifyContent: 'center',
@@ -108,19 +113,39 @@ const stylesheet = createStyleSheet(theme => ({
         color: theme.colors.typography
     },
     row: {
-        flexDirection: 'row'
+        width: '60%',
+        flexDirection: 'row',
+        justifyContent: 'space-between'
     },
     boxes: {
         flexDirection: {
-            sm: 'row',
-            lg: 'column'
+            sm: 'column',
+            lg: 'row'
         },
         flexWrap: 'wrap',
         gap: 10
     },
     box: {
-        width: 50,
-        height: 50,
-        backgroundColor: theme.colors.accent
+        width: {
+            sm: 50,
+            lg: 40
+        },
+        height: {
+            sm: 50,
+            lg: 40
+        },
+        borderRadius: {
+            lg: 20
+        },
+        backgroundColor: theme.colors.accent,
+        marginVertical: 10
+    },
+    spacer: {
+        width: '50%',
+        height: 1,
+        backgroundColor: theme.colors.typography
+    },
+    actions: {
+        marginTop: 20
     }
 }))
