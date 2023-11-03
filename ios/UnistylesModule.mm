@@ -62,7 +62,7 @@ RCT_EXPORT_MODULE(Unistyles)
 }
 
 - (void)dealloc {
-//    delete (UnistylesRuntime*)self.unistylesRuntime;
+    delete (UnistylesRuntime*)self.unistylesRuntime;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
