@@ -1,8 +1,10 @@
 #import "UnistylesModule.h"
 #import "UnistylesRuntime.h"
+#import "UnistylesModule.h"
 
+
+#import <React/RCTAppearance.h>
 #import <React/RCTBridge+Private.h>
-#import <React/RCTUtils.h>
 #import <jsi/jsi.h>
 
 @implementation UnistylesModule
@@ -19,6 +21,11 @@ RCT_EXPORT_MODULE(Unistyles)
                                                  selector:@selector(handleOrientationChange:)
                                                      name:UIDeviceOrientationDidChangeNotification
                                                    object:nil];
+        // todo from iOS 13
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                     selector:@selector(appearanceChanged:)
+                                                         name:RCTUserInterfaceStyleDidChangeNotification
+                                                       object:nil];
     }
     return self;
 }
@@ -30,6 +37,19 @@ RCT_EXPORT_MODULE(Unistyles)
 
         ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange(screenWidth, screenHeight);
     });
+}
+
+- (void)appearanceChanged:(NSNotification *)notification
+{
+  NSDictionary *userInfo = [notification userInfo];
+
+  if (userInfo) {
+      UITraitCollection *traitCollection = userInfo[RCTUserInterfaceStyleDidChangeNotificationTraitCollectionKey];
+      NSString *newColorScheme = RCTColorSchemePreference(traitCollection);
+      std::string colorScheme = [newColorScheme UTF8String];
+      
+      ((UnistylesRuntime*)self.unistylesRuntime)->handleAppearanceChange(colorScheme);
+  }
 }
 
 - (void)dealloc {
@@ -92,10 +112,12 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSelf) {
     CGFloat initialScreenWidth = [UIScreen mainScreen].bounds.size.width;
     CGFloat initialScreenHeight = [UIScreen mainScreen].bounds.size.height;
+    UIUserInterfaceStyle style = [UIScreen mainScreen].traitCollection.userInterfaceStyle;
     UnistylesEventHandler eventHandler = ^(NSDictionary *body) {
         [weakSelf emitEvent:@"onChange" withBody:body];
     };
     
+    // todo share initial style with C++
     auto unistylesRuntime = std::make_shared<UnistylesRuntime>(eventHandler, initialScreenWidth, initialScreenHeight);
     
     weakSelf.unistylesRuntime = unistylesRuntime.get();

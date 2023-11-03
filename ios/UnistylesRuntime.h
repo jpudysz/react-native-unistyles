@@ -32,5 +32,6 @@ public:
 
     jsi::Value getThemeOrFail(jsi::Runtime&);
     void handleScreenSizeChange(CGFloat width, CGFloat height);
+    void handleAppearanceChange(std::string colorScheme);
     std::string getBreakpointFromScreenWidth(double width, const std::vector<std::pair<std::string, double>>& sortedBreakpointEntries);
 };
