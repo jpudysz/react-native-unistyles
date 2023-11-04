@@ -3,6 +3,7 @@ import type { UnistylesThemes, UnistylesBreakpoints } from './global'
 
 export class UnistyleRegistry {
     public config: UnistylesConfig = {}
+    public themeNames: Array<keyof UnistylesThemes> = []
     public themes: UnistylesThemes = {} as UnistylesThemes
     public breakpoints: UnistylesBreakpoints = {} as UnistylesBreakpoints
     public sortedBreakpointPairs: Array<[keyof UnistylesBreakpoints, UnistylesBreakpoints[keyof UnistylesBreakpoints]]> = []
@@ -11,7 +12,11 @@ export class UnistyleRegistry {
 
     public addThemes = (themes: UnistylesThemes) => {
         this.themes = themes
-        this.unistylesBridge.themes = Object.keys(themes) as Array<keyof UnistylesThemes>
+
+        const keys = Object.keys(themes) as Array<keyof UnistylesThemes>
+
+        this.unistylesBridge.themes = keys
+        this.themeNames = keys
 
         return this
     }
@@ -31,5 +36,15 @@ export class UnistyleRegistry {
         }
 
         return this
+    }
+
+    public dangerouslyUnregister = () => {
+        this.config = {}
+        this.themeNames = []
+        this.themes = {} as UnistylesThemes
+        this.breakpoints = {} as UnistylesBreakpoints
+        this.sortedBreakpointPairs = []
+
+        this.unistylesBridge.unregister()
     }
 }

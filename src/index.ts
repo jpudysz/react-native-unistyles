@@ -15,6 +15,8 @@ const UnistylesRegistry = {
     addConfig
 }
 
+export const __dangerouslyUnregister = unistyles.registry.dangerouslyUnregister
+
 export {
     UnistylesRuntime,
     UnistylesRegistry

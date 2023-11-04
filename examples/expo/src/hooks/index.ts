@@ -1,0 +1,1 @@
+export { useLazyRegistryForDemo } from './useLazyRegistryForDemo'

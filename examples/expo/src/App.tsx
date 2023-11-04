@@ -1,23 +1,27 @@
 import React from 'react'
-import { useInitialTheme, UnistylesRegistry } from 'react-native-unistyles'
-import { Cxx } from './examples'
-import { breakpoints, darkTheme, lightTheme, premiumTheme } from './styles'
+import { NavigationContainer } from '@react-navigation/native'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import * as Screens from './examples'
+import { DemoNames } from './common'
+import type { DemoStackParams } from './common'
 
-UnistylesRegistry
-    .addThemes({
-        light: lightTheme,
-        dark: darkTheme,
-        premium: premiumTheme
-    })
-    .addBreakpoints(breakpoints)
-    .addConfig({
-        adaptiveThemes: true
-    })
+const Stack = createNativeStackNavigator<DemoStackParams>()
 
-export const App: React.FunctionComponent = () => {
-    useInitialTheme('premium')
-
-    return (
-        <Cxx />
-    )
-}
+export const App: React.FunctionComponent = () => (
+    <SafeAreaProvider>
+        <NavigationContainer>
+            <Stack.Navigator
+                initialRouteName={DemoNames.Home}
+                screenOptions={{
+                    headerShown: false
+                }}
+            >
+                <Stack.Screen name={DemoNames.Home} component={Screens.HomeScreen} />
+                <Stack.Screen name={DemoNames.NoThemes} component={Screens.NoThemesScreen} />
+                <Stack.Screen name={DemoNames.SingleTheme} component={Screens.SingleThemeScreen} />
+                <Stack.Screen name={DemoNames.TwoThemes} component={Screens.TwoThemesScreen} />
+            </Stack.Navigator>
+        </NavigationContainer>
+    </SafeAreaProvider>
+)

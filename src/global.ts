@@ -1,2 +1,4 @@
 export interface UnistylesThemes {}
-export interface UnistylesBreakpoints {}
+export interface UnistylesBreakpoints {
+    default: 0
+}
