@@ -6,7 +6,10 @@ export enum DemoNames {
     SingleTheme = 'SingleTheme',
     TwoThemes = 'TwoThemes',
     LightDarkThemes = 'LightDarkThemes',
-    MultipleThemes = 'MultipleThemes'
+    MultipleThemes = 'MultipleThemes',
+    MultipleThemesAdaptive = 'MultipleThemesAdaptive',
+    NoBreakpoints = 'NoBreakpoints',
+    WithBreakpoints = 'WithBreakpoints'
 }
 
 export type DemoStackParams = {
@@ -15,7 +18,10 @@ export type DemoStackParams = {
     [DemoNames.SingleTheme]: undefined,
     [DemoNames.TwoThemes]: undefined,
     [DemoNames.LightDarkThemes]: undefined,
-    [DemoNames.MultipleThemes]: undefined
+    [DemoNames.MultipleThemes]: undefined,
+    [DemoNames.MultipleThemesAdaptive]: undefined,
+    [DemoNames.NoBreakpoints]: undefined,
+    [DemoNames.WithBreakpoints]: undefined
 }
 
 export type NavigationProps<S extends DemoNames = DemoNames.Home> = NavigationProp<DemoStackParams, S>

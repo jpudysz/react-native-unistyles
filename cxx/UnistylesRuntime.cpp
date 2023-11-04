@@ -139,6 +139,7 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                 }
 
                 this->themeName = this->colorScheme;
+                this->onThemeChange(this->themeName);
 
                 return jsi::Value::undefined();
             }
