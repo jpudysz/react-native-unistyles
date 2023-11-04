@@ -19,7 +19,7 @@ export class UnistylesRuntime {
     }
 
     public get themeName() {
-        return this.unistylesBridge.theme
+        return this.unistylesBridge.themeName
     }
 
     public get breakpoint() {
