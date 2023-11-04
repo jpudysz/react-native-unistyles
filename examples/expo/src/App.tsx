@@ -23,6 +23,9 @@ export const App: React.FunctionComponent = () => (
                 <Stack.Screen name={DemoNames.TwoThemes} component={Screens.TwoThemesScreen} />
                 <Stack.Screen name={DemoNames.LightDarkThemes} component={Screens.LightDarkThemesScreen} />
                 <Stack.Screen name={DemoNames.MultipleThemes} component={Screens.MultipleThemesScreen} />
+                <Stack.Screen name={DemoNames.MultipleThemesAdaptive} component={Screens.MultipleThemesAdaptiveScreen} />
+                <Stack.Screen name={DemoNames.NoBreakpoints} component={Screens.NoBreakpointsScreen} />
+                <Stack.Screen name={DemoNames.WithBreakpoints} component={Screens.WithBreakpointsScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     </SafeAreaProvider>

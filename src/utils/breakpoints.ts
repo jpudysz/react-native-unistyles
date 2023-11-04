@@ -66,7 +66,7 @@ export const sortAndValidateBreakpoints = (breakpoints: UnistylesBreakpoints): U
 export const getBreakpointFromScreenWidth = (width: number, breakpointEntries: Array<[keyof UnistylesBreakpoints, UnistylesBreakpoints[keyof UnistylesBreakpoints]]>): keyof UnistylesBreakpoints & string => {
     const [key] = breakpointEntries
         .find(([, value], index, otherBreakpoints) => {
-            const minVal = value
+            const minVal = value as number
             const maxVal = otherBreakpoints[index + 1]?.[1]
 
             if (!maxVal) {

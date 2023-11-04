@@ -1,4 +1,4 @@
 export interface UnistylesThemes {}
 export interface UnistylesBreakpoints {
-    default: 0
+    default?: 0
 }

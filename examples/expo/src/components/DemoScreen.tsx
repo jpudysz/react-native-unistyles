@@ -53,8 +53,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'black'
     },
     goBackContainer: {
-        paddingBottom: 20,
-        paddingHorizontal: 10,
+        padding: 20,
         flexDirection: 'row',
         justifyContent: 'space-between'
     },

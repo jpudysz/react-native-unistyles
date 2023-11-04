@@ -50,6 +50,20 @@ export const HomeScreen = () => {
                         description="Multiple themes"
                         onPress={() => navigation.navigate(DemoNames.MultipleThemes)}
                     />
+                    <DemoLink
+                        description="Multiple themes and adaptive modes"
+                        onPress={() => navigation.navigate(DemoNames.MultipleThemesAdaptive)}
+                    />
+                </DemoGroup>
+                <DemoGroup title="Breakpoints">
+                    <DemoLink
+                        description="No breakpoints"
+                        onPress={() => navigation.navigate(DemoNames.NoBreakpoints)}
+                    />
+                    <DemoLink
+                        description="With breakpoints"
+                        onPress={() => navigation.navigate(DemoNames.WithBreakpoints)}
+                    />
                 </DemoGroup>
             </ScrollView>
         </View>
