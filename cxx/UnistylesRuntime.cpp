@@ -144,6 +144,23 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
             }
         );
     }
+    
+    if (propName == "unregister") {
+        return jsi::Function::createFromHostFunction(runtime,
+            jsi::PropNameID::forAscii(runtime, "unregister"),
+            1,
+            [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
+                this->hasAdaptiveThemes = false;
+                this->supportsAutomaticColorScheme = false;
+                this->themeName = "";
+                this->breakpoint = "";
+                this->themes.clear();
+                this->sortedBreakpointPairs.clear();
+
+                return jsi::Value::undefined();
+            }
+        );
+    }
 
     return jsi::Value::undefined();
 }

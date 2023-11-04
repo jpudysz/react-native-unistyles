@@ -27,6 +27,9 @@ export type UnistylesBridge = {
     useBreakpoints(breakpoints: UnistylesBreakpoints): void,
     useTheme(name: keyof UnistylesThemes): void,
     useAdaptiveThemes(enable: boolean): void,
+
+    // other
+    unregister(): void
 }
 
 export enum CxxUnistylesEventTypes {
@@ -61,5 +64,6 @@ export type UnistylesEvents = CxxUnistylesThemeEvent | CxxUnistylesSizeEvent | C
 
 export enum UnistylesError {
     RuntimeUnavailable = 'UNISTYLES_ERROR_RUNTIME_UNAVAILABLE',
-    ThemeNotFound = 'UNISTYLES_ERROR_THEME_NOT_FOUND'
+    ThemeNotFound = 'UNISTYLES_ERROR_THEME_NOT_FOUND',
+    ThemeNotRegistered = 'UNISTYLES_ERROR_THEME_NOT_REGISTERED',
 }

@@ -50,10 +50,14 @@ export class UnistylesRuntime {
             return true
         }
 
-        return false
+        throw new Error(UnistylesError.ThemeNotRegistered)
     }
 
     public getTheme = (forName: keyof UnistylesThemes) => {
+        if (this.registry.themeNames.length === 0) {
+            return {} as UnistylesThemes[keyof UnistylesThemes]
+        }
+
         if (!this.hasTheme(forName)) {
             throw new Error(UnistylesError.ThemeNotFound)
         }
