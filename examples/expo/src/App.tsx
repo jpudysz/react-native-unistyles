@@ -21,6 +21,7 @@ export const App: React.FunctionComponent = () => (
                 <Stack.Screen name={DemoNames.NoThemes} component={Screens.NoThemesScreen} />
                 <Stack.Screen name={DemoNames.SingleTheme} component={Screens.SingleThemeScreen} />
                 <Stack.Screen name={DemoNames.TwoThemes} component={Screens.TwoThemesScreen} />
+                <Stack.Screen name={DemoNames.LightDarkThemes} component={Screens.LightDarkThemesScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     </SafeAreaProvider>
