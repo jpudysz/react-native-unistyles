@@ -1,10 +1,16 @@
 #pragma once
 
-#import "UnistylesModule.h"
-#import <jsi/jsi.h>
-#import <vector>
+#include <jsi/jsi.h>
+#include <vector>
 
 using namespace facebook;
+
+const std::string UnistylesDarkScheme = "dark";
+const std::string UnistylesLightScheme = "light";
+const std::string UnistylesUnspecifiedScheme = "unspecified";
+
+typedef void(^UnistylesThemeChangeEvent)(std::string);
+typedef void(^UnistylesBreakpointChangeEvent)(std::string);
 
 class JSI_EXPORT UnistylesRuntime : public jsi::HostObject {
 private:
@@ -19,8 +25,8 @@ public:
     UnistylesRuntime(
         UnistylesThemeChangeEvent onThemeChange,
         UnistylesBreakpointChangeEvent onBreakpointChange,
-        float screenWidth,
-        float screenHeight,
+        int screenWidth,
+        int screenHeight,
         std::string colorScheme
     ): onThemeChange(onThemeChange),
        onBreakpointChange(onBreakpointChange),
@@ -31,10 +37,10 @@ public:
     bool hasAdaptiveThemes;
     bool supportsAutomaticColorScheme;
 
-    std::string theme;
+    std::string themeName;
     std::string breakpoint;
     std::vector<std::string> themes;
-    std::vector<std::pair<std::string, double>> sortedBreakpointEntries;
+    std::vector<std::pair<std::string, double>> sortedBreakpointPairs;
 
     jsi::Value get(jsi::Runtime&, const jsi::PropNameID& name) override;
     void set(jsi::Runtime& runtime, const jsi::PropNameID& propNameId, const jsi::Value& value) override;
@@ -44,5 +50,5 @@ public:
     void handleAppearanceChange(std::string colorScheme);
 
     jsi::Value getThemeOrFail(jsi::Runtime&);
-    std::string getBreakpointFromScreenWidth(double width, const std::vector<std::pair<std::string, double>>& sortedBreakpointEntries);
+    std::string getBreakpointFromScreenWidth(int width, const std::vector<std::pair<std::string, double>>& sortedBreakpointEntries);
 };

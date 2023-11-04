@@ -9788,6 +9788,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-splash-screen@npm:~0.20.5":
+  version: 0.20.5
+  resolution: "expo-splash-screen@npm:0.20.5"
+  dependencies:
+    "@expo/prebuild-config": 6.2.6
+  peerDependencies:
+    expo: "*"
+  checksum: c4b0db3d0e8ab755a9f4afb1f20824229fa84ea2410528e4316a62e676e08f990157c9edd4af0978f79183d6b47cf3d4843b86f76c084274a40e07adfd697889
+  languageName: node
+  linkType: hard
+
 "expo-status-bar@npm:1.7.1":
   version: 1.7.1
   resolution: "expo-status-bar@npm:1.7.1"
@@ -17729,6 +17740,7 @@ __metadata:
     babel-loader: 9.1.3
     babel-plugin-module-resolver: 5.0.0
     expo: 49.0.13
+    expo-splash-screen: ~0.20.5
     expo-status-bar: 1.7.1
     react: 18.2.0
     react-dom: 18.2.0

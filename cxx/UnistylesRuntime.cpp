@@ -1,30 +1,35 @@
-#import "UnistylesRuntime.h"
+#include "UnistylesRuntime.h"
 
-std::vector<jsi::PropNameID> UnistylesRuntime::getPropertyNames(jsi::Runtime& rt) {
+#include <string>
+#include <vector>
+
+#pragma region HostObject
+
+std::vector<jsi::PropNameID> UnistylesRuntime::getPropertyNames(jsi::Runtime& runtime) {
     std::vector<jsi::PropNameID> properties;
 
     // getters
-    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("screenWidth")));
-    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("screenHeight")));
-    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("hasAdaptiveThemes")));
-    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("theme")));
-    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("breakpoint")));
-    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("colorScheme")));
-    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("sortedBreakpointPairs")));
-    
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("screenWidth")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("screenHeight")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("hasAdaptiveThemes")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("themeName")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("breakpoint")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("colorScheme")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("sortedBreakpointPairs")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("useBreakpoints")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("useTheme")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("useAdaptiveThemes")));
+
     // setters
-    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("themes")));
-    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("useBreakpoints")));
-    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("useTheme")));
-    properties.push_back(jsi::PropNameID::forUtf8(rt, std::string("useAdaptiveThemes")));
-    
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("themes")));
+
     return properties;
 }
 
 
 jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& propNameId) {
     std::string propName = propNameId.utf8(runtime);
-    
+
     if (propName == "screenWidth") {
         return jsi::Value(this->screenWidth);
     }
@@ -32,48 +37,48 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
     if (propName == "screenHeight") {
         return jsi::Value(this->screenHeight);
     }
-    
+
     if (propName == "hasAdaptiveThemes") {
         return jsi::Value(this->hasAdaptiveThemes);
     }
-    
-    if (propName == "theme") {
-        return !this->theme.empty()
-            ? jsi::Value(jsi::String::createFromUtf8(runtime, this->theme))
+
+    if (propName == "themeName") {
+        return !this->themeName.empty()
+            ? jsi::Value(jsi::String::createFromUtf8(runtime, this->themeName))
             : this->getThemeOrFail(runtime);
     }
-    
+
     if (propName == "breakpoint") {
         return !this->breakpoint.empty()
             ? jsi::Value(jsi::String::createFromUtf8(runtime, this->breakpoint))
             : jsi::Value::undefined();
     }
-    
+
     if (propName == "colorScheme") {
         return jsi::Value(jsi::String::createFromUtf8(runtime, this->colorScheme));
     }
 
     if (propName == "sortedBreakpointPairs") {
-        std::unique_ptr<jsi::Array> sortedBreakpointEntriesArray = std::make_unique<jsi::Array>(runtime, this->sortedBreakpointEntries.size());
-            
-        for (size_t i = 0; i < this->sortedBreakpointEntries.size(); ++i) {
+        std::unique_ptr<jsi::Array> sortedBreakpointEntriesArray = std::make_unique<jsi::Array>(runtime, this->sortedBreakpointPairs.size());
+
+        for (size_t i = 0; i < this->sortedBreakpointPairs.size(); ++i) {
             std::unique_ptr<jsi::Array> pairArray = std::make_unique<jsi::Array>(runtime, 2);
-            jsi::String nameValue = jsi::String::createFromUtf8(runtime, this->sortedBreakpointEntries[i].first);
-            
+            jsi::String nameValue = jsi::String::createFromUtf8(runtime, this->sortedBreakpointPairs[i].first);
+
             pairArray->setValueAtIndex(runtime, 0, nameValue);
-            pairArray->setValueAtIndex(runtime, 1, jsi::Value(this->sortedBreakpointEntries[i].second));
+            pairArray->setValueAtIndex(runtime, 1, jsi::Value(this->sortedBreakpointPairs[i].second));
             sortedBreakpointEntriesArray->setValueAtIndex(runtime, i, *pairArray);
         }
-        
+
         return jsi::Value(runtime, *sortedBreakpointEntriesArray);
     }
-    
+
     if (propName == "useBreakpoints") {
         return jsi::Function::createFromHostFunction(
-           runtime,
-           jsi::PropNameID::forAscii(runtime, "useBreakpoints"),
-           1,
-           [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
+            runtime,
+            jsi::PropNameID::forAscii(runtime, "useBreakpoints"),
+            1,
+            [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
                 jsi::Object breakpointsObj = arguments[0].asObject(runtime);
                 jsi::Array propertyNames = breakpointsObj.getPropertyNames(runtime);
                 std::vector<std::pair<std::string, double>> sortedBreakpointEntriesVec;
@@ -91,36 +96,35 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                 }
 
                 std::sort(sortedBreakpointEntriesVec.begin(), sortedBreakpointEntriesVec.end(), [](const std::pair<std::string, double>& a, const std::pair<std::string, double>& b) {
-                        return a.second < b.second;
+                    return a.second < b.second;
                 });
 
-                this->sortedBreakpointEntries = sortedBreakpointEntriesVec;
-                
-               std::string breakpoint = this->getBreakpointFromScreenWidth(this->screenWidth, sortedBreakpointEntriesVec);
+                this->sortedBreakpointPairs = sortedBreakpointEntriesVec;
 
-               this->breakpoint = breakpoint;
+                std::string breakpoint = this->getBreakpointFromScreenWidth(this->screenWidth, sortedBreakpointEntriesVec);
 
-               return jsi::Value::undefined();
-           }
-         );
+                this->breakpoint = breakpoint;
+
+                return jsi::Value::undefined();
+            }
+        );
     }
-    
+
     if (propName == "useTheme") {
         return jsi::Function::createFromHostFunction(runtime,
             jsi::PropNameID::forAscii(runtime, "useTheme"),
             1,
             [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
                 std::string themeName = arguments[0].asString(runtime).utf8(runtime);
-                NSString *currentTheme = [NSString stringWithUTF8String:themeName.c_str()];
-            
-                this->theme = themeName;
+
+                this->themeName = themeName;
                 this->onThemeChange(themeName);
 
                 return jsi::Value::undefined();
             }
         );
     }
-    
+
     if (propName == "useAdaptiveThemes") {
         return jsi::Function::createFromHostFunction(runtime,
             jsi::PropNameID::forAscii(runtime, "useAdaptiveThemes"),
@@ -129,30 +133,29 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                 bool enableAdaptiveThemes = arguments[0].asBool();
 
                 this->hasAdaptiveThemes = enableAdaptiveThemes;
-            
+
                 if (!enableAdaptiveThemes || !this->supportsAutomaticColorScheme) {
                     return jsi::Value::undefined();
                 }
 
-                this->theme = this->colorScheme;
-//                this->onThemeChange(this->theme);
+                this->themeName = this->colorScheme;
 
                 return jsi::Value::undefined();
             }
         );
     }
-    
+
     return jsi::Value::undefined();
 }
 
 void UnistylesRuntime::set(jsi::Runtime& runtime, const jsi::PropNameID& propNameId, const jsi::Value& value) {
     std::string propName = propNameId.utf8(runtime);
-    
+
     if (propName == "themes" && value.isObject()) {
         jsi::Array themes = value.asObject(runtime).asArray(runtime);
         std::vector<std::string> themesVector;
         size_t length = themes.size(runtime);
-        
+
         for (size_t i = 0; i < length; ++i) {
             jsi::Value element = themes.getValueAtIndex(runtime, i);
 
@@ -161,43 +164,46 @@ void UnistylesRuntime::set(jsi::Runtime& runtime, const jsi::PropNameID& propNam
                 themesVector.push_back(theme);
             }
         }
-        
+
         this->themes = themesVector;
-        
+
         bool hasLightTheme = std::find(themesVector.begin(), themesVector.end(), "light") != themesVector.end();
         bool hasDarkTheme = std::find(themesVector.begin(), themesVector.end(), "dark") != themesVector.end();
-        
+
         this->supportsAutomaticColorScheme = hasLightTheme && hasDarkTheme;
-        
+
         return;
     }
 }
 
-std::string UnistylesRuntime::getBreakpointFromScreenWidth(double width, const std::vector<std::pair<std::string, double>>& sortedBreakpointEntries) {
-    for (size_t i = 0; i < sortedBreakpointEntries.size(); ++i) {
-        const auto& [key, value] = sortedBreakpointEntries[i];
-        const double maxVal = (i + 1 < sortedBreakpointEntries.size()) ? sortedBreakpointEntries[i + 1].second : std::numeric_limits<double>::infinity();
+#pragma endregion
+#pragma region Helpers
+
+std::string UnistylesRuntime::getBreakpointFromScreenWidth(int width, const std::vector<std::pair<std::string, double>>& sortedBreakpointPairs) {
+    for (size_t i = 0; i < sortedBreakpointPairs.size(); ++i) {
+        const auto& [key, value] = sortedBreakpointPairs[i];
+        const double maxVal = (i + 1 < sortedBreakpointPairs.size()) ? sortedBreakpointPairs[i + 1].second : std::numeric_limits<double>::infinity();
 
         if (width >= value && width < maxVal) {
             return key;
         }
     }
-    
-    return sortedBreakpointEntries.empty() ? "" : sortedBreakpointEntries.back().first;
+
+    return sortedBreakpointPairs.empty() ? "" : sortedBreakpointPairs.back().first;
 }
 
 void UnistylesRuntime::handleScreenSizeChange(int width, int height) {
     if (width != this->screenWidth) {
         this->screenWidth = width;
     }
-    
+
     if (height != this->screenHeight) {
         this->screenHeight = height;
     }
-    
+
     std::string currentBreakpoint = this->breakpoint;
-    std::string nextBreakpoint = this->getBreakpointFromScreenWidth(width, this->sortedBreakpointEntries);
-    
+    std::string nextBreakpoint = this->getBreakpointFromScreenWidth(width, this->sortedBreakpointPairs);
+
     if (currentBreakpoint != nextBreakpoint) {
         this->breakpoint = nextBreakpoint;
         this->onBreakpointChange(nextBreakpoint);
@@ -206,23 +212,25 @@ void UnistylesRuntime::handleScreenSizeChange(int width, int height) {
 
 void UnistylesRuntime::handleAppearanceChange(std::string colorScheme) {
     this->colorScheme = colorScheme;
-    
+
     if (!this->supportsAutomaticColorScheme || !this->hasAdaptiveThemes) {
         return;
     }
-    
-    this->theme = this->colorScheme;
-    this->onThemeChange(this->theme);
+
+    this->themeName = this->colorScheme;
+    this->onThemeChange(this->themeName);
 }
 
 jsi::Value UnistylesRuntime::getThemeOrFail(jsi::Runtime& runtime) {
     if (this->themes.size() == 1) {
         std::string themeName = this->themes.at(0);
 
-        this->theme = themeName;
-        
+        this->themeName = themeName;
+
         return jsi::String::createFromUtf8(runtime, themeName);
     }
-    
+
     return jsi::Value().undefined();
 }
+
+#pragma endregion

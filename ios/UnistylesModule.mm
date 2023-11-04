@@ -1,19 +1,18 @@
 #import "UnistylesModule.h"
+#import "UnistylesHelpers.h"
 #import "UnistylesRuntime.h"
-#import "UnistylesModule.h"
-
 
 #import <React/RCTAppearance.h>
 #import <React/RCTBridge+Private.h>
 #import <jsi/jsi.h>
 
-@implementation UnistylesModule
-
-BOOL hasListeners;
-
 using namespace facebook;
 
+@implementation UnistylesModule
+
 RCT_EXPORT_MODULE(Unistyles)
+
+#pragma mark - Lifecycle
 
 - (instancetype)init {
     if ((self = [super init])) {
@@ -21,14 +20,29 @@ RCT_EXPORT_MODULE(Unistyles)
                                                  selector:@selector(handleOrientationChange:)
                                                      name:UIDeviceOrientationDidChangeNotification
                                                    object:nil];
-        // todo from iOS 13
         [[NSNotificationCenter defaultCenter] addObserver:self
-                                                     selector:@selector(appearanceChanged:)
-                                                         name:RCTUserInterfaceStyleDidChangeNotification
-                                                       object:nil];
+                                                 selector:@selector(appearanceChanged:)
+                                                     name:RCTUserInterfaceStyleDidChangeNotification
+                                                   object:nil];
     }
+
     return self;
 }
+
+- (void)dealloc {
+    if (self.unistylesRuntime != nullptr) {
+        delete (UnistylesRuntime*)self.unistylesRuntime;
+    }
+
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+
++ (BOOL)requiresMainQueueSetup {
+    return YES;
+}
+
+#pragma mark - Event handlers
 
 - (void)handleOrientationChange:(NSNotification *)notification {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -39,37 +53,32 @@ RCT_EXPORT_MODULE(Unistyles)
     });
 }
 
-- (void)appearanceChanged:(NSNotification *)notification
-{
-  std::string colorScheme = [self getColorScheme];
+- (void)appearanceChanged:(NSNotification *)notification {
+    std::string colorScheme = getColorScheme();
 
-  ((UnistylesRuntime*)self.unistylesRuntime)->handleAppearanceChange(colorScheme);
+    ((UnistylesRuntime*)self.unistylesRuntime)->handleAppearanceChange(colorScheme);
 }
 
-- (std::string)getColorScheme {
-    UIUserInterfaceStyle colorScheme = [UIScreen mainScreen].traitCollection.userInterfaceStyle;
-    
-    // todo enums
-    switch (colorScheme) {
-        case UIUserInterfaceStyleLight:
-            return "light";
-        case UIUserInterfaceStyleDark:
-            return "dark";
-        case UIUserInterfaceStyleUnspecified:
-        default:
-            return "";
+#pragma mark - Event emitter
+- (NSArray<NSString *> *)supportedEvents {
+    return @[@"onChange"];
+}
+
+- (void)startObserving {
+    self.hasListeners = YES;
+}
+
+- (void)stopObserving {
+    self.hasListeners = NO;
+}
+
+- (void)emitEvent:(NSString *)eventName withBody:(NSDictionary *)body {
+    if (self.hasListeners) {
+        [self sendEventWithName:@"onChange" body:body];
     }
 }
 
-- (void)dealloc {
-    delete (UnistylesRuntime*)self.unistylesRuntime;
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
-+ (BOOL)requiresMainQueueSetup
-{
-  return YES;
-}
+#pragma mark - Core
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 {
@@ -79,13 +88,13 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
     RCTCxxBridge* cxxBridge = (RCTCxxBridge*)bridge;
 
     if (cxxBridge == nil) {
-       return @false;
+        return @false;
     }
 
     auto jsiRuntime = (jsi::Runtime*)cxxBridge.runtime;
 
     if (jsiRuntime == nil) {
-       return @false;
+        return @false;
     }
 
     auto& runtime = *jsiRuntime;
@@ -98,66 +107,47 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
     return @true;
 }
 
-- (NSArray<NSString *> *)supportedEvents {
-    return @[@"onChange"];
-}
-
-- (void)startObserving
-{
-    hasListeners = YES;
-}
-
-- (void)stopObserving
-{
-    hasListeners = NO;
-}
-
-- (void)emitEvent:(NSString *)eventName withBody:(NSDictionary *)body {
-    if (hasListeners) {
-        [self sendEventWithName:@"onChange" body:body];
-    }
-}
 
 void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSelf) {
     CGFloat initialScreenWidth = [UIScreen mainScreen].bounds.size.width;
     CGFloat initialScreenHeight = [UIScreen mainScreen].bounds.size.height;
-    std::string initalColorScheme = [weakSelf getColorScheme];
+    std::string initialColorScheme = getColorScheme();
     UnistylesThemeChangeEvent onThemeChange = ^(std::string theme) {
-        NSString *nextTheme = [NSString stringWithUTF8String:theme.c_str()];
         NSDictionary *body = @{
             @"type": @"theme",
             @"payload": @{
-                @"themeName": nextTheme
+                @"themeName": cxxStringToNSString(theme)
             }
         };
-        
+
         [weakSelf emitEvent:@"onChange" withBody:body];
     };
     UnistylesBreakpointChangeEvent onBreakpointChange = ^(std::string breakpoint) {
-        NSString *nextBreakpoint = [NSString stringWithUTF8String:breakpoint.c_str()];
         NSDictionary *body = @{
             @"type": @"breakpoint",
             @"payload": @{
-                @"breakpoint": nextBreakpoint
+                @"breakpoint": cxxStringToNSString(breakpoint)
             }
         };
-        
+
         [weakSelf emitEvent:@"onChange" withBody:body];
     };
-    
+
     auto unistylesRuntime = std::make_shared<UnistylesRuntime>(
         onThemeChange,
         onBreakpointChange,
         (int)initialScreenWidth,
         (int)initialScreenHeight,
-        initalColorScheme
+        initialColorScheme
     );
-    
+
     weakSelf.unistylesRuntime = unistylesRuntime.get();
 
     auto hostObject = jsi::Object::createFromHostObject(runtime, unistylesRuntime);
- 
+
     runtime.global().setProperty(runtime, "__UNISTYLES__", std::move(hostObject));
 }
 
 @end
+
+#pragma mark - End

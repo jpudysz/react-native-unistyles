@@ -17,7 +17,7 @@ export type UnistylesBridge = {
     screenWidth: number,
     screenHeight: number,
     hasAdaptiveThemes: boolean,
-    theme: keyof UnistylesThemes,
+    themeName: keyof UnistylesThemes,
     breakpoint: keyof UnistylesBreakpoints,
     colorScheme: ColorSchemeName,
     sortedBreakpointPairs: Array<[keyof UnistylesBreakpoints, UnistylesBreakpoints[keyof UnistylesBreakpoints]]>,
