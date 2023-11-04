@@ -3,18 +3,21 @@ import type { PropsWithChildren } from 'react'
 import { __dangerouslyUnregister } from 'react-native-unistyles'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { View, StyleSheet, Pressable, Text } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import { useIsFocused, useNavigation } from '@react-navigation/native'
 import type { NavigationProps } from '../common'
 import { Timer } from './Timer'
 
 export const DemoScreen: React.FunctionComponent<PropsWithChildren> = ({ children }) => {
+    const isFocused = useIsFocused()
     const { top } = useSafeAreaInsets()
     const navigation = useNavigation<NavigationProps>()
     const [renderTime, setRenderTime] = useState(0)
 
     // You shouldn't do that in your app, it's just for the demo
     // as we're having tons of screens with different setups
-    useEffect(() => () => __dangerouslyUnregister(), [])
+    useEffect(() => () => {
+        __dangerouslyUnregister()
+    }, [isFocused])
 
     return (
         <Timer onMeasureEnd={setRenderTime}>
@@ -67,3 +70,4 @@ const styles = StyleSheet.create({
         color: '#fff'
     }
 })
+

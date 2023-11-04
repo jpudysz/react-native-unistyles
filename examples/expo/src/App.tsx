@@ -22,6 +22,7 @@ export const App: React.FunctionComponent = () => (
                 <Stack.Screen name={DemoNames.SingleTheme} component={Screens.SingleThemeScreen} />
                 <Stack.Screen name={DemoNames.TwoThemes} component={Screens.TwoThemesScreen} />
                 <Stack.Screen name={DemoNames.LightDarkThemes} component={Screens.LightDarkThemesScreen} />
+                <Stack.Screen name={DemoNames.MultipleThemes} component={Screens.MultipleThemesScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     </SafeAreaProvider>
