@@ -42,6 +42,10 @@ export const HomeScreen = () => {
                         description="Two themes"
                         onPress={() => navigation.navigate(DemoNames.TwoThemes)}
                     />
+                    <DemoLink
+                        description="Light/Dark themes"
+                        onPress={() => navigation.navigate(DemoNames.LightDarkThemes)}
+                    />
                 </DemoGroup>
             </ScrollView>
         </View>
