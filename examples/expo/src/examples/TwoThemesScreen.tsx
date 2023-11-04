@@ -12,12 +12,12 @@ export const TwoThemesScreen: React.FunctionComponent = () => {
                 light: lightTheme,
                 premium: premiumTheme
                 // we need to cast it to UnistylesThemes as we already registered 3 themes with TypeScript under styles/index.ts,
-                // but we want to demonstrate how to register a single theme
+                // but we want to demonstrate how to register two themes
             } as UnistylesThemes)
     })
 
     // if you have 2 or more themes, you need to select one of them
-    // keep in mind that everything is so fast, that you can set it in the same screen 🔥
+    // keep in mind that everything is synchronous and so fast, that you can set it in the same screen 🔥
     // two more notes:
     // call it before useStyles
     // if you won't do that you will get UNISTYLES_THEME_NOT_FOUND error
@@ -48,7 +48,6 @@ export const TwoThemesScreen: React.FunctionComponent = () => {
 }
 
 const stylesheet = createStyleSheet(theme => ({
-    // you can access your theme here
     container: {
         flex: 1,
         justifyContent: 'center',
