@@ -37,7 +37,7 @@ import Seo from '../../../components/Seo.astro'
         lg: 8,
         xl: 12
       }
-    }
+    } as const
     ```
 
     or something more advanced with nested objects / functions:
@@ -76,8 +76,10 @@ import Seo from '../../../components/Seo.astro'
           return `rgba(${rgb.at(0)}, ${rgb.at(1)}, ${rgb.at(2)}, ${opacity})`
         }
       }
-    }
+    } as const
     ```
+
+    It's good to add "as const" to the end of your theme object to make sure TypeScript knows it's a constant object and not a mutable one. It also allows you to spread your partial theme object into a full theme object without TypeScript complaining.
 
     ### Create breakpoints
 
@@ -93,8 +95,10 @@ import Seo from '../../../components/Seo.astro'
         xl: 1200,
         superLarge: 2000,
         tvLike: 4000
-    }
+    } as const
     ```
+
+    It's good to add "as const" to the end of your breakpoints object to make sure TypeScript knows it's a constant object and not a mutable one.
 
     ### Wrap your app with UnistylesTheme to inject theme
 
