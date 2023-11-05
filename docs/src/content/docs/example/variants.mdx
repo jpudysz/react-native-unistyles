@@ -97,6 +97,8 @@ const stylesheet = createStyleSheet(theme => ({
     }
 }))
 ```
+Remember, that if you want to spread styles like so you need to export your theme "as const" for TypeScript.
+This is how React Native types works, and you can see the same behavior with StyleSheet.create.
 
 Now, let's create another variant, e.g., Heading:
 
