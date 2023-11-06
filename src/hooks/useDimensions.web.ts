@@ -1,12 +1,16 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { ScreenSize } from '../types'
 
 export const useDimensions = (): ScreenSize => {
     const timerRef = useRef<ReturnType<typeof setTimeout>>()
-    const [screenSize, setScreenSize] = useState<ScreenSize>({
-        width: window.innerWidth,
-        height: window.innerHeight
-    })
+    const [screenSize, setScreenSize] = useState<ScreenSize>({} as ScreenSize)
+
+    useLayoutEffect(() => {
+        setScreenSize({
+            width: window.innerWidth,
+            height: window.innerHeight
+        })
+    }, [])
 
     useEffect(() => {
         const handleResize = () => {
