@@ -98,6 +98,14 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                 std::sort(sortedBreakpointEntriesVec.begin(), sortedBreakpointEntriesVec.end(), [](const std::pair<std::string, double>& a, const std::pair<std::string, double>& b) {
                     return a.second < b.second;
                 });
+                
+                if (sortedBreakpointEntriesVec.size() == 0) {
+                    throw jsi::JSError(runtime, UnistylesErrorBreakpointsCannotBeEmpty);
+                }
+                
+                if (sortedBreakpointEntriesVec.at(0).second != 0) {
+                    throw jsi::JSError(runtime, UnistylesErrorBreakpointsMustStartFromZero);
+                }
 
                 this->sortedBreakpointPairs = sortedBreakpointEntriesVec;
 
@@ -181,6 +189,10 @@ void UnistylesRuntime::set(jsi::Runtime& runtime, const jsi::PropNameID& propNam
                 std::string theme = element.asString(runtime).utf8(runtime);
                 themesVector.push_back(theme);
             }
+        }
+        
+        if (themesVector.size() == 0) {
+            throw jsi::JSError(runtime, UnistylesErrorThemesCannotBeEmpty);
         }
 
         this->themes = themesVector;
