@@ -16,13 +16,25 @@ import type { ScreenSize } from '../types'
  * extractValues("h[100,]")    // returns [100]
  */
 export const extractValues = (codedValue: string): Array<number> => {
-    const [lh, rh] = codedValue
-        .replace(/[wh[\]]/g, '')
-        .split(',')
+    const cleanedValue = codedValue.replace(/[wh ]/g, '')
+    const [left, right] = cleanedValue.split(',') as [string, string | undefined]
 
-    return rh
-        ? [Number(lh), Number(rh)]
-        : [Number(lh)]
+    if (!right) {
+        const lh = left.startsWith('[')
+            ? Number(left.replace(/[[\]()]/g, ''))
+            : Number(left.replace(/[[\]()]/g, '')) + 1
+
+        return [lh]
+    }
+
+    const lh = left.startsWith('[')
+        ? Number(left.replace('[', ''))
+        : Number(left.replace('(', '')) + 1
+    const rh = right.endsWith(']')
+        ? Number(right.replace(']', ''))
+        : Number(right.replace(')', '')) - 1
+
+    return [lh, rh]
 }
 
 /**
