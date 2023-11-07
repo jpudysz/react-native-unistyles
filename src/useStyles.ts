@@ -31,13 +31,13 @@ export const useStyles = <ST extends CustomNamedStyles<ST>>(stylesheet?: ST | Cr
             if (typeof value === 'function') {
                 return {
                     ...acc,
-                    [key]: proxifyFunction(value, breakpoint!, screenSize)
+                    [key]: proxifyFunction(value, breakpoint, screenSize)
                 }
             }
 
             return StyleSheet.create({
                 ...acc,
-                [key]: parseStyle<ST>(style, breakpoint!, screenSize)
+                [key]: parseStyle<ST>(style, breakpoint, screenSize)
             })
         }, {} as ST), [breakpoint, screenSize, parsedStyles])
 

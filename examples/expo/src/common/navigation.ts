@@ -9,7 +9,8 @@ export enum DemoNames {
     MultipleThemes = 'MultipleThemes',
     MultipleThemesAdaptive = 'MultipleThemesAdaptive',
     NoBreakpoints = 'NoBreakpoints',
-    WithBreakpoints = 'WithBreakpoints'
+    WithBreakpoints = 'WithBreakpoints',
+    MediaQueriesWidthHeight = 'MediaQueriesWidthHeight',
 }
 
 export type DemoStackParams = {
@@ -21,7 +22,8 @@ export type DemoStackParams = {
     [DemoNames.MultipleThemes]: undefined,
     [DemoNames.MultipleThemesAdaptive]: undefined,
     [DemoNames.NoBreakpoints]: undefined,
-    [DemoNames.WithBreakpoints]: undefined
+    [DemoNames.WithBreakpoints]: undefined,
+    [DemoNames.MediaQueriesWidthHeight]: undefined,
 }
 
 export type NavigationProps<S extends DemoNames = DemoNames.Home> = NavigationProp<DemoStackParams, S>

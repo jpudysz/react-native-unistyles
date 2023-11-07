@@ -26,6 +26,7 @@ export const App: React.FunctionComponent = () => (
                 <Stack.Screen name={DemoNames.MultipleThemesAdaptive} component={Screens.MultipleThemesAdaptiveScreen} />
                 <Stack.Screen name={DemoNames.NoBreakpoints} component={Screens.NoBreakpointsScreen} />
                 <Stack.Screen name={DemoNames.WithBreakpoints} component={Screens.WithBreakpointsScreen} />
+                <Stack.Screen name={DemoNames.MediaQueriesWidthHeight} component={Screens.MediaQueriesWidthHeight} />
             </Stack.Navigator>
         </NavigationContainer>
     </SafeAreaProvider>

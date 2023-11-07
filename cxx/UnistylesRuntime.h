@@ -5,6 +5,9 @@
 
 using namespace facebook;
 
+const int UnistylesOrientationPortrait = 1;
+const int UnistylesOrientationLandscape = 2;
+
 const std::string UnistylesDarkScheme = "dark";
 const std::string UnistylesLightScheme = "light";
 const std::string UnistylesUnspecifiedScheme = "unspecified";
@@ -13,8 +16,8 @@ const std::string UnistylesErrorBreakpointsCannotBeEmpty = "UNISTYLES_ERROR_BREA
 const std::string UnistylesErrorBreakpointsMustStartFromZero = "UNISTYLES_ERROR_BREAKPOINTS_MUST_START_FROM_ZER0";
 const std::string UnistylesErrorThemesCannotBeEmpty = "UNISTYLES_ERROR_THEMES_CANNOT_BE_EMPTY";
 
-typedef void(^UnistylesThemeChangeEvent)(std::string);
-typedef void(^UnistylesBreakpointChangeEvent)(std::string);
+typedef void(^UnistylesThemeChangeEvent)(std::string themeName);
+typedef void(^UnistylesBreakpointChangeEvent)(std::string breakpoint, int layout, int screenWidth, int screenHeight);
 
 class JSI_EXPORT UnistylesRuntime : public jsi::HostObject {
 private:

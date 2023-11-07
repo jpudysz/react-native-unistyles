@@ -223,21 +223,17 @@ std::string UnistylesRuntime::getBreakpointFromScreenWidth(int width, const std:
 }
 
 void UnistylesRuntime::handleScreenSizeChange(int width, int height) {
-    if (width != this->screenWidth) {
-        this->screenWidth = width;
-    }
+    std::string breakpoint = this->getBreakpointFromScreenWidth(width, this->sortedBreakpointPairs);
+    
+    this->breakpoint = breakpoint;
+    this->screenWidth = width;
+    this->screenHeight = height;
+    
+    int orientation = width > height
+        ? UnistylesOrientationLandscape
+        : UnistylesOrientationPortrait;
 
-    if (height != this->screenHeight) {
-        this->screenHeight = height;
-    }
-
-    std::string currentBreakpoint = this->breakpoint;
-    std::string nextBreakpoint = this->getBreakpointFromScreenWidth(width, this->sortedBreakpointPairs);
-
-    if (currentBreakpoint != nextBreakpoint) {
-        this->breakpoint = nextBreakpoint;
-        this->onBreakpointChange(nextBreakpoint);
-    }
+    this->onBreakpointChange(breakpoint, orientation, width, height);
 }
 
 void UnistylesRuntime::handleAppearanceChange(std::string colorScheme) {

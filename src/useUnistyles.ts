@@ -1,22 +1,18 @@
 import { NativeEventEmitter, NativeModules } from 'react-native'
 import { useEffect, useState } from 'react'
-import type {
-    CxxUnistylesBreakpointEvent,
-    CxxUnistylesSizeEvent,
-    CxxUnistylesThemeEvent,
-    UnistylesEvents
-} from './types'
-import { CxxUnistylesEventTypes } from './types'
+import type { UnistylesThemeEvent, UnistylesMobileLayoutEvent, UnistylesEvents } from './types'
+import { CxxUnistylesEventTypes, ScreenOrientation } from './types'
 import { unistyles } from './Unistyles'
 
 const unistylesEvents = new NativeEventEmitter(NativeModules.Unistyles)
 
 export const useUnistyles = () => {
+    const [orientation, setOrientation] = useState<ScreenOrientation>(unistyles.runtime.orientation)
     const [theme, setTheme] = useState(unistyles.runtime.getTheme(unistyles.runtime.themeName))
     const [breakpoint, setBreakpoint] = useState(unistyles.runtime.breakpoint)
     const [screenSize, setScreenSize] = useState({
-        width: 0,
-        height: 0
+        width: unistyles.runtime.screen.width,
+        height: unistyles.runtime.screen.height
     })
 
     useEffect(() => {
@@ -25,27 +21,18 @@ export const useUnistyles = () => {
             (event: UnistylesEvents) => {
                 switch (event.type) {
                     case CxxUnistylesEventTypes.Theme: {
-                        const themeEvent = event as CxxUnistylesThemeEvent
+                        const themeEvent = event as UnistylesThemeEvent
 
                         setTheme(unistyles.runtime.getTheme(themeEvent.payload.themeName))
 
                         return
                     }
-                    // this event is not available on mobile
-                    case CxxUnistylesEventTypes.Size: {
-                        const sizeEvent = event as CxxUnistylesSizeEvent
+                    case CxxUnistylesEventTypes.Layout: {
+                        const layoutEvent = event as UnistylesMobileLayoutEvent
 
-                        setScreenSize({
-                            width: sizeEvent.payload.width,
-                            height: sizeEvent.payload.height
-                        })
-
-                        return
-                    }
-                    case CxxUnistylesEventTypes.Breakpoint: {
-                        const breakpointEvent = event as CxxUnistylesBreakpointEvent
-
-                        setBreakpoint(breakpointEvent.payload.breakpoint)
+                        setBreakpoint(layoutEvent.payload.breakpoint)
+                        setOrientation(layoutEvent.payload.orientation)
+                        setScreenSize(layoutEvent.payload.screen)
 
                         return
                     }
@@ -60,6 +47,7 @@ export const useUnistyles = () => {
 
     return {
         theme,
+        orientation,
         breakpoint,
         screenSize
     }
