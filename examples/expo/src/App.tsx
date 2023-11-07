@@ -28,6 +28,8 @@ export const App: React.FunctionComponent = () => (
                 <Stack.Screen name={DemoNames.WithBreakpoints} component={Screens.WithBreakpointsScreen} />
                 <Stack.Screen name={DemoNames.OrientationBreakpoints} component={Screens.OrientationBreakpoints} />
                 <Stack.Screen name={DemoNames.MediaQueriesWidthHeight} component={Screens.MediaQueriesWidthHeight} />
+                <Stack.Screen name={DemoNames.MediaQueriesOpenRanges} component={Screens.MediaQueriesOpenRanges} />
+                <Stack.Screen name={DemoNames.MixedMediaQueries} component={Screens.MixedMediaQueries} />
             </Stack.Navigator>
         </NavigationContainer>
     </SafeAreaProvider>

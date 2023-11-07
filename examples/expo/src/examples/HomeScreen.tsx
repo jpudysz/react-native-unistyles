@@ -74,6 +74,14 @@ export const HomeScreen = () => {
                         description="Width and Height"
                         onPress={() => navigation.navigate(DemoNames.MediaQueriesWidthHeight)}
                     />
+                    <DemoLink
+                        description="Open ranges"
+                        onPress={() => navigation.navigate(DemoNames.MediaQueriesOpenRanges)}
+                    />
+                    <DemoLink
+                        description="Mixed with breakpoints"
+                        onPress={() => navigation.navigate(DemoNames.MixedMediaQueries)}
+                    />
                 </DemoGroup>
             </ScrollView>
         </View>
