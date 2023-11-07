@@ -11,6 +11,7 @@ export enum DemoNames {
     NoBreakpoints = 'NoBreakpoints',
     WithBreakpoints = 'WithBreakpoints',
     MediaQueriesWidthHeight = 'MediaQueriesWidthHeight',
+    OrientationBreakpoints = 'OrientationBreakpoints'
 }
 
 export type DemoStackParams = {
@@ -24,6 +25,7 @@ export type DemoStackParams = {
     [DemoNames.NoBreakpoints]: undefined,
     [DemoNames.WithBreakpoints]: undefined,
     [DemoNames.MediaQueriesWidthHeight]: undefined,
+    [DemoNames.OrientationBreakpoints]: undefined
 }
 
 export type NavigationProps<S extends DemoNames = DemoNames.Home> = NavigationProp<DemoStackParams, S>

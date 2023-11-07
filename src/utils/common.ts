@@ -8,5 +8,11 @@ export const warn = (message: string) => {
     console.warn(`🦄 [react-native-unistyles]: ${message}`)
 }
 
+export const isMobile = Platform.OS === 'android' || Platform.OS === 'ios'
 export const isWeb = Platform.OS === 'web'
 export const isServer = typeof window === 'undefined'
+
+export const Orientation = {
+    Landscape: 'landscape',
+    Portrait: 'portrait'
+} as const

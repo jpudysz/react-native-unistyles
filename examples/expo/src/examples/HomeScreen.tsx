@@ -64,6 +64,10 @@ export const HomeScreen = () => {
                         description="With breakpoints"
                         onPress={() => navigation.navigate(DemoNames.WithBreakpoints)}
                     />
+                    <DemoLink
+                        description="With orientation breakpoints"
+                        onPress={() => navigation.navigate(DemoNames.OrientationBreakpoints)}
+                    />
                 </DemoGroup>
                 <DemoGroup title="Media queries">
                     <DemoLink
