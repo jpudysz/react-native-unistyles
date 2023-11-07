@@ -122,11 +122,16 @@ void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSel
 
         [weakSelf emitEvent:@"onChange" withBody:body];
     };
-    UnistylesBreakpointChangeEvent onBreakpointChange = ^(std::string breakpoint) {
+    UnistylesBreakpointChangeEvent onBreakpointChange = ^(std::string breakpoint, int orientation, int width, int height) {
         NSDictionary *body = @{
-            @"type": @"breakpoint",
+            @"type": @"layout",
             @"payload": @{
-                @"breakpoint": cxxStringToNSString(breakpoint)
+                @"breakpoint": cxxStringToNSString(breakpoint),
+                @"orientation": @(orientation),
+                @"screen": @{
+                    @"width": @(width),
+                    @"height": @(height)
+                }
             }
         };
 

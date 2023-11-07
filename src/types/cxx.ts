@@ -1,4 +1,5 @@
 import type { UnistylesThemes, UnistylesBreakpoints } from '../global'
+import type { ScreenSize } from './breakpoints'
 
 export type Nullable<T> = T | null
 export type ColorSchemeName = 'light' | 'dark' | undefined
@@ -34,33 +35,26 @@ export type UnistylesBridge = {
 
 export enum CxxUnistylesEventTypes {
     Theme = 'theme',
-    Size = 'size',
-    Breakpoint = 'breakpoint'
+    Layout = 'layout'
 }
 
-export type CxxUnistylesThemeEvent = {
+export type UnistylesThemeEvent = {
     type: CxxUnistylesEventTypes.Theme,
     payload: {
         themeName: keyof UnistylesThemes
     }
 }
 
-export type CxxUnistylesSizeEvent = {
-    type: CxxUnistylesEventTypes.Size,
+export type UnistylesMobileLayoutEvent = {
+    type: CxxUnistylesEventTypes.Layout,
     payload: {
-        width: number,
-        height: number
+        screen: ScreenSize,
+        breakpoint: keyof UnistylesBreakpoints,
+        orientation: ScreenOrientation
     }
 }
 
-export type CxxUnistylesBreakpointEvent = {
-    type: CxxUnistylesEventTypes.Breakpoint,
-    payload: {
-        breakpoint: keyof UnistylesBreakpoints
-    }
-}
-
-export type UnistylesEvents = CxxUnistylesThemeEvent | CxxUnistylesSizeEvent | CxxUnistylesBreakpointEvent
+export type UnistylesEvents = UnistylesThemeEvent | UnistylesMobileLayoutEvent
 
 export enum UnistylesError {
     RuntimeUnavailable = 'UNISTYLES_ERROR_RUNTIME_UNAVAILABLE',
