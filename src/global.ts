@@ -1,4 +1,5 @@
 export interface UnistylesThemes {}
 export interface UnistylesBreakpoints {
-    default?: 0
+    landscape?: number,
+    portrait?: number,
 }

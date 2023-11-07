@@ -2,7 +2,7 @@ export { normalizeStyles } from './normalizeStyles'
 export * from './normalizer'
 export { getBreakpointFromScreenWidth, sortAndValidateBreakpoints, getValueForBreakpoint } from './breakpoints'
 export { proxifyFunction, parseStyle } from './styles'
-export { isServer } from './common'
+export { isServer, Orientation } from './common'
 export {
     extractValues,
     getKeyForCustomMediaQuery,

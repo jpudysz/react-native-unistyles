@@ -1,6 +1,7 @@
 import { unistyles } from '../Unistyles'
-import { throwError } from './common'
+import { isMobile, Orientation, throwError } from './common'
 import type { ScreenSize, MediaQueries } from '../types'
+import { ScreenOrientation } from '../types'
 import { getKeyForCustomMediaQuery, isMediaQuery } from './mediaQueries'
 import type { UnistylesBreakpoints } from '../global'
 
@@ -118,7 +119,20 @@ export const getValueForBreakpoint = (
         return value[customMediaQueryKey]
     }
 
-    // if no custom media query, or didn't match, proceed with defined breakpoints
+    // at this point user didn't use custom media queries (:w, :h)
+    // check if user defined any breakpoints
+    const hasBreakpoints = unistyles.runtime.sortedBreakpoints.length > 0
+
+    // if not then we can fallback to horizontal and portrait (mobile only)
+    if (!hasBreakpoints && isMobile && (Orientation.Landscape in  value || Orientation.Portrait in value)) {
+        return value[
+            unistyles.runtime.orientation === ScreenOrientation.Portrait
+                ? Orientation.Portrait
+                : Orientation.Landscape
+        ]
+    }
+
+    // if user defined breakpoints, then we look for the valid one
     const unifiedKey = breakpoint?.toLowerCase() as keyof typeof value
     const directBreakpoint = value[unifiedKey]
 
@@ -127,7 +141,7 @@ export const getValueForBreakpoint = (
         return directBreakpoint
     }
 
-    // there is no direct hit for breakpoint nor media-query, so let's simulate CSS cascading
+    // there is no direct hit for breakpoint nor media-query, let's simulate CSS cascading
     const breakpointPairs = unistyles.runtime.sortedBreakpoints
     const currentBreakpoint = breakpointPairs
         .findIndex(([key]) => key === unifiedKey)
