@@ -51,7 +51,7 @@ const stylesheet = createStyleSheet(theme => ({
         paddingHorizontal: 20,
         backgroundColor: {
             ':w[, 500]:h[, 1000]': theme.colors.backgroundColor,
-            ':w[900]': theme.colors.aloes
+            ':w[932]': theme.colors.aloes
         },
         rowGap: 20
     },
