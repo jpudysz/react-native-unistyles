@@ -30,6 +30,7 @@ export const WithBreakpointsScreen: React.FunctionComponent = () => {
                 <Text style={styles.text}>
                     The current breakpoint is: {breakpoint}
                 </Text>
+                <View style={styles.box} />
             </View>
         </DemoScreen>
     )
@@ -47,5 +48,14 @@ const stylesheet = createStyleSheet(theme => ({
     text: {
         textAlign: 'center',
         color: theme.colors.typography
+    },
+    box: {
+        width: 100,
+        height: 100,
+        borderRadius: {
+            sm: 50,
+            lg: 0
+        },
+        backgroundColor: theme.colors.accent
     }
 }))
