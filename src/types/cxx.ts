@@ -1,8 +1,10 @@
 import type { UnistylesThemes, UnistylesBreakpoints } from '../global'
 import type { ScreenSize } from './breakpoints'
+import type { NestedKeys } from './core'
 
+export type Optional<T> = T | undefined
 export type Nullable<T> = T | null
-export type ColorSchemeName = 'light' | 'dark' | undefined
+export type ColorSchemeName = Optional<'light' | 'dark'>
 
 export type UnistylesConfig = {
     adaptiveThemes?: boolean
@@ -63,4 +65,9 @@ export enum UnistylesError {
     ThemesCannotBeEmpty = 'UNISTYLES_ERROR_THEMES_CANNOT_BE_EMPTY',
     BreakpointsCannotBeEmpty = 'UNISTYLES_ERROR_BREAKPOINTS_CANNOT_BE_EMPTY',
     BreakpointsMustStartFromZero = 'UNISTYLES_ERROR_BREAKPOINTS_MUST_START_FROM_ZERO',
+}
+
+export interface UnistylesEngine {
+    isMediaQuery(key: string): boolean,
+    didMatchMediaQuery(keys: NestedKeys): Optional<string>,
 }

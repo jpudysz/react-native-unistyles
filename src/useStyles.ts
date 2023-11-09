@@ -3,12 +3,9 @@ import { StyleSheet } from 'react-native'
 import { parseStyle, proxifyFunction } from './utils'
 import type { CreateStylesFactory, CustomNamedStyles, ExtractBreakpoints, RemoveKeysWithPrefix } from './types'
 import { useUnistyles } from './useUnistyles'
-import type { UnistylesThemes } from './global'
+import type { UnistylesTheme } from './types'
 
-// todo types
-type T = UnistylesThemes[keyof UnistylesThemes]
-
-export const useStyles = <ST extends CustomNamedStyles<ST>>(stylesheet?: ST | CreateStylesFactory<ST, T>) => {
+export const useStyles = <ST extends CustomNamedStyles<ST>>(stylesheet?: ST | CreateStylesFactory<ST, UnistylesTheme>) => {
     const { theme, breakpoint, screenSize } = useUnistyles()
 
     if (!stylesheet) {
@@ -20,7 +17,7 @@ export const useStyles = <ST extends CustomNamedStyles<ST>>(stylesheet?: ST | Cr
     }
 
     const parsedStyles = useMemo(() => typeof stylesheet === 'function'
-        ? stylesheet(theme!)
+        ? stylesheet(theme)
         : stylesheet, [theme, stylesheet])
 
     const dynamicStyleSheet = useMemo(() => Object
