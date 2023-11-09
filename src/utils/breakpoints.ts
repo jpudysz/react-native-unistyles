@@ -2,7 +2,6 @@ import { unistyles } from '../Unistyles'
 import { isMobile, Orientation, throwError } from './common'
 import type { MediaQueries } from '../types'
 import { ScreenOrientation } from '../types'
-import { isMediaQuery } from './mediaQueries'
 import type { UnistylesBreakpoints } from '../global'
 
 export const sortAndValidateBreakpoints = (breakpoints: UnistylesBreakpoints): UnistylesBreakpoints => {
@@ -50,9 +49,9 @@ export const getValueForBreakpoint = (value: Record<keyof UnistylesBreakpoints |
     // the highest priority is for custom media queries
     const customMediaQueries = Object
         .entries(value)
-        .filter(([key]) => isMediaQuery(key)) as Array<[keyof UnistylesBreakpoints | MediaQueries, string | number | undefined]>
+        .filter(([key]) => unistyles.engine.isMediaQuery(key)) as Array<[keyof UnistylesBreakpoints | MediaQueries, string | number | undefined]>
     // const customMediaQueryKey = getKeyForCustomMediaQuery(customMediaQueries, screenSize) as keyof typeof value
-    const customMediaQueryKey = unistyles.engine.parseCustomMediaQuery(customMediaQueries) as keyof typeof value
+    const customMediaQueryKey = unistyles.engine.didMatchMediaQuery(customMediaQueries) as keyof typeof value
 
     if (customMediaQueryKey && customMediaQueryKey in value) {
         return value[customMediaQueryKey]
@@ -78,18 +77,17 @@ export const getValueForBreakpoint = (value: Record<keyof UnistylesBreakpoints |
     }
 
     // if user defined breakpoints, then we look for the valid one
-    const unifiedKey = breakpoint.toLowerCase() as keyof typeof value
-    const directBreakpoint = value[unifiedKey]
+    const directBreakpoint = value[breakpoint]
 
     // if there is a direct key like 'sm' or 'md', or value for this key exists but its undefined
-    if (directBreakpoint || (unifiedKey in value)) {
+    if (directBreakpoint || (breakpoint in value)) {
         return directBreakpoint
     }
 
     // there is no direct hit for breakpoint nor media-query, let's simulate CSS cascading
     const breakpointPairs = unistyles.runtime.sortedBreakpoints
     const currentBreakpoint = breakpointPairs
-        .findIndex(([key]) => key === unifiedKey)
+        .findIndex(([key]) => key === breakpoint)
 
     const availableBreakpoints = breakpointPairs
         .filter(([key], index) => index < currentBreakpoint && key && key in value)

@@ -17,7 +17,7 @@ export const parseStyle = <T>(
     breakpoint: keyof UnistylesBreakpoints & string,
     screenSize: ScreenSize
 ): T => {
-    const entries = Object.entries(style) as [[
+    const entries = Object.entries(style || {}) as [[
         keyof T,
         CustomNamedStyles<T> | Record<keyof UnistylesBreakpoints & string, string | number | undefined>]
     ]

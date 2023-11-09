@@ -15,7 +15,7 @@ import type {
 } from 'react-native/Libraries/StyleSheet/StyleSheetTypes'
 import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
 import type { MediaQueries } from './mediaQueries'
-import type { UnistylesBreakpoints } from '../global'
+import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
 
 type ShadowOffset = {
     width: number,
@@ -37,37 +37,40 @@ type TransformStyles =
     & SkewYTransform
     & MatrixTransform
 
-type UnistyleNested<B> = {
-    shadowOffset?: DeepUniStyle<ShadowOffset, B>,
-    textShadowOffset?: DeepUniStyle<ShadowOffset, B>,
-    transform?: Array<DeepUniStyle<TransformStyles, B>>
+type UnistyleNested = {
+    shadowOffset?: DeepUniStyle<ShadowOffset>,
+    textShadowOffset?: DeepUniStyle<ShadowOffset>,
+    transform?: Array<DeepUniStyle<TransformStyles>>
 }
 
-type UniStyle<V, B> = {
-    [innerKey in keyof B]?: V
+type UniStyle<V> = {
+    [innerKey in keyof UnistylesBreakpoints]: V
 } | {
-    [innerKey in MediaQueries]?: V
-} | V
+    [innerKey in MediaQueries]: V
+}
 
-type DeepUniStyle<T, B> = {
-    [K in keyof T]?: UniStyle<T[K], B>
+type DeepUniStyle<T> = {
+    [K in keyof T]?: UniStyle<T[K]> | T[K]
 }
 
 // these props are treated differently to nest breakpoints and media queries
 type NestedTypes = 'shadowOffset' | 'transform' | 'textShadowOffset'
 
-type UnistyleView<B> = DeepUniStyle<Omit<ViewStyle, NestedTypes>, B>
-type UnistyleText<B> = DeepUniStyle<Omit<TextStyle, NestedTypes>, B>
-type UnistyleImage<B> = DeepUniStyle<Omit<ImageStyle, NestedTypes>, B>
+type UnistyleView = DeepUniStyle<Omit<ViewStyle, NestedTypes>>
+type UnistyleText = DeepUniStyle<Omit<TextStyle, NestedTypes>>
+type UnistyleImage = DeepUniStyle<Omit<ImageStyle, NestedTypes>>
 
-export type StaticStyles<B> =
-    | UnistyleView<B>
-    | UnistyleText<B>
-    | UnistyleImage<B>
-    & UnistyleNested<B>
+export type StaticStyles =
+    | UnistyleView
+    | UnistyleText
+    | UnistyleImage
+    & UnistyleNested
 
 export type CustomNamedStyles<T> = {
-    [K in keyof T]: T[K] extends (...args: infer A) => StaticStyles<UnistylesBreakpoints>
-        ? (...args: A) => StaticStyles<UnistylesBreakpoints>
-        : StaticStyles<UnistylesBreakpoints>
+    [K in keyof T]: T[K] extends (...args: infer A) => StaticStyles
+        ? (...args: A) => StaticStyles
+        : StaticStyles
 }
+
+export type NestedKeys = Array<[keyof UnistylesBreakpoints | MediaQueries, string | number | undefined]>
+export type UnistylesTheme = UnistylesThemes[keyof UnistylesThemes]
