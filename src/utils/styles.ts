@@ -64,7 +64,7 @@ export const parseStyle = <T, B extends Breakpoints>(
     screenSize: ScreenSize,
     breakpointPairs: SortedBreakpointEntries<B>
 ): T => {
-    const entries = Object.entries(style) as [[
+    const entries = Object.entries(style || {}) as [[
         keyof T,
         CustomNamedStyles<T, B> | Record<keyof B & string, string | number | undefined>]
     ]
