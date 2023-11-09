@@ -72,7 +72,7 @@ export const parseStyle = <T, B extends Breakpoints>(
     const parsedStyles = Object
         .fromEntries(entries
             .map(([key, value]) => {
-                const hasNestedProperties = key === 'shadowOffset' || key === 'textShadowOffset'
+                const hasNestedProperties = (key === 'shadowOffset' || key === 'textShadowOffset') && value
 
                 if (hasNestedProperties) {
                     return [
