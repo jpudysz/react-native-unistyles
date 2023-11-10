@@ -35,10 +35,10 @@ export const proxifyFunction = <B extends Breakpoints>(
 
 export const isPlatformColor = <T extends {}>(value: T): boolean => {
     if (isIOS) {
-        return 'semantic' in value
+        return 'semantic' in value && typeof value.semantic === 'object'
     }
 
-    return isAndroid && 'resource_paths' in value
+    return isAndroid && 'resource_paths' in value && typeof value.resource_paths === 'object'
 }
 
 /**
