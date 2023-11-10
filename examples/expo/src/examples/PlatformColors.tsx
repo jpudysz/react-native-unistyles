@@ -14,6 +14,8 @@ export const PlatformColors: React.FunctionComponent = () => {
     )
 }
 
+// it will crash on web!
+// https://github.com/necolas/react-native-web/issues/2128
 const stylesheet = createStyleSheet({
     container: {
         flex: 1,
