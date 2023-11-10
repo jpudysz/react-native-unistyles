@@ -1,7 +1,7 @@
 import type { Breakpoints, CustomNamedStyles, ScreenSize, SortedBreakpointEntries } from '../types'
 import { getValueForBreakpoint } from './breakpoints'
 import { normalizeStyles } from './normalizeStyles'
-import { isWeb } from './common'
+import { isAndroid, isIOS, isWeb } from './common'
 
 /**
  * Proxies a function to parse its return value for custom media queries or breakpoints.
@@ -32,6 +32,14 @@ export const proxifyFunction = <B extends Breakpoints>(
     apply: (target, thisArg, argumentsList) =>
         parseStyle(target.apply(thisArg, argumentsList), breakpoint, screenSize, breakpointPairs)
 })
+
+export const isPlatformColor = <T extends {}>(value: T): boolean => {
+    if (isIOS) {
+        return 'semantic' in value && typeof value.semantic === 'object'
+    }
+
+    return isAndroid && 'resource_paths' in value && typeof value.resource_paths === 'object'
+}
 
 /**
  * Parses a style object to resolve custom media queries or breakpoints based on the provided screen size and breakpoints.
@@ -91,7 +99,7 @@ export const parseStyle = <T, B extends Breakpoints>(
                 }
 
                 const isDynamicFunction = typeof value === 'function'
-                const isValidStyle = typeof value !== 'object'
+                const isValidStyle = typeof value !== 'object' || isPlatformColor(value)
 
                 if (isDynamicFunction || isValidStyle) {
                     return [key, value]
