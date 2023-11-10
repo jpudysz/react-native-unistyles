@@ -10,6 +10,8 @@ export const warn = (message: string) => {
 
 export const isMobile = Platform.OS === 'android' || Platform.OS === 'ios'
 export const isWeb = Platform.OS === 'web'
+export const isIOS = Platform.OS === 'ios'
+export const isAndroid = Platform.OS === 'android'
 export const isServer = typeof window === 'undefined'
 
 export const Orientation = {

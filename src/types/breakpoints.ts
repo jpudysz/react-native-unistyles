@@ -1,3 +1,4 @@
+import type { OpaqueColorValue } from 'react-native'
 import type { UnistylesBreakpoints } from '../global'
 import type { MediaQueries } from './mediaQueries'
 
@@ -25,7 +26,9 @@ export type ExtractBreakpoints<T> = T extends Partial<Record<keyof UnistylesBrea
 export type RemoveKeysWithPrefix<T> = T extends (...args: Array<any>) => infer R
     ? (...args: Parameters<T>) => RemoveKeysWithPrefix<R>
     : T extends object
-        ? T extends Record<string, infer _V>
-            ? { [K in keyof T as K extends MediaQueries ? keyof UnistylesBreakpoints & string : K]: RemoveKeysWithPrefix<T[K]> }
-            : { [K in keyof T]: RemoveKeysWithPrefix<T[K]> }
+        ? T extends OpaqueColorValue
+            ? string
+            : T extends Record<string, infer _V>
+                ? { [K in keyof T as K extends MediaQueries ? keyof UnistylesBreakpoints & string : K]: RemoveKeysWithPrefix<T[K]> }
+                : { [K in keyof T]: RemoveKeysWithPrefix<T[K]> }
         : T

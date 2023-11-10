@@ -1,8 +1,8 @@
 import type { CustomNamedStyles, MediaQueries, ScreenSize } from '../types'
 import { getValueForBreakpoint } from './breakpoints'
 import { normalizeStyles } from './normalizeStyles'
-import { isWeb } from './common'
 import type { UnistylesBreakpoints } from '../global'
+import { isAndroid, isIOS, isWeb } from './common'
 
 export const proxifyFunction = (
     fn: Function, breakpoint: keyof UnistylesBreakpoints & string,
@@ -11,6 +11,14 @@ export const proxifyFunction = (
     apply: (target, thisArg, argumentsList) =>
         parseStyle(target.apply(thisArg, argumentsList), breakpoint, screenSize)
 })
+
+export const isPlatformColor = <T extends {}>(value: T): boolean => {
+    if (isIOS) {
+        return 'semantic' in value && typeof value.semantic === 'object'
+    }
+
+    return isAndroid && 'resource_paths' in value && typeof value.resource_paths === 'object'
+}
 
 export const parseStyle = <T>(
     style: CustomNamedStyles<T>,
@@ -44,7 +52,7 @@ export const parseStyle = <T>(
                 }
 
                 const isDynamicFunction = typeof value === 'function'
-                const isValidStyle = typeof value !== 'object'
+                const isValidStyle = typeof value !== 'object' || isPlatformColor(value)
 
                 if (isDynamicFunction || isValidStyle) {
                     return [key, value]
