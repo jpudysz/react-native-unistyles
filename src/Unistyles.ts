@@ -22,7 +22,7 @@ class Unistyles {
         this._bridge = global.__UNISTYLES__ as UnistylesBridge
         this._registry = new UnistyleRegistry(this._bridge)
         this._runtime = new UnistylesRuntime(this._bridge, this._registry)
-        this._engine = new UnistylesBuiltInEngine(this._registry, this._runtime)
+        this._engine = new UnistylesBuiltInEngine(this.runtime)
     }
 
     public get registry() {

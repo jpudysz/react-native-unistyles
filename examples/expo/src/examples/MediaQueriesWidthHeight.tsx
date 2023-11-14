@@ -1,6 +1,6 @@
 import React from 'react'
 import { Text, View } from 'react-native'
-import { createStyleSheet, useStyles, UnistylesRegistry, useInitialTheme, UnistylesRuntime } from 'react-native-unistyles'
+import { mq, createStyleSheet, useStyles, UnistylesRegistry, useInitialTheme, UnistylesRuntime } from 'react-native-unistyles'
 import { DemoScreen } from '../components'
 import { breakpoints, darkTheme, lightTheme, premiumTheme } from '../styles'
 import { useLazyRegistryForDemo } from '../hooks'
@@ -50,8 +50,8 @@ const stylesheet = createStyleSheet(theme => ({
         alignItems: 'center',
         paddingHorizontal: 20,
         backgroundColor: {
-            ':w[, 500]:h[, 1000]': theme.colors.backgroundColor,
-            ':w[932]': theme.colors.aloes
+            [mq.width(undefined, 500).height(undefined, 1000)]: theme.colors.backgroundColor,
+            [mq.width(932)]: theme.colors.aloes
         },
         rowGap: 20
     },

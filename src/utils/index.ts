@@ -1,14 +1,7 @@
 export { normalizeStyles } from './normalizeStyles'
 export * from './normalizer'
-export { mq } from './mq'
+export { mq, getKeyForUnistylesMediaQuery } from './mediaQueries'
+export type { MediaQuery } from './mediaQueries'
 export { getBreakpointFromScreenWidth, sortAndValidateBreakpoints, getValueForBreakpoint } from './breakpoints'
 export { proxifyFunction, parseStyle } from './styles'
 export { isServer, Orientation } from './common'
-export {
-    extractValues,
-    getKeyForCustomMediaQuery,
-    isMediaQuery,
-    isWithinTheHeight,
-    isWithinTheWidth,
-    isWithinTheWidthAndHeight
-} from './mediaQueries'

@@ -68,6 +68,5 @@ export enum UnistylesError {
 }
 
 export interface UnistylesEngine {
-    isMediaQuery(key: string): boolean,
     didMatchMediaQuery(keys: NestedKeys): Optional<string>,
 }

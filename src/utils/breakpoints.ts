@@ -1,8 +1,9 @@
 import { unistyles } from '../Unistyles'
 import { isMobile, Orientation, throwError } from './common'
-import type { MediaQueries } from '../types'
+import type { NestedKeys } from '../types'
 import { ScreenOrientation } from '../types'
 import type { UnistylesBreakpoints } from '../global'
+import type { MediaQuery } from './mediaQueries'
 
 export const sortAndValidateBreakpoints = (breakpoints: UnistylesBreakpoints): UnistylesBreakpoints => {
     const sortedPairs = Object
@@ -45,15 +46,13 @@ export const getBreakpointFromScreenWidth = (width: number, breakpointEntries: A
     return key
 }
 
-export const getValueForBreakpoint = (value: Record<keyof UnistylesBreakpoints | MediaQueries, string | number | undefined>): string | number | undefined => {
+export const getValueForBreakpoint = (value: Record<keyof UnistylesBreakpoints | MediaQuery, string | number | undefined>): string | number | undefined => {
     // the highest priority is for custom media queries
-    const customMediaQueries = Object
-        .entries(value)
-        .filter(([key]) => unistyles.engine.isMediaQuery(key)) as Array<[keyof UnistylesBreakpoints | MediaQueries, string | number | undefined]>
-    // const customMediaQueryKey = getKeyForCustomMediaQuery(customMediaQueries, screenSize) as keyof typeof value
-    const customMediaQueryKey = unistyles.engine.didMatchMediaQuery(customMediaQueries) as keyof typeof value
+    const customMediaQueryKey = unistyles
+        .engine
+        .didMatchMediaQuery(Object.entries(value) as NestedKeys) as keyof typeof value
 
-    if (customMediaQueryKey && customMediaQueryKey in value) {
+    if (customMediaQueryKey) {
         return value[customMediaQueryKey]
     }
 
@@ -61,8 +60,8 @@ export const getValueForBreakpoint = (value: Record<keyof UnistylesBreakpoints |
     // check if user defined any breakpoints
     const hasBreakpoints = unistyles.runtime.sortedBreakpoints.length > 0
 
-    // if not then we can fallback to horizontal and portrait (mobile only)
-    if (!hasBreakpoints && isMobile && (Orientation.Landscape in  value || Orientation.Portrait in value)) {
+    // if not then we can fall back to horizontal and portrait (mobile only)
+    if (!hasBreakpoints && isMobile && (Orientation.Landscape in value || Orientation.Portrait in value)) {
         return value[
             unistyles.runtime.orientation === ScreenOrientation.Portrait
                 ? Orientation.Portrait
@@ -70,6 +69,7 @@ export const getValueForBreakpoint = (value: Record<keyof UnistylesBreakpoints |
         ]
     }
 
+    // let's get the current breakpoint
     const breakpoint = unistyles.runtime.breakpoint
 
     if (!breakpoint) {

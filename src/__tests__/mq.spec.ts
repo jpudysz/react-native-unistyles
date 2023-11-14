@@ -1,4 +1,4 @@
-import { mq } from '../utils/mq'
+import { mq } from '../utils'
 
 jest.mock('../Unistyles', () => ({
     unistyles: {
@@ -82,6 +82,46 @@ describe('mq', () => {
                 ':w[0, 100]:h[500, -500]': 'orange',
                 ':w[0, 200]:h[0, Infinity]': 'green',
                 ':w[0, 0]:h[0, 0]': 'yellow'
+            })
+        })
+
+        it ('should allow for nulls', () => {
+            const container = {
+                backgroundColor: {
+                    [mq.width(null, 100).height(300)]: 'red',
+                    [mq.height(100, 300).width(500)]: 'blue',
+                    [mq.width(null, 100).height(500)]: 'orange',
+                    [mq.width(null, 999).height()]: 'green',
+                    [mq.width(null).height(null)]: 'yellow'
+                }
+            }
+
+            expect(container.backgroundColor).toEqual({
+                ':w[0, 100]:h[300, Infinity]': 'red',
+                ':w[500, Infinity]:h[100, 300]': 'blue',
+                ':w[0, 100]:h[500, Infinity]': 'orange',
+                ':w[0, 999]:h[0, Infinity]': 'green',
+                ':w[0, Infinity]:h[0, Infinity]': 'yellow'
+            })
+        })
+
+        it ('should allow for shortcuts', () => {
+            const container = {
+                backgroundColor: {
+                    [mq.w(100, 200).h(300)]: 'red',
+                    [mq.h(100, 300).w(500)]: 'blue',
+                    [mq.w(100, 200).h(500, -500)]: 'orange',
+                    [mq.w(undefined, 200).h()]: 'green',
+                    [mq.w().h(null)]: 'yellow'
+                }
+            }
+
+            expect(container.backgroundColor).toEqual({
+                ':w[100, 200]:h[300, Infinity]': 'red',
+                ':w[500, Infinity]:h[100, 300]': 'blue',
+                ':w[100, 200]:h[500, -500]': 'orange',
+                ':w[0, 200]:h[0, Infinity]': 'green',
+                ':w[0, Infinity]:h[0, Infinity]': 'yellow'
             })
         })
     })
