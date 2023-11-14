@@ -1,16 +1,23 @@
 import { NativeEventEmitter, NativeModules } from 'react-native'
 import { useEffect, useState } from 'react'
-import type { UnistylesThemeEvent, UnistylesMobileLayoutEvent, UnistylesEvents } from './types'
+import type {
+    UnistylesThemeEvent,
+    UnistylesMobileLayoutEvent,
+    UnistylesEvents,
+    ScreenSize,
+    UnistylesTheme
+} from './types'
 import { CxxUnistylesEventTypes, ScreenOrientation } from './types'
 import { unistyles } from './Unistyles'
+import type { UnistylesBreakpoints } from './global'
 
 const unistylesEvents = new NativeEventEmitter(NativeModules.Unistyles)
 
 export const useUnistyles = () => {
     const [orientation, setOrientation] = useState<ScreenOrientation>(unistyles.runtime.orientation)
-    const [theme, setTheme] = useState(unistyles.runtime.getTheme(unistyles.runtime.themeName))
-    const [breakpoint, setBreakpoint] = useState(unistyles.runtime.breakpoint)
-    const [screenSize, setScreenSize] = useState({
+    const [theme, setTheme] = useState<UnistylesTheme>(unistyles.runtime.getTheme(unistyles.runtime.themeName))
+    const [breakpoint, setBreakpoint] = useState<keyof UnistylesBreakpoints>(unistyles.runtime.breakpoint)
+    const [screenSize, setScreenSize] = useState<ScreenSize>({
         width: unistyles.runtime.screen.width,
         height: unistyles.runtime.screen.height
     })
