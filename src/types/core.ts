@@ -14,8 +14,8 @@ import type {
     TranslateYTransform
 } from 'react-native/Libraries/StyleSheet/StyleSheetTypes'
 import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
-import type { MediaQueries } from './mediaQueries'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
+import type { MediaQuery } from '../utils'
 
 type ShadowOffset = {
     width: number,
@@ -44,9 +44,9 @@ type UnistyleNested = {
 }
 
 type UniStyle<V> = {
-    [innerKey in keyof UnistylesBreakpoints]: V
+    [innerKey in keyof UnistylesBreakpoints]?: V
 } | {
-    [innerKey in MediaQueries]: V
+    [innerKey in MediaQuery]: V
 }
 
 type DeepUniStyle<T> = {
@@ -72,5 +72,5 @@ export type CustomNamedStyles<T> = {
         : StaticStyles
 }
 
-export type NestedKeys = Array<[keyof UnistylesBreakpoints | MediaQueries, string | number | undefined]>
+export type NestedKeys = Array<[keyof UnistylesBreakpoints | MediaQuery, string | number | undefined]>
 export type UnistylesTheme = UnistylesThemes[keyof UnistylesThemes]

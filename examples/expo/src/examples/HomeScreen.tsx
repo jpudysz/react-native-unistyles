@@ -75,10 +75,6 @@ export const HomeScreen = () => {
                         onPress={() => navigation.navigate(DemoNames.MediaQueriesWidthHeight)}
                     />
                     <DemoLink
-                        description="Open ranges"
-                        onPress={() => navigation.navigate(DemoNames.MediaQueriesOpenRanges)}
-                    />
-                    <DemoLink
                         description="Mixed with breakpoints"
                         onPress={() => navigation.navigate(DemoNames.MixedMediaQueries)}
                     />

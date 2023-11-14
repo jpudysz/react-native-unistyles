@@ -12,7 +12,6 @@ export enum DemoNames {
     WithBreakpoints = 'WithBreakpoints',
     MediaQueriesWidthHeight = 'MediaQueriesWidthHeight',
     OrientationBreakpoints = 'OrientationBreakpoints',
-    MediaQueriesOpenRanges = 'MediaQueriesOpenRanges',
     MixedMediaQueries = 'MixedMediaQueries'
 }
 
@@ -28,7 +27,6 @@ export type DemoStackParams = {
     [DemoNames.WithBreakpoints]: undefined,
     [DemoNames.MediaQueriesWidthHeight]: undefined,
     [DemoNames.OrientationBreakpoints]: undefined,
-    [DemoNames.MediaQueriesOpenRanges]: undefined,
     [DemoNames.MixedMediaQueries]: undefined
 }
 

@@ -1,6 +1,6 @@
 import type { OpaqueColorValue } from 'react-native'
 import type { UnistylesBreakpoints } from '../global'
-import type { MediaQueries } from './mediaQueries'
+import type { MediaQuery } from '../utils'
 
 export type ScreenSize = {
     width: number,
@@ -29,6 +29,6 @@ export type RemoveKeysWithPrefix<T> = T extends (...args: Array<any>) => infer R
         ? T extends OpaqueColorValue
             ? string
             : T extends Record<string, infer _V>
-                ? { [K in keyof T as K extends MediaQueries ? keyof UnistylesBreakpoints & string : K]: RemoveKeysWithPrefix<T[K]> }
+                ? { [K in keyof T as K extends MediaQuery ? keyof UnistylesBreakpoints & string : K]: RemoveKeysWithPrefix<T[K]> }
                 : { [K in keyof T]: RemoveKeysWithPrefix<T[K]> }
         : T
