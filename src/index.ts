@@ -2,6 +2,7 @@ import { unistyles } from './Unistyles'
 import type { UnistylesThemes, UnistylesBreakpoints } from './global'
 import { ScreenOrientation } from './types'
 
+export { mq } from './utils'
 export { useInitialTheme } from './useInitialTheme'
 
 export { useStyles } from './useStyles'
