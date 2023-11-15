@@ -1,18 +1,25 @@
 import { useMemo } from 'react'
 import { StyleSheet } from 'react-native'
 import { parseStyle, proxifyFunction } from './utils'
-import type { CreateStylesFactory, CustomNamedStyles, ExtractBreakpoints, RemoveKeysWithPrefix } from './types'
-import { useUnistyles } from './useUnistyles'
-import type { UnistylesTheme } from './types'
+import type { CreateStylesFactory, CustomNamedStyles, ReactNativeStyleSheet, UnistylesTheme } from './types'
+import { useUnistyles } from './hooks'
+import type { UnistylesBreakpoints } from './global'
 
-export const useStyles = <ST extends CustomNamedStyles<ST>>(stylesheet?: ST | CreateStylesFactory<ST, UnistylesTheme>) => {
-    const { theme, breakpoint, screenSize } = useUnistyles()
+type ParsedStylesheet<ST extends CustomNamedStyles<ST>> = {
+    theme: UnistylesTheme,
+    breakpoint: keyof UnistylesBreakpoints,
+    styles: ReactNativeStyleSheet<ST>
+}
+
+export const useStyles = <ST extends CustomNamedStyles<ST>>(stylesheet?: ST | CreateStylesFactory<ST, UnistylesTheme>): ParsedStylesheet<ST> => {
+    const { theme, layout } = useUnistyles()
+    const { screenSize, breakpoint } = layout
 
     if (!stylesheet) {
         return {
             theme,
             breakpoint,
-            styles: {} as ExtractBreakpoints<RemoveKeysWithPrefix<ST>>
+            styles: {} as ReactNativeStyleSheet<ST>
         }
     }
 
@@ -36,11 +43,11 @@ export const useStyles = <ST extends CustomNamedStyles<ST>>(stylesheet?: ST | Cr
                 ...acc,
                 [key]: parseStyle<ST>(style, breakpoint, screenSize)
             })
-        }, {} as ST), [breakpoint, screenSize, parsedStyles])
+        }, {} as ST), [breakpoint, screenSize, parsedStyles]) as ReactNativeStyleSheet<ST>
 
     return {
         theme,
         breakpoint,
-        styles: dynamicStyleSheet as ExtractBreakpoints<RemoveKeysWithPrefix<ST>>
+        styles: dynamicStyleSheet
     }
 }

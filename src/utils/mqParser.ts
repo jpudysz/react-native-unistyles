@@ -1,4 +1,4 @@
-import type { NestedKeys, Optional, ScreenSize } from '../../types'
+import type { NestedKeys, Optional, ScreenSize } from '../types'
 
 const IS_UNISTYLES_REGEX = /:([hw])\[(\d+)(?:,\s*(\d+|Infinity))?]/
 const UNISTYLES_WIDTH_REGEX = /:(w)\[(\d+)(?:,\s*(\d+|Infinity))?]/g
@@ -71,26 +71,17 @@ const isWithinTheWidthAndHeight = (parsedMq: UnistylesParsedMq, screenSize: Scre
 const isWithinTheWidth = (width: UnistylesParsedMq['width'], screenWidth: number): boolean => {
     const { from, to } = width as ParsedMqDimension
 
-    if (to) {
-        return screenWidth >= from && screenWidth <= to
-    }
-
-    return screenWidth >= from
+    return screenWidth >= from && screenWidth <= to
 }
 
 const isWithinTheHeight = (height: UnistylesParsedMq['height'], screenHeight: number): boolean => {
     const { from, to } = height as ParsedMqDimension
 
-    if (to) {
-        return screenHeight >= from && screenHeight <= to
-    }
-
-    return screenHeight >= from
+    return screenHeight >= from && screenHeight <= to
 }
 
 export const getKeyForUnistylesMediaQuery = (mediaQueries: NestedKeys, screenSize: ScreenSize) => {
     const mq = mediaQueries.find(([key]) => {
-
         if (!isUnistylesMq(key as string)) {
             return false
         }

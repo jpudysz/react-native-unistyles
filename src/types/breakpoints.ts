@@ -1,17 +1,10 @@
 import type { OpaqueColorValue } from 'react-native'
 import type { UnistylesBreakpoints } from '../global'
-import type { MediaQuery } from '../utils'
-
-export type ScreenSize = {
-    width: number,
-    height: number
-}
-
-export type CreateStylesFactory<ST, Theme> = (theme: Theme) => ST
+import type { MediaQuery } from './mq'
 
 type WithEmptyObject<V> = keyof V extends never ? {} : V
 
-export type ExtractBreakpoints<T> = T extends Partial<Record<keyof UnistylesBreakpoints & string, infer V>>
+type ExtractBreakpoints<T> = T extends Partial<Record<keyof UnistylesBreakpoints & string, infer V>>
     ? WithEmptyObject<V>
     : T extends (...args: infer A) => infer R
         ? (...args: A) => ExtractBreakpoints<R>
@@ -23,7 +16,7 @@ export type ExtractBreakpoints<T> = T extends Partial<Record<keyof UnistylesBrea
                     : T[K]
         }
 
-export type RemoveKeysWithPrefix<T> = T extends (...args: Array<any>) => infer R
+type RemoveKeysWithPrefix<T> = T extends (...args: Array<any>) => infer R
     ? (...args: Parameters<T>) => RemoveKeysWithPrefix<R>
     : T extends object
         ? T extends OpaqueColorValue
@@ -32,3 +25,5 @@ export type RemoveKeysWithPrefix<T> = T extends (...args: Array<any>) => infer R
                 ? { [K in keyof T as K extends MediaQuery ? keyof UnistylesBreakpoints & string : K]: RemoveKeysWithPrefix<T[K]> }
                 : { [K in keyof T]: RemoveKeysWithPrefix<T[K]> }
         : T
+
+export type ReactNativeStyleSheet<T> = ExtractBreakpoints<RemoveKeysWithPrefix<T>>

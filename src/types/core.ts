@@ -15,9 +15,14 @@ import type {
 } from 'react-native/Libraries/StyleSheet/StyleSheetTypes'
 import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
-import type { MediaQuery } from '../utils'
+import type { MediaQuery } from './mq'
 
 type ShadowOffset = {
+    width: number,
+    height: number
+}
+
+export type ScreenSize = {
     width: number,
     height: number
 }
@@ -74,3 +79,4 @@ export type CustomNamedStyles<T> = {
 
 export type NestedKeys = Array<[keyof UnistylesBreakpoints | MediaQuery, string | number | undefined]>
 export type UnistylesTheme = UnistylesThemes[keyof UnistylesThemes]
+export type CreateStylesFactory<ST, Theme> = (theme: Theme) => ST

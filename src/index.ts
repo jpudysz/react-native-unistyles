@@ -1,12 +1,10 @@
-import { unistyles } from './Unistyles'
+import { unistyles } from './core'
+import { mq } from './utils'
+import { useInitialTheme } from './hooks'
 import type { UnistylesThemes, UnistylesBreakpoints } from './global'
-import { ScreenOrientation } from './types'
-
-export { mq } from './utils'
-export { useInitialTheme } from './useInitialTheme'
-
-export { useStyles } from './useStyles'
-export { createStyleSheet } from './createStyleSheet'
+import { ScreenOrientation } from './common'
+import { useStyles } from './useStyles'
+import { createStyleSheet } from './createStyleSheet'
 
 const { addThemes, addBreakpoints, addConfig  } = unistyles.registry
 const UnistylesRuntime = unistyles.runtime
@@ -24,6 +22,10 @@ export {
 }
 
 export {
+    mq,
+    useInitialTheme,
+    useStyles,
+    createStyleSheet,
     ScreenOrientation
 }
 

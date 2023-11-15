@@ -1,5 +1,5 @@
-import type { UnistylesBridge, UnistylesConfig } from './types'
-import type { UnistylesThemes, UnistylesBreakpoints } from './global'
+import type { UnistylesBridge, UnistylesConfig } from '../types'
+import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
 
 export class UnistyleRegistry {
     public config: UnistylesConfig = {}

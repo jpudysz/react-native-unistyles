@@ -1,9 +1,8 @@
-import type { CustomNamedStyles, ScreenSize } from '../types'
+import type { CustomNamedStyles, ScreenSize, MediaQuery } from '../types'
 import { getValueForBreakpoint } from './breakpoints'
 import { normalizeStyles } from './normalizeStyles'
 import type { UnistylesBreakpoints } from '../global'
 import { isAndroid, isIOS, isWeb } from './common'
-import type { MediaQuery } from './mediaQueries'
 
 export const proxifyFunction = (
     fn: Function, breakpoint: keyof UnistylesBreakpoints & string,

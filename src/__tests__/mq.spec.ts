@@ -1,6 +1,6 @@
 import { mq } from '../utils'
 
-jest.mock('../Unistyles', () => ({
+jest.mock('../core', () => ({
     unistyles: {
         registry: {
             breakpoints: {

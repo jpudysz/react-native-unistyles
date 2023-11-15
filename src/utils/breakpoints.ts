@@ -1,9 +1,9 @@
-import { unistyles } from '../Unistyles'
+import { unistyles } from '../core'
 import { isMobile, Orientation, throwError } from './common'
-import type { NestedKeys } from '../types'
-import { ScreenOrientation } from '../types'
+import type { MediaQuery, NestedKeys } from '../types'
 import type { UnistylesBreakpoints } from '../global'
-import type { MediaQuery } from './mediaQueries'
+import { ScreenOrientation } from '../common'
+import { getKeyForUnistylesMediaQuery } from './mqParser'
 
 export const sortAndValidateBreakpoints = (breakpoints: UnistylesBreakpoints): UnistylesBreakpoints => {
     const sortedPairs = Object
@@ -48,9 +48,10 @@ export const getBreakpointFromScreenWidth = (width: number, breakpointEntries: A
 
 export const getValueForBreakpoint = (value: Record<keyof UnistylesBreakpoints | MediaQuery, string | number | undefined>): string | number | undefined => {
     // the highest priority is for custom media queries
-    const customMediaQueryKey = unistyles
-        .engine
-        .didMatchMediaQuery(Object.entries(value) as NestedKeys) as keyof typeof value
+    const customMediaQueryKey = getKeyForUnistylesMediaQuery(
+        Object.entries(value) as NestedKeys,
+        unistyles.runtime.screen
+    ) as keyof typeof value
 
     if (customMediaQueryKey) {
         return value[customMediaQueryKey]
