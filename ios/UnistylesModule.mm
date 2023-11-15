@@ -31,7 +31,6 @@ RCT_EXPORT_MODULE(Unistyles)
 
 - (void)dealloc {
     if (self.unistylesRuntime != nullptr) {
-        free(self.unistylesRuntime);
         self.unistylesRuntime = nullptr;
     }
 
@@ -113,7 +112,14 @@ void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSel
     CGFloat initialScreenWidth = [UIScreen mainScreen].bounds.size.width;
     CGFloat initialScreenHeight = [UIScreen mainScreen].bounds.size.height;
     std::string initialColorScheme = getColorScheme();
-    UnistylesThemeChangeEvent onThemeChange = ^(std::string theme) {
+
+    auto unistylesRuntime = std::make_shared<UnistylesRuntime>(
+        (int)initialScreenWidth,
+        (int)initialScreenHeight,
+        initialColorScheme
+    );
+
+    unistylesRuntime.get()->onThemeChange([=](std::string theme) {
         NSDictionary *body = @{
             @"type": @"theme",
             @"payload": @{
@@ -122,8 +128,9 @@ void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSel
         };
 
         [weakSelf emitEvent:@"onChange" withBody:body];
-    };
-    UnistylesBreakpointChangeEvent onBreakpointChange = ^(std::string breakpoint, int orientation, int width, int height) {
+    });
+
+    unistylesRuntime.get()->onLayoutChange([=](std::string breakpoint, int orientation, int width, int height) {
         NSDictionary *body = @{
             @"type": @"layout",
             @"payload": @{
@@ -137,15 +144,7 @@ void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSel
         };
 
         [weakSelf emitEvent:@"onChange" withBody:body];
-    };
-
-    auto unistylesRuntime = std::make_shared<UnistylesRuntime>(
-        onThemeChange,
-        onBreakpointChange,
-        (int)initialScreenWidth,
-        (int)initialScreenHeight,
-        initialColorScheme
-    );
+    });
 
     weakSelf.unistylesRuntime = unistylesRuntime.get();
 
