@@ -98,11 +98,11 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                 std::sort(sortedBreakpointEntriesVec.begin(), sortedBreakpointEntriesVec.end(), [](const std::pair<std::string, double>& a, const std::pair<std::string, double>& b) {
                     return a.second < b.second;
                 });
-                
+
                 if (sortedBreakpointEntriesVec.size() == 0) {
                     throw jsi::JSError(runtime, UnistylesErrorBreakpointsCannotBeEmpty);
                 }
-                
+
                 if (sortedBreakpointEntriesVec.at(0).second != 0) {
                     throw jsi::JSError(runtime, UnistylesErrorBreakpointsMustStartFromZero);
                 }
@@ -153,23 +153,6 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
             }
         );
     }
-    
-    if (propName == "unregister") {
-        return jsi::Function::createFromHostFunction(runtime,
-            jsi::PropNameID::forAscii(runtime, "unregister"),
-            1,
-            [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
-                this->hasAdaptiveThemes = false;
-                this->supportsAutomaticColorScheme = false;
-                this->themeName = "";
-                this->breakpoint = "";
-                this->themes.clear();
-                this->sortedBreakpointPairs.clear();
-
-                return jsi::Value::undefined();
-            }
-        );
-    }
 
     return jsi::Value::undefined();
 }
@@ -190,12 +173,13 @@ void UnistylesRuntime::set(jsi::Runtime& runtime, const jsi::PropNameID& propNam
                 themesVector.push_back(theme);
             }
         }
-        
+
         if (themesVector.size() == 0) {
             throw jsi::JSError(runtime, UnistylesErrorThemesCannotBeEmpty);
         }
 
         this->themes = themesVector;
+        this->themeName = "";
 
         bool hasLightTheme = std::find(themesVector.begin(), themesVector.end(), "light") != themesVector.end();
         bool hasDarkTheme = std::find(themesVector.begin(), themesVector.end(), "dark") != themesVector.end();
@@ -224,11 +208,11 @@ std::string UnistylesRuntime::getBreakpointFromScreenWidth(int width, const std:
 
 void UnistylesRuntime::handleScreenSizeChange(int width, int height) {
     std::string breakpoint = this->getBreakpointFromScreenWidth(width, this->sortedBreakpointPairs);
-    
+
     this->breakpoint = breakpoint;
     this->screenWidth = width;
     this->screenHeight = height;
-    
+
     int orientation = width > height
         ? UnistylesOrientationLandscape
         : UnistylesOrientationPortrait;
@@ -243,8 +227,13 @@ void UnistylesRuntime::handleAppearanceChange(std::string colorScheme) {
         return;
     }
 
+    // don't emit even when selecting initial theme
+//    if (!this->themeName.empty()) {
+//        this->onThemeChange(this->colorScheme);
+//    }
+    this->onThemeChange(this->colorScheme);
+
     this->themeName = this->colorScheme;
-    this->onThemeChange(this->themeName);
 }
 
 jsi::Value UnistylesRuntime::getThemeOrFail(jsi::Runtime& runtime) {

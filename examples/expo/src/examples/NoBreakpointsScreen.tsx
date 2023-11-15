@@ -1,20 +1,9 @@
 import React from 'react'
 import { Text, View } from 'react-native'
-import { createStyleSheet, useStyles, UnistylesRegistry, useInitialTheme } from 'react-native-unistyles'
+import { createStyleSheet, useStyles, useInitialTheme } from 'react-native-unistyles'
 import { DemoScreen } from '../components'
-import { darkTheme, lightTheme, premiumTheme } from '../styles'
-import { useLazyRegistryForDemo } from '../hooks'
 
 export const NoBreakpointsScreen: React.FunctionComponent = () => {
-    useLazyRegistryForDemo(() => {
-        UnistylesRegistry
-            .addThemes({
-                light: lightTheme,
-                dark: darkTheme,
-                premium: premiumTheme
-            })
-    })
-
     useInitialTheme('light')
 
     const { styles, breakpoint } = useStyles(stylesheet)

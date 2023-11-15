@@ -1,23 +1,9 @@
 import React from 'react'
 import { Button, Text, View } from 'react-native'
-import { createStyleSheet, useStyles, UnistylesRegistry, UnistylesRuntime } from 'react-native-unistyles'
+import { createStyleSheet, useStyles, UnistylesRuntime } from 'react-native-unistyles'
 import { DemoScreen } from '../components'
-import { darkTheme, lightTheme, premiumTheme } from '../styles'
-import { useLazyRegistryForDemo } from '../hooks'
 
 export const MultipleThemesAdaptiveScreen: React.FunctionComponent = () => {
-    useLazyRegistryForDemo(() => {
-        UnistylesRegistry
-            .addThemes({
-                light: lightTheme,
-                dark: darkTheme,
-                premium: premiumTheme
-            })
-            .addConfig({
-                adaptiveThemes: true
-            })
-    })
-
     const { styles, theme  } = useStyles(stylesheet)
 
     return (

@@ -3,5 +3,9 @@ import { unistyles } from '../core'
 import type { UnistylesThemes } from '../global'
 
 export const useInitialTheme = (forName: keyof UnistylesThemes) => {
-    useMemo(() => unistyles.runtime.setTheme(forName), [])
+    useMemo(() => {
+        if (!unistyles.runtime.themeName) {
+            unistyles.runtime.setTheme(forName)
+        }
+    }, [])
 }

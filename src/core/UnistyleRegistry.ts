@@ -22,6 +22,7 @@ export class UnistyleRegistry {
     }
 
     public addBreakpoints = (breakpoints: UnistylesBreakpoints) => {
+        this.breakpoints = breakpoints
         this.unistylesBridge.useBreakpoints(breakpoints)
         this.sortedBreakpointPairs = this.unistylesBridge.sortedBreakpointPairs
 
@@ -36,15 +37,5 @@ export class UnistyleRegistry {
         }
 
         return this
-    }
-
-    public dangerouslyUnregister = () => {
-        this.config = {}
-        this.themeNames = []
-        this.themes = {} as UnistylesThemes
-        this.breakpoints = {} as UnistylesBreakpoints
-        this.sortedBreakpointPairs = []
-
-        this.unistylesBridge.unregister()
     }
 }

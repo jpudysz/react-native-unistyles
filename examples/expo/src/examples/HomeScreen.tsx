@@ -1,10 +1,13 @@
 import React from 'react'
+import { UnistylesRegistry } from 'react-native-unistyles'
+import type { UnistylesThemes } from 'react-native-unistyles'
 import { useNavigation } from '@react-navigation/native'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { DemoGroup, DemoLink } from '../components'
 import { DemoNames } from '../common'
 import type { NavigationProps } from '../common'
+import { breakpoints, darkTheme, lightTheme, premiumTheme } from '../styles'
 
 export const HomeScreen = () => {
     const navigation = useNavigation<NavigationProps>()
@@ -36,47 +39,160 @@ export const HomeScreen = () => {
                     />
                     <DemoLink
                         description="Single theme"
-                        onPress={() => navigation.navigate(DemoNames.SingleTheme)}
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme
+                                    // we need to cast it to UnistylesThemes as we already registered 3 themes with TypeScript under styles/index.ts,
+                                    // but we want to demonstrate how to register a single theme
+                                } as UnistylesThemes)
+
+                            navigation.navigate(DemoNames.SingleTheme)
+                        }}
                     />
                     <DemoLink
                         description="Two themes"
-                        onPress={() => navigation.navigate(DemoNames.TwoThemes)}
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    premium: premiumTheme
+                                    // we need to cast it to UnistylesThemes as we already registered 3 themes with TypeScript under styles/index.ts,
+                                    // but we want to demonstrate how to register two themes
+                                } as UnistylesThemes)
+
+                            navigation.navigate(DemoNames.TwoThemes)
+                        }}
                     />
                     <DemoLink
                         description="Light/Dark themes"
-                        onPress={() => navigation.navigate(DemoNames.LightDarkThemes)}
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme
+                                    // we need to cast it to UnistylesThemes as we already registered 3 themes with TypeScript under styles/index.ts,
+                                    // but we want to demonstrate how to register two themes
+                                } as UnistylesThemes)
+                                .addConfig({
+                                    adaptiveThemes: true
+                                })
+
+                            navigation.navigate(DemoNames.LightDarkThemes)
+                        }}
                     />
                     <DemoLink
                         description="Multiple themes"
-                        onPress={() => navigation.navigate(DemoNames.MultipleThemes)}
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+
+                            navigation.navigate(DemoNames.MultipleThemes)
+                        }}
                     />
                     <DemoLink
                         description="Multiple themes and adaptive modes"
-                        onPress={() => navigation.navigate(DemoNames.MultipleThemesAdaptive)}
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addConfig({
+                                    adaptiveThemes: true
+                                })
+
+                            navigation.navigate(DemoNames.MultipleThemesAdaptive)
+                        }}
                     />
                 </DemoGroup>
                 <DemoGroup title="Breakpoints">
                     <DemoLink
                         description="No breakpoints"
-                        onPress={() => navigation.navigate(DemoNames.NoBreakpoints)}
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+
+                            navigation.navigate(DemoNames.NoBreakpoints)
+                        }}
                     />
                     <DemoLink
                         description="With breakpoints"
-                        onPress={() => navigation.navigate(DemoNames.WithBreakpoints)}
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addBreakpoints(breakpoints)
+                                .addConfig({
+                                    adaptiveThemes: true
+                                })
+
+                            navigation.navigate(DemoNames.WithBreakpoints)
+                        }}
                     />
                     <DemoLink
                         description="With orientation breakpoints"
-                        onPress={() => navigation.navigate(DemoNames.OrientationBreakpoints)}
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addConfig({
+                                    adaptiveThemes: true
+                                })
+
+                            navigation.navigate(DemoNames.OrientationBreakpoints)
+                        }}
                     />
                 </DemoGroup>
                 <DemoGroup title="Media queries">
                     <DemoLink
                         description="Width and Height"
-                        onPress={() => navigation.navigate(DemoNames.MediaQueriesWidthHeight)}
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addBreakpoints(breakpoints)
+                                .addConfig({
+                                    adaptiveThemes: true
+                                })
+
+                            navigation.navigate(DemoNames.MediaQueriesWidthHeight)
+                        }}
                     />
                     <DemoLink
                         description="Mixed with breakpoints"
-                        onPress={() => navigation.navigate(DemoNames.MixedMediaQueries)}
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addBreakpoints(breakpoints)
+                                .addConfig({
+                                    adaptiveThemes: true
+                                })
+
+                            navigation.navigate(DemoNames.MixedMediaQueries)
+                        }}
                     />
                 </DemoGroup>
             </ScrollView>
