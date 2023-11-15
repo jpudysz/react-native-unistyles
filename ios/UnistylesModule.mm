@@ -31,7 +31,8 @@ RCT_EXPORT_MODULE(Unistyles)
 
 - (void)dealloc {
     if (self.unistylesRuntime != nullptr) {
-        delete (UnistylesRuntime*)self.unistylesRuntime;
+        free(self.unistylesRuntime);
+        self.unistylesRuntime = nullptr;
     }
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -49,14 +50,18 @@ RCT_EXPORT_MODULE(Unistyles)
         CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
         CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
 
-        ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange((int)screenWidth, (int)screenHeight);
+        if (self.unistylesRuntime != nullptr) {
+            ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange((int)screenWidth, (int)screenHeight);
+        }
     });
 }
 
 - (void)appearanceChanged:(NSNotification *)notification {
     std::string colorScheme = getColorScheme();
 
-    ((UnistylesRuntime*)self.unistylesRuntime)->handleAppearanceChange(colorScheme);
+    if (self.unistylesRuntime != nullptr) {
+        ((UnistylesRuntime*)self.unistylesRuntime)->handleAppearanceChange(colorScheme);
+    }
 }
 
 #pragma mark - Event emitter
@@ -80,10 +85,7 @@ RCT_EXPORT_MODULE(Unistyles)
 
 #pragma mark - Core
 
-RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
-{
-    NSLog(@"Installing Unistyles 🦄...");
-
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
     RCTBridge* bridge = [RCTBridge currentBridge];
     RCTCxxBridge* cxxBridge = (RCTCxxBridge*)bridge;
 
@@ -106,7 +108,6 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 
     return @true;
 }
-
 
 void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSelf) {
     CGFloat initialScreenWidth = [UIScreen mainScreen].bounds.size.width;

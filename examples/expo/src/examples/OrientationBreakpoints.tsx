@@ -1,23 +1,9 @@
 import React from 'react'
 import { Text, View } from 'react-native'
-import { createStyleSheet, useStyles, UnistylesRegistry, UnistylesRuntime, ScreenOrientation } from 'react-native-unistyles'
+import { createStyleSheet, useStyles, UnistylesRuntime, ScreenOrientation } from 'react-native-unistyles'
 import { DemoScreen } from '../components'
-import { darkTheme, lightTheme, premiumTheme } from '../styles'
-import { useLazyRegistryForDemo } from '../hooks'
 
 export const OrientationBreakpoints: React.FunctionComponent = () => {
-    useLazyRegistryForDemo(() => {
-        UnistylesRegistry
-            .addThemes({
-                light: lightTheme,
-                dark: darkTheme,
-                premium: premiumTheme
-            })
-            .addConfig({
-                adaptiveThemes: true
-            })
-    })
-
     const { styles } = useStyles(stylesheet)
 
     return (

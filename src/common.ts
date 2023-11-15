@@ -12,6 +12,7 @@ export enum UnistylesError {
     BreakpointsMustStartFromZero = 'UNISTYLES_ERROR_BREAKPOINTS_MUST_START_FROM_ZERO',
 }
 
+// todo to string?
 export enum ScreenOrientation {
     Portrait = 1,
     Landscape = 2

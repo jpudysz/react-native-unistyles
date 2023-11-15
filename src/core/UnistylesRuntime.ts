@@ -44,7 +44,7 @@ export class UnistylesRuntime {
     }
 
     public setTheme = (name: keyof UnistylesThemes) => {
-        if (name !== this.themeName && this.hasTheme(name)) {
+        if (this.hasTheme(name)) {
             this.unistylesBridge.useTheme(name)
 
             return true

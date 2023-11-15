@@ -6,27 +6,22 @@ import { ScreenOrientation } from './common'
 import { useStyles } from './useStyles'
 import { createStyleSheet } from './createStyleSheet'
 
-const { addThemes, addBreakpoints, addConfig  } = unistyles.registry
-const UnistylesRuntime = unistyles.runtime
 const UnistylesRegistry = {
-    addThemes,
-    addBreakpoints,
-    addConfig
+    addThemes: unistyles.registry.addThemes,
+    addBreakpoints: unistyles.registry.addBreakpoints,
+    addConfig: unistyles.registry.addConfig
 }
 
-export const __dangerouslyUnregister = unistyles.registry.dangerouslyUnregister
-
-export {
-    UnistylesRuntime,
-    UnistylesRegistry
-}
+const UnistylesRuntime = unistyles.runtime
 
 export {
     mq,
-    useInitialTheme,
     useStyles,
+    useInitialTheme,
     createStyleSheet,
-    ScreenOrientation
+    ScreenOrientation,
+    UnistylesRegistry,
+    UnistylesRuntime
 }
 
 export type {

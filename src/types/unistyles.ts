@@ -23,10 +23,7 @@ export type UnistylesBridge = {
     themes: Array<keyof UnistylesThemes>,
     useBreakpoints(breakpoints: UnistylesBreakpoints): void,
     useTheme(name: keyof UnistylesThemes): void,
-    useAdaptiveThemes(enable: boolean): void,
-
-    // other
-    unregister(): void
+    useAdaptiveThemes(enable: boolean): void
 }
 
 export type UnistylesThemeEvent = {

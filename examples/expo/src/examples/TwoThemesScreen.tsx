@@ -1,21 +1,9 @@
 import React from 'react'
 import { Button, Text, View } from 'react-native'
-import { createStyleSheet, useStyles, UnistylesRegistry, UnistylesRuntime, type UnistylesThemes, useInitialTheme } from 'react-native-unistyles'
+import { createStyleSheet, useStyles, UnistylesRuntime, useInitialTheme } from 'react-native-unistyles'
 import { DemoScreen } from '../components'
-import { lightTheme, premiumTheme } from '../styles'
-import { useLazyRegistryForDemo } from '../hooks'
 
 export const TwoThemesScreen: React.FunctionComponent = () => {
-    useLazyRegistryForDemo(() => {
-        UnistylesRegistry
-            .addThemes({
-                light: lightTheme,
-                premium: premiumTheme
-                // we need to cast it to UnistylesThemes as we already registered 3 themes with TypeScript under styles/index.ts,
-                // but we want to demonstrate how to register two themes
-            } as UnistylesThemes)
-    })
-
     // if you have 2 or more themes, you need to select one of them
     // keep in mind that everything is synchronous and so fast, that you can set it in the same screen 🔥
     // two more notes:

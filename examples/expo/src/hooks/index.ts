@@ -1,1 +1,0 @@
-export { useLazyRegistryForDemo } from './useLazyRegistryForDemo'

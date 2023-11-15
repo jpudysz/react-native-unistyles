@@ -1,20 +1,9 @@
 import React from 'react'
 import { Button, Text, View } from 'react-native'
-import { createStyleSheet, useStyles, UnistylesRegistry, UnistylesRuntime, useInitialTheme } from 'react-native-unistyles'
+import { createStyleSheet, useStyles, UnistylesRuntime, useInitialTheme } from 'react-native-unistyles'
 import { DemoScreen } from '../components'
-import { darkTheme, lightTheme, premiumTheme } from '../styles'
-import { useLazyRegistryForDemo } from '../hooks'
 
 export const MultipleThemesScreen: React.FunctionComponent = () => {
-    useLazyRegistryForDemo(() => {
-        UnistylesRegistry
-            .addThemes({
-                light: lightTheme,
-                dark: darkTheme,
-                premium: premiumTheme
-            })
-    })
-
     // if you have multiple themes, you need to select one of them
     useInitialTheme('premium')
 

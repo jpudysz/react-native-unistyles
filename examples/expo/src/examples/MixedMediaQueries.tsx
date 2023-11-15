@@ -1,24 +1,9 @@
 import React from 'react'
 import { Text, View } from 'react-native'
-import { mq, createStyleSheet, useStyles, UnistylesRegistry, UnistylesRuntime } from 'react-native-unistyles'
+import { mq, createStyleSheet, useStyles, UnistylesRuntime } from 'react-native-unistyles'
 import { DemoScreen } from '../components'
-import { breakpoints, darkTheme, lightTheme, premiumTheme } from '../styles'
-import { useLazyRegistryForDemo } from '../hooks'
 
 export const MixedMediaQueries: React.FunctionComponent = () => {
-    useLazyRegistryForDemo(() => {
-        UnistylesRegistry
-            .addThemes({
-                light: lightTheme,
-                dark: darkTheme,
-                premium: premiumTheme
-            })
-            .addBreakpoints(breakpoints)
-            .addConfig({
-                adaptiveThemes: true
-            })
-    })
-
     const { styles } = useStyles(stylesheet)
 
     return (
