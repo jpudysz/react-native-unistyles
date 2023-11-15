@@ -33,7 +33,7 @@ export const OrientationBreakpoints: React.FunctionComponent = () => {
                     The current orientation is: {UnistylesRuntime.orientation === ScreenOrientation.Portrait ? 'portrait' : 'landscape'}
                 </Text>
                 <Text style={styles.text}>
-                    You should see circles on portrait and rectangles on landscape
+                    You should see circles on landscape and rectangles on portrait
                 </Text>
                 <View style={styles.objectContainer}>
                     {Array.from(new Array(10)).map((_, index) => (

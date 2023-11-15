@@ -1,10 +1,8 @@
-import type { UnistylesBreakpoints } from '../../global'
-import { unistyles } from '../../Unistyles'
-import type { Nullable } from '../../types'
+import type { MediaQuery, Nullable } from '../types'
+import type { UnistylesBreakpoints } from '../global'
+import { unistyles } from '../core'
 
-const MQSymbol = Symbol('unistyles-mq')
-
-export type MediaQuery = typeof MQSymbol
+export const MQSymbol = Symbol('unistyles-mq')
 
 type MQValue = keyof UnistylesBreakpoints | number
 

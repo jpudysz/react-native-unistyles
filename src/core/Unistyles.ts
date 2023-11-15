@@ -1,13 +1,11 @@
 import { UnistylesModule } from './UnistylesModule'
 import { UnistylesRuntime } from './UnistylesRuntime'
-import { UnistylesBuiltInEngine } from './UnistylesEngine'
 import { UnistyleRegistry } from './UnistyleRegistry'
-import type { UnistylesBridge } from './types'
-import { UnistylesError } from './types'
+import type { UnistylesBridge } from '../types'
+import { UnistylesError } from '../common'
 
 class Unistyles {
     private _runtime: UnistylesRuntime
-    private _engine: UnistylesBuiltInEngine
     private _registry: UnistyleRegistry
     private _bridge: UnistylesBridge
 
@@ -22,7 +20,6 @@ class Unistyles {
         this._bridge = global.__UNISTYLES__ as UnistylesBridge
         this._registry = new UnistyleRegistry(this._bridge)
         this._runtime = new UnistylesRuntime(this._bridge, this._registry)
-        this._engine = new UnistylesBuiltInEngine(this.runtime)
     }
 
     public get registry() {
@@ -31,10 +28,6 @@ class Unistyles {
 
     public get runtime() {
         return this._runtime
-    }
-
-    public get engine() {
-        return this._engine
     }
 }
 

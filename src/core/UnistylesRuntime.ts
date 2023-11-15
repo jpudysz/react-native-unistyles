@@ -1,7 +1,7 @@
-import type { UnistylesBridge } from './types'
+import { ScreenOrientation, UnistylesError } from '../common'
+import type { UnistylesBridge } from '../types'
+import type { UnistylesThemes } from '../global'
 import type { UnistyleRegistry } from './UnistyleRegistry'
-import { ScreenOrientation, UnistylesError } from './types'
-import type { UnistylesThemes } from './global'
 
 export class UnistylesRuntime {
     constructor(private unistylesBridge: UnistylesBridge, private registry: UnistyleRegistry) {}

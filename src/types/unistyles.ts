@@ -1,18 +1,12 @@
+import { CxxUnistylesEventTypes, ScreenOrientation } from '../common'
 import type { UnistylesThemes, UnistylesBreakpoints } from '../global'
-import type { ScreenSize } from './breakpoints'
-import type { NestedKeys } from './core'
+import type { NestedKeys, ScreenSize } from './core'
+import type { Optional } from './common'
 
-export type Optional<T> = T | undefined
-export type Nullable<T> = T | null
 export type ColorSchemeName = Optional<'light' | 'dark'>
 
 export type UnistylesConfig = {
     adaptiveThemes?: boolean
-}
-
-export enum ScreenOrientation {
-    Portrait = 1,
-    Landscape = 2
 }
 
 export type UnistylesBridge = {
@@ -35,11 +29,6 @@ export type UnistylesBridge = {
     unregister(): void
 }
 
-export enum CxxUnistylesEventTypes {
-    Theme = 'theme',
-    Layout = 'layout'
-}
-
 export type UnistylesThemeEvent = {
     type: CxxUnistylesEventTypes.Theme,
     payload: {
@@ -57,15 +46,6 @@ export type UnistylesMobileLayoutEvent = {
 }
 
 export type UnistylesEvents = UnistylesThemeEvent | UnistylesMobileLayoutEvent
-
-export enum UnistylesError {
-    RuntimeUnavailable = 'UNISTYLES_ERROR_RUNTIME_UNAVAILABLE',
-    ThemeNotFound = 'UNISTYLES_ERROR_THEME_NOT_FOUND',
-    ThemeNotRegistered = 'UNISTYLES_ERROR_THEME_NOT_REGISTERED',
-    ThemesCannotBeEmpty = 'UNISTYLES_ERROR_THEMES_CANNOT_BE_EMPTY',
-    BreakpointsCannotBeEmpty = 'UNISTYLES_ERROR_BREAKPOINTS_CANNOT_BE_EMPTY',
-    BreakpointsMustStartFromZero = 'UNISTYLES_ERROR_BREAKPOINTS_MUST_START_FROM_ZERO',
-}
 
 export interface UnistylesEngine {
     didMatchMediaQuery(keys: NestedKeys): Optional<string>,
