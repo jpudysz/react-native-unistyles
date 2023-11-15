@@ -16,13 +16,10 @@ const std::string UnistylesErrorBreakpointsCannotBeEmpty = "UNISTYLES_ERROR_BREA
 const std::string UnistylesErrorBreakpointsMustStartFromZero = "UNISTYLES_ERROR_BREAKPOINTS_MUST_START_FROM_ZER0";
 const std::string UnistylesErrorThemesCannotBeEmpty = "UNISTYLES_ERROR_THEMES_CANNOT_BE_EMPTY";
 
-typedef void(^UnistylesThemeChangeEvent)(std::string themeName);
-typedef void(^UnistylesBreakpointChangeEvent)(std::string breakpoint, int layout, int screenWidth, int screenHeight);
-
 class JSI_EXPORT UnistylesRuntime : public jsi::HostObject {
 private:
-    UnistylesThemeChangeEvent onThemeChange;
-    UnistylesBreakpointChangeEvent onBreakpointChange;
+    std::function<void(std::string)> onThemeChangeCallback;
+    std::function<void(std::string breakpoint, int layout, int screenWidth, int screenHeight)> onLayoutChangeCallback;
 
     int screenWidth;
     int screenHeight;
@@ -30,16 +27,10 @@ private:
 
 public:
     UnistylesRuntime(
-        UnistylesThemeChangeEvent onThemeChange,
-        UnistylesBreakpointChangeEvent onBreakpointChange,
         int screenWidth,
         int screenHeight,
         std::string colorScheme
-    ): onThemeChange(onThemeChange),
-       onBreakpointChange(onBreakpointChange),
-       screenWidth(screenWidth),
-       screenHeight(screenHeight),
-       colorScheme(colorScheme) {}
+    ): screenWidth(screenWidth), screenHeight(screenHeight), colorScheme(colorScheme) {}
 
     bool hasAdaptiveThemes;
     bool supportsAutomaticColorScheme;
@@ -48,6 +39,14 @@ public:
     std::string breakpoint;
     std::vector<std::string> themes;
     std::vector<std::pair<std::string, double>> sortedBreakpointPairs;
+    
+    void onThemeChange(std::function<void(std::string)> callback) {
+        this->onThemeChangeCallback = callback;
+    }
+    
+    void onLayoutChange(std::function<void(std::string breakpoint, int layout, int screenWidth, int screenHeight)> callback) {
+        this->onLayoutChangeCallback = callback;
+    }
 
     jsi::Value get(jsi::Runtime&, const jsi::PropNameID& name) override;
     void set(jsi::Runtime& runtime, const jsi::PropNameID& propNameId, const jsi::Value& value) override;

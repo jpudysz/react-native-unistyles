@@ -125,9 +125,11 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
             [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
                 std::string themeName = arguments[0].asString(runtime).utf8(runtime);
 
-                this->themeName = themeName;
-                this->onThemeChange(themeName);
-
+                if (this->themeName != themeName) {
+                    this->themeName = themeName;
+                    this->onThemeChangeCallback(themeName);
+                }
+            
                 return jsi::Value::undefined();
             }
         );
@@ -145,9 +147,11 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                 if (!enableAdaptiveThemes || !this->supportsAutomaticColorScheme) {
                     return jsi::Value::undefined();
                 }
-
-                this->themeName = this->colorScheme;
-                this->onThemeChange(this->themeName);
+            
+                if (this->themeName != this->colorScheme) {
+                    this->themeName = this->colorScheme;
+                    this->onThemeChangeCallback(this->themeName);
+                }
 
                 return jsi::Value::undefined();
             }
@@ -208,7 +212,8 @@ std::string UnistylesRuntime::getBreakpointFromScreenWidth(int width, const std:
 
 void UnistylesRuntime::handleScreenSizeChange(int width, int height) {
     std::string breakpoint = this->getBreakpointFromScreenWidth(width, this->sortedBreakpointPairs);
-
+    bool shouldNotify = this->breakpoint != breakpoint || this->screenWidth != width || this->screenHeight != height;
+    
     this->breakpoint = breakpoint;
     this->screenWidth = width;
     this->screenHeight = height;
@@ -217,7 +222,9 @@ void UnistylesRuntime::handleScreenSizeChange(int width, int height) {
         ? UnistylesOrientationLandscape
         : UnistylesOrientationPortrait;
 
-    this->onBreakpointChange(breakpoint, orientation, width, height);
+    if (shouldNotify) {
+        this->onLayoutChangeCallback(breakpoint, orientation, width, height);
+    }
 }
 
 void UnistylesRuntime::handleAppearanceChange(std::string colorScheme) {
@@ -226,14 +233,11 @@ void UnistylesRuntime::handleAppearanceChange(std::string colorScheme) {
     if (!this->supportsAutomaticColorScheme || !this->hasAdaptiveThemes) {
         return;
     }
-
-    // don't emit even when selecting initial theme
-//    if (!this->themeName.empty()) {
-//        this->onThemeChange(this->colorScheme);
-//    }
-    this->onThemeChange(this->colorScheme);
-
-    this->themeName = this->colorScheme;
+    
+    if (this->themeName != this->colorScheme) {
+        this->onThemeChangeCallback(this->colorScheme);
+        this->themeName = this->colorScheme;
+    }
 }
 
 jsi::Value UnistylesRuntime::getThemeOrFail(jsi::Runtime& runtime) {
