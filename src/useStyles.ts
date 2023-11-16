@@ -11,7 +11,10 @@ type ParsedStylesheet<ST extends CustomNamedStyles<ST>> = {
     styles: ReactNativeStyleSheet<ST>
 }
 
-export const useStyles = <ST extends CustomNamedStyles<ST>>(stylesheet?: ST | CreateStylesFactory<ST, UnistylesTheme>): ParsedStylesheet<ST> => {
+export const useStyles = <ST extends CustomNamedStyles<ST>>(
+    stylesheet?: ST | CreateStylesFactory<ST, UnistylesTheme>,
+    variant?: string
+): ParsedStylesheet<ST> => {
     const { theme, layout } = useUnistyles()
     const { screenSize, breakpoint } = layout
 
@@ -35,15 +38,15 @@ export const useStyles = <ST extends CustomNamedStyles<ST>>(stylesheet?: ST | Cr
             if (typeof value === 'function') {
                 return {
                     ...acc,
-                    [key]: proxifyFunction(value, breakpoint, screenSize)
+                    [key]: proxifyFunction(value, breakpoint, screenSize, variant)
                 }
             }
 
             return StyleSheet.create({
                 ...acc,
-                [key]: parseStyle<ST>(style, breakpoint, screenSize)
+                [key]: parseStyle<ST>(style, breakpoint, screenSize, variant)
             })
-        }, {} as ST), [breakpoint, screenSize, parsedStyles]) as ReactNativeStyleSheet<ST>
+        }, {} as ST), [breakpoint, screenSize, parsedStyles, variant]) as ReactNativeStyleSheet<ST>
 
     return {
         theme,

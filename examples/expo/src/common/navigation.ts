@@ -12,7 +12,8 @@ export enum DemoNames {
     WithBreakpoints = 'WithBreakpoints',
     MediaQueriesWidthHeight = 'MediaQueriesWidthHeight',
     OrientationBreakpoints = 'OrientationBreakpoints',
-    MixedMediaQueries = 'MixedMediaQueries'
+    MixedMediaQueries = 'MixedMediaQueries',
+    Variants = 'Variants'
 }
 
 export type DemoStackParams = {
@@ -27,7 +28,8 @@ export type DemoStackParams = {
     [DemoNames.WithBreakpoints]: undefined,
     [DemoNames.MediaQueriesWidthHeight]: undefined,
     [DemoNames.OrientationBreakpoints]: undefined,
-    [DemoNames.MixedMediaQueries]: undefined
+    [DemoNames.MixedMediaQueries]: undefined,
+    [DemoNames.Variants]: undefined
 }
 
 export type NavigationProps<S extends DemoNames = DemoNames.Home> = NavigationProp<DemoStackParams, S>

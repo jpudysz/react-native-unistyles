@@ -52,6 +52,10 @@ type UniStyle<V> = {
     [innerKey in keyof UnistylesBreakpoints]?: V
 } | {
     [innerKey in MediaQuery]: V
+} | {
+    [innerKey in 'variants']?: {
+        [variant: string]: V
+    }
 }
 
 type DeepUniStyle<T> = {
@@ -77,6 +81,11 @@ export type CustomNamedStyles<T> = {
         : StaticStyles
 }
 
-export type NestedKeys = Array<[keyof UnistylesBreakpoints | MediaQuery, string | number | undefined]>
+export type RNValue = number | string | undefined
+export type VariantValue = Record<string, RNValue>
+export type NestedStyle = Record<keyof UnistylesBreakpoints | MediaQuery | 'variants', RNValue> & {
+    variants: VariantValue
+}
+export type NestedStylePairs = Array<[keyof UnistylesBreakpoints | MediaQuery | 'variants', RNValue | VariantValue]>
 export type UnistylesTheme = UnistylesThemes[keyof UnistylesThemes]
 export type CreateStylesFactory<ST, Theme> = (theme: Theme) => ST
