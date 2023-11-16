@@ -2,12 +2,17 @@
     --background: #8e7cc4;
     --white: #fff;
     --black: #000;
+    --pink: #e46fbb;
 }
 
 * {
     box-sizing: border-box;
     padding: 0;
     margin: 0;
+
+    &::selection {
+        background-color: var(--pink);
+    }
 }
 
 body {
@@ -19,4 +24,12 @@ body {
 a {
     text-decoration: none;
     color: inherit;
+}
+
+img {
+    pointer-events: none;
+
+    &::selection {
+        background: none;
+    }
 }

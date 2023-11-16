@@ -1,9 +1,7 @@
 ---
-import { Image } from 'astro:assets'
 import '@fontsource-variable/nunito'
-import HeroImage from '../assets/hero.webp'
-import Github from '../assets/github.svg'
-import { Nav, Seo } from '../components'
+
+import { Features, Footer, Hero, Nav, Seo } from '../components'
 import '../styles/home.css'
 
 const homeSeo = {
@@ -15,37 +13,9 @@ const homeSeo = {
 <Seo seo={homeSeo}>
     <Nav />
     <main>
-        <Image
-            class="hero-image"
-            src={HeroImage}
-            alt=""
-        />
-        <div class="hero-gradient" />
-        <section class="welcome">
-            <h1>
-                Welcome to <span class="bold">Unistyles 2.0<span>
-            </h1>
-            <h2>
-                Level up your React Native StyleSheet!
-            </h2>
-            <div class="buttons">
-                <a href="/start/setup/">
-                    <button class="primary">
-                        Get Started
-                    </button>
-                </a>
-                <a href="https://github.com/jpudysz/react-native-unistyles" target="_blank">
-                    <button>
-                        <Image
-                            class="github"
-                            src={Github}
-                            alt=""
-                        />
-                        Github
-                    </button>
-                </a>
-            </div>
-        </section>
+        <Hero />
+        <Features />
+        <Footer />
     </main>
 </Seo>
 
@@ -53,82 +23,6 @@ const homeSeo = {
     main {
         margin-top: 100px;
         position: relative;
-        height: 100vh;
-    }
-
-    .hero-image {
-        width: 100%;
-        height: auto;
-        pointer-events: none;
-        position: absolute;
-        inset: 0;
-        z-index: 10;
-
-        &::selection {
-            background: none;
-        }
-    }
-
-    .hero-gradient {
-        width: 100%;
-        aspect-ratio: 1.5;
-        background: radial-gradient(50% 50% at 50% 50%, #2D0BB5, cubic-bezier(0.3, 0, 0.5, 0.5), transparent);
-        position: absolute;
-        left: 0;
-        top: 20%;
-    }
-
-    .welcome {
-        position: relative;
-        color: var(--black);
-        z-index: 20;
-        padding: 22vw 11vw;
-    }
-
-    h1 {
-        font-size: clamp(32px, 3.5vw, 74px);
-        font-weight: 500;
-    }
-
-    h2 {
-        font-size: clamp(16px, 1.5vw, 32px);
-        font-weight: 600;
-        margin-left: 1%;
-    }
-
-    .bold {
-        font-weight: 700;
-    }
-
-    .buttons {
-        margin-top: 40px;
-        display: flex;
-        gap: 16px;
-    }
-
-    button {
-	    font: inherit;
-        font-size: 100%;
-        border: none;
-        padding: 16px 48px;
-        border-radius: 100px;
-        background-color: rgba(255, 255, 255, 0.5);
-        color: var(--black);
-        cursor: pointer;
-        font-size: 20px;
-        font-weight: 600;
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
-
-    .primary {
-        background-color: var(--black);
-        color: var(--white);
-    }
-
-    .github {
-        width: 32px;
-        height: auto;
+        overflow-x: hidden;
     }
 </style>
