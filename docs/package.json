@@ -12,9 +12,10 @@
     "@astrojs/sitemap": "3.0.3",
     "@astrojs/starlight": "0.12.0",
     "@fontsource-variable/nunito": "5.0.16",
-    "astro": "3.5.4",
+    "astro": "3.5.5",
     "astro-seo": "0.8.0",
     "autoprefixer": "10.4.16",
+    "motion": "10.16.4",
     "postcss-easing-gradients": "3.0.1",
     "postcss-nested": "6.0.1",
     "sharp": "0.32.6"

@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets'
 import CodemaskLogo from '../assets/codemask-black.svg'
-import Clouds from '../assets/clouds.svg'
+import Clouds from '../assets/footer-clouds.svg'
 
 const motto = 'Bridging Your Idea to the digital world\nYour experts in mobile and web development'
 ---
@@ -12,6 +12,7 @@ const motto = 'Bridging Your Idea to the digital world\nYour experts in mobile a
         src={Clouds}
         alt=""
     />
+    <div class="footer-gradient" />
     <div class="footer-content">
         <h3>
             Brought to you by Codemask
@@ -34,6 +35,15 @@ const motto = 'Bridging Your Idea to the digital world\nYour experts in mobile a
         margin: 0;
         color: var(--black);
         margin-top: 15vw;
+    }
+
+    .footer-gradient {
+        position: absolute;
+        width: 100vw;
+        height: 200vh;
+        background: linear-gradient(to top, rgba(191, 38, 140, 0.6), ease, transparent);
+        z-index: -10;
+        bottom: 0;
     }
 
     .clouds {
