@@ -1,6 +1,6 @@
 import { CxxUnistylesEventTypes, ScreenOrientation } from '../common'
 import type { UnistylesThemes, UnistylesBreakpoints } from '../global'
-import type { NestedKeys, ScreenSize } from './core'
+import type { ScreenSize } from './core'
 import type { Optional } from './common'
 
 export type ColorSchemeName = Optional<'light' | 'dark'>
@@ -43,7 +43,3 @@ export type UnistylesMobileLayoutEvent = {
 }
 
 export type UnistylesEvents = UnistylesThemeEvent | UnistylesMobileLayoutEvent
-
-export interface UnistylesEngine {
-    didMatchMediaQuery(keys: NestedKeys): Optional<string>,
-}
