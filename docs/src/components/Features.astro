@@ -1,0 +1,123 @@
+---
+import { Image } from 'astro:assets'
+import Icon from '../assets/icon.svg'
+
+type Feature = {
+    icon: string,
+    title: string,
+    description: string
+}
+
+const features = [
+    {
+        title: 'Lorem Ipsum',
+        description: 'Blazing fast, adds around ~3ms on top of StyleSheet*',
+        icon: ''
+    },
+    {
+        title: 'Lorem Ipsum',
+        description: 'Share up to 100% of your styles across platforms in monorepo',
+        icon: ''
+    },
+    {
+        title: 'Lorem Ipsum',
+        description: 'Doesn’t introduce new components',
+        icon: ''
+    },
+    {
+        title: 'Lorem Ipsum',
+        description: 'Supports custom breakpoints and css-like media queries',
+        icon: ''
+    },
+    {
+        title: 'Lorem Ipsum',
+        description: 'Access theme in your StyleSheets and components',
+        icon: ''
+    },
+    {
+        title: 'Lorem Ipsum',
+        description: 'Supports dynamic functions to access values from JSX',
+        icon: ''
+    },
+    {
+        title: 'Lorem Ipsum',
+        description: 'Compatible with Expo, Expo Go, Bare React Native and React Native Web',
+        icon: ''
+    },
+    {
+        title: 'Lorem Ipsum',
+        description: 'No 3rd party dependencies',
+        icon: ''
+    },
+    {
+        title: 'Lorem Ipsum',
+        description: 'Doesn’t introduce new components',
+        icon: ''
+    }
+] satisfies Array<Feature>
+---
+
+<section>
+    <h2>
+        Features
+    </h2>
+    <div class="features">
+        {features.map(feature => (
+            <div class="feature">
+                <Image
+                    class="feature__icon"
+                    src={Icon}
+                    alt=""
+                />
+                <h3 class="feature__title">
+                    {feature.title}
+                </h3>
+                <p class="feature__description">
+                    {feature.description}
+                </p>
+            </div>
+        ))}
+    </div>
+</section>
+
+<style>
+    h2 {
+        font-weight: 700;
+        font-size: 40px;
+        margin: 33vw 0 100px 0;
+        text-align: center;
+    }
+
+    .features {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin: 0 auto;
+        max-width: 1600px;
+        gap: 48px;
+    }
+
+    .feature {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 24px;
+        padding: 32px;
+        gap: 12px;
+        width: 30%;
+        text-align: center;
+        min-width: 460px;
+
+        &__title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        &__description {
+            font-size: 24px;
+            line-height: 32px;
+            font-weight: 500;
+        }
+    }
+</style>

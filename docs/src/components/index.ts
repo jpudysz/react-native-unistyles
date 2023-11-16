@@ -1,3 +1,6 @@
 export { default as Codemask } from './Codemask.astro'
 export { default as Seo } from './Seo.astro'
 export { default as Nav } from './Nav.astro'
+export { default as Features } from './Features.astro'
+export { default as Footer } from './Footer.astro'
+export { default as Hero } from './Hero.astro'
