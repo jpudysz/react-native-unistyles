@@ -1,0 +1,86 @@
+---
+import { Image } from 'astro:assets'
+import Logo from '../assets/logo.svg'
+
+const links = [
+    {
+        name: 'Sponsors',
+        href: '/sponsors/'
+    },
+    {
+        name: 'Examples',
+        href: '/examples/'
+    },
+    {
+        name: 'Blog',
+        href: 'https://www.reactnativecrossroads.com/'
+    }
+]
+---
+
+<nav>
+    <div class="logo-wrapper">
+        <Image
+            class="logo"
+            src={Logo}
+            alt=''
+        />
+        react-native-unistyles
+    </div>
+    <ul>
+        {links.map(link => (
+            <li>
+                <a href={link.href} target={link.href.startsWith('http') ? '_blank' : '_self'}>
+                    {link.name}
+                </a>
+            </li>
+        ))}
+    </ul>
+</nav>
+
+<style>
+    nav {
+       position: fixed;
+       top: 0;
+       left: 0;
+       width: 100vw;
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       padding: 48px;
+       font-size: 24px;
+       background: linear-gradient(to bottom, rgba(22, 10, 97, 0.38), ease-in-out, transparent);
+       z-index: 50;
+    }
+
+    .logo {
+        width: 60px;
+        height: 60px;
+        transform: translateY(-20%);
+        font-weight: 700;
+    }
+
+    .logo-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    ul {
+        list-style: none;
+        display: flex;
+        height: 36px;
+    }
+
+    li {
+        padding: 0 32px;
+        font-weight: 500;
+        border-right: 1px solid var(--white);
+        display: flex;
+        align-items: center;
+    }
+
+    li:last-child {
+        border-right: none;
+    }
+</style>

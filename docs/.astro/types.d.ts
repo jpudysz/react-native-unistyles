@@ -220,13 +220,6 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
-"index.mdx": {
-	id: "index.mdx";
-  slug: "index";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
 "reference/create-stylesheet.mdx": {
 	id: "reference/create-stylesheet.mdx";
   slug: "reference/create-stylesheet";
