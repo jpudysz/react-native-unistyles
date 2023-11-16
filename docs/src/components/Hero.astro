@@ -1,16 +1,20 @@
 ---
-import { Image } from 'astro:assets';
-import HeroImage from '../assets/hero.webp';
-import Github from '../assets/github.svg';
-import ArrowDown from '../assets/arrow-down.svg';
+import { Image } from 'astro:assets'
+import Github from '../assets/github.svg'
+import Unicorn from '../assets/unicorn.svg'
+import CloudA from '../assets/cloud-a.svg'
+import CloudB from '../assets/cloud-b.svg'
+import ArrowDown from '../assets/arrow-down.svg'
 ---
 
-<Image class="hero-image" src={HeroImage} alt="" />
+<Image class="unicorn" src={Unicorn} alt="" />
+<Image class="cloud-a" src={CloudA} alt="" />
+<Image class="cloud-b" src={CloudB} alt="" />
 <div class="hero-gradient"></div>
+<div class="scroll-target"></div>
 <section class="welcome">
     <h1>
-        Welcome to <span class="bold"
-            >Unistyles 2.0<span> </span>
+            Welcome to <span class="bold">Unistyles 2.0<span> </span>
             <h2>Level up your React Native StyleSheet!</h2>
             <div class="buttons">
                 <a href="/start/setup/">
@@ -34,13 +38,58 @@ import ArrowDown from '../assets/arrow-down.svg';
     </h1>
 </section>
 
+<script>
+    import { scroll, timeline } from 'motion'
+
+    const scrollTarget = document.querySelector<HTMLDivElement>('.scroll-target')!
+    const cloudA = document.querySelector<HTMLDivElement>('.cloud-a')!
+    const cloudB = document.querySelector<HTMLDivElement>('.cloud-b')!
+    const unicorn = document.querySelector<HTMLDivElement>('.unicorn')!
+
+    scroll(timeline([
+        [cloudA, { transform: ['translateX(0%)', 'translateX(-5%)'] }, { at: '<' } ],
+        [cloudB, { transform: ['translateX(0%)', 'translateX(5%)'] }, { at: '<' } ],
+        [unicorn, { filter: ['hue-rotate(0deg)', 'hue-rotate(-90deg)'] }, { at: '<' }]
+    ]), {
+        smooth: 1,
+        target: scrollTarget
+    })
+</script>
+
 <style>
-    .hero-image {
-        width: 100%;
+    .unicorn,
+    .cloud-a,
+    .cloud-b {
         height: auto;
         position: absolute;
+    }
+
+    .scroll-target {
+        pointer-events: none;
         inset: 0;
+        position: absolute;
+        height: 200vh;
+        width: 0;
+    }
+
+    .unicorn {
+        width: 100vw;
         z-index: 10;
+        inset: 0;
+    }
+
+    .cloud-a {
+        z-index: 20;
+        width: 69vw;
+        top: 34.5vw;
+        left: 12.5vw;
+    }
+
+    .cloud-b {
+        z-index: 10;
+        width: 69vw;
+        top: 32vw;
+        left: 42.5vw;
     }
 
     .hero-gradient {

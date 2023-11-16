@@ -834,6 +834,91 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@motionone/animation@npm:^10.16.3":
+  version: 10.16.3
+  resolution: "@motionone/animation@npm:10.16.3"
+  dependencies:
+    "@motionone/easing": ^10.16.3
+    "@motionone/types": ^10.16.3
+    "@motionone/utils": ^10.16.3
+    tslib: ^2.3.1
+  checksum: 797cacea335e6f892af27579eff51450dcf18c5bbc5c0ca44a000929b21857f4afb974ffb411c4935bfbd01ef2ddb3ef542ba3313ae66e1e5392b5d314df6ad3
+  languageName: node
+  linkType: hard
+
+"@motionone/dom@npm:^10.16.4":
+  version: 10.16.4
+  resolution: "@motionone/dom@npm:10.16.4"
+  dependencies:
+    "@motionone/animation": ^10.16.3
+    "@motionone/generators": ^10.16.4
+    "@motionone/types": ^10.16.3
+    "@motionone/utils": ^10.16.3
+    hey-listen: ^1.0.8
+    tslib: ^2.3.1
+  checksum: 8307864351d1c0108492c2f414ab564f59f4bb797180382948696df44e7389339560e642c7d0fbdbe63c1755515b2ace8264b5f8827ba2590636e11d474dd226
+  languageName: node
+  linkType: hard
+
+"@motionone/easing@npm:^10.16.3":
+  version: 10.16.3
+  resolution: "@motionone/easing@npm:10.16.3"
+  dependencies:
+    "@motionone/utils": ^10.16.3
+    tslib: ^2.3.1
+  checksum: 03e2460cdd35ee4967a86ce28ffbaaaca589263f659f652801cf6bd667baba9b3d5ce6d134df6b64413b60b34dd21d7c38b0cd8a4c3e1ed789789cdb971905b2
+  languageName: node
+  linkType: hard
+
+"@motionone/generators@npm:^10.16.4":
+  version: 10.16.4
+  resolution: "@motionone/generators@npm:10.16.4"
+  dependencies:
+    "@motionone/types": ^10.16.3
+    "@motionone/utils": ^10.16.3
+    tslib: ^2.3.1
+  checksum: 185091c5cfbe67c38e84bf3920d1b5862e5d7eb624136494a7e4779b2f9d06855ebe3e633d95dcc5a1735d92d59d1ae28a0724c2f9d8bddd60fc9bc3603fab48
+  languageName: node
+  linkType: hard
+
+"@motionone/svelte@npm:^10.16.4":
+  version: 10.16.4
+  resolution: "@motionone/svelte@npm:10.16.4"
+  dependencies:
+    "@motionone/dom": ^10.16.4
+    tslib: ^2.3.1
+  checksum: 699e20955ea832bcf32d410ae9f88edf61a5c2cf2b56527119ab1df6fecbf2632b62d541743d0f6d278fd700a15a20b9eb7c8aa5266e7aed5e113b8f8f75b863
+  languageName: node
+  linkType: hard
+
+"@motionone/types@npm:^10.16.3":
+  version: 10.16.3
+  resolution: "@motionone/types@npm:10.16.3"
+  checksum: ff38982f5aff2c0abbc3051c843d186d6f954c971e97dd6fced97a4ef50ee04f6e49607541ebb80e14dd143cf63553c388392110e270d04eca23f6b529f7f321
+  languageName: node
+  linkType: hard
+
+"@motionone/utils@npm:^10.16.3":
+  version: 10.16.3
+  resolution: "@motionone/utils@npm:10.16.3"
+  dependencies:
+    "@motionone/types": ^10.16.3
+    hey-listen: ^1.0.8
+    tslib: ^2.3.1
+  checksum: d06025911c54c2217c98026cd38d4d681268a2b9b2830ac7342820881ba6be09721dd03626f52547749ead0543d5e2f2a69c9270ffdeaabc0949f7afb3233817
+  languageName: node
+  linkType: hard
+
+"@motionone/vue@npm:^10.16.4":
+  version: 10.16.4
+  resolution: "@motionone/vue@npm:10.16.4"
+  dependencies:
+    "@motionone/dom": ^10.16.4
+    tslib: ^2.3.1
+  checksum: 746e38d0ee831829bfac2ce471f3d98a9e37bd8cbdf2706fa3becce69c17f51180a1ee47582d97758d68aafdfc9a187ab47ff216c77254ac994287dabcf266c1
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -1294,9 +1379,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"astro@npm:3.5.4":
-  version: 3.5.4
-  resolution: "astro@npm:3.5.4"
+"astro@npm:3.5.5":
+  version: 3.5.5
+  resolution: "astro@npm:3.5.5"
   dependencies:
     "@astrojs/compiler": ^2.3.0
     "@astrojs/internal-helpers": 0.2.1
@@ -1362,7 +1447,7 @@ __metadata:
       optional: true
   bin:
     astro: astro.js
-  checksum: 078b88f4f0d08b7d9876670cefa9de4718de378cfe815eb861587383151d3bf8de7dd4f11fa65bae3c1d13c99a2f36d23078e344955af7a955a2d49ec9ca09b8
+  checksum: bac5e6226637eb9757c0127941cde32169ac39d5f22ade869ce86c663b114307431b996c9ffbd28469ba55157d316bdec4dffaa257db087fde71813f2412fc3d
   languageName: node
   linkType: hard
 
@@ -2891,6 +2976,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"hey-listen@npm:^1.0.8":
+  version: 1.0.8
+  resolution: "hey-listen@npm:1.0.8"
+  checksum: 6bad60b367688f5348e25e7ca3276a74b59ac5a09b0455e6ff8ab7d4a9e38cd2116c708a7dcd8a954d27253ce1d8717ec891d175723ea739885b828cf44e4072
+  languageName: node
+  linkType: hard
+
 "html-escaper@npm:^3.0.3":
   version: 3.0.3
   resolution: "html-escaper@npm:3.0.3"
@@ -4379,6 +4471,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"motion@npm:10.16.4":
+  version: 10.16.4
+  resolution: "motion@npm:10.16.4"
+  dependencies:
+    "@motionone/animation": ^10.16.3
+    "@motionone/dom": ^10.16.4
+    "@motionone/svelte": ^10.16.4
+    "@motionone/types": ^10.16.3
+    "@motionone/utils": ^10.16.3
+    "@motionone/vue": ^10.16.4
+  checksum: 4e6993d3eebe77c0b82983dcfec4005939b7f2889ded6509a7660675bcf6a6dca71e67cf733873bb09b349728eb83e1697c4aa09bf008691193dcea5bc96323f
+  languageName: node
+  linkType: hard
+
 "mri@npm:^1.1.0":
   version: 1.2.0
   resolution: "mri@npm:1.2.0"
@@ -5043,9 +5149,10 @@ __metadata:
     "@astrojs/sitemap": 3.0.3
     "@astrojs/starlight": 0.12.0
     "@fontsource-variable/nunito": 5.0.16
-    astro: 3.5.4
+    astro: 3.5.5
     astro-seo: 0.8.0
     autoprefixer: 10.4.16
+    motion: 10.16.4
     postcss-easing-gradients: 3.0.1
     postcss-nested: 6.0.1
     sharp: 0.32.6
@@ -5832,6 +5939,13 @@ __metadata:
   bin:
     tsconfck: bin/tsconfck.js
   checksum: a9fd941dfbeb3cb095ff079e1177c219bf7b900edb36bb273f081c226436e1561e8f78aa482240450097da3463dc0f57353ef4e2cda2df7d472ecded16843379
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^2.3.1":
+  version: 2.6.2
+  resolution: "tslib@npm:2.6.2"
+  checksum: 329ea56123005922f39642318e3d1f0f8265d1e7fcb92c633e0809521da75eeaca28d2cf96d7248229deb40e5c19adf408259f4b9640afd20d13aecc1430f3ad
   languageName: node
   linkType: hard
 
