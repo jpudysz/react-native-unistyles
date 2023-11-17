@@ -5,6 +5,7 @@ const REFERENCE_WIDTH = 300
 const REFERENCE_HEIGHT = 800
 
 export const autoGuidelinePlugin: UnistylesPlugin = {
+    name: 'autoGuideline',
     onParsedStyle: (styleKey, style, runtime) => {
         const pairs = Object
             .entries(style)

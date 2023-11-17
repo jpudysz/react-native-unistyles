@@ -7,6 +7,7 @@ import type { UnistylesEvents, UnistylesMobileLayoutEvent, UnistylesThemeEvent }
 const unistylesEvents = new NativeEventEmitter(NativeModules.Unistyles)
 
 export const useUnistyles = () => {
+    const [plugins, setPlugins] = useState(unistyles.runtime.enabledPlugins)
     const [theme, setTheme] = useState(unistyles.runtime.getTheme(unistyles.runtime.themeName))
     const [layout, setLayout] = useState({
         breakpoint: unistyles.runtime.breakpoint,
@@ -39,6 +40,9 @@ export const useUnistyles = () => {
                             }
                         })
                     }
+                    case CxxUnistylesEventTypes.Plugin: {
+                        return setPlugins(unistyles.runtime.enabledPlugins)
+                    }
                     default:
                         return
                 }
@@ -49,6 +53,7 @@ export const useUnistyles = () => {
     }, [])
 
     return {
+        plugins,
         theme,
         layout
     }

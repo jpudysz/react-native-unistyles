@@ -13,6 +13,7 @@ export type UnistylesBridge = {
     // getters
     screenWidth: number,
     screenHeight: number,
+    enabledPlugins: Array<string>,
     hasAdaptiveThemes: boolean,
     themeName: keyof UnistylesThemes,
     breakpoint: keyof UnistylesBreakpoints,
@@ -23,7 +24,9 @@ export type UnistylesBridge = {
     themes: Array<keyof UnistylesThemes>,
     useBreakpoints(breakpoints: UnistylesBreakpoints): void,
     useTheme(name: keyof UnistylesThemes): void,
-    useAdaptiveThemes(enable: boolean): void
+    useAdaptiveThemes(enable: boolean): void,
+    addPlugin(pluginName: string): void,
+    removePlugin(pluginName: string): void
 }
 
 export type UnistylesThemeEvent = {
@@ -42,4 +45,8 @@ export type UnistylesMobileLayoutEvent = {
     }
 }
 
-export type UnistylesEvents = UnistylesThemeEvent | UnistylesMobileLayoutEvent
+export type UnistylesPluginEvent = {
+    type: CxxUnistylesEventTypes.Plugin
+}
+
+export type UnistylesEvents = UnistylesThemeEvent | UnistylesMobileLayoutEvent | UnistylesPluginEvent

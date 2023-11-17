@@ -21,7 +21,7 @@ export const useStyles = <ST extends CustomNamedStyles<ST>>(
     stylesheet?: ST | CreateStylesFactory<ST, UnistylesTheme>,
     variant?: ExtractVariantNames<typeof stylesheet> & string
 ): ParsedStylesheet<ST> => {
-    const { theme, layout } = useUnistyles()
+    const { theme, layout, plugins } = useUnistyles()
     const { screenSize, breakpoint } = layout
 
     if (!stylesheet) {
@@ -52,7 +52,7 @@ export const useStyles = <ST extends CustomNamedStyles<ST>>(
                 ...acc,
                 [key]: parseStyle<ST>(key, style, breakpoint, screenSize, variant)
             })
-        }, {} as ST), [breakpoint, screenSize, parsedStyles, variant]) as ReactNativeStyleSheet<ST>
+        }, {} as ST), [breakpoint, screenSize, parsedStyles, variant, plugins]) as ReactNativeStyleSheet<ST>
 
     return {
         theme,

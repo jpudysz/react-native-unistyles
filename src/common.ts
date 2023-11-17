@@ -21,7 +21,8 @@ export const Orientation = {
 
 export enum CxxUnistylesEventTypes {
     Theme = 'theme',
-    Layout = 'layout'
+    Layout = 'layout',
+    Plugin = 'plugin'
 }
 
 export enum UnistylesError {
@@ -31,6 +32,9 @@ export enum UnistylesError {
     ThemesCannotBeEmpty = 'UNISTYLES_ERROR_THEMES_CANNOT_BE_EMPTY',
     BreakpointsCannotBeEmpty = 'UNISTYLES_ERROR_BREAKPOINTS_CANNOT_BE_EMPTY',
     BreakpointsMustStartFromZero = 'UNISTYLES_ERROR_BREAKPOINTS_MUST_START_FROM_ZERO',
+    InvalidPluginName = 'UNISTYLES_ERROR_INVALID_PLUGIN_NAME',
+    DuplicatePluginName = 'UNISTYLES_ERROR_DUPLICATE_PLUGIN_NAME',
+    CantRemoveInternalPlugin = 'UNISTYLES_ERROR_CANT_REMOVE_INTERNAL_PLUGIN'
 }
 
 // todo to string?

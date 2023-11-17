@@ -20,6 +20,7 @@ class JSI_EXPORT UnistylesRuntime : public jsi::HostObject {
 private:
     std::function<void(std::string)> onThemeChangeCallback;
     std::function<void(std::string breakpoint, int layout, int screenWidth, int screenHeight)> onLayoutChangeCallback;
+    std::function<void()> onPluginChangeCallback;
 
     int screenWidth;
     int screenHeight;
@@ -37,6 +38,7 @@ public:
 
     std::string themeName;
     std::string breakpoint;
+    std::vector<std::string> pluginNames;
     std::vector<std::string> themes;
     std::vector<std::pair<std::string, double>> sortedBreakpointPairs;
     
@@ -46,6 +48,10 @@ public:
     
     void onLayoutChange(std::function<void(std::string breakpoint, int layout, int screenWidth, int screenHeight)> callback) {
         this->onLayoutChangeCallback = callback;
+    }
+    
+    void onPluginChange(std::function<void()> callback) {
+        this->onPluginChangeCallback = callback;
     }
 
     jsi::Value get(jsi::Runtime&, const jsi::PropNameID& name) override;

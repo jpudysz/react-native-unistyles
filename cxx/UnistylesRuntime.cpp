@@ -19,6 +19,9 @@ std::vector<jsi::PropNameID> UnistylesRuntime::getPropertyNames(jsi::Runtime& ru
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("useBreakpoints")));
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("useTheme")));
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("useAdaptiveThemes")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("addPlugin")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("removePlugin")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("enabledPlugins")));
 
     // setters
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("themes")));
@@ -57,6 +60,16 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
     if (propName == "colorScheme") {
         return jsi::Value(jsi::String::createFromUtf8(runtime, this->colorScheme));
     }
+    
+    if (propName == "enabledPlugins") {
+        auto jsiArray = facebook::jsi::Array(runtime, this->pluginNames.size());
+        
+        for (size_t i = 0; i < this->pluginNames.size(); i++) {
+            jsiArray.setValueAtIndex(runtime, i, facebook::jsi::String::createFromUtf8(runtime, this->pluginNames[i]));
+        }
+        
+        return jsiArray;
+    }
 
     if (propName == "sortedBreakpointPairs") {
         std::unique_ptr<jsi::Array> sortedBreakpointEntriesArray = std::make_unique<jsi::Array>(runtime, this->sortedBreakpointPairs.size());
@@ -71,6 +84,42 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
         }
 
         return jsi::Value(runtime, *sortedBreakpointEntriesArray);
+    }
+    
+    if (propName == "addPlugin") {
+        return jsi::Function::createFromHostFunction(
+            runtime,
+            jsi::PropNameID::forAscii(runtime, "addPlugin"),
+            1,
+            [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
+                std::string pluginName = arguments[0].asString(runtime).utf8(runtime);
+                
+                this->pluginNames.push_back(pluginName);
+                this->onPluginChangeCallback();
+                
+                return jsi::Value::undefined();
+            }
+        );
+    }
+    
+    if (propName == "removePlugin") {
+        return jsi::Function::createFromHostFunction(
+            runtime,
+            jsi::PropNameID::forAscii(runtime, "removePlugin"),
+            1,
+            [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
+                std::string pluginName = arguments[0].asString(runtime).utf8(runtime);
+                
+                auto it = std::find(this->pluginNames.begin(), this->pluginNames.end(), pluginName);
+                
+                if (it != this->pluginNames.end()) {
+                    this->pluginNames.erase(it);
+                    this->onPluginChangeCallback();
+                }
+ 
+                return jsi::Value::undefined();
+            }
+        );
     }
 
     if (propName == "useBreakpoints") {

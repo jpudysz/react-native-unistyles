@@ -11,7 +11,8 @@ const UnistylesRegistry = {
     addThemes: unistyles.registry.addThemes,
     addBreakpoints: unistyles.registry.addBreakpoints,
     addConfig: unistyles.registry.addConfig,
-    addExperimentalPlugins: unistyles.registry.addExperimentalPlugins
+    addExperimentalPlugin: unistyles.registry.addExperimentalPlugin,
+    removeExperimentalPlugin: unistyles.registry.removeExperimentalPlugin
 }
 
 const UnistylesRuntime = unistyles.runtime
