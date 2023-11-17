@@ -30,6 +30,7 @@ export const App: React.FunctionComponent = () => (
                 <Stack.Screen name={DemoNames.MediaQueriesWidthHeight} component={Screens.MediaQueriesWidthHeight} />
                 <Stack.Screen name={DemoNames.MixedMediaQueries} component={Screens.MixedMediaQueries} />
                 <Stack.Screen name={DemoNames.Variants} component={Screens.VariantsScreen} />
+                <Stack.Screen name={DemoNames.AutoGuidelinePlugin} component={Screens.AutoGuidelinePluginScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     </SafeAreaProvider>

@@ -78,6 +78,7 @@ export type CustomNamedStyles<T> = {
         : StaticStyles
 }
 
+export type RNStyle = ViewStyle | TextStyle | ImageStyle
 export type RNValue = number | string | undefined
 export type NestedStyle = Record<keyof UnistylesBreakpoints | MediaQuery, RNValue>
 export type NestedStylePairs = Array<[keyof UnistylesBreakpoints | MediaQuery, RNValue]>

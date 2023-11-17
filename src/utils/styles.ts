@@ -1,17 +1,18 @@
-import type { CustomNamedStyles, ScreenSize, NestedStyle } from '../types'
+import type { CustomNamedStyles, ScreenSize, NestedStyle, RNStyle } from '../types'
 import { getValueForBreakpoint } from './breakpoints'
-import { normalizeStyles } from './normalizeStyles'
 import type { UnistylesBreakpoints } from '../global'
-import { isAndroid, isIOS, isWeb } from './common'
+import { isAndroid, isIOS } from '../common'
 import { getKeyForVariant } from './variants'
+import { withPlugins } from '../plugins'
 
 export const proxifyFunction = (
+    key: string,
     fn: Function, breakpoint: keyof UnistylesBreakpoints & string,
     screenSize: ScreenSize,
     variant?: string
 ): Function => new Proxy(fn, {
     apply: (target, thisArg, argumentsList) =>
-        parseStyle(target.apply(thisArg, argumentsList), breakpoint, screenSize, variant)
+        parseStyle(key, target.apply(thisArg, argumentsList), breakpoint, screenSize, variant)
 })
 
 export const isPlatformColor = <T extends {}>(value: T): boolean => {
@@ -22,7 +23,8 @@ export const isPlatformColor = <T extends {}>(value: T): boolean => {
     return isAndroid && 'resource_paths' in value && typeof value.resource_paths === 'object'
 }
 
-export const parseStyle = <T>(
+export const parseStyle = <T extends RNStyle>(
+    key: string,
     style: CustomNamedStyles<T>,
     breakpoint: keyof UnistylesBreakpoints & string,
     screenSize: ScreenSize,
@@ -58,7 +60,7 @@ export const parseStyle = <T>(
                 if (hasNestedProperties) {
                     return [
                         key,
-                        parseStyle(value as CustomNamedStyles<T>, breakpoint, screenSize, variant)
+                        parseStyle(key, value as CustomNamedStyles<T>, breakpoint, screenSize, variant)
                     ]
                 }
 
@@ -67,7 +69,7 @@ export const parseStyle = <T>(
                 if (isTransform && Array.isArray(value)) {
                     return [
                         key,
-                        value.map(value => parseStyle(value, breakpoint, screenSize, variant))
+                        value.map(value => parseStyle(key, value, breakpoint, screenSize, variant))
                     ]
                 }
 
@@ -83,9 +85,7 @@ export const parseStyle = <T>(
                     getValueForBreakpoint(value as NestedStyle)
                 ]
             })
-        )
+        ) as T
 
-    return isWeb
-        ? normalizeStyles(parsedStyles)
-        : parsedStyles
+    return withPlugins(key, parsedStyles) as T
 }
