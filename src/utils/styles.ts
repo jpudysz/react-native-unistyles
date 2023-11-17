@@ -1,8 +1,9 @@
 import type { CustomNamedStyles, ScreenSize, NestedStyle } from '../types'
-import { getValueForNestedStyle } from './breakpoints'
+import { getValueForBreakpoint } from './breakpoints'
 import { normalizeStyles } from './normalizeStyles'
 import type { UnistylesBreakpoints } from '../global'
 import { isAndroid, isIOS, isWeb } from './common'
+import { getKeyForVariant } from './variants'
 
 export const proxifyFunction = (
     fn: Function, breakpoint: keyof UnistylesBreakpoints & string,
@@ -27,10 +28,27 @@ export const parseStyle = <T>(
     screenSize: ScreenSize,
     variant?: string
 ): T => {
-    const entries = Object.entries(style || {}) as [[
-        keyof T,
-        CustomNamedStyles<T> | NestedStyle]
-    ]
+    const entries = (Object
+        .entries(style || {}) as Array<[keyof T, CustomNamedStyles<T> | NestedStyle]>)
+        .map(([key, value]) => {
+            if (key !== 'variants') {
+                return [key, value]
+            }
+
+            const variantKey = getKeyForVariant(
+                value as NestedStyle,
+                variant
+            )
+
+            if (!variantKey) {
+                return undefined
+            }
+
+            return Object
+                .entries(value[variantKey as keyof typeof value] as NestedStyle)
+                .flat()
+        })
+        .filter(Boolean) as Array<[keyof T, CustomNamedStyles<T> | NestedStyle]>
 
     const parsedStyles = Object
         .fromEntries(entries
@@ -62,10 +80,7 @@ export const parseStyle = <T>(
 
                 return [
                     key,
-                    getValueForNestedStyle(
-                        value as NestedStyle,
-                        variant
-                    )
+                    getValueForBreakpoint(value as NestedStyle)
                 ]
             })
         )

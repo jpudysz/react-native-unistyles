@@ -1,16 +1,12 @@
 import type { Optional, NestedStyle } from '../types'
 
-export const getKeyForVariant = (value: NestedStyle, variant?: string): Optional<keyof typeof value> => {
-    if (!value.variants) {
-        return undefined
+export const getKeyForVariant = (value: NestedStyle, variant?: string): Optional<string> => {
+    if (variant && variant in value) {
+        return variant
     }
 
-    if (variant && variant in value.variants) {
-        return variant as keyof typeof value
-    }
-
-    if ('default' in value.variants) {
-        return 'default' as keyof typeof value
+    if ('default' in value) {
+        return 'default'
     }
 
     return undefined

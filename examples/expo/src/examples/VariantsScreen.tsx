@@ -12,8 +12,8 @@ enum ButtonVariant {
 export const VariantsScreen: React.FunctionComponent = () => {
     const [buttonVariant, setButtonVariant] = useState<ButtonVariant>(ButtonVariant.Primary)
     // you can pass your variant name to `useStyles` hook, this is optional
-    // variants have bigger priority than media queries and breakpoints
-    const { styles  } = useStyles(stylesheet, buttonVariant)
+    // you can mix variants with media queries and breakpoints
+    const { styles } = useStyles(stylesheet, buttonVariant)
 
     return (
         <DemoScreen>
@@ -61,12 +61,18 @@ const stylesheet = createStyleSheet(theme => ({
         color: theme.colors.typography
     },
     button: {
-        backgroundColor: {
-            variants: {
-                primary: theme.colors.barbie,
-                secondary: theme.colors.accent,
-                outlined: 'transparent',
-                default: theme.colors.blood
+        variants: {
+            primary: {
+                backgroundColor: theme.colors.barbie
+            },
+            secondary: {
+                backgroundColor: theme.colors.accent
+            },
+            outlined: {
+                backgroundColor: 'transparent'
+            },
+            default: {
+                backgroundColor: theme.colors.blood
             }
         },
         paddingHorizontal: 20,
@@ -76,10 +82,15 @@ const stylesheet = createStyleSheet(theme => ({
         borderColor: theme.colors.typography
     },
     buttonText: {
-        color: {
-            variants: {
-                outlined: theme.colors.accent,
-                default: theme.colors.typography
+        variants: {
+            outlined: {
+                color: theme.colors.accent
+            },
+            default: {
+                color: {
+                    sm: theme.colors.backgroundColor,
+                    lg: theme.colors.accent
+                }
             }
         },
         fontWeight: 'bold'

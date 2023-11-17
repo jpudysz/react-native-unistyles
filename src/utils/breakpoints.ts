@@ -4,7 +4,6 @@ import type { NestedStyle, NestedStylePairs, RNValue } from '../types'
 import type { UnistylesBreakpoints } from '../global'
 import { ScreenOrientation } from '../common'
 import { getKeyForUnistylesMediaQuery } from './mqParser'
-import { getKeyForVariant } from './variants'
 
 export const sortAndValidateBreakpoints = (breakpoints: UnistylesBreakpoints): UnistylesBreakpoints => {
     const sortedPairs = Object
@@ -47,16 +46,8 @@ export const getBreakpointFromScreenWidth = (width: number, breakpointEntries: A
     return key
 }
 
-// todo move it to different file
-export const getValueForNestedStyle = (value: NestedStyle, variant?: string): RNValue => {
-    // the highest priority is for variants
-    const variantKey = getKeyForVariant(value, variant)
-
-    if (variantKey) {
-        return value.variants[variantKey as string]
-    }
-
-    // then custom media queries
+export const getValueForBreakpoint = (value: NestedStyle): RNValue => {
+    // the highest priority is for custom media queries
     const customMediaQueryKey = getKeyForUnistylesMediaQuery(
         Object.entries(value) as NestedStylePairs,
         unistyles.runtime.screen
