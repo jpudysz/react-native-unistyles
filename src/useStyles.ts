@@ -1,7 +1,13 @@
 import { useMemo } from 'react'
 import { StyleSheet } from 'react-native'
 import { parseStyle, proxifyFunction } from './utils'
-import type { CreateStylesFactory, CustomNamedStyles, ReactNativeStyleSheet, UnistylesTheme } from './types'
+import type {
+    CreateStylesFactory,
+    CustomNamedStyles,
+    ExtractVariantNames,
+    ReactNativeStyleSheet,
+    UnistylesTheme
+} from './types'
 import { useUnistyles } from './hooks'
 import type { UnistylesBreakpoints } from './global'
 
@@ -13,7 +19,7 @@ type ParsedStylesheet<ST extends CustomNamedStyles<ST>> = {
 
 export const useStyles = <ST extends CustomNamedStyles<ST>>(
     stylesheet?: ST | CreateStylesFactory<ST, UnistylesTheme>,
-    variant?: string
+    variant?: ExtractVariantNames<typeof stylesheet> & string
 ): ParsedStylesheet<ST> => {
     const { theme, layout } = useUnistyles()
     const { screenSize, breakpoint } = layout

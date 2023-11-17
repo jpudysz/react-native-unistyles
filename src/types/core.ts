@@ -45,17 +45,14 @@ type TransformStyles =
 type UnistyleNested = {
     shadowOffset?: DeepUniStyle<ShadowOffset>,
     textShadowOffset?: DeepUniStyle<ShadowOffset>,
-    transform?: Array<DeepUniStyle<TransformStyles>>
+    transform?: Array<DeepUniStyle<TransformStyles>>,
+    variants?: Record<string, UnistyleView | UnistyleText | UnistyleImage & Omit<UnistyleNested, 'variants'>>
 }
 
 type UniStyle<V> = {
     [innerKey in keyof UnistylesBreakpoints]?: V
 } | {
     [innerKey in MediaQuery]: V
-} | {
-    [innerKey in 'variants']?: {
-        [variant: string]: V
-    }
 }
 
 type DeepUniStyle<T> = {
@@ -82,10 +79,7 @@ export type CustomNamedStyles<T> = {
 }
 
 export type RNValue = number | string | undefined
-export type VariantValue = Record<string, RNValue>
-export type NestedStyle = Record<keyof UnistylesBreakpoints | MediaQuery | 'variants', RNValue> & {
-    variants: VariantValue
-}
-export type NestedStylePairs = Array<[keyof UnistylesBreakpoints | MediaQuery | 'variants', RNValue | VariantValue]>
+export type NestedStyle = Record<keyof UnistylesBreakpoints | MediaQuery, RNValue>
+export type NestedStylePairs = Array<[keyof UnistylesBreakpoints | MediaQuery, RNValue]>
 export type UnistylesTheme = UnistylesThemes[keyof UnistylesThemes]
 export type CreateStylesFactory<ST, Theme> = (theme: Theme) => ST
