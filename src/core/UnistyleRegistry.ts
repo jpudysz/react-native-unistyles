@@ -1,8 +1,9 @@
-import type { UnistylesBridge, UnistylesConfig } from '../types'
+import type { UnistylesBridge, UnistylesConfig, UnistylesPlugin } from '../types'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
 
 export class UnistyleRegistry {
     public config: UnistylesConfig = {}
+    public plugins: Array<UnistylesPlugin> = []
     public themeNames: Array<keyof UnistylesThemes> = []
     public themes: UnistylesThemes = {} as UnistylesThemes
     public breakpoints: UnistylesBreakpoints = {} as UnistylesBreakpoints
@@ -37,5 +38,9 @@ export class UnistyleRegistry {
         }
 
         return this
+    }
+
+    public addExperimentalPlugins = (plugins: Array<UnistylesPlugin>) => {
+        this.plugins = plugins
     }
 }

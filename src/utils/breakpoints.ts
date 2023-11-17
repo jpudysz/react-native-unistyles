@@ -1,8 +1,7 @@
 import { unistyles } from '../core'
-import { isMobile, Orientation, throwError } from './common'
 import type { NestedStyle, NestedStylePairs, RNValue } from '../types'
 import type { UnistylesBreakpoints } from '../global'
-import { ScreenOrientation } from '../common'
+import { ScreenOrientation, isMobile, Orientation, throwError } from '../common'
 import { getKeyForUnistylesMediaQuery } from './mqParser'
 
 export const sortAndValidateBreakpoints = (breakpoints: UnistylesBreakpoints): UnistylesBreakpoints => {

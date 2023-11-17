@@ -44,13 +44,13 @@ export const useStyles = <ST extends CustomNamedStyles<ST>>(
             if (typeof value === 'function') {
                 return {
                     ...acc,
-                    [key]: proxifyFunction(value, breakpoint, screenSize, variant)
+                    [key]: proxifyFunction(key, value, breakpoint, screenSize, variant)
                 }
             }
 
             return StyleSheet.create({
                 ...acc,
-                [key]: parseStyle<ST>(style, breakpoint, screenSize, variant)
+                [key]: parseStyle<ST>(key, style, breakpoint, screenSize, variant)
             })
         }, {} as ST), [breakpoint, screenSize, parsedStyles, variant]) as ReactNativeStyleSheet<ST>
 

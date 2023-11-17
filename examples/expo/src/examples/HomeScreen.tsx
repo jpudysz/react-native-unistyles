@@ -8,6 +8,7 @@ import { DemoGroup, DemoLink } from '../components'
 import { DemoNames } from '../common'
 import type { NavigationProps } from '../common'
 import { breakpoints, darkTheme, lightTheme, premiumTheme } from '../styles'
+import { autoGuidelinePlugin } from '../plugins'
 
 export const HomeScreen = () => {
     const navigation = useNavigation<NavigationProps>()
@@ -46,6 +47,7 @@ export const HomeScreen = () => {
                                     // we need to cast it to UnistylesThemes as we already registered 3 themes with TypeScript under styles/index.ts,
                                     // but we want to demonstrate how to register a single theme
                                 } as UnistylesThemes)
+                                .addExperimentalPlugins([])
 
                             navigation.navigate(DemoNames.SingleTheme)
                         }}
@@ -60,6 +62,7 @@ export const HomeScreen = () => {
                                     // we need to cast it to UnistylesThemes as we already registered 3 themes with TypeScript under styles/index.ts,
                                     // but we want to demonstrate how to register two themes
                                 } as UnistylesThemes)
+                                .addExperimentalPlugins([])
 
                             navigation.navigate(DemoNames.TwoThemes)
                         }}
@@ -77,6 +80,7 @@ export const HomeScreen = () => {
                                 .addConfig({
                                     adaptiveThemes: true
                                 })
+                                .addExperimentalPlugins([])
 
                             navigation.navigate(DemoNames.LightDarkThemes)
                         }}
@@ -90,6 +94,7 @@ export const HomeScreen = () => {
                                     dark: darkTheme,
                                     premium: premiumTheme
                                 })
+                                .addExperimentalPlugins([])
 
                             navigation.navigate(DemoNames.MultipleThemes)
                         }}
@@ -106,6 +111,7 @@ export const HomeScreen = () => {
                                 .addConfig({
                                     adaptiveThemes: true
                                 })
+                                .addExperimentalPlugins([])
 
                             navigation.navigate(DemoNames.MultipleThemesAdaptive)
                         }}
@@ -121,6 +127,7 @@ export const HomeScreen = () => {
                                     dark: darkTheme,
                                     premium: premiumTheme
                                 })
+                                .addExperimentalPlugins([])
 
                             navigation.navigate(DemoNames.NoBreakpoints)
                         }}
@@ -138,6 +145,7 @@ export const HomeScreen = () => {
                                 .addConfig({
                                     adaptiveThemes: true
                                 })
+                                .addExperimentalPlugins([])
 
                             navigation.navigate(DemoNames.WithBreakpoints)
                         }}
@@ -154,6 +162,7 @@ export const HomeScreen = () => {
                                 .addConfig({
                                     adaptiveThemes: true
                                 })
+                                .addExperimentalPlugins([])
 
                             navigation.navigate(DemoNames.OrientationBreakpoints)
                         }}
@@ -173,6 +182,7 @@ export const HomeScreen = () => {
                                 .addConfig({
                                     adaptiveThemes: true
                                 })
+                                .addExperimentalPlugins([])
 
                             navigation.navigate(DemoNames.MediaQueriesWidthHeight)
                         }}
@@ -190,6 +200,7 @@ export const HomeScreen = () => {
                                 .addConfig({
                                     adaptiveThemes: true
                                 })
+                                .addExperimentalPlugins([])
 
                             navigation.navigate(DemoNames.MixedMediaQueries)
                         }}
@@ -209,8 +220,29 @@ export const HomeScreen = () => {
                                 .addConfig({
                                     adaptiveThemes: true
                                 })
+                                .addExperimentalPlugins([])
 
                             navigation.navigate(DemoNames.Variants)
+                        }}
+                    />
+                </DemoGroup>
+                <DemoGroup title="Plugins">
+                    <DemoLink
+                        description="Auto guideline"
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addBreakpoints(breakpoints)
+                                .addConfig({
+                                    adaptiveThemes: true
+                                })
+                                .addExperimentalPlugins([autoGuidelinePlugin])
+
+                            navigation.navigate(DemoNames.AutoGuidelinePlugin)
                         }}
                     />
                 </DemoGroup>

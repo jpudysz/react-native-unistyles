@@ -1,7 +1,7 @@
 // based on react-native-web normalizer
 // https://github.com/necolas/react-native-web
 import normalizeColors from '@react-native/normalize-colors'
-import type { TextShadow, Transforms, BoxShadow } from '../types'
+import type { TextShadow, Transforms, BoxShadow } from '../../types'
 
 type Preprocessor = {
     createTextShadowValue(style: TextShadow): string,
