@@ -145,6 +145,16 @@ void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSel
 
         [weakSelf emitEvent:@"onChange" withBody:body];
     });
+    
+    unistylesRuntime.get()->onPluginChange([=]() {
+        NSDictionary *body = @{
+            @"type": @"plugin"
+        };
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [weakSelf emitEvent:@"onChange" withBody:body];
+        });
+    });
 
     weakSelf.unistylesRuntime = unistylesRuntime.get();
 

@@ -1,5 +1,6 @@
 import type { UnistylesBridge, UnistylesConfig, UnistylesPlugin } from '../types'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
+import { UnistylesError } from '../common'
 
 export class UnistyleRegistry {
     public config: UnistylesConfig = {}
@@ -40,7 +41,25 @@ export class UnistyleRegistry {
         return this
     }
 
-    public addExperimentalPlugins = (plugins: Array<UnistylesPlugin>) => {
-        this.plugins = plugins
+    public addExperimentalPlugin = (plugin: UnistylesPlugin) => {
+        if (plugin.name.startsWith('__unistyles')) {
+            throw new Error(UnistylesError.InvalidPluginName)
+        }
+
+        if (this.plugins.some(({ name }) => name === plugin.name)) {
+            throw new Error(UnistylesError.DuplicatePluginName)
+        }
+
+        this.plugins = this.plugins.concat([plugin])
+        this.unistylesBridge.addPlugin(plugin.name)
+    }
+
+    public removeExperimentalPlugin = (plugin: UnistylesPlugin) => {
+        if (plugin.name.startsWith('__unistyles')) {
+            throw new Error(UnistylesError.CantRemoveInternalPlugin)
+        }
+
+        this.plugins = this.plugins.filter(({ name }) => name !== plugin.name)
+        this.unistylesBridge.removePlugin(plugin.name)
     }
 }

@@ -26,6 +26,10 @@ export class UnistylesRuntime {
         return this.unistylesBridge.breakpoint
     }
 
+    public get enabledPlugins() {
+        return this.unistylesBridge.enabledPlugins
+    }
+
     public get screen() {
         return {
             width: this.unistylesBridge.screenWidth,
