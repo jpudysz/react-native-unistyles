@@ -267,7 +267,7 @@ void UnistylesRuntime::handleScreenSizeChange(int width, int height) {
     this->screenWidth = width;
     this->screenHeight = height;
 
-    int orientation = width > height
+    std::string orientation = width > height
         ? UnistylesOrientationLandscape
         : UnistylesOrientationPortrait;
 

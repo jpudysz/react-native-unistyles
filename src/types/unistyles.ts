@@ -41,7 +41,7 @@ export type UnistylesMobileLayoutEvent = {
     payload: {
         screen: ScreenSize,
         breakpoint: keyof UnistylesBreakpoints,
-        orientation: ScreenOrientation
+        orientation: typeof ScreenOrientation[keyof typeof ScreenOrientation]
     }
 }
 

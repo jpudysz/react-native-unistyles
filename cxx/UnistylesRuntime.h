@@ -5,8 +5,8 @@
 
 using namespace facebook;
 
-const int UnistylesOrientationPortrait = 1;
-const int UnistylesOrientationLandscape = 2;
+const std::string UnistylesOrientationPortrait = "portrait";
+const std::string UnistylesOrientationLandscape = "landscape";
 
 const std::string UnistylesDarkScheme = "dark";
 const std::string UnistylesLightScheme = "light";
@@ -19,7 +19,7 @@ const std::string UnistylesErrorThemesCannotBeEmpty = "UNISTYLES_ERROR_THEMES_CA
 class JSI_EXPORT UnistylesRuntime : public jsi::HostObject {
 private:
     std::function<void(std::string)> onThemeChangeCallback;
-    std::function<void(std::string breakpoint, int layout, int screenWidth, int screenHeight)> onLayoutChangeCallback;
+    std::function<void(std::string breakpoint, std::string orientation, int screenWidth, int screenHeight)> onLayoutChangeCallback;
     std::function<void()> onPluginChangeCallback;
 
     int screenWidth;
@@ -46,7 +46,7 @@ public:
         this->onThemeChangeCallback = callback;
     }
     
-    void onLayoutChange(std::function<void(std::string breakpoint, int layout, int screenWidth, int screenHeight)> callback) {
+    void onLayoutChange(std::function<void(std::string breakpoint, std::string orientation, int screenWidth, int screenHeight)> callback) {
         this->onLayoutChangeCallback = callback;
     }
     

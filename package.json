@@ -3,7 +3,7 @@
   "version": "2.0.0-alpha.11",
   "description": "Level up your React Native StyleSheet",
   "scripts": {
-    "test": "jest",
+    "test": "jest src/**/*.spec.(ts|tsx)",
     "test:coverage": "jest --coverage",
     "tsc": "node_modules/typescript/bin/tsc --noEmit",
     "lint": "eslint . --ext .ts,.tsx",
