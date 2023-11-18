@@ -2,11 +2,14 @@ import { CxxUnistylesEventTypes, ScreenOrientation } from '../common'
 import type { UnistylesThemes, UnistylesBreakpoints } from '../global'
 import type { ScreenSize } from './core'
 import type { Optional } from './common'
+import type { UnistylesPlugin } from './plugin'
 
 export type ColorSchemeName = Optional<'light' | 'dark'>
 
 export type UnistylesConfig = {
-    adaptiveThemes?: boolean
+    adaptiveThemes?: boolean,
+    experimentalPlugins?: Array<UnistylesPlugin>,
+    initialTheme?: keyof UnistylesThemes
 }
 
 export type UnistylesBridge = {
@@ -25,7 +28,7 @@ export type UnistylesBridge = {
     useBreakpoints(breakpoints: UnistylesBreakpoints): void,
     useTheme(name: keyof UnistylesThemes): void,
     useAdaptiveThemes(enable: boolean): void,
-    addPlugin(pluginName: string): void,
+    addPlugin(pluginName: string, notify: boolean): void,
     removePlugin(pluginName: string): void
 }
 

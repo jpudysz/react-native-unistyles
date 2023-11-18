@@ -8,6 +8,7 @@ import { DemoGroup, DemoLink } from '../components'
 import { DemoNames } from '../common'
 import type { NavigationProps } from '../common'
 import { breakpoints, darkTheme, lightTheme, premiumTheme } from '../styles'
+import { autoGuidelinePlugin } from '../plugins'
 
 export const HomeScreen = () => {
     const navigation = useNavigation<NavigationProps>()
@@ -60,6 +61,9 @@ export const HomeScreen = () => {
                                     // we need to cast it to UnistylesThemes as we already registered 3 themes with TypeScript under styles/index.ts,
                                     // but we want to demonstrate how to register two themes
                                 } as UnistylesThemes)
+                                .addConfig({
+                                    initialTheme: 'light'
+                                })
 
                             navigation.navigate(DemoNames.TwoThemes)
                         }}
@@ -226,7 +230,9 @@ export const HomeScreen = () => {
                                 })
                                 .addBreakpoints(breakpoints)
                                 .addConfig({
-                                    adaptiveThemes: true
+                                    adaptiveThemes: true,
+                                    // plugin can be registry enabled
+                                    experimentalPlugins: [autoGuidelinePlugin]
                                 })
 
                             navigation.navigate(DemoNames.AutoGuidelinePlugin)

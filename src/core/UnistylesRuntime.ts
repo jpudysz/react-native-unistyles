@@ -1,10 +1,10 @@
 import { ScreenOrientation, UnistylesError } from '../common'
-import type { UnistylesBridge } from '../types'
+import type { UnistylesBridge, UnistylesPlugin } from '../types'
 import type { UnistylesThemes } from '../global'
 import type { UnistyleRegistry } from './UnistyleRegistry'
 
 export class UnistylesRuntime {
-    constructor(private unistylesBridge: UnistylesBridge, private registry: UnistyleRegistry) {}
+    constructor(private unistylesBridge: UnistylesBridge, private unistylesRegistry: UnistyleRegistry) {}
 
     public get colorScheme() {
         return this.unistylesBridge.colorScheme
@@ -15,7 +15,7 @@ export class UnistylesRuntime {
     }
 
     public get sortedBreakpoints() {
-        return this.registry.sortedBreakpointPairs
+        return this.unistylesRegistry.sortedBreakpointPairs
     }
 
     public get themeName() {
@@ -58,7 +58,7 @@ export class UnistylesRuntime {
     }
 
     public getTheme = (forName: keyof UnistylesThemes) => {
-        if (this.registry.themeNames.length === 0) {
+        if (this.unistylesRegistry.themeNames.length === 0) {
             return {} as UnistylesThemes[keyof UnistylesThemes]
         }
 
@@ -66,12 +66,20 @@ export class UnistylesRuntime {
             throw new Error(UnistylesError.ThemeNotFound)
         }
 
-        return this.registry.themes[forName]
+        return this.unistylesRegistry.themes[forName]
     }
 
     public setAdaptiveThemes = (enable: boolean) => {
         this.unistylesBridge.useAdaptiveThemes(enable)
     }
 
-    private hasTheme = (name: keyof UnistylesThemes) => name in this.registry.themes
+    public addPlugin = (plugin: UnistylesPlugin) => {
+        this.unistylesRegistry.addPlugin(plugin)
+    }
+
+    public removePlugin = (plugin: UnistylesPlugin) => {
+        this.unistylesRegistry.removePlugin(plugin)
+    }
+
+    private hasTheme = (name: keyof UnistylesThemes) => name in this.unistylesRegistry.themes
 }

@@ -38,10 +38,16 @@ export class UnistyleRegistry {
             this.unistylesBridge.useAdaptiveThemes(config.adaptiveThemes)
         }
 
-        return this
+        if (config.experimentalPlugins) {
+            config.experimentalPlugins.forEach(plugin => this.addPlugin(plugin, false))
+        }
+
+        if (config.initialTheme) {
+            this.unistylesBridge.useTheme(config.initialTheme)
+        }
     }
 
-    public addExperimentalPlugin = (plugin: UnistylesPlugin) => {
+    public addPlugin = (plugin: UnistylesPlugin, notify: boolean = true) => {
         if (plugin.name.startsWith('__unistyles')) {
             throw new Error(UnistylesError.InvalidPluginName)
         }
@@ -51,10 +57,10 @@ export class UnistyleRegistry {
         }
 
         this.plugins = this.plugins.concat([plugin])
-        this.unistylesBridge.addPlugin(plugin.name)
+        this.unistylesBridge.addPlugin(plugin.name, notify)
     }
 
-    public removeExperimentalPlugin = (plugin: UnistylesPlugin) => {
+    public removePlugin = (plugin: UnistylesPlugin) => {
         if (plugin.name.startsWith('__unistyles')) {
             throw new Error(UnistylesError.CantRemoveInternalPlugin)
         }

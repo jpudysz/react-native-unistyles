@@ -1,20 +1,14 @@
 import React, { useEffect } from 'react'
 import { Button, Text, View } from 'react-native'
-import { createStyleSheet, useStyles, UnistylesRegistry, UnistylesRuntime } from 'react-native-unistyles'
+import { createStyleSheet, useStyles, UnistylesRuntime } from 'react-native-unistyles'
 import { DemoScreen } from '../components'
 import { autoGuidelinePlugin } from '../plugins'
 
 export const AutoGuidelinePluginScreen: React.FunctionComponent = () => {
     const { styles } = useStyles(stylesheet)
 
-    useEffect(() => {
-        // plugins can be runtime enabled/disabled
-        // it will cause re-render of the stylesheets
-        UnistylesRegistry.addExperimentalPlugin(autoGuidelinePlugin)
-
-        return () => {
-            UnistylesRegistry.removeExperimentalPlugin(autoGuidelinePlugin)
-        }
+    useEffect(() => () => {
+        UnistylesRuntime.removePlugin(autoGuidelinePlugin)
     }, [])
 
     // check if plugin is enabled with runtime
@@ -39,8 +33,8 @@ export const AutoGuidelinePluginScreen: React.FunctionComponent = () => {
                     title={isAutoGuidelinePluginEnabled ? 'Disable plugin' : 'Enable plugin'}
                     onPress={() => {
                         isAutoGuidelinePluginEnabled
-                            ? UnistylesRegistry.removeExperimentalPlugin(autoGuidelinePlugin)
-                            : UnistylesRegistry.addExperimentalPlugin(autoGuidelinePlugin)
+                            ? UnistylesRuntime.removePlugin(autoGuidelinePlugin)
+                            : UnistylesRuntime.addPlugin(autoGuidelinePlugin)
                     }}
                 />
             </View>

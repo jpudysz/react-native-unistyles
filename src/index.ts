@@ -10,9 +10,7 @@ import { createStyleSheet } from './createStyleSheet'
 const UnistylesRegistry = {
     addThemes: unistyles.registry.addThemes,
     addBreakpoints: unistyles.registry.addBreakpoints,
-    addConfig: unistyles.registry.addConfig,
-    addExperimentalPlugin: unistyles.registry.addExperimentalPlugin,
-    removeExperimentalPlugin: unistyles.registry.removeExperimentalPlugin
+    addConfig: unistyles.registry.addConfig
 }
 
 const UnistylesRuntime = unistyles.runtime

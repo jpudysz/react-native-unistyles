@@ -11,6 +11,8 @@ export const TwoThemesScreen: React.FunctionComponent = () => {
     // if you won't do that you will get UNISTYLES_THEME_NOT_FOUND error
     useInitialTheme('premium')
 
+    // you can also skip useInitialTheme and set the theme during UnistylesRegistry.addConfig({}) call
+
     const { styles, theme } = useStyles(stylesheet)
 
     return (
