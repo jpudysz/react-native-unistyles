@@ -93,9 +93,14 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
             1,
             [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
                 std::string pluginName = arguments[0].asString(runtime).utf8(runtime);
+                bool notify = arguments[1].asBool();
                 
                 this->pluginNames.push_back(pluginName);
-                this->onPluginChangeCallback();
+                
+                // registry enabled plugins won't notify listeners
+                if (notify) {
+                    this->onPluginChangeCallback();
+                }
                 
                 return jsi::Value::undefined();
             }

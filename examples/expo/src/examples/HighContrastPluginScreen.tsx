@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { Pressable, Text, View } from 'react-native'
-import { createStyleSheet, useStyles, UnistylesRegistry, UnistylesRuntime } from 'react-native-unistyles'
+import { createStyleSheet, useStyles, UnistylesRuntime } from 'react-native-unistyles'
 import { DemoScreen } from '../components'
 import { highContrastPlugin } from '../plugins'
 
@@ -10,10 +10,10 @@ export const HighContrastPluginScreen: React.FunctionComponent = () => {
     useEffect(() => {
         // plugins can be runtime enabled/disabled
         // it will cause re-render of the stylesheets
-        UnistylesRegistry.addExperimentalPlugin(highContrastPlugin)
+        UnistylesRuntime.addPlugin(highContrastPlugin)
 
         return () => {
-            UnistylesRegistry.removeExperimentalPlugin(highContrastPlugin)
+            UnistylesRuntime.removePlugin(highContrastPlugin)
         }
     }, [])
 
@@ -36,8 +36,8 @@ export const HighContrastPluginScreen: React.FunctionComponent = () => {
                     style={styles.button}
                     onPress={() => {
                         isHighContrastPluginEnabled
-                            ? UnistylesRegistry.removeExperimentalPlugin(highContrastPlugin)
-                            : UnistylesRegistry.addExperimentalPlugin(highContrastPlugin)
+                            ? UnistylesRuntime.removePlugin(highContrastPlugin)
+                            : UnistylesRuntime.addPlugin(highContrastPlugin)
                     }}
                 >
                     <Text style={styles.text}>
