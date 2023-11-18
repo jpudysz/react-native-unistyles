@@ -1,6 +1,6 @@
 import { getValueForBreakpoint, mq } from '../utils'
 import type { NestedStyle } from '../types'
-import { mockRuntime } from './mocks'
+import { mockRuntime, mockRegistry } from './mocks'
 
 jest.mock('../core', () => {
     class MockedUnistyles {
@@ -34,6 +34,7 @@ describe('breakpoints', () => {
                 width: 500,
                 height: 1200
             })
+            unistyles.registry = mockRegistry()
 
             const style = {
                 [mq.width(null, 300)]: 'green',
@@ -52,6 +53,7 @@ describe('breakpoints', () => {
                 width: 200,
                 height: 750
             })
+            unistyles.registry = mockRegistry()
 
             const style = {
                 [mq.width(null, 199)]: 'green',
@@ -68,8 +70,8 @@ describe('breakpoints', () => {
                 width: 500,
                 height: 1200
             })
-
-            unistyles.runtime.sortedBreakpoints = []
+            unistyles.registry = mockRegistry()
+            unistyles.registry.sortedBreakpointPairs = []
 
             const style = {
                 portrait: 'green',
@@ -88,8 +90,8 @@ describe('breakpoints', () => {
                 width: 1200,
                 height: 500
             })
-
-            unistyles.runtime.sortedBreakpoints = []
+            unistyles.registry = mockRegistry()
+            unistyles.registry.sortedBreakpointPairs = []
 
             const style = {
                 portrait: 'green',
@@ -110,8 +112,8 @@ describe('breakpoints', () => {
                 width: 500,
                 height: 1200
             })
+            unistyles.registry = mockRegistry()
 
-            unistyles.runtime.sortedBreakpoints = []
             unistyles.runtime.breakpoint = ''
 
             const style = {
@@ -130,6 +132,7 @@ describe('breakpoints', () => {
                 width: 400,
                 height: 600
             })
+            unistyles.registry = mockRegistry()
 
             const style = {
                 sm: 100,
@@ -147,6 +150,7 @@ describe('breakpoints', () => {
                 width: 800,
                 height: 1200
             })
+            unistyles.registry = mockRegistry()
 
             const style = {
                 sm: 100,
@@ -164,6 +168,7 @@ describe('breakpoints', () => {
                 width: 990,
                 height: 1200
             })
+            unistyles.registry = mockRegistry()
 
             const style = {
                 [mq.width(100, 300)]: 'center',

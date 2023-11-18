@@ -14,10 +14,6 @@ export class UnistylesRuntime {
         return this.unistylesBridge.hasAdaptiveThemes
     }
 
-    public get sortedBreakpoints() {
-        return this.unistylesRegistry.sortedBreakpointPairs
-    }
-
     public get themeName() {
         return this.unistylesBridge.themeName
     }
@@ -48,25 +44,13 @@ export class UnistylesRuntime {
     }
 
     public setTheme = (name: keyof UnistylesThemes) => {
-        if (this.hasTheme(name)) {
+        if (this.unistylesRegistry.hasTheme(name)) {
             this.unistylesBridge.useTheme(name)
 
             return true
         }
 
         throw new Error(UnistylesError.ThemeNotRegistered)
-    }
-
-    public getTheme = (forName: keyof UnistylesThemes) => {
-        if (this.unistylesRegistry.themeNames.length === 0) {
-            return {} as UnistylesThemes[keyof UnistylesThemes]
-        }
-
-        if (!this.hasTheme(forName)) {
-            throw new Error(UnistylesError.ThemeNotFound)
-        }
-
-        return this.unistylesRegistry.themes[forName]
     }
 
     public setAdaptiveThemes = (enable: boolean) => {
@@ -80,6 +64,4 @@ export class UnistylesRuntime {
     public removePlugin = (plugin: UnistylesPlugin) => {
         this.unistylesRegistry.removePlugin(plugin)
     }
-
-    private hasTheme = (name: keyof UnistylesThemes) => name in this.unistylesRegistry.themes
 }

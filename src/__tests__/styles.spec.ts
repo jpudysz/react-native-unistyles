@@ -1,5 +1,5 @@
 import { mq, parseStyle, proxifyFunction } from '../utils'
-import { mockRuntime } from './mocks'
+import { mockRegistry, mockRuntime } from './mocks'
 import type { CustomNamedStyles } from '../types'
 
 jest.mock('../core', () => {
@@ -28,6 +28,7 @@ describe('styles', () => {
                 width: 400,
                 height: 800
             })
+            unistyles.registry = mockRegistry()
             const dynamicFunction = (isEven: boolean) => ({
                 backgroundColor: {
                     sm: isEven

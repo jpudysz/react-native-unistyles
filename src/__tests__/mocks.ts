@@ -15,6 +15,10 @@ export const mockRuntime = (screenSize: ScreenSize) => ({
     orientation: screenSize.width > screenSize.height
         ? 'landscape'
         : 'portrait',
-    screen: screenSize,
-    sortedBreakpoints: Object.entries(TEST_BREAKPOINTS)
+    screen: screenSize
+})
+
+export const mockRegistry = () => ({
+    sortedBreakpointPairs: Object.entries(TEST_BREAKPOINTS),
+    plugins: []
 })

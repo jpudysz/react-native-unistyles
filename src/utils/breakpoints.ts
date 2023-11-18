@@ -14,7 +14,7 @@ export const getValueForBreakpoint = (value: NestedStyle): Optional<RNValue> => 
         return value[customMediaQueryKey]
     }
 
-    const hasBreakpoints = unistyles.runtime.sortedBreakpoints.length > 0
+    const hasBreakpoints = unistyles.registry.sortedBreakpointPairs.length > 0
 
     if (!hasBreakpoints && isMobile && (ScreenOrientation.Landscape in value || ScreenOrientation.Portrait in value)) {
         return value[unistyles.runtime.orientation]
@@ -32,7 +32,7 @@ export const getValueForBreakpoint = (value: NestedStyle): Optional<RNValue> => 
         return directBreakpoint
     }
 
-    const breakpointPairs = unistyles.runtime.sortedBreakpoints
+    const breakpointPairs = unistyles.registry.sortedBreakpointPairs
     const currentBreakpointIndex = breakpointPairs
         .findIndex(([key]) => key === breakpoint)
 

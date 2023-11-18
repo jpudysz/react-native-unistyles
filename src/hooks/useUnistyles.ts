@@ -8,7 +8,7 @@ const unistylesEvents = new NativeEventEmitter(NativeModules.Unistyles)
 
 export const useUnistyles = () => {
     const [plugins, setPlugins] = useState(unistyles.runtime.enabledPlugins)
-    const [theme, setTheme] = useState(unistyles.runtime.getTheme(unistyles.runtime.themeName))
+    const [theme, setTheme] = useState(unistyles.registry.getTheme(unistyles.runtime.themeName))
     const [layout, setLayout] = useState({
         breakpoint: unistyles.runtime.breakpoint,
         orientation: unistyles.runtime.orientation,
@@ -26,7 +26,7 @@ export const useUnistyles = () => {
                     case CxxUnistylesEventTypes.Theme: {
                         const themeEvent = event as UnistylesThemeEvent
 
-                        return setTheme(unistyles.runtime.getTheme(themeEvent.payload.themeName))
+                        return setTheme(unistyles.registry.getTheme(themeEvent.payload.themeName))
                     }
                     case CxxUnistylesEventTypes.Layout: {
                         const layoutEvent = event as UnistylesMobileLayoutEvent
