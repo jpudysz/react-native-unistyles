@@ -68,7 +68,7 @@ describe('mq', () => {
             const container = {
                 backgroundColor: {
                     [mq.width(0, 100).height(500)]: 'red',
-                    [mq.height(100, 200).width(500)]: 'blue',
+                    [mq.height(100, 200).width(undefined, 500)]: 'blue',
                     [mq.width(0, 100).height(500, -500)]: 'orange',
                     [mq.width(undefined, 200).height()]: 'green',
                     // @ts-ignore test invalid case, even if typescript secures it
@@ -78,7 +78,7 @@ describe('mq', () => {
 
             expect(container.backgroundColor).toEqual({
                 ':w[0, 100]:h[500, Infinity]': 'red',
-                ':w[500, Infinity]:h[100, 200]': 'blue',
+                ':w[0, 500]:h[100, 200]': 'blue',
                 ':w[0, 100]:h[500, -500]': 'orange',
                 ':w[0, 200]:h[0, Infinity]': 'green',
                 ':w[0, 0]:h[0, 0]': 'yellow'
@@ -123,6 +123,41 @@ describe('mq', () => {
                 ':w[0, 200]:h[0, Infinity]': 'green',
                 ':w[0, Infinity]:h[0, Infinity]': 'yellow'
             })
+        })
+
+        it('should do nothing for unknown props', () => {
+            // @ts-ignore
+            const value = mq.unknown
+
+            expect(value).toBe(undefined)
+
+            // @ts-ignore
+            const partialValue1 = mq.width(100, 200).unknown
+
+            expect(partialValue1).toBe(undefined)
+
+            // @ts-ignore
+            const partialValue2 = mq.height(100, 200).unknown
+
+            expect(partialValue2).toBe(undefined)
+
+            // @ts-ignore
+            const partialValue3 = mq.w(100, 200).h(100, 200).unknown
+
+            expect(partialValue3).toBe(undefined)
+
+            // @ts-ignore
+            const partialValue4 = mq.h(100, 200).w(100, 200).unknown
+
+            expect(partialValue4).toBe(undefined)
+
+            const value5 = mq.w(100, 200).h(100, 200).toString()
+
+            expect(value5).toBe(':w[100, 200]:h[100, 200]')
+
+            const value6 = mq.h(100, 200).w(100, 200).toString()
+
+            expect(value6).toBe(':w[100, 200]:h[100, 200]')
         })
     })
 })

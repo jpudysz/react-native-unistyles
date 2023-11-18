@@ -14,7 +14,7 @@ type UnistylesParsedMq = {
     height?: ParsedMqDimension
 }
 
-const parseMq = (mq: string): UnistylesParsedMq => {
+export const parseMq = (mq: string): UnistylesParsedMq => {
     const [, width, fromW, toW] = UNISTYLES_WIDTH_REGEX.exec(mq) || []
     const [, height, fromH, toH] = UNISTYLES_HEIGHT_REGEX.exec(mq) || []
 
@@ -32,7 +32,7 @@ const parseMq = (mq: string): UnistylesParsedMq => {
 
 const isUnistylesMq = (mq: string) => IS_UNISTYLES_REGEX.test(mq)
 
-const isValidMq = (parsedMq: UnistylesParsedMq) => {
+export const isValidMq = (parsedMq: UnistylesParsedMq) => {
     const { width, height } = parsedMq
 
     if (width && height) {
@@ -50,7 +50,7 @@ const isValidMq = (parsedMq: UnistylesParsedMq) => {
     return false
 }
 
-const isWithinTheWidthAndHeight = (parsedMq: UnistylesParsedMq, screenSize: ScreenSize): boolean => {
+export const isWithinTheWidthAndHeight = (parsedMq: UnistylesParsedMq, screenSize: ScreenSize): boolean => {
     const { width, height } = parsedMq
 
     if (width && height) {
@@ -80,7 +80,7 @@ const isWithinTheHeight = (height: UnistylesParsedMq['height'], screenHeight: nu
     return screenHeight >= from && screenHeight <= to
 }
 
-export const getKeyForUnistylesMediaQuery = (mediaQueries: NestedStylePairs, screenSize: ScreenSize) => {
+export const getKeyForUnistylesMediaQuery = (mediaQueries: NestedStylePairs, screenSize: ScreenSize): Optional<string> => {
     const mq = mediaQueries.find(([key]) => {
         if (!isUnistylesMq(key as string)) {
             return false
