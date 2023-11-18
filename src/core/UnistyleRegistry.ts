@@ -47,6 +47,18 @@ export class UnistyleRegistry {
         }
     }
 
+    public getTheme = (forName: keyof UnistylesThemes) => {
+        if (this.themeNames.length === 0) {
+            return {} as UnistylesThemes[keyof UnistylesThemes]
+        }
+
+        if (!this.hasTheme(forName)) {
+            throw new Error(UnistylesError.ThemeNotFound)
+        }
+
+        return this.themes[forName]
+    }
+
     public addPlugin = (plugin: UnistylesPlugin, notify: boolean = true) => {
         if (plugin.name.startsWith('__unistyles')) {
             throw new Error(UnistylesError.InvalidPluginName)
@@ -68,4 +80,6 @@ export class UnistyleRegistry {
         this.plugins = this.plugins.filter(({ name }) => name !== plugin.name)
         this.unistylesBridge.removePlugin(plugin.name)
     }
+
+    public hasTheme = (name: keyof UnistylesThemes) => name in this.themes
 }
