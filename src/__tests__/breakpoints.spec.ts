@@ -61,7 +61,7 @@ describe('breakpoints', () => {
             expect(getValueForBreakpoint(style as NestedStyle)).toEqual('pink')
         })
 
-        it('should fallback to orientation breakpoints on mobile if didn\'t match custom media query', () => {
+        it('should fallback to portrait on mobile if didn\'t match custom media query', () => {
             const { unistyles } = require('../core')
 
             unistyles.runtime = mockRuntime({
@@ -77,8 +77,28 @@ describe('breakpoints', () => {
                 md: 'pink'
             }
 
-            expect(unistyles.runtime.breakpoint).toEqual('md')
+            expect(unistyles.runtime.orientation).toEqual('portrait')
             expect(getValueForBreakpoint(style as NestedStyle)).toEqual('green')
+        })
+
+        it('should fallback to landscape breakpoints on mobile if didn\'t match custom media query', () => {
+            const { unistyles } = require('../core')
+
+            unistyles.runtime = mockRuntime({
+                width: 1200,
+                height: 500
+            })
+
+            unistyles.runtime.sortedBreakpoints = []
+
+            const style = {
+                portrait: 'green',
+                landscape: 'orange',
+                md: 'pink'
+            }
+
+            expect(unistyles.runtime.orientation).toEqual('landscape')
+            expect(getValueForBreakpoint(style as NestedStyle)).toEqual('orange')
         })
 
         it('should return undefined if didn\'t match any media query, user has no breakpoints and it\'s not mobile', () => {

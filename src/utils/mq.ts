@@ -78,7 +78,7 @@ const heightHandler = (wMin: Nullable<MQValue> = 0, wMax: MQValue = Infinity) =>
         if (prop === MQProp.height || prop === MQProp.shortH) {
             return (hMin: MQValue = 0, hMax: MQValue = Infinity) => new Proxy<FinalHandler>({} as FinalHandler, {
                 get: (target, prop, receiver) => {
-                    if (prop === Symbol.toPrimitive || MQProp.toString) {
+                    if (prop === Symbol.toPrimitive || prop === MQProp.toString) {
                         return () => `:w[${getMQValue(wMin)}, ${getMQValue(wMax)}]:h[${getMQValue(hMin)}, ${getMQValue(hMax)}]`
                     }
 
