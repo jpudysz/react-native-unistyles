@@ -14,7 +14,8 @@ export enum DemoNames {
     OrientationBreakpoints = 'OrientationBreakpoints',
     MixedMediaQueries = 'MixedMediaQueries',
     Variants = 'Variants',
-    AutoGuidelinePlugin = 'AutoGuidelinePlugin'
+    AutoGuidelinePlugin = 'AutoGuidelinePlugin',
+    HighContrastPlugin = 'HighContrastPlugin'
 }
 
 export type DemoStackParams = {
@@ -31,7 +32,8 @@ export type DemoStackParams = {
     [DemoNames.OrientationBreakpoints]: undefined,
     [DemoNames.MixedMediaQueries]: undefined,
     [DemoNames.Variants]: undefined,
-    [DemoNames.AutoGuidelinePlugin]: undefined
+    [DemoNames.AutoGuidelinePlugin]: undefined,
+    [DemoNames.HighContrastPlugin]: undefined
 }
 
 export type NavigationProps<S extends DemoNames = DemoNames.Home> = NavigationProp<DemoStackParams, S>

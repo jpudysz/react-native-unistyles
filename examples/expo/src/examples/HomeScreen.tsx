@@ -232,6 +232,23 @@ export const HomeScreen = () => {
                             navigation.navigate(DemoNames.AutoGuidelinePlugin)
                         }}
                     />
+                    <DemoLink
+                        description="High contrast"
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addBreakpoints(breakpoints)
+                                .addConfig({
+                                    adaptiveThemes: true
+                                })
+
+                            navigation.navigate(DemoNames.HighContrastPlugin)
+                        }}
+                    />
                 </DemoGroup>
             </ScrollView>
         </View>

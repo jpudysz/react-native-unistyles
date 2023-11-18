@@ -50,7 +50,7 @@ body:
     attributes:
       label: Unistyles version
       description: What version of react-native-unistyles are you using?
-      placeholder: 1.0.0
+      placeholder: 2.0.0
     validations:
       required: true
 
@@ -73,5 +73,7 @@ body:
         - Android
         - iOS
         - React Native Web
+        - SSR
+        - React Native Windows
     validations:
       required: true
