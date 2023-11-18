@@ -14,7 +14,7 @@ export const isIOS = Platform.OS === 'ios'
 export const isAndroid = Platform.OS === 'android'
 export const isServer = typeof window === 'undefined'
 
-export const Orientation = {
+export const ScreenOrientation = {
     Landscape: 'landscape',
     Portrait: 'portrait'
 } as const
@@ -35,10 +35,4 @@ export enum UnistylesError {
     InvalidPluginName = 'UNISTYLES_ERROR_INVALID_PLUGIN_NAME',
     DuplicatePluginName = 'UNISTYLES_ERROR_DUPLICATE_PLUGIN_NAME',
     CantRemoveInternalPlugin = 'UNISTYLES_ERROR_CANT_REMOVE_INTERNAL_PLUGIN'
-}
-
-// todo to string?
-export enum ScreenOrientation {
-    Portrait = 1,
-    Landscape = 2
 }

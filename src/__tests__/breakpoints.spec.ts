@@ -1,178 +1,159 @@
-// todo
+import { getValueForBreakpoint, mq } from '../utils'
+import type { NestedStyle } from '../types'
+import { mockRuntime } from './mocks'
+
+jest.mock('../core', () => {
+    class MockedUnistyles {
+        registry = {}
+        runtime = {}
+    }
+
+    return {
+        unistyles: new MockedUnistyles()
+    }
+})
+
+jest.mock('../common', () => ({
+    isMobile: true,
+    ScreenOrientation: {
+        Landscape: 'landscape',
+        Portrait: 'portrait'
+    }
+}))
+
 describe('breakpoints', () => {
-    it('should pass', () => {
-        expect(1 + 1).toEqual(2)
+    describe('getValueForBreakpoint', () => {
+        afterEach(() => {
+            jest.restoreAllMocks()
+        })
+
+        it('should prioritize custom media query', () => {
+            const { unistyles } = require('../core')
+
+            unistyles.runtime = mockRuntime({
+                width: 500,
+                height: 1200
+            })
+
+            const style = {
+                [mq.width(null, 300)]: 'green',
+                [mq.width(301)]: 'orange',
+                md: 'pink'
+            }
+
+            expect(unistyles.runtime.breakpoint).toEqual('md')
+            expect(getValueForBreakpoint(style as NestedStyle)).toEqual('orange')
+        })
+
+        it('should fallback to breakpoints if didn\'t match any custom media query', () => {
+            const { unistyles } = require('../core')
+
+            unistyles.runtime = mockRuntime({
+                width: 200,
+                height: 750
+            })
+
+            const style = {
+                [mq.width(null, 199)]: 'green',
+                xs: 'pink'
+            }
+
+            expect(getValueForBreakpoint(style as NestedStyle)).toEqual('pink')
+        })
+
+        it('should fallback to orientation breakpoints on mobile if didn\'t match custom media query', () => {
+            const { unistyles } = require('../core')
+
+            unistyles.runtime = mockRuntime({
+                width: 500,
+                height: 1200
+            })
+
+            unistyles.runtime.sortedBreakpoints = []
+
+            const style = {
+                portrait: 'green',
+                landscape: 'orange',
+                md: 'pink'
+            }
+
+            expect(unistyles.runtime.breakpoint).toEqual('md')
+            expect(getValueForBreakpoint(style as NestedStyle)).toEqual('green')
+        })
+
+        it('should return undefined if didn\'t match any media query, user has no breakpoints and it\'s not mobile', () => {
+            const { unistyles } = require('../core')
+
+            jest.requireMock('../common').isMobile = false
+
+            unistyles.runtime = mockRuntime({
+                width: 500,
+                height: 1200
+            })
+
+            unistyles.runtime.sortedBreakpoints = []
+            unistyles.runtime.breakpoint = ''
+
+            const style = {
+                portrait: 'green',
+                landscape: 'orange',
+                md: 'pink'
+            }
+
+            expect(getValueForBreakpoint(style as NestedStyle)).toEqual(undefined)
+        })
+
+        it('should return direct breakpoint value if matched', () => {
+            const { unistyles } = require('../core')
+
+            unistyles.runtime = mockRuntime({
+                width: 400,
+                height: 600
+            })
+
+            const style = {
+                sm: 100,
+                md: 200,
+                lg: 300
+            }
+
+            expect(getValueForBreakpoint(style as NestedStyle)).toEqual(100)
+        })
+
+        it('should return direct breakpoint value even if it\'s undefined', () => {
+            const { unistyles } = require('../core')
+
+            unistyles.runtime = mockRuntime({
+                width: 800,
+                height: 1200
+            })
+
+            const style = {
+                sm: 100,
+                md: 200,
+                lg: undefined
+            }
+
+            expect(getValueForBreakpoint(style as NestedStyle)).toEqual(undefined)
+        })
+
+        it('should match lower breakpoint to match css cascading', () => {
+            const { unistyles } = require('../core')
+
+            unistyles.runtime = mockRuntime({
+                width: 990,
+                height: 1200
+            })
+
+            const style = {
+                [mq.width(100, 300)]: 'center',
+                sm: 'center',
+                md: 'flex-start',
+                xl: 'flex-end'
+            }
+
+            expect(unistyles.runtime.breakpoint).toEqual('lg')
+            expect(getValueForBreakpoint(style as NestedStyle)).toEqual('flex-start')
+        })
     })
-    // describe('sortAndValidateBreakpoints', () => {
-    //     it('should throw error for empty breakpoints', () => {
-    //         const breakpoints = {}
-    //
-    //         expect(() => sortAndValidateBreakpoints(breakpoints)).toThrow()
-    //     })
-    //
-    //     it('should throw error for breakpoints that don\'t start with 0', () => {
-    //         const breakpoints = {
-    //             sm: -1
-    //         }
-    //
-    //         expect(() => sortAndValidateBreakpoints(breakpoints)).toThrow()
-    //     })
-    //
-    //     it('should return same order for sorted elements', () => {
-    //         const breakpoints = {
-    //             sm: 0,
-    //             md: 200,
-    //             lg: 300,
-    //             xl: 500
-    //         }
-    //
-    //         expect(sortAndValidateBreakpoints(breakpoints)).toEqual(breakpoints)
-    //     })
-    //
-    //     it('should sort the order of breakpoints', () => {
-    //         const breakpoints = {
-    //             md: 200,
-    //             sm: 0,
-    //             lg: 300,
-    //             xl: 500
-    //         }
-    //
-    //         expect(sortAndValidateBreakpoints(breakpoints)).toEqual({
-    //             sm: 0,
-    //             md: 200,
-    //             lg: 300,
-    //             xl: 500
-    //         })
-    //     })
-    //
-    //     it('should throw errors for duplicated values', () => {
-    //         const breakpoints = {
-    //             md: 200,
-    //             sm: 0,
-    //             lg: 300,
-    //             xl: 300
-    //         }
-    //
-    //         expect(() => sortAndValidateBreakpoints(breakpoints)).toThrow()
-    //     })
-    // })
-    //
-    // describe('getBreakpointFromScreenWidth', () => {
-    //     it('should return correct breakpoints based on screen width', () => {
-    //         const breakpoints = {
-    //             xs: 0,
-    //             sm: 300,
-    //             md: 500,
-    //             xl: 1200
-    //         }
-    //         const breakpointPairs = Object
-    //             .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
-    //
-    //         expect(getBreakpointFromScreenWidth(0, breakpointPairs)).toEqual('xs')
-    //         expect(getBreakpointFromScreenWidth(20, breakpointPairs)).toEqual('xs')
-    //         expect(getBreakpointFromScreenWidth(100, breakpointPairs)).toEqual('xs')
-    //         expect(getBreakpointFromScreenWidth(101, breakpointPairs)).toEqual('xs')
-    //         expect(getBreakpointFromScreenWidth(250, breakpointPairs)).toEqual('xs')
-    //         expect(getBreakpointFromScreenWidth(300, breakpointPairs)).toEqual('sm')
-    //         expect(getBreakpointFromScreenWidth(499, breakpointPairs)).toEqual('sm')
-    //         expect(getBreakpointFromScreenWidth(500, breakpointPairs)).toEqual('md')
-    //         expect(getBreakpointFromScreenWidth(799, breakpointPairs)).toEqual('md')
-    //         expect(getBreakpointFromScreenWidth(1200, breakpointPairs)).toEqual('xl')
-    //         expect(getBreakpointFromScreenWidth(2000, breakpointPairs)).toEqual('xl')
-    //     })
-    // })
-
-    // describe('getValueForBreakpoint', () => {
-    //     it('should prioritize custom media query', () => {
-    //         const breakpoint = 'sm'
-    //         const breakpoints = {
-    //             xs: 0,
-    //             sm: 200,
-    //             md: 500
-    //         }
-    //         const breakpointPairs = Object
-    //             .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
-    //         const style: Record<string, string> = {
-    //             ':w[, 200]': 'green',
-    //             ':w[201]': 'orange',
-    //             sm: 'pink'
-    //         }
-    //         const screenSize: ScreenSize = {
-    //             width: 200,
-    //             height: 800
-    //         }
-    //
-    //         expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpointPairs)).toEqual('green')
-    //     })
-    // })
-
-    // it('should match breakpoint if media query doesnt exist', () => {
-    //     const breakpoint = 'md'
-    //     const breakpoints = {
-    //         xs: 0,
-    //         sm: 200,
-    //         md: 500
-    //     }
-    //     const breakpointPairs = Object
-    //         .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
-    //     const style: Record<string, string> = {
-    //         ':w[, 200]': 'green',
-    //         ':w[201, 499]': 'orange',
-    //         sm: 'pink',
-    //         md: 'red'
-    //     }
-    //     const screenSize: ScreenSize = {
-    //         width: 500,
-    //         height: 1200
-    //     }
-    //
-    //     expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpointPairs)).toEqual('red')
-    // })
-
-    // it('should match breakpoint even if value is undefined', () => {
-    //     const breakpoint = 'md'
-    //     const breakpoints = {
-    //         xs: 0,
-    //         sm: 200,
-    //         md: 500
-    //     }
-    //     const breakpointPairs = Object
-    //         .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
-    //     const style: Record<string, string | undefined> = {
-    //         ':w[, 200]': 'green',
-    //         ':w[201, 499]': 'orange',
-    //         sm: 'pink',
-    //         md: undefined
-    //     }
-    //     const screenSize: ScreenSize = {
-    //         width: 500,
-    //         height: 1200
-    //     }
-    //
-    //     expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpointPairs)).toEqual(undefined)
-    // })
-
-    // it('should match lower breakpoint to match css cascading', () => {
-    //     const breakpoint = 'xl'
-    //     const breakpoints = {
-    //         xs: 0,
-    //         sm: 200,
-    //         md: 500,
-    //         xl: 600
-    //     }
-    //     const breakpointPairs = Object
-    //         .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
-    //     const style: Record<string, string | undefined> = {
-    //         ':w[, 200]': 'green',
-    //         ':w[201, 499]': 'orange',
-    //         sm: 'pink',
-    //         md: 'red'
-    //     }
-    //     const screenSize: ScreenSize = {
-    //         width: 500,
-    //         height: 1200
-    //     }
-    //
-    //     expect(getValueForBreakpoint(style, breakpoint, screenSize, breakpointPairs)).toEqual('red')
-    // })
 })
