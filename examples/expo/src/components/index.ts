@@ -1,3 +1,5 @@
 export { DemoGroup } from './DemoGroup'
 export { DemoLink } from './DemoLink'
 export { DemoScreen } from './DemoScreen'
+export { Timer } from './Timer'
+export { Benchmark } from './Benchmark'
