@@ -21,6 +21,9 @@ export const OrientationBreakpoints: React.FunctionComponent = () => {
                 <Text style={styles.text}>
                     You should see circles on landscape and rectangles on portrait
                 </Text>
+                <Text style={styles.boldText}>
+                    If you browsed other demos before, you may need to refresh the app to see the changes as there is no way to unregister breakpoints
+                </Text>
                 <View style={styles.objectContainer}>
                     {Array.from(new Array(10)).map((_, index) => (
                         <View
@@ -46,6 +49,10 @@ const stylesheet = createStyleSheet(theme => ({
     text: {
         textAlign: 'center',
         color: theme.colors.typography
+    },
+    boldText: {
+        fontWeight: 'bold',
+        textAlign: 'center'
     },
     objectContainer: {
         flexDirection: 'row',
