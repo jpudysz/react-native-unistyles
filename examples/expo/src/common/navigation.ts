@@ -16,7 +16,8 @@ export enum DemoNames {
     Variants = 'Variants',
     AutoGuidelinePlugin = 'AutoGuidelinePlugin',
     HighContrastPlugin = 'HighContrastPlugin',
-    Runtime = 'Runtime'
+    Runtime = 'Runtime',
+    RuntimeWithStyleSheet = 'RuntimeWithStyleSheet'
 }
 
 export type DemoStackParams = {
@@ -35,7 +36,8 @@ export type DemoStackParams = {
     [DemoNames.Variants]: undefined,
     [DemoNames.AutoGuidelinePlugin]: undefined,
     [DemoNames.HighContrastPlugin]: undefined,
-    [DemoNames.Runtime]: undefined
+    [DemoNames.Runtime]: undefined,
+    [DemoNames.RuntimeWithStyleSheet]: undefined
 }
 
 export type NavigationProps<S extends DemoNames = DemoNames.Home> = NavigationProp<DemoStackParams, S>
