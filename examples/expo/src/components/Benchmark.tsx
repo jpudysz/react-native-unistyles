@@ -165,9 +165,11 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
                     ...styles.difference,
                     color: difference === 'N/A'
                         ? 'black'
-                        : parseFloat(difference) < 3.00
+                        : parseFloat(difference) < 2.50
                             ? 'green'
-                            : 'red'
+                            : parseFloat(difference) < 5.00
+                                ? 'orange'
+                                : 'red'
                 }}
             >
                 Difference: {difference} ms
