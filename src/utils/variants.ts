@@ -1,6 +1,6 @@
-import type { Optional, CustomNamedStyles, StaticStyles } from '../types'
+import type { Optional, CustomNamedStyles, NestedStyle } from '../types'
 
-const getKeyForVariant = (value: Record<string, StaticStyles>, variant?: string): Optional<string> => {
+const getKeyForVariant = (value: Record<string, NestedStyle>, variant?: string): Optional<string> => {
     if (variant && variant in value) {
         return variant
     }
@@ -21,11 +21,11 @@ export const getStyleWithVariant = <T>(
     }
 
     const variantKey = getKeyForVariant(
-        style.variants as Record<string, StaticStyles>,
+        style.variants as Record<string, NestedStyle>,
         variant
     )
     const variantValue = variantKey
-        ? (style.variants as Record<string, StaticStyles>)[variantKey]
+        ? (style.variants as Record<string, NestedStyle>)[variantKey]
         : {}
 
     const { variants, ...otherStyles } = style
