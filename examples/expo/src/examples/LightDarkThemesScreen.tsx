@@ -19,7 +19,7 @@ export const LightDarkThemesScreen: React.FunctionComponent = () => {
                     you need to set it explicitly in `UnistylesRegistry.addConfig` function.
                 </Text>
                 <Text style={styles.text}>
-                    Otherwise, you need to pick the theme with `useInitialTheme` hook.
+                    Otherwise, you need to pick the theme with `useInitialTheme` hook or during registry with `UnistylesRegistry.addConfig` function.
                 </Text>
                 <Text style={styles.text}>
                     Your phone color scheme is {UnistylesRuntime.colorScheme}.
