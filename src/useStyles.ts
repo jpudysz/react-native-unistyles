@@ -10,6 +10,7 @@ import type {
 } from './types'
 import { useUnistyles } from './hooks'
 import type { UnistylesBreakpoints } from './global'
+import { unistyles } from './core'
 
 type ParsedStylesheet<ST extends CustomNamedStyles<ST>> = {
     theme: UnistylesTheme,
@@ -22,12 +23,11 @@ export const useStyles = <ST extends CustomNamedStyles<ST>>(
     variant?: ExtractVariantNames<typeof stylesheet> & string
 ): ParsedStylesheet<ST> => {
     const { theme, layout, plugins } = useUnistyles()
-    const { screenSize, breakpoint } = layout
 
     if (!stylesheet) {
         return {
             theme,
-            breakpoint,
+            breakpoint: layout.breakpoint,
             styles: {} as ReactNativeStyleSheet<ST>
         }
     }
@@ -39,24 +39,30 @@ export const useStyles = <ST extends CustomNamedStyles<ST>>(
     const dynamicStyleSheet = useMemo(() => Object
         .entries(parsedStyles)
         .reduce((acc, [key, value]) => {
-            const style = value as CustomNamedStyles<ST>
-
             if (typeof value === 'function') {
                 return {
                     ...acc,
-                    [key]: proxifyFunction(key, value, breakpoint, screenSize, variant)
+                    [key]: proxifyFunction(key, value,unistyles.registry.plugins, unistyles.runtime, variant)
                 }
             }
 
             return StyleSheet.create({
                 ...acc,
-                [key]: parseStyle<ST>(key, style, breakpoint, screenSize, variant)
+                [key]: parseStyle<ST>(
+                    key,
+                    value as CustomNamedStyles<ST>,
+                    unistyles.registry.plugins,
+                    unistyles.runtime,
+                    variant
+                )
             })
-        }, {} as ST), [breakpoint, screenSize, parsedStyles, variant, plugins]) as ReactNativeStyleSheet<ST>
+        }, {} as ST),
+    [layout, parsedStyles, variant, plugins]
+    ) as ReactNativeStyleSheet<ST>
 
     return {
         theme,
-        breakpoint,
+        breakpoint: layout.breakpoint,
         styles: dynamicStyleSheet
     }
 }

@@ -43,9 +43,8 @@ describe('styles', () => {
             const result = proxifyFunction(
                 'container',
                 dynamicFunction,
-                unistyles.runtime.breakpoint,
-                unistyles.runtime.screen,
-                unistyles.runtime.sortedBreakpoints
+                [],
+                unistyles.runtime
             )(true)
 
             expect(result).toEqual({
@@ -74,9 +73,8 @@ describe('styles', () => {
             const result = proxifyFunction(
                 'container',
                 dynamicFunction,
-                unistyles.runtime.breakpoint,
-                unistyles.runtime.screen,
-                unistyles.runtime.sortedBreakpoints
+                [],
+                unistyles.runtime
             )(false)
 
             expect(result).toEqual({
@@ -100,9 +98,8 @@ describe('styles', () => {
             const result = proxifyFunction(
                 'container',
                 dynamicFunction,
-                unistyles.runtime.breakpoint,
-                unistyles.runtime.screen,
-                unistyles.runtime.sortedBreakpoints
+                [],
+                unistyles.runtime
             )(false)
 
             expect(result).toEqual({
@@ -134,9 +131,8 @@ describe('styles', () => {
             const parsedStyles = parseStyle(
                 'container',
                 style as CustomNamedStyles<typeof style>,
-                unistyles.runtime.breakpoint,
-                unistyles.runtime.screen,
-                unistyles.runtime.sortedBreakpoints
+                [],
+                unistyles.runtime
             )
 
             expect(parsedStyles).toEqual({
@@ -169,9 +165,8 @@ describe('styles', () => {
             const parsedStyles = parseStyle(
                 'container',
                 style as CustomNamedStyles<typeof style>,
-                unistyles.runtime.breakpoint,
-                unistyles.runtime.screen,
-                unistyles.runtime.sortedBreakpoints
+                [],
+                unistyles.runtime
             )
 
             expect(parsedStyles).toEqual({
@@ -210,16 +205,14 @@ describe('styles', () => {
             const parsedStyles = parseStyle(
                 'container',
                 style as CustomNamedStyles<typeof style>,
-                unistyles.runtime.breakpoint,
-                unistyles.runtime.screen,
-                unistyles.runtime.sortedBreakpoints
+                [],
+                unistyles.runtime
             )
             const parsedStylesWithBreakpoints = parseStyle(
                 'container',
                 styleWithBreakpoints as CustomNamedStyles<typeof styleWithBreakpoints>,
-                unistyles.runtime.breakpoint,
-                unistyles.runtime.screen,
-                unistyles.runtime.sortedBreakpoints
+                [],
+                unistyles.runtime
             )
 
             expect(parsedStyles).toEqual({

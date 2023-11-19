@@ -1,10 +1,13 @@
 import type { UnistylesBridge, UnistylesConfig, UnistylesPlugin } from '../types'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
-import { UnistylesError } from '../common'
+import { isWeb, UnistylesError } from '../common'
+import { normalizeWebStylesPlugin } from '../plugins'
 
 export class UnistyleRegistry {
     public config: UnistylesConfig = {}
-    public plugins: Array<UnistylesPlugin> = []
+    public plugins: Array<UnistylesPlugin> = isWeb
+        ? [normalizeWebStylesPlugin]
+        : []
     public themeNames: Array<keyof UnistylesThemes> = []
     public themes: UnistylesThemes = {} as UnistylesThemes
     public breakpoints: UnistylesBreakpoints = {} as UnistylesBreakpoints
@@ -68,7 +71,7 @@ export class UnistyleRegistry {
             throw new Error(UnistylesError.DuplicatePluginName)
         }
 
-        this.plugins = this.plugins.concat([plugin])
+        this.plugins = [plugin].concat(this.plugins)
         this.unistylesBridge.addPlugin(plugin.name, notify)
     }
 
