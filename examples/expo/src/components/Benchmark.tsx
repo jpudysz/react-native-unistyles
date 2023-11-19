@@ -98,7 +98,7 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
                             }
 
                             return {
-                                library: undefined,
+                                ...prevState,
                                 isMeasuring: !(prevState.renderTime.StyleSheet.length === 9),
                                 renderTime: {
                                     ...prevState.renderTime,
@@ -124,7 +124,6 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
 
                             return {
                                 ...prevState,
-                                library: undefined,
                                 renderTime: {
                                     ...prevState.renderTime,
                                     Unistyles: [...prevState.renderTime[Library.Unistyles], time]
