@@ -1,17 +1,15 @@
-import type { RNStyle } from '../types'
-import { normalizeWebStylesPlugin } from './normalizeWebStylesPlugin'
-import { isWeb } from '../common'
-import { unistyles } from '../core'
+import type { RNStyle, UnistylesPlugin } from '../types'
+import type { UnistylesRuntime } from '../core'
 
-const UNISTYLES_PLUGINS = isWeb
-    ? [normalizeWebStylesPlugin]
-    : []
+export const withPlugins = (
+    key: string,
+    style: RNStyle,
+    plugins: Array<UnistylesPlugin>,
+    runtime: UnistylesRuntime
+) => plugins.reduce((acc, plugin) => {
+    if (plugin.onParsedStyle) {
+        return plugin.onParsedStyle(key, acc, runtime)
+    }
 
-export const withPlugins = (key: string, style: RNStyle) => unistyles.registry.plugins.concat(UNISTYLES_PLUGINS)
-    .reduce((acc, plugin) => {
-        if (plugin.onParsedStyle) {
-            return plugin.onParsedStyle(key, acc, unistyles.runtime)
-        }
-
-        return acc
-    }, style)
+    return acc
+}, style)

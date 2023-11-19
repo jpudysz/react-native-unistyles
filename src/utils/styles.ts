@@ -1,18 +1,19 @@
-import type { CustomNamedStyles, ScreenSize, NestedStyle, RNStyle } from '../types'
+import type { CustomNamedStyles, NestedStyle, RNStyle, UnistylesPlugin } from '../types'
 import { getValueForBreakpoint } from './breakpoints'
-import type { UnistylesBreakpoints } from '../global'
+import type { UnistylesRuntime } from '../core'
 import { isAndroid, isIOS } from '../common'
-import { getKeyForVariant } from './variants'
+import { getStyleWithVariant } from './variants'
 import { withPlugins } from '../plugins'
 
 export const proxifyFunction = (
     key: string,
-    fn: Function, breakpoint: keyof UnistylesBreakpoints & string,
-    screenSize: ScreenSize,
+    fn: Function,
+    plugins: Array<UnistylesPlugin>,
+    runtime: UnistylesRuntime,
     variant?: string
 ): Function => new Proxy(fn, {
     apply: (target, thisArg, argumentsList) =>
-        parseStyle(key, target.apply(thisArg, argumentsList), breakpoint, screenSize, variant)
+        parseStyle(key, target.apply(thisArg, argumentsList), plugins, runtime, variant)
 })
 
 export const isPlatformColor = <T extends {}>(value: T): boolean => {
@@ -26,31 +27,12 @@ export const isPlatformColor = <T extends {}>(value: T): boolean => {
 export const parseStyle = <T extends RNStyle>(
     key: string,
     style: CustomNamedStyles<T>,
-    breakpoint: keyof UnistylesBreakpoints & string,
-    screenSize: ScreenSize,
+    plugins: Array<UnistylesPlugin>,
+    runtime: UnistylesRuntime,
     variant?: string
 ): T => {
-    const entries = (Object
-        .entries(style || {}) as Array<[keyof T, CustomNamedStyles<T> | NestedStyle]>)
-        .map(([key, value]) => {
-            if (key !== 'variants') {
-                return [key, value]
-            }
-
-            const variantKey = getKeyForVariant(
-                value as NestedStyle,
-                variant
-            )
-
-            if (!variantKey) {
-                return undefined
-            }
-
-            return Object
-                .entries(value[variantKey as keyof typeof value] as NestedStyle)
-                .flat()
-        })
-        .filter(Boolean) as Array<[keyof T, CustomNamedStyles<T> | NestedStyle]>
+    const entries = Object
+        .entries(getStyleWithVariant(style || {}, variant)) as Array<[keyof T, CustomNamedStyles<T> | NestedStyle]>
 
     const parsedStyles = Object
         .fromEntries(entries
@@ -60,7 +42,7 @@ export const parseStyle = <T extends RNStyle>(
                 if (hasNestedProperties) {
                     return [
                         key,
-                        parseStyle(key, value as CustomNamedStyles<T>, breakpoint, screenSize, variant)
+                        parseStyle(key, value as CustomNamedStyles<T>, plugins, runtime, variant)
                     ]
                 }
 
@@ -69,7 +51,7 @@ export const parseStyle = <T extends RNStyle>(
                 if (isTransform && Array.isArray(value)) {
                     return [
                         key,
-                        value.map(value => parseStyle(key, value, breakpoint, screenSize, variant))
+                        value.map(value => parseStyle(key, value, plugins, runtime, variant))
                     ]
                 }
 
@@ -87,5 +69,5 @@ export const parseStyle = <T extends RNStyle>(
             })
         ) as T
 
-    return withPlugins(key, parsedStyles) as T
+    return withPlugins(key, parsedStyles, plugins, runtime) as T
 }

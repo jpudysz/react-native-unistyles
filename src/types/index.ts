@@ -10,7 +10,8 @@ export type {
     ScreenSize,
     NestedStyle,
     RNValue,
-    RNStyle
+    RNStyle,
+    StaticStyles
 } from './core'
 export type { ReactNativeStyleSheet } from './breakpoints'
 export type { ExtractVariantNames } from './variants'
