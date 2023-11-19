@@ -32,6 +32,7 @@ export const App: React.FunctionComponent = () => (
                 <Stack.Screen name={DemoNames.Variants} component={Screens.VariantsScreen} />
                 <Stack.Screen name={DemoNames.AutoGuidelinePlugin} component={Screens.AutoGuidelinePluginScreen} />
                 <Stack.Screen name={DemoNames.HighContrastPlugin} component={Screens.HighContrastPluginScreen} />
+                <Stack.Screen name={DemoNames.Runtime} component={Screens.RuntimeScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     </SafeAreaProvider>

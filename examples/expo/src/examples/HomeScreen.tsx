@@ -256,6 +256,25 @@ export const HomeScreen = () => {
                         }}
                     />
                 </DemoGroup>
+                <DemoGroup title="Runtime">
+                    <DemoLink
+                        description="Runtime values"
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addBreakpoints(breakpoints)
+                                .addConfig({
+                                    initialTheme: 'light'
+                                })
+
+                            navigation.navigate(DemoNames.Runtime)
+                        }}
+                    />
+                </DemoGroup>
             </ScrollView>
         </View>
     )
