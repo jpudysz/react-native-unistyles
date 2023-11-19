@@ -18,7 +18,8 @@ export enum DemoNames {
     AutoGuidelinePlugin = 'AutoGuidelinePlugin',
     HighContrastPlugin = 'HighContrastPlugin',
     Runtime = 'Runtime',
-    RuntimeWithStyleSheet = 'RuntimeWithStyleSheet'
+    RuntimeWithStyleSheet = 'RuntimeWithStyleSheet',
+    Benchmark = 'Benchmark'
 }
 
 export type DemoStackParams = {
@@ -39,7 +40,8 @@ export type DemoStackParams = {
     [DemoNames.AutoGuidelinePlugin]: undefined,
     [DemoNames.HighContrastPlugin]: undefined,
     [DemoNames.Runtime]: undefined,
-    [DemoNames.RuntimeWithStyleSheet]: undefined
+    [DemoNames.RuntimeWithStyleSheet]: undefined,
+    [DemoNames.Benchmark]: undefined
 }
 
 export type NavigationProps<S extends DemoNames = DemoNames.Home> = NavigationProp<DemoStackParams, S>

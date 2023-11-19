@@ -309,6 +309,13 @@ export const HomeScreen = () => {
                         }}
                     />
                 </DemoGroup>
+                <DemoGroup title="Benchmark">
+                    <DemoLink
+                        description="Startup time with 1000 boxes"
+                        onPress={() => navigation.navigate(DemoNames.Benchmark)}
+                    />
+                </DemoGroup>
+                <View style={styles.fakeSpacer} />
             </ScrollView>
         </View>
     )
@@ -342,5 +349,8 @@ const styles = StyleSheet.create({
     list: {
         marginTop: 50,
         paddingHorizontal: 20
+    },
+    fakeSpacer: {
+        height: 100
     }
 })
