@@ -274,6 +274,23 @@ export const HomeScreen = () => {
                             navigation.navigate(DemoNames.Runtime)
                         }}
                     />
+                    <DemoLink
+                        description="With StyleSheet"
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addBreakpoints(breakpoints)
+                                .addConfig({
+                                    initialTheme: 'light'
+                                })
+
+                            navigation.navigate(DemoNames.RuntimeWithStyleSheet)
+                        }}
+                    />
                 </DemoGroup>
             </ScrollView>
         </View>

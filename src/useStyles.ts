@@ -34,7 +34,7 @@ export const useStyles = <ST extends CustomNamedStyles<ST>>(
 
     const parsedStyles = useMemo(() => typeof stylesheet === 'function'
         ? stylesheet(theme)
-        : stylesheet, [theme, stylesheet])
+        : stylesheet, [theme, stylesheet, layout])
 
     const dynamicStyleSheet = useMemo(() => Object
         .entries(parsedStyles)
