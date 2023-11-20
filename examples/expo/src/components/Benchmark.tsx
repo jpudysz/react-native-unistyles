@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import { Pressable, Text, View, StyleSheet } from 'react-native'
+import { Pressable, Text, View, StyleSheet, ScrollView } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import React, { useState } from 'react'
 
@@ -12,23 +12,15 @@ const getAvgResultWithVariance = (results: Array<number>) => {
     const numberOfResults = results.length
 
     if (numberOfResults === 0) {
-        return {
-            avg: 'N/A',
-            variance: 'N/A'
-        }
+        return 'N/A'
     }
 
-    const mean = parseFloat((results.reduce((a, b) => a + b) / results.length).toFixed(2))
-    const variance = results.reduce((acc, val) => acc + ((val - mean) ** 2), 0) / numberOfResults
-
-    return {
-        avg: mean,
-        variance: variance.toFixed(2)
-    }
+    return parseFloat((results.reduce((a, b) => a + b) / results.length).toFixed(2))
 }
 
 type BenchmarkProps = {
     title: string,
+    times: number,
     description: string,
     stylesheet(onMeasureEnd: (time: number) => void): React.ReactNode,
     unistyles(onMeasureEnd: (time: number) => void): React.ReactNode
@@ -38,7 +30,8 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
     title,
     description,
     stylesheet,
-    unistyles
+    unistyles,
+    times
 }) => {
     const navigation = useNavigation()
     const { top } = useSafeAreaInsets()
@@ -50,14 +43,14 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
             StyleSheet: [] as Array<number>
         }
     })
-    const { avg: avgStyleSheet, variance: varianceStyleSheet } = getAvgResultWithVariance(benchmark.renderTime[Library.StyleSheet])
-    const { avg: avgUnistyles, variance: varianceUnistyles } = getAvgResultWithVariance(benchmark.renderTime[Library.Unistyles])
-    const differenceInPercentage = avgUnistyles === 'N/A' || avgStyleSheet === 'N/A'
+    const avgStyleSheet = getAvgResultWithVariance(benchmark.renderTime[Library.StyleSheet])
+    const avgUnistyles = getAvgResultWithVariance(benchmark.renderTime[Library.Unistyles])
+    const difference = avgUnistyles === 'N/A' || avgStyleSheet === 'N/A'
         ? 'N/A'
-        : (((avgUnistyles as number) - (avgStyleSheet as number)) / (avgStyleSheet as number) * 100).toFixed(2)
+        : ((avgUnistyles as number) - (avgStyleSheet as number)).toFixed(2)
 
     return (
-        <View
+        <ScrollView
             style={{
                 ...styles.container,
                 paddingTop: top
@@ -74,8 +67,8 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
                 <Pressable
                     style={styles.stylesheetButton}
                     onPress={() => setBenchmark({
-                        isMeasuring: false,
-                        library: Library.Unistyles,
+                        isMeasuring: true,
+                        library: Library.StyleSheet,
                         renderTime: {
                             Unistyles: [],
                             StyleSheet: []
@@ -99,17 +92,25 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
                 <React.Fragment>
                     {stylesheet(time => {
                         setBenchmark(prevState => {
-                            if (prevState.renderTime.Unistyles.length < 10) {
+                            if (prevState.renderTime.Unistyles.length < times) {
+                                setTimeout(() => {
+                                    setBenchmark(prevState => ({
+                                        ...prevState,
+                                        library: undefined
+                                    }))
+                                }, 1000)
+
                                 setTimeout(() => {
                                     setBenchmark(prevState => ({
                                         ...prevState,
                                         library: Library.Unistyles
                                     }))
-                                }, 1000)
+                                }, 2000)
                             }
 
                             return {
                                 ...prevState,
+                                isMeasuring: !(prevState.renderTime.StyleSheet.length === times - 1),
                                 renderTime: {
                                     ...prevState.renderTime,
                                     StyleSheet: [...prevState.renderTime[Library.StyleSheet], time]
@@ -123,18 +124,24 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
                 <React.Fragment>
                     {unistyles(time => {
                         setBenchmark(prevState => {
-                            if (prevState.renderTime.StyleSheet.length < 10) {
+                            if (prevState.renderTime.StyleSheet.length < times) {
+                                setTimeout(() => {
+                                    setBenchmark(prevState => ({
+                                        ...prevState,
+                                        library: undefined
+                                    }))
+                                }, 1000)
+
                                 setTimeout(() => {
                                     setBenchmark(prevState => ({
                                         ...prevState,
                                         library: Library.StyleSheet
                                     }))
-                                }, 1000)
+                                }, 2000)
                             }
 
                             return {
                                 ...prevState,
-                                isMeasuring: !(prevState.renderTime.Unistyles.length === 9),
                                 renderTime: {
                                     ...prevState.renderTime,
                                     Unistyles: [...prevState.renderTime[Library.Unistyles], time]
@@ -146,45 +153,54 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
             )}
             <View style={styles.resultsRow}>
                 <Text style={styles.libName}>
-                    Unistyles
+                    StyleSheet
                 </Text>
-                <Text>
-                    {benchmark.renderTime[Library.Unistyles]
-                        .map((time, index) => `${index + 1}) ${time}ms `)
+                <View style={styles.wrap}>
+                    {benchmark.renderTime[Library.StyleSheet]
+                        .map((time, index) => (
+                            <Text key={index}>
+                                {`${index + 1}) ${time}ms `}
+                            </Text>
+                        ))
                     }
-                </Text>
+                </View>
                 <Text style={styles.result}>
-                    Avg: {avgUnistyles}(±{varianceUnistyles})ms
+                    Avg: {avgStyleSheet}ms
                 </Text>
             </View>
             <View style={styles.resultsRow}>
                 <Text style={styles.libName}>
-                    StyleSheet
+                    Unistyles
                 </Text>
-                <Text>
-                    {benchmark.renderTime[Library.StyleSheet]
-                        .map((time, index) => `${index + 1}) ${time}ms `)
+                <View style={styles.wrap}>
+                    {benchmark.renderTime[Library.Unistyles]
+                        .map((time, index) => (
+                            <Text key={index}>
+                                {`${index + 1}) ${time}ms `}
+                            </Text>
+                        ))
                     }
-                </Text>
+                </View>
                 <Text style={styles.result}>
-                    Avg: {avgStyleSheet}(±{varianceStyleSheet})ms
+                    Avg: {avgUnistyles}ms
                 </Text>
             </View>
             <Text
                 style={{
                     ...styles.difference,
-                    color: differenceInPercentage === 'N/A'
+                    color: difference === 'N/A'
                         ? 'black'
-                        : parseFloat(differenceInPercentage) < 2.50
+                        : parseFloat(difference) < 5.00
                             ? 'green'
-                            : parseFloat(differenceInPercentage) < 5.00
+                            : parseFloat(difference) < 10.00
                                 ? 'orange'
                                 : 'red'
                 }}
             >
-                Difference: {differenceInPercentage}%
+                Difference: +{difference}ms
             </Text>
-        </View>
+            <View style={styles.fakeSpacer} />
+        </ScrollView>
     )
 }
 
@@ -223,7 +239,10 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 20,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        textAlign: 'center',
+        paddingHorizontal: 20,
+        marginBottom: 10
     },
     libName: {
         fontWeight: 'bold',
@@ -245,5 +264,12 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         textAlign: 'center'
+    },
+    wrap: {
+        flexWrap: 'wrap',
+        flexDirection: 'row'
+    },
+    fakeSpacer: {
+        height: 100
     }
 })
