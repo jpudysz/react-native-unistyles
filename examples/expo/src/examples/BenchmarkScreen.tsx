@@ -1,17 +1,16 @@
 import React  from 'react'
-import { UnistylesBenchmarkScreen } from './UnistylesBenchmarkScreen'
-import { StyleSheetBenchmarkScreen } from './StyleSheetBenchmarkScreen'
-import { Benchmark } from '../components'
+import { Benchmark, UnistylesWithThemeBenchmark, StyleSheetBenchmark } from '../components'
 
 export const BenchmarkScreen: React.FunctionComponent = () => (
     <Benchmark
-        title="Init unistyles + rendering 2000 boxes"
+        times={20}
+        title="Init unistyles + rendering 1000 boxes"
         description="Raw StyleSheet vs Unistyles with single theme"
         stylesheet={onMeasureEnd => (
-            <StyleSheetBenchmarkScreen onMeasureEnd={onMeasureEnd} />
+            <StyleSheetBenchmark onMeasureEnd={onMeasureEnd} />
         )}
         unistyles={onMeasureEnd => (
-            <UnistylesBenchmarkScreen onMeasureEnd={onMeasureEnd} />
+            <UnistylesWithThemeBenchmark onMeasureEnd={onMeasureEnd} />
         )}
     />
 )

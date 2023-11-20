@@ -19,7 +19,8 @@ export enum DemoNames {
     HighContrastPlugin = 'HighContrastPlugin',
     Runtime = 'Runtime',
     RuntimeWithStyleSheet = 'RuntimeWithStyleSheet',
-    Benchmark = 'Benchmark'
+    Benchmark = 'Benchmark',
+    BenchmarkAllFeatures = 'BenchmarkAllFeatures'
 }
 
 export type DemoStackParams = {
@@ -41,7 +42,8 @@ export type DemoStackParams = {
     [DemoNames.HighContrastPlugin]: undefined,
     [DemoNames.Runtime]: undefined,
     [DemoNames.RuntimeWithStyleSheet]: undefined,
-    [DemoNames.Benchmark]: undefined
+    [DemoNames.Benchmark]: undefined,
+    [DemoNames.BenchmarkAllFeatures]: undefined
 }
 
 export type NavigationProps<S extends DemoNames = DemoNames.Home> = NavigationProp<DemoStackParams, S>

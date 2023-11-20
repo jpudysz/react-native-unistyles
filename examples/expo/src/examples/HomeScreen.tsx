@@ -314,6 +314,10 @@ export const HomeScreen = () => {
                         description="Startup time with 1000 boxes"
                         onPress={() => navigation.navigate(DemoNames.Benchmark)}
                     />
+                    <DemoLink
+                        description="Unistyles with all features"
+                        onPress={() => navigation.navigate(DemoNames.BenchmarkAllFeatures)}
+                    />
                 </DemoGroup>
                 <View style={styles.fakeSpacer} />
             </ScrollView>

@@ -36,6 +36,7 @@ export const App: React.FunctionComponent = () => (
                 <Stack.Screen name={DemoNames.Runtime} component={Screens.RuntimeScreen} />
                 <Stack.Screen name={DemoNames.RuntimeWithStyleSheet} component={Screens.RuntimeWithStyleSheetScreen} />
                 <Stack.Screen name={DemoNames.Benchmark} component={Screens.BenchmarkScreen} />
+                <Stack.Screen name={DemoNames.BenchmarkAllFeatures} component={Screens.BenchmarkUnistylesAllFeaturesScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     </SafeAreaProvider>
