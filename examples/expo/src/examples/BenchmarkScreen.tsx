@@ -5,7 +5,7 @@ export const BenchmarkScreen: React.FunctionComponent = () => (
     <Benchmark
         times={20}
         title="Init unistyles + rendering 1000 boxes"
-        description="Raw StyleSheet vs Unistyles with single theme"
+        description="Single StyleSheet vs 1000x Unistyles useStyles with single theme"
         stylesheet={onMeasureEnd => (
             <StyleSheetBenchmark onMeasureEnd={onMeasureEnd} />
         )}
