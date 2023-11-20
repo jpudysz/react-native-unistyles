@@ -19,7 +19,7 @@ export const UnistylesBenchmarkScreen: React.FunctionComponent<UnistylesBenchmar
     return (
         <Timer onMeasureEnd={onMeasureEnd}>
             <View style={styles.row}>
-                {Array.from({ length: 1000 }).map((_, index) => (
+                {Array.from({ length: 2000 }).map((_, index) => (
                     <View
                         key={index}
                         style={styles.box}

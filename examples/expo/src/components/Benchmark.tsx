@@ -8,12 +8,23 @@ enum Library {
     StyleSheet = 'StyleSheet'
 }
 
-const getAvgResult = (results: Array<number>) => {
-    if (results.length === 0) {
-        return 'N/A'
+const getAvgResultWithVariance = (results: Array<number>) => {
+    const numberOfResults = results.length
+
+    if (numberOfResults === 0) {
+        return {
+            avg: 'N/A',
+            variance: 'N/A'
+        }
     }
 
-    return parseFloat((results.reduce((a, b) => a + b, 0) / results.length).toFixed(2))
+    const mean = parseFloat((results.reduce((a, b) => a + b) / results.length).toFixed(2))
+    const variance = results.reduce((acc, val) => acc + ((val - mean) ** 2), 0) / numberOfResults
+
+    return {
+        avg: mean,
+        variance: variance.toFixed(2)
+    }
 }
 
 type BenchmarkProps = {
@@ -39,11 +50,11 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
             StyleSheet: [] as Array<number>
         }
     })
-    const avgStylesheet = getAvgResult(benchmark.renderTime[Library.StyleSheet])
-    const avgUnistyles = getAvgResult(benchmark.renderTime[Library.Unistyles])
-    const difference = avgUnistyles === 'N/A' || avgStylesheet === 'N/A'
+    const { avg: avgStyleSheet, variance: varianceStyleSheet } = getAvgResultWithVariance(benchmark.renderTime[Library.StyleSheet])
+    const { avg: avgUnistyles, variance: varianceUnistyles } = getAvgResultWithVariance(benchmark.renderTime[Library.Unistyles])
+    const differenceInPercentage = avgUnistyles === 'N/A' || avgStyleSheet === 'N/A'
         ? 'N/A'
-        : parseFloat(((avgUnistyles as number) - (avgStylesheet as number)).toString()).toFixed(2)
+        : (((avgUnistyles as number) - (avgStyleSheet as number)) / (avgStyleSheet as number) * 100).toFixed(2)
 
     return (
         <View
@@ -99,7 +110,6 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
 
                             return {
                                 ...prevState,
-                                isMeasuring: !(prevState.renderTime.StyleSheet.length === 9),
                                 renderTime: {
                                     ...prevState.renderTime,
                                     StyleSheet: [...prevState.renderTime[Library.StyleSheet], time]
@@ -124,6 +134,7 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
 
                             return {
                                 ...prevState,
+                                isMeasuring: !(prevState.renderTime.Unistyles.length === 9),
                                 renderTime: {
                                     ...prevState.renderTime,
                                     Unistyles: [...prevState.renderTime[Library.Unistyles], time]
@@ -143,7 +154,7 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
                     }
                 </Text>
                 <Text style={styles.result}>
-                    Avg: {avgUnistyles} ms
+                    Avg: {avgUnistyles}(±{varianceUnistyles})ms
                 </Text>
             </View>
             <View style={styles.resultsRow}>
@@ -156,22 +167,22 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
                     }
                 </Text>
                 <Text style={styles.result}>
-                    Avg: {avgStylesheet} ms
+                    Avg: {avgStyleSheet}(±{varianceStyleSheet})ms
                 </Text>
             </View>
             <Text
                 style={{
                     ...styles.difference,
-                    color: difference === 'N/A'
+                    color: differenceInPercentage === 'N/A'
                         ? 'black'
-                        : parseFloat(difference) < 2.50
+                        : parseFloat(differenceInPercentage) < 2.50
                             ? 'green'
-                            : parseFloat(difference) < 5.00
+                            : parseFloat(differenceInPercentage) < 5.00
                                 ? 'orange'
                                 : 'red'
                 }}
             >
-                Difference: {difference} ms
+                Difference: {differenceInPercentage}%
             </Text>
         </View>
     )

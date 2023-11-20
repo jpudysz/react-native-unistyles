@@ -9,7 +9,7 @@ type StyleSheetBenchmarkScreenProps = {
 export const StyleSheetBenchmarkScreen: React.FunctionComponent<StyleSheetBenchmarkScreenProps> = ({ onMeasureEnd }) => (
     <Timer onMeasureEnd={onMeasureEnd}>
         <View style={styles.row}>
-            {Array.from({ length: 1000 }).map((_, index) => (
+            {Array.from({ length: 2000 }).map((_, index) => (
                 <View
                     key={index}
                     style={styles.box}
