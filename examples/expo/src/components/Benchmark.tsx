@@ -65,6 +65,7 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
             </View>
             <View style={styles.buttons}>
                 <Pressable
+                    disabled={benchmark.isMeasuring}
                     style={styles.stylesheetButton}
                     onPress={() => setBenchmark({
                         isMeasuring: true,
@@ -84,7 +85,7 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
                 <Text style={styles.title}>
                     {title}
                 </Text>
-                <Text>
+                <Text style={styles.description}>
                     {description}
                 </Text>
             </View>
@@ -199,6 +200,12 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
             >
                 Difference: +{difference}ms
             </Text>
+            <Text style={styles.difference}>
+                Cost per view: {difference === 'N/A'
+                    ? 'N/A'
+                    : `${(parseFloat(difference) / 1000).toFixed(3)}ms`
+                }
+            </Text>
             <View style={styles.fakeSpacer} />
         </ScrollView>
     )
@@ -243,6 +250,10 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         paddingHorizontal: 20,
         marginBottom: 10
+    },
+    description: {
+        paddingHorizontal: 20,
+        textAlign: 'center'
     },
     libName: {
         fontWeight: 'bold',
