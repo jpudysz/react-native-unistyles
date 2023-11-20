@@ -20,6 +20,8 @@ const getAvgResultWithVariance = (results: Array<number>) => {
 
 type BenchmarkProps = {
     title: string,
+    boxes: number,
+    testDelay: number,
     times: number,
     description: string,
     stylesheet(onMeasureEnd: (time: number) => void): React.ReactNode,
@@ -27,10 +29,12 @@ type BenchmarkProps = {
 }
 
 export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
+    boxes,
     title,
     description,
     stylesheet,
     unistyles,
+    testDelay,
     times
 }) => {
     const navigation = useNavigation()
@@ -99,14 +103,14 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
                                         ...prevState,
                                         library: undefined
                                     }))
-                                }, 1000)
+                                }, testDelay)
 
                                 setTimeout(() => {
                                     setBenchmark(prevState => ({
                                         ...prevState,
                                         library: Library.Unistyles
                                     }))
-                                }, 2000)
+                                }, testDelay * 2)
                             }
 
                             return {
@@ -131,14 +135,14 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
                                         ...prevState,
                                         library: undefined
                                     }))
-                                }, 1000)
+                                }, testDelay)
 
                                 setTimeout(() => {
                                     setBenchmark(prevState => ({
                                         ...prevState,
                                         library: Library.StyleSheet
                                     }))
-                                }, 2000)
+                                }, testDelay * 2)
                             }
 
                             return {
@@ -203,7 +207,7 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
             <Text style={styles.difference}>
                 Cost per view: {difference === 'N/A'
                     ? 'N/A'
-                    : `${(parseFloat(difference) / 1000).toFixed(3)}ms`
+                    : `+${(parseFloat(difference) / boxes).toFixed(3)}ms`
                 }
             </Text>
             <View style={styles.fakeSpacer} />

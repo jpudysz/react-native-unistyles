@@ -5,7 +5,7 @@ import { mq, createStyleSheet, useStyles } from 'react-native-unistyles'
 type UnistylesBoxProps = {}
 
 export const UnistylesFullBox: React.FunctionComponent<UnistylesBoxProps> = () => {
-    const { styles } = useStyles(stylesheet)
+    const { styles } = useStyles(stylesheet, 'primary')
 
     return (
         <View style={styles.box} />
