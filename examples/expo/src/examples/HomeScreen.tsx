@@ -311,7 +311,7 @@ export const HomeScreen = () => {
                 </DemoGroup>
                 <DemoGroup title="Benchmark">
                     <DemoLink
-                        description="Startup time with 1000 boxes"
+                        description="Startup time with single theme"
                         onPress={() => navigation.navigate(DemoNames.Benchmark)}
                     />
                     <DemoLink

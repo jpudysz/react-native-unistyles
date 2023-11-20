@@ -4,13 +4,17 @@ import { Timer } from './Timer'
 import { StyleSheetBox } from './StyleSheetBox'
 
 type StyleSheetBenchmarkScreenProps = {
+    boxes: number,
     onMeasureEnd(renderTime: number): void
 }
 
-export const StyleSheetBenchmark: React.FunctionComponent<StyleSheetBenchmarkScreenProps> = ({ onMeasureEnd }) => (
+export const StyleSheetBenchmark: React.FunctionComponent<StyleSheetBenchmarkScreenProps> = ({
+    onMeasureEnd,
+    boxes
+}) => (
     <Timer onMeasureEnd={onMeasureEnd}>
         <View style={{ flexDirection: 'row', columnGap: 5 }}>
-            {Array.from({ length: 1000 }).map((_, index) => (
+            {Array.from({ length: boxes }).map((_, index) => (
                 <StyleSheetBox key={index} />
             ))}
         </View>

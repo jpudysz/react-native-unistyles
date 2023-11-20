@@ -6,10 +6,14 @@ import { Timer } from './Timer'
 import { UnistylesFullBox } from './UnistylesFullBox'
 
 type UnistylesBenchmarkScreenProps = {
+    boxes: number,
     onMeasureEnd(renderTime: number): void
 }
 
-export const UnistylesWithAllFeaturesBenchmark: React.FunctionComponent<UnistylesBenchmarkScreenProps> = ({ onMeasureEnd }) => {
+export const UnistylesWithAllFeaturesBenchmark: React.FunctionComponent<UnistylesBenchmarkScreenProps> = ({
+    boxes,
+    onMeasureEnd
+}) => {
     UnistylesRegistry
         .addThemes({
             light: lightTheme,
@@ -24,7 +28,7 @@ export const UnistylesWithAllFeaturesBenchmark: React.FunctionComponent<Unistyle
     return (
         <Timer onMeasureEnd={onMeasureEnd}>
             <View style={{ flexDirection: 'row', columnGap: 5 }}>
-                {Array.from({ length: 1000 }).map((_, index) => (
+                {Array.from({ length: boxes }).map((_, index) => (
                     <UnistylesFullBox key={index} />
                 ))}
             </View>
