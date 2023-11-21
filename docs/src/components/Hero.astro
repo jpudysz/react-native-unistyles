@@ -44,12 +44,10 @@ import ArrowDown from '../assets/arrow-down.svg'
     const scrollTarget = document.querySelector<HTMLDivElement>('.scroll-target')!
     const cloudA = document.querySelector<HTMLDivElement>('.cloud-a')!
     const cloudB = document.querySelector<HTMLDivElement>('.cloud-b')!
-    const unicorn = document.querySelector<HTMLDivElement>('.unicorn')!
 
     scroll(timeline([
         [cloudA, { transform: ['translateX(0%)', 'translateX(-5%)'] }, { at: '<' } ],
         [cloudB, { transform: ['translateX(0%)', 'translateX(5%)'] }, { at: '<' } ],
-        [unicorn, { filter: ['hue-rotate(0deg)', 'hue-rotate(-90deg)'] }, { at: '<' }]
     ]), {
         smooth: 1,
         target: scrollTarget
@@ -57,6 +55,18 @@ import ArrowDown from '../assets/arrow-down.svg'
 </script>
 
 <style>
+    @keyframes rainbow {
+        0% {
+            filter: hue-rotate(0deg);
+        }
+        50% {
+            filter: hue-rotate(-90deg);
+        }
+        100% {
+            filter: hue-rotate(0deg);
+        }
+    }
+
     .unicorn,
     .cloud-a,
     .cloud-b {
@@ -76,6 +86,7 @@ import ArrowDown from '../assets/arrow-down.svg'
         width: 100vw;
         z-index: 10;
         inset: 0;
+        animation: rainbow 20s infinite;
     }
 
     .cloud-a {
