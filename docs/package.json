@@ -18,7 +18,8 @@
     "motion": "10.16.4",
     "postcss-easing-gradients": "3.0.1",
     "postcss-nested": "6.0.1",
-    "sharp": "0.32.6"
+    "sharp": "0.32.6",
+    "swiper": "11.0.4"
   },
   "private": true
 }
