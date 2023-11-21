@@ -1,5 +1,7 @@
 ---
 import { Image } from 'astro:assets'
+import 'swiper/css'
+import 'swiper/css/effect-coverflow'
 import Icon from '../assets/icon.svg'
 
 type Feature = {
@@ -58,26 +60,20 @@ const features = [
 ---
 
 <section>
-    <h2>
-        Features
-    </h2>
-    <div class="features">
-        {features.map(feature => (
-            <div class="feature">
-                <Image
-                    class="feature__icon"
-                    src={Icon}
-                    alt=""
-                />
-                <h3 class="feature__title">
-                    {feature.title}
-                </h3>
-                <p class="feature__description">
-                    {feature.description}
-                </p>
-            </div>
-        ))}
-    </div>
+    <h2>Features</h2>
+    <section class="swiper features-container">
+        <div class="swiper-wrapper features">
+            {features.map((feature) => (
+                <div class="feature swiper-slide">
+                    <Image class="feature__icon" src={Icon} alt="" />
+                    <h3 class="feature__title">{feature.title}</h3>
+                    <p class="feature__description">
+                        {feature.description}
+                    </p>
+                </div>
+            ))}
+        </div>
+    </section>
 </section>
 
 <style>
@@ -88,13 +84,23 @@ const features = [
         text-align: center;
     }
 
+    .features-container {
+        width: 100%;
+    }
+
     .features {
         display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        margin: 0 auto;
-        max-width: 1600px;
-        gap: 48px;
+
+        @media (min-width: 1025px) {
+            visibility: visible!important;
+            padding: 0 20px!important;
+            margin: 0 auto!important;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 0 auto;
+            max-width: 1600px;
+            gap: 48px;
+        }
     }
 
     .feature {
@@ -103,11 +109,16 @@ const features = [
         align-items: center;
         background-color: rgba(255, 255, 255, 0.2);
         border-radius: 24px;
-        padding: 32px;
         gap: 12px;
-        width: 30%;
         text-align: center;
-        min-width: 460px;
+        padding: 40px 26px;
+        height: auto!important;
+
+        @media (min-width: 1025px) {
+            width: 30%;
+            min-width: 460px;
+            padding: 32px;
+        }
 
         &__title {
             font-size: 24px;
@@ -121,3 +132,24 @@ const features = [
         }
     }
 </style>
+
+<script>
+    const matchTablet = window.matchMedia('(min-width: 700px) and (max-width: 1024px)')
+    const matchMobile = window.matchMedia('(max-width: 700px)')
+    let disposeCarousel = () => {}
+
+    const handleMedia = async () => {
+        disposeCarousel()
+
+        if (!matchTablet.matches && !matchMobile.matches) {
+            return
+        }
+
+        const { init } = await import('../carousel')
+
+        disposeCarousel = init(matchTablet.matches)
+    }
+
+    matchTablet.addEventListener('change', handleMedia)
+    handleMedia()
+</script>
