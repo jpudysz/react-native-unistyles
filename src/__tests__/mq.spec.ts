@@ -19,13 +19,13 @@ describe('mq', () => {
         it ('should correctly return width media query', () => {
             const container = {
                 flex: {
-                    [mq.width(100, 200)]: 1,
-                    [mq.width(0, 100)]: 2,
-                    [mq.width(0, 0)]: 1,
-                    [mq.width(undefined, 400)]: 3,
-                    [mq.width(400)]: 1,
-                    [mq.width('xs', 'lg')]: 1,
-                    [mq.width()]: 0
+                    [mq.only.width(100, 200)]: 1,
+                    [mq.only.width(0, 100)]: 2,
+                    [mq.only.width(0, 0)]: 1,
+                    [mq.only.width(undefined, 400)]: 3,
+                    [mq.only.width(400)]: 1,
+                    [mq.only.width('xs', 'lg')]: 1,
+                    [mq.only.width()]: 0
                 }
             }
 
@@ -43,13 +43,13 @@ describe('mq', () => {
         it ('should correctly return height media query', () => {
             const container = {
                 width: {
-                    [mq.height(120, 750)]: 100,
-                    [mq.height(0, 1000)]: 200,
-                    [mq.height(0, 0)]: 125,
-                    [mq.height(undefined, 250)]: 700,
-                    [mq.height(75)]: 0,
-                    [mq.height('md', 'xl')]: undefined,
-                    [mq.height()]: 100
+                    [mq.only.height(120, 750)]: 100,
+                    [mq.only.height(0, 1000)]: 200,
+                    [mq.only.height(0, 0)]: 125,
+                    [mq.only.height(undefined, 250)]: 700,
+                    [mq.only.height(75)]: 0,
+                    [mq.only.height('md', 'xl')]: undefined,
+                    [mq.only.height()]: 100
                 }
             }
 
@@ -67,12 +67,12 @@ describe('mq', () => {
         it ('should correctly return combined media query', () => {
             const container = {
                 backgroundColor: {
-                    [mq.width(0, 100).height(500)]: 'red',
-                    [mq.height(100, 200).width(undefined, 500)]: 'blue',
-                    [mq.width(0, 100).height(500, -500)]: 'orange',
-                    [mq.width(undefined, 200).height()]: 'green',
+                    [mq.width(0, 100).and.height(500)]: 'red',
+                    [mq.height(100, 200).and.width(undefined, 500)]: 'blue',
+                    [mq.width(0, 100).and.height(500, -500)]: 'orange',
+                    [mq.width(undefined, 200).and.height()]: 'green',
                     // @ts-ignore test invalid case, even if typescript secures it
-                    [mq.width('xs', 'xxl').height('doesnt', 'exist')]: 'yellow'
+                    [mq.width('xs', 'xxl').and.height('doesnt', 'exist')]: 'yellow'
                 }
             }
 
@@ -88,11 +88,11 @@ describe('mq', () => {
         it ('should allow for nulls', () => {
             const container = {
                 backgroundColor: {
-                    [mq.width(null, 100).height(300)]: 'red',
-                    [mq.height(100, 300).width(500)]: 'blue',
-                    [mq.width(null, 100).height(500)]: 'orange',
-                    [mq.width(null, 999).height()]: 'green',
-                    [mq.width(null).height(null)]: 'yellow'
+                    [mq.width(null, 100).and.height(300)]: 'red',
+                    [mq.height(100, 300).and.width(500)]: 'blue',
+                    [mq.width(null, 100).and.height(500)]: 'orange',
+                    [mq.width(null, 999).and.height()]: 'green',
+                    [mq.width(null).and.height(null)]: 'yellow'
                 }
             }
 
@@ -108,11 +108,11 @@ describe('mq', () => {
         it ('should allow for shortcuts', () => {
             const container = {
                 backgroundColor: {
-                    [mq.w(100, 200).h(300)]: 'red',
-                    [mq.h(100, 300).w(500)]: 'blue',
-                    [mq.w(100, 200).h(500, -500)]: 'orange',
-                    [mq.w(undefined, 200).h()]: 'green',
-                    [mq.w().h(null)]: 'yellow'
+                    [mq.width(100, 200).and.height(300)]: 'red',
+                    [mq.height(100, 300).and.width(500)]: 'blue',
+                    [mq.width(100, 200).and.height(500, -500)]: 'orange',
+                    [mq.width(undefined, 200).and.height()]: 'green',
+                    [mq.width().and.height(null)]: 'yellow'
                 }
             }
 
@@ -132,30 +132,30 @@ describe('mq', () => {
             expect(value).toBe(undefined)
 
             // @ts-ignore
-            const partialValue1 = mq.width(100, 200).unknown
+            const partialValue1 = mq.only.width(100, 200).unknown
 
             expect(partialValue1).toBe(undefined)
 
             // @ts-ignore
-            const partialValue2 = mq.height(100, 200).unknown
+            const partialValue2 = mq.only.height(100, 200).unknown
 
             expect(partialValue2).toBe(undefined)
 
             // @ts-ignore
-            const partialValue3 = mq.w(100, 200).h(100, 200).unknown
+            const partialValue3 = mq.width(100, 200).and.height(100, 200).unknown
 
             expect(partialValue3).toBe(undefined)
 
             // @ts-ignore
-            const partialValue4 = mq.h(100, 200).w(100, 200).unknown
+            const partialValue4 = mq.height(100, 200).and.width(100, 200).unknown
 
             expect(partialValue4).toBe(undefined)
 
-            const value5 = mq.w(100, 200).h(100, 200).toString()
+            const value5 = mq.width(100, 200).and.height(100, 200).toString()
 
             expect(value5).toBe(':w[100, 200]:h[100, 200]')
 
-            const value6 = mq.h(100, 200).w(100, 200).toString()
+            const value6 = mq.height(100, 200).and.width(100, 200).toString()
 
             expect(value6).toBe(':w[100, 200]:h[100, 200]')
         })

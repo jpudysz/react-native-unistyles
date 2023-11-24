@@ -1,26 +1,25 @@
 import { useMemo } from 'react'
 import { StyleSheet } from 'react-native'
 import { parseStyle, proxifyFunction } from './utils'
-import type {
-    CreateStylesFactory,
-    CustomNamedStyles,
-    ExtractVariantNames,
-    ReactNativeStyleSheet,
-    UnistylesTheme
-} from './types'
 import { useUnistyles } from './hooks'
 import type { UnistylesBreakpoints } from './global'
 import { unistyles } from './core'
+import type {
+    ExtractVariantNames,
+    ReactNativeStyleSheet,
+    StyleSheetWithSuperPowers,
+    UnistylesTheme
+} from './types'
 
-type ParsedStylesheet<ST extends CustomNamedStyles<ST>> = {
+type ParsedStylesheet<ST extends StyleSheetWithSuperPowers> = {
     theme: UnistylesTheme,
     breakpoint: keyof UnistylesBreakpoints,
     styles: ReactNativeStyleSheet<ST>
 }
 
-export const useStyles = <ST extends CustomNamedStyles<ST>>(
-    stylesheet?: ST | CreateStylesFactory<ST, UnistylesTheme>,
-    variant?: ExtractVariantNames<typeof stylesheet> & string
+export const useStyles = <ST extends StyleSheetWithSuperPowers>(
+    stylesheet?: ST,
+    variant?: ExtractVariantNames<typeof stylesheet>
 ): ParsedStylesheet<ST> => {
     const { theme, layout, plugins } = useUnistyles()
 
@@ -48,15 +47,15 @@ export const useStyles = <ST extends CustomNamedStyles<ST>>(
 
             return StyleSheet.create({
                 ...acc,
-                [key]: parseStyle<ST>(
+                [key]: parseStyle(
                     key,
-                    value as CustomNamedStyles<ST>,
+                    value,
                     unistyles.registry.plugins,
                     unistyles.runtime,
                     variant
                 )
             })
-        }, {} as ST),
+        }, {}),
     [layout, parsedStyles, variant, plugins]
     ) as ReactNativeStyleSheet<ST>
 

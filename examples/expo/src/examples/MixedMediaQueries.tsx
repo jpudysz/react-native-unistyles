@@ -33,7 +33,7 @@ const stylesheet = createStyleSheet(theme => ({
         alignItems: 'center',
         paddingHorizontal: 20,
         backgroundColor: {
-            [mq.w(null, 430).h(null, 1000)]: theme.colors.barbie,
+            [mq.width(null, 430).and.height(null, 1000)]: theme.colors.barbie,
             // xs will could also be applied here, but it has lower priority than media queries
             xs: theme.colors.aloes
         },

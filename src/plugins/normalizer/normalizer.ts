@@ -1,7 +1,7 @@
 // based on react-native-web normalizer
 // https://github.com/necolas/react-native-web
 import normalizeColors from '@react-native/normalize-colors'
-import type { TextShadow, Transforms, BoxShadow } from '../../types'
+import type { TextShadow, Transforms, BoxShadow, Nullable } from '../../types'
 
 type Preprocessor = {
     createTextShadowValue(style: TextShadow): string,
@@ -15,9 +15,9 @@ export const normalizeColor = (color: string, opacity: number = 1) => {
         return color
     }
 
-    const integer = normalizeColors(color) as number | null
+    const integer = normalizeColors(color) as Nullable<number>
 
-    // If the colour is an unknown format, the return value is null
+    // If the color is an unknown format, the return value is null
     if (integer === null) {
         return color
     }

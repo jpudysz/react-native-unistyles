@@ -29,7 +29,10 @@ export const UnistylesWithAllFeaturesBenchmark: React.FunctionComponent<Unistyle
         <Timer onMeasureEnd={onMeasureEnd}>
             <View style={{ flexDirection: 'row', columnGap: 5 }}>
                 {Array.from({ length: boxes }).map((_, index) => (
-                    <UnistylesFullBox key={index} />
+                    <UnistylesFullBox
+                        key={index}
+                        index={index}
+                    />
                 ))}
             </View>
         </Timer>

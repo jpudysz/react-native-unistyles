@@ -1,37 +1,45 @@
-import type { Optional, CustomNamedStyles, NestedStyle } from '../types'
+import type { Optional, StyleSheet, NestedStyle } from '../types'
 
-const getKeyForVariant = (value: Record<string, NestedStyle>, variant?: string): Optional<string> => {
-    if (variant && variant in value) {
-        return variant
-    }
+const getKeysForVariants = (
+    value: Record<string, NestedStyle>,
+    variants: Array<[string, Optional<string>]>
+): Array<[string, string]> => variants
+    .map(([variantKey, variantValue]) => {
+        const variantStyle = value[variantKey]
 
-    if ('default' in value) {
-        return 'default'
-    }
+        if (variantStyle && variantValue && variantValue in variantStyle) {
+            return [variantKey, variantValue]
+        }
 
-    return undefined
-}
+        if (variantStyle && 'default' in variantStyle) {
+            return [variantKey, 'default']
+        }
 
-export const getStyleWithVariant = <T>(
-    style: CustomNamedStyles<T>,
-    variant?: string
+        return undefined
+    })
+    .filter(Boolean) as Array<[string, string]>
+
+export const getStyleWithVariants = (
+    style: StyleSheet,
+    variantValues?: Record<string, Optional<string>>
 ) => {
     if (!('variants' in style)) {
         return style
     }
 
-    const variantKey = getKeyForVariant(
+    const keys = getKeysForVariants(
         style.variants as Record<string, NestedStyle>,
-        variant
+        Object.entries(variantValues || {})
     )
-    const variantValue = variantKey
-        ? (style.variants as Record<string, NestedStyle>)[variantKey]
-        : {}
+
+    const variantsValues = keys
+        .map(([key, nestedKey]) => ((style.variants as Record<string, Record<string, NestedStyle>>)[key] as Record<string, NestedStyle>)[nestedKey])
+        .reduce((acc, styles) => ({ ...acc, ...styles }), {})
 
     const { variants, ...otherStyles } = style
 
     return {
         ...otherStyles,
-        ...variantValue
+        ...variantsValues
     }
 }

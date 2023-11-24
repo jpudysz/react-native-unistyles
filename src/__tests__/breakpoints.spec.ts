@@ -37,8 +37,8 @@ describe('breakpoints', () => {
             unistyles.registry = mockRegistry()
 
             const style = {
-                [mq.width(null, 300)]: 'green',
-                [mq.width(301)]: 'orange',
+                [mq.only.width(null, 300)]: 'green',
+                [mq.only.width(301)]: 'orange',
                 md: 'pink'
             }
 
@@ -56,7 +56,7 @@ describe('breakpoints', () => {
             unistyles.registry = mockRegistry()
 
             const style = {
-                [mq.width(null, 199)]: 'green',
+                [mq.only.width(null, 199)]: 'green',
                 xs: 'pink'
             }
 
@@ -171,7 +171,7 @@ describe('breakpoints', () => {
             unistyles.registry = mockRegistry()
 
             const style = {
-                [mq.width(100, 300)]: 'center',
+                [mq.only.width(100, 300)]: 'center',
                 sm: 'center',
                 md: 'flex-start',
                 xl: 'flex-end'
