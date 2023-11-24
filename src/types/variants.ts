@@ -12,10 +12,8 @@ type ExtractSubVariantKeys<T> = T extends object
 
 type ExtractVariant<T> = T extends (...args: any) => infer R
     ? R extends { variants: infer V }
-        ? { [key in keyof V]: ExtractSubVariantKeys<V[key]> }
+        ? { [key in keyof V]?: ExtractSubVariantKeys<V[key]> }
         : never
     : T extends { variants: infer V }
-        ? {
-            [key in keyof V]: ExtractSubVariantKeys<V[key]>
-        }
+        ? { [key in keyof V]?: ExtractSubVariantKeys<V[key]> }
         : never

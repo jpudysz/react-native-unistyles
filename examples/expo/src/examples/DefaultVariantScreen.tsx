@@ -5,9 +5,7 @@ import { DemoScreen } from '../components'
 
 export const DefaultVariantScreen: React.FunctionComponent = () => {
     // with no variant specified, the default variant is used
-    const { styles } = useStyles(stylesheet, {
-        colors: undefined
-    })
+    const { styles } = useStyles(stylesheet)
 
     return (
         <DemoScreen>

@@ -3,21 +3,37 @@ import type { Optional, StyleSheet, NestedStyle } from '../types'
 const getKeysForVariants = (
     value: Record<string, NestedStyle>,
     variants: Array<[string, Optional<string>]>
-): Array<[string, string]> => variants
-    .map(([variantKey, variantValue]) => {
-        const variantStyle = value[variantKey]
+): Array<[string, string]> => {
+    // case for no specified variants by user, we should fallback to 'default'
+    if (!variants.length) {
+        return Object
+            .entries(value)
+            .map(([key, value]) => {
+                if ('default' in value) {
+                    return [key, 'default']
+                }
 
-        if (variantStyle && variantValue && variantValue in variantStyle) {
-            return [variantKey, variantValue]
-        }
+                return undefined
+            })
+            .filter(Boolean) as Array<[string, string]>
+    }
 
-        if (variantStyle && 'default' in variantStyle) {
-            return [variantKey, 'default']
-        }
+    return variants
+        .map(([variantKey, variantValue]) => {
+            const variantStyle = value[variantKey]
 
-        return undefined
-    })
-    .filter(Boolean) as Array<[string, string]>
+            if (variantStyle && variantValue && variantValue in variantStyle) {
+                return [variantKey, variantValue]
+            }
+
+            if (variantStyle && 'default' in variantStyle) {
+                return [variantKey, 'default']
+            }
+
+            return undefined
+        })
+        .filter(Boolean) as Array<[string, string]>
+}
 
 export const getStyleWithVariants = (
     style: StyleSheet,

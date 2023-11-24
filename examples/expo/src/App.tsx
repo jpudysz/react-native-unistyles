@@ -37,6 +37,9 @@ export const App: React.FunctionComponent = () => (
                 <Stack.Screen name={DemoNames.RuntimeWithStyleSheet} component={Screens.RuntimeWithStyleSheetScreen} />
                 <Stack.Screen name={DemoNames.Benchmark} component={Screens.BenchmarkScreen} />
                 <Stack.Screen name={DemoNames.BenchmarkAllFeatures} component={Screens.BenchmarkUnistylesAllFeaturesScreen} />
+                <Stack.Screen name={DemoNames.PlatformColors} component={Screens.PlatformColors} />
+                <Stack.Screen name={DemoNames.StyleSheet} component={Screens.StyleSheetScreen} />
+                <Stack.Screen name={DemoNames.MemoizationScreen} component={Screens.MemoizationScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     </SafeAreaProvider>

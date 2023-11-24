@@ -309,14 +309,93 @@ export const HomeScreen = () => {
                         }}
                     />
                 </DemoGroup>
+                <DemoGroup title="Other">
+                    <DemoLink
+                        description="Memoization"
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addBreakpoints(breakpoints)
+                                .addConfig({
+                                    initialTheme: 'light'
+                                })
+
+                            navigation.navigate(DemoNames.MemoizationScreen)
+                        }}
+                    />
+                    <DemoLink
+                        description="PlatformColor"
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addBreakpoints(breakpoints)
+                                .addConfig({
+                                    initialTheme: 'light'
+                                })
+
+                            navigation.navigate(DemoNames.PlatformColors)
+                        }}
+                    />
+                    <DemoLink
+                        description="Compatibility with StyleSheet"
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addBreakpoints(breakpoints)
+                                .addConfig({
+                                    initialTheme: 'light'
+                                })
+
+                            navigation.navigate(DemoNames.StyleSheet)
+                        }}
+                    />
+                </DemoGroup>
                 <DemoGroup title="Benchmark">
                     <DemoLink
                         description="Startup time with single theme"
-                        onPress={() => navigation.navigate(DemoNames.Benchmark)}
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addBreakpoints(breakpoints)
+                                .addConfig({
+                                    initialTheme: 'light'
+                                })
+
+                            navigation.navigate(DemoNames.Benchmark)
+                        }}
                     />
                     <DemoLink
                         description="Unistyles with all features"
-                        onPress={() => navigation.navigate(DemoNames.BenchmarkAllFeatures)}
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addBreakpoints(breakpoints)
+                                .addConfig({
+                                    initialTheme: 'light'
+                                })
+
+                            navigation.navigate(DemoNames.BenchmarkAllFeatures)
+                        }}
                     />
                 </DemoGroup>
                 <View style={styles.fakeSpacer} />
