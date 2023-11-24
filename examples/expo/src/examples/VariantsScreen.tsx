@@ -10,16 +10,18 @@ enum ButtonVariant {
 }
 
 export const VariantsScreen: React.FunctionComponent = () => {
-    const [buttonVariant, setButtonVariant] = useState<ButtonVariant>(ButtonVariant.Primary)
-    // you can pass your variant name to `useStyles` hook, this is optional
+    const [buttonVariant, setButtonVariant] = useState(ButtonVariant.Primary)
+    // you can pass your variants names to `useStyles` hook, this is optional
     // you can mix variants with media queries and breakpoints
-    const { styles } = useStyles(stylesheet, buttonVariant)
+    const { styles } = useStyles(stylesheet, {
+        color: buttonVariant
+    })
 
     return (
         <DemoScreen>
             <View style={styles.container}>
                 <Text style={styles.text}>
-                    This screen has a button that reacts to the selected variant.
+                    This screen has a button and text that react to the selected variant.
                 </Text>
                 <Text style={styles.text}>
                     Current variant: {buttonVariant}
@@ -62,17 +64,19 @@ const stylesheet = createStyleSheet(theme => ({
     },
     button: {
         variants: {
-            primary: {
-                backgroundColor: theme.colors.barbie
-            },
-            secondary: {
-                backgroundColor: theme.colors.accent
-            },
-            outlined: {
-                backgroundColor: 'transparent'
-            },
-            default: {
-                backgroundColor: theme.colors.blood
+            color: {
+                primary: {
+                    backgroundColor: theme.colors.barbie
+                },
+                secondary: {
+                    backgroundColor: theme.colors.accent
+                },
+                outlined: {
+                    backgroundColor: 'transparent'
+                },
+                default: {
+                    backgroundColor: theme.colors.blood
+                }
             }
         },
         paddingHorizontal: 20,
@@ -83,13 +87,15 @@ const stylesheet = createStyleSheet(theme => ({
     },
     buttonText: {
         variants: {
-            outlined: {
-                color: theme.colors.accent
-            },
-            default: {
-                color: {
-                    sm: theme.colors.backgroundColor,
-                    lg: theme.colors.accent
+            color: {
+                primary: {
+                    color: theme.colors.backgroundColor
+                },
+                default: {
+                    color: {
+                        sm: theme.colors.typography,
+                        lg: theme.colors.accent
+                    }
                 }
             }
         },

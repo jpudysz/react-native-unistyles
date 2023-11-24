@@ -9,9 +9,9 @@ describe('mqParser', () => {
     describe('getKeyForUnistylesMediaQuery', () => {
         it('should return key for matching media query', () => {
             const mediaQueries = Object.entries({
-                [mq.width(100, 300)]: 'green',
-                [mq.width(300, 500)]: 'blue',
-                [mq.height(500, 700)]: 'red'
+                [mq.only.width(100, 300)]: 'green',
+                [mq.only.width(300, 500)]: 'blue',
+                [mq.only.height(500, 700)]: 'red'
             }) as NestedStylePairs
 
             const screenSize = {

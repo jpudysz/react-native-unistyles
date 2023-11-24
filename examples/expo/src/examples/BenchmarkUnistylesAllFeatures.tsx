@@ -1,5 +1,5 @@
 import React  from 'react'
-import { Benchmark, StyleSheetBenchmark, UnistylesWithAllFeaturesBenchmark } from '../components'
+import { Benchmark, StyleSheetWithAllFeaturesBenchmark, UnistylesWithAllFeaturesBenchmark } from '../components'
 
 const BOXES = 100
 
@@ -11,7 +11,7 @@ export const BenchmarkUnistylesAllFeaturesScreen: React.FunctionComponent = () =
         title={`Init unistyles + enable/use all features and render ${BOXES} boxes`}
         description={`Single StyleSheet vs ${BOXES}x Unistyles useStyles with all features`}
         stylesheet={onMeasureEnd => (
-            <StyleSheetBenchmark
+            <StyleSheetWithAllFeaturesBenchmark
                 boxes={BOXES}
                 onMeasureEnd={onMeasureEnd}
             />

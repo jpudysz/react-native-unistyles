@@ -1,8 +1,8 @@
-import type { CustomNamedStyles, NestedStyle, RNStyle, UnistylesPlugin } from '../types'
+import type { NestedStyle, UnistylesPlugin, StyleSheet, Optional } from '../types'
 import { getValueForBreakpoint } from './breakpoints'
 import type { UnistylesRuntime } from '../core'
 import { isAndroid, isIOS } from '../common'
-import { getStyleWithVariant } from './variants'
+import { getStyleWithVariants } from './variants'
 import { withPlugins } from '../plugins'
 
 export const proxifyFunction = (
@@ -10,7 +10,7 @@ export const proxifyFunction = (
     fn: Function,
     plugins: Array<UnistylesPlugin>,
     runtime: UnistylesRuntime,
-    variant?: string
+    variant?: Record<string, Optional<string>>
 ): Function => new Proxy(fn, {
     apply: (target, thisArg, argumentsList) =>
         parseStyle(key, target.apply(thisArg, argumentsList), plugins, runtime, variant)
@@ -24,41 +24,42 @@ export const isPlatformColor = <T extends {}>(value: T): boolean => {
     return isAndroid && 'resource_paths' in value && typeof value.resource_paths === 'object'
 }
 
-export const parseStyle = <T extends RNStyle>(
+export const parseStyle = <T extends StyleSheet>(
     key: string,
-    style: CustomNamedStyles<T>,
+    style: T,
     plugins: Array<UnistylesPlugin>,
     runtime: UnistylesRuntime,
-    variant?: string
+    variant?: Record<string, Optional<string>>
 ): T => {
     const entries = Object
-        .entries(getStyleWithVariant(style || {}, variant)) as Array<[keyof T, CustomNamedStyles<T> | NestedStyle]>
+        .entries(getStyleWithVariants(style || {}, variant)) as Array<[keyof T, StyleSheet]>
 
     const parsedStyles = Object
         .fromEntries(entries
             .map(([key, value]) => {
-                const hasNestedProperties = key === 'shadowOffset' || key === 'textShadowOffset'
+                // dynamic functions
+                if (typeof value === 'function') {
+                    return [key, value]
+                }
 
-                if (hasNestedProperties) {
+                // nested objects
+                if (key === 'shadowOffset' || key === 'textShadowOffset') {
                     return [
                         key,
-                        parseStyle(key, value as CustomNamedStyles<T>, plugins, runtime, variant)
+                        parseStyle(key, value, plugins, runtime, variant)
                     ]
                 }
 
-                const isTransform = key === 'transform'
-
-                if (isTransform && Array.isArray(value)) {
+                // transforms
+                if (key === 'transform' && Array.isArray(value)) {
                     return [
                         key,
                         value.map(value => parseStyle(key, value, plugins, runtime, variant))
                     ]
                 }
 
-                const isDynamicFunction = typeof value === 'function'
-                const isValidStyle = typeof value !== 'object' || isPlatformColor(value)
-
-                if (isDynamicFunction || isValidStyle) {
+                // values or platform colors
+                if (typeof value !== 'object' || isPlatformColor(value)) {
                     return [key, value]
                 }
 

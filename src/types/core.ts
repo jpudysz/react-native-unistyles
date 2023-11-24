@@ -17,17 +17,12 @@ import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
 import type { MediaQuery } from './mq'
 
-type ShadowOffset = {
+export type ShadowOffset = {
     width: number,
     height: number
 }
 
-export type ScreenSize = {
-    width: number,
-    height: number
-}
-
-type TransformStyles =
+export type TransformStyles =
     & PerpectiveTransform
     & RotateTransform
     & RotateXTransform
@@ -42,40 +37,9 @@ type TransformStyles =
     & SkewYTransform
     & MatrixTransform
 
-type UnistyleNested = {
-    shadowOffset?: DeepUniStyle<ShadowOffset>,
-    textShadowOffset?: DeepUniStyle<ShadowOffset>,
-    transform?: Array<DeepUniStyle<TransformStyles>>,
-    variants?: Record<string, UnistyleView | UnistyleText | UnistyleImage & Omit<UnistyleNested, 'variants'>>
-}
-
-type UniStyle<V> = {
-    [innerKey in keyof UnistylesBreakpoints]?: V
-} | {
-    [innerKey in MediaQuery]: V
-}
-
-type DeepUniStyle<T> = {
-    [K in keyof T]?: UniStyle<T[K]> | T[K]
-}
-
-// these props are treated differently to nest breakpoints and media queries
-type NestedTypes = 'shadowOffset' | 'transform' | 'textShadowOffset'
-
-type UnistyleView = DeepUniStyle<Omit<ViewStyle, NestedTypes>>
-type UnistyleText = DeepUniStyle<Omit<TextStyle, NestedTypes>>
-type UnistyleImage = DeepUniStyle<Omit<ImageStyle, NestedTypes>>
-
-export type StaticStyles =
-    | UnistyleView
-    | UnistyleText
-    | UnistyleImage
-    & UnistyleNested
-
-export type CustomNamedStyles<T> = {
-    [K in keyof T]: T[K] extends (...args: infer A) => StaticStyles
-        ? (...args: A) => StaticStyles
-        : StaticStyles
+export type ScreenSize = {
+    width: number,
+    height: number
 }
 
 export type RNStyle = ViewStyle | TextStyle | ImageStyle
@@ -83,4 +47,4 @@ export type RNValue = number | string | undefined
 export type NestedStyle = Record<keyof UnistylesBreakpoints | MediaQuery, RNValue>
 export type NestedStylePairs = Array<[keyof UnistylesBreakpoints | MediaQuery, RNValue]>
 export type UnistylesTheme = UnistylesThemes[keyof UnistylesThemes]
-export type CreateStylesFactory<ST, Theme> = (theme: Theme) => ST
+export type CreateStylesFactory<ST> = (theme: UnistylesTheme) => ST

@@ -1,6 +1,6 @@
+import type { StyleSheet } from '../types'
 import { mq, parseStyle, proxifyFunction } from '../utils'
 import { mockRegistry, mockRuntime } from './mocks'
-import type { CustomNamedStyles } from '../types'
 
 jest.mock('../core', () => {
     class MockedUnistyles {
@@ -62,10 +62,10 @@ describe('styles', () => {
 
             const dynamicFunction = (isEven: boolean) => ({
                 backgroundColor: {
-                    [mq.width(null, 399)]: isEven
+                    [mq.only.width(null, 399)]: isEven
                         ? 'green'
                         : 'red',
-                    [mq.width(400)]: isEven
+                    [mq.only.width(400)]: isEven
                         ? 'orange'
                         : 'pink'
                 }
@@ -130,7 +130,7 @@ describe('styles', () => {
             }
             const parsedStyles = parseStyle(
                 'container',
-                style as CustomNamedStyles<typeof style>,
+                style as StyleSheet,
                 [],
                 unistyles.runtime
             )
@@ -164,7 +164,7 @@ describe('styles', () => {
 
             const parsedStyles = parseStyle(
                 'container',
-                style as CustomNamedStyles<typeof style>,
+                style as StyleSheet,
                 [],
                 unistyles.runtime
             )
@@ -204,13 +204,13 @@ describe('styles', () => {
             }
             const parsedStyles = parseStyle(
                 'container',
-                style as CustomNamedStyles<typeof style>,
+                style as StyleSheet,
                 [],
                 unistyles.runtime
             )
             const parsedStylesWithBreakpoints = parseStyle(
                 'container',
-                styleWithBreakpoints as CustomNamedStyles<typeof styleWithBreakpoints>,
+                styleWithBreakpoints as StyleSheet,
                 [],
                 unistyles.runtime
             )

@@ -15,20 +15,20 @@ export const ScreenOrientation = {
     Portrait: 'portrait'
 } as const
 
-export enum CxxUnistylesEventTypes {
+export enum UnistylesEventType {
     Theme = 'theme',
     Layout = 'layout',
     Plugin = 'plugin'
 }
 
 export enum UnistylesError {
-    RuntimeUnavailable = 'UNISTYLES_ERROR_RUNTIME_UNAVAILABLE',
-    ThemeNotFound = 'UNISTYLES_ERROR_THEME_NOT_FOUND',
-    ThemeNotRegistered = 'UNISTYLES_ERROR_THEME_NOT_REGISTERED',
-    ThemesCannotBeEmpty = 'UNISTYLES_ERROR_THEMES_CANNOT_BE_EMPTY',
-    BreakpointsCannotBeEmpty = 'UNISTYLES_ERROR_BREAKPOINTS_CANNOT_BE_EMPTY',
-    BreakpointsMustStartFromZero = 'UNISTYLES_ERROR_BREAKPOINTS_MUST_START_FROM_ZERO',
-    InvalidPluginName = 'UNISTYLES_ERROR_INVALID_PLUGIN_NAME',
-    DuplicatePluginName = 'UNISTYLES_ERROR_DUPLICATE_PLUGIN_NAME',
-    CantRemoveInternalPlugin = 'UNISTYLES_ERROR_CANT_REMOVE_INTERNAL_PLUGIN'
+    RuntimeUnavailable = 'Unistyles runtime is not available. Make sure you followed the installation instructions.',
+    ThemeNotFound = 'You are trying to get a theme that is not registered.',
+    ThemeNotRegistered = 'You are trying to set a theme that is not registered.',
+    ThemesCannotBeEmpty = 'You are trying to register an empty themes object.',
+    BreakpointsCannotBeEmpty = 'You are trying to register an empty breakpoints object.',
+    BreakpointsMustStartFromZero = 'One breakpoint must start from 0.',
+    InvalidPluginName = 'Plugin name can\'t start from reserved prefix. Use another name.',
+    DuplicatePluginName = 'You are trying to register a plugin with a name that is already registered.',
+    CantRemoveInternalPlugin = 'You are trying to remove an internal unistyles plugin.'
 }

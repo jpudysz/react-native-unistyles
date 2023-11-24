@@ -38,8 +38,8 @@ const stylesheet = createStyleSheet(theme => ({
         alignItems: 'center',
         paddingHorizontal: 20,
         backgroundColor: {
-            [mq.width(undefined, 500).height(undefined, 1000)]: theme.colors.backgroundColor,
-            [mq.width(932)]: theme.colors.aloes
+            [mq.width(undefined, 500).and.height(undefined, 1000)]: theme.colors.backgroundColor,
+            [mq.only.width(932)]: theme.colors.aloes
         },
         rowGap: 20
     },

@@ -207,7 +207,7 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
             <Text style={styles.difference}>
                 Cost per view: {difference === 'N/A'
                     ? 'N/A'
-                    : `+${(parseFloat(difference) / boxes).toFixed(3)}ms`
+                    : `+${(parseFloat(difference) / boxes).toFixed(4)} ms`
                 }
             </Text>
             <View style={styles.fakeSpacer} />

@@ -5,7 +5,9 @@ import { DemoScreen } from '../components'
 
 export const DefaultVariantScreen: React.FunctionComponent = () => {
     // with no variant specified, the default variant is used
-    const { styles } = useStyles(stylesheet, undefined)
+    const { styles } = useStyles(stylesheet, {
+        colors: undefined
+    })
 
     return (
         <DemoScreen>
@@ -37,8 +39,10 @@ const stylesheet = createStyleSheet(theme => ({
         height: 100,
         borderRadius: 10,
         variants: {
-            default: {
-                backgroundColor: theme.colors.accent
+            colors: {
+                default: {
+                    backgroundColor: theme.colors.accent
+                }
             }
         }
     }

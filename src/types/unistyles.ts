@@ -1,4 +1,4 @@
-import { CxxUnistylesEventTypes, ScreenOrientation } from '../common'
+import { UnistylesEventType, ScreenOrientation } from '../common'
 import type { UnistylesThemes, UnistylesBreakpoints } from '../global'
 import type { ScreenSize } from './core'
 import type { Optional } from './common'
@@ -33,14 +33,14 @@ export type UnistylesBridge = {
 }
 
 export type UnistylesThemeEvent = {
-    type: CxxUnistylesEventTypes.Theme,
+    type: UnistylesEventType.Theme,
     payload: {
         themeName: keyof UnistylesThemes
     }
 }
 
 export type UnistylesMobileLayoutEvent = {
-    type: CxxUnistylesEventTypes.Layout,
+    type: UnistylesEventType.Layout,
     payload: {
         screen: ScreenSize,
         breakpoint: keyof UnistylesBreakpoints,
@@ -49,7 +49,7 @@ export type UnistylesMobileLayoutEvent = {
 }
 
 export type UnistylesPluginEvent = {
-    type: CxxUnistylesEventTypes.Plugin
+    type: UnistylesEventType.Plugin
 }
 
 export type UnistylesEvents = UnistylesThemeEvent | UnistylesMobileLayoutEvent | UnistylesPluginEvent
