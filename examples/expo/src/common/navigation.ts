@@ -23,7 +23,8 @@ export enum DemoNames {
     BenchmarkAllFeatures = 'BenchmarkAllFeatures',
     PlatformColors = 'PlatformColors',
     StyleSheet = 'StyleSheet',
-    MemoizationScreen = 'MemoizationScreen'
+    MemoizationScreen = 'MemoizationScreen',
+    NoStyleSheetScreen = 'NoStyleSheetScreen'
 }
 
 export type DemoStackParams = {
@@ -49,7 +50,8 @@ export type DemoStackParams = {
     [DemoNames.BenchmarkAllFeatures]: undefined,
     [DemoNames.PlatformColors]: undefined,
     [DemoNames.StyleSheet]: undefined,
-    [DemoNames.MemoizationScreen]: undefined
+    [DemoNames.MemoizationScreen]: undefined,
+    [DemoNames.NoStyleSheetScreen]: undefined
 }
 
 export type NavigationProps<S extends DemoNames = DemoNames.Home> = NavigationProp<DemoStackParams, S>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, Button } from 'react-native'
+import { View, Text, Button, ScrollView } from 'react-native'
 import { UnistylesRuntime, createStyleSheet, useStyles } from 'react-native-unistyles'
 import { DemoScreen } from '../components'
 import { autoGuidelinePlugin } from '../plugins'
@@ -23,108 +23,111 @@ export const RuntimeScreen: React.FunctionComponent = () => {
     return (
         <DemoScreen>
             <View style={styles.container}>
-                <Text style={styles.title}>
-                    Runtime demo
-                </Text>
-                <View style={styles.row}>
-                    <Text style={styles.text(true)}>
-                        Screen dimensions:
+                <ScrollView>
+                    <Text style={styles.title}>
+                        Runtime demo
                     </Text>
-                    <Text style={styles.text(false)}>
-                        {screen.width}x{screen.height}
-                    </Text>
-                </View>
-                <View style={styles.row}>
-                    <Text style={styles.text(true)}>
-                        Selected theme:
-                    </Text>
-                    <Text style={styles.text(false)}>
-                        {themeName}
-                    </Text>
-                </View>
-                <View style={styles.row}>
-                    <Text style={styles.text(true)}>
-                        Current breakpoint:
-                    </Text>
-                    <Text style={styles.text(false)}>
-                        {breakpoint}
-                    </Text>
-                </View>
-                <View style={styles.row}>
-                    <Text style={styles.text(true)}>
-                        Device orientation:
-                    </Text>
-                    <Text style={styles.text(false)}>
-                        {orientation}
-                    </Text>
-                </View>
-                <View style={styles.row}>
-                    <Text style={styles.text(true)}>
-                        Adaptive themes:
-                    </Text>
-                    <Text style={styles.text(false)}>
-                        {hasAdaptiveThemes ? 'Enabled' : 'Disabled'}
-                    </Text>
-                </View>
-                <View style={styles.row}>
-                    <Text style={styles.text(true)}>
-                        Preferred scheme:
-                    </Text>
-                    <Text style={styles.text(false)}>
-                        {colorScheme}
-                    </Text>
-                </View>
-                <View style={styles.row}>
-                    <Text style={styles.text(true)}>
-                        Enabled plugins:
-                    </Text>
-                    <Text style={styles.text(false)}>
-                        {enabledPlugins.length > 0 ? enabledPlugins.join(', ') : 'None'}
-                    </Text>
-                </View>
-                <View style={styles.buttons}>
                     <View style={styles.row}>
-                        <Button
-                            color={theme.colors.accent}
-                            title={enabledPlugins.includes(autoGuidelinePlugin.name)
-                                ? 'Remove Auto Guideline plugin'
-                                : 'Add Auto Guideline plugin'
-                            }
-                            onPress={() => enabledPlugins.includes(autoGuidelinePlugin.name)
-                                ? removePlugin(autoGuidelinePlugin)
-                                : addPlugin(autoGuidelinePlugin)
-                            }
-                        />
-                    </View>
-                    <View style={styles.row}>
-                        <Button
-                            color={theme.colors.accent}
-                            title="Change theme"
-                            onPress={() => {
-                                switch (themeName) {
-                                    case 'light':
-                                        return setTheme('dark')
-                                    case 'dark':
-                                        return setTheme('premium')
-                                    default:
-                                        return setTheme('light')
-                                }
-                            }}
-                        />
-                    </View>
-                    <View style={styles.row}>
-                        <Button
-                            color={theme.colors.accent}
-                            title={hasAdaptiveThemes ? 'Disable adaptive themes' : 'Enable adaptive themes'}
-                            onPress={() => setAdaptiveThemes(!hasAdaptiveThemes)}
-                        />
-                    </View>
-                    <View style={styles.row}>
-                        <Text style={styles.note}>
-                            * - Toggling adaptive themes re-renders components only if the theme changes
+                        <Text style={styles.text(true)}>
+                            Screen dimensions:
+                        </Text>
+                        <Text style={styles.text(false)}>
+                            {screen.width}x{screen.height}
                         </Text>
                     </View>
-                </View>
+                    <View style={styles.row}>
+                        <Text style={styles.text(true)}>
+                            Selected theme:
+                        </Text>
+                        <Text style={styles.text(false)}>
+                            {themeName}
+                        </Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Text style={styles.text(true)}>
+                            Current breakpoint:
+                        </Text>
+                        <Text style={styles.text(false)}>
+                            {breakpoint}
+                        </Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Text style={styles.text(true)}>
+                            Device orientation:
+                        </Text>
+                        <Text style={styles.text(false)}>
+                            {orientation}
+                        </Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Text style={styles.text(true)}>
+                            Adaptive themes:
+                        </Text>
+                        <Text style={styles.text(false)}>
+                            {hasAdaptiveThemes ? 'Enabled' : 'Disabled'}
+                        </Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Text style={styles.text(true)}>
+                            Preferred scheme:
+                        </Text>
+                        <Text style={styles.text(false)}>
+                            {colorScheme}
+                        </Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Text style={styles.text(true)}>
+                            Enabled plugins:
+                        </Text>
+                        <Text style={styles.text(false)}>
+                            {enabledPlugins.length > 0 ? enabledPlugins.join(', ') : 'None'}
+                        </Text>
+                    </View>
+                    <View style={styles.buttons}>
+                        <View style={styles.row}>
+                            <Button
+                                color={theme.colors.accent}
+                                title={enabledPlugins.includes(autoGuidelinePlugin.name)
+                                    ? 'Remove Auto Guideline plugin'
+                                    : 'Add Auto Guideline plugin'
+                                }
+                                onPress={() => enabledPlugins.includes(autoGuidelinePlugin.name)
+                                    ? removePlugin(autoGuidelinePlugin)
+                                    : addPlugin(autoGuidelinePlugin)
+                                }
+                            />
+                        </View>
+                        <View style={styles.row}>
+                            <Button
+                                color={theme.colors.accent}
+                                title="Change theme"
+                                onPress={() => {
+                                    switch (themeName) {
+                                        case 'light':
+                                            return setTheme('dark')
+                                        case 'dark':
+                                            return setTheme('premium')
+                                        default:
+                                            return setTheme('light')
+                                    }
+                                }}
+                            />
+                        </View>
+                        <View style={styles.row}>
+                            <Button
+                                color={theme.colors.accent}
+                                title={hasAdaptiveThemes ? 'Disable adaptive themes' : 'Enable adaptive themes'}
+                                onPress={() => setAdaptiveThemes(!hasAdaptiveThemes)}
+                            />
+                        </View>
+                        <View style={styles.row}>
+                            <Text style={styles.note}>
+                                * - Toggling adaptive themes re-renders components only if the theme changes
+                            </Text>
+                        </View>
+                    </View>
+                    <View style={styles.fakeSpacer} />
+                </ScrollView>
             </View>
         </DemoScreen>
     )
@@ -168,5 +171,8 @@ const stylesheet = createStyleSheet(theme => ({
         padding: 10,
         borderRadius: 5,
         marginTop: 20
+    },
+    fakeSpacer: {
+        height: 100
     }
 }))

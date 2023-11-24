@@ -1,5 +1,5 @@
 import React from 'react'
-import { UnistylesRegistry } from 'react-native-unistyles'
+import { UnistylesRegistry, UnistylesRuntime } from 'react-native-unistyles'
 import type { UnistylesThemes } from 'react-native-unistyles'
 import { useNavigation } from '@react-navigation/native'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -21,18 +21,18 @@ export const HomeScreen = () => {
                 paddingTop: top
             }}
         >
-            <View style={styles.titleContainer}>
-                <Text style={styles.unicorn}>
-                    🦄
-                </Text>
-                <Text style={styles.header}>
-                    Welcome to Unistyles 2.0!
-                </Text>
-                <Text style={styles.text}>
-                    / Select demo /
-                </Text>
-            </View>
             <ScrollView contentContainerStyle={styles.list}>
+                <View style={styles.titleContainer}>
+                    <Text style={styles.unicorn}>
+                        🦄
+                    </Text>
+                    <Text style={styles.header}>
+                        Welcome to Unistyles 2.0!
+                    </Text>
+                    <Text style={styles.text}>
+                        / Select demo /
+                    </Text>
+                </View>
                 <DemoGroup title="Themes">
                     <DemoLink
                         description="No themes"
@@ -249,7 +249,9 @@ export const HomeScreen = () => {
                                 .addConfig({
                                     adaptiveThemes: true,
                                     // plugin can be registry enabled
-                                    experimentalPlugins: [autoGuidelinePlugin]
+                                    experimentalPlugins: UnistylesRuntime.enabledPlugins.includes(autoGuidelinePlugin.name)
+                                        ? []
+                                        : [autoGuidelinePlugin]
                                 })
 
                             navigation.navigate(DemoNames.AutoGuidelinePlugin)
@@ -361,6 +363,23 @@ export const HomeScreen = () => {
                             navigation.navigate(DemoNames.StyleSheet)
                         }}
                     />
+                    <DemoLink
+                        description="No StyleSheet"
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addBreakpoints(breakpoints)
+                                .addConfig({
+                                    initialTheme: 'light'
+                                })
+
+                            navigation.navigate(DemoNames.NoStyleSheetScreen)
+                        }}
+                    />
                 </DemoGroup>
                 <DemoGroup title="Benchmark">
                     <DemoLink
@@ -414,7 +433,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#ff9ff3'
     },
     titleContainer: {
-        alignItems: 'center'
+        alignItems: 'center',
+        marginBottom: 20
     },
     unicorn: {
         fontSize: 80
@@ -422,8 +442,8 @@ const styles = StyleSheet.create({
     header: {
         fontSize: 20,
         fontWeight: 'bold',
-        marginBottom: 20,
-        color: '#B53471'
+        color: '#B53471',
+        marginTop: 10
     },
     text: {
         color: '#2f3542',
