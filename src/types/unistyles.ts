@@ -1,10 +1,9 @@
 import { UnistylesEventType, ScreenOrientation } from '../common'
 import type { UnistylesThemes, UnistylesBreakpoints } from '../global'
 import type { ScreenSize } from './core'
-import type { Optional } from './common'
 import type { UnistylesPlugin } from './plugin'
 
-export type ColorSchemeName = Optional<'light' | 'dark'>
+export type ColorSchemeName = 'light' | 'dark' | 'unspecified'
 
 export type UnistylesConfig = {
     adaptiveThemes?: boolean,
