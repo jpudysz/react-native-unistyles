@@ -6,12 +6,10 @@ import type { MediaQuery } from './mq'
 // these props are treated differently to nest breakpoints and media queries
 type NestedTypes = 'shadowOffset' | 'transform' | 'textShadowOffset'
 
-// so let's remove their original types
 type UnistyleView = Omit<ViewStyle, NestedTypes>
 type UnistyleText = Omit<TextStyle, NestedTypes>
 type UnistyleImage = Omit<ImageStyle, NestedTypes>
 
-// and replace them with our own
 type UnistyleNestedStyles = {
     shadowOffset?: ToDeepUnistyles<ShadowOffset>,
     textShadowOffset?: ToDeepUnistyles<ShadowOffset>,
@@ -32,7 +30,6 @@ type Variants = {
     }
 }
 
-// but still allow the old types
 type ToDeepUnistyles<T> = {
     [K in keyof T]?: T[K] | {
         [key in BreakpointsOrMediaQueries]?: T[K]

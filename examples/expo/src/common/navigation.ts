@@ -20,7 +20,10 @@ export enum DemoNames {
     Runtime = 'Runtime',
     RuntimeWithStyleSheet = 'RuntimeWithStyleSheet',
     Benchmark = 'Benchmark',
-    BenchmarkAllFeatures = 'BenchmarkAllFeatures'
+    BenchmarkAllFeatures = 'BenchmarkAllFeatures',
+    PlatformColors = 'PlatformColors',
+    StyleSheet = 'StyleSheet',
+    MemoizationScreen = 'MemoizationScreen'
 }
 
 export type DemoStackParams = {
@@ -43,7 +46,10 @@ export type DemoStackParams = {
     [DemoNames.Runtime]: undefined,
     [DemoNames.RuntimeWithStyleSheet]: undefined,
     [DemoNames.Benchmark]: undefined,
-    [DemoNames.BenchmarkAllFeatures]: undefined
+    [DemoNames.BenchmarkAllFeatures]: undefined,
+    [DemoNames.PlatformColors]: undefined,
+    [DemoNames.StyleSheet]: undefined,
+    [DemoNames.MemoizationScreen]: undefined
 }
 
 export type NavigationProps<S extends DemoNames = DemoNames.Home> = NavigationProp<DemoStackParams, S>

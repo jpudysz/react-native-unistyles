@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { StyleSheet } from 'react-native'
 import { parseStyle, proxifyFunction } from './utils'
-import { useUnistyles } from './hooks'
+import { useUnistyles, useVariants } from './hooks'
 import type { UnistylesBreakpoints } from './global'
 import { unistyles } from './core'
 import type {
@@ -19,7 +19,7 @@ type ParsedStylesheet<ST extends StyleSheetWithSuperPowers> = {
 
 export const useStyles = <ST extends StyleSheetWithSuperPowers>(
     stylesheet?: ST,
-    variant?: ExtractVariantNames<typeof stylesheet>
+    variantsMap?: ExtractVariantNames<typeof stylesheet>
 ): ParsedStylesheet<ST> => {
     const { theme, layout, plugins } = useUnistyles()
 
@@ -31,6 +31,7 @@ export const useStyles = <ST extends StyleSheetWithSuperPowers>(
         }
     }
 
+    const variants = useVariants(variantsMap)
     const parsedStyles = useMemo(() => typeof stylesheet === 'function'
         ? stylesheet(theme)
         : stylesheet, [theme, stylesheet, layout])
@@ -41,7 +42,7 @@ export const useStyles = <ST extends StyleSheetWithSuperPowers>(
             if (typeof value === 'function') {
                 return {
                     ...acc,
-                    [key]: proxifyFunction(key, value,unistyles.registry.plugins, unistyles.runtime, variant)
+                    [key]: proxifyFunction(key, value,unistyles.registry.plugins, unistyles.runtime, variants)
                 }
             }
 
@@ -52,11 +53,11 @@ export const useStyles = <ST extends StyleSheetWithSuperPowers>(
                     value,
                     unistyles.registry.plugins,
                     unistyles.runtime,
-                    variant
+                    variants
                 )
             })
         }, {}),
-    [layout, parsedStyles, variant, plugins]
+    [layout, parsedStyles, variants, plugins]
     ) as ReactNativeStyleSheet<ST>
 
     return {
