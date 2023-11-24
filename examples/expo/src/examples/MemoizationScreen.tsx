@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { Text, View, type TextStyle, Button } from 'react-native'
+import { Text, View, type TextStyle, Button, ScrollView } from 'react-native'
 import { UnistylesRuntime, createStyleSheet, mq, useStyles } from 'react-native-unistyles'
 import { DemoScreen } from '../components'
 import { autoGuidelinePlugin } from '../plugins'
@@ -21,80 +21,82 @@ export const MemoizationScreen: React.FunctionComponent = () => {
     return (
         <DemoScreen>
             <View style={styles.container}>
-                <Text>
-                    Unistyles respects React.memo
-                </Text>
-                <Memoized
-                    text="Static"
-                    style={styles.text}
-                />
-                <Memoized
-                    text="Breakpoints"
-                    style={styles.breakpoints}
-                />
-                <Memoized
-                    text="Media queries"
-                    style={styles.mediaQueries}
-                />
-                <Memoized
-                    text="Dynamic fn"
-                    style={styles.dynamicFunction()}
-                />
-                <Memoized
-                    text="Variants"
-                    style={styles.textVariants}
-                />
-                <View style={styles.actions}>
-                    <Button
-                        color={theme.colors.typography}
-                        title={`Re-render (${count})`}
-                        onPress={() => setCount(count => count + 1)}
-                    />
-                    <Button
-                        color={theme.colors.typography}
-                        title="Change theme"
-                        onPress={() => {
-                            switch (UnistylesRuntime.themeName) {
-                                case 'light':
-                                    return UnistylesRuntime.setTheme('dark')
-                                case 'dark':
-                                    return UnistylesRuntime.setTheme('premium')
-                                case 'premium':
-                                default:
-                                    return UnistylesRuntime.setTheme('light')
-                            }
-                        }}
-                    />
-                    <Button
-                        color={theme.colors.typography}
-                        title="Change variant"
-                        onPress={() => {
-                            if (!variant) {
-                                return setVariant({ size: TextVariant.sm })
-                            }
-
-                            switch (variant.size) {
-                                case TextVariant.sm:
-                                    return setVariant({ size: TextVariant.md })
-                                case TextVariant.md:
-                                default:
-                                    return setVariant(undefined)
-                            }
-                        }}
-                    />
-                    <Button
-                        color={theme.colors.typography}
-                        title="Toggle plugin"
-                        onPress={() => {
-                            UnistylesRuntime.enabledPlugins.includes(autoGuidelinePlugin.name)
-                                ? UnistylesRuntime.removePlugin(autoGuidelinePlugin)
-                                : UnistylesRuntime.addPlugin(autoGuidelinePlugin)
-                        }}
-                    />
-                    <Text style={styles.centerText}>
-                        Try to rotate your screen or change window size to re-render stylesheet
+                <ScrollView>
+                    <Text>
+                        Unistyles respects React.memo
                     </Text>
-                </View>
+                    <Memoized
+                        text="Static"
+                        style={styles.text}
+                    />
+                    <Memoized
+                        text="Breakpoints"
+                        style={styles.breakpoints}
+                    />
+                    <Memoized
+                        text="Media queries"
+                        style={styles.mediaQueries}
+                    />
+                    <Memoized
+                        text="Dynamic fn"
+                        style={styles.dynamicFunction()}
+                    />
+                    <Memoized
+                        text="Variants"
+                        style={styles.textVariants}
+                    />
+                    <View style={styles.actions}>
+                        <Button
+                            color={theme.colors.typography}
+                            title={`Re-render (${count})`}
+                            onPress={() => setCount(count => count + 1)}
+                        />
+                        <Button
+                            color={theme.colors.typography}
+                            title="Change theme"
+                            onPress={() => {
+                                switch (UnistylesRuntime.themeName) {
+                                    case 'light':
+                                        return UnistylesRuntime.setTheme('dark')
+                                    case 'dark':
+                                        return UnistylesRuntime.setTheme('premium')
+                                    case 'premium':
+                                    default:
+                                        return UnistylesRuntime.setTheme('light')
+                                }
+                            }}
+                        />
+                        <Button
+                            color={theme.colors.typography}
+                            title="Change variant"
+                            onPress={() => {
+                                if (!variant) {
+                                    return setVariant({ size: TextVariant.sm })
+                                }
+
+                                switch (variant.size) {
+                                    case TextVariant.sm:
+                                        return setVariant({ size: TextVariant.md })
+                                    case TextVariant.md:
+                                    default:
+                                        return setVariant(undefined)
+                                }
+                            }}
+                        />
+                        <Button
+                            color={theme.colors.typography}
+                            title="Toggle plugin"
+                            onPress={() => {
+                                UnistylesRuntime.enabledPlugins.includes(autoGuidelinePlugin.name)
+                                    ? UnistylesRuntime.removePlugin(autoGuidelinePlugin)
+                                    : UnistylesRuntime.addPlugin(autoGuidelinePlugin)
+                            }}
+                        />
+                        <Text style={styles.centerText}>
+                            Try to rotate your screen or change window size to re-render stylesheet
+                        </Text>
+                    </View>
+                </ScrollView>
             </View>
         </DemoScreen>
     )

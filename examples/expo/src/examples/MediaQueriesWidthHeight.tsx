@@ -48,7 +48,7 @@ const stylesheet = createStyleSheet(theme => ({
         color: {
             // you can also use media queries with breakpoint keys
             [mq.only.width('xs', 'md')]: theme.colors.typography,
-            [mq.only.width('md')]: theme.colors.accent
+            [mq.only.width('md')]: theme.colors.typography
         }
     }
 }))

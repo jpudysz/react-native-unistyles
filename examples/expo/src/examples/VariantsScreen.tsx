@@ -94,7 +94,7 @@ const stylesheet = createStyleSheet(theme => ({
                 default: {
                     color: {
                         sm: theme.colors.typography,
-                        lg: theme.colors.accent
+                        lg: theme.colors.typography
                     }
                 }
             }
