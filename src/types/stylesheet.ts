@@ -1,7 +1,6 @@
 import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
 import type { ShadowOffset, TransformStyles, UnistylesTheme } from './core'
 import type { UnistylesBreakpoints } from '../global'
-import type { MediaQuery } from './mq'
 
 // these props are treated differently to nest breakpoints and media queries
 type NestedTypes = 'shadowOffset' | 'transform' | 'textShadowOffset'
@@ -19,18 +18,12 @@ type UnistyleNestedStyles = {
 type Variants = {
     variants?: {
         [variantName: string]: {
-            [variant: string]: {
-                [propName in AllAvailableKeys]?: AllAvailableStyles[propName] | {
-                    [key in BreakpointsOrMediaQueries]?: AllAvailableStyles[propName]
-                } & {
-                    [propName in NestedTypes]?: UnistyleNestedStyles[propName]
-                }
-            }
+            [variant: string]: Omit<UnistylesValues, 'variants'>
         }
     }
 }
 
-type ToDeepUnistyles<T> = {
+export type ToDeepUnistyles<T> = {
     [K in keyof T]?: T[K] | {
         [key in BreakpointsOrMediaQueries]?: T[K]
     }
@@ -39,7 +32,7 @@ type ToDeepUnistyles<T> = {
 type AllAvailableStyles = UnistyleView & UnistyleText & UnistyleImage & UnistyleNestedStyles
 
 export type AllAvailableKeys = keyof (UnistyleView & UnistyleText & UnistyleImage)
-export type BreakpointsOrMediaQueries = keyof UnistylesBreakpoints | MediaQuery
+export type BreakpointsOrMediaQueries = keyof UnistylesBreakpoints | symbol
 
 export type UnistylesValues = {
     [propName in AllAvailableKeys]?: AllAvailableStyles[propName] | {

@@ -1,24 +1,26 @@
 import type { ColorValue, OpaqueColorValue } from 'react-native'
 import type { UnistylesTheme } from '../types'
-import type { AllAvailableKeys, BreakpointsOrMediaQueries } from './stylesheet'
+import type { BreakpointsOrMediaQueries, ToDeepUnistyles } from './stylesheet'
+import type { TransformStyles } from './core'
 
-type WithEmptyObject<V> = keyof V extends never ? {} : V
+type ExtractTransformArray<T> = T extends object
+    ? { [K in keyof T]: ExtractBreakpoints<T[K]> }
+    : never
 
-type ExtractBreakpoints<T> = T extends Partial<Record<BreakpointsOrMediaQueries, infer R>>
-    ? WithEmptyObject<R>
-    : {
-        [K in keyof T]: T[K] extends object
-            ? T[K] extends OpaqueColorValue
-                ? ColorValue
-                : ExtractBreakpoints<T[K]>
-            : T[K]
-    }
+type ExtractBreakpoints<T> = T extends object
+    ? keyof T extends BreakpointsOrMediaQueries
+        ? T[keyof T]
+        : T extends Array<ToDeepUnistyles<TransformStyles>>
+            ? Array<ExtractTransformArray<T[number]>>
+            : {
+                [K in keyof T]: ExtractBreakpoints<T[K]>
+            }
+    : T
 
 type ParseNestedObject<T> = T extends (...args: infer A) => infer R
     ? (...args: A) => ParseNestedObject<R>
-    : keyof T extends AllAvailableKeys
-        ? ExtractBreakpoints<T>
-        : T extends { variants: infer R }
+    : T extends object
+        ? T extends { variants: infer R }
             ? ParseVariants<FlattenVariants<R>> & ParseNestedObject<Omit<T, 'variants'>>
             : {
                 [K in keyof T]: T[K] extends object
@@ -27,6 +29,7 @@ type ParseNestedObject<T> = T extends (...args: infer A) => infer R
                         : ExtractBreakpoints<T[K]>
                     : T[K]
             }
+        : T
 
 type FlattenVariants<T> = T extends object
     ? {

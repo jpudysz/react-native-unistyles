@@ -1,7 +1,6 @@
 export * from './normalizer'
 export * from './unistyles'
 export type { Optional, Nullable } from './common'
-export type { MediaQuery } from './mq'
 export type {
     NestedStylePairs,
     UnistylesTheme,
