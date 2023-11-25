@@ -82,7 +82,7 @@
     "react-native-web": "0.19.9",
     "react-test-renderer": "18.2.0",
     "release-it": "17.0.0",
-    "typescript": "5.2.2"
+    "typescript": "5.3.2"
   },
   "peerDependencies": {
     "@react-native/normalize-colors": "*",

@@ -15,7 +15,6 @@ import type {
 } from 'react-native/Libraries/StyleSheet/StyleSheetTypes'
 import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
-import type { MediaQuery } from './mq'
 
 export type ShadowOffset = {
     width: number,
@@ -44,7 +43,7 @@ export type ScreenSize = {
 
 export type RNStyle = ViewStyle | TextStyle | ImageStyle
 export type RNValue = number | string | undefined
-export type NestedStyle = Record<keyof UnistylesBreakpoints | MediaQuery, RNValue>
-export type NestedStylePairs = Array<[keyof UnistylesBreakpoints | MediaQuery, RNValue]>
+export type NestedStyle = Record<keyof UnistylesBreakpoints | symbol, RNValue>
+export type NestedStylePairs = Array<[keyof UnistylesBreakpoints | symbol, RNValue]>
 export type UnistylesTheme = UnistylesThemes[keyof UnistylesThemes]
 export type CreateStylesFactory<ST> = (theme: UnistylesTheme) => ST

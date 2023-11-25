@@ -51,7 +51,8 @@ const stylesheet = createStyleSheet(theme => ({
                         sm: 10,
                         md: 10,
                         lg: 10
-                    }
+                    },
+                    justifyContent: 'center'
                 }
             },
             colors: {
