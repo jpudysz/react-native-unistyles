@@ -22,22 +22,13 @@ export const useStyles = <ST extends StyleSheetWithSuperPowers>(
     variantsMap?: ExtractVariantNames<typeof stylesheet>
 ): ParsedStylesheet<ST> => {
     const { theme, layout, plugins } = useUnistyles()
-
-    if (!stylesheet) {
-        return {
-            theme,
-            breakpoint: layout.breakpoint,
-            styles: {} as ReactNativeStyleSheet<ST>
-        }
-    }
-
     const variants = useVariants(variantsMap)
     const parsedStyles = useMemo(() => typeof stylesheet === 'function'
         ? stylesheet(theme)
         : stylesheet, [theme, stylesheet, layout])
 
     const dynamicStyleSheet = useMemo(() => Object
-        .entries(parsedStyles)
+        .entries(parsedStyles || {})
         .reduce((acc, [key, value]) => {
             if (typeof value === 'function') {
                 return {
@@ -56,13 +47,12 @@ export const useStyles = <ST extends StyleSheetWithSuperPowers>(
                     variants
                 )
             })
-        }, {}),
-    [layout, parsedStyles, variants, plugins]
-    ) as ReactNativeStyleSheet<ST>
+        }, {}), [layout, parsedStyles, variants, plugins]
+    )
 
     return {
         theme,
         breakpoint: layout.breakpoint,
-        styles: dynamicStyleSheet
+        styles: dynamicStyleSheet as ReactNativeStyleSheet<ST>
     }
 }
