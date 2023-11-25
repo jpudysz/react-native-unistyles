@@ -23,7 +23,10 @@ export class UnistyleRegistry {
         this.unistylesBridge.themes = keys
         this.themeNames = keys
 
-        return this
+        return {
+            addBreakpoints: this.addBreakpoints,
+            addConfig: this.addConfig
+        }
     }
 
     public addBreakpoints = (breakpoints: UnistylesBreakpoints) => {
@@ -31,7 +34,10 @@ export class UnistyleRegistry {
         this.unistylesBridge.useBreakpoints(breakpoints)
         this.sortedBreakpointPairs = this.unistylesBridge.sortedBreakpointPairs
 
-        return this
+        return {
+            addThemes: this.addThemes,
+            addConfig: this.addConfig
+        }
     }
 
     public addConfig = (config: UnistylesConfig) => {
@@ -48,6 +54,11 @@ export class UnistyleRegistry {
         if (config.initialTheme) {
             this.unistylesBridge.useTheme(config.initialTheme)
         }
+
+        return {
+            addBreakpoints: this.addBreakpoints,
+            addThemes: this.addThemes
+        }
     }
 
     public getTheme = (forName: keyof UnistylesThemes) => {
@@ -55,11 +66,15 @@ export class UnistyleRegistry {
             return {} as UnistylesThemes[keyof UnistylesThemes]
         }
 
-        if (!this.hasTheme(forName)) {
+        if (this.hasTheme(forName)) {
+            return this.themes[forName]
+        }
+
+        if (this.unistylesBridge.themeName) {
             throw new Error(UnistylesError.ThemeNotFound)
         }
 
-        return this.themes[forName]
+        throw new Error(UnistylesError.ThemeNotSelected)
     }
 
     public addPlugin = (plugin: UnistylesPlugin, notify: boolean = true) => {

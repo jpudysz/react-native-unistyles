@@ -22,13 +22,14 @@ export enum UnistylesEventType {
 }
 
 export enum UnistylesError {
-    RuntimeUnavailable = 'Unistyles runtime is not available. Make sure you followed the installation instructions.',
-    ThemeNotFound = 'You are trying to get a theme that is not registered.',
-    ThemeNotRegistered = 'You are trying to set a theme that is not registered.',
-    ThemesCannotBeEmpty = 'You are trying to register an empty themes object.',
-    BreakpointsCannotBeEmpty = 'You are trying to register an empty breakpoints object.',
-    BreakpointsMustStartFromZero = 'One breakpoint must start from 0.',
-    InvalidPluginName = 'Plugin name can\'t start from reserved prefix. Use another name.',
-    DuplicatePluginName = 'You are trying to register a plugin with a name that is already registered.',
-    CantRemoveInternalPlugin = 'You are trying to remove an internal unistyles plugin.'
+    RuntimeUnavailable = 'Unistyles runtime is not available. Make sure you followed the installation instructions',
+    ThemeNotFound = 'You are trying to get a theme that is not registered with UnistylesRegistry',
+    ThemeNotRegistered = 'You are trying to set a theme that was not registered with UnistylesRegistry',
+    ThemeNotSelected = 'Your themes are registered, but you didn\'t select the initial theme',
+    ThemesCannotBeEmpty = 'You are trying to register empty themes object',
+    BreakpointsCannotBeEmpty = 'You are trying to register empty breakpoints object',
+    BreakpointsMustStartFromZero = 'You are trying to register breakpoints that don\'t start from 0',
+    InvalidPluginName = 'Plugin name can\'t start from reserved prefix __unistyles',
+    DuplicatePluginName = 'You are trying to register a plugin with a name that is already registered',
+    CantRemoveInternalPlugin = 'You are trying to remove an internal unistyles plugin'
 }
