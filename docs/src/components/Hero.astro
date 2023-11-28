@@ -72,6 +72,7 @@ import MediaImage from './MediaImage.astro'
     const scrollTarget = document.querySelector<HTMLDivElement>('.scroll-target')!
     const cloudA = document.querySelector<HTMLDivElement>('.cloud-a')!
     const cloudB = document.querySelector<HTMLDivElement>('.cloud-b')!
+    const scrollButton = document.querySelector<HTMLDivElement>('.scroll')!
 
     scroll(timeline([
         [cloudA, { transform: ['translateX(0%)', 'translateX(-5%)'] }, { at: '<' } ],
@@ -79,6 +80,10 @@ import MediaImage from './MediaImage.astro'
     ]), {
         smooth: 1,
         target: scrollTarget
+    })
+
+    scrollButton.addEventListener('click', () => {
+        document.querySelector('#features')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     })
 </script>
 
