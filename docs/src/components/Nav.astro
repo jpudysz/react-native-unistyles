@@ -47,10 +47,14 @@ const links = [
        display: flex;
        justify-content: space-between;
        align-items: center;
-       padding: 48px;
+       padding: 16px;
        font-size: 24px;
        background: linear-gradient(to bottom, rgba(22, 10, 97, 0.38), ease-in-out, transparent);
        z-index: 50;
+
+       @media (min-width: 700px) {
+            padding: 48px;
+       }
     }
 
     .logo {
