@@ -4,38 +4,66 @@ import Github from '../assets/github.svg'
 import Unicorn from '../assets/unicorn.svg'
 import CloudA from '../assets/cloud-a.svg'
 import CloudB from '../assets/cloud-b.svg'
+import HeroMobile from '../assets/hero-mobile.svg'
 import ArrowDown from '../assets/arrow-down.svg'
+import MediaImage from './MediaImage.astro'
 ---
 
-<Image class="unicorn" src={Unicorn} alt="" />
-<Image class="cloud-a" src={CloudA} alt="" />
-<Image class="cloud-b" src={CloudB} alt="" />
+<div class="hero-container">
+    <MediaImage
+        class="hero"
+        image={Unicorn}
+        mediaQuery='(min-width: 700px)'
+    />
+    <MediaImage
+        class="cloud-a"
+        image={CloudA}
+        mediaQuery='(min-width: 700px)'
+    />
+    <MediaImage
+        class="cloud-b"
+        image={CloudB}
+        mediaQuery='(min-width: 700px)'
+    />
+</div>
 <div class="hero-gradient"></div>
+<MediaImage
+    class="hero-mobile"
+    image={HeroMobile}
+    mediaQuery='(max-width: 699px)'
+/>
+<picture>
+    <source
+        src={HeroMobile.src}
+        media="(max-width: 699px)"
+    />
+</picture>
+<div class="hero-mobile-gradient"></div>
 <div class="scroll-target"></div>
 <section class="welcome">
     <h1>
-            Welcome to <span class="bold">Unistyles 2.0<span> </span>
-            <h2>Level up your React Native StyleSheet!</h2>
-            <div class="buttons">
-                <a href="/start/setup/">
-                    <button class="primary"> Get Started</button>
-                </a>
-                <a
-                    href="https://github.com/jpudysz/react-native-unistyles"
-                    target="_blank"
-                >
-                    <button>
-                        <Image class="github" src={Github} alt="" />
-                         Github
-                    </button>
-                </a>
-            </div>
-        </span>
-        <div class="scroll">
-            Click to scroll
-            <Image class="scroll__icon" src={ArrowDown} alt="" />
-        </div>
+        Welcome to
+        <span class="bold">Unistyles 2.0</span>
     </h1>
+    <h2>Level up your React Native StyleSheet!</h2>
+    <div class="buttons">
+        <a href="/start/setup/">
+            <button class="primary"> Get Started</button>
+        </a>
+        <a
+            href="https://github.com/jpudysz/react-native-unistyles"
+            target="_blank"
+        >
+            <button>
+                <Image class="github" src={Github} alt="" />
+                    Github
+            </button>
+        </a>
+    </div>
+    <div class="scroll">
+        Click to scroll
+        <Image class="scroll__icon" src={ArrowDown} alt="" />
+    </div>
 </section>
 
 <script>
@@ -67,11 +95,40 @@ import ArrowDown from '../assets/arrow-down.svg'
         }
     }
 
+    .hero {
+        position: absolute;
+        z-index: 10;
+    }
+
     .unicorn,
     .cloud-a,
     .cloud-b {
         height: auto;
         position: absolute;
+    }
+
+    .hero-mobile {
+        position: absolute;
+        inset: 0;
+        display: block;
+        width: 100%;
+        height: auto;
+        z-index: 20;
+    }
+
+    .hero-mobile-gradient {
+        position: absolute;
+        width: 100vw;
+        height: 180vw;
+        top: 80vw;
+        left: 0;
+        mask-image: linear-gradient(to bottom, transparent 0%, black 10vw, black 10vw, transparent 100%);
+        z-index: 20;
+        background: linear-gradient(to bottom, #fbece9, ease-in-out, #aa98d0);
+
+        @media (min-width: 700px) {
+            display: none;
+        }
     }
 
     .scroll-target {
@@ -113,24 +170,36 @@ import ArrowDown from '../assets/arrow-down.svg'
             transparent
         );
         position: absolute;
-        left: 0;
-        top: 20vw;
+        left: -30vw;
+        top: 50vw;
+
+        @media (min-width: 700px) {
+            left: 0;
+            top: 20vw;
+        }
     }
 
     .welcome {
         position: relative;
         color: var(--black);
         z-index: 20;
-        padding: 22vw 11vw;
+        margin-top: 100vw;
+        padding: 0 20px;
+
+        @media (min-width: 700px) {
+            padding: 22vw 11vw;
+            margin-top: 0;
+        }
     }
 
     h1 {
-        font-size: clamp(32px, 3.5vw, 74px);
+        font-size: clamp(48px, 3.5vw, 74px);
         font-weight: 500;
+        line-height: 52px;
     }
 
     h2 {
-        font-size: clamp(16px, 1.5vw, 32px);
+        font-size: clamp(20px, 1.5vw, 32px);
         font-weight: 600;
         margin-left: 1%;
     }
@@ -142,14 +211,29 @@ import ArrowDown from '../assets/arrow-down.svg'
     .buttons {
         margin-top: 40px;
         display: flex;
+        justify-content: space-between;
         gap: 16px;
+        width: 100%;
+
+        @media (min-width: 700px) {
+            justify-content: flex-start;
+        }
+
+        a {
+            width: 50%;
+
+            @media (min-width: 700px) {
+                width: auto;
+            }
+        }
     }
 
     button {
         font: inherit;
         font-size: 100%;
         border: none;
-        padding: 16px 48px;
+        padding: 16px 0px;
+        width: 100%;
         border-radius: 100px;
         background-color: rgba(255, 255, 255, 0.5);
         color: var(--black);
@@ -159,6 +243,14 @@ import ArrowDown from '../assets/arrow-down.svg'
         display: flex;
         gap: 10px;
         align-items: center;
+        white-space: nowrap;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        @media (min-width: 700px) {
+            padding: 16px 48px;
+        }
     }
 
     .primary {
@@ -178,13 +270,17 @@ import ArrowDown from '../assets/arrow-down.svg'
         left: 50%;
         top: 55vw;
         transform: translateX(-50%);
-        display: flex;
         flex-direction: column;
         align-items: center;
         gap: 16px;
         font-weight: 700;
         font-size: 16px;
         cursor: pointer;
+        display: none;
+
+        @media (min-width: 700px) {
+            display: flex;
+        }
 
         &::selection {
             background-color: var(--background);

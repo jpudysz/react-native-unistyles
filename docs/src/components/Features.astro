@@ -77,6 +77,11 @@ const features = [
 </section>
 
 <style>
+    section {
+        position: relative;
+        z-index: 1000;
+    }
+
     h2 {
         font-weight: 700;
         font-size: 40px;
@@ -93,7 +98,6 @@ const features = [
 
         @media (min-width: 1025px) {
             visibility: visible!important;
-            padding: 0 20px!important;
             margin: 0 auto!important;
             flex-wrap: wrap;
             justify-content: center;
@@ -123,12 +127,21 @@ const features = [
         &__title {
             font-size: 24px;
             font-weight: 700;
+
+            @media (max-width: 1024px) {
+                font-size: 16px;
+            }
         }
 
         &__description {
             font-size: 24px;
             line-height: 32px;
             font-weight: 500;
+
+            @media (max-width: 1024px) {
+                font-size: 16px;
+                line-height: 18px;
+            }
         }
     }
 </style>

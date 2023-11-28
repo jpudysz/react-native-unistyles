@@ -30,11 +30,15 @@ const motto = 'Bridging Your Idea to the digital world\nYour experts in mobile a
 
 <style>
     footer {
+        --height: max(42vw, 700px);
+    }
+
+    footer {
         position: relative;
         padding: 0;
         margin: 0;
         color: var(--black);
-        margin-top: 15vw;
+        margin-top: calc(var(--height) / 2);
     }
 
     .footer-gradient {
@@ -47,11 +51,12 @@ const motto = 'Bridging Your Idea to the digital world\nYour experts in mobile a
     }
 
     .clouds {
-        width: 100vw;
-        height: auto;
+        width: auto;
+        height: var(--height);
         position: absolute;
         bottom: 0;
-        left: 0;
+        left: 50%;
+        transform: translateX(-50%);
     }
 
     .footer-content {
