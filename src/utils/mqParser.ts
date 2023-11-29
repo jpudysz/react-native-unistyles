@@ -1,4 +1,4 @@
-import type { NestedStylePairs, Optional, ScreenSize } from '../types'
+import type { Optional, RNValue, ScreenSize } from '../types'
 
 const IS_UNISTYLES_REGEX = /:([hw])\[(\d+)(?:,\s*(\d+|Infinity))?]/
 const UNISTYLES_WIDTH_REGEX = /:(w)\[(\d+)(?:,\s*(\d+|Infinity))?]/
@@ -80,7 +80,7 @@ const isWithinTheHeight = (height: UnistylesParsedMq['height'], screenHeight: nu
     return screenHeight >= from && screenHeight <= to
 }
 
-export const getKeyForUnistylesMediaQuery = (mediaQueries: NestedStylePairs, screenSize: ScreenSize): Optional<string> => {
+export const getKeyForUnistylesMediaQuery = (mediaQueries: Array<[string, RNValue]>, screenSize: ScreenSize): Optional<string> => {
     const mq = mediaQueries.find(([key]) => {
         if (!isUnistylesMq(key as string)) {
             return false

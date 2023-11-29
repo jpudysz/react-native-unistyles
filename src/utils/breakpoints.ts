@@ -1,12 +1,12 @@
 import { unistyles } from '../core'
-import type { NestedStyle, NestedStylePairs, Optional, RNValue } from '../types'
+import type { Optional, RNValue } from '../types'
 import type { UnistylesBreakpoints } from '../global'
 import { ScreenOrientation, isMobile } from '../common'
 import { getKeyForUnistylesMediaQuery } from './mqParser'
 
-export const getValueForBreakpoint = (value: NestedStyle): Optional<RNValue> => {
+export const getValueForBreakpoint = (value: Record<string, RNValue>): Optional<RNValue> => {
     const customMediaQueryKey = getKeyForUnistylesMediaQuery(
-        Object.entries(value) as NestedStylePairs,
+        Object.entries(value),
         unistyles.runtime.screen
     ) as keyof typeof value
 

@@ -1,19 +1,14 @@
-import type { NestedStyle, UnistylesPlugin, StyleSheet, Optional } from '../types'
+import type { Optional, RNStyle, RNValue } from '../types'
 import { getValueForBreakpoint } from './breakpoints'
-import type { UnistylesRuntime } from '../core'
 import { isAndroid, isIOS } from '../common'
-import { getStyleWithVariants } from './variants'
-import { withPlugins } from '../plugins'
+import { withPlugins } from './withPlugins'
 
 export const proxifyFunction = (
     key: string,
     fn: Function,
-    plugins: Array<UnistylesPlugin>,
-    runtime: UnistylesRuntime,
     variant?: Record<string, Optional<string>>
 ): Function => new Proxy(fn, {
-    apply: (target, thisArg, argumentsList) =>
-        parseStyle(key, target.apply(thisArg, argumentsList), plugins, runtime, variant)
+    apply: (target, thisArg, argumentsList) => withPlugins(key, parseStyle(target.apply(thisArg, argumentsList), variant))
 })
 
 export const isPlatformColor = <T extends {}>(value: T): boolean => {
@@ -24,51 +19,47 @@ export const isPlatformColor = <T extends {}>(value: T): boolean => {
     return isAndroid && 'resource_paths' in value && typeof value.resource_paths === 'object'
 }
 
-export const parseStyle = <T extends StyleSheet>(
-    key: string,
+export const parseStyle = <T extends RNStyle>(
     style: T,
-    plugins: Array<UnistylesPlugin>,
-    runtime: UnistylesRuntime,
-    variant?: Record<string, Optional<string>>
-): T => {
-    const entries = Object
-        .entries(getStyleWithVariants(style || {}, variant)) as Array<[keyof T, StyleSheet]>
+    variant: Record<string, Optional<string>> = {}
+): T => Object
+    .entries(style || {})
+    .reduce((acc, [key, value]) => {
+        // nested objects
+        if (key === 'shadowOffset' || key  === 'textShadowOffset') {
+            acc[key] = parseStyle(value, variant)
 
-    const parsedStyles = Object
-        .fromEntries(entries
-            .map(([key, value]) => {
-                // dynamic functions
-                if (typeof value === 'function') {
-                    return [key, value]
-                }
+            return acc
+        }
 
-                // nested objects
-                if (key === 'shadowOffset' || key === 'textShadowOffset') {
-                    return [
-                        key,
-                        parseStyle(key, value, plugins, runtime, variant)
-                    ]
-                }
+        // transforms
+        if (key === 'transform' && Array.isArray(value)) {
+            acc[key] = value.map(value => parseStyle(value, variant))
 
-                // transforms
-                if (key === 'transform' && Array.isArray(value)) {
-                    return [
-                        key,
-                        value.map(value => parseStyle(key, value, plugins, runtime, variant))
-                    ]
-                }
+            return acc
+        }
 
-                // values or platform colors
-                if (typeof value !== 'object' || isPlatformColor(value)) {
-                    return [key, value]
-                }
+        // values or platform colors
+        if (typeof value !== 'object' || isPlatformColor(value)) {
+            acc[key as keyof T] = value
 
-                return [
-                    key,
-                    getValueForBreakpoint(value as NestedStyle)
-                ]
-            })
-        ) as T
+            return acc
+        }
 
-    return withPlugins(key, parsedStyles, plugins, runtime) as T
-}
+        if (key === 'variants') {
+            return {
+                ...acc,
+                ...(Object
+                    .keys(value) as Array<keyof typeof value>)
+                    .reduce((acc, key) => ({
+                        ...acc,
+                        ...parseStyle((value)[key][variant[key as keyof typeof variant] || 'default'] ?? {})
+                    }), {})
+            }
+        }
+
+        return {
+            ...acc,
+            [key]: getValueForBreakpoint(value as Record<string, RNValue>)
+        }
+    }, {} as T)

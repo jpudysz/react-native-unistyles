@@ -45,9 +45,12 @@ type FlattenVariants<T> = T extends object
 
 type ParseVariants<T> = T extends object
     ? T[keyof T] extends object
-        ? ParseVariants<T[keyof T]>
+        ? UnionToIntersection<ParseVariants<T[keyof T]>>
         : T
     : T
+
+type UnionToIntersection<U> =
+    (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never
 
 type ParseStyleKeys<T> = T extends object
     ? { [K in keyof T]: ParseNestedObject<T[K]> }

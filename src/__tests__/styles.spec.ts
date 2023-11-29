@@ -43,8 +43,7 @@ describe('styles', () => {
             const result = proxifyFunction(
                 'container',
                 dynamicFunction,
-                [],
-                unistyles.runtime
+                {}
             )(true)
 
             expect(result).toEqual({
@@ -73,8 +72,7 @@ describe('styles', () => {
             const result = proxifyFunction(
                 'container',
                 dynamicFunction,
-                [],
-                unistyles.runtime
+                {}
             )(false)
 
             expect(result).toEqual({
@@ -98,8 +96,7 @@ describe('styles', () => {
             const result = proxifyFunction(
                 'container',
                 dynamicFunction,
-                [],
-                unistyles.runtime
+                {}
             )(false)
 
             expect(result).toEqual({
@@ -129,10 +126,8 @@ describe('styles', () => {
                 fontWeight: 'bold'
             }
             const parsedStyles = parseStyle(
-                'container',
                 style as StyleSheet,
-                [],
-                unistyles.runtime
+                {}
             )
 
             expect(parsedStyles).toEqual({
@@ -163,10 +158,8 @@ describe('styles', () => {
             }
 
             const parsedStyles = parseStyle(
-                'container',
                 style as StyleSheet,
-                [],
-                unistyles.runtime
+                {}
             )
 
             expect(parsedStyles).toEqual({
@@ -203,16 +196,12 @@ describe('styles', () => {
                 }
             }
             const parsedStyles = parseStyle(
-                'container',
                 style as StyleSheet,
-                [],
-                unistyles.runtime
+                {}
             )
             const parsedStylesWithBreakpoints = parseStyle(
-                'container',
                 styleWithBreakpoints as StyleSheet,
-                [],
-                unistyles.runtime
+                {}
             )
 
             expect(parsedStyles).toEqual({

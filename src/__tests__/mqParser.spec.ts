@@ -1,5 +1,5 @@
 import { getKeyForUnistylesMediaQuery, isValidMq, isWithinTheWidthAndHeight, mq, parseMq } from '../utils'
-import type { NestedStylePairs } from '../types'
+import type { RNValue } from '../types'
 
 jest.mock('../core', () => ({
     unistyles: {}
@@ -8,11 +8,11 @@ jest.mock('../core', () => ({
 describe('mqParser', () => {
     describe('getKeyForUnistylesMediaQuery', () => {
         it('should return key for matching media query', () => {
-            const mediaQueries = Object.entries({
-                [mq.only.width(100, 300)]: 'green',
-                [mq.only.width(300, 500)]: 'blue',
-                [mq.only.height(500, 700)]: 'red'
-            }) as NestedStylePairs
+            const mediaQueries = [
+                [[mq.only.width(100, 300).toString()], 'green'],
+                [[mq.only.width(300, 500)].toString(), 'blue'],
+                [[mq.only.height(500, 700)].toString(), 'red']
+            ] as Array<[string, RNValue]>
 
             const screenSize = {
                 width: 400,
@@ -23,12 +23,12 @@ describe('mqParser', () => {
         })
 
         it('should return undefined for invalid media queries', () => {
-            const mediaQueries = Object.entries({
-                'media-query(100-200)': 'green',
-                ':w[ , 400]': 'blue',
-                'width[200, 400]': 'red',
-                ':w[Infinity, 400]': 'pink'
-            }) as NestedStylePairs
+            const mediaQueries = [
+                ['media-query(100-200)', 'green'],
+                [':w[ , 400]', 'blue'],
+                ['width[200, 400]', 'red'],
+                [':w[Infinity, 400]', 'pink']
+            ] as Array<[string, RNValue]>
 
             const screenSize = {
                 width: 400,
@@ -39,12 +39,12 @@ describe('mqParser', () => {
         })
 
         it('should return undefined for invalid media queries after parsing', () => {
-            const mediaQueries = Object.entries({
-                ':w[200, 100]': 'green',
-                ':w[Infinity, 10000]': 'blue',
-                ':w[0, -1]': 'red',
-                ':h[-100, 800]:w[200, 300]': 'pink'
-            }) as NestedStylePairs
+            const mediaQueries = [
+                [':w[200, 100]', 'green'],
+                [':w[Infinity, 10000]', 'blue'],
+                [':w[0, -1]', 'red'],
+                [':h[-100, 800]:w[200, 300]', 'pink']
+            ] as Array<[string, RNValue]>
 
             const screenSize = {
                 width: 400,

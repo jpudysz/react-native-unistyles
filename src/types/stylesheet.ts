@@ -3,11 +3,11 @@ import type { ShadowOffset, TransformStyles, UnistylesTheme } from './core'
 import type { UnistylesBreakpoints } from '../global'
 
 // these props are treated differently to nest breakpoints and media queries
-type NestedTypes = 'shadowOffset' | 'transform' | 'textShadowOffset'
+type NestedKeys = 'shadowOffset' | 'transform' | 'textShadowOffset'
 
-type UnistyleView = Omit<ViewStyle, NestedTypes>
-type UnistyleText = Omit<TextStyle, NestedTypes>
-type UnistyleImage = Omit<ImageStyle, NestedTypes>
+type UnistyleView = Omit<ViewStyle, NestedKeys>
+type UnistyleText = Omit<TextStyle, NestedKeys>
+type UnistyleImage = Omit<ImageStyle, NestedKeys>
 
 type UnistyleNestedStyles = {
     shadowOffset?: ToDeepUnistyles<ShadowOffset>,
@@ -39,7 +39,7 @@ export type UnistylesValues = {
         [key in BreakpointsOrMediaQueries]?: AllAvailableStyles[propName]
     }
 } & Variants & {
-    [propName in NestedTypes]?: UnistyleNestedStyles[propName]
+    [propName in NestedKeys]?: UnistyleNestedStyles[propName]
 }
 
 export type StyleSheet = {
