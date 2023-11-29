@@ -5,17 +5,6 @@ import { breakpoints, darkTheme, lightTheme, premiumTheme } from '../styles'
 import { Timer } from './Timer'
 import { UnistylesFullBox } from './UnistylesFullBox'
 
-UnistylesRegistry
-    .addThemes({
-        light: lightTheme,
-        dark: darkTheme,
-        premium: premiumTheme
-    })
-    .addBreakpoints(breakpoints)
-    .addConfig({
-        initialTheme: 'light'
-    })
-
 type UnistylesBenchmarkScreenProps = {
     boxes: number,
     onMeasureEnd(renderTime: number): void
@@ -24,15 +13,28 @@ type UnistylesBenchmarkScreenProps = {
 export const UnistylesWithAllFeaturesBenchmark: React.FunctionComponent<UnistylesBenchmarkScreenProps> = ({
     boxes,
     onMeasureEnd
-}) => (
-    <Timer onMeasureEnd={onMeasureEnd}>
-        <View style={{ flexDirection: 'row', columnGap: 5 }}>
-            {Array.from({ length: boxes }).map((_, index) => (
-                <UnistylesFullBox
-                    key={index}
-                    index={index}
-                />
-            ))}
-        </View>
-    </Timer>
-)
+}) => {
+    UnistylesRegistry
+        .addThemes({
+            light: lightTheme,
+            dark: darkTheme,
+            premium: premiumTheme
+        })
+        .addBreakpoints(breakpoints)
+        .addConfig({
+            initialTheme: 'light'
+        })
+
+    return (
+        <Timer onMeasureEnd={onMeasureEnd}>
+            <View style={{ flexDirection: 'row', columnGap: 5 }}>
+                {Array.from({ length: boxes }).map((_, index) => (
+                    <UnistylesFullBox
+                        key={index}
+                        index={index}
+                    />
+                ))}
+            </View>
+        </Timer>
+    )
+}
