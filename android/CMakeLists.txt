@@ -5,6 +5,7 @@ project(unistyles)
 add_library(unistyles
     SHARED
     ../cxx/UnistylesRuntime.cpp
+    ./src/main/cxx/cpp-adapter.cpp
     ../node_modules/react-native/ReactCommon/jsi/jsi/jsi.cpp
 )
 
