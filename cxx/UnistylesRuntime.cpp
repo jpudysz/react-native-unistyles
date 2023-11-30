@@ -29,7 +29,6 @@ std::vector<jsi::PropNameID> UnistylesRuntime::getPropertyNames(jsi::Runtime& ru
     return properties;
 }
 
-
 jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& propNameId) {
     std::string propName = propNameId.utf8(runtime);
 

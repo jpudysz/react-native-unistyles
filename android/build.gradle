@@ -16,9 +16,12 @@ apply plugin: 'com.android.library'
 apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
-    compileSdkVersion safeExtGet('minSdkVersion', 21)
     compileSdkVersion safeExtGet('compileSdkVersion', 33)
     namespace "com.unistyles"
+
+    defaultConfig {
+        minSdkVersion safeExtGet('minSdkVersion', 21)
+    }
 
     externalNativeBuild {
         cmake {
