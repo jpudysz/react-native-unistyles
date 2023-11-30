@@ -1,6 +1,6 @@
 {
   "name": "react-native-unistyles",
-  "version": "2.0.0-alpha.18",
+  "version": "2.0.0-beta.0",
   "description": "Level up your React Native StyleSheet",
   "scripts": {
     "test": "jest",
@@ -9,7 +9,7 @@
     "lint": "eslint . --ext .ts,.tsx",
     "prepare": "husky install && bob build",
     "precommit": "concurrently 'yarn tsc' 'yarn lint' 'yarn test'",
-    "release": "release-it patch --preRelease=alpha --npm.tag=next"
+    "release": "release-it patch --preRelease=beta --npm.tag=next"
   },
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
