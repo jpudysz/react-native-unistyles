@@ -117,7 +117,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
         reactApplicationContext
             .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-            .emit("onChange", body)
+            .emit("__unistylesOnChange", body)
     }
 
     private fun onThemeChange(themeName: String) {
@@ -130,7 +130,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
         reactApplicationContext
             .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-            .emit("onChange", body)
+            .emit("__unistylesOnChange", body)
     }
 
     private fun onPluginChange() {
@@ -140,7 +140,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
         reactApplicationContext
             .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-            .emit("onChange", body)
+            .emit("__unistylesOnChange", body)
     }
 
     @ReactMethod
