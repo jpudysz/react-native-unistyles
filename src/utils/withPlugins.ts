@@ -6,7 +6,7 @@ export const withPlugins = (
     style: RNStyle
 ) => unistyles.registry.plugins.reduce((acc, plugin) => {
     if (plugin.onParsedStyle) {
-        return plugin.onParsedStyle(key, style, unistyles.runtime)
+        return plugin.onParsedStyle(key, acc, unistyles.runtime)
     }
 
     return acc

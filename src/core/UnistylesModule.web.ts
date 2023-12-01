@@ -1,56 +1,213 @@
+import { NativeEventEmitter, NativeModules } from 'react-native'
 import type { UnistylesThemes, UnistylesBreakpoints } from 'react-native-unistyles'
-import type { ColorSchemeName, UnistylesBridge } from '../types'
+import type { ColorSchemeName } from '../types'
+import { normalizeWebStylesPlugin } from '../plugins'
 
-const getPreferredColorScheme = (): ColorSchemeName => {
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return 'dark'
-    }
+export class UnistylesBridgeWeb {
+    #timerRef?: ReturnType<typeof setTimeout> = undefined
+    #hasAdaptiveThemes: boolean = false
+    #supportsAutomaticColorScheme = false
+    #screenWidth: number = window.innerWidth
+    #screenHeight: number = window.innerHeight
+    #themes: Array<keyof UnistylesThemes> = []
+    #colorScheme: ColorSchemeName = this.getPreferredColorScheme()
+    #themeName: keyof UnistylesThemes = '' as keyof UnistylesThemes
+    #enabledPlugins: Array<string> = [normalizeWebStylesPlugin.name]
+    #unistylesEvents = new NativeEventEmitter(NativeModules.Unistyles)
+    #sortedBreakpointPairs: Array<[keyof UnistylesBreakpoints, number]> = []
+    #breakpoint: keyof UnistylesBreakpoints = '' as keyof UnistylesBreakpoints
 
-    return 'light'
-}
-
-export class UnistylesBridgeWeb implements UnistylesBridge {
-    public screenWidth: number = window.innerWidth
-    public screenHeight: number = window.innerHeight
-    public enabledPlugins: Array<string> = []
-    public hasAdaptiveThemes: boolean = false
-    public themeName: keyof UnistylesThemes = '' as keyof UnistylesThemes
-    public breakpoint: keyof UnistylesBreakpoints = {} as keyof UnistylesBreakpoints
-    public colorScheme: ColorSchemeName = getPreferredColorScheme()
-    public sortedBreakpointPairs: Array<[keyof UnistylesBreakpoints, number]> = []
-    public themes: Array<keyof UnistylesThemes> = []
-
-    public useBreakpoints(breakpoints: UnistylesBreakpoints): void {
-        this.sortedBreakpointPairs = Object
-            .entries(breakpoints)
-            .sort(([, a], [, b]) => (a ?? 0) - (b ?? 0)) as Array<[keyof UnistylesBreakpoints, number]>
-    }
-
-    public useTheme(name: keyof UnistylesThemes): void {
-        this.themeName = name
-    }
-
-    public useAdaptiveThemes(enable: boolean): void {
-        this.hasAdaptiveThemes = enable
-    }
-
-    public addPlugin(pluginName: string, notify: boolean): void {
-        this.enabledPlugins = this.enabledPlugins.concat(pluginName)
-
-        if (notify) {
-            // todo
-        }
-    }
-
-    public removePlugin(pluginName: string): void {
-        this.enabledPlugins = this.enabledPlugins.filter(name => name !== pluginName)
+    constructor() {
+        this.setupListeners()
     }
 
     public install() {
         // @ts-ignore
-        window.__UNISTYLES__ = this
+        window.__UNISTYLES__ = new Proxy({}, {
+            get: (_target, prop) => {
+                switch (prop) {
+                    case 'themeName':
+                        return this.getTheme()
+                    case 'screenWidth':
+                        return this.#screenWidth
+                    case 'screenHeight':
+                        return this.#screenHeight
+                    case 'breakpoint':
+                        return this.#breakpoint || undefined
+                    case 'hasAdaptiveThemes':
+                        return this.#hasAdaptiveThemes
+                    case 'sortedBreakpointPairs':
+                        return this.#sortedBreakpointPairs
+                    case 'enabledPlugins':
+                        return this.#enabledPlugins
+                    case 'colorScheme':
+                        return this.#colorScheme
+                    case 'useTheme':
+                        return (themeName: keyof UnistylesThemes) => this.useTheme(themeName)
+                    case 'useBreakpoints':
+                        return (breakpoints: UnistylesBreakpoints) => this.useBreakpoints(breakpoints)
+                    case 'useAdaptiveThemes':
+                        return (enable: boolean) => this.useAdaptiveThemes(enable)
+                    case 'addPlugin':
+                        return (pluginName: string, notify: boolean) => this.addPlugin(pluginName, notify)
+                    case 'removePlugin':
+                        return (pluginName: string) => this.removePlugin(pluginName)
+                    default:
+                        return Reflect.get(this, prop)
+                }
+            },
+            set: (target, prop, newValue, receiver) => {
+                switch (prop) {
+                    case 'themes': {
+                        this.#themes = newValue
+                        this.#supportsAutomaticColorScheme = newValue.includes('light') && newValue.includes('dark')
+
+                        return true
+                    }
+                    case 'themeName': {
+                        this.#themeName = newValue as keyof UnistylesThemes
+                        this.emitThemeChange()
+
+                        return true
+                    }
+                    default:
+                        return Reflect.set(target, prop, newValue, receiver)
+                }
+            }
+        })
 
         return true
+    }
+
+    private useTheme(themeName: keyof UnistylesThemes) {
+        this.#themeName = themeName
+        this.emitThemeChange()
+    }
+
+    private useBreakpoints(breakpoints: UnistylesBreakpoints) {
+        this.#sortedBreakpointPairs = Object
+            .entries(breakpoints)
+            .sort(([, a], [, b]) => (a ?? 0) - (b ?? 0)) as Array<[keyof UnistylesBreakpoints, number]>
+        this.#breakpoint = this.getBreakpointFromScreenWidth(this.#screenWidth)
+    }
+
+    private useAdaptiveThemes(enable: boolean) {
+        this.#hasAdaptiveThemes = enable
+
+        if (!this.#hasAdaptiveThemes || !this.#supportsAutomaticColorScheme) {
+            return
+        }
+
+        if (this.#themeName !== this.#colorScheme) {
+            this.#themeName = this.#colorScheme as keyof UnistylesThemes
+            this.emitThemeChange()
+        }
+    }
+
+    private addPlugin(pluginName: string, notify: boolean) {
+        this.#enabledPlugins = [pluginName].concat(this.#enabledPlugins)
+
+        if (notify) {
+            this.emitPluginChange()
+        }
+    }
+
+    private removePlugin(pluginName: string) {
+        this.#enabledPlugins = this.#enabledPlugins.filter(name => name !== pluginName)
+        this.emitPluginChange()
+    }
+
+    private getTheme(): keyof UnistylesThemes {
+
+        if (this.#themes.length === 1) {
+            return this.#themes.at(0) as keyof UnistylesThemes
+        }
+
+        return this.#themeName
+    }
+
+    private setupListeners() {
+        window.addEventListener('resize', () => {
+            clearTimeout(this.#timerRef)
+
+            this.#timerRef = setTimeout(() => {
+                this.#screenWidth = window.innerWidth
+                this.#screenHeight = window.innerHeight
+                this.#breakpoint = this.getBreakpointFromScreenWidth(this.#screenWidth)
+
+                this.emitLayoutChange()
+            }, 100)
+        })
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            this.#colorScheme = event.matches
+                ? 'dark'
+                : 'light'
+
+            if (!this.#supportsAutomaticColorScheme || !this.#hasAdaptiveThemes) {
+                return
+            }
+
+            if (this.#colorScheme !== this.#themeName) {
+                this.#themeName = this.#colorScheme as keyof UnistylesThemes
+                this.emitThemeChange()
+            }
+        })
+    }
+
+    private getBreakpointFromScreenWidth(width: number): keyof UnistylesBreakpoints {
+        const breakpoint = this.#sortedBreakpointPairs
+            .find(([, value], index, otherBreakpoints) => {
+                const minVal = value
+                const maxVal = otherBreakpoints[index + 1]?.[1]
+
+                if (!maxVal) {
+                    return true
+                }
+
+                return width >= minVal && width < maxVal
+            })
+
+        return breakpoint?.at(0) as keyof UnistylesBreakpoints
+    }
+
+    private getPreferredColorScheme() {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark'
+        }
+
+        return 'light'
+    }
+
+    private emitPluginChange() {
+        this.#unistylesEvents.emit('__unistylesOnChange', {
+            type: 'plugin'
+        })
+    }
+
+    private emitThemeChange() {
+        this.#unistylesEvents.emit('__unistylesOnChange', {
+            type: 'theme',
+            payload: {
+                themeName: this.#themeName
+            }
+        })
+    }
+
+    private emitLayoutChange() {
+        this.#unistylesEvents.emit('__unistylesOnChange', {
+            type: 'layout',
+            payload: {
+                breakpoint: this.#breakpoint,
+                orientation: this.#screenWidth > this.#screenHeight
+                    ? 'landscape'
+                    : 'portrait',
+                screen: {
+                    width: this.#screenWidth,
+                    height: this.#screenHeight
+                }
+            }
+        })
     }
 }
 

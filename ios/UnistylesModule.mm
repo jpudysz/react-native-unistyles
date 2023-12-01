@@ -65,7 +65,7 @@ RCT_EXPORT_MODULE(Unistyles)
 
 #pragma mark - Event emitter
 - (NSArray<NSString *> *)supportedEvents {
-    return @[@"onChange"];
+    return @[@"__unistylesOnChange"];
 }
 
 - (void)startObserving {
@@ -78,7 +78,7 @@ RCT_EXPORT_MODULE(Unistyles)
 
 - (void)emitEvent:(NSString *)eventName withBody:(NSDictionary *)body {
     if (self.hasListeners) {
-        [self sendEventWithName:@"onChange" body:body];
+        [self sendEventWithName:@"__unistylesOnChange" body:body];
     }
 }
 
@@ -127,7 +127,7 @@ void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSel
             }
         };
 
-        [weakSelf emitEvent:@"onChange" withBody:body];
+        [weakSelf emitEvent:@"__unistylesOnChange" withBody:body];
     });
 
     unistylesRuntime.get()->onLayoutChange([=](std::string breakpoint, std::string orientation, int width, int height) {
@@ -143,7 +143,7 @@ void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSel
             }
         };
 
-        [weakSelf emitEvent:@"onChange" withBody:body];
+        [weakSelf emitEvent:@"__unistylesOnChange" withBody:body];
     });
     
     unistylesRuntime.get()->onPluginChange([=]() {
@@ -152,7 +152,7 @@ void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSel
         };
 
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [weakSelf emitEvent:@"onChange" withBody:body];
+            [weakSelf emitEvent:@"__unistylesOnChange" withBody:body];
         });
     });
 

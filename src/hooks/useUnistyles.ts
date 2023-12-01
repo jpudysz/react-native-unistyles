@@ -20,7 +20,7 @@ export const useUnistyles = () => {
 
     useEffect(() => {
         const subscription = unistylesEvents.addListener(
-            'onChange',
+            '__unistylesOnChange',
             (event: UnistylesEvents) => {
                 switch (event.type) {
                     case UnistylesEventType.Theme: {

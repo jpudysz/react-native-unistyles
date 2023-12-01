@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { UnistylesRegistry, UnistylesRuntime } from 'react-native-unistyles'
 import type { UnistylesThemes } from 'react-native-unistyles'
 import { useNavigation } from '@react-navigation/native'
@@ -13,6 +13,12 @@ import { autoGuidelinePlugin } from '../plugins'
 export const HomeScreen = () => {
     const navigation = useNavigation<NavigationProps>()
     const { top } = useSafeAreaInsets()
+
+    useEffect(() => {
+        if (isWeb) {
+            console.log('Warnings about deprecated syntax comes from StyleSheet.create. Unistyles 🦄 will handle it for you!')
+        }
+    }, [])
 
     return (
         <View
