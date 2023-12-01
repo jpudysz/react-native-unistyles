@@ -2,7 +2,7 @@ import { UnistylesModule } from './UnistylesModule'
 import { UnistylesRuntime } from './UnistylesRuntime'
 import { UnistyleRegistry } from './UnistyleRegistry'
 import type { UnistylesBridge } from '../types'
-import { UnistylesError } from '../common'
+import { UnistylesError, isWeb } from '../common'
 
 class Unistyles {
     private _runtime: UnistylesRuntime
@@ -17,7 +17,7 @@ class Unistyles {
         }
 
         // @ts-ignore
-        this._bridge = global.__UNISTYLES__ as UnistylesBridge
+        this._bridge = (isWeb ? window : global).__UNISTYLES__ as UnistylesBridge
         this._registry = new UnistyleRegistry(this._bridge)
         this._runtime = new UnistylesRuntime(this._bridge, this._registry)
     }

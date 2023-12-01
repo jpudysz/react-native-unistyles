@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { DemoGroup, DemoLink } from '../components'
-import { DemoNames } from '../common'
+import { DemoNames, isWeb } from '../common'
 import type { NavigationProps } from '../common'
 import { breakpoints, darkTheme, lightTheme, premiumTheme } from '../styles'
 import { autoGuidelinePlugin } from '../plugins'
@@ -329,23 +329,25 @@ export const HomeScreen = () => {
                             navigation.navigate(DemoNames.MemoizationScreen)
                         }}
                     />
-                    <DemoLink
-                        description="PlatformColor"
-                        onPress={() => {
-                            UnistylesRegistry
-                                .addThemes({
-                                    light: lightTheme,
-                                    dark: darkTheme,
-                                    premium: premiumTheme
-                                })
-                                .addBreakpoints(breakpoints)
-                                .addConfig({
-                                    initialTheme: 'light'
-                                })
+                    {!isWeb && (
+                        <DemoLink
+                            description="PlatformColor"
+                            onPress={() => {
+                                UnistylesRegistry
+                                    .addThemes({
+                                        light: lightTheme,
+                                        dark: darkTheme,
+                                        premium: premiumTheme
+                                    })
+                                    .addBreakpoints(breakpoints)
+                                    .addConfig({
+                                        initialTheme: 'light'
+                                    })
 
-                            navigation.navigate(DemoNames.PlatformColors)
-                        }}
-                    />
+                                navigation.navigate(DemoNames.PlatformColors)
+                            }}
+                        />
+                    )}
                     <DemoLink
                         description="Compatibility with StyleSheet"
                         onPress={() => {
