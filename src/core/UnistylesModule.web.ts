@@ -10,6 +10,7 @@ export class UnistylesBridgeWeb {
     #screenWidth: number = window.innerWidth
     #screenHeight: number = window.innerHeight
     #themes: Array<keyof UnistylesThemes> = []
+    #breakpoints: UnistylesBreakpoints = {} as UnistylesBreakpoints
     #colorScheme: ColorSchemeName = this.getPreferredColorScheme()
     #themeName: keyof UnistylesThemes = '' as keyof UnistylesThemes
     #enabledPlugins: Array<string> = [normalizeWebStylesPlugin.name]
@@ -34,6 +35,8 @@ export class UnistylesBridgeWeb {
                         return this.#screenHeight
                     case 'breakpoint':
                         return this.#breakpoint || undefined
+                    case 'breakpoints':
+                        return this.#breakpoints
                     case 'hasAdaptiveThemes':
                         return this.#hasAdaptiveThemes
                     case 'sortedBreakpointPairs':
@@ -85,6 +88,7 @@ export class UnistylesBridgeWeb {
     }
 
     private useBreakpoints(breakpoints: UnistylesBreakpoints) {
+        this.#breakpoints = breakpoints
         this.#sortedBreakpointPairs = Object
             .entries(breakpoints)
             .sort(([, a], [, b]) => (a ?? 0) - (b ?? 0)) as Array<[keyof UnistylesBreakpoints, number]>

@@ -1,5 +1,5 @@
 import type { BoxShadow, TextShadow, Transforms } from '../types'
-import { preprocessor, normalizeNumericValue, normalizeColor, normalizeStyle } from '../plugins'
+import { preprocessor, normalizeNumericValue, normalizeColor, normalizeStyle } from '../normalizer'
 
 jest.mock('../core', () => ({}))
 

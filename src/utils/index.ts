@@ -1,5 +1,7 @@
 export { mq } from './mq'
-export { getKeyForUnistylesMediaQuery, isWithinTheWidthAndHeight, isValidMq, parseMq } from './mqParser'
+export type { UnistylesParsedMq } from './mqParser'
+export { getKeyForUnistylesMediaQuery, isWithinTheWidthAndHeight, isValidMq, parseMq, isUnistylesMq } from './mqParser'
 export { getValueForBreakpoint } from './breakpoints'
 export { proxifyFunction, parseStyle } from './styles'
 export { withPlugins } from './withPlugins'
+export { generateReactNativeWebId } from './generateId'

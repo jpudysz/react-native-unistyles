@@ -1,7 +1,7 @@
 // based on react-native-web normalizer
 // https://github.com/necolas/react-native-web
 import normalizeColors from '@react-native/normalize-colors'
-import type { TextShadow, Transforms, BoxShadow, Nullable } from '../../types'
+import type { TextShadow, Transforms, BoxShadow, Nullable } from '../types'
 
 type Preprocessor = {
     createTextShadowValue(style: TextShadow): string,
@@ -37,6 +37,7 @@ export const normalizeColor = (color: string, opacity: number = 1) => {
 }
 
 export const normalizeNumericValue = (value: number) => value ? `${value}px` : value
+
 const normalizeTransform = (key: string, value: number | string) => {
     if (key.includes('scale')) {
         return value

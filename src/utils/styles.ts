@@ -21,7 +21,8 @@ export const isPlatformColor = <T extends {}>(value: T): boolean => {
 
 export const parseStyle = <T extends RNStyle>(
     style: T,
-    variant: Record<string, Optional<string>> = {}
+    variant: Record<string, Optional<string>> = {},
+    parseMediaQueries = true
 ): T => Object
     .entries(style || {})
     .reduce((acc, [key, value]) => {
@@ -55,6 +56,14 @@ export const parseStyle = <T extends RNStyle>(
                         ...acc,
                         ...parseStyle((value)[key][variant[key as keyof typeof variant] || 'default'] ?? {})
                     }), {})
+            }
+        }
+
+        // don't parse media queries and breakpoints
+        if (!parseMediaQueries) {
+            return {
+                ...acc,
+                [key]: value
             }
         }
 

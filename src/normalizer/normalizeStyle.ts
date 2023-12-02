@@ -1,6 +1,6 @@
 import { preprocessor } from './normalizer'
-import { warn } from '../../common'
-import type { NormalizedBoxShadow, NormalizedTextShadow, BoxShadow, TextShadow, RNStyle } from '../../types'
+import { warn } from '../common'
+import type { NormalizedBoxShadow, NormalizedTextShadow, BoxShadow, TextShadow, RNStyle } from '../types'
 
 const normalizeBoxShadow = <T extends BoxShadow>(style: T): NormalizedBoxShadow => {
     const requiredBoxShadowProperties = [

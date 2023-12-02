@@ -22,6 +22,10 @@ export class UnistylesRuntime {
         return this.unistylesBridge.breakpoint
     }
 
+    public get breakpoints() {
+        return this.unistylesRegistry.breakpoints
+    }
+
     public get enabledPlugins() {
         return this.unistylesBridge.enabledPlugins
     }
