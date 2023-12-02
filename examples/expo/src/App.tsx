@@ -40,6 +40,9 @@ export const App: React.FunctionComponent = () => (
                 {!isWeb && (
                     <Stack.Screen name={DemoNames.PlatformColors} component={Screens.PlatformColors} />
                 )}
+                {isWeb && (
+                    <Stack.Screen name={DemoNames.WebMediaQueriesScreen} component={Screens.WebMediaQueriesScreen} />
+                )}
                 <Stack.Screen name={DemoNames.StyleSheet} component={Screens.StyleSheetScreen} />
                 <Stack.Screen name={DemoNames.MemoizationScreen} component={Screens.MemoizationScreen} />
                 <Stack.Screen name={DemoNames.NoStyleSheetScreen} component={Screens.NoStyleSheetScreen} />

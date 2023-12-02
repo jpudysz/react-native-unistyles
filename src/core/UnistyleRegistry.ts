@@ -1,7 +1,7 @@
 import type { UnistylesBridge, UnistylesConfig, UnistylesPlugin } from '../types'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
 import { isWeb, UnistylesError } from '../common'
-import { normalizeWebStylesPlugin } from '../plugins'
+import { cssMediaQueriesPlugin, normalizeWebStylesPlugin } from '../plugins'
 
 export class UnistyleRegistry {
     public config: UnistylesConfig = {}
@@ -47,12 +47,17 @@ export class UnistyleRegistry {
             this.unistylesBridge.useAdaptiveThemes(config.adaptiveThemes)
         }
 
-        if (config.experimentalPlugins) {
-            config.experimentalPlugins.forEach(plugin => this.addPlugin(plugin, false))
+        if (config.plugins) {
+            config.plugins.forEach(plugin => this.addPlugin(plugin, false))
         }
 
         if (config.initialTheme) {
             this.unistylesBridge.useTheme(config.initialTheme)
+        }
+
+        if (config.experimentalCSSMediaQueries) {
+            this.plugins = [cssMediaQueriesPlugin].concat(this.plugins)
+            this.unistylesBridge.addPlugin(cssMediaQueriesPlugin.name, false)
         }
 
         return {

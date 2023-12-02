@@ -7,8 +7,9 @@ export type ColorSchemeName = 'light' | 'dark' | 'unspecified'
 
 export type UnistylesConfig = {
     adaptiveThemes?: boolean,
-    experimentalPlugins?: Array<UnistylesPlugin>,
-    initialTheme?: keyof UnistylesThemes
+    initialTheme?: keyof UnistylesThemes,
+    plugins?: Array<UnistylesPlugin>,
+    experimentalCSSMediaQueries?: boolean
 }
 
 export type UnistylesBridge = {

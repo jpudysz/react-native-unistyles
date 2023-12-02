@@ -1,9 +1,11 @@
 import { useMemo } from 'react'
 import { StyleSheet } from 'react-native'
 import { parseStyle, proxifyFunction, withPlugins } from './utils'
-import { useUnistyles, useVariants } from './hooks'
+import { useCSS, useUnistyles, useVariants } from './hooks'
 import type { UnistylesBreakpoints } from './global'
 import type { ExtractVariantNames, ReactNativeStyleSheet, StyleSheetWithSuperPowers, UnistylesTheme } from './types'
+import { unistyles } from './core'
+import { isWeb } from './common'
 
 type ParsedStylesheet<ST extends StyleSheetWithSuperPowers> = {
     theme: UnistylesTheme,
@@ -33,10 +35,16 @@ export const useStyles = <ST extends StyleSheetWithSuperPowers>(
 
             return StyleSheet.create({
                 ...acc,
-                [key]: withPlugins(key, parseStyle(value, variants))
+                [key]: withPlugins(key, parseStyle(
+                    value,
+                    variants,
+                    !isWeb || !unistyles.registry.config.experimentalCSSMediaQueries)
+                )
             })
         }, {}), [parsedStyles, variants, plugins]
     )
+
+    useCSS(dynamicStyleSheet as ReactNativeStyleSheet<ST>)
 
     return {
         theme,

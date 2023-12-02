@@ -204,6 +204,26 @@ export const HomeScreen = () => {
                             navigation.navigate(DemoNames.MixedMediaQueries)
                         }}
                     />
+                    {isWeb && (
+                        <DemoLink
+                            description="CSS Media Queries"
+                            onPress={() => {
+                                UnistylesRegistry
+                                    .addThemes({
+                                        light: lightTheme,
+                                        dark: darkTheme,
+                                        premium: premiumTheme
+                                    })
+                                    .addBreakpoints(breakpoints)
+                                    .addConfig({
+                                        adaptiveThemes: true,
+                                        experimentalCSSMediaQueries: true
+                                    })
+
+                                navigation.navigate(DemoNames.WebMediaQueriesScreen)
+                            }}
+                        />
+                    )}
                 </DemoGroup>
                 <DemoGroup title="Variants">
                     <DemoLink
@@ -255,7 +275,7 @@ export const HomeScreen = () => {
                                 .addConfig({
                                     adaptiveThemes: true,
                                     // plugin can be registry enabled
-                                    experimentalPlugins: UnistylesRuntime.enabledPlugins.includes(autoGuidelinePlugin.name)
+                                    plugins: UnistylesRuntime.enabledPlugins.includes(autoGuidelinePlugin.name)
                                         ? []
                                         : [autoGuidelinePlugin]
                                 })

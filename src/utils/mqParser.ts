@@ -9,7 +9,7 @@ type ParsedMqDimension = {
     to: number
 }
 
-type UnistylesParsedMq = {
+export type UnistylesParsedMq = {
     width?: ParsedMqDimension,
     height?: ParsedMqDimension
 }
@@ -30,7 +30,7 @@ export const parseMq = (mq: string): UnistylesParsedMq => {
     }
 }
 
-const isUnistylesMq = (mq: string) => IS_UNISTYLES_REGEX.test(mq)
+export const isUnistylesMq = (mq: string) => IS_UNISTYLES_REGEX.test(mq)
 
 export const isValidMq = (parsedMq: UnistylesParsedMq) => {
     const { width, height } = parsedMq

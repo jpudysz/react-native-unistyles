@@ -144,7 +144,8 @@
   },
   "eslintIgnore": [
     "node_modules/",
-    "lib/"
+    "lib/",
+    "src/utils/hash32.ts"
   ],
   "react-native-builder-bob": {
     "source": "src",
