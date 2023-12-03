@@ -55,7 +55,7 @@ export const parseStyle = <T extends RNStyle>(
                     .reduce((acc, key) => ({
                         ...acc,
                         // this will parse the styles of the selected variant (or default if it is undefined), if selected variant has no styles then it will fallback to default styles
-                        ...parseStyle((value)[key][variant[key as keyof typeof variant] || 'default'] ?? (value)[key]['default'] ?? {})
+                        ...parseStyle((value)[key][variant[key as keyof typeof variant] || 'default'] ?? (value)[key].default ?? {})
                     }), {})
             }
         }
