@@ -88,7 +88,7 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_unistyles_UnistylesModule_nativeDestroy(JNIEnv *env, jobject thiz) {
     unistylesRuntime.reset();
-    env->DeleteGlobalRef(unistylesModule);
+    unistylesModule = nullptr;
 }
 
 extern "C"
