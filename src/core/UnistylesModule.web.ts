@@ -2,13 +2,14 @@ import { NativeEventEmitter, NativeModules } from 'react-native'
 import type { UnistylesThemes, UnistylesBreakpoints } from 'react-native-unistyles'
 import type { ColorSchemeName } from '../types'
 import { normalizeWebStylesPlugin } from '../plugins'
+import { isServer } from '../common'
 
 export class UnistylesBridgeWeb {
     #timerRef?: ReturnType<typeof setTimeout> = undefined
     #hasAdaptiveThemes: boolean = false
     #supportsAutomaticColorScheme = false
-    #screenWidth: number = window.innerWidth
-    #screenHeight: number = window.innerHeight
+    #screenWidth = isServer ? undefined : window.innerWidth
+    #screenHeight = isServer ? undefined : window.innerHeight
     #themes: Array<keyof UnistylesThemes> = []
     #breakpoints: UnistylesBreakpoints = {} as UnistylesBreakpoints
     #colorScheme: ColorSchemeName = this.getPreferredColorScheme()
@@ -19,12 +20,17 @@ export class UnistylesBridgeWeb {
     #breakpoint: keyof UnistylesBreakpoints = '' as keyof UnistylesBreakpoints
 
     constructor() {
-        this.setupListeners()
+        if (!isServer) {
+            this.setupListeners()
+            this.#screenWidth = window.innerWidth
+            this.#screenHeight = window.innerHeight
+        }
     }
 
     public install() {
         // @ts-ignore
-        window.__UNISTYLES__ = new Proxy({}, {
+        // eslint-disable-next-line no-undef
+        globalThis.__UNISTYLES__ = new Proxy({}, {
             get: (_target, prop) => {
                 switch (prop) {
                     case 'themeName':
@@ -92,7 +98,10 @@ export class UnistylesBridgeWeb {
         this.#sortedBreakpointPairs = Object
             .entries(breakpoints)
             .sort(([, a], [, b]) => (a ?? 0) - (b ?? 0)) as Array<[keyof UnistylesBreakpoints, number]>
-        this.#breakpoint = this.getBreakpointFromScreenWidth(this.#screenWidth)
+
+        if (!isServer) {
+            this.#breakpoint = this.getBreakpointFromScreenWidth(this.#screenWidth as number)
+        }
     }
 
     private useAdaptiveThemes(enable: boolean) {
@@ -176,7 +185,7 @@ export class UnistylesBridgeWeb {
     }
 
     private getPreferredColorScheme() {
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        if (!isServer && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             return 'dark'
         }
 
@@ -203,7 +212,7 @@ export class UnistylesBridgeWeb {
             type: 'layout',
             payload: {
                 breakpoint: this.#breakpoint,
-                orientation: this.#screenWidth > this.#screenHeight
+                orientation: (this.#screenWidth as number) > (this.#screenHeight as number)
                     ? 'landscape'
                     : 'portrait',
                 screen: {
