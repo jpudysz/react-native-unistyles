@@ -17,7 +17,8 @@ class Unistyles {
         }
 
         // @ts-ignore
-        this._bridge = (isWeb ? window : global).__UNISTYLES__ as UnistylesBridge
+        // eslint-disable-next-line no-undef
+        this._bridge = (isWeb ? globalThis : global).__UNISTYLES__ as UnistylesBridge
         this._registry = new UnistyleRegistry(this._bridge)
         this._runtime = new UnistylesRuntime(this._bridge, this._registry)
     }
