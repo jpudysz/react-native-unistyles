@@ -6,14 +6,10 @@ add_library(unistyles
     SHARED
     ../cxx/UnistylesRuntime.cpp
     ./src/main/cxx/cpp-adapter.cpp
-    ../node_modules/react-native/ReactCommon/jsi/jsi/jsi.cpp
 )
 
 include_directories(
     ../cxx
-    ../node_modules/react-native/React
-    ../node_modules/react-native/React/Base
-    ../node_modules/react-native/ReactCommon/jsi
 )
 
 set_target_properties(unistyles PROPERTIES
@@ -23,6 +19,9 @@ set_target_properties(unistyles PROPERTIES
     POSITION_INDEPENDENT_CODE ON
 )
 
+find_package(ReactAndroid REQUIRED CONFIG)
+
 target_link_libraries(unistyles
+    ReactAndroid::jsi
     android
 )
