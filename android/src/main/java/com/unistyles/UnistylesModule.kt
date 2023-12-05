@@ -80,12 +80,14 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             System.loadLibrary("unistyles")
             val config = this.getConfig()
 
-            this.nativeInstall(
-                this.reactApplicationContext.javaScriptContextHolder.get(),
-                config["width"] as Int,
-                config["height"] as Int,
-                config["colorScheme"] as String
-            )
+            this.reactApplicationContext.javaScriptContextHolder?.let {
+                this.nativeInstall(
+                    it.get(),
+                    config["width"] as Int,
+                    config["height"] as Int,
+                    config["colorScheme"] as String
+                )
+            }
 
             Log.i(NAME, "Installed Unistyles \uD83E\uDD84!")
 
