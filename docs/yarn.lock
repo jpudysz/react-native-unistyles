@@ -1177,6 +1177,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/swiper@npm:6.0.0":
+  version: 6.0.0
+  resolution: "@types/swiper@npm:6.0.0"
+  dependencies:
+    swiper: "*"
+  checksum: 53688c7fd949895d24deff102679d1a1080cd876a7d493de263aff818666cfa06ccd043a8602e9ecabf581cd750815426aec544796f27d1bfa1d71b815a966e9
+  languageName: node
+  linkType: hard
+
 "@types/unist@npm:*, @types/unist@npm:^3.0.0":
   version: 3.0.0
   resolution: "@types/unist@npm:3.0.0"
@@ -5149,6 +5158,7 @@ __metadata:
     "@astrojs/sitemap": 3.0.3
     "@astrojs/starlight": 0.12.0
     "@fontsource-variable/nunito": 5.0.16
+    "@types/swiper": 6.0.0
     astro: 3.5.5
     astro-seo: 0.8.0
     autoprefixer: 10.4.16
@@ -5835,6 +5845,13 @@ __metadata:
   version: 1.0.0
   resolution: "supports-preserve-symlinks-flag@npm:1.0.0"
   checksum: 53b1e247e68e05db7b3808b99b892bd36fb096e6fba213a06da7fab22045e97597db425c724f2bbd6c99a3c295e1e73f3e4de78592289f38431049e1277ca0ae
+  languageName: node
+  linkType: hard
+
+"swiper@npm:*":
+  version: 11.0.5
+  resolution: "swiper@npm:11.0.5"
+  checksum: 83b125d16733a66ed5f58627c81263116e39eea5cead92667d2e24692ff94632de9aa05fec1ed80dc352779c0d7525e9a18424fce1c39c5e970823414b212edb
   languageName: node
   linkType: hard
 
