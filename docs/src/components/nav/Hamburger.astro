@@ -108,9 +108,17 @@ import { links } from './data'
     const hamburger = document.querySelector('.hamburger')!
     const mobileMenu = document.querySelector('.mobile-menu')!
 
-    hamburger.addEventListener('click', () => {
+    const toggleMenu = () => {
         hamburger.classList.toggle('hamburger--is-active')
         mobileMenu.classList.toggle('mobile-menu--is-active')
         document.body.classList.toggle('no-scroll')
+    }
+
+    window.matchMedia('(min-width: 700px)').addEventListener('change', event => {
+        if (event.matches && hamburger.classList.contains('hamburger--is-active')) {
+            toggleMenu()
+        }
     })
+
+    hamburger.addEventListener('click', toggleMenu)
 </script>
