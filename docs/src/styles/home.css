@@ -10,6 +10,7 @@
     padding: 0;
     margin: 0;
     overscroll-behavior: none;
+    list-style: none;
 
     &::selection {
         background-color: var(--pink);
@@ -33,4 +34,8 @@ img {
     &::selection {
         background: none;
     }
+}
+
+.no-scroll {
+    overflow: hidden!important;
 }
