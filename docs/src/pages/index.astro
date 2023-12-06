@@ -1,0 +1,28 @@
+---
+import '@fontsource-variable/nunito'
+
+import { Features, Footer, Hero, Nav, Seo } from '../components'
+import '../styles/home.css'
+
+const homeSeo = {
+    title: 'Welcome to Unistyles | Unistyles',
+    description: 'Level up your React Native StyleSheet'
+}
+---
+
+<Seo seo={homeSeo}>
+    <Nav />
+    <main>
+        <Hero />
+        <Features />
+        <Footer />
+    </main>
+</Seo>
+
+<style>
+    main {
+        margin-top: 100px;
+        position: relative;
+        overflow-x: hidden;
+    }
+</style>
