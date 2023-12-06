@@ -87,11 +87,13 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                     config["height"] as Int,
                     config["colorScheme"] as String
                 )
+
+                Log.i(NAME, "Installed Unistyles \uD83E\uDD84!")
+
+                return true
             }
 
-            Log.i(NAME, "Installed Unistyles \uD83E\uDD84!")
-
-            true
+            false
         } catch (e: Exception) {
             false
         }

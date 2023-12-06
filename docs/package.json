@@ -21,5 +21,8 @@
     "sharp": "0.32.6",
     "swiper": "11.0.4"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@types/swiper": "6.0.0"
+  }
 }

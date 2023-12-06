@@ -22,11 +22,20 @@ def resolveBuildType() {
     return tskReqStr.contains('Release') ? 'release' : 'debug'
 }
 
+def isNewArchitectureEnabled() {
+    return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
+}
+
+if (isNewArchitectureEnabled()) {
+    apply plugin: 'com.facebook.react'
+}
+
 android {
     compileSdkVersion safeExtGet('compileSdkVersion', 33)
     namespace "com.unistyles"
 
     defaultConfig {
+        buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
         minSdkVersion safeExtGet('minSdkVersion', 21)
         externalNativeBuild {
             cmake {

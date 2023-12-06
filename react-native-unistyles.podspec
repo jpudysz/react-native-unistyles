@@ -18,5 +18,5 @@ Pod::Spec.new do |s|
     "cxx/*.{h,cpp}"
   ]
 
-  s.dependency "React-Core"
+  install_modules_dependencies(s)
 end
