@@ -54,3 +54,8 @@ main .hero {
     padding-bottom: 0;
     padding-top: 20px;
 }
+
+.expressive-code figure pre,
+.expressive-code figure pre > code div {
+    margin-top: 0;
+}
