@@ -2,90 +2,79 @@
 title: Setup
 ---
 
-import { Card } from '@astrojs/starlight/components'
+import { Card, Tabs, TabItem, CardGrid, Icon } from '@astrojs/starlight/components'
 import Seo from '../../../components/Seo.astro'
 
 <Seo
     seo={{
         title: 'Setup',
-        description: 'How to Setup react-native-unistyles'
+        description: 'How to Setup react-native-unistyles?'
     }}
 >
-    ### Install library
+:::caution
+Unistyles is currently in RC phase.
+:::
+
+    ### 1. Install package
 
     ```cmd
-    yarn add react-native-unistyles
+    yarn add react-native-unistyles@next
     ```
 
+    ### 2. Finish installation
 
-    ### Define your theme
+    <Tabs>
+    <TabItem label="Expo">
+      <Card title="Dev client only">
+         Unistyles includes custom native code, which means **it does not support Expo Go**.
+      </Card>
 
-    You don't have to follow a specific format. Just make an object and add any keys/values you like.
+      To finish the setup use <a href="https://docs.expo.dev/develop/development-builds/introduction/" target="_blank">expo dev client</a> and run `prebuild` command:
 
-    ```ts
-    // theme.ts
-    export const theme = {
-      colors: {
-        blood: '#eb4d4b',
-        barbie: '#e056fd',
-        pumpkin: '#f0932b',
-        background: '#ffffff'
-      },
-      margins: {
-        sm: 2,
-        md: 4,
-        lg: 8,
-        xl: 12
-      }
-    } as const
-    ```
+      ```cmd
+      yarn expo prebuild --clean
+      ```
+    </TabItem>
+    <TabItem label="React Native">
+      Library supports autolinking, to finish the setup run `pod install`:
 
-    or something more advanced with nested objects / functions:
+      ```cmd
+      cd ios && pod install
+      ```
+    </TabItem>
+    <TabItem label="Web">
+      
+      Unistyles offers first-class support for React Native Web. To run the project, we recommend following the guidelines provided by <a href="https://docs.expo.dev/workflow/web/" target="_blank">Expo</a>:
 
-    ```ts
-    // theme.ts
-    export const theme = {
-      colors: {
-        blood: '#eb4d4b',
-        barbie: '#e056fd',
-        pumpkin: '#f0932b',
-        background: '#ffffff'
-      },
-      components: {
-        typography: {
-          bold: {
-            fontWeight: 'bold'
-          },
-          thin: {
-            fontWeight: '300'
-          }
-        }
-      },
-      margins: {
-        sm: 2,
-        md: 4,
-        lg: 8,
-        xl: 12
-      },
-      utils: {
-        hexToRGBA: (hex: string, opacity: number) => {
-          const rgb = hex
-            .replace('#', '')
-            .split(/(?=(?:..)*$)/)
-            .map(x => parseInt(x, 16))
-          return `rgba(${rgb.at(0)}, ${rgb.at(1)}, ${rgb.at(2)}, ${opacity})`
-        }
-      }
-    } as const
-    ```
+      ```cmd
+      yarn expo add react-dom react-native-web @expo/webpack-config
+      ```
 
-    It's good to add "as const" to the end of your theme object to make sure TypeScript knows it's a constant object and not a mutable one. It also allows you to spread your partial theme object into a full theme object without TypeScript complaining.
+    </TabItem>
+    <TabItem label="NextJS">
+      Library supports also Server Side Rendering. We recomment to setup to project with <a href="https://solito.dev" target="_blank">Solito</a>:
 
-    ### Create breakpoints
+      ```cmd
+      npx create-solito-app@latest my-solito-app
+      ```
+    </TabItem>
+   </Tabs>
 
-    There are no predefined breakpoints. You can name them anything. Just make an object with string keys and number values.
+   ### 3. Configure Unistyles with `UnistylesRegistry`
 
-    ```ts
+    
+  Every step mentioned here is optional. If you don't want to use theming, breakpoints, or any other setting, you don't need to even call `UnistylesRegistry`. 
+  You can jump directly into working on your components.
+
+     <Card>
+          Remember that `UnistylesRegistry` should be called only once. If you want to interact with Unistyles use `UnistylesRuntime` as described [here](/reference/unistyles-runtime).
+     </Card>
+
+    ### 3.1 Define your breakpoints
+
+    You can name your breakpoints however you like. The only restriction is that the first breakpoint must start with `0`:
+
+      ```ts {3}
     // breakpoints.ts
     export const breakpoints = {
         xs: 0,
@@ -98,38 +87,124 @@ import Seo from '../../../components/Seo.astro'
     } as const
     ```
 
-    It's good to add "as const" to the end of your breakpoints object to make sure TypeScript knows it's a constant object and not a mutable one.
+    ### 3.2 Define your theme(s)
 
-    ### Wrap your app with UnistylesTheme to inject theme
+    
+You can define as many themes as you want. Each theme just needs to have a unique name and the same type. 
+The library has no restrictions on the shape of the theme. You can use nested objects, functions, spread operators, and so on.
 
-    ```tsx
-    import React from 'react'
-    import { UnistylesTheme } from 'react-native-unistyles'
-    import { theme } from './theme'
+   ```ts
+    // themes.ts
+    export const lightTheme = {
+      colors: {
+        typography: '#000000'
+        background: '#ffffff'
+      },
+      margins: {
+        sm: 2,
+        md: 4,
+        lg: 8,
+        xl: 12
+      }
+    } as const
 
-    export const App: React.FunctionComponent = () => (
-      <UnistylesTheme theme={theme}>
-        // Your App
-      </UnistylesTheme>
-    )
+    export const darkTheme = {
+      colors: {
+        typography: '#ffffff'
+        background: '#000000'
+      },
+      margins: {
+        sm: 2,
+        md: 4,
+        lg: 8,
+        xl: 12
+      }
+    } as const
+
+    // define other themes
     ```
 
-    ### Access createStyleSheet and useStyles with a factory
+    ### 3.3 Configure TypeScript
+
+    If you're using TypeScript, create types for your breakpoints and/or themes. 
+    This step is required to achieve perfect Intellisense support across all StyleSheets.
 
     ```ts
-    // styles.ts
+    //unistyles.ts
 
-    // import library factory
-    import { createUnistyles } from 'react-native-unistyles'
-    // import your breakpoints, add whatever keys and numeric values you want
-    import { breakpoints } from './breakpoints'
-    // import your app's theme TypeScript type, or simply use 'typeof theme'
-    import { theme } from './theme'
+    // if you defined breakpoints
+    type AppBreakpoints = typeof breakpoints
 
-    export const {
-        createStyleSheet,
-        useStyles,
-    } = createUnistyles<typeof breakpoints, typeof theme>(breakpoints)
+    // if you defined themes
+    type AppThemes = {
+      light: typeof lightTheme,
+      dark: typeof darkTheme
+    }
+
+    // override library types
+    declare module 'react-native-unistyles' {
+      export interface UnistylesBreakpoints extends AppBreakpoints {}
+      export interface UnistylesThemes extends AppThemes {}
+    }
     ```
 
+    ### 3.4 Call `UnistylesRegistry`
+
+    The final step is to call `UnistylesRegistry` to pass your themes, breakpoints and optional config.
+
+    ```ts
+    //unistyles.ts
+    import { UnistylesRegistry } from 'react-native-unistyles'
+
+    UnistylesRegistry
+      .addBreakpoints(breakpoints)
+      .addThemes({
+        light: lightTheme,
+        dark: darkTheme,
+        // register other themes with unique names
+      })
+      .addConfig({
+        // you can pass here optional config described below
+        adaptiveThemes: true
+      })
+    ```
+
+    <Card>
+       Don't forget to import the `unistyles.ts` file somewhere in your code eg. in the `App.tsx` file.
+    </Card>
+
+    #### Optional config
+
+    `UnistylesRegistry` has a method called `addConfig` that let's you use some cool additional features.
+    List of all available settings can be found [here](/reference/unistyles-registry).
+
+    ### 3.5 Full example
+
+    ```ts
+    //unistyles.ts
+    import { UnistylesRegistry } from 'react-native-unistyles'
+    import { breakpoints } from './breakpoints'
+    import { lightTheme, darkTheme } from './themes'
+    
+    type AppBreakpoints = typeof breakpoints
+    type AppThemes = {
+      light: typeof lightTheme,
+      dark: typeof darkTheme
+    }
+
+    declare module 'react-native-unistyles' {
+      export interface UnistylesBreakpoints extends AppBreakpoints {}
+      export interface UnistylesThemes extends AppThemes {}
+    }
+
+    UnistylesRegistry
+      .addBreakpoints(breakpoints)
+      .addThemes({
+        light: lightTheme,
+        dark: darkTheme,
+      })
+      .addConfig({
+        adaptiveThemes: true
+      })
+    ```
 </Seo>

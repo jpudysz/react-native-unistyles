@@ -8,23 +8,25 @@ import Seo from '../../../components/Seo.astro'
 <Seo
     seo={{
         title: 'Basic Usage',
-        description: 'How to use react-native-unistyles'
+        description: 'How to use react-native-unistyles?'
     }}
 >
-    <Card
-        icon="document"
-        title="Requirements"
-    >
-      After the initial setup, you only need to focus on two functions responsible for your styles:
-      - `createStyleSheet` which replaces `StyleSheet.create`
-      - `useStyles` which parses your styles and ensures TypeScript compatibility with media queries and breakpoints
-    </Card>
 
-    ```tsx
+    
+:::tip[Did you know?]
+The library was designed to keep your components clean. 
+You don't need to worry about importing custom components or creating styles based on an opinionated syntax.
+:::
+
+After the initial setup, you only need to focus on two functions responsible for your styles:
+
+- `createStyleSheet` which replaces `StyleSheet.create`
+- `useStyles` which parses your styles and ensures TypeScript compatibility with media queries and breakpoints
+
+    ```tsx title="Simple example with theming"
     import React from 'react'
     import { View, Text } from 'react-native'
-    // access createStyleSheet and useStyles exported from factory
-    import { createStyleSheet, useStyles } from 'lib/styles'
+    import { createStyleSheet, useStyles } from 'react-native-unistyles'
 
     export const ExampleUnistyles = () => {
         const { styles } = useStyles(stylesheet)
@@ -49,5 +51,5 @@ import Seo from '../../../components/Seo.astro'
            color: theme.colors.typography
         }
     }))
-```
+    ```
 </Seo>

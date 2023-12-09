@@ -15,48 +15,160 @@ export default defineConfig({
             },
             social: {
                 github: 'https://github.com/jpudysz/react-native-unistyles',
-                'x.com': 'https://x.com/jpudysz'
+                'x.com': 'https://x.com/jpudysz',
+                discord: 'https://discord.gg/2Y5W2Vh'
             },
-            sidebar: [{
-                label: 'Start here',
-                items: [{
-                    label: 'Setup',
-                    link: '/start/setup/'
-                }, {
-                    label: 'Basic Usage',
-                    link: '/start/basic-usage/'
-                }, {
-                    label: 'Migration from StyleSheet',
-                    link: '/start/migration-from-stylesheet/'
-                }]
-            }, {
-                label: 'Reference',
-                items: [{
-                    label: 'createStyleSheet',
-                    link: '/reference/create-stylesheet/'
-                }, {
-                    label: 'useStyles',
-                    link: '/reference/use-styles/'
-                }]
-            }, {
-                label: 'Examples',
-                items: [{
-                    label: 'Breakpoints',
-                    link: '/example/breakpoints/'
-                }, {
-                    label: 'Media queries',
-                    link: '/example/media-queries/'
-                }, {
-                    label: 'Dynamic functions',
-                    link: '/example/dynamic-functions/'
-                }, {
-                    label: 'Dynamic themes',
-                    link: '/example/dynamic-themes/'
-                }, {
-                    label: 'Variants',
-                    link: '/example/variants/'
-                }]
-            }]
+            sidebar: [
+                {
+                    label: 'Start here',
+                    items: [
+                        {
+                            label: 'Introduction',
+                            link: '/start/introduction/'
+                        },
+                        {
+                            label: 'Setup',
+                            link: '/start/setup/'
+                        },
+                        {
+                            label: 'Migration from 1.x',
+                            link: '/start/migration-from-1/'
+                        },
+                        {
+                            label: 'Basic Usage',
+                            link: '/start/basic-usage/'
+                        },
+                        {
+                            label: 'Migration from StyleSheet',
+                            link: '/start/migration-from-stylesheet/'
+                        },
+                        {
+                            label: 'Benchmarks',
+                            link: '/start/benchmarks/'
+                        }
+                    ]
+                },
+                {
+                    label: 'Reference',
+                    items: [
+                        {
+                            label: 'createStyleSheet',
+                            link: '/reference/create-stylesheet/'
+                        },
+                        {
+                            label: 'useStyles',
+                            link: '/reference/use-styles/'
+                        },
+                        {
+                            label: 'Dynamic functions',
+                            link: '/reference/dynamic-functions/'
+                        },
+                        {
+                            label: 'Theming',
+                            link: '/reference/theming/'
+                        },
+                        {
+                            label: 'useInitialTheme',
+                            link: '/reference/use-initial-theme/'
+                        },
+                        {
+                            label: 'Breakpoints',
+                            link: '/reference/breakpoints/'
+                        },
+                        {
+                            label: 'Media queries',
+                            link: '/reference/media-queries/'
+                        },
+                        {
+                            label: 'Variants',
+                            link: '/reference/variants/'
+                        },
+                        {
+                            label: 'Compound variants',
+                            link: '/reference/compound-variants/'
+                        },
+                        {
+                            label: 'Unistyles Registry',
+                            link: '/reference/unistyles-registry/'
+                        },
+                        {
+                            label: 'Unistyles Runtime',
+                            link: '/reference/unistyles-runtime/'
+                        },
+                        {
+                            label: 'Plugins',
+                            link: '/reference/plugins/'
+                        },
+                        {
+                            label: 'Web support',
+                            link: '/reference/web-support/'
+                        },
+                        {
+                            label: 'Server side rendering',
+                            link: '/reference/server-side-rendering/'
+                        },
+                        {
+                            label: 'Errors',
+                            link: '/reference/errors/'
+                        },
+                        {
+                            label: 'FAQ',
+                            link: '/reference/faq/'
+                        },
+                        {
+                            label: 'For library authors',
+                            link: '/reference/for-library-authors/'
+                        }
+                    ]
+                },
+                {
+                    label: 'Show case',
+                    items: [
+                        {
+                            label: 'Projects',
+                            link: '/show-case/projects/'
+                        },
+                        {
+                            label: 'Tools',
+                            link: '/show-case/tools/'
+                        },
+                        {
+                            label: 'UI Kits',
+                            link: '/show-case/ui-kits/'
+                        }
+                    ]
+                },
+                {
+                    label: 'Examples',
+                    items: [
+                        {
+                            label: 'All examples',
+                            link: '/examples/all'
+                        }
+                    ]
+                },
+                {
+                    label: 'Other',
+                    items: [
+                        {
+                            label: 'Sponsors',
+                            link: 'other/sponsors/'
+                        },
+                        {
+                            label: 'Build Native Library',
+                            link: 'other/build-native-library/'
+                        }
+                    ]
+                },
+                {
+                    label: 'React Native Crossroads',
+                    link: 'https://reactnativecrossroads.com/'
+                },
+                {
+                    label: 'Codemask',
+                    link: 'https://codemask.com/'
+                }
+            ]
         }),
         sitemap(),
         expressiveCode({
