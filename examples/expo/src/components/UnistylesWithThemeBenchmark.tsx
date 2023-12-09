@@ -2,7 +2,7 @@ import React from 'react'
 import { View } from 'react-native'
 import { UnistylesRegistry } from 'react-native-unistyles'
 import type { UnistylesThemes } from 'react-native-unistyles'
-import { lightTheme } from '../styles'
+import { breakpoints, lightTheme } from '../styles'
 import { Timer } from './Timer'
 import { UnistylesBox } from './UnistylesBox'
 
@@ -16,6 +16,7 @@ export const UnistylesWithThemeBenchmark: React.FunctionComponent<UnistylesBench
     onMeasureEnd
 }) => {
     UnistylesRegistry
+        .addBreakpoints(breakpoints)
         .addThemes({
             light: lightTheme
         } as UnistylesThemes)

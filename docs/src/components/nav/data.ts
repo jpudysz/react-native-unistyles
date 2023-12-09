@@ -1,11 +1,11 @@
 export const links = [
     {
         name: 'Sponsors',
-        href: '/sponsors/'
+        href: 'other/sponsors/'
     },
     {
         name: 'Examples',
-        href: '/start/basic-usage/'
+        href: 'examples/all/'
     },
     {
         name: 'Blog',
