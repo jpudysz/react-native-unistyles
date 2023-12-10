@@ -4,9 +4,6 @@ title: Benchamarks
 
 import { Card } from '@astrojs/starlight/components'
 import Seo from '../../../components/Seo.astro'
-import Bench1 from '../../../assets/bench-1.png'
-import Bench2 from '../../../assets/bench-2.png'
-import Bench3 from '../../../assets/bench-3.png'
 
 <Seo
     seo={{
@@ -21,8 +18,6 @@ import Bench3 from '../../../assets/bench-3.png'
  Unistyles was designed to be the fastest styling solution on the market. Before we delve further, it's important to note that this library is not a UI Kit. 
  It provides low-level functionality for developers who either want full control of styling in their commercial projects or for library authors to build UI Kits on top of it.
 
-It would be inappropriate to compare the rendering performance of Unistyles with feature-rich UI Kits that are popular in the React Native ecosystem. 
-Therefore, I have decided to compare it only to StyleSheet and Unistyles 1.x.
 
 It's also worth mentioning that there won't be a faster way than passing your objects to StyleSheet.create.
 Unfortunately, the functionalities of StyleSheet are limited. Building a fully-featured, cross-platform app without some additional help is challenging.
@@ -33,39 +28,98 @@ Benchmarks are publicly available in the Unistyles 2.0 repository and were measu
 
 ### Startup time
 
-<img src={Bench1.src} alt="Startup benchmark" />
+[TODO]: chart 1
 
-<Card>
-- Unistyles 1.x: single theme, breakpoints
-- Unistyles 2.x: single theme, breakpoints
-</Card>
+title: Startup time
+
+subtitle: Avg. time (meassured 20 times)
+
+x: StyleSheet, Unistyles 2.x
+
+y: 2.8 ms, 3.15ms
+
+label: Single view with StyleSheet vs single view with UnistyleRegistry (register theme + breakpoints)
 
 
-:::tip[Why is Unistyles 2.x slower?]
+:::tip[Initialization time]
 The startup time of Unistyles 2.x is about 0.2 ms slower than Unistyles 1.x due to an additional roundtrip to C++.
 :::
 
+### Most popular benchamrk in the RN community
 
-### Rendering 100 views
+Many libraries utilize a test to render 1000 views styled with each respective library. 
+You can find theme [here](https://github.com/efstathiosntonas/react-native-style-libraries-benchmark) 
+and [here](https://gluestack.io/ui/docs/performance/benchmarks).
 
-<img src={Bench2.src} alt="Rendering 100 views benchmark" />
+Unistyles will consistently be the fastest solution compared to these alternatives because it avoids 
+abstraction in components and parses the StyleSheet just once for the 1000 views.
 
-<Card>
-- Unistyles 1.x: single theme, breakpoints
-- Unistyles 2.x: single theme, breakpoints
+[TODO]: chart 2
 
-Rendering 100 views in both versions of Unistyles is comparable, and it's hard to measure the difference.
-</Card>
+title: Rendering 1000 views with Unistyles
 
-### Rendering 1000 views with all features
+subtitle: Avg. time (meassured 20 times)
 
-<img src={Bench3.src} alt="Rendering 1000 views benchmark" />
+x: StyleSheet, Unistyles 2.x
 
-<Card>
-- Unistyles 1.x: media queries, breakpoints, theme
-- Unistyles 2.x: media queries (mq), breakpoints, variants, registered 3 themes
-</Card>
+y: 47.4 ms, 47.9 ms
 
-In the final benchmark, where 1000 views are rendered, Unistyles 2.x outperforms its predecessor, being ~25% faster than version 1.x. This demonstrates that Unistyles 2.x excels in handling complex layouts, 
-showcasing its strength in more demanding scenarios. Moreover, it offers better overall performance coupled with an enhanced developer experience (DX) and more features, making it a more efficient and user-friendly option for complex projects.
+label: Loop with 1000 views with StyleSheet vs with UnistyleRegistry (register theme + breakpoints) and single useStyles
+
+### Rendering 100 useStyles hooks
+
+Let's modify the benchmark to create a more challenging scenario for Unistyles. We'll render 100 StyleSheets vs 100 `useStyles` hooks. 
+This scenario is designed to represent the worst-case scenario for a production app, which simultaneously mounts 100 individual components, each with separate StyleSheets.
+
+[TODO]: chart 3
+
+title: Rendering 100 views with 100 StyleSheets and useStyles
+
+subtitle: Avg. time (meassured 20 times)
+
+x: StyleSheet, Unistyles 2.x
+
+y: 10.75 ms, 14.25 ms
+
+The performance overhead of Unistyles 2.x, when compared to StyleSheet, is approximately **0.035 milliseconds per view**. 
+This number was determined by subtracting the average time of StyleSheet from that of Unistyles 2.x and then dividing the result by the number of views.
+
+### Rendering large lists with 1000 items
+
+Let's delve deeper and consider a scenario where your app needs to render up to 1000 separate views using the useStyles hook. 
+This might simulate a complex app featuring a non-virtualized list.
+
+[TODO]: chart 4
+
+title: Rendering 1000 views with 1000 StyleSheets and useStyles
+
+subtitle: Avg. time (meassured 20 times)
+
+x: StyleSheet, Unistyles 2.x
+
+y: 38.9 ms, 56.7 ms
+
+This benchmark illustrates the scenario for using traditional StyleSheets vs Unistyles 2.x in rendering large lists in React Native applications. We can also observe that as the number of views increases, the performance overhead decreases in favor of Unistyles 2.x. 
+This time, the cost per view is approximately **0.017 milliseconds per view**.
+
+### Rendering large list with all features
+
+In the final benchmark, we compare the performance of a plain StyleSheet against Unistyles 2.x, which incorporates a comprehensive range of features. Unistyles 2.x is tested with three registered themes, 
+breakpoints, and the full utilization of all its features: media queries (mq), breakpoints, variants, and theme integration.
+
+[TODO]: chart 5
+
+title: Rendering 1000 views with 1000 StyleSheets and useStyles with all features
+
+subtitle: Avg. time (meassured 20 times)
+
+x: StyleSheet, Unistyles 2.x
+
+y: 46.5 ms, 71.75 ms
+
+:::tip[Rendering time]
+Did you know that a blink of the eye takes around 120ms? 
+Unistyles can render your 1000 views in an even shorter period of time! 👀
+:::
+
 </Seo>
