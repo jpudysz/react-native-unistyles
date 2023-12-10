@@ -129,10 +129,6 @@ export default defineConfig({
                             link: '/show-case/projects/'
                         },
                         {
-                            label: 'Tools',
-                            link: '/show-case/tools/'
-                        },
-                        {
                             label: 'UI Kits',
                             link: '/show-case/ui-kits/'
                         }
@@ -155,8 +151,8 @@ export default defineConfig({
                             link: 'other/sponsors/'
                         },
                         {
-                            label: 'Build Native Library',
-                            link: 'other/build-native-library/'
+                            label: 'For Sponsors',
+                            link: 'other/for-sponsors/'
                         }
                     ]
                 },
