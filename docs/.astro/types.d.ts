@@ -332,13 +332,6 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
-"show-case/tools.mdx": {
-	id: "show-case/tools.mdx";
-  slug: "show-case/tools";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
 "show-case/ui-kits.mdx": {
 	id: "show-case/ui-kits.mdx";
   slug: "show-case/ui-kits";
