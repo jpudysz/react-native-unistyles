@@ -1,3 +1,62 @@
 ---
 title: FAQ
 ---
+
+import { Card, CardGrid } from '@astrojs/starlight/components'
+import Seo from '../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'FAQ',
+        description: 'Frequently asked questions about the Unistyles'
+    }}
+>
+
+Here, you can find answers to the most frequently asked questions about Unistyles.
+
+### Why Unistyles runtime is not available?
+
+This error occurs when you try to use a Unistyles feature without proper installation.
+
+Possible causes include:
+- Running the app in Expo Go, which is not supported.
+- Running your Expo project without rebuilding it using the `expo prebuild` command
+- Forgetting to execute `pod install` in your bare React Native project
+- Omitting the import of the file where you set up your UnistylesRegistry eg. in your `App.tsx` file
+
+### I'm trying to override library types, but I'm receiving error that react-native-unistyles is not found?
+
+To override types, you must import something from `react-native-unistyles`, such as `UnistylesRegistry`.
+
+### Adaptive mode doesn't work for me
+
+To enable adaptive mode, you need to register two themes named `light` and `dark` and set the `adaptiveThemes` flag to true within `UnistylesRegistry`.
+
+If your app still doesn't automatically switch themes, ensure that:
+- For Expo your `app.json` contains a `userInterfaceStyle` key with the value `automatic`
+- For bare React Native, your `Info.plist` does not have the `UIUserInterfaceStyle` key set to a hardcoded value
+- `Appearance` from `react-native` is set to `null`
+- You have phone with iOS 13+ or Android 10+
+- Your device supports dark mode
+
+### I'm getting some TypeScript error for my stylesheet
+
+This should not occur, but if it does, please create a new issue in the GitHub repository.
+
+Unistyles is built with first-class support for TypeScript, inferring all the types for you. 
+There should be no need for extra steps. Please include your stylesheet and the error you're encountering in the issue.
+
+### Does Unistyles support PlatformColor?
+
+Yes, it does! You can even use PlatformColor in your themes!
+
+### Are class components supported?
+
+No, the library only supports functional components. 
+If you need support for class components, you would need to create a wrapper component.
+
+### How to use Unistyles with Expo?
+
+Unistyles supports Expo. However, it can't be used with Expo Go.
+
+</Seo>

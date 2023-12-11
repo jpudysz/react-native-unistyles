@@ -1,3 +1,168 @@
 ---
 title: Plugins
 ---
+
+import Seo from '../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Plugins',
+        description: 'How to use plugins with react-native-unistyles'
+    }}
+>
+
+If you find that Unistyles lacks certain features, you can easily extend its functionality with plugins.
+
+Plugins are functions that accept a style object and return a new style object.
+They are resolved in the order in which they were passed to the `addConfig` function in [UnistylesRegistry](/reference/unistyles-registry).
+
+### Create a plugin
+
+To create a plugin, you need to import the `UnistylesPlugin` type:
+
+```ts
+import type { UnistylesPlugin } from 'react-native-unistyles'
+
+```
+
+Then, create a function that conforms to this type:
+
+```tsx /myPlugin/
+export const myPlugin: UnistylesPlugin = {
+    name: 'myPlugin',
+    onParsedStyle: (key, styles, runtime) => {
+        // parse styles here
+    }
+}
+```
+
+Your plugin must have a unique name; otherwise, it will be rejected from the registry.
+
+:::tip
+Unistyles uses plugins internally, hence you can't prefix your plugin's name with `__unistyles` prefix.
+:::
+
+### onParsedStyle
+
+The `onParsedStyle` function is called for every style object in the stylesheet passed to the `useStyles` hook.
+These objects are processed **after** Unistyles has finished parsing them, so they do not include:
+- variants
+- breakpoints
+- theme
+- media queries
+
+For example:
+
+```tsx /container/ /text/
+const stylesheet = createStyleSheet(theme => ({
+    container: {
+        backgroundColor: theme.colors.primary,
+        padding: 10
+    },
+    text: {
+        color: theme.colors.typography,
+        fontSize: {
+            sm: 12,
+            md: 14
+        }
+    }
+}))
+```
+
+You will get, for instance, the following calls:
+
+```tsx /onParsedStyle/
+onParsedStyle('container', {
+    backgroundColor: 'pink',
+    padding: 10
+}, runtime)
+
+onParsedStyle('text', {
+    color: '#000000',
+    fontSize: 12
+}, runtime)
+```
+
+Your function will be called twice: once for the `container` and once for `text` styles.
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| key | string | Name of the style eg. `container` or `text` |
+| styles | StyleObject | Style object for the corresponding key |
+| runtime | [UnistylesRuntime](/reference/unistyles-runtime/) | Runtime with all required information about your configuration eg. breakpoint, themes etc. |
+
+### Register plugins with `UnistylesRegistry`
+
+Once you have your plugin, you need to register it with `UnistylesRegistry`:
+
+```tsx /plugins/
+import { UnistylesRegistry } from 'react-native-unistyles'
+import { myPlugin1 } from './myPlugin1'
+import { myPlugin2 } from './myPlugin2'
+
+UnistylesRegistry
+    .addConfig({
+        plugins: [myPlugin1, myPlugin2]
+    })
+```
+
+
+### Enable plugin at runtime
+
+Unistyles offers the option to register plugins at runtime, allowing you to enable them only for specific components.
+
+```tsx /runtime/
+import { UnistylesRuntime } from 'react-native-unistyles'
+import { myPlugin } from './myPlugin'
+
+export const EnablePlugin: React.FunctionComponent = () => (
+    <Button
+        title="Add plugin"
+        onPress={() => UnistylesRuntime.addPlugin(myPlugin)}
+    />
+)
+```
+### Disable plugin at runtime
+
+Similarly, you can disable plugins at runtime:
+
+```tsx /runtime/
+import { UnistylesRuntime } from 'react-native-unistyles'
+import { myPlugin } from './myPlugin'
+
+export const DisablePlugin: React.FunctionComponent = () => (
+    <Button
+        title="Remove plugin"
+        onPress={() => UnistylesRuntime.removePlugin(myPlugin)}
+    />
+)
+```
+
+### Get enabled plugins
+
+You can also check which plugins are enabled at runtime:
+
+```tsx /runtime/
+import { UnistylesRuntime } from 'react-native-unistyles'
+
+export const GetPlugins: React.FunctionComponent = () => (
+    <Button
+        title="Get enabled plugins"
+        onPress={() => {
+            const plugins = UnistylesRuntime.enabledPlugins()
+
+            // names of the plugins eg. myPlugin1, myPlugin2
+            console.log(plugins)
+        }}
+    />
+)
+```
+
+:::tip
+Plugins are still experimental, and the API might change in the future.
+If you need other lifecycle events for plugins, please open a discussion.
+
+I'm open to suggestions and ideas.
+:::
+
+</Seo>
