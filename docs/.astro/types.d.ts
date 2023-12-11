@@ -192,9 +192,9 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
-"other/build-native-library.mdx": {
-	id: "other/build-native-library.mdx";
-  slug: "other/build-native-library";
+"other/for-sponsors.mdx": {
+	id: "other/for-sponsors.mdx";
+  slug: "other/for-sponsors";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">

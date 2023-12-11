@@ -7,10 +7,10 @@ body:
       value: |
         Thanks for taking the time to fill out this bug report!
 
-         Before submitting a new bug/issue, please check the links below to see if there is a solution or question posted there already:
-         -  Issues tab: https://github.com/jpudysz/react-native-unistyles/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc
-         -  Closed issues tab: https://github.com/jpudysz/react-native-unistyles/issues?q=is%3Aissue+is%3Aclosed
-         -  Discussions tab: https://github.com/jpudysz/react-native-unistyles/discussions
+        Before submitting a new bug/issue, please check the links below to see if there is a solution or question posted there already:
+        -  Issues tab: https://github.com/jpudysz/react-native-unistyles/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc
+        -  Closed issues tab: https://github.com/jpudysz/react-native-unistyles/issues?q=is%3Aissue+is%3Aclosed
+        -  Discussions tab: https://github.com/jpudysz/react-native-unistyles/discussions
   - type: markdown
     attributes:
       value: |
@@ -75,5 +75,25 @@ body:
         - React Native Web
         - SSR
         - React Native Windows
+
+  - type: dropdown
+    id: engine
+    attributes:
+      label: Engine
+      description: Which engine do you use?
+      multiple: false
+      options:
+        - Hermes
+        - JSC
+
+  - type: dropdown
+    id: architecture
+    attributes:
+      label: Architecture
+      description: Which architecture do you use?
+      multiple: false
+      options:
+        - Paper (old)
+        - Fabric (new)
     validations:
       required: true
