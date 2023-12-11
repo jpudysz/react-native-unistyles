@@ -4,6 +4,10 @@ title: Benchamarks
 
 import { Card } from '@astrojs/starlight/components'
 import Seo from '../../../components/Seo.astro'
+import Benchmark1 from '../../../assets/benchmark-1.png'
+import Benchmark2 from '../../../assets/benchmark-2.png'
+import Benchmark3 from '../../../assets/benchmark-3.png'
+import Benchmark5 from '../../../assets/benchmark-5.png'
 
 <Seo
     seo={{
@@ -28,17 +32,7 @@ Benchmarks are publicly available in the Unistyles 2.0 repository and were measu
 
 ### Startup time
 
-[TODO]: chart 1
-
-title: Startup time
-
-subtitle: Avg. time (meassured 20 times)
-
-x: StyleSheet, Unistyles 2.x
-
-y: 2.8 ms, 3.15ms
-
-label: Single view with StyleSheet vs single view with UnistyleRegistry (register theme + breakpoints)
+<img src={Benchmark1.src} alt="Startup time" />
 
 
 :::tip[Initialization time]
@@ -48,40 +42,22 @@ The startup time of Unistyles 2.x is about 0.2 ms slower than Unistyles 1.x due 
 ### Most popular benchamrk in the RN community
 
 Many libraries utilize a test to render 1000 views styled with each respective library. 
-You can find theme [here](https://github.com/efstathiosntonas/react-native-style-libraries-benchmark) 
+You can find them [here](https://github.com/efstathiosntonas/react-native-style-libraries-benchmark) 
 and [here](https://gluestack.io/ui/docs/performance/benchmarks).
 
 Unistyles will consistently be the fastest solution compared to these alternatives because it avoids 
 abstraction in components and parses the StyleSheet just once for the 1000 views.
 
-[TODO]: chart 2
-
-title: Rendering 1000 views with Unistyles
-
-subtitle: Avg. time (meassured 20 times)
-
-x: StyleSheet, Unistyles 2.x
-
-y: 47.4 ms, 47.9 ms
-
-label: Loop with 1000 views with StyleSheet vs with UnistyleRegistry (register theme + breakpoints) and single useStyles
+<img src={Benchmark2.src} alt="Rendering 1000 views" />
 
 ### Rendering 100 useStyles hooks
 
 Let's modify the benchmark to create a more challenging scenario for Unistyles. We'll render 100 StyleSheets vs 100 `useStyles` hooks. 
 This scenario is designed to represent the worst-case scenario for a production app, which simultaneously mounts 100 individual components, each with separate StyleSheets.
 
-[TODO]: chart 3
+<img src={Benchmark3.src} alt="Rendering 100 useStyles" />
 
-title: Rendering 100 views with 100 StyleSheets and useStyles
-
-subtitle: Avg. time (meassured 20 times)
-
-x: StyleSheet, Unistyles 2.x
-
-y: 10.75 ms, 14.25 ms
-
-The performance overhead of Unistyles 2.x, when compared to StyleSheet, is approximately **0.035 milliseconds per view**. 
+The performance overhead of Unistyles 2.x, when compared to StyleSheet, is approximately **0.03 milliseconds per view**. 
 This number was determined by subtracting the average time of StyleSheet from that of Unistyles 2.x and then dividing the result by the number of views.
 
 ### Rendering large lists with 1000 items
@@ -89,33 +65,18 @@ This number was determined by subtracting the average time of StyleSheet from th
 Let's delve deeper and consider a scenario where your app needs to render up to 1000 separate views using the useStyles hook. 
 This might simulate a complex app featuring a non-virtualized list.
 
-[TODO]: chart 4
-
-title: Rendering 1000 views with 1000 StyleSheets and useStyles
-
-subtitle: Avg. time (meassured 20 times)
-
-x: StyleSheet, Unistyles 2.x
-
-y: 38.9 ms, 56.7 ms
+// todo
+<img src={Benchmark3.src} alt="Rendering 1000 useStyles" />
 
 This benchmark illustrates the scenario for using traditional StyleSheets vs Unistyles 2.x in rendering large lists in React Native applications. We can also observe that as the number of views increases, the performance overhead decreases in favor of Unistyles 2.x. 
-This time, the cost per view is approximately **0.017 milliseconds per view**.
+This time, the cost per view is approximately **0.01 milliseconds per view**.
 
 ### Rendering large list with all features
 
 In the final benchmark, we compare the performance of a plain StyleSheet against Unistyles 2.x, which incorporates a comprehensive range of features. Unistyles 2.x is tested with three registered themes, 
 breakpoints, and the full utilization of all its features: media queries (mq), breakpoints, variants, and theme integration.
 
-[TODO]: chart 5
-
-title: Rendering 1000 views with 1000 StyleSheets and useStyles with all features
-
-subtitle: Avg. time (meassured 20 times)
-
-x: StyleSheet, Unistyles 2.x
-
-y: 46.5 ms, 71.75 ms
+<img src={Benchmark5.src} alt="Rendering 1000 useStyles" />
 
 :::tip[Rendering time]
 Did you know that a blink of the eye takes around 120ms? 

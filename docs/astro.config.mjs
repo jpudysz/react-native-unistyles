@@ -16,7 +16,7 @@ export default defineConfig({
             social: {
                 github: 'https://github.com/jpudysz/react-native-unistyles',
                 'x.com': 'https://x.com/jpudysz',
-                discord: 'https://discord.gg/2Y5W2Vh'
+                discord: 'https://discord.gg/akGHf27P4C'
             },
             sidebar: [
                 {
