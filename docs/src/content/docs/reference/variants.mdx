@@ -11,7 +11,8 @@ import Seo from '../../../components/Seo.astro'
     }}
 >
 
-Variants, the most requested feature in version 1.0, are now available to use with other Unistyles features like media queries and breakpoints!
+Variants were the most requested feature in version 1.0 and are now available to use!
+You can mix them with other Unistyles features like [media queries](/reference/media-queries/) and  d[breakpoints](/reference/breakpoints/).
 
 ## Basic usage
 
@@ -36,9 +37,9 @@ const stylesheet = createStyleSheet(theme => ({
 
 Variants contain `groups` of atomic variants. 
 
-First, you need to name your group and then define variants within it:
+To define a group, first you need to name it and then define variants within it:
 
-```tsx /colors/ /sizes/ /otherGroupName/
+```tsx /color/ /size/ /otherGroupName/
 const stylesheet = createStyleSheet(theme => ({
     container: {
         flex: 1,
@@ -56,7 +57,7 @@ These groups will later be used to select your variants, so remember to name the
 With the given structure, you can now define your variants that can contain any number of styles. You can also use
 `breakpoints`, `media queries` or styles like `transform`:
 
-```tsx /color/ /size/ /otherGroupName/
+```tsx /color:/ /size:/ /otherGroupName:/
 const stylesheet = createStyleSheet(theme => ({
     container: {
         flex: 1,
@@ -144,22 +145,22 @@ const stylesheet = createStyleSheet(theme => ({
 If you pass `undefined` or `empty object` Unsityles will try to find the `default` variant in your stylesheet:
 
 ```tsx /undefined/ /{}/
-const styles = useStyles(stylesheet, undefined) // will use default variant
-const styles = useStyles(stylesheet, {}) // will use default variant
+const { styles } = useStyles(stylesheet, undefined) // will use default variant (if any)
+const { styles } = useStyles(stylesheet, {}) // will use default variant (if any)
 ```
 
 Passing an object with named keys and `undefined` will work the same way dafaulting to the `default` option:
 
 ```tsx /undefined/
-const styles = useStyles(stylesheet, {
-    color: undefined // will use default variant
+const { styles } = useStyles(stylesheet, {
+    color: undefined // will use default variant (if any)
 })
 ```
 
 Lastly, you can pass the correct variant name for a variant group:
 
 ```tsx /secondary/
-const styles = useStyles(stylesheet, {
+const { styles } = useStyles(stylesheet, {
     color: 'secondary' // will use secondary variant
 })
 ```
@@ -189,7 +190,7 @@ type ComponentProps = {
 }
 
 const Component: React.FunctionComponent = ({ color, size }) => {
-    const styles = useStyles(stylesheet, {
+    const { styles } = useStyles(stylesheet, {
         color,
         size
     })

@@ -17,24 +17,21 @@ Unistyles can render styles on the server-side, which is useful, for example, fo
 
 You just need to modify the `__document.ts` or `__document.js` file in your project root.
 
-```tsx /UnistylesRegistry/
+```diff lang="tsx"
 export const getInitialProps = async ({ renderPage }) => {
     AppRegistry.registerComponent('Main', () => Main)
 
-    UnistylesRegistry
-        .addBreakpoints({
-            xs: 0,
-            sm: 300,
-            md: 500,
-            lg: 800,
-            xl: 1200
-        })
-        .addThemes({
-            light: theme
-        })
-        .addConfig({
-            experimentalCSSMediaQueries: true
-        })
++    UnistylesRegistry
++        .addBreakpoints({
++            xs: 0,
++            sm: 300,
++            md: 500,
++            lg: 800,
++            xl: 1200
++        })
++        .addThemes({
++            light: theme
++        })
 
     const { getStyleElement } = AppRegistry.getApplication('Main')
     const page = await renderPage()

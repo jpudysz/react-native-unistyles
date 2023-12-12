@@ -18,7 +18,7 @@ Media queries provide more power and allow you to style cross-platform apps with
 To use media queries, you need to import the `mq` utility and convert your value to an `object`:
 
 ```diff lang="tsx" /mq/ del="backgroundColor: theme.colors.background,"  ins="backgroundColor: {"
-import { createStyleSheet, mq} from 'react-native-unistyles'
+import { createStyleSheet, mq } from 'react-native-unistyles'
 
 const stylesheet = createStyleSheet(theme => ({
     container: {
@@ -41,7 +41,7 @@ The `mq` utility provides Intellisense for quickly building your media queries.
 You can also combine `width` media queries with `height` media queries:
 
 ```tsx /mq/
-import { createStyleSheet, mq} from 'react-native-unistyles'
+import { createStyleSheet, mq } from 'react-native-unistyles'
 
 const stylesheet = createStyleSheet(theme => ({
     container: {
@@ -60,7 +60,7 @@ const stylesheet = createStyleSheet(theme => ({
 Or use only `height` media queries:
 
 ```tsx /mq/
-import { createStyleSheet, mq} from 'react-native-unistyles'
+import { createStyleSheet, mq } from 'react-native-unistyles'
 
 const stylesheet = createStyleSheet(theme => ({
     container: {
@@ -79,7 +79,7 @@ const stylesheet = createStyleSheet(theme => ({
 You can also reuse your defined [breakpoints](/reference/breakpoints/):
 
 ```tsx /xl/
-import { createStyleSheet, mq} from 'react-native-unistyles'
+import { createStyleSheet, mq } from 'react-native-unistyles'
 
 const stylesheet = createStyleSheet(theme => ({
     container: {
@@ -163,6 +163,6 @@ CSS Media queries is an experimental feature and doesn't support all properties 
 It will be moved to stable in Unistyles 3.0.
 :::
 
-With `experimentalCSSMediaQueries` set to `false`, Unsityles will update your styles in the `style` attribute.
+With `experimentalCSSMediaQueries` set to `false`, Unsityles will compute your styles in the JavaScript.
 
 </Seo>
