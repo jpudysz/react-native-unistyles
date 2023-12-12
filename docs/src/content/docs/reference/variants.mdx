@@ -1,3 +1,341 @@
 ---
 title: Variants
 ---
+
+import Seo from '../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Variants',
+        description: 'How to use variants in react-native-unistyles'
+    }}
+>
+
+Variants, the most requested feature in version 1.0, are now available to use with other Unistyles features like media queries and breakpoints!
+
+## Basic usage
+
+Variants are objects that can be nested in any style object:
+
+```tsx /variants:/
+const stylesheet = createStyleSheet(theme => ({
+    container: {
+        backgroundColor: theme.colors.background,
+        variants: {
+            // here you can define your variants
+        }
+    },
+    text: {
+        color: theme.colors.text,
+        variants: {
+            // here you can define other variants!
+        }
+    }
+}))
+```
+
+Variants contain `groups` of atomic variants. 
+
+First, you need to name your group and then define variants within it:
+
+```tsx /colors/ /sizes/ /otherGroupName/
+const stylesheet = createStyleSheet(theme => ({
+    container: {
+        flex: 1,
+        variants: {
+            color: {},
+            size: {},
+            otherGroupName: {}
+        }
+    }
+}
+```
+
+These groups will later be used to select your variants, so remember to name them appropriately.
+
+With the given structure, you can now define your variants that can contain any number of styles. You can also use
+`breakpoints`, `media queries` or styles like `transform`:
+
+```tsx /color/ /size/ /otherGroupName/
+const stylesheet = createStyleSheet(theme => ({
+    container: {
+        flex: 1,
+        variants: {
+            color: {
+                primary: {
+                    backgroundColor: theme.colors.primary
+                },
+                secondary: {
+                    backgroundColor: theme.colors.secondary
+                }
+            },
+            size: {
+                small: {
+                    width: 100,
+                    height: 100
+                },
+                medium: {
+                    width: 200,
+                    height: 200
+                },
+                large: {
+                    width: 300,
+                    height: 300
+                }
+            },
+            otherGroupName: {
+                // other variants
+            }
+        }
+    }
+}
+```
+
+## Selecting variants
+
+With your named groups, you can now select any variant from your stylesheet using the `useStyles` hook:
+
+```tsx /useStyles/ /color/ /size/
+import { useStyles } from 'react-native-unistyles'
+
+const Component = () => {
+    const styles = useStyles(stylesheet, {
+        color: 'primary',
+        size: 'small'
+    })
+
+    return (
+        <View style={styles.container} />
+    )
+}
+
+const stylesheet = ...
+```
+
+TypeScript will provide perfect autocompletion for your variants, ensuring accuracy!
+
+## Default variant
+
+You can define a `default` variant that will be used when you don't pass any variant to the `useStyles` hook:
+
+```tsx /default/
+const stylesheet = createStyleSheet(theme => ({
+    container: {
+        flex: 1,
+        variants: {
+            color: {
+                primary: {
+                    backgroundColor: theme.colors.primary
+                },
+                secondary: {
+                    backgroundColor: theme.colors.secondary
+                },
+                default: {
+                    backgroundColor: theme.colors.barbie
+                }
+            }
+        }
+    }
+}
+```
+
+## Options to select the variant
+
+If you pass `undefined` or `empty object` Unsityles will try to find the `default` variant in your stylesheet:
+
+```tsx /undefined/ /{}/
+const styles = useStyles(stylesheet, undefined) // will use default variant
+const styles = useStyles(stylesheet, {}) // will use default variant
+```
+
+Passing an object with named keys and `undefined` will work the same way dafaulting to the `default` option:
+
+```tsx /undefined/
+const styles = useStyles(stylesheet, {
+    color: undefined // will use default variant
+})
+```
+
+Lastly, you can pass the correct variant name for a variant group:
+
+```tsx /secondary/
+const styles = useStyles(stylesheet, {
+    color: 'secondary' // will use secondary variant
+})
+```
+
+## Pass variants as component props
+
+Variants were designed to be used as component props:
+
+```tsx /color/ /size/
+import React from 'react'
+import { useStyles } from 'react-native-unistyles'
+
+enum Color = {
+    primary = 'primary',
+    secondary = 'secondary'
+}
+
+enum Size = {
+    small = 'small',
+    medium = 'medium',
+    large = 'large'
+}
+
+type ComponentProps = {
+    color: Color
+    size: Size
+}
+
+const Component: React.FunctionComponent = ({ color, size }) => {
+    const styles = useStyles(stylesheet, {
+        color,
+        size
+    })
+
+    return (
+        <View style={styles.container} />
+    )
+}
+```
+
+:::tip
+Unistyles will automatically re-render if your variant props change.
+:::
+
+## Defining the same variant across multiple styles
+
+It's possible to define the same variant group across multiple styles:
+
+```tsx /size:/
+const stylesheet = createStyleSheet(theme => ({
+    container: {
+        flex: 1,
+        variants: {
+            size: {
+                small: {
+                    width: 100,
+                    height: 100
+                },
+                medium: {
+                    width: 200,
+                    height: 200
+                },
+                large: {
+                    width: 300,
+                    height: 300
+                }
+            }
+        }
+    },
+    text: {
+        fontWeight: 'bold',
+        variants: {
+            size: {
+                small: {
+                    fontSize: 12
+                },
+                medium: {
+                    fontSize: 16
+                },
+                large: {
+                    fontSize: 20
+                }
+            }
+        }
+    }
+}
+```
+
+:::caution
+Unistyles will work as intended, selecting the correct variant for each style. 
+However, you need to repeat all your options like `small`, `medium`, and `large` in each style to avoid TypeScript errors.
+:::
+
+```tsx /size:/ /missing medium and large variants!/
+const stylesheet = createStyleSheet(theme => ({
+    container: {
+        flex: 1,
+        variants: {
+            size: {
+                small: {
+                    width: 100,
+                    height: 100
+                },
+                medium: {
+                    width: 200,
+                    height: 200
+                },
+                large: {
+                    width: 300,
+                    height: 300
+                }
+            }
+        }
+    },
+    text: {
+        fontWeight: 'bold',
+        variants: {
+            size: {
+                small: {
+                    fontSize: 12
+                },
+                // missing medium and large variants!
+            }
+        }
+    }
+}
+```
+
+In this case, the generated TypeScript type will be:
+
+```
+size: ('small' | 'medium' | 'large') | ('small')
+```
+
+If you don't need all variants and want the correct type, please add empty variants:
+
+```tsx /size:/
+const stylesheet = createStyleSheet(theme => ({
+    container: {
+        flex: 1,
+        variants: {
+            size: {
+                small: {
+                    width: 100,
+                    height: 100
+                },
+                medium: {
+                    width: 200,
+                    height: 200
+                },
+                large: {
+                    width: 300,
+                    height: 300
+                }
+            }
+        }
+    },
+    text: {
+        fontWeight: 'bold',
+        variants: {
+            size: {
+                small: {
+                    fontSize: 12
+                },
+                medium: {},
+                large: {}
+            }
+        }
+    }
+}
+```
+
+The generated TypeScript type will then be:
+
+```
+size: ('small' | 'medium' | 'large')
+```
+
+</Seo>

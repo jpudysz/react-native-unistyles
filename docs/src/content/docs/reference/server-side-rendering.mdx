@@ -1,3 +1,107 @@
 ---
 title: Server Side Rendering
 ---
+
+import Seo from '../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Server side rendering',
+        description: 'SSR with react-native-unistyles',
+    }}
+>
+
+Unistyles can render styles on the server-side, which is useful, for example, for SEO purposes.
+
+### Server side configuration
+
+You just need to modify the `__document.ts` or `__document.js` file in your project root.
+
+```tsx /UnistylesRegistry/
+export const getInitialProps = async ({ renderPage }) => {
+    AppRegistry.registerComponent('Main', () => Main)
+
+    UnistylesRegistry
+        .addBreakpoints({
+            xs: 0,
+            sm: 300,
+            md: 500,
+            lg: 800,
+            xl: 1200
+        })
+        .addThemes({
+            light: theme
+        })
+        .addConfig({
+            experimentalCSSMediaQueries: true
+        })
+
+    const { getStyleElement } = AppRegistry.getApplication('Main')
+    const page = await renderPage()
+    const styles = [
+        <style key="style-reset" dangerouslySetInnerHTML={{ __html: style }} />,
+        getStyleElement()
+    ]
+
+    return { ...page, styles: React.Children.toArray(styles) }
+}
+```
+
+### Client side configuration
+
+You need to import a file where you configured Unistyles with `UnistylesRegistry`.
+Some dynamic features like breakpoint are not available on the server. That's why you need additional configuration with the `isClient` flag.
+
+```tsx /import './styles'/ /isClient/
+import React, { useEffect, useState } from 'react'
+import { View, Text, ActivityIndicator } from 'react-native'
+import { useStyles } from 'react-native-unistyles'
+import './styles'
+
+export const HomeScreen = () => {
+    const { styles, breakpoint, theme } = useStyles(stylesheet)
+    const [isClient, setIsClient] = useState(false)
+
+    useEffect(() => {
+        // this will run only on client side
+        setIsClient(true)
+    }, [])
+
+    return (
+        <View style={styles.container}>
+            <Text style={styles.text}>
+                Welcome to Expo + Next.js + Unistyles 👋
+            </Text>
+            <Text>
+                Current breakpoint: {isClient ? breakpoint : null}
+            </Text>
+            <Text>
+                I like {theme.colors.barbie} color
+            </Text>
+            <View style={styles.linksContainer}>
+                <TextLink href="/user/">
+                    Click me 🦄
+                </TextLink>
+            </View>
+            {!isClient && (
+                <View style={styles.loader}>
+                    <ActivityIndicator />
+                </View>
+            )}
+        </View>
+    )
+}
+
+const stylesheet = ...
+```
+
+:::caution
+SSR support is still experimental and may not work in all cases.
+It still requires JS to compute your styles.
+
+There is ongoing work to make it work without JS as static styles.
+This feature will land in Unistyles 3.0!
+:::
+
+
+</Seo>

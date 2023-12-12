@@ -2,9 +2,30 @@
 title: Unistyles Registry
 ---
 
-    | Key   |      Description      |  Default value | More info |
-    |----------|:-------------:|------:|------:|
-    | adaptiveThemes | Enable Unistyles to automatically switch between `dark` and `light` themes based on the device settings. | false | [link](/reference/theming/#adaptive-themes) |
-    | initialTheme | If you have registered more than one theme and know the initial theme upfront, you can pass the theme name here. | undefined | [link](/reference/theming/#select-theme) |
-    | plugins | A list of plugins that Unistyles will call after resolving the StyleSheet. |   [] | [link](/reference/plugins/) |
-    | experimentalCSSMediaQueries |  Web only: Inject CSS media queries instead of inline styles. |   false | [link](/reference/web-support/) |
+import Seo from '../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'UnistylesRegistry',
+        description: 'How to use UnistylesRegistry in react-native-unistyles'
+    }}
+>
+
+UnistylesRegistry is a singleton that allows you to register `themes`, `breakpoints` and pass additional `config`.
+
+:::tip
+You should call `UnistylesRegistry` only once in your application. If you want to interact with `Unistyles` during runtime use [UnistylesRuntime](/reference/unistyles-runtime/) instead.
+:::
+
+There is no required timing for when you should call it. It can be done, for example, in your `App.tsx` file or somewhere deeper.
+
+### List of available actions
+
+| Key   |      Description      |  Default value | More info |
+|----------|:-------------:|------:|------:|
+| adaptiveThemes | Enable Unistyles to automatically switch between `dark` and `light` themes based on the device settings. | false | [link](/reference/theming/#adaptive-themes) |
+| initialTheme | If you have registered more than one theme and know the initial theme upfront, you can pass the theme name here. | undefined | [link](/reference/theming/#select-theme) |
+| plugins | A list of plugins that Unistyles will call after resolving the StyleSheet. |   [] | [link](/reference/plugins/) |
+| experimentalCSSMediaQueries |  Web only: Inject CSS media queries instead of inline styles. |   false | [link](/reference/web-support/) |
+
+</Seo>

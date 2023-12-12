@@ -7,6 +7,7 @@ import Seo from '../../../components/Seo.astro'
 import Benchmark1 from '../../../assets/benchmark-1.png'
 import Benchmark2 from '../../../assets/benchmark-2.png'
 import Benchmark3 from '../../../assets/benchmark-3.png'
+import Benchmark4 from '../../../assets/benchmark-4.png'
 import Benchmark5 from '../../../assets/benchmark-5.png'
 
 <Seo
@@ -65,8 +66,7 @@ This number was determined by subtracting the average time of StyleSheet from th
 Let's delve deeper and consider a scenario where your app needs to render up to 1000 separate views using the useStyles hook. 
 This might simulate a complex app featuring a non-virtualized list.
 
-// todo
-<img src={Benchmark3.src} alt="Rendering 1000 useStyles" />
+<img src={Benchmark4.src} alt="Rendering 1000 useStyles" />
 
 This benchmark illustrates the scenario for using traditional StyleSheets vs Unistyles 2.x in rendering large lists in React Native applications. We can also observe that as the number of views increases, the performance overhead decreases in favor of Unistyles 2.x. 
 This time, the cost per view is approximately **0.01 milliseconds per view**.
