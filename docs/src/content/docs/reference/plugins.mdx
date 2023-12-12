@@ -93,7 +93,7 @@ Your function will be called twice: once for the `container` and once for `text`
 
 ### Register plugins with `UnistylesRegistry`
 
-Once you have your plugin, you need to register it with `UnistylesRegistry`:
+Once you have your plugin, you can register it with `UnistylesRegistry`:
 
 ```tsx /plugins/
 import { UnistylesRegistry } from 'react-native-unistyles'
@@ -111,7 +111,7 @@ UnistylesRegistry
 
 Unistyles offers the option to register plugins at runtime, allowing you to enable them only for specific components.
 
-```tsx /runtime/
+```tsx /UnistylesRuntime.addPlugin/
 import { UnistylesRuntime } from 'react-native-unistyles'
 import { myPlugin } from './myPlugin'
 
@@ -126,7 +126,7 @@ export const EnablePlugin: React.FunctionComponent = () => (
 
 Similarly, you can disable plugins at runtime:
 
-```tsx /runtime/
+```tsx /UnistylesRuntime.removePlugin/
 import { UnistylesRuntime } from 'react-native-unistyles'
 import { myPlugin } from './myPlugin'
 
@@ -142,7 +142,7 @@ export const DisablePlugin: React.FunctionComponent = () => (
 
 You can also check which plugins are enabled at runtime:
 
-```tsx /runtime/
+```tsx /UnistylesRuntime.enabledPlugins/
 import { UnistylesRuntime } from 'react-native-unistyles'
 
 export const GetPlugins: React.FunctionComponent = () => (

@@ -114,10 +114,6 @@ export default defineConfig({
                         {
                             label: 'FAQ',
                             link: '/reference/faq/'
-                        },
-                        {
-                            label: 'For library authors',
-                            link: '/reference/for-library-authors/'
                         }
                     ]
                 },
@@ -146,6 +142,10 @@ export default defineConfig({
                 {
                     label: 'Other',
                     items: [
+                        {
+                            label: 'For library authors',
+                            link: '/other/for-library-authors/'
+                        },
                         {
                             label: 'Sponsors',
                             link: 'other/sponsors/'
