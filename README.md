@@ -8,7 +8,7 @@
 ## [Documentation](https://reactnativeunistyles.vercel.app/)
 - [Start here](https://reactnativeunistyles.vercel.app/start/introduction/)
 - [API](https://reactnativeunistyles.vercel.app/reference/create-stylesheet/)
-- [Show case](https://reactnativeunistyles.vercel.app//show-case/projects/)
+- [Show case](https://reactnativeunistyles.vercel.app/show-case/projects/)
 - [Examples](https://reactnativeunistyles.vercel.app/examples/all/)
 
 ## Features
