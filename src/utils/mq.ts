@@ -33,6 +33,10 @@ const getMQValue = (value: Nullable<MQValue>) => {
     return unistyles.registry.breakpoints[value] ?? 0
 }
 
+/**
+ * Utility to create cross-platform media queries
+ * @returns - JavaScript symbol to be used in your stylesheet
+ */
 export const mq: MQHandler = {
     only: {
         width: (wMin: Nullable<MQValue> = 0, wMax: MQValue = Infinity) => (`:w[${getMQValue(wMin)}, ${getMQValue(wMax)}]` as unknown as symbol),
