@@ -185,44 +185,37 @@ declare module 'astro:content' {
 
 	type ContentEntryMap = {
 		"docs": {
-"example/breakpoints.mdx": {
-	id: "example/breakpoints.mdx";
-  slug: "example/breakpoints";
+"examples/all.mdx": {
+	id: "examples/all.mdx";
+  slug: "examples/all";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
-"example/dynamic-functions.mdx": {
-	id: "example/dynamic-functions.mdx";
-  slug: "example/dynamic-functions";
+"other/for-sponsors.mdx": {
+	id: "other/for-sponsors.mdx";
+  slug: "other/for-sponsors";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
-"example/dynamic-themes.mdx": {
-	id: "example/dynamic-themes.mdx";
-  slug: "example/dynamic-themes";
+"other/sponsors.mdx": {
+	id: "other/sponsors.mdx";
+  slug: "other/sponsors";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
-"example/media-queries.mdx": {
-	id: "example/media-queries.mdx";
-  slug: "example/media-queries";
+"reference/breakpoints.mdx": {
+	id: "reference/breakpoints.mdx";
+  slug: "reference/breakpoints";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
-"example/variants.mdx": {
-	id: "example/variants.mdx";
-  slug: "example/variants";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"index.mdx": {
-	id: "index.mdx";
-  slug: "index";
+"reference/compound-variants.mdx": {
+	id: "reference/compound-variants.mdx";
+  slug: "reference/compound-variants";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">
@@ -234,6 +227,83 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
+"reference/dynamic-functions.mdx": {
+	id: "reference/dynamic-functions.mdx";
+  slug: "reference/dynamic-functions";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"reference/errors.mdx": {
+	id: "reference/errors.mdx";
+  slug: "reference/errors";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"reference/faq.mdx": {
+	id: "reference/faq.mdx";
+  slug: "reference/faq";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"reference/for-library-authors.mdx": {
+	id: "reference/for-library-authors.mdx";
+  slug: "reference/for-library-authors";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"reference/media-queries.mdx": {
+	id: "reference/media-queries.mdx";
+  slug: "reference/media-queries";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"reference/plugins.mdx": {
+	id: "reference/plugins.mdx";
+  slug: "reference/plugins";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"reference/server-side-rendering.mdx": {
+	id: "reference/server-side-rendering.mdx";
+  slug: "reference/server-side-rendering";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"reference/theming.mdx": {
+	id: "reference/theming.mdx";
+  slug: "reference/theming";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"reference/unistyles-registry.mdx": {
+	id: "reference/unistyles-registry.mdx";
+  slug: "reference/unistyles-registry";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"reference/unistyles-runtime.mdx": {
+	id: "reference/unistyles-runtime.mdx";
+  slug: "reference/unistyles-runtime";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"reference/use-initial-theme.mdx": {
+	id: "reference/use-initial-theme.mdx";
+  slug: "reference/use-initial-theme";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
 "reference/use-styles.mdx": {
 	id: "reference/use-styles.mdx";
   slug: "reference/use-styles";
@@ -241,9 +311,58 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
+"reference/variants.mdx": {
+	id: "reference/variants.mdx";
+  slug: "reference/variants";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"reference/web-support.mdx": {
+	id: "reference/web-support.mdx";
+  slug: "reference/web-support";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"show-case/projects.mdx": {
+	id: "show-case/projects.mdx";
+  slug: "show-case/projects";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"show-case/ui-kits.mdx": {
+	id: "show-case/ui-kits.mdx";
+  slug: "show-case/ui-kits";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
 "start/basic-usage.mdx": {
 	id: "start/basic-usage.mdx";
   slug: "start/basic-usage";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"start/benchmarks.mdx": {
+	id: "start/benchmarks.mdx";
+  slug: "start/benchmarks";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"start/introduction.mdx": {
+	id: "start/introduction.mdx";
+  slug: "start/introduction";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"start/migration-from-1.mdx": {
+	id: "start/migration-from-1.mdx";
+  slug: "start/migration-from-1";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">

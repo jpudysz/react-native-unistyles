@@ -1,22 +1,34 @@
-import { parseStyle, proxifyFunction } from '../utils'
-import type { CustomNamedStyles, ScreenSize } from '../types'
-import type { SortedBreakpointEntries } from '../types'
+import type { StyleSheet } from '../types'
+import { mq, parseStyle, proxifyFunction } from '../utils'
+import { mockRegistry, mockRuntime } from './mocks'
+
+jest.mock('../core', () => {
+    class MockedUnistyles {
+        registry = {
+            plugins: []
+        }
+        runtime = {}
+    }
+
+    return {
+        unistyles: new MockedUnistyles()
+    }
+})
 
 describe('styles', () => {
     describe('proxifyFunction', () => {
+        afterEach(() => {
+            jest.restoreAllMocks()
+        })
+
         it('should parse style for dynamic function', () => {
-            const screenSize: ScreenSize = {
+            const { unistyles } = require('../core')
+
+            unistyles.runtime = mockRuntime({
                 width: 400,
                 height: 800
-            }
-            const breakpoint = 'sm'
-            const breakpoints = {
-                xs: 0,
-                sm: 400,
-                md: 800
-            }
-            const breakpointPairs = Object
-                .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
+            })
+            unistyles.registry = mockRegistry()
             const dynamicFunction = (isEven: boolean) => ({
                 backgroundColor: {
                     sm: isEven
@@ -28,60 +40,66 @@ describe('styles', () => {
                 }
             })
 
-            expect(proxifyFunction(dynamicFunction, breakpoint, screenSize, breakpointPairs)(true)).toEqual({
+            const result = proxifyFunction(
+                'container',
+                dynamicFunction,
+                {}
+            )(true)
+
+            expect(result).toEqual({
                 backgroundColor: 'green'
             })
         })
 
         it('should return proxified function for custom media query', () => {
-            const screenSize: ScreenSize = {
+            const { unistyles } = require('../core')
+
+            unistyles.runtime = mockRuntime({
                 width: 400,
                 height: 800
-            }
-            const breakpoint = 'sm'
-            const breakpoints = {
-                xs: 0,
-                sm: 400,
-                md: 800
-            }
-            const breakpointPairs = Object
-                .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
+            })
+
             const dynamicFunction = (isEven: boolean) => ({
                 backgroundColor: {
-                    ':w[,399]': isEven
+                    [mq.only.width(null, 399)]: isEven
                         ? 'green'
                         : 'red',
-                    ':w[400]': isEven
+                    [mq.only.width(400)]: isEven
                         ? 'orange'
                         : 'pink'
                 }
             })
+            const result = proxifyFunction(
+                'container',
+                dynamicFunction,
+                {}
+            )(false)
 
-            expect(proxifyFunction(dynamicFunction, breakpoint, screenSize, breakpointPairs)(false)).toEqual({
+            expect(result).toEqual({
                 backgroundColor: 'pink'
             })
         })
 
         it('should return same function for no breakpoints nor media queries', () => {
-            const screenSize: ScreenSize = {
+            const { unistyles } = require('../core')
+
+            unistyles.runtime = mockRuntime({
                 width: 400,
                 height: 800
-            }
-            const breakpoint = 'sm'
-            const breakpoints = {
-                xs: 0,
-                sm: 400,
-                md: 800
-            }
-            const breakpointPairs = Object
-                .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
+            })
+
             const dynamicFunction = (isEven: boolean) => ({
                 backgroundColor: isEven
                     ? 'pink'
                     : 'purple'
             })
+            const result = proxifyFunction(
+                'container',
+                dynamicFunction,
+                {}
+            )(false)
 
-            expect(proxifyFunction(dynamicFunction, breakpoint, screenSize, breakpointPairs)(false)).toEqual({
+            expect(result).toEqual({
                 backgroundColor: 'purple'
             })
         })
@@ -89,18 +107,13 @@ describe('styles', () => {
 
     describe('parseStyle', () => {
         it('should correctly parse styles', () => {
-            const screenSize: ScreenSize = {
+            const { unistyles } = require('../core')
+
+            unistyles.runtime = mockRuntime({
                 width: 400,
                 height: 800
-            }
-            const breakpoint = 'sm'
-            const breakpoints = {
-                xs: 0,
-                sm: 400,
-                md: 800
-            }
-            const breakpointPairs = Object
-                .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
+            })
+
             const style = {
                 fontSize: {
                     sm: 12,
@@ -113,10 +126,8 @@ describe('styles', () => {
                 fontWeight: 'bold'
             }
             const parsedStyles = parseStyle(
-                style as CustomNamedStyles<typeof style, typeof breakpoints>,
-                breakpoint,
-                screenSize,
-                breakpointPairs
+                style as StyleSheet,
+                {}
             )
 
             expect(parsedStyles).toEqual({
@@ -127,18 +138,13 @@ describe('styles', () => {
         })
 
         it('should correctly parse transform styles', () => {
-            const screenSize: ScreenSize = {
+            const { unistyles } = require('../core')
+
+            unistyles.runtime = mockRuntime({
                 width: 400,
                 height: 800
-            }
-            const breakpoint = 'sm'
-            const breakpoints = {
-                xs: 0,
-                sm: 400,
-                md: 800
-            }
-            const breakpointPairs = Object
-                .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
+            })
+
             const style = {
                 transform: [
                     {
@@ -152,10 +158,8 @@ describe('styles', () => {
             }
 
             const parsedStyles = parseStyle(
-                style as CustomNamedStyles<typeof style, typeof breakpoints>,
-                breakpoint,
-                screenSize,
-                breakpointPairs
+                style as StyleSheet,
+                {}
             )
 
             expect(parsedStyles).toEqual({
@@ -169,18 +173,13 @@ describe('styles', () => {
         })
 
         it('should correctly parse shadowOffset styles', () => {
-            const screenSize: ScreenSize = {
+            const { unistyles } = require('../core')
+
+            unistyles.runtime = mockRuntime({
                 width: 400,
                 height: 800
-            }
-            const breakpoint = 'sm'
-            const breakpoints = {
-                xs: 0,
-                sm: 400,
-                md: 800
-            }
-            const breakpointPairs = Object
-                .entries(breakpoints) as SortedBreakpointEntries<typeof breakpoints>
+            })
+
             const style = {
                 shadowOffset: {
                     width: 0,
@@ -196,18 +195,13 @@ describe('styles', () => {
                     }
                 }
             }
-
             const parsedStyles = parseStyle(
-                style as CustomNamedStyles<typeof style, typeof breakpoints>,
-                breakpoint,
-                screenSize,
-                breakpointPairs
+                style as StyleSheet,
+                {}
             )
             const parsedStylesWithBreakpoints = parseStyle(
-                styleWithBreakpoints as CustomNamedStyles<typeof style, typeof breakpoints>,
-                breakpoint,
-                screenSize,
-                breakpointPairs
+                styleWithBreakpoints as StyleSheet,
+                {}
             )
 
             expect(parsedStyles).toEqual({

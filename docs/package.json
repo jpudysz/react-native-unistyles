@@ -9,11 +9,21 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/sitemap": "3.0.1",
-    "@astrojs/starlight": "0.11.0",
-    "astro": "3.2.3",
+    "@astrojs/sitemap": "3.0.3",
+    "@astrojs/starlight": "0.15.0",
+    "@fontsource-variable/nunito": "5.0.17",
+    "astro": "4.0.2",
+    "astro-expressive-code": "^0.29.3",
     "astro-seo": "0.8.0",
-    "sharp": "0.32.5"
+    "autoprefixer": "10.4.16",
+    "motion": "10.16.4",
+    "postcss-easing-gradients": "3.0.1",
+    "postcss-nested": "6.0.1",
+    "sharp": "0.33.0",
+    "swiper": "11.0.5"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@types/swiper": "6.0.0"
+  }
 }

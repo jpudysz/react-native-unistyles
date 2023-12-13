@@ -1,5 +1,5 @@
 
 {
   "extends": "./tsconfig",
-  "exclude": ["example", "src/__tests__", "docs"]
+  "exclude": ["examples", "src/__tests__", "docs"]
 }

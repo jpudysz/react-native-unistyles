@@ -14,15 +14,14 @@ import type {
     TranslateYTransform
 } from 'react-native/Libraries/StyleSheet/StyleSheetTypes'
 import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
-import type { Breakpoints } from './breakpoints'
-import type { MediaQueries } from './mediaQueries'
+import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
 
-type ShadowOffset = {
+export type ShadowOffset = {
     width: number,
     height: number
 }
 
-type TransformStyles =
+export type TransformStyles =
     & PerpectiveTransform
     & RotateTransform
     & RotateXTransform
@@ -37,37 +36,13 @@ type TransformStyles =
     & SkewYTransform
     & MatrixTransform
 
-type UnistyleNested<B> = {
-    shadowOffset?: DeepUniStyle<ShadowOffset, B>,
-    textShadowOffset?: DeepUniStyle<ShadowOffset, B>,
-    transform?: Array<DeepUniStyle<TransformStyles, B>>
+export type ScreenSize = {
+    width: number,
+    height: number
 }
 
-type UniStyle<V, B> = {
-    [innerKey in keyof B]?: V
-} | {
-    [innerKey in MediaQueries]?: V
-} | V
-
-type DeepUniStyle<T, B> = {
-    [K in keyof T]?: UniStyle<T[K], B>
-}
-
-// these props are treated differently to nest breakpoints and media queries
-type NestedTypes = 'shadowOffset' | 'transform' | 'textShadowOffset'
-
-type UnistyleView<B> = DeepUniStyle<Omit<ViewStyle, NestedTypes>, B>
-type UnistyleText<B> = DeepUniStyle<Omit<TextStyle, NestedTypes>, B>
-type UnistyleImage<B> = DeepUniStyle<Omit<ImageStyle, NestedTypes>, B>
-
-export type StaticStyles<B extends Breakpoints> =
-    | UnistyleView<B>
-    | UnistyleText<B>
-    | UnistyleImage<B>
-    & UnistyleNested<B>
-
-export type CustomNamedStyles<T, B extends Breakpoints> = {
-    [K in keyof T]: T[K] extends (...args: infer A) => StaticStyles<B>
-        ? (...args: A) => StaticStyles<B>
-        : StaticStyles<B>
-}
+export type RNStyle = ViewStyle & TextStyle & ImageStyle
+export type RNValue = ViewStyle[keyof ViewStyle] | TextStyle[keyof TextStyle] | ImageStyle[keyof ImageStyle]
+export type NestedStyle = Record<keyof UnistylesBreakpoints | symbol, RNValue>
+export type NestedStylePairs = Array<[keyof UnistylesBreakpoints | symbol, RNValue]>
+export type UnistylesTheme = UnistylesThemes[keyof UnistylesThemes]

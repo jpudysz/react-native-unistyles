@@ -1,0 +1,41 @@
+:root {
+    --background: #8e7cc4;
+    --white: #fff;
+    --black: #000;
+    --pink: #e46fbb;
+}
+
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    overscroll-behavior: none;
+    list-style: none;
+
+    &::selection {
+        background-color: var(--pink);
+    }
+}
+
+body {
+    background-color: var(--background);
+    color: #fff;
+    font-family: 'Nunito Variable', sans-serif;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+img {
+    pointer-events: none;
+
+    &::selection {
+        background: none;
+    }
+}
+
+.no-scroll {
+    overflow: hidden!important;
+}

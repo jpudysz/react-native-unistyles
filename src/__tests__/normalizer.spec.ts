@@ -1,6 +1,7 @@
-import { preprocessor, normalizeNumericValue, normalizeColor, normalizeStyles } from '../utils'
 import type { BoxShadow, TextShadow, Transforms } from '../types'
-import { normalizeStyles as normalizeStylesWeb } from '../utils/normalizeStyles.web'
+import { preprocessor, normalizeNumericValue, normalizeColor, normalizeStyle } from '../normalizer'
+
+jest.mock('../core', () => ({}))
 
 describe('Normalizer', () => {
     describe('Box Shadow', () => {
@@ -384,24 +385,6 @@ describe('Normalizer', () => {
     })
 
     describe('normalizeStyles', () => {
-        it('should do nothing to styles object', () => {
-            const styles = {
-                container: {
-                    flex: 1,
-                    transform: [
-                        {
-                            translateX: 30
-                        }
-                    ]
-                }
-            }
-
-            expect(normalizeStyles({})).toEqual({})
-            expect(normalizeStyles(styles)).toEqual(styles)
-        })
-    })
-
-    describe('normalizeStylesWeb', () => {
         beforeEach(() => {
             console.warn = jest.fn()
         })
@@ -424,7 +407,7 @@ describe('Normalizer', () => {
                     }
                 ]
             }
-            expect(normalizeStylesWeb(styles)).toEqual({
+            expect(normalizeStyle(styles)).toEqual({
                 transform: 'translateX(30px) scale(2) rotate(20deg)'
             })
         })
@@ -439,7 +422,7 @@ describe('Normalizer', () => {
                 shadowOpacity: 0.5,
                 shadowRadius: 5
             }
-            expect(normalizeStylesWeb(styles)).toEqual({
+            expect(normalizeStyle(styles)).toEqual({
                 boxShadow: '0 0 5px rgba(0,0,0,0.5)',
                 shadowColor: undefined,
                 shadowOffset: undefined,
@@ -457,7 +440,7 @@ describe('Normalizer', () => {
                 },
                 textShadowRadius: 12
             }
-            expect(normalizeStylesWeb(styles)).toEqual({
+            expect(normalizeStyle(styles)).toEqual({
                 textShadow: '-5px 0 12px #fff',
                 textShadowColor: undefined,
                 textShadowOffset: undefined,
@@ -474,7 +457,7 @@ describe('Normalizer', () => {
                 }
             }
 
-            normalizeStylesWeb(styles as BoxShadow)
+            normalizeStyle(styles as BoxShadow)
 
             expect(console.warn).toBeCalled()
         })
@@ -485,7 +468,7 @@ describe('Normalizer', () => {
                 textShadowRadius: 12
             }
 
-            normalizeStylesWeb(styles as TextShadow)
+            normalizeStyle(styles as TextShadow)
 
             expect(console.warn).toBeCalled()
         })

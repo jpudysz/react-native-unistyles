@@ -1,0 +1,89 @@
+---
+title: Unistyles Runtime
+---
+
+import Seo from '../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'UnistylesRuntime',
+        description: 'How to use UnistylesRuntime in react-native-unistyles'
+    }}
+>
+
+Unistyles Runtime is the most powerful part of Unistyles 2.0. 
+It replaces much of the functionality previously handled by the React Native API. It also keeps track of your device dimensions, orientation, theme, preferred scheme, etc.
+
+You can interact with Unistyles via `UnistylesRuntime` in your code.
+
+:::tip
+Unistyles Runtime is a Host Object (created in C++). It's always up to date and allows you to interact with the native side of Unistyles.
+:::
+
+## Usage
+
+You can import `UnistylesRuntime` from `react-native-unistyles`:
+
+```tsx /UnistylesRuntime/
+import { UnistylesRuntime } from 'react-native-unistyles'
+```
+
+and use it anywhere in your code, even outside a component.
+
+## Getters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| colorScheme | string | Get your device's color scheme. Available options `dark`, `light` or `unspecified` |
+| hasAdaptiveThemes | boolean | Indicates if you have enabled [adaptive themes](/reference/theming#adaptive-themes) |
+| themeName | string | Name of the selected theme or an empty string if you don't use themes |
+| breakpoint | string / undefined | Current breakpoint or always undefined if you don't use breakpoints |
+| breakpoints | Object | Your breakpoints registered with [UnistylesRegistry](/reference/unistyles-registry/) |
+| enabledPlugins | string[] | Names of currently enabled plugins |
+| screen | Object | Screen dimensions |
+| orientation | ScreenOrientation | Your device's orientation |
+
+## Setters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| setTheme | (themeName: string) => void | Change the current theme |
+| setAdaptiveThemes | (enabled: boolean) => void | Toggle [adaptive themes](/reference/theming#adaptive-themes) |
+| addPlugin | (plugin: UnistylesPlugin) => void | Enable a [plugin](/reference/plugins/) |
+| removePlugin | (plugin: UnistylesPlugin) => void | Disable a [plugin](/reference/plugins/) |
+
+### Why doesn't `UnistylesRuntime` re-render my component?
+
+You should think of `UnistylesRuntime` as a JavaScript object. 
+It's not a React component, so it doesn't re-render your component when, for example, screen size or breakpoint changes.
+
+### How to re-render my stylesheets based on `UnistylesRuntime`?
+
+If you use `UnistylesRuntime` in your `createStyleSheet` it will automatically re-render your styles to get the correct values in real-time.
+
+One example could be reading device width and height. 
+
+Using `Dimensions` from React Native won't work as intended, as it will always return the same value.
+
+```tsx /UnistylesRuntime/
+import { UnistylesRuntime, createStyleSheet } from 'react-native-unistyles'
+
+// your component
+
+const stylesheet = createStyleSheet(theme => ({
+    container: {
+        backgroundColor: theme.colors.background,
+        width: UnistylesRuntime.screen.width,
+        height: UnistylesRuntime.screen.height
+    }
+}))
+```
+
+:::tip
+Your stylesheets with `UnistylesRuntime` will only be re-rendered when:
+- screen size changes
+- orientation changes
+- breakpoint changes
+:::
+
+</Seo>

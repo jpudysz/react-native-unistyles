@@ -1,0 +1,260 @@
+---
+title: Theming
+---
+
+import Seo from '../../../components/Seo.astro'
+
+
+<Seo
+    seo={{
+        title: 'Theming',
+        description: 'Learn about theming with react-native-unistyles'
+    }}
+>
+
+Theming in `Unistyles` differs from other libraries as it doesn't impose any specific syntax.
+
+**Any JavaScript object can be a Unistyles theme**.
+
+There is also no limit to the number of themes. You can even register dozens of them, for example, if your app sells some premium ones.
+
+Theming is optional. If you dont't register themes with [UnistylesRegistry](/reference/unistyles-registry) 
+the library will use an empty object by default.
+
+### Create a theme
+
+You can organize your themes however you want:
+
+```tsx
+const myTheme = {
+    // any keys
+    colors: {
+        // your colors
+    },
+    components: {
+        // any number of nesting
+        button: {
+            deepKey: {}
+        }
+    },
+    utils: {
+        // you can even use functions here
+        hexToRGBA: () => {}
+    },
+    // or compute your themes with functions and spread operators
+    ...premiumFeatures,
+    ...getMyColors()
+}
+```
+
+If you use TypeScript you need to override the library's type:
+
+```tsx /name/
+type AppThemes = {
+  name: typeof myTheme
+}
+
+declare module 'react-native-unistyles' {
+  export interface UnistylesThemes extends AppThemes {}
+}
+```
+
+Finally, to register the theme, you need to call `UnistylesRegistry`:
+
+```tsx /name/
+import { UnistylesRegistry } from 'react-native-unistyles'
+import { myTheme } from './themes'
+
+UnistylesRegistry
+    .addThemes({
+        name: myTheme,
+        // you can add more themes here
+    })
+```
+
+Where `name` is the unique name of your theme.
+
+:::tip
+Your themes may have different shapes, but it's generally not recommended.
+:::
+
+### Select theme
+
+If you've registered more than one theme, Unistyles won't know which one is the initial one.
+At this point, you have 3 options:
+
+- If you know the initial theme upfront, select it with `addConfig` from [UnistylesRegistry](/reference/unistyles-registry)
+
+```tsx /initialTheme/
+UnistylesRegistry
+    .addThemes({
+        light: myTheme,
+        premium: premiumTheme
+    })
+    .addConfig({
+        initialTheme: 'premium'
+    })
+```
+
+- If you need to resolve the user-selected theme during runtime, call [useInitialTheme](/reference/use-initial-theme) before
+using your first `useStyles` hook:
+
+```tsx /useInitialTheme/
+import { useInitialTheme, useStyles } from 'react-native-unistyles'
+
+// can be read from any storage eg. MMKV/SQL/FileSystem/Appearance
+const userTheme = ...
+
+useInitialTheme(userTheme)
+
+// useInitialTheme must be called before the first useStyles hook
+// it's so fast that you can even call it in the same component!
+const { styles } = useStyles(stylesheet)
+```
+
+- Use adaptive themes, as mentioned below
+
+:::danger
+Without a selected theme, Unistyles will throw an error:
+
+"Your themes are registered, but you didn't select the initial theme"
+:::
+
+### Get the current theme
+
+To get the current theme, you can either obtain it from the `useStyles` hook:
+
+```tsx /theme/
+const { theme } = useStyles()
+```
+
+or access it in the `createStyleSheet` function:
+
+```tsx /theme/
+const stylesheet = createStyleSheet(theme => ({
+    ...
+}))
+```
+
+### Get the current theme name
+
+To get the current theme name, import `UnistylesRuntime`:
+
+```tsx /UnistylesRuntime.themeName/
+import { UnistylesRuntime } from 'react-native-unistyles'
+
+// access the current theme name in your component
+export const UserTheme = () => (
+    <Text>
+        Selected theme is {UnistylesRuntime.themeName}
+    </Text>
+)
+```
+
+### Adaptive themes
+
+Adaptive themes allow Unistyles to automatically manage the selection of your themes based on device scheme settings.
+To enable this, you need to meet two conditions:
+
+- register two themes with reserved names `light` and `dark`:
+
+```tsx /light:/ /dark:/
+UnistylesRegistry
+    .addThemes({
+        light: lightTheme,
+        dark: darkTheme,
+        // you may have more themes
+    })
+```
+
+- Explicitly enable  `adaptiveThemes`:
+
+```tsx /adaptiveThemes/
+UnistylesRegistry
+    .addThemes({
+        light: lightTheme,
+        dark: darkTheme,
+        // you may have more themes
+    })
+    .addConfig({
+        adaptiveThemes: true
+    })
+```
+
+### Toggle adaptive themes during runtime
+
+To toggle adaptive theme support at any point, use `UnistylesRuntime`:
+
+```tsx /UnistylesRuntime.setAdaptiveThemes.*/
+import { UnistylesRuntime } from 'react-native-unistyles'
+
+// toggle support for adaptive themes at any point
+export const ToggleAdaptiveThemes = () => (
+    <Button
+        title="Disable adaptive themes"
+        onPress={() => UnistylesRuntime.setAdaptiveThemes(false)}
+    />
+)
+```
+
+### Check if adaptive themes are enabled
+
+To check if adaptive themes are enabled, again use `UnistylesRuntime`:
+
+```tsx /UnistylesRuntime.hasAdaptiveThemes/
+import { UnistylesRuntime } from 'react-native-unistyles'
+
+// check if you've enabled adaptive themes
+export const AdaptiveThemes = () => (
+    <Text>
+        Adaptive themes are {UnistylesRuntime.hasAdaptiveThemes ? 'enabled' : 'disabled'}
+    </Text>
+)
+```
+
+### Get device color scheme
+
+Check your device color preference with `UnistylesRuntime`:
+
+```tsx /colorScheme/
+import { UnistylesRuntime } from 'react-native-unistyles'
+
+// check the current device scheme preference
+export const UserTheme = () => (
+    <Text>
+        My device is using the {UnistylesRuntime.colorScheme} scheme.
+    </Text>
+)
+```
+
+Available options are: `dark`, `light` or `unspecified` for devices that don't support color schemes.
+
+:::caution
+Unistyles will read your device settings, not user preferences. It's not compatible with the React Native `Appearance` module.
+:::
+
+If your app's theme is not changing based on device settings, please refer to the [FAQ](/reference/faq/)
+
+### Change theme
+
+With Unistyles 2.0, we no longer use a React Context. However, this doesn't mean you can't change the theme. 
+In fact, it's even easier as you don't need to re-render the entire app.
+To change the theme at any time, simply call `setTheme` function:
+
+```tsx /UnistylesRuntime.setTheme.*/
+import { UnistylesRuntime } from 'react-native-unistyles'
+
+// change the theme in any component
+export const ChangeTheme = () => (
+    <Button
+        title="Change theme"
+        onPress={() => UnistylesRuntime.setTheme('dark')}
+    />
+)
+```
+
+:::tip[UnistylesRuntime]
+UnistylesRuntime is a powerful feature, and you can learn more about it [here](/reference/unistyles-runtime).
+:::
+
+</Seo>

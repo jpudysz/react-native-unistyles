@@ -42,7 +42,8 @@ android.iml
 
 # Cocoapods
 #
-examples/expo/ios/Pods
+examples/expo/ios
+examples/expo/android
 
 # Ruby
 examples/expo/vendor/
@@ -81,3 +82,4 @@ example/expo/.yarn
 #docs
 docs/.yarn
 coverage
+docs/dist
