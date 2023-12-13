@@ -10,52 +10,56 @@ import Seo from '../../../components/Seo.astro'
         description: 'How to use createStyleSheet from react-native-unistyles'
     }}
 >
-    `createStyleSheet` is interchangeable with `StyleSheet.create`. You can use objects, and it will function identically to its React Native counterpart.
 
-    ```ts
-    const stylesheet = createStyleSheet({
-        container: {
-           flex: 1,
-           justifyContent: 'center',
-           alignItems: 'center',
-        },
-    })
-    ```
-    The difference is that you can now use breakpoints and media queries:
+Utility for building your `StyleSheets` with superpowers.
+It can be imported from the `react-native-unistyles`:
 
-    ```ts
-    const stylesheet = createStyleSheet({
-        container: {
-           flex: 1,
-           justifyContent: 'center',
-           alignItems: 'center',
-           flexDirection: {
-               xs: 'row',
-               sm: 'column',
-               ':w[800]': 'row'
-           }
-        },
-    })
-    ```
+```ts
+import { createStyleSheet } from 'react-native-unistyles'
+```
 
-    `createStyleSheet` also accepts a function, to which the library will inject your theme:
+This tool is interchangeable with React Native's `StyleSheet.create`.
 
-    ```ts
-    const stylesheet = createStyleSheet(theme => ({
-        container: {
-           flex: 1,
-           justifyContent: 'center',
-           alignItems: 'center',
-           flexDirection: {
-               xs: 'row',
-               sm: 'column',
-               ':w[800]': 'row'
-           },
-           backgroundColor: theme.colors.background
-        },
-    }))
-    ```
+:::tip[Learn more]
+Interested in incrementally migrating from StyleSheet? [Read this guide](/start/migration-from-stylesheet/)
+:::
 
-    Importantly, you'll receive the same TypeScript hints as with `StyleSheet.create`!
+
+`crateStyleSheet` accepts both `object` or `function`.
+
+### Basic usage (object)
+
+If you pass an object to the `createStyleSheet` it will work the same like with `StyleSheet.create`.
+With this tool you can now use [variants](/reference/variants/), [breakpoints](/reference/breakpoints/) and
+[media queries](/reference/media-queries/).
+
+```ts
+const stylesheet = createStyleSheet({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+})
+```
+
+### Basic usage (function)
+
+When you pass a function to `createStyleSheet` it automatically injects a `theme` as the first argument for you.
+
+To register your themes please follow [setup](/start/setup/) and [theming](/reference/theming/) guides.
+
+```ts /theme/
+const stylesheet = createStyleSheet(theme => ({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: theme.colors.background
+    },
+}))
+```
+
+Importantly, you'll receive the same TypeScript hints as with `StyleSheet.create`!
 
 </Seo>

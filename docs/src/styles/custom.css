@@ -1,10 +1,10 @@
 :root {
-    --sl-color-text-accent: #ee42b2;
+    --sl-color-text-accent: #59a9ee;
     --sl-logo-brightness: brightness(100%)
 }
 
 :root[data-theme='light'] {
-    --sl-color-text-accent: #db33a0;
+    --sl-color-text-accent: #59a9ee;
     --sl-logo-brightness: brightness(0%)
 }
 
@@ -53,4 +53,9 @@ select {
 main .hero {
     padding-bottom: 0;
     padding-top: 20px;
+}
+
+.expressive-code figure pre,
+.expressive-code figure pre > code div {
+    margin-top: 0;
 }

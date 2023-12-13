@@ -1,0 +1,37 @@
+---
+title: useInitialTheme
+---
+
+import Seo from '../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'useInitialTheme',
+        description: 'How to use useInitialTheme hook from react-native-unistyles'
+    }}
+>
+
+This hook is optional, but its use is required under certain circumstances, as described in the [theming guide](/reference/theming/#select-theme).
+
+If you're using multiple themes and need to determine the initial theme during runtime, this hook is necessary to select the initial theme.
+
+```tsx /useInitialTheme/
+import { useInitialTheme, useStyles } from 'react-native-unistyles'
+
+// can be read from any storage eg. MMKV/SQL/FileSystem/Appearance
+const userTheme = ...
+
+useInitialTheme(userTheme)
+
+// useInitialTheme must be called before the first useStyles hook
+// it's so fast that you can even call it in the same component!
+const { styles } = useStyles(stylesheet)
+```
+
+:::danger
+Without a selected theme, Unistyles will throw an error:
+
+"Your themes are registered, but you didn't select the initial theme"
+:::
+
+</Seo>
