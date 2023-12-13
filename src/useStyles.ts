@@ -13,6 +13,12 @@ type ParsedStylesheet<ST extends StyleSheetWithSuperPowers> = {
     styles: ReactNativeStyleSheet<ST>
 }
 
+/**
+ * Hook that enables all the features of Unistyles
+ * @param stylesheet - The stylesheet with superpowers to be used
+ * @param variantsMap - The map of variants to be used
+ * @returns - The theme, current breakpoint and RN compatible styles
+ */
 export const useStyles = <ST extends StyleSheetWithSuperPowers>(
     stylesheet?: ST,
     variantsMap?: ExtractVariantNames<typeof stylesheet>
