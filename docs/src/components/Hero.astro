@@ -5,7 +5,6 @@ import Unicorn from '../assets/unicorn.svg'
 import CloudA from '../assets/cloud-a.svg'
 import CloudB from '../assets/cloud-b.svg'
 import HeroMobile from '../assets/hero-mobile.svg'
-import ArrowDown from '../assets/arrow-down.svg'
 import MediaImage from './MediaImage.astro'
 ---
 
@@ -60,11 +59,11 @@ import MediaImage from './MediaImage.astro'
             </button>
         </a>
     </div>
-    <div class="scroll">
-        Click to scroll
-        <Image class="scroll__icon" src={ArrowDown} alt="" />
-    </div>
 </section>
+<div class="scroll">
+    Click to scroll
+    <svg class="scroll__icon" xmlns="http://www.w3.org/2000/svg" width="30" height="12" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="m1 1 14.104 9L29 1"/></svg>
+</div>
 
 <script>
     import { scroll, timeline } from 'motion'
@@ -274,7 +273,7 @@ import MediaImage from './MediaImage.astro'
         color: var(--pink);
         z-index: 50;
         left: 50%;
-        top: 55vw;
+        top: calc(100vh - 200px);
         transform: translateX(-50%);
         flex-direction: column;
         align-items: center;
@@ -283,6 +282,10 @@ import MediaImage from './MediaImage.astro'
         font-size: 16px;
         cursor: pointer;
         display: none;
+
+        @media (min-aspect-ratio: 9/4) {
+            color: var(--white);
+        }
 
         @media (min-width: 700px) {
             display: flex;
@@ -295,6 +298,11 @@ import MediaImage from './MediaImage.astro'
         &__icon {
             width: 28px;
             height: auto;
+            color: var(--pink);
+
+            @media (min-aspect-ratio: 9/4) {
+                color: var(--white);
+            }
         }
     }
 </style>
