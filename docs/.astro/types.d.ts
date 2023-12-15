@@ -192,6 +192,13 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
+"other/for-library-authors.mdx": {
+	id: "other/for-library-authors.mdx";
+  slug: "other/for-library-authors";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
 "other/for-sponsors.mdx": {
 	id: "other/for-sponsors.mdx";
   slug: "other/for-sponsors";
@@ -244,13 +251,6 @@ declare module 'astro:content' {
 "reference/faq.mdx": {
 	id: "reference/faq.mdx";
   slug: "reference/faq";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/for-library-authors.mdx": {
-	id: "reference/for-library-authors.mdx";
-  slug: "reference/for-library-authors";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">
