@@ -13,25 +13,20 @@ import Seo from '../../../components/Seo.astro'
 
 Unistyles can render styles on the server-side, which is useful, for example, for SEO purposes.
 
+### Intiial configuration
+
+Configure your `unistyles.ts` file as it's listed in the [Getting started](/start/setup) section.
+
 ### Server side configuration
 
-You just need to modify the `__document.ts` or `__document.js` file in your project root.
+You just need to modify the `__document.ts` or `__document.js` file in your project's root by importing
+`unistyles.ts` file.
 
 ```diff lang="tsx"
++ import '../unistyles'
+
 export const getInitialProps = async ({ renderPage }) => {
     AppRegistry.registerComponent('Main', () => Main)
-
-+    UnistylesRegistry
-+        .addBreakpoints({
-+            xs: 0,
-+            sm: 300,
-+            md: 500,
-+            lg: 800,
-+            xl: 1200
-+        })
-+        .addThemes({
-+            light: theme
-+        })
 
     const { getStyleElement } = AppRegistry.getApplication('Main')
     const page = await renderPage()
@@ -46,14 +41,23 @@ export const getInitialProps = async ({ renderPage }) => {
 
 ### Client side configuration
 
-You need to import a file where you configured Unistyles with `UnistylesRegistry`.
+To setup the listeners and Unistyles bindings, simply repeat the process, 
+but this time with `_app.tsx` file.
+
+```diff lang="tsx"
++ import '../unistyles'
+
+export const MyApp = ({ Component, pageProps }: SolitoAppProps) => {
+    // your component
+}
+```
+
 Some dynamic features like breakpoint are not available on the server. That's why you need additional configuration with the `isClient` flag.
 
 ```tsx /import './styles'/ /isClient/
 import React, { useEffect, useState } from 'react'
 import { View, Text, ActivityIndicator } from 'react-native'
 import { useStyles } from 'react-native-unistyles'
-import './styles'
 
 export const HomeScreen = () => {
     const { styles, breakpoint, theme } = useStyles(stylesheet)
@@ -91,6 +95,10 @@ export const HomeScreen = () => {
 
 const stylesheet = ...
 ```
+
+:::tip
+If you are struggling with the working example, you can check out the [example repository](https://github.com/jpudysz/react-native-unistyles-ssr-exmaple).
+:::
 
 :::caution
 SSR support is still experimental and may not work in all cases.
