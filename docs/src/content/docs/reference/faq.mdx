@@ -16,13 +16,18 @@ Here, you can find answers to the most frequently asked questions about Unistyle
 
 ### Why Unistyles runtime is not available?
 
-This error occurs when you try to use a Unistyles feature without proper installation.
+This error occurs when you try to use a Unistyles features without proper installation.
 
 Possible causes include:
 - Running the app in Expo Go, which is not supported.
 - Running your Expo project without rebuilding it using the `expo prebuild` command
 - Forgetting to execute `pod install` in your bare React Native project
 - Omitting the import of the file where you set up your UnistylesRegistry eg. in your `App.tsx` file
+- If you don't use breakpoints and themes, you still need to somehow initialize the Unistyles code. To do that, add an empty import from `react-native-unistyles` in your `App.tsx` file:
+
+```ts
+import 'react-native-unistyles'
+```
 
 ### I'm trying to override library types, but I'm receiving error that react-native-unistyles is not found?
 
