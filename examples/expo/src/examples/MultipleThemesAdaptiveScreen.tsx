@@ -1,7 +1,7 @@
 import React from 'react'
-import { Button, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import { createStyleSheet, useStyles, UnistylesRuntime } from 'react-native-unistyles'
-import { DemoScreen } from '../components'
+import { Button, DemoScreen } from '../components'
 
 export const MultipleThemesAdaptiveScreen: React.FunctionComponent = () => {
     const { styles, theme  } = useStyles(stylesheet)

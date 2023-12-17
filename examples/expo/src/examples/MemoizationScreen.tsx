@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
-import { Text, View, type TextStyle, Button, ScrollView } from 'react-native'
+import { Text, View, type TextStyle, ScrollView } from 'react-native'
 import { UnistylesRuntime, createStyleSheet, mq, useStyles } from 'react-native-unistyles'
-import { DemoScreen } from '../components'
+import { Button, DemoScreen } from '../components'
 import { autoGuidelinePlugin } from '../plugins'
 
 enum TextVariant {
@@ -133,7 +133,9 @@ const stylesheet = createStyleSheet(theme => ({
     actions: {
         borderTopWidth: 1,
         borderTopColor: theme.colors.typography,
-        marginTop: 20
+        marginTop: 20,
+        paddingTop: 20,
+        rowGap: 20
     },
     centerText: {
         textAlign: 'center',

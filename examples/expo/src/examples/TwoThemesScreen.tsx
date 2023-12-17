@@ -1,7 +1,7 @@
 import React from 'react'
-import { Button, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import { createStyleSheet, useStyles, UnistylesRuntime, useInitialTheme } from 'react-native-unistyles'
-import { DemoScreen } from '../components'
+import { Button, DemoScreen } from '../components'
 
 export const TwoThemesScreen: React.FunctionComponent = () => {
     // if you have 2 or more themes, you need to select one of them

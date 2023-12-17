@@ -1,7 +1,7 @@
 import React from 'react'
-import { View, Text, Button, ScrollView } from 'react-native'
+import { View, Text, ScrollView } from 'react-native'
 import { UnistylesRuntime, createStyleSheet, useStyles } from 'react-native-unistyles'
-import { DemoScreen } from '../components'
+import { Button, DemoScreen } from '../components'
 import { autoGuidelinePlugin } from '../plugins'
 
 export const RuntimeScreen: React.FunctionComponent = () => {
@@ -143,7 +143,8 @@ const stylesheet = createStyleSheet(theme => ({
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        marginVertical: 5
     },
     title: {
         fontSize: 20,
