@@ -157,6 +157,10 @@ export default defineConfig({
                     ]
                 },
                 {
+                    label: 'Unistyles 1.x Documentation',
+                    link: '/v1/docs/start/setup'
+                },
+                {
                     label: 'React Native Crossroads',
                     link: 'https://reactnativecrossroads.com/'
                 },
