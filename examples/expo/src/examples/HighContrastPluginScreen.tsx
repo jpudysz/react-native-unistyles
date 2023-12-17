@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react'
-import { Pressable, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import { createStyleSheet, useStyles, UnistylesRuntime } from 'react-native-unistyles'
-import { DemoScreen } from '../components'
+import { Button, DemoScreen } from '../components'
 import { highContrastPlugin } from '../plugins'
 
 export const HighContrastPluginScreen: React.FunctionComponent = () => {
-    const { styles } = useStyles(stylesheet)
+    const { styles, theme } = useStyles(stylesheet)
 
     useEffect(() => {
         // plugins can be runtime enabled/disabled
@@ -32,20 +32,20 @@ export const HighContrastPluginScreen: React.FunctionComponent = () => {
                     It will automatically change your theme colors to high contrast
                 </Text>
                 <View style={styles.circle} />
-                <Pressable
-                    style={styles.button}
+                <Button
+                    textColor={theme.colors.typography}
+                    title={isHighContrastPluginEnabled ? 'Disable high contrast' : 'Enable high contrast'}
+                    color={theme.colors.backgroundColor}
                     onPress={() => {
                         isHighContrastPluginEnabled
                             ? UnistylesRuntime.removePlugin(highContrastPlugin)
                             : UnistylesRuntime.addPlugin(highContrastPlugin)
                     }}
-                >
-                    <Text style={styles.text}>
-                        {isHighContrastPluginEnabled ? 'Disable high contrast' : 'Enable high contrast'}
-                    </Text>
-                </Pressable>
-                <Pressable
-                    style={styles.button}
+                />
+                <Button
+                    title="Change theme"
+                    textColor={theme.colors.typography}
+                    color={theme.colors.backgroundColor}
                     onPress={() => {
                         switch (UnistylesRuntime.themeName) {
                             case 'light':
@@ -57,11 +57,7 @@ export const HighContrastPluginScreen: React.FunctionComponent = () => {
                                 return UnistylesRuntime.setTheme('light')
                         }
                     }}
-                >
-                    <Text style={styles.text}>
-                        Change theme
-                    </Text>
-                </Pressable>
+                />
             </View>
         </DemoScreen>
     )
@@ -78,11 +74,6 @@ const stylesheet = createStyleSheet(theme => ({
     text: {
         textAlign: 'center',
         color: theme.colors.typography
-    },
-    button: {
-        padding: 10,
-        borderRadius: 5,
-        backgroundColor: theme.colors.backgroundColor
     },
     circle: {
         width: 100,

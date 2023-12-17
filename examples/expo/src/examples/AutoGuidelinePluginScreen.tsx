@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
-import { Button, ScrollView, Text, View } from 'react-native'
+import { ScrollView, Text, View } from 'react-native'
 import { createStyleSheet, useStyles, UnistylesRuntime } from 'react-native-unistyles'
-import { DemoScreen } from '../components'
+import { Button, DemoScreen } from '../components'
 import { autoGuidelinePlugin } from '../plugins'
 
 export const AutoGuidelinePluginScreen: React.FunctionComponent = () => {
