@@ -12,11 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        uses: oven-sh/setup-bun@v1
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - uses: oven-sh/setup-bun@v1
 
       - name: Install
         uses: bun install
