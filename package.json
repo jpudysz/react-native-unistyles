@@ -136,9 +136,7 @@
     },
     "plugins": {
       "@release-it/conventional-changelog": {
-        "preset": {
-          "name": "conventionalcommits"
-        }
+        "preset": "angular"
       }
     }
   },
