@@ -96,6 +96,10 @@ export default defineConfig({
                             link: '/reference/unistyles-runtime/'
                         },
                         {
+                            label: 'Content size category',
+                            link: '/reference/content-size-category/'
+                        },
+                        {
                             label: 'Plugins',
                             link: '/reference/plugins/'
                         },

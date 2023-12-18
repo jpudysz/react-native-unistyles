@@ -227,6 +227,13 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
+"reference/content-size-category.mdx": {
+	id: "reference/content-size-category.mdx";
+  slug: "reference/content-size-category";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
 "reference/create-stylesheet.mdx": {
 	id: "reference/create-stylesheet.mdx";
   slug: "reference/create-stylesheet";

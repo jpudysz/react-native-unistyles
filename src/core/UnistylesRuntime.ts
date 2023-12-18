@@ -34,6 +34,14 @@ export class UnistylesRuntime {
     }
 
     /**
+     * Get the current content size category
+     * @returns - The current content size category
+     */
+    public get contentSizeCategory() {
+        return this.unistylesBridge.contentSizeCategory
+    }
+
+    /**
      * Get the current breakpoint based on device size
      * @returns - The current breakpoint
      */

@@ -24,6 +24,10 @@ RCT_EXPORT_MODULE(Unistyles)
                                                  selector:@selector(appearanceChanged:)
                                                      name:RCTUserInterfaceStyleDidChangeNotification
                                                    object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(contentSizeCategoryDidChange:)
+                                                     name:UIContentSizeCategoryDidChangeNotification
+                                                   object:nil];
     }
 
     return self;
@@ -34,7 +38,15 @@ RCT_EXPORT_MODULE(Unistyles)
         self.unistylesRuntime = nullptr;
     }
 
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                          name: UIContentSizeCategoryDidChangeNotification
+                                          object: nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                          name: RCTUserInterfaceStyleDidChangeNotification
+                                          object: nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                          name: UIDeviceOrientationDidChangeNotification
+                                          object: nil];
 }
 
 
@@ -60,6 +72,14 @@ RCT_EXPORT_MODULE(Unistyles)
 
     if (self.unistylesRuntime != nullptr) {
         ((UnistylesRuntime*)self.unistylesRuntime)->handleAppearanceChange(colorScheme);
+    }
+}
+
+- (void)contentSizeCategoryDidChange:(NSNotification *)notification {
+    UIContentSizeCategory contentSizeCategory = [[UIApplication sharedApplication] preferredContentSizeCategory];
+
+    if (self.unistylesRuntime != nullptr) {
+        ((UnistylesRuntime*)self.unistylesRuntime)->handleContentSizeCategoryChange(getContentSizeCategory(contentSizeCategory));
     }
 }
 
@@ -112,11 +132,17 @@ void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSel
     CGFloat initialScreenWidth = [UIScreen mainScreen].bounds.size.width;
     CGFloat initialScreenHeight = [UIScreen mainScreen].bounds.size.height;
     std::string initialColorScheme = getColorScheme();
+    __block UIContentSizeCategory contentSizeCategory;
+    
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        contentSizeCategory = [[UIApplication sharedApplication] preferredContentSizeCategory];
+    });
 
     auto unistylesRuntime = std::make_shared<UnistylesRuntime>(
         (int)initialScreenWidth,
         (int)initialScreenHeight,
-        initialColorScheme
+        initialColorScheme,
+        getContentSizeCategory(contentSizeCategory)
     );
 
     unistylesRuntime.get()->onThemeChange([=](std::string theme) {
@@ -154,6 +180,17 @@ void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSel
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [weakSelf emitEvent:@"__unistylesOnChange" withBody:body];
         });
+    });
+    
+    unistylesRuntime.get()->onContentSizeCategoryChange([=](std::string contentSizeCategory) {
+        NSDictionary *body = @{
+            @"type": @"dynamicTypeSize",
+            @"payload": @{
+                @"contentSizeCategory": cxxStringToNSString(contentSizeCategory)
+            }
+        };
+
+        [weakSelf emitEvent:@"__unistylesOnChange" withBody:body];
     });
 
     weakSelf.unistylesRuntime = unistylesRuntime.get();

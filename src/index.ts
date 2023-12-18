@@ -3,7 +3,7 @@ import { mq } from './utils'
 import { useInitialTheme } from './hooks'
 import type { UnistylesPlugin } from './types'
 import type { UnistylesThemes, UnistylesBreakpoints } from './global'
-import { ScreenOrientation } from './common'
+import { ScreenOrientation, AndroidContentSizeCategory, IOSContentSizeCategory } from './common'
 import { useStyles } from './useStyles'
 import { createStyleSheet } from './createStyleSheet'
 
@@ -37,6 +37,8 @@ export {
     useInitialTheme,
     createStyleSheet,
     ScreenOrientation,
+    AndroidContentSizeCategory,
+    IOSContentSizeCategory,
     UnistylesRegistry,
     UnistylesRuntime
 }
