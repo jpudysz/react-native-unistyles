@@ -27,7 +27,8 @@ Java_com_unistyles_UnistylesModule_nativeInstall(
         jlong jsi,
         jint screenWidth,
         jint screenHeight,
-        jstring colorScheme
+        jstring colorScheme,
+        jstring contentSizeCategory
 ) {
     auto runtime = reinterpret_cast<facebook::jsi::Runtime *>(jsi);
 
@@ -43,10 +44,15 @@ Java_com_unistyles_UnistylesModule_nativeInstall(
     std::string colorSchemeStr(colorSchemeChars);
     env->ReleaseStringUTFChars(colorScheme, colorSchemeChars);
 
+    const char *contentSizeCategoryChars = env->GetStringUTFChars(contentSizeCategory, nullptr);
+    std::string contentSizeCategoryStr(contentSizeCategoryChars);
+    env->ReleaseStringUTFChars(contentSizeCategory, contentSizeCategoryChars);
+
     unistylesRuntime = std::make_shared<UnistylesRuntime>(
         screenWidth,
         screenHeight,
-        colorSchemeStr
+        colorSchemeStr,
+        contentSizeCategoryStr
     );
 
     unistylesRuntime->onThemeChange([=](const std::string &theme) {
@@ -79,6 +85,16 @@ Java_com_unistyles_UnistylesModule_nativeInstall(
         env->DeleteLocalRef(cls);
     });
 
+    unistylesRuntime->onContentSizeCategoryChange([=](const std::string &contentSizeCategory) {
+        jstring contentSizeCategoryStr = env->NewStringUTF(contentSizeCategory.c_str());
+        jclass cls = env->GetObjectClass(unistylesModule);
+        jmethodID methodId = env->GetMethodID(cls, "onContentSizeCategoryChange", "(Ljava/lang/String;)V");
+
+        env->CallVoidMethod(unistylesModule, methodId, contentSizeCategoryStr);
+        env->DeleteLocalRef(contentSizeCategoryStr);
+        env->DeleteLocalRef(cls);
+    });
+
     jsi::Object hostObject = jsi::Object::createFromHostObject(*runtime, unistylesRuntime);
 
     runtime->global().setProperty(*runtime, "__UNISTYLES__", std::move(hostObject));
@@ -104,5 +120,13 @@ JNIEXPORT void JNICALL
 Java_com_unistyles_UnistylesModule_nativeOnAppearanceChange(JNIEnv *env, jobject thiz, jstring colorScheme) {
     if (unistylesRuntime != nullptr) {
         unistylesRuntime->handleAppearanceChange(env->GetStringUTFChars(colorScheme, nullptr));
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_unistyles_UnistylesModule_nativeOnContentSizeCategoryChange(JNIEnv *env, jobject thiz, jstring contentSizeCategory) {
+    if (unistylesRuntime != nullptr) {
+        unistylesRuntime->handleContentSizeCategoryChange(env->GetStringUTFChars(contentSizeCategory, nullptr));
     }
 }

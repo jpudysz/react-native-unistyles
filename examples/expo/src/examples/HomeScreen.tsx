@@ -355,6 +355,23 @@ export const HomeScreen = () => {
                             navigation.navigate(DemoNames.MemoizationScreen)
                         }}
                     />
+                    <DemoLink
+                        description="Content Size Category"
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addBreakpoints(breakpoints)
+                                .addConfig({
+                                    initialTheme: 'light'
+                                })
+
+                            navigation.navigate(DemoNames.ContentSizeCategoryScreen)
+                        }}
+                    />
                     {!isWeb && (
                         <DemoLink
                             description="PlatformColor"

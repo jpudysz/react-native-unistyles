@@ -15,6 +15,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.modules.core.DeviceEventManagerModule
 
+
 class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener {
     private val configurationChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -54,6 +55,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             this.nativeOnAppearanceChange(
                 config["colorScheme"] as String
             )
+            this.nativeOnContentSizeCategoryChange(config["contentSizeCategory"] as String)
         }
     }
 
@@ -64,11 +66,20 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             Configuration.UI_MODE_NIGHT_NO -> "light"
             else -> "unspecified"
         }
+        val fontScale = reactApplicationContext.resources.configuration.fontScale
+        val contentSizeCategory = when {
+            fontScale <= 0.85f -> "Small"
+            fontScale <= 1.0f -> "Default"
+            fontScale <= 1.15f -> "Large"
+            fontScale <= 1.3f -> "ExtraLarge"
+            else -> "Huge"
+        }
 
         return mapOf(
             "width" to (displayMetrics.widthPixels / displayMetrics.density).toInt(),
             "height" to (displayMetrics.heightPixels / displayMetrics.density).toInt(),
-            "colorScheme" to colorScheme
+            "colorScheme" to colorScheme,
+            "contentSizeCategory" to contentSizeCategory
         )
     }
 
@@ -85,7 +96,8 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                     it.get(),
                     config["width"] as Int,
                     config["height"] as Int,
-                    config["colorScheme"] as String
+                    config["colorScheme"] as String,
+                    config["contentSizeCategory"] as String
                 )
 
                 Log.i(NAME, "Installed Unistyles \uD83E\uDD84!")
@@ -99,10 +111,11 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
     }
 
-    private external fun nativeInstall(jsi: Long, width: Int, height: Int, colorScheme: String)
+    private external fun nativeInstall(jsi: Long, width: Int, height: Int, colorScheme: String, contentSizeCategory: String)
     private external fun nativeDestroy()
     private external fun nativeOnOrientationChange(width: Int, height: Int)
     private external fun nativeOnAppearanceChange(colorScheme: String)
+    private external fun nativeOnContentSizeCategoryChange(contentSizeCategory: String)
 
     //endregion
     //region Event emitter
@@ -140,6 +153,19 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private fun onPluginChange() {
         val body = Arguments.createMap().apply {
             putString("type", "plugin")
+        }
+
+        reactApplicationContext
+            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+            .emit("__unistylesOnChange", body)
+    }
+
+    private fun onContentSizeCategoryChange(contentSizeCategory: String) {
+        val body = Arguments.createMap().apply {
+            putString("type", "dynamicTypeSize")
+            putMap("payload", Arguments.createMap().apply {
+                putString("contentSizeCategory", contentSizeCategory)
+            })
         }
 
         reactApplicationContext
