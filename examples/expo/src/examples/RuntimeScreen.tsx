@@ -10,6 +10,8 @@ export const RuntimeScreen: React.FunctionComponent = () => {
         themeName,
         breakpoint,
         orientation,
+        breakpoints,
+        contentSizeCategory,
         hasAdaptiveThemes,
         colorScheme,
         enabledPlugins,
@@ -49,6 +51,22 @@ export const RuntimeScreen: React.FunctionComponent = () => {
                         </Text>
                         <Text style={styles.text(false)}>
                             {breakpoint}
+                        </Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Text style={styles.text(true)}>
+                            All breakpoints:
+                        </Text>
+                        <Text style={styles.text(false)}>
+                            {JSON.stringify(breakpoints)}
+                        </Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Text style={styles.text(true)}>
+                            Content size category:
+                        </Text>
+                        <Text style={styles.text(false)}>
+                            {contentSizeCategory}
                         </Text>
                     </View>
                     <View style={styles.row}>

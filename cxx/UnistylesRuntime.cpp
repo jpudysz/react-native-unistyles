@@ -11,6 +11,7 @@ std::vector<jsi::PropNameID> UnistylesRuntime::getPropertyNames(jsi::Runtime& ru
     // getters
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("screenWidth")));
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("screenHeight")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("contentSizeCategory")));
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("hasAdaptiveThemes")));
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("themeName")));
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("breakpoint")));
@@ -42,6 +43,10 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
 
     if (propName == "hasAdaptiveThemes") {
         return jsi::Value(this->hasAdaptiveThemes);
+    }
+    
+    if (propName == "contentSizeCategory") {
+        return jsi::Value(jsi::String::createFromUtf8(runtime, this->contentSizeCategory));
     }
 
     if (propName == "themeName") {
@@ -291,6 +296,11 @@ void UnistylesRuntime::handleAppearanceChange(std::string colorScheme) {
         this->onThemeChangeCallback(this->colorScheme);
         this->themeName = this->colorScheme;
     }
+}
+
+void UnistylesRuntime::handleContentSizeCategoryChange(std::string contentSizeCategory) {
+    this->contentSizeCategory = contentSizeCategory;
+    this->onContentSizeCategoryChangeCallback(contentSizeCategory);
 }
 
 jsi::Value UnistylesRuntime::getThemeOrFail(jsi::Runtime& runtime) {

@@ -64,4 +64,12 @@ If you need support for class components, you would need to create a wrapper com
 
 Unistyles supports Expo. However, it can't be used with Expo Go.
 
+### Why Does My App Restart on Theme Change or Font Size Change (Android)?
+
+This behavior is default in Android. To prevent this, you need to add the following line to your `AndroidManifest.xml` file:
+
+```xml /uiMode/ /fontScale/
+<activity android:configChanges="uiMode|fontScale|keyboard|keyboardHidden|orientation|screenSize" />
+```
+
 </Seo>

@@ -1,4 +1,4 @@
-import { UnistylesEventType, ScreenOrientation } from '../common'
+import { UnistylesEventType, ScreenOrientation, IOSContentSizeCategory, AndroidContentSizeCategory } from '../common'
 import type { UnistylesThemes, UnistylesBreakpoints } from '../global'
 import type { ScreenSize } from './core'
 import type { UnistylesPlugin } from './plugin'
@@ -21,6 +21,7 @@ export type UnistylesBridge = {
     themeName: keyof UnistylesThemes,
     breakpoint: keyof UnistylesBreakpoints,
     colorScheme: ColorSchemeName,
+    contentSizeCategory: IOSContentSizeCategory | AndroidContentSizeCategory,
     sortedBreakpointPairs: Array<[keyof UnistylesBreakpoints, UnistylesBreakpoints[keyof UnistylesBreakpoints]]>,
 
     // setters
@@ -52,4 +53,11 @@ export type UnistylesPluginEvent = {
     type: UnistylesEventType.Plugin
 }
 
-export type UnistylesEvents = UnistylesThemeEvent | UnistylesMobileLayoutEvent | UnistylesPluginEvent
+export type UnistylesDynamicTypeSizeEvent = {
+    type: UnistylesEventType.DynamicTypeSize,
+    payload: {
+        contentSizeCategory: IOSContentSizeCategory | AndroidContentSizeCategory
+    }
+}
+
+export type UnistylesEvents = UnistylesThemeEvent | UnistylesMobileLayoutEvent | UnistylesPluginEvent | UnistylesDynamicTypeSizeEvent
