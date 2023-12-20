@@ -20,18 +20,21 @@ class JSI_EXPORT UnistylesRuntime : public jsi::HostObject {
 private:
     std::function<void(std::string)> onThemeChangeCallback;
     std::function<void(std::string breakpoint, std::string orientation, int screenWidth, int screenHeight)> onLayoutChangeCallback;
+    std::function<void(std::string)> onContentSizeCategoryChangeCallback;
     std::function<void()> onPluginChangeCallback;
 
     int screenWidth;
     int screenHeight;
     std::string colorScheme;
+    std::string contentSizeCategory;
 
 public:
     UnistylesRuntime(
         int screenWidth,
         int screenHeight,
-        std::string colorScheme
-    ): screenWidth(screenWidth), screenHeight(screenHeight), colorScheme(colorScheme) {}
+        std::string colorScheme,
+        std::string contentSizeCategory
+    ): screenWidth(screenWidth), screenHeight(screenHeight), colorScheme(colorScheme), contentSizeCategory(contentSizeCategory) {}
 
     bool hasAdaptiveThemes;
     bool supportsAutomaticColorScheme;
@@ -53,6 +56,10 @@ public:
     void onPluginChange(std::function<void()> callback) {
         this->onPluginChangeCallback = callback;
     }
+    
+    void onContentSizeCategoryChange(std::function<void(std::string)> callback) {
+        this->onContentSizeCategoryChangeCallback = callback;
+    }
 
     jsi::Value get(jsi::Runtime&, const jsi::PropNameID& name) override;
     void set(jsi::Runtime& runtime, const jsi::PropNameID& propNameId, const jsi::Value& value) override;
@@ -60,6 +67,7 @@ public:
 
     void handleScreenSizeChange(int width, int height);
     void handleAppearanceChange(std::string colorScheme);
+    void handleContentSizeCategoryChange(std::string contentSizeCategory);
 
     jsi::Value getThemeOrFail(jsi::Runtime&);
     std::string getBreakpointFromScreenWidth(int width, const std::vector<std::pair<std::string, double>>& sortedBreakpointEntries);

@@ -15,10 +15,30 @@ export const ScreenOrientation = {
     Portrait: 'portrait'
 } as const
 
+export enum IOSContentSizeCategory {
+    ExtraExtraExtraLarge = 'xxxLarge',
+    ExtraExtraLarge = 'xxLarge',
+    ExtraLarge = 'xLarge',
+    Large = 'Large',
+    Medium = 'Medium',
+    Small = 'Small',
+    ExtraSmall = 'xSmall',
+    Unspecified = 'unspecified'
+}
+
+export enum AndroidContentSizeCategory {
+    Small = 'Small',
+    Default = 'Default',
+    Large = 'Large',
+    ExtraLarge = 'ExtraLarge',
+    Huge = 'Huge'
+}
+
 export enum UnistylesEventType {
     Theme = 'theme',
     Layout = 'layout',
-    Plugin = 'plugin'
+    Plugin = 'plugin',
+    DynamicTypeSize = 'dynamicTypeSize'
 }
 
 export enum UnistylesError {

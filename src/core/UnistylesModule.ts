@@ -18,6 +18,7 @@ export class UnistylesBridgeWeb {
     #unistylesEvents = new NativeEventEmitter(NativeModules.Unistyles)
     #sortedBreakpointPairs: Array<[keyof UnistylesBreakpoints, number]> = []
     #breakpoint: keyof UnistylesBreakpoints = '' as keyof UnistylesBreakpoints
+    #contentSizeCategory: string = 'unspecified'
 
     constructor() {
         if (!isServer) {
@@ -39,6 +40,8 @@ export class UnistylesBridgeWeb {
                         return this.#screenWidth
                     case 'screenHeight':
                         return this.#screenHeight
+                    case 'contentSizeCategory':
+                        return this.#contentSizeCategory
                     case 'breakpoint':
                         return this.#breakpoint || undefined
                     case 'breakpoints':

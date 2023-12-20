@@ -46,6 +46,7 @@ export const App: React.FunctionComponent = () => (
                 <Stack.Screen name={DemoNames.StyleSheet} component={Screens.StyleSheetScreen} />
                 <Stack.Screen name={DemoNames.MemoizationScreen} component={Screens.MemoizationScreen} />
                 <Stack.Screen name={DemoNames.NoStyleSheetScreen} component={Screens.NoStyleSheetScreen} />
+                <Stack.Screen name={DemoNames.ContentSizeCategoryScreen} component={Screens.ContentSizeCategoryScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     </SafeAreaProvider>
