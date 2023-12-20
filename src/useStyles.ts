@@ -35,7 +35,7 @@ export const useStyles = <ST extends StyleSheetWithSuperPowers>(
             if (typeof value === 'function') {
                 return {
                     ...acc,
-                    [key]: proxifyFunction(key, value)
+                    [key]: proxifyFunction(key, value, variants)
                 }
             }
 
