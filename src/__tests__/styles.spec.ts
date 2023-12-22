@@ -1,5 +1,5 @@
 import type { StyleSheet } from '../types'
-import { mq, parseStyle, proxifyFunction } from '../utils'
+import { mq, parseStyle, proxifyFunction, isPlatformColor } from '../utils'
 import { mockRegistry, mockRuntime } from './mocks'
 
 jest.mock('../core', () => {
@@ -14,6 +14,11 @@ jest.mock('../core', () => {
         unistyles: new MockedUnistyles()
     }
 })
+
+jest.mock('../common', () => ({
+    isIOS: false,
+    isAndroid: false
+}))
 
 describe('styles', () => {
     describe('proxifyFunction', () => {
@@ -215,6 +220,180 @@ describe('styles', () => {
                     width: 0,
                     height: 10
                 }
+            })
+        })
+
+        it('should not parse styles if parseMediaQueries flag is falsy', () => {
+            const style = {
+                backgroundColor: {
+                    sm: 'pink',
+                    md: 'orange'
+                }
+            }
+
+            const parsedStyles = parseStyle(
+                style as StyleSheet,
+                {},
+                false
+            )
+
+            expect(parsedStyles).toEqual({
+                backgroundColor: {
+                    sm: 'pink',
+                    md: 'orange'
+                }
+            })
+        })
+    })
+
+    describe('platformColors', () => {
+        it('should detect if given object is android PlatformColor', () => {
+            jest.requireMock('../common').isAndroid = true
+
+            const obj1 = {}
+            const obj2 = {
+                android: 'red'
+            }
+            const obj3 = {
+                semantic: true
+            }
+            const obj4 = {
+                semantic: {}
+            }
+            const obj5 = {
+                // eslint-disable-next-line camelcase
+                resource_paths: true
+            }
+            const obj6 = {
+                // eslint-disable-next-line camelcase
+                resource_paths: {}
+            }
+
+            expect(isPlatformColor(obj1)).toBe(false)
+            expect(isPlatformColor(obj2)).toBe(false)
+            expect(isPlatformColor(obj3)).toBe(false)
+            expect(isPlatformColor(obj4)).toBe(false)
+            expect(isPlatformColor(obj5)).toBe(false)
+            expect(isPlatformColor(obj6)).toBe(true)
+        })
+
+        it('should detect if given object is ios PlatformColor', () => {
+            jest.requireMock('../common').isIOS = true
+
+            const obj1 = {}
+            const obj2 = {
+                ios: 'red'
+            }
+            const obj3 = {
+                semantic: true
+            }
+            const obj4 = {
+                semantic: {}
+            }
+            const obj5 = {
+                // eslint-disable-next-line camelcase
+                resource_paths: true
+            }
+            const obj6 = {
+                // eslint-disable-next-line camelcase
+                resource_paths: {}
+            }
+
+            expect(isPlatformColor(obj1)).toBe(false)
+            expect(isPlatformColor(obj2)).toBe(false)
+            expect(isPlatformColor(obj3)).toBe(false)
+            expect(isPlatformColor(obj4)).toBe(true)
+            expect(isPlatformColor(obj5)).toBe(false)
+            expect(isPlatformColor(obj6)).toBe(false)
+        })
+    })
+
+    describe('variants', () => {
+        it ('should return correct variants from style', () => {
+            const style = {
+                flex: 1,
+                variants: {
+                    color: {
+                        green: {
+                            backgroundColor: 'green'
+                        },
+                        blue: {
+                            backgroundColor: 'blue'
+                        }
+                    }
+                }
+            }
+
+            const parsedStyles = parseStyle(
+                style as StyleSheet,
+                {
+                    color: 'blue'
+                },
+                false
+            )
+
+            expect(parsedStyles).toEqual({
+                flex: 1,
+                backgroundColor: 'blue'
+            })
+        })
+
+        it ('should do nothing for invalid variant', () => {
+            const style = {
+                flex: 1,
+                variants: {
+                    color: {
+                        green: {
+                            backgroundColor: 'green'
+                        },
+                        blue: {
+                            backgroundColor: 'blue'
+                        }
+                    }
+                }
+            }
+
+            const parsedStyles = parseStyle(
+                style as StyleSheet,
+                {
+                    color: 'pink',
+                    otherVariant: 'md'
+                },
+                false
+            )
+
+            expect(parsedStyles).toEqual({
+                flex: 1
+            })
+        })
+
+        it ('should return default variant if there is any', () => {
+            const style = {
+                flex: 1,
+                variants: {
+                    color: {
+                        green: {
+                            backgroundColor: 'green'
+                        },
+                        blue: {
+                            backgroundColor: 'blue'
+                        },
+                        default: {
+                            backgroundColor: 'pink'
+                        }
+                    }
+                }
+            }
+
+            const parsedStyles = parseStyle(
+                style as StyleSheet,
+                undefined,
+                false
+            )
+
+            expect(parsedStyles).toEqual({
+                flex: 1,
+                backgroundColor: 'pink'
             })
         })
     })

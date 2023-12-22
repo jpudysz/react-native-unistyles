@@ -382,6 +382,12 @@ describe('Normalizer', () => {
                 expect(normalizeColor(value, 0.1)).toEqual(results[index])
             })
         })
+
+        it('should handle colors in unknown formar', () => {
+            const value = '#zzzUUUUIIII'
+
+            expect(normalizeColor(value)).toEqual(value)
+        })
     })
 
     describe('normalizeStyles', () => {
