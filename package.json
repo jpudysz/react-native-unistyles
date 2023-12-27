@@ -37,7 +37,10 @@
   "keywords": [
     "react-native",
     "ios",
-    "android"
+    "android",
+    "react-native-macos",
+    "react-native-web",
+    "expo"
   ],
   "repository": "https://github.com/jpudysz/react-native-unistyles",
   "author": "Jacek Pudysz <jacekpudysz@gmail.com> (https://github.com/jpudysz)",
@@ -88,10 +91,14 @@
     "@react-native/normalize-colors": "*",
     "react": "*",
     "react-native": "*",
-    "react-native-web": "*"
+    "react-native-web": "*",
+    "react-native-macos": "*"
   },
   "peerDependenciesMeta": {
     "react-native-web": {
+      "optional": true
+    },
+    "react-native-macos": {
       "optional": true
     }
   },
