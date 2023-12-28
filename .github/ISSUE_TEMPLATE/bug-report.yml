@@ -74,7 +74,9 @@ body:
         - iOS
         - React Native Web
         - SSR
-        - React Native Windows
+        - React Native macOS
+    validations:
+      required: true
 
   - type: dropdown
     id: engine
@@ -85,6 +87,8 @@ body:
       options:
         - Hermes
         - JSC
+    validations:
+      required: true
 
   - type: dropdown
     id: architecture
