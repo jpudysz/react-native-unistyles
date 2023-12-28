@@ -91,19 +91,20 @@
     "@react-native/normalize-colors": "*",
     "react": "*",
     "react-native": "*",
-    "react-native-web": "*",
-    "react-native-macos": "*"
+    "react-native-macos": "*",
+    "react-native-web": "*"
   },
   "peerDependenciesMeta": {
-    "react-native-web": {
+    "react-native-macos": {
       "optional": true
     },
-    "react-native-macos": {
+    "react-native-web": {
       "optional": true
     }
   },
   "workspaces": [
     "examples/expo",
+    "examples/macos",
     "docs"
   ],
   "packageManager": "yarn@3.6.1",

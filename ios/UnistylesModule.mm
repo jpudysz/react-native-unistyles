@@ -2,7 +2,6 @@
 #import "UnistylesHelpers.h"
 #import "UnistylesRuntime.h"
 
-#import <React/RCTAppearance.h>
 #import <React/RCTBridge+Private.h>
 #import <jsi/jsi.h>
 
@@ -16,71 +15,14 @@ RCT_EXPORT_MODULE(Unistyles)
 
 - (instancetype)init {
     if ((self = [super init])) {
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(handleOrientationChange:)
-                                                     name:UIDeviceOrientationDidChangeNotification
-                                                   object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(appearanceChanged:)
-                                                     name:RCTUserInterfaceStyleDidChangeNotification
-                                                   object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(contentSizeCategoryDidChange:)
-                                                     name:UIContentSizeCategoryDidChangeNotification
-                                                   object:nil];
+        self.platform = [[Platform alloc] init];
     }
 
     return self;
 }
 
-- (void)dealloc {
-    if (self.unistylesRuntime != nullptr) {
-        self.unistylesRuntime = nullptr;
-    }
-
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                          name: UIContentSizeCategoryDidChangeNotification
-                                          object: nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                          name: RCTUserInterfaceStyleDidChangeNotification
-                                          object: nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                          name: UIDeviceOrientationDidChangeNotification
-                                          object: nil];
-}
-
-
 + (BOOL)requiresMainQueueSetup {
     return YES;
-}
-
-#pragma mark - Event handlers
-
-- (void)handleOrientationChange:(NSNotification *)notification {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
-        CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
-
-        if (self.unistylesRuntime != nullptr) {
-            ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange((int)screenWidth, (int)screenHeight);
-        }
-    });
-}
-
-- (void)appearanceChanged:(NSNotification *)notification {
-    std::string colorScheme = getColorScheme();
-
-    if (self.unistylesRuntime != nullptr) {
-        ((UnistylesRuntime*)self.unistylesRuntime)->handleAppearanceChange(colorScheme);
-    }
-}
-
-- (void)contentSizeCategoryDidChange:(NSNotification *)notification {
-    UIContentSizeCategory contentSizeCategory = [[UIApplication sharedApplication] preferredContentSizeCategory];
-
-    if (self.unistylesRuntime != nullptr) {
-        ((UnistylesRuntime*)self.unistylesRuntime)->handleContentSizeCategoryChange(getContentSizeCategory(contentSizeCategory));
-    }
 }
 
 #pragma mark - Event emitter
@@ -129,20 +71,11 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
 }
 
 void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSelf) {
-    CGFloat initialScreenWidth = [UIScreen mainScreen].bounds.size.width;
-    CGFloat initialScreenHeight = [UIScreen mainScreen].bounds.size.height;
-    std::string initialColorScheme = getColorScheme();
-    __block UIContentSizeCategory contentSizeCategory;
-    
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        contentSizeCategory = [[UIApplication sharedApplication] preferredContentSizeCategory];
-    });
-
     auto unistylesRuntime = std::make_shared<UnistylesRuntime>(
-        (int)initialScreenWidth,
-        (int)initialScreenHeight,
-        initialColorScheme,
-        getContentSizeCategory(contentSizeCategory)
+        (int)weakSelf.platform.initialWidth,
+        (int)weakSelf.platform.initialWidth,
+        weakSelf.platform.initialColorScheme,
+        weakSelf.platform.initialContentSizeCategory
     );
 
     unistylesRuntime.get()->onThemeChange([=](std::string theme) {
@@ -193,7 +126,7 @@ void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSel
         [weakSelf emitEvent:@"__unistylesOnChange" withBody:body];
     });
 
-    weakSelf.unistylesRuntime = unistylesRuntime.get();
+    weakSelf.platform.unistylesRuntime = unistylesRuntime.get();
 
     auto hostObject = jsi::Object::createFromHostObject(runtime, unistylesRuntime);
 

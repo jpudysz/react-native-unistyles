@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => package["repository"], :tag => "#{s.version}" }
 
   s.source_files = [
-    "ios/*.{h,mm}",
+    "ios/**/*.{h,mm}",
     "cxx/*.{h,cpp}"
   ]
 
