@@ -1,9 +1,15 @@
 [<img alt="react-native-unistyles" src="assets/banner.png">](https://reactnativeunistyles.vercel.app/)
 
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/jpudysz/react-native-unistyles?style=for-the-badge)
-[![npm downloads](https://img.shields.io/npm/dm/react-native-unistyles.svg?style=for-the-badge)](https://www.npmjs.com/package/react-native-unistyles)
-![Platform - Android and iOS](https://img.shields.io/badge/platform-Android%20%7C%20IOS%20%7C%20SSR%20%7C%20Web-blue.svg?style=for-the-badge)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![npm downloads](https://img.shields.io/npm/dt/react-native-unistyles?style=for-the-badge)](https://www.npmjs.com/package/react-native-unistyles)
+[![License: MIT](https://img.shields.io/badge/License-MIT-44CD11.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+<br />
+[![platform - expo](https://img.shields.io/badge/Expo-fff?style=for-the-badge&logo=expo&logoColor=black)](https://docs.expo.dev/)
+[![platform - web](https://img.shields.io/badge/React_Native_Web-white?logo=react&logoColor=57BDDA&style=for-the-badge)](https://www.w3.org/)
+[![platform - ios](https://img.shields.io/badge/iOS-000?logo=apple&style=for-the-badge)](https://developer.apple.com/ios/)
+[![platform - macos](https://img.shields.io/badge/macOS-000?logo=apple&style=for-the-badge)](https://developer.apple.com/macos/)
+[![platform - ssr](https://img.shields.io/badge/SSR-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![platform - android](https://img.shields.io/badge/Android-44CD11?style=for-the-badge&logo=android&logoColor=white)](https://developer.android.com/)
 
 ## [Documentation](https://reactnativeunistyles.vercel.app/)
 - [Start here](https://reactnativeunistyles.vercel.app/start/introduction/)
@@ -20,7 +26,7 @@
 - ⚛️ No React Context
 - 🖥️ Supports custom breakpoints, css-like media queries and variants
 - 🎨 Register multiple themes and change them with single function call
-- 🥳 Compatible with Expo, Bare React Native, React Native Web and SSR
+- 🥳 Compatible with Expo, Bare React Native, React Native Web, React Native macOS and SSR
 - 🛡️ ~99% Test coverage
 - 🔌 Extend stylesheets with your own plugins
 - ⚔️ No 3rd party dependencies
