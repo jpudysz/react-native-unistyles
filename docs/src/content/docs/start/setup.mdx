@@ -58,6 +58,29 @@ Unistyles is currently in RC phase.
       npx create-solito-app@latest my-solito-app
       ```
     </TabItem>
+
+    <TabItem label="macOS">
+      You can also style your `macOS` apps using `react-native-unistyles`.
+      Please follow the instructions provided by <a href="https://microsoft.github.io/react-native-windows/docs/rnm-getting-started" target="_blank">react-native-macos</a> and then:
+
+      Open `macos/Podfile` and add the following line:
+      ```txt title="Podfile" /pod.*/
+      target 'macos-macOS' do
+        # add this line somewhere within the target scope
+        pod 'react-native-unistyles', :path => '../node_modules/react-native-unistyles'
+      end
+      ```
+
+      Then run `pod install`:
+
+      ```cmd title="macos"
+      pod install
+      ```
+
+:::caution
+Remember to add this line to the `macos` folder, not the `ios` folder!
+:::
+    </TabItem>
    </Tabs>
 
    ### 3. Configure Unistyles with `UnistylesRegistry`
