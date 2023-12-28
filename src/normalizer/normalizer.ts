@@ -38,7 +38,7 @@ export const normalizeColor = (color: string, opacity: number = 1) => {
 
 export const normalizeNumericValue = (value: number) => value ? `${value}px` : value
 
-const normalizeTransform = (key: string, value: number | string) => {
+const normalizeTransform = <T>(key: string, value: T) => {
     if (key.includes('scale')) {
         return value
     }
