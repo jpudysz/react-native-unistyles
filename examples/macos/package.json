@@ -1,0 +1,28 @@
+{
+  "name": "macos",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start"
+  },
+  "dependencies": {
+    "react": "18.2.0",
+    "react-native": "0.73.0",
+    "react-native-macos": "0.73.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@babel/preset-env": "7.23.6",
+    "@babel/runtime": "7.20.0",
+    "@react-native/babel-preset": "0.73.18",
+    "@react-native/metro-config": "0.73.2",
+    "@types/react": "18.2.45",
+    "babel-plugin-module-resolver": "5.0.0",
+    "typescript": "5.0.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
