@@ -37,7 +37,10 @@
   "keywords": [
     "react-native",
     "ios",
-    "android"
+    "android",
+    "react-native-macos",
+    "react-native-web",
+    "expo"
   ],
   "repository": "https://github.com/jpudysz/react-native-unistyles",
   "author": "Jacek Pudysz <jacekpudysz@gmail.com> (https://github.com/jpudysz)",
@@ -88,15 +91,20 @@
     "@react-native/normalize-colors": "*",
     "react": "*",
     "react-native": "*",
+    "react-native-macos": "*",
     "react-native-web": "*"
   },
   "peerDependenciesMeta": {
+    "react-native-macos": {
+      "optional": true
+    },
     "react-native-web": {
       "optional": true
     }
   },
   "workspaces": [
     "examples/expo",
+    "examples/macos",
     "docs"
   ],
   "packageManager": "yarn@3.6.1",
@@ -107,7 +115,7 @@
     "preset": "react-native",
     "modulePathIgnorePatterns": [
       "<rootDir>/examples/expo/node_modules",
-      "<rootDir>/examples/ssr/node_modules",
+      "<rootDir>/examples/macos/node_modules",
       "<rootDir>/docs/node_modules",
       "<rootDir>/lib/"
     ],

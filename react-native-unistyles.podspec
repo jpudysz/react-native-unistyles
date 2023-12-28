@@ -10,11 +10,11 @@ Pod::Spec.new do |s|
   s.license      = package["license"]
   s.authors      = package["author"]
 
-  s.platforms    = { :ios => min_ios_version_supported }
+  s.platforms    = { :ios => min_ios_version_supported, :osx => "10.14" }
   s.source       = { :git => package["repository"], :tag => "#{s.version}" }
 
   s.source_files = [
-    "ios/*.{h,mm}",
+    "ios/**/*.{h,mm}",
     "cxx/*.{h,cpp}"
   ]
 
