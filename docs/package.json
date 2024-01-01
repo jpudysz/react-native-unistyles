@@ -9,17 +9,17 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/sitemap": "3.0.3",
-    "@astrojs/starlight": "0.15.0",
+    "@astrojs/sitemap": "3.0.4",
+    "@astrojs/starlight": "0.15.1",
     "@fontsource-variable/nunito": "5.0.17",
-    "astro": "4.0.6",
+    "astro": "4.0.8",
     "astro-expressive-code": "0.30.1",
     "astro-seo": "0.8.0",
     "autoprefixer": "10.4.16",
     "motion": "10.16.4",
     "postcss-easing-gradients": "3.0.1",
     "postcss-nested": "6.0.1",
-    "sharp": "0.33.0",
+    "sharp": "0.33.1",
     "swiper": "11.0.5"
   },
   "private": true,
