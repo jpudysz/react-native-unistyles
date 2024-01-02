@@ -11,14 +11,10 @@ import Seo from '../../../components/Seo.astro'
         description: 'How to Setup react-native-unistyles?'
     }}
 >
-:::caution
-Unistyles is currently in RC phase.
-:::
-
     ### 1. Install package
 
     ```cmd
-    yarn add react-native-unistyles@next
+    yarn add react-native-unistyles
     ```
 
     ### 2. Finish installation
@@ -52,7 +48,7 @@ Unistyles is currently in RC phase.
 
     </TabItem>
     <TabItem label="NextJS">
-      Library supports also Server Side Rendering. We recomment to setup to project with <a href="https://solito.dev" target="_blank">Solito</a>:
+      Library supports also Server Side Rendering. We recommend to setup to project with <a href="https://solito.dev" target="_blank">Solito</a>:
 
       ```cmd
       npx create-solito-app@latest my-solito-app
@@ -170,6 +166,17 @@ The library has no restrictions on the shape of the theme. You can use nested ob
       export interface UnistylesThemes extends AppThemes {}
     }
     ```
+
+:::tip[Did you encounter errors like these?]
+
+`"An interface declaring no members is equivalent to its supertype."`
+
+Don't worry! This issue arises due to the eslint preset. To fix it, disable the following [rule](https://typescript-eslint.io/rules/no-empty-interface/).
+
+`"TS2664: Invalid module name in augmentation, module 'react-native-unistyles' cannot be found."`
+
+To resolve this, simply follow the steps described below. You need to import something from `react-native-unistyles`.
+:::
 
     ### 3.4 Call `UnistylesRegistry`
 

@@ -35,8 +35,7 @@
 ## Installation
 
 ```shell
-# Unistyles is currently in RC phase 
-yarn add react-native-unistyles@next
+yarn add react-native-unistyles
 ```
 
 ## Discord
