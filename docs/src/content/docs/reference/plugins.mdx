@@ -1,7 +1,7 @@
 ---
 title: Plugins
 ---
-
+import { Card, CardGrid } from '@astrojs/starlight/components'
 import Seo from '../../../components/Seo.astro'
 import Badge from '../../../components/Badge.astro'
 
@@ -161,6 +161,65 @@ export const GetPlugins: React.FunctionComponent = () => (
     />
 )
 ```
+
+### Example
+
+Let's build an example plugin that will add `fontFamily` based on the `fontWeight`.
+
+```tsx /fontWeightPlugin/
+export const fontWeightPlugin: UnistylesPlugin = {
+    name: 'fontWeightPlugin',
+    onParsedStyle: (_key, styles) => {
+        if ('fontWeight' in styles) {
+             // in this case we should add fontFamily
+        }
+        
+        return styles
+    }
+}
+```
+
+We can use the `onParsedStyle` function to check if the `fontWeight` property is present in the style object.
+If so we will add a `fontFamily`:
+
+```tsx /switch/ /case/
+export const fontWeightPlugin: UnistylesPlugin = {
+    name: 'fontWeightPlugin',
+    onParsedStyle: (_key, styles) => {
+        if ('fontWeight' in styles) {
+            switch (styles.fontWeight) {
+                // add other weights
+                case 'bold': {
+                    styles.fontFamily = 'Roboto-Bold'
+
+                    return
+                }
+                case '500':
+                default: {
+                    styles.fontFamily = 'Roboto-Regular'
+                }
+            }
+        }
+        
+        return styles
+    }
+}
+```
+
+Looking for other inspirations?
+
+<CardGrid>
+  <Card title="Auto Guideline Plugin" icon="random">
+    Scale your UI automatically based on the screen size. Can replace [react-native-responsive-screen](https://github.com/marudy/react-native-responsive-screen#readme).
+
+    [Source code](https://github.com/jpudysz/react-native-unistyles/blob/main/examples/expo/src/plugins/autoGuidelinePlugin.ts)
+  </Card>
+  <Card title="High Contrast Plugin" icon="sun">
+    Automatically adjust the contrast of your UI based on the theme.
+
+   [Source code](https://github.com/jpudysz/react-native-unistyles/blob/main/examples/expo/src/plugins/highContrastPlugin.ts)
+  </Card>
+</CardGrid>
 
 :::tip
 Plugins are still experimental, and the API might change in the future.
