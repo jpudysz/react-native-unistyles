@@ -43,15 +43,14 @@
 
 ## Sponsors
 
-<img src="https://codemask.com/assets/svg/codemask.svg" height="50px" />
-<p>
-    <a href="https://codemask.com">Codemask</a> - Your experts in mobile and web development
-</p>
+[How to become a sponsor?](https://reactnativeunistyles.vercel.app/other/for-sponsors/)
 
-<img src="https://galaxies.dev/img/logos/logo--blue.png" height="80px" />
-<p>
-    <a href="https://galaxies.dev">Galaxies.dev</a> - Learn React Native with practical courses & tutorials
-</p>
+<a href="https://codemask.com">
+     <img src="https://avatars.githubusercontent.com/u/51229884?s=200&v=4" height="70px" width="70px" />
+</a>
+<a href="https://galaxies.dev">
+     <img src="https://avatars.githubusercontent.com/u/118431096?s=200&v=4" height="70px" width="70px" />
+</a>
 
 
 ## Installation
