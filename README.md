@@ -11,6 +11,15 @@
 [![platform - ssr](https://img.shields.io/badge/SSR-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![platform - android](https://img.shields.io/badge/Android-44CD11?style=for-the-badge&logo=android&logoColor=white)](https://developer.android.com/)
 
+<a href="https://github.com/jpudysz?tab=followers">
+    <img src="https://img.shields.io/github/followers/jpudysz?label=Follow%20%40jpudysz&style=social" />
+</a>
+<br/>
+<a href="https://twitter.com/jpudysz">
+    <img src="https://img.shields.io/twitter/follow/jpudysz?label=Follow%20%40jpudysz&style=social" />
+</a>
+
+
 ## [Documentation](https://reactnativeunistyles.vercel.app/)
 - [Start here](https://reactnativeunistyles.vercel.app/start/introduction/)
 - [API](https://reactnativeunistyles.vercel.app/reference/create-stylesheet/)
@@ -32,11 +41,29 @@
 - ⚔️ No 3rd party dependencies
 - and much much more!
 
+## Sponsors
+
+<img src="https://codemask.com/assets/svg/codemask.svg" height="50px" />
+<p>
+    <a href="https://codemask.com">Codemask</a> - Your experts in mobile and web development
+</p>
+
+<img src="https://galaxies.dev/img/logos/logo--blue.png" height="80px" />
+<p>
+    <a href="https://galaxies.dev">Galaxies.dev</a> - Learn React Native with practical courses & tutorials
+</p>
+
+
 ## Installation
 
 ```shell
 yarn add react-native-unistyles
 ```
+
+## Benchmarks
+
+<img src="https://reactnativeunistyles.vercel.app/_astro/benchmark-2.jAtWyu0v.png" />
+
 
 ## Discord
 Looking for help or you want to chat with me?
