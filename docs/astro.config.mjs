@@ -112,6 +112,10 @@ export default defineConfig({
                             link: '/reference/server-side-rendering/'
                         },
                         {
+                            label: 'Debugging',
+                            link: '/reference/debugging/'
+                        },
+                        {
                             label: 'Errors',
                             link: '/reference/errors/'
                         },
