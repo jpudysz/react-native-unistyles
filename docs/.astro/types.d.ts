@@ -241,6 +241,13 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
+"reference/debugging.mdx": {
+	id: "reference/debugging.mdx";
+  slug: "reference/debugging";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
 "reference/dynamic-functions.mdx": {
 	id: "reference/dynamic-functions.mdx";
   slug: "reference/dynamic-functions";
