@@ -47,7 +47,7 @@ export const useStyles = <ST extends StyleSheetWithSuperPowers>(
                     !isWeb || !unistyles.registry.config.experimentalCSSMediaQueries)
                 )
             })
-        }, {}), [parsedStyles, variants, plugins]
+        }, {}), [parsedStyles, variants, plugins, layout]
     )
 
     useCSS(dynamicStyleSheet as ReactNativeStyleSheet<ST>)
