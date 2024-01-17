@@ -9,7 +9,12 @@ export type {
     RNValue,
     RNStyle
 } from './core'
-export type { StyleSheetWithSuperPowers, StyleSheet, AllAvailableKeys } from './stylesheet'
+export type {
+    StyleSheetWithSuperPowers,
+    StyleSheet,
+    AllAvailableKeys,
+    UnistylesValues
+} from './stylesheet'
 export type { ReactNativeStyleSheet } from './breakpoints'
 export type { ExtractVariantNames } from './variants'
 export type { UnistylesPlugin } from './plugin'
