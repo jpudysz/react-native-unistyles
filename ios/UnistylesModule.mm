@@ -73,7 +73,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
 void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSelf) {
     auto unistylesRuntime = std::make_shared<UnistylesRuntime>(
         (int)weakSelf.platform.initialWidth,
-        (int)weakSelf.platform.initialWidth,
+        (int)weakSelf.platform.initialHeight,
         weakSelf.platform.initialColorScheme,
         weakSelf.platform.initialContentSizeCategory
     );
