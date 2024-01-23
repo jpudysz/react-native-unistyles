@@ -26,7 +26,8 @@ export enum DemoNames {
     MemoizationScreen = 'MemoizationScreen',
     NoStyleSheetScreen = 'NoStyleSheetScreen',
     WebMediaQueriesScreen = 'WebMediaQueriesScreen',
-    ContentSizeCategoryScreen = 'ContentSizeCategoryScreen'
+    ContentSizeCategoryScreen = 'ContentSizeCategoryScreen',
+    BooleanVariants = 'BooleanVariantsScreen'
 }
 
 export type DemoStackParams = {
@@ -55,7 +56,8 @@ export type DemoStackParams = {
     [DemoNames.MemoizationScreen]: undefined,
     [DemoNames.NoStyleSheetScreen]: undefined,
     [DemoNames.WebMediaQueriesScreen]: undefined,
-    [DemoNames.ContentSizeCategoryScreen]: undefined
+    [DemoNames.ContentSizeCategoryScreen]: undefined,
+    [DemoNames.BooleanVariants]: undefined
 }
 
 export type NavigationProps<S extends DemoNames = DemoNames.Home> = NavigationProp<DemoStackParams, S>

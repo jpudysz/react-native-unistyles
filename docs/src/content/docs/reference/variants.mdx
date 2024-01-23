@@ -104,7 +104,7 @@ With your named groups, you can now select any variant from your stylesheet usin
 import { useStyles } from 'react-native-unistyles'
 
 const Component = () => {
-    const styles = useStyles(stylesheet, {
+    const { styles } = useStyles(stylesheet, {
         color: 'primary',
         size: 'small'
     })
@@ -118,6 +118,63 @@ const stylesheet = ...
 ```
 
 TypeScript will provide perfect autocompletion for your variants, ensuring accuracy!
+
+## Selecting variants with boolean values
+
+<Badge label="All platforms" />
+<Badge label="2.1.0" />
+
+You can also use boolean values to select variants:
+
+```tsx /isDisabled/ /isPrimary/ /true/ /false/
+import { useStyles } from 'react-native-unistyles'
+
+const Component = ({ isPrimary, isDisabled }) => {
+    const { styles } = useStyles(stylesheet, {
+        color: !isDisabled,
+        borderColor: isPrimary
+        // you can also use strings
+        // color: "true" | "false"
+    })
+
+    return (
+        <View style={styles.container} />
+    )
+}
+
+const stylesheet = createStyleSheet(theme => ({
+    container: {
+        // otter styles
+        variants: {
+            color: {
+                true: {
+                    backgroundColor: theme.colors.primary
+                },
+                false: {
+                    backgroundColor: theme.colors.disabled
+                },
+                // you can still specify a default variant
+                default: {
+                    backgroundColor: theme.colors.barbie
+                }
+                // or other variants
+                special: {
+                    backgroundColor: theme.colors.special
+                }
+            },
+            borderColor: {
+                true: {
+                    borderColor: theme.colors.primary
+                }
+                // you can also skip "false" here 
+            }
+        }
+    }
+})
+```
+
+If you specify a boolean variants like "true", there is no requirement to specify a "false" variant (and vice versa).
+You can mix boolean variants with other variants as well.
 
 ## Default variant
 
