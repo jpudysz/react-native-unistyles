@@ -260,6 +260,23 @@ export const HomeScreen = () => {
                             navigation.navigate(DemoNames.DefaultVariant)
                         }}
                     />
+                    <DemoLink
+                        description="Boolean variants"
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addBreakpoints(breakpoints)
+                                .addConfig({
+                                    adaptiveThemes: true
+                                })
+
+                            navigation.navigate(DemoNames.BooleanVariants)
+                        }}
+                    />
                 </DemoGroup>
                 <DemoGroup title="Plugins">
                     <DemoLink

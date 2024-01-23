@@ -1,6 +1,7 @@
 [<img alt="react-native-unistyles" src="assets/banner.png">](https://reactnativeunistyles.vercel.app/)
 
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/jpudysz/react-native-unistyles?style=for-the-badge)
+[![npm downloads](https://img.shields.io/npm/dm/react-native-unistyles?style=for-the-badge)](https://www.npmjs.com/package/react-native-unistyles)
 [![npm downloads](https://img.shields.io/npm/dt/react-native-unistyles?style=for-the-badge)](https://www.npmjs.com/package/react-native-unistyles)
 [![License: MIT](https://img.shields.io/badge/License-MIT-44CD11.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 <br />
