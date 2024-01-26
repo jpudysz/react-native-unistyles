@@ -104,5 +104,13 @@ export class UnistyleRegistry {
         this.unistylesBridge.removePlugin(plugin.name)
     }
 
+    public updateTheme = (name: keyof UnistylesThemes, theme: UnistylesThemes[keyof UnistylesThemes]) => {
+        this.themes[name] = theme
+
+        if (this.unistylesBridge.themeName === name) {
+            this.unistylesBridge.updateTheme(name)
+        }
+    }
+
     public hasTheme = (name: keyof UnistylesThemes) => name in this.themes
 }

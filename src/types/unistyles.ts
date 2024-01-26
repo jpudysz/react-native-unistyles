@@ -28,6 +28,7 @@ export type UnistylesBridge = {
     themes: Array<keyof UnistylesThemes>,
     useBreakpoints(breakpoints: UnistylesBreakpoints): void,
     useTheme(name: keyof UnistylesThemes): void,
+    updateTheme(name: keyof UnistylesThemes): void,
     useAdaptiveThemes(enable: boolean): void,
     addPlugin(pluginName: string, notify: boolean): void,
     removePlugin(pluginName: string): void

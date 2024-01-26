@@ -110,6 +110,16 @@ export class UnistylesRuntime {
     }
 
     /**
+     * Update a theme in runtime
+     * If current theme is updated, the changes will be applied immediately
+     * @param name - The name of the theme to update
+     * @param updater - Function that receives the current theme and expect modified theme to be returned
+     */
+    public updateTheme = (name: keyof UnistylesThemes, updater: (theme: UnistylesThemes[keyof UnistylesThemes]) => UnistylesThemes[keyof UnistylesThemes]) => {
+        this.unistylesRegistry.updateTheme(name, updater(this.unistylesRegistry.getTheme(name)))
+    }
+
+    /**
      * Enable or disable adaptive themes
      * @param enable - boolean indicating if adaptive themes should be enabled
      */
