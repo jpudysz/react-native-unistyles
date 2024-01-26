@@ -23,7 +23,41 @@ You should call `UnistylesRegistry` only once in your application. If you want t
 
 There is no required timing for when you should call it. It can be done, for example, in your `App.tsx` file or somewhere deeper.
 
-### List of available actions
+### Register themes
+
+```tsx
+import { UnistylesRegistry } from 'react-native-unistyles'
+import { lightTheme, darkTheme } from './themes'
+
+UnistylesRegistry
+    .addThemes({
+        light: lightTheme,
+        dark: darkTheme,
+    })
+```
+
+### Register breakpoints
+
+```tsx
+import { UnistylesRegistry } from 'react-native-unistyles'
+import { breakpoints } from './breakpoints'
+
+UnistylesRegistry
+    .addBreakpoints(breakpoints)
+```
+
+### Add config
+
+```tsx
+import { UnistylesRegistry } from 'react-native-unistyles'
+
+UnistylesRegistry
+    .addConfig({
+        adaptiveThemes: true
+    })
+```
+
+Available config options:
 
 | Key   |      Description      |  Default value | More info |
 |----------|:-------------:|------:|------:|
@@ -31,5 +65,25 @@ There is no required timing for when you should call it. It can be done, for exa
 | initialTheme | If you have registered more than one theme and know the initial theme upfront, you can pass the theme name here. | undefined | [link](/reference/theming/#select-theme) |
 | plugins | A list of plugins that Unistyles will call after resolving the StyleSheet. |   [] | [link](/reference/plugins/) |
 | experimentalCSSMediaQueries |  Web only: Inject CSS media queries instead of inline styles. |   false | [link](/reference/web-support/) |
+
+### Full example
+
+
+```tsx
+UnistylesRegistry
+    .addBreakpoints(breakpoints)
+    .addThemes({
+        light: lightTheme,
+        dark: darkTheme,
+    })
+    .addConfig({
+        adaptiveThemes: true,
+        experimentalCSSMediaQueries: true
+    })
+```
+
+:::tip
+If you use TypeScript, remember to override library types. [Read more](/start/setup/#33-configure-typescript)
+:::
 
 </Seo>
