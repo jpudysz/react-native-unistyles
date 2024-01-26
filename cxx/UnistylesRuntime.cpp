@@ -19,6 +19,7 @@ std::vector<jsi::PropNameID> UnistylesRuntime::getPropertyNames(jsi::Runtime& ru
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("sortedBreakpointPairs")));
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("useBreakpoints")));
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("useTheme")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("updateTheme")));
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("useAdaptiveThemes")));
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("addPlugin")));
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("removePlugin")));
@@ -185,6 +186,22 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
 
                 if (this->themeName != themeName) {
                     this->themeName = themeName;
+                    this->onThemeChangeCallback(themeName);
+                }
+            
+                return jsi::Value::undefined();
+            }
+        );
+    }
+    
+    if (propName == "updateTheme") {
+        return jsi::Function::createFromHostFunction(runtime,
+            jsi::PropNameID::forAscii(runtime, "updateTheme"),
+            1,
+            [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
+                std::string themeName = arguments[0].asString(runtime).utf8(runtime);
+
+                if (this->themeName == themeName) {
                     this->onThemeChangeCallback(themeName);
                 }
             

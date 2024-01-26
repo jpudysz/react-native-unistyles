@@ -20,7 +20,8 @@ export const App: React.FunctionComponent = () => {
         setTheme,
         enabledPlugins,
         addPlugin,
-        removePlugin
+        removePlugin,
+        updateTheme
     } = UnistylesRuntime
 
     return (
@@ -144,6 +145,48 @@ export const App: React.FunctionComponent = () => {
                         >
                             <Text style={styles.buttonText}>
                                 Toggle plugin
+                            </Text>
+                        </Pressable>
+                        <Pressable
+                            style={event => styles.button(event.pressed)}
+                            onPress={() => {
+                                switch (themeName) {
+                                    case 'light':
+                                        return updateTheme('light', theme => ({
+                                            ...theme,
+                                            colors: {
+                                                ...theme.colors,
+                                                typography: theme.colors.typography === '#000000'
+                                                    ? '#00d2d3'
+                                                    : '#000000'
+                                            }
+                                        }))
+                                    case 'dark':
+                                        return updateTheme('dark', theme => ({
+                                            ...theme,
+                                            colors: {
+                                                ...theme.colors,
+                                                typography: theme.colors.typography === '#ffffff'
+                                                    ? '#00d2d3'
+                                                    : '#ffffff'
+                                            }
+                                        }))
+                                    case 'premium':
+                                    default:
+                                        return updateTheme('premium', theme => ({
+                                            ...theme,
+                                            colors: {
+                                                ...theme.colors,
+                                                typography: theme.colors.typography === '#76278f'
+                                                    ? '#000000'
+                                                    : '#76278f'
+                                            }
+                                        }))
+                                }
+                            }}
+                        >
+                            <Text style={styles.buttonText}>
+                                Update theme
                             </Text>
                         </Pressable>
                     </View>
