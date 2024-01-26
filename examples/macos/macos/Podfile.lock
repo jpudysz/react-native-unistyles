@@ -852,7 +852,7 @@ PODS:
   - React-Mapbuffer (0.73.1):
     - glog
     - React-debug
-  - react-native-unistyles (2.0.0-rc.3):
+  - react-native-unistyles (2.1.1):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
@@ -1205,7 +1205,7 @@ SPEC CHECKSUMS:
   React-jsinspector: e7fe4c636b3b430849f4f2437576f7354c32ed71
   React-logger: e0906b20e364a6aac5be304deddb6a80af89982a
   React-Mapbuffer: 19cb6342ce098786998d3d7bf4d54373b7faab91
-  react-native-unistyles: 7e2918c420d0e6ccaeaaec8aa29bce15b2205eac
+  react-native-unistyles: 157635ac9179b4c21985c408167da2093d302b7b
   React-nativeconfig: 07a4cc0202473d7370b903ce5b74a282e9f58a58
   React-NativeModulesApple: cb80187275a968337df3a3cdd432204f1f3c95b0
   React-perflogger: 137a1faa857f753fe74141abd3c859e536805ceb
