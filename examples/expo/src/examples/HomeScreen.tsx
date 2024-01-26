@@ -120,6 +120,22 @@ export const HomeScreen = () => {
                             navigation.navigate(DemoNames.MultipleThemesAdaptive)
                         }}
                     />
+                    <DemoLink
+                        description="Update theme at runtime"
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addConfig({
+                                    adaptiveThemes: true
+                                })
+
+                            navigation.navigate(DemoNames.UpdateTheme)
+                        }}
+                    />
                 </DemoGroup>
                 <DemoGroup title="Breakpoints">
                     <DemoLink

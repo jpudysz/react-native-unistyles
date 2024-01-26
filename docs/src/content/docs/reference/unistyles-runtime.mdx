@@ -50,12 +50,13 @@ and use it anywhere in your code, even outside a component.
 
 ## Setters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| setTheme | (themeName: string) => void | Change the current theme |
-| setAdaptiveThemes | (enabled: boolean) => void | Toggle [adaptive themes](/reference/theming#adaptive-themes) |
-| addPlugin | (plugin: UnistylesPlugin) => void | Enable a [plugin](/reference/plugins/) |
-| removePlugin | (plugin: UnistylesPlugin) => void | Disable a [plugin](/reference/plugins/) |
+| Version | Name | Type | Description |
+| ---- | ---- | ---- | ----------- |
+| - | setTheme | (themeName: string) => void | Change the current theme |
+| - | setAdaptiveThemes | (enabled: boolean) => void | Toggle [adaptive themes](/reference/theming#adaptive-themes) |
+| - | addPlugin | (plugin: UnistylesPlugin) => void | Enable a [plugin](/reference/plugins/) |
+| - | removePlugin | (plugin: UnistylesPlugin) => void | Disable a [plugin](/reference/plugins/) |
+| <Badge label="2.2.0" /> | updateTheme | (themeName: string, updater: (currentTheme: Theme) => Theme) => void | Update the [theme](/reference/theming/#update-theme-during-runtime) at runtime |
 
 ### Why doesn't `UnistylesRuntime` re-render my component?
 
