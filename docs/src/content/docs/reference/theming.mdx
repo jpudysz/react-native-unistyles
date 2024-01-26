@@ -261,4 +261,33 @@ export const ChangeTheme = () => (
 UnistylesRuntime is a powerful feature, and you can learn more about it [here](/reference/unistyles-runtime).
 :::
 
+### Update theme during runtime
+
+<Badge label="All platforms" />
+<Badge label="2.2.0" />
+
+Unistyles allows you to update your theme during runtime. This is useful if you want to show the user interface with default colors and later alter them based on user preferences. 
+
+If you update the currently selected theme, it will be automatically applied, and Unistyles will notify all stylesheets about the change. Otherwise, the theme will be updated silently.
+
+To update the theme during runtime, call `updateTheme` function, and return new theme object:
+
+```tsx /UnistylesRuntime.updateTheme/
+import { UnistylesRuntime } from 'react-native-unistyles'
+
+// update the theme at any time
+export const UpdateTheme = ({ selectedColors }) => (
+    <Button
+        title="Update theme"
+        onPress={() => UnistylesRuntime.updateTheme('dark', currentTheme => ({
+            ...currentTheme,
+            colors: {
+                ...currentTheme.colors,
+                ...selectedColors
+            }
+        }))}
+    />
+)
+```
+
 </Seo>
