@@ -56,6 +56,8 @@ export class UnistylesBridgeWeb {
                         return this.#colorScheme
                     case 'useTheme':
                         return (themeName: keyof UnistylesThemes) => this.useTheme(themeName)
+                    case 'updateTheme':
+                        return (themeName: keyof UnistylesThemes) => this.updateTheme(themeName)
                     case 'useBreakpoints':
                         return (breakpoints: UnistylesBreakpoints) => this.useBreakpoints(breakpoints)
                     case 'useAdaptiveThemes':
@@ -94,6 +96,12 @@ export class UnistylesBridgeWeb {
     private useTheme(themeName: keyof UnistylesThemes) {
         this.#themeName = themeName
         this.emitThemeChange()
+    }
+
+    private updateTheme(themeName: keyof UnistylesThemes) {
+        if (this.#themeName === themeName) {
+            this.emitThemeChange()
+        }
     }
 
     private useBreakpoints(breakpoints: UnistylesBreakpoints) {
