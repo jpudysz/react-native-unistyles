@@ -110,7 +110,7 @@ export class UnistylesRuntime {
     }
 
     /**
-     * Update a theme in runtime
+     * Update the theme at runtime
      * If current theme is updated, the changes will be applied immediately
      * @param name - The name of the theme to update
      * @param updater - Function that receives the current theme and expect modified theme to be returned

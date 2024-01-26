@@ -201,11 +201,11 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
             [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
                 std::string themeName = arguments[0].asString(runtime).utf8(runtime);
 
-            if (this->themeName == themeName) {
-                this->onThemeChangeCallback(themeName);
-            }
-        
-            return jsi::Value::undefined();
+                if (this->themeName == themeName) {
+                    this->onThemeChangeCallback(themeName);
+                }
+            
+                return jsi::Value::undefined();
             }
         );
     }
