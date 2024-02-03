@@ -1,6 +1,6 @@
 import React from 'react'
 import { createStyleSheet, useStyles, UnistylesRuntime, mq } from 'react-native-unistyles'
-import { SafeAreaView, ScrollView, StatusBar, View, Text, Image, Pressable } from 'react-native'
+import { ScrollView, View, Text, Image, Pressable } from 'react-native'
 import { highContrastPlugin } from './highContrastPlugin'
 import './styles'
 
@@ -25,8 +25,7 @@ export const App: React.FunctionComponent = () => {
     } = UnistylesRuntime
 
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle={colorScheme === 'light' ? 'light-content' : 'dark-content'} />
+        <View style={styles.container}>
             <ScrollView contentInsetAdjustmentBehavior="automatic" >
                 <Image
                     source={Logo}
@@ -192,7 +191,7 @@ export const App: React.FunctionComponent = () => {
                     </View>
                 </View>
             </ScrollView>
-        </SafeAreaView>
+        </View>
     )
 }
 
