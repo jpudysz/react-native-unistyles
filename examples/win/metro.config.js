@@ -19,7 +19,7 @@ const config = {
   resolver: {
     ...defaultConfig.resolver,
     blockList: exclusionList([
-      // This stops "react-native run-windows" from causing the metro server to crash if its already running
+            // This stops "react-native run-windows" from causing the metro server to crash if its already running
       new RegExp(
         `${path.resolve(__dirname, 'windows').replace(/[/\\]/g, '/')}.*`,
       ),

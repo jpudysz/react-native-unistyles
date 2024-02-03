@@ -24436,7 +24436,6 @@ __metadata:
     "@react-native/metro-config": 0.73.2
     "@types/react": 18.2.45
     babel-plugin-module-resolver: 5.0.0
-    react: 18.2.0
     react-native: 0.73.2
     react-native-windows: 0.73.4
     typescript: 5.0.4
