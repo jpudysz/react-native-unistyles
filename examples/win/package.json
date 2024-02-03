@@ -11,7 +11,6 @@
     "windows": "react-native run-windows"
   },
   "dependencies": {
-    "react": "18.2.0",
     "react-native": "0.73.2",
     "react-native-windows": "0.73.4"
   },
