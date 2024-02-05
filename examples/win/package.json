@@ -1,16 +1,18 @@
 {
-  "name": "macos",
+  "name": "win",
   "version": "0.0.1",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "start": "react-native start"
+    "lint": "eslint .",
+    "start": "react-native start",
+    "test": "jest",
+    "windows": "react-native run-windows"
   },
   "dependencies": {
-    "react": "18.2.0",
-    "react-native": "0.73.0",
-    "react-native-macos": "0.73.1"
+    "react-native": "0.73.2",
+    "react-native-windows": "0.73.4"
   },
   "devDependencies": {
     "@babel/core": "7.23.6",

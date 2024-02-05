@@ -92,7 +92,8 @@
     "react": "*",
     "react-native": "*",
     "react-native-macos": "*",
-    "react-native-web": "*"
+    "react-native-web": "*",
+    "react-native-windows": "*"
   },
   "peerDependenciesMeta": {
     "react-native-macos": {
@@ -100,11 +101,15 @@
     },
     "react-native-web": {
       "optional": true
+    },
+    "react-native-windows": {
+      "optional": true
     }
   },
   "workspaces": [
     "examples/expo",
     "examples/macos",
+    "examples/win",
     "docs"
   ],
   "packageManager": "yarn@3.6.1",
