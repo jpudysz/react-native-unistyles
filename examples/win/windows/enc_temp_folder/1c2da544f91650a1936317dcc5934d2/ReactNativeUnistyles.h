@@ -133,7 +133,7 @@ struct Unistyles {
         });
 
         unistylesRuntime.get()->onContentSizeCategoryChange([this](std::string contentSizeCategory) {
-            // not available on windows
+            // not available for windows
         });
 
         this->unistylesRuntime = unistylesRuntime.get();
