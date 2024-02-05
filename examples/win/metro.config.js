@@ -6,11 +6,7 @@ const pak = require('../../package.json')
 
 const root = path.resolve(__dirname, '../..')
 const modules = Object.keys({ ...pak.peerDependencies })
-
-const rnwPath = fs.realpathSync(
-  path.resolve(require.resolve('react-native-windows/package.json'), '..'),
-);
-
+const rnwPath = fs.realpathSync(path.resolve(require.resolve('react-native-windows/package.json'), '..'))
 const defaultConfig = getDefaultConfig(__dirname)
 
 const config = {
