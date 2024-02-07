@@ -39,6 +39,7 @@
     "ios",
     "android",
     "react-native-macos",
+    "react-native-windows",
     "react-native-web",
     "expo"
   ],
