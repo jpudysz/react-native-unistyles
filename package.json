@@ -23,6 +23,7 @@
     "android",
     "cxx",
     "windows",
+    "react-native.config.js",
     "react-native-unistyles.podspec",
     "!lib/typescript/examples",
     "!ios/build",
