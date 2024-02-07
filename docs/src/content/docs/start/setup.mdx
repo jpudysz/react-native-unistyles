@@ -4,6 +4,7 @@ title: Setup
 
 import { Card, Tabs, TabItem, CardGrid, Icon } from '@astrojs/starlight/components'
 import Seo from '../../../components/Seo.astro'
+import Badge from '../../../components/Badge.astro'
 
 <Seo
     seo={{
@@ -76,6 +77,13 @@ import Seo from '../../../components/Seo.astro'
 :::caution
 Remember to add this line to the `macos` folder, not the `ios` folder!
 :::
+    </TabItem>
+    <TabItem label="Windows">
+    <Badge label="2.3.0" />
+
+      Windows is also supported with <a href="https://microsoft.github.io/react-native-windows/docs/getting-started" target="_blank">react-native-windows</a> package.
+      Simply install the package and it will be autolinked.
+
     </TabItem>
    </Tabs>
 
