@@ -6,17 +6,16 @@ type ExtractVariantKeys<T> = T extends object
     ? ExtractVariant<T[keyof T]>
     : never
 
-type HasTrue<T> = 'true' extends keyof T ? true : false
-type HasFalse<T> = 'false' extends keyof T ? true : false
+type HasBooleanVariants<T> = T extends Record<'true', any>
+    ? true
+    : T extends Record<'false', any>
+        ? true
+        : false
 
 type ExtractSubVariantKeys<T> = T extends object
-    ? [HasTrue<T>, HasFalse<T>] extends [true, true]
+    ? HasBooleanVariants<T> extends true
         ? keyof Omit<T, 'default'> | boolean | undefined
-        : [HasTrue<T>] extends [true]
-            ? keyof Omit<T, 'default'> | true | undefined
-            : [HasFalse<T>] extends [true]
-                ? keyof Omit<T, 'default'> | false | undefined
-                : keyof Omit<T, 'default'>
+        : keyof Omit<T, 'default'> | undefined
     : never
 
 type ExtractVariant<T> = T extends (...args: any) => infer R
