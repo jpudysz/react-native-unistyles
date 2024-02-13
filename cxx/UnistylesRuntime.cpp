@@ -25,6 +25,8 @@ std::vector<jsi::PropNameID> UnistylesRuntime::getPropertyNames(jsi::Runtime& ru
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("addPlugin")));
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("removePlugin")));
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("enabledPlugins")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("insets")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("statusBar")));
 
     // setters
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("themes")));
@@ -233,6 +235,26 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
             }
         );
     }
+    
+    if (propName == "insets") {
+        auto insets = jsi::Object(runtime);
+        
+        insets.setProperty(runtime, "top", this->insets.at("top"));
+        insets.setProperty(runtime, "bottom", this->insets.at("bottom"));
+        insets.setProperty(runtime, "left", this->insets.at("left"));
+        insets.setProperty(runtime, "right", this->insets.at("right"));
+        
+        return insets;
+    }
+    
+    if (propName == "statusBar") {
+        auto statusBar = jsi::Object(runtime);
+        
+        statusBar.setProperty(runtime, "height", this->statusBar.at("height"));
+        statusBar.setProperty(runtime, "width", this->statusBar.at("width"));
+        
+        return statusBar;
+    }
 
     return jsi::Value::undefined();
 }
@@ -286,13 +308,15 @@ std::string UnistylesRuntime::getBreakpointFromScreenWidth(int width, const std:
     return sortedBreakpointPairs.empty() ? "" : sortedBreakpointPairs.back().first;
 }
 
-void UnistylesRuntime::handleScreenSizeChange(int width, int height) {
+void UnistylesRuntime::handleScreenSizeChange(int width, int height, std::map<std::string, int> insets, std::map<std::string, int> statusBar) {
     std::string breakpoint = this->getBreakpointFromScreenWidth(width, this->sortedBreakpointPairs);
     bool shouldNotify = this->breakpoint != breakpoint || this->screenWidth != width || this->screenHeight != height;
     
     this->breakpoint = breakpoint;
     this->screenWidth = width;
     this->screenHeight = height;
+    this->insets = insets;
+    this->statusBar = statusBar;
 
     std::string orientation = width > height
         ? UnistylesOrientationLandscape
