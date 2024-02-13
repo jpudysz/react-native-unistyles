@@ -15,6 +15,8 @@
         self.initialHeight = window.frame.size.height;
         self.initialContentSizeCategory = std::string([@"unspecified" UTF8String]);
         self.initialColorScheme = [self getColorScheme];
+        self.initialStatusBar = [self getStatusBarDimensions];
+        self.initialInsets = [self getInsets];
         
         [self setupListeners];
     }
@@ -64,7 +66,12 @@
     CGFloat screenHeight  = window.frame.size.height;
 
     if (self.unistylesRuntime != nullptr) {
-        ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange((int)screenWidth, (int)screenHeight);
+        ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange(
+           (int)screenWidth,
+           (int)screenHeight,
+           self.initialInsets,
+           self.initialStatusBar
+        );
     }
 }
 
@@ -76,6 +83,26 @@
     }
     
     return UnistylesLightScheme;
+}
+
+- (std::map<std::string, int>)getInsets {
+    std::map<std::string, int> insets;
+    
+    insets.insert({ "top", 0 });
+    insets.insert({ "bottom", 0 });
+    insets.insert({ "left", 0 });
+    insets.insert({ "right", 0 });
+    
+    return insets;
+}
+
+- (std::map<std::string, int>)getStatusBarDimensions {
+    std::map<std::string, int> statusBar;
+    
+    statusBar.insert({ "height", 0 });
+    statusBar.insert({ "width", 0 });
+    
+    return statusBar;
 }
 
 @end

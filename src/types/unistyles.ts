@@ -5,6 +5,18 @@ import type { UnistylesPlugin } from './plugin'
 
 export type ColorSchemeName = 'light' | 'dark' | 'unspecified'
 
+export type ScreenInsets = {
+    top: number,
+    right: number,
+    bottom: number,
+    left: number
+}
+
+export type StatusBarDimensions = {
+    height: number,
+    width: number
+}
+
 export type UnistylesConfig = {
     adaptiveThemes?: boolean,
     initialTheme?: keyof UnistylesThemes,
@@ -23,6 +35,8 @@ export type UnistylesBridge = {
     colorScheme: ColorSchemeName,
     contentSizeCategory: IOSContentSizeCategory | AndroidContentSizeCategory,
     sortedBreakpointPairs: Array<[keyof UnistylesBreakpoints, UnistylesBreakpoints[keyof UnistylesBreakpoints]]>,
+    insets: ScreenInsets,
+    statusBar: StatusBarDimensions,
 
     // setters
     themes: Array<keyof UnistylesThemes>,

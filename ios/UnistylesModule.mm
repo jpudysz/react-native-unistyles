@@ -75,7 +75,9 @@ void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSel
         (int)weakSelf.platform.initialWidth,
         (int)weakSelf.platform.initialHeight,
         weakSelf.platform.initialColorScheme,
-        weakSelf.platform.initialContentSizeCategory
+        weakSelf.platform.initialContentSizeCategory,
+        weakSelf.platform.initialInsets,
+        weakSelf.platform.initialStatusBar
     );
 
     unistylesRuntime.get()->onThemeChange([=](std::string theme) {

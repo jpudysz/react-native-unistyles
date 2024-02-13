@@ -2,6 +2,7 @@
 
 #include <jsi/jsi.h>
 #include <vector>
+#include <map>
 
 using namespace facebook;
 
@@ -33,8 +34,15 @@ public:
         int screenWidth,
         int screenHeight,
         std::string colorScheme,
-        std::string contentSizeCategory
-    ): screenWidth(screenWidth), screenHeight(screenHeight), colorScheme(colorScheme), contentSizeCategory(contentSizeCategory) {}
+        std::string contentSizeCategory,
+        std::map<std::string, int> insets,
+        std::map<std::string, int> statusBar
+    ): screenWidth(screenWidth),
+       screenHeight(screenHeight),
+       colorScheme(colorScheme),
+       contentSizeCategory(contentSizeCategory),
+       insets(insets),
+       statusBar(statusBar) {}
 
     bool hasAdaptiveThemes;
     bool supportsAutomaticColorScheme;
@@ -44,6 +52,9 @@ public:
     std::vector<std::string> pluginNames;
     std::vector<std::string> themes;
     std::vector<std::pair<std::string, double>> sortedBreakpointPairs;
+    
+    std::map<std::string, int> insets;
+    std::map<std::string, int> statusBar;
 
     void onThemeChange(std::function<void(std::string)> callback) {
         this->onThemeChangeCallback = callback;
@@ -65,7 +76,7 @@ public:
     void set(jsi::Runtime& runtime, const jsi::PropNameID& propNameId, const jsi::Value& value) override;
     std::vector<jsi::PropNameID> getPropertyNames(jsi::Runtime& runtime) override;
 
-    void handleScreenSizeChange(int width, int height);
+    void handleScreenSizeChange(int width, int height, std::map<std::string, int> insets, std::map<std::string, int> statusBar);
     void handleAppearanceChange(std::string colorScheme);
     void handleContentSizeCategoryChange(std::string contentSizeCategory);
 
