@@ -39,7 +39,7 @@ struct Unistyles {
                 auto bounds = Window::Current().Bounds();
 
                 if (this->unistylesRuntime != nullptr) {
-                    ((UnistylesRuntime*)this->unistylesRuntime)->handleScreenSizeChange((int)bounds.Width, (int)bounds.Height);
+                    ((UnistylesRuntime*)this->unistylesRuntime)->handleScreenSizeChange((int)bounds.Width, (int)bounds.Height, this.getInsets(), this.getStatusBarDimensions());
                 }
             }));
 
@@ -94,7 +94,9 @@ struct Unistyles {
             uiInfo.screenWidth,
             uiInfo.screenHeight,
             uiInfo.colorScheme,
-            uiInfo.contentSizeCategory
+            uiInfo.contentSizeCategory,
+            this->getInsets(),
+            this->getStatusBarDimensions()
         );
 
         unistylesRuntime->onThemeChange([this](std::string theme) {
@@ -191,6 +193,26 @@ struct Unistyles {
             }
 
             return UnistylesUnspecifiedScheme;
+        }
+
+        std::map<std::string, int>getInsets() {
+            std::map<std::string, int> insets;
+
+            insets.insert({ "top", 0 });
+            insets.insert({ "bottom", 0 });
+            insets.insert({ "left", 0 });
+            insets.insert({ "right", 0 });
+
+            return insets;
+        }
+
+        std::map<std::string, int>getStatusBarDimensions() {
+            std::map<std::string, int> statusBar;
+
+            statusBar.insert({ "height", 0 });
+            statusBar.insert({ "width", 0 });
+
+            return statusBar;
         }
 };
 
