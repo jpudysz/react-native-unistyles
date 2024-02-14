@@ -36,17 +36,19 @@ and use it anywhere in your code, even outside a component.
 
 ## Getters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| colorScheme | string | Get your device's color scheme. Available options `dark`, `light` or `unspecified` |
-| hasAdaptiveThemes | boolean | Indicates if you have enabled [adaptive themes](/reference/theming#adaptive-themes) |
-| themeName | string | Name of the selected theme or an empty string if you don't use themes |
-| breakpoint | string / undefined | Current breakpoint or always undefined if you don't use breakpoints |
-| breakpoints | Object | Your breakpoints registered with [UnistylesRegistry](/reference/unistyles-registry/) |
-| enabledPlugins | string[] | Names of currently enabled plugins |
-| screen | Object | Screen dimensions |
-| orientation | ScreenOrientation | Your device's orientation |
-| contentSizeCategory | IOSContentSizeCategory or AndroidContentSizeCategory | Your device's [content size category](/reference/content-size-category/) |
+| Version | Name | Type | Description |
+| ----| ---- | ---- | ----------- |
+| - | colorScheme | string | Get your device's color scheme. Available options `dark`, `light` or `unspecified` |
+| - | hasAdaptiveThemes | boolean | Indicates if you have enabled [adaptive themes](/reference/theming#adaptive-themes) |
+| - | themeName | string | Name of the selected theme or an empty string if you don't use themes |
+| - | breakpoint | string / undefined | Current breakpoint or always undefined if you don't use breakpoints |
+| - | breakpoints | Object | Your breakpoints registered with [UnistylesRegistry](/reference/unistyles-registry/) |
+| - | enabledPlugins | string[] | Names of currently enabled plugins |
+| - | screen | \{width: number, height: number\} | Screen dimensions |
+| - | orientation | ScreenOrientation | Your device's orientation |
+| - | contentSizeCategory | IOSContentSizeCategory or AndroidContentSizeCategory | Your device's [content size category](/reference/content-size-category/) |
+| <Badge label="2.4.0" />| insets | \{ top: number, bottom: number, left: number, right: number \} | Device insets which are safe to put content into |
+| <Badge label="2.4.0" />| statusBar | \{width: number, height: number\} | Status bar dimensions |
 
 ## Setters
 

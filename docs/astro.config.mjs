@@ -88,6 +88,10 @@ export default defineConfig({
                             link: '/reference/compound-variants/'
                         },
                         {
+                            label: 'Dimensions',
+                            link: '/reference/dimensions/'
+                        },
+                        {
                             label: 'Unistyles Registry',
                             link: '/reference/unistyles-registry/'
                         },
