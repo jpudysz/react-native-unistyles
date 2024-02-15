@@ -1,5 +1,10 @@
 import React from 'react'
-import { createStyleSheet, useStyles, UnistylesRuntime, mq } from 'react-native-unistyles'
+import {
+    createStyleSheet,
+    useStyles,
+    UnistylesRuntime,
+    mq
+} from 'react-native-unistyles'
 import { ScrollView, View, Text, Image, Pressable } from 'react-native'
 import { highContrastPlugin } from './highContrastPlugin'
 import './styles'
@@ -21,93 +26,73 @@ export const App: React.FunctionComponent = () => {
         enabledPlugins,
         addPlugin,
         removePlugin,
-        updateTheme
+        updateTheme,
+        insets,
+        statusBar
     } = UnistylesRuntime
 
     return (
         <View style={styles.container}>
-            <ScrollView contentInsetAdjustmentBehavior="automatic" >
-                <Image
-                    source={Logo}
-                    style={styles.logo}
-                />
-                <Text style={styles.heading}>
-                    Welcome to Unistyles!
-                </Text>
+            <ScrollView contentInsetAdjustmentBehavior="automatic">
+                <Image source={Logo} style={styles.logo} />
+                <Text style={styles.heading}>Welcome to Unistyles!</Text>
                 <View style={styles.row}>
                     <View style={styles.runtime}>
-                        <Text style={styles.title}>
-                            Runtime values:
-                        </Text>
+                        <Text style={styles.title}>Runtime values:</Text>
                         <View style={styles.valueContainer}>
-                            <Text style={styles.valueName}>
-                                Screen dimensions:
-                            </Text>
+                            <Text style={styles.valueName}>Screen dimensions:</Text>
                             <Text style={styles.value}>
                                 {screen.width}x{screen.height}
                             </Text>
                         </View>
                         <View style={styles.valueContainer}>
-                            <Text style={styles.valueName}>
-                                Current breakpoint:
-                            </Text>
+                            <Text style={styles.valueName}>Status bar dimensions:</Text>
                             <Text style={styles.value}>
-                                {breakpoint}
+                                {statusBar.width}x{statusBar.height}
                             </Text>
                         </View>
                         <View style={styles.valueContainer}>
-                            <Text style={styles.valueName}>
-                                Color scheme:
-                            </Text>
+                            <Text style={styles.valueName}>Insets:</Text>
                             <Text style={styles.value}>
-                                {colorScheme}
+                T:{insets.top} B:{insets.bottom} R:{insets.right} L:
+                                {insets.left}
                             </Text>
                         </View>
                         <View style={styles.valueContainer}>
-                            <Text style={styles.valueName}>
-                                Content size category:
-                            </Text>
-                            <Text style={styles.value}>
-                                {contentSizeCategory}
-                            </Text>
+                            <Text style={styles.valueName}>Current breakpoint:</Text>
+                            <Text style={styles.value}>{breakpoint}</Text>
                         </View>
                         <View style={styles.valueContainer}>
-                            <Text style={styles.valueName}>
-                                Selected theme:
-                            </Text>
-                            <Text style={styles.value}>
-                                {themeName}
-                            </Text>
+                            <Text style={styles.valueName}>Color scheme:</Text>
+                            <Text style={styles.value}>{colorScheme}</Text>
                         </View>
                         <View style={styles.valueContainer}>
-                            <Text style={styles.valueName}>
-                                Orientation:
-                            </Text>
-                            <Text style={styles.value}>
-                                {orientation}
-                            </Text>
+                            <Text style={styles.valueName}>Content size category:</Text>
+                            <Text style={styles.value}>{contentSizeCategory}</Text>
                         </View>
                         <View style={styles.valueContainer}>
-                            <Text style={styles.valueName}>
-                                Has adaptive themes:
-                            </Text>
+                            <Text style={styles.valueName}>Selected theme:</Text>
+                            <Text style={styles.value}>{themeName}</Text>
+                        </View>
+                        <View style={styles.valueContainer}>
+                            <Text style={styles.valueName}>Orientation:</Text>
+                            <Text style={styles.value}>{orientation}</Text>
+                        </View>
+                        <View style={styles.valueContainer}>
+                            <Text style={styles.valueName}>Has adaptive themes:</Text>
                             <Text style={styles.value}>
                                 {hasAdaptiveThemes ? 'Yes' : 'No'}
                             </Text>
                         </View>
                         <View style={styles.valueContainer}>
-                            <Text style={styles.valueName}>
-                                Enabled plugins:
-                            </Text>
+                            <Text style={styles.valueName}>Enabled plugins:</Text>
                             <Text style={styles.value}>
                                 {enabledPlugins.length > 0 ? enabledPlugins.join(', ') : '-'}
                             </Text>
                         </View>
                     </View>
                     <View style={styles.actions}>
-                        <Text style={styles.title}>
-                            Actions:
-                        </Text>
+                        <Text style={styles.title}>Actions:</Text>
                         <Pressable
                             style={event => styles.button(event.pressed)}
                             onPress={() => {
@@ -122,17 +107,13 @@ export const App: React.FunctionComponent = () => {
                                 }
                             }}
                         >
-                            <Text style={styles.buttonText}>
-                                Change theme
-                            </Text>
+                            <Text style={styles.buttonText}>Change theme</Text>
                         </Pressable>
                         <Pressable
                             style={event => styles.button(event.pressed)}
                             onPress={() => setAdaptiveThemes(!hasAdaptiveThemes)}
                         >
-                            <Text style={styles.buttonText}>
-                                Toggle adaptive themes
-                            </Text>
+                            <Text style={styles.buttonText}>Toggle adaptive themes</Text>
                         </Pressable>
                         <Pressable
                             style={event => styles.button(event.pressed)}
@@ -142,9 +123,7 @@ export const App: React.FunctionComponent = () => {
                                     : addPlugin(highContrastPlugin)
                             }}
                         >
-                            <Text style={styles.buttonText}>
-                                Toggle plugin
-                            </Text>
+                            <Text style={styles.buttonText}>Toggle plugin</Text>
                         </Pressable>
                         <Pressable
                             style={event => styles.button(event.pressed)}
@@ -155,9 +134,10 @@ export const App: React.FunctionComponent = () => {
                                             ...theme,
                                             colors: {
                                                 ...theme.colors,
-                                                typography: theme.colors.typography === '#000000'
-                                                    ? '#00d2d3'
-                                                    : '#000000'
+                                                typography:
+                          theme.colors.typography === '#000000'
+                              ? '#00d2d3'
+                              : '#000000'
                                             }
                                         }))
                                     case 'dark':
@@ -165,9 +145,10 @@ export const App: React.FunctionComponent = () => {
                                             ...theme,
                                             colors: {
                                                 ...theme.colors,
-                                                typography: theme.colors.typography === '#ffffff'
-                                                    ? '#00d2d3'
-                                                    : '#ffffff'
+                                                typography:
+                          theme.colors.typography === '#ffffff'
+                              ? '#00d2d3'
+                              : '#ffffff'
                                             }
                                         }))
                                     case 'premium':
@@ -176,17 +157,16 @@ export const App: React.FunctionComponent = () => {
                                             ...theme,
                                             colors: {
                                                 ...theme.colors,
-                                                typography: theme.colors.typography === '#76278f'
-                                                    ? '#000000'
-                                                    : '#76278f'
+                                                typography:
+                          theme.colors.typography === '#76278f'
+                              ? '#000000'
+                              : '#76278f'
                                             }
                                         }))
                                 }
                             }}
                         >
-                            <Text style={styles.buttonText}>
-                                Update theme
-                            </Text>
+                            <Text style={styles.buttonText}>Update theme</Text>
                         </Pressable>
                     </View>
                 </View>
