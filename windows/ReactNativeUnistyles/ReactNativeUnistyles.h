@@ -39,7 +39,7 @@ struct Unistyles {
                 auto bounds = Window::Current().Bounds();
 
                 if (this->unistylesRuntime != nullptr) {
-                    ((UnistylesRuntime*)this->unistylesRuntime)->handleScreenSizeChange((int)bounds.Width, (int)bounds.Height, this.getInsets(), this.getStatusBarDimensions());
+                    ((UnistylesRuntime*)this->unistylesRuntime)->handleScreenSizeChange((int)bounds.Width, (int)bounds.Height, this->getInsets(), this->getStatusBarDimensions());
                 }
             }));
 
