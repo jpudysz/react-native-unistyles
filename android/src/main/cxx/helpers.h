@@ -1,9 +1,9 @@
 #include <jni.h>
 #include <string>
 #include <map>
+#include <UnistylesRuntime.h>
 
-int jobjectToInt(JNIEnv *env, jobject integer);
-std::string jstringToStdString(JNIEnv *env, jstring jStr);
-std::map<std::string, int> jobjectToStdMap(JNIEnv *env, jobject map);
+Dimensions jobjectToDimensions(JNIEnv *env, jobject dimensionObj);
+Insets jobjectToInsets(JNIEnv *env, jobject insetsObj);
 
 void throwKotlinException(JNIEnv *env, const char *message);

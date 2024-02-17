@@ -1,69 +1,34 @@
 #include "helpers.h"
+#include "UnistylesRuntime.h"
 
-int jobjectToInt(JNIEnv *env, jobject integer) {
-    jclass integerClass = env->FindClass("java/lang/Integer");
-    jmethodID intValueMethod = env->GetMethodID(integerClass, "intValue", "()I");
-    int value = env->CallIntMethod(integer, intValueMethod);
+Dimensions jobjectToDimensions(JNIEnv *env, jobject dimensionObj) {
+    jclass dimensionClass = env->FindClass("com/unistyles/Dimensions");
+    jfieldID widthFieldID = env->GetFieldID(dimensionClass, "width", "I");
+    jfieldID heightFieldID = env->GetFieldID(dimensionClass, "height", "I");
 
-    env->DeleteLocalRef(integerClass);
+    int width = env->GetIntField(dimensionObj, widthFieldID);
+    int height = env->GetIntField(dimensionObj, heightFieldID);
 
-    return value;
+    env->DeleteLocalRef(dimensionClass);
+
+    return Dimensions{width, height};
 }
 
-std::string jstringToStdString(JNIEnv *env, jstring jStr) {
-    if (!jStr) {
-        return "";
-    }
+Insets jobjectToInsets(JNIEnv *env, jobject insetsObj) {
+    jclass insetsClass = env->FindClass("com/unistyles/Insets");
+    jfieldID leftFieldID = env->GetFieldID(insetsClass, "left", "I");
+    jfieldID topFieldID = env->GetFieldID(insetsClass, "top", "I");
+    jfieldID rightFieldID = env->GetFieldID(insetsClass, "right", "I");
+    jfieldID bottomFieldID = env->GetFieldID(insetsClass, "bottom", "I");
 
-    const jclass stringClass = env->GetObjectClass(jStr);
-    const jmethodID getBytes = env->GetMethodID(stringClass, "getBytes", "(Ljava/lang/String;)[B");
-    const jbyteArray stringJbytes = (jbyteArray) env->CallObjectMethod(jStr, getBytes, env->NewStringUTF("UTF-8"));
+    int left = env->GetIntField(insetsObj, leftFieldID);
+    int top = env->GetIntField(insetsObj, topFieldID);
+    int right = env->GetIntField(insetsObj, rightFieldID);
+    int bottom = env->GetIntField(insetsObj, bottomFieldID);
 
-    size_t length = (size_t) env->GetArrayLength(stringJbytes);
-    jbyte* pBytes = env->GetByteArrayElements(stringJbytes, NULL);
+    env->DeleteLocalRef(insetsClass);
 
-    std::string ret = std::string((char *)pBytes, length);
-    env->ReleaseByteArrayElements(stringJbytes, pBytes, JNI_ABORT);
-
-    env->DeleteLocalRef(stringJbytes);
-    env->DeleteLocalRef(stringClass);
-
-    return ret;
-}
-
-std::map<std::string, int> jobjectToStdMap(JNIEnv *env, jobject map) {
-    std::map<std::string, int> result;
-
-    jclass setClass = env->FindClass("java/util/Set");
-    jclass iteratorClass = env->FindClass("java/util/Iterator");
-    jmethodID entrySetMethod = env->GetMethodID(env->GetObjectClass(map), "entrySet", "()Ljava/util/Set;");
-    jmethodID iteratorMethod = env->GetMethodID(setClass, "iterator", "()Ljava/util/Iterator;");
-    jobject set = env->CallObjectMethod(map, entrySetMethod);
-    jobject iterator = env->CallObjectMethod(set, iteratorMethod);
-    jmethodID hasNextMethod = env->GetMethodID(iteratorClass, "hasNext", "()Z");
-    jmethodID nextMethod = env->GetMethodID(iteratorClass, "next", "()Ljava/lang/Object;");
-
-    while (env->CallBooleanMethod(iterator, hasNextMethod)) {
-        jobject entry = env->CallObjectMethod(iterator, nextMethod);
-
-        jmethodID getKeyMethod = env->GetMethodID(env->GetObjectClass(entry), "getKey", "()Ljava/lang/Object;");
-        jmethodID getValueMethod = env->GetMethodID(env->GetObjectClass(entry), "getValue", "()Ljava/lang/Object;");
-        jstring key = (jstring) env->CallObjectMethod(entry, getKeyMethod);
-        jobject value = env->CallObjectMethod(entry, getValueMethod);
-
-        result[jstringToStdString(env, key)] = jobjectToInt(env, value);
-
-        env->DeleteLocalRef(entry);
-        env->DeleteLocalRef(key);
-        env->DeleteLocalRef(value);
-    }
-
-    env->DeleteLocalRef(set);
-    env->DeleteLocalRef(iterator);
-    env->DeleteLocalRef(setClass);
-    env->DeleteLocalRef(iteratorClass);
-
-    return result;
+    return Insets{top, bottom, left, right};
 }
 
 void throwKotlinException(

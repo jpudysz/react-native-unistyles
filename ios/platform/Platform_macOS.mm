@@ -11,8 +11,7 @@
     if (self) {
         NSWindow *window = RCTSharedApplication().mainWindow;
         
-        self.initialWidth = window.frame.size.width;
-        self.initialHeight = window.frame.size.height;
+        self.initialScreen = {(int)window.frame.size.width, (int)window.frame.size.height};
         self.initialContentSizeCategory = std::string([@"unspecified" UTF8String]);
         self.initialColorScheme = [self getColorScheme];
         self.initialStatusBar = [self getStatusBarDimensions];
@@ -61,16 +60,15 @@
 
 - (void)onWindowResize {
     NSWindow *window = RCTSharedApplication().mainWindow;
-    
-    CGFloat screenWidth = window.frame.size.width;
-    CGFloat screenHeight  = window.frame.size.height;
+    Dimensions screen = {(int)window.frame.size.width, (int)window.frame.size.height};
+    Insets insets = [self getInsets];
+    Dimensions statusBar = [self getStatusBarDimensions];
 
     if (self.unistylesRuntime != nullptr) {
         ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange(
-           (int)screenWidth,
-           (int)screenHeight,
-           self.initialInsets,
-           self.initialStatusBar
+           screen,
+           insets,
+           statusBar
         );
     }
 }
@@ -85,24 +83,12 @@
     return UnistylesLightScheme;
 }
 
-- (std::map<std::string, int>)getInsets {
-    std::map<std::string, int> insets;
-    
-    insets.insert({ "top", 0 });
-    insets.insert({ "bottom", 0 });
-    insets.insert({ "left", 0 });
-    insets.insert({ "right", 0 });
-    
-    return insets;
+- (Insets)getInsets {
+    return {0, 0, 0, 0};
 }
 
-- (std::map<std::string, int>)getStatusBarDimensions {
-    std::map<std::string, int> statusBar;
-    
-    statusBar.insert({ "height", 0 });
-    statusBar.insert({ "width", 0 });
-    
-    return statusBar;
+- (Dimensions)getStatusBarDimensions {
+    return {0, 0};
 }
 
 @end

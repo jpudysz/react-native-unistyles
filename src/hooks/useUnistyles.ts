@@ -16,6 +16,16 @@ export const useUnistyles = () => {
         screenSize: {
             width: unistyles.runtime.screen.width,
             height: unistyles.runtime.screen.height
+        },
+        statusBar: {
+            width: unistyles.runtime.statusBar.width,
+            height: unistyles.runtime.statusBar.height
+        },
+        intents: {
+            top: unistyles.runtime.insets.top,
+            bottom: unistyles.runtime.insets.bottom,
+            left: unistyles.runtime.insets.left,
+            right: unistyles.runtime.insets.right
         }
     })
 
@@ -35,7 +45,9 @@ export const useUnistyles = () => {
                         return setLayout({
                             breakpoint: layoutEvent.payload.breakpoint,
                             orientation: layoutEvent.payload.orientation,
-                            screenSize: layoutEvent.payload.screen
+                            screenSize: layoutEvent.payload.screen,
+                            statusBar: layoutEvent.payload.statusBar,
+                            intents: layoutEvent.payload.intents
                         })
                     }
                     case UnistylesEventType.Plugin: {

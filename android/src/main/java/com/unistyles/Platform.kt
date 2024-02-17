@@ -1,10 +1,16 @@
 package com.unistyles
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import android.view.WindowInsets
+import android.view.WindowManager
 import com.facebook.react.bridge.ReactApplicationContext
+import kotlin.math.roundToInt
+
+class Dimensions(var width: Int, var height: Int)
+class Insets(var top: Int, var bottom: Int, var left: Int, var right: Int)
 
 class Platform(private val reactApplicationContext: ReactApplicationContext) {
     @SuppressLint("InternalInsetResource", "DiscouragedApi", "ObsoleteSdkInt")
@@ -15,15 +21,11 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
         val screenHeight = (displayMetrics.heightPixels / displayMetrics.density).toInt()
 
         return mapOf(
-            "width" to screenWidth,
-            "height" to screenHeight,
+            "screen" to Dimensions(screenWidth, screenHeight),
             "colorScheme" to getColorScheme(),
             "contentSizeCategory" to getContentSizeCategory(fontScale),
             "insets" to getScreenInsets(displayMetrics.density),
-            "statusBar" to mapOf(
-                "height" to getStatusBarHeight(displayMetrics.density),
-                "width" to screenWidth
-            )
+            "statusBar" to Dimensions(screenWidth, getStatusBarHeight(displayMetrics.density))
         )
     }
 
@@ -50,33 +52,28 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
     }
 
     @Suppress("DEPRECATION")
-    private fun getScreenInsets(density: Float): Map<String, Int> {
-        val insets = mutableMapOf(
-            "top" to 0,
-            "bottom" to 0,
-            "left" to 0,
-            "right" to 0
-        )
-
+    private fun getScreenInsets(density: Float): Insets  {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val systemInsets = reactApplicationContext.currentActivity?.window?.decorView?.rootWindowInsets?.getInsets(WindowInsets.Type.displayCutout())
+            val windowManager = reactApplicationContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            val systemBarsInsets = windowManager.currentWindowMetrics.windowInsets.getInsets(WindowInsets.Type.systemBars())
 
-            insets["top"] = ((systemInsets?.top ?: 0) / density).toInt()
-            insets["bottom"] = ((systemInsets?.bottom ?: 0) / density).toInt()
-            insets["left"] = ((systemInsets?.left ?: 0) / density).toInt()
-            insets["right"] = ((systemInsets?.right ?: 0) / density).toInt()
+            val top = (systemBarsInsets.top / density).roundToInt()
+            val bottom = (systemBarsInsets.bottom / density).roundToInt()
+            val left = (systemBarsInsets.left / density).roundToInt()
+            val right = (systemBarsInsets.right / density).roundToInt()
 
-            return insets
+            return Insets(top, bottom, left, right)
         }
 
         val systemInsets = reactApplicationContext.currentActivity?.window?.decorView?.rootWindowInsets
+            ?: return Insets(0, 0, 0, 0)
 
-        insets["top"] = ((systemInsets?.systemWindowInsetTop ?: 0) / density).toInt()
-        insets["bottom"] = ((systemInsets?.systemWindowInsetBottom ?: 0) / density).toInt()
-        insets["left"] = ((systemInsets?.systemWindowInsetLeft ?: 0) / density).toInt()
-        insets["right"] = ((systemInsets?.systemWindowInsetRight ?: 0) / density).toInt()
+        val top = (systemInsets.systemWindowInsetTop / density).roundToInt()
+        val bottom = (systemInsets.systemWindowInsetBottom / density).roundToInt()
+        val left = (systemInsets.systemWindowInsetLeft / density).roundToInt()
+        val right = (systemInsets.systemWindowInsetRight / density).roundToInt()
 
-        return insets
+        return Insets(top, bottom, left, right)
     }
 
     @SuppressLint("InternalInsetResource", "DiscouragedApi")

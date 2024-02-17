@@ -59,6 +59,8 @@ export type UnistylesMobileLayoutEvent = {
     type: UnistylesEventType.Layout,
     payload: {
         screen: ScreenSize,
+        statusBar: StatusBarDimensions,
+        intents: ScreenInsets,
         breakpoint: keyof UnistylesBreakpoints,
         orientation: typeof ScreenOrientation[keyof typeof ScreenOrientation]
     }
