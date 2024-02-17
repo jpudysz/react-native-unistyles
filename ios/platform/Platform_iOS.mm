@@ -12,8 +12,7 @@
         UIScreen *screen = [UIScreen mainScreen];
         UIContentSizeCategory contentSizeCategory = [[UIApplication sharedApplication] preferredContentSizeCategory];
 
-        self.initialWidth = screen.bounds.size.width;
-        self.initialHeight = screen.bounds.size.height;
+        self.initialScreen = {(int)screen.bounds.size.width, (int)screen.bounds.size.height};
         self.initialColorScheme = [self getColorScheme];
         self.initialContentSizeCategory = [self getContentSizeCategory:contentSizeCategory];
         self.initialStatusBar = [self getStatusBarDimensions];
@@ -73,14 +72,13 @@
 
 - (void)onOrientationChange:(NSNotification *)notification {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        UIScreen *screen = [UIScreen mainScreen];
-        CGFloat screenWidth = screen.bounds.size.width;
-        CGFloat screenHeight = screen.bounds.size.height;
-        std::map<std::string, int> insets = [self getInsets];
-        std::map<std::string, int> statusBar = [self getStatusBarDimensions];
+        UIScreen *mainScreen = [UIScreen mainScreen];
+        Dimensions screen = {(int)mainScreen.bounds.size.width, (int)mainScreen.bounds.size.height};
+        Insets insets = [self getInsets];
+        Dimensions statusBar = [self getStatusBarDimensions];
 
         if (self.unistylesRuntime != nullptr) {
-            ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange((int)screenWidth, (int)screenHeight, insets, statusBar);
+            ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange(screen, insets, statusBar);
         }
     });
 }
@@ -99,27 +97,17 @@
     }
 }
 
-- (std::map<std::string, int>)getInsets {
+- (Insets)getInsets {
     UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
     UIEdgeInsets safeArea = window.safeAreaInsets;
-    std::map<std::string, int> insets;
     
-    insets.insert({ "top", safeArea.top });
-    insets.insert({ "bottom", safeArea.bottom });
-    insets.insert({ "left", safeArea.left });
-    insets.insert({ "right", safeArea.right });
-    
-    return insets;
+    return {(int)safeArea.top, (int)safeArea.bottom, (int)safeArea.left, (int)safeArea.right};
 }
 
-- (std::map<std::string, int>)getStatusBarDimensions {
+- (Dimensions)getStatusBarDimensions {
     CGRect statusBarFrame = UIApplication.sharedApplication.statusBarFrame;
-    std::map<std::string, int> statusBar;
     
-    statusBar.insert({ "height", statusBarFrame.size.height });
-    statusBar.insert({ "width", statusBarFrame.size.width });
-    
-    return statusBar;
+    return {(int)statusBarFrame.size.width, (int)statusBarFrame.size.height};
 }
 
 - (std::string)getContentSizeCategory:(UIContentSizeCategory)contentSizeCategory {

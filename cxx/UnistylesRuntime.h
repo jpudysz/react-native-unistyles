@@ -17,32 +17,43 @@ const std::string UnistylesErrorBreakpointsCannotBeEmpty = "You are trying to re
 const std::string UnistylesErrorBreakpointsMustStartFromZero = "You are trying to register breakpoints that don't start from 0";
 const std::string UnistylesErrorThemesCannotBeEmpty = "You are trying to register empty themes object";
 
+struct Dimensions {
+    int width;
+    int height;
+};
+
+struct Insets {
+    int top;
+    int bottom;
+    int left;
+    int right;
+};
+
 class JSI_EXPORT UnistylesRuntime : public jsi::HostObject {
 private:
     std::function<void(std::string)> onThemeChangeCallback;
-    std::function<void(std::string breakpoint, std::string orientation, int screenWidth, int screenHeight)> onLayoutChangeCallback;
+    std::function<void(std::string breakpoint, std::string orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets)> onLayoutChangeCallback;
     std::function<void(std::string)> onContentSizeCategoryChangeCallback;
     std::function<void()> onPluginChangeCallback;
 
-    int screenWidth;
-    int screenHeight;
+    Dimensions screen;
+    Dimensions statusBar;
+    Insets insets;
     std::string colorScheme;
     std::string contentSizeCategory;
 
 public:
     UnistylesRuntime(
-        int screenWidth,
-        int screenHeight,
+        Dimensions screen,
         std::string colorScheme,
         std::string contentSizeCategory,
-        std::map<std::string, int> insets,
-        std::map<std::string, int> statusBar
-    ): screenWidth(screenWidth),
-       screenHeight(screenHeight),
-       colorScheme(colorScheme),
-       contentSizeCategory(contentSizeCategory),
-       insets(insets),
-       statusBar(statusBar) {}
+        Insets insets,
+        Dimensions statusBar
+     ): screen(screen),
+        colorScheme(colorScheme),
+        contentSizeCategory(contentSizeCategory),
+        insets(insets),
+        statusBar(statusBar) {}
 
     bool hasAdaptiveThemes;
     bool supportsAutomaticColorScheme;
@@ -52,22 +63,19 @@ public:
     std::vector<std::string> pluginNames;
     std::vector<std::string> themes;
     std::vector<std::pair<std::string, double>> sortedBreakpointPairs;
-    
-    std::map<std::string, int> insets;
-    std::map<std::string, int> statusBar;
 
     void onThemeChange(std::function<void(std::string)> callback) {
         this->onThemeChangeCallback = callback;
     }
 
-    void onLayoutChange(std::function<void(std::string breakpoint, std::string orientation, int screenWidth, int screenHeight)> callback) {
+    void onLayoutChange(std::function<void(std::string breakpoint, std::string orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets)> callback) {
         this->onLayoutChangeCallback = callback;
     }
 
     void onPluginChange(std::function<void()> callback) {
         this->onPluginChangeCallback = callback;
     }
-    
+
     void onContentSizeCategoryChange(std::function<void(std::string)> callback) {
         this->onContentSizeCategoryChangeCallback = callback;
     }
@@ -76,7 +84,7 @@ public:
     void set(jsi::Runtime& runtime, const jsi::PropNameID& propNameId, const jsi::Value& value) override;
     std::vector<jsi::PropNameID> getPropertyNames(jsi::Runtime& runtime) override;
 
-    void handleScreenSizeChange(int width, int height, std::map<std::string, int> insets, std::map<std::string, int> statusBar);
+    void handleScreenSizeChange(Dimensions& screen, Insets& insets, Dimensions& statusBar);
     void handleAppearanceChange(std::string colorScheme);
     void handleContentSizeCategoryChange(std::string contentSizeCategory);
 

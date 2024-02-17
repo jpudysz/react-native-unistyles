@@ -45,16 +45,14 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     //endregion
     //region Event handlers
-    @Suppress("UNCHECKED_CAST")
     private fun onConfigChange() {
         val config = platform.getConfig()
 
         reactApplicationContext.runOnJSQueueThread {
             this.nativeOnOrientationChange(
-                config["width"] as Int,
-                config["height"] as Int,
-                config["insets"] as Map<String, Int>,
-                config["statusBar"] as Map<String, Int>
+                config["screen"] as Dimensions,
+                config["insets"] as Insets,
+                config["statusBar"] as Dimensions
             )
             this.nativeOnAppearanceChange(
                 config["colorScheme"] as String
@@ -65,7 +63,6 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     //endregion
     //region Core
-    @Suppress("UNCHECKED_CAST")
     @ReactMethod(isBlockingSynchronousMethod = true)
     fun install(): Boolean {
         return try {
@@ -75,12 +72,11 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             this.reactApplicationContext.javaScriptContextHolder?.let {
                 this.nativeInstall(
                     it.get(),
-                    config["width"] as Int,
-                    config["height"] as Int,
+                    config["screen"] as Dimensions,
                     config["colorScheme"] as String,
                     config["contentSizeCategory"] as String,
-                    config["insets"] as Map<String, Int>,
-                    config["statusBar"] as Map<String, Int>
+                    config["insets"] as Insets,
+                    config["statusBar"] as Dimensions
                 )
 
                 Log.i(NAME, "Installed Unistyles \uD83E\uDD84!")
@@ -96,29 +92,38 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     private external fun nativeInstall(
         jsi: Long,
-        width: Int,
-        height: Int,
+        screen: Dimensions,
         colorScheme: String,
         contentSizeCategory: String,
-        insets: Map<String, Int>,
-        statusBar: Map<String, Int>
+        insets: Insets,
+        statusBar: Dimensions
     )
     private external fun nativeDestroy()
-    private external fun nativeOnOrientationChange(width: Int, height: Int, insets: Map<String, Int>, statusBar: Map<String, Int>)
+    private external fun nativeOnOrientationChange(screen: Dimensions, insets: Insets, statusBar: Dimensions)
     private external fun nativeOnAppearanceChange(colorScheme: String)
     private external fun nativeOnContentSizeCategoryChange(contentSizeCategory: String)
 
     //endregion
     //region Event emitter
-    private fun onLayoutChange(breakpoint: String, orientation: String, width: Int, height: Int) {
+    private fun onLayoutChange(breakpoint: String, orientation: String, screen: Dimensions, statusBar: Dimensions, insets: Insets) {
         val body = Arguments.createMap().apply {
             putString("type", "layout")
             putMap("payload", Arguments.createMap().apply {
                 putString("breakpoint", breakpoint)
                 putString("orientation", orientation)
                 putMap("screen", Arguments.createMap().apply {
-                    putInt("width", width)
-                    putInt("height", height)
+                    putInt("width", screen.width)
+                    putInt("height", screen.height)
+                })
+                putMap("statusBar", Arguments.createMap().apply {
+                    putInt("width", statusBar.width)
+                    putInt("height", statusBar.height)
+                })
+                putMap("insets", Arguments.createMap().apply {
+                    putInt("top", insets.top)
+                    putInt("bottom", insets.bottom)
+                    putInt("left", insets.left)
+                    putInt("right", insets.right)
                 })
             })
         }

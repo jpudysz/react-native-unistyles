@@ -38,11 +38,11 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
     std::string propName = propNameId.utf8(runtime);
 
     if (propName == "screenWidth") {
-        return jsi::Value(this->screenWidth);
+        return jsi::Value(this->screen.width);
     }
 
     if (propName == "screenHeight") {
-        return jsi::Value(this->screenHeight);
+        return jsi::Value(this->screen.height);
     }
 
     if (propName == "hasAdaptiveThemes") {
@@ -171,7 +171,7 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
 
                 this->sortedBreakpointPairs = sortedBreakpointEntriesVec;
 
-                std::string breakpoint = this->getBreakpointFromScreenWidth(this->screenWidth, sortedBreakpointEntriesVec);
+                std::string breakpoint = this->getBreakpointFromScreenWidth(this->screen.width, sortedBreakpointEntriesVec);
 
                 this->breakpoint = breakpoint;
 
@@ -239,19 +239,19 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
     if (propName == "insets") {
         auto insets = jsi::Object(runtime);
         
-        insets.setProperty(runtime, "top", this->insets.at("top"));
-        insets.setProperty(runtime, "bottom", this->insets.at("bottom"));
-        insets.setProperty(runtime, "left", this->insets.at("left"));
-        insets.setProperty(runtime, "right", this->insets.at("right"));
+        insets.setProperty(runtime, "top", this->insets.top);
+        insets.setProperty(runtime, "bottom", this->insets.bottom);
+        insets.setProperty(runtime, "left", this->insets.left);
+        insets.setProperty(runtime, "right", this->insets.right);
         
         return insets;
     }
     
     if (propName == "statusBar") {
         auto statusBar = jsi::Object(runtime);
-        
-        statusBar.setProperty(runtime, "height", this->statusBar.at("height"));
-        statusBar.setProperty(runtime, "width", this->statusBar.at("width"));
+
+        statusBar.setProperty(runtime, "width", this->statusBar.width);
+        statusBar.setProperty(runtime, "height", this->statusBar.height);
         
         return statusBar;
     }
@@ -308,22 +308,21 @@ std::string UnistylesRuntime::getBreakpointFromScreenWidth(int width, const std:
     return sortedBreakpointPairs.empty() ? "" : sortedBreakpointPairs.back().first;
 }
 
-void UnistylesRuntime::handleScreenSizeChange(int width, int height, std::map<std::string, int> insets, std::map<std::string, int> statusBar) {
-    std::string breakpoint = this->getBreakpointFromScreenWidth(width, this->sortedBreakpointPairs);
-    bool shouldNotify = this->breakpoint != breakpoint || this->screenWidth != width || this->screenHeight != height;
+void UnistylesRuntime::handleScreenSizeChange(Dimensions& screen, Insets& insets, Dimensions& statusBar) {
+    std::string breakpoint = this->getBreakpointFromScreenWidth(screen.width, this->sortedBreakpointPairs);
+    bool shouldNotify = this->breakpoint != breakpoint || this->screen.width != screen.width || this->screen.height != screen.height;
     
     this->breakpoint = breakpoint;
-    this->screenWidth = width;
-    this->screenHeight = height;
-    this->insets = insets;
-    this->statusBar = statusBar;
+    this->screen = {screen.width, screen.height};
+    this->insets = {insets.top, insets.bottom, insets.left, insets.right};
+    this->statusBar = {statusBar.width, statusBar.height};
 
-    std::string orientation = width > height
+    std::string orientation = screen.width > screen.height
         ? UnistylesOrientationLandscape
         : UnistylesOrientationPortrait;
 
     if (shouldNotify) {
-        this->onLayoutChangeCallback(breakpoint, orientation, width, height);
+        this->onLayoutChangeCallback(breakpoint, orientation, screen, statusBar, insets);
     }
 }
 
