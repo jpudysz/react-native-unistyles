@@ -7,6 +7,7 @@ import android.content.IntentFilter
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.ViewTreeObserver
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactApplicationContext
@@ -15,11 +16,17 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.modules.core.DeviceEventManagerModule
 
 class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener {
+    private var isCxxReady: Boolean = false
     private val platform: Platform = Platform(reactContext)
+    private val globalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+        if (platform.hasNewInsets() && this.isCxxReady) {
+            this@UnistylesModule.onConfigChange()
+        }
+    }
 
     private val configurationChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == Intent.ACTION_CONFIGURATION_CHANGED) {
+            if (intent.action == Intent.ACTION_CONFIGURATION_CHANGED && this@UnistylesModule.isCxxReady) {
                 Handler(Looper.getMainLooper()).postDelayed({
                     this@UnistylesModule.onConfigChange()
                 }, 10)
@@ -37,10 +44,18 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         reactApplicationContext.registerReceiver(configurationChangeReceiver, IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED))
     }
 
+    private fun setupLayoutListener() {
+        val activity = currentActivity ?: return
+        activity.window.decorView.rootView.viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
+    }
+
     @Deprecated("Deprecated in Java")
     override fun onCatalystInstanceDestroy() {
         reactApplicationContext.unregisterReceiver(configurationChangeReceiver)
         this.nativeDestroy()
+
+        val activity = currentActivity ?: return
+        activity.window.decorView.rootView.viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
     }
 
     //endregion
@@ -69,6 +84,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             System.loadLibrary("unistyles")
             val config = platform.getConfig()
 
+            this.setupLayoutListener()
             this.reactApplicationContext.javaScriptContextHolder?.let {
                 this.nativeInstall(
                     it.get(),
@@ -78,6 +94,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                     config["insets"] as Insets,
                     config["statusBar"] as Dimensions
                 )
+                this.isCxxReady = true
 
                 Log.i(NAME, "Installed Unistyles \uD83E\uDD84!")
 
