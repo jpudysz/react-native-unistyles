@@ -1,5 +1,6 @@
 import React from 'react'
 import { View, Text, ScrollView, StatusBar } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { UnistylesRuntime, createStyleSheet, useStyles } from 'react-native-unistyles'
 import { Button, DemoScreen } from '../components'
 import { autoGuidelinePlugin } from '../plugins'
@@ -23,10 +24,11 @@ export const RuntimeScreen: React.FunctionComponent = () => {
         statusBar
     } = UnistylesRuntime
     const { styles, theme } = useStyles(stylesheet)
+    const { top, bottom, left, right } = useSafeAreaInsets()
 
     return (
         <DemoScreen>
-            <StatusBar translucent backgroundColor="black" />
+            <StatusBar hidden barStyle="dark-content" backgroundColor="transparent" />
             <View style={styles.container}>
                 <ScrollView>
                     <Text style={styles.title}>
@@ -53,7 +55,7 @@ export const RuntimeScreen: React.FunctionComponent = () => {
                             Insets:
                         </Text>
                         <Text style={styles.text(false)}>
-                            T:{insets.top} B:{insets.bottom} R:{insets.right} L:{insets.left}
+                            T:{insets.top}({top}) B:{insets.bottom}({bottom}) R:{insets.right}({right}) L:{insets.left}({left})
                         </Text>
                     </View>
                     <View style={styles.row}>
