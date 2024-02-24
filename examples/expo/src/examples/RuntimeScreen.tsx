@@ -28,7 +28,7 @@ export const RuntimeScreen: React.FunctionComponent = () => {
 
     return (
         <DemoScreen>
-            <StatusBar hidden barStyle="dark-content" backgroundColor="transparent" />
+            <StatusBar translucent barStyle="dark-content" backgroundColor="transparent" />
             <View style={styles.container}>
                 <ScrollView>
                     <Text style={styles.title}>

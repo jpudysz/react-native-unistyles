@@ -8,6 +8,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.ViewTreeObserver
+import android.view.WindowManager
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactApplicationContext
@@ -19,7 +20,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private var isCxxReady: Boolean = false
     private val platform: Platform = Platform(reactContext)
     private val globalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
-        if (platform.hasNewInsets() && this.isCxxReady) {
+        if (this.isCxxReady) {
             this@UnistylesModule.onConfigChange()
         }
     }
@@ -51,28 +52,34 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     @Deprecated("Deprecated in Java")
     override fun onCatalystInstanceDestroy() {
+        val activity = currentActivity ?: return
+
+        activity.window.decorView.rootView.viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
         reactApplicationContext.unregisterReceiver(configurationChangeReceiver)
         this.nativeDestroy()
-
-        val activity = currentActivity ?: return
-        activity.window.decorView.rootView.viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
     }
 
     //endregion
     //region Event handlers
     private fun onConfigChange() {
+        if (!platform.hasNewConfig()) {
+            return
+        }
+
         val config = platform.getConfig()
+
+        // todo remove me 
+        Log.d("unistyes", "Emitting!")
 
         reactApplicationContext.runOnJSQueueThread {
             this.nativeOnOrientationChange(
-                config["screen"] as Dimensions,
-                config["insets"] as Insets,
-                config["statusBar"] as Dimensions
+                config.screen,
+                config.insets,
+                config.statusBar
+                // todo add navigationBar
             )
-            this.nativeOnAppearanceChange(
-                config["colorScheme"] as String
-            )
-            this.nativeOnContentSizeCategoryChange(config["contentSizeCategory"] as String)
+            this.nativeOnAppearanceChange(config.colorScheme)
+            this.nativeOnContentSizeCategoryChange(config.contentSizeCategory)
         }
     }
 
@@ -84,15 +91,22 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             System.loadLibrary("unistyles")
             val config = platform.getConfig()
 
+            // todo remove me
+//            val activity = currentActivity
+//            activity?.runOnUiThread {
+//                activity.window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+//            }
+
             this.setupLayoutListener()
             this.reactApplicationContext.javaScriptContextHolder?.let {
                 this.nativeInstall(
                     it.get(),
-                    config["screen"] as Dimensions,
-                    config["colorScheme"] as String,
-                    config["contentSizeCategory"] as String,
-                    config["insets"] as Insets,
-                    config["statusBar"] as Dimensions
+                    config.screen,
+                    config.colorScheme,
+                    config.contentSizeCategory,
+                    config.insets,
+                    config.statusBar
+                    // todo add navigationBar
                 )
                 this.isCxxReady = true
 
