@@ -2,45 +2,68 @@ package com.unistyles
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import android.util.Log
 import com.facebook.react.bridge.ReactApplicationContext
 
 class UnistylesConfig(private val reactApplicationContext: ReactApplicationContext) {
     private val insets: UnistylesInsets = UnistylesInsets(reactApplicationContext)
     private val density: Float = reactApplicationContext.resources.displayMetrics.density
-    private var lastConfig: Config = this.getConfig()
+    private var lastConfig: Config = this.getAppConfig()
+    private var lastLayoutConfig: LayoutConfig = this.getAppLayoutConfig()
 
     fun hasNewConfig(): Boolean {
-        val newConfig = this.get()
+        val newConfig = this.getAppConfig()
+        val newContentSizeCategory = newConfig.contentSizeCategory != lastConfig.contentSizeCategory
+        val newColorScheme = newConfig.colorScheme != lastConfig.colorScheme
 
-        if (newConfig.isEqual(lastConfig)) {
+        if (!newContentSizeCategory && !newColorScheme) {
             return false
         }
 
         lastConfig = newConfig
-
-        // todo remove me
-        Log.d("unistyes", "New Config")
-        Log.d("unistyes", newConfig.toString())
+        lastConfig.hasNewContentSizeCategory = newContentSizeCategory
+        lastConfig.hasNewColorScheme = newColorScheme
 
         return true
     }
 
-    fun get(): Config {
-        return this.getConfig()
+    fun hasNewLayoutConfig(): Boolean {
+        val newConfig = this.getAppLayoutConfig()
+
+        if (newConfig.isEqual(lastLayoutConfig)) {
+            return false
+        }
+
+        lastLayoutConfig = newConfig
+
+        return true
+    }
+
+    fun getConfig(): Config {
+        return this.lastConfig
+    }
+
+    fun getLayoutConfig(): LayoutConfig {
+        return this.lastLayoutConfig
     }
 
     @SuppressLint("InternalInsetResource", "DiscouragedApi", "ObsoleteSdkInt")
-    private fun getConfig(): Config {
+    private fun getAppConfig(): Config {
+        val fontScale = reactApplicationContext.resources.configuration.fontScale
+
+        return Config(
+            this.getColorScheme(),
+            this.getContentSizeCategory(fontScale),
+        )
+    }
+
+    private fun getAppLayoutConfig(): LayoutConfig {
         val displayMetrics = reactApplicationContext.resources.displayMetrics
         val fontScale = reactApplicationContext.resources.configuration.fontScale
         val screenWidth = (displayMetrics.widthPixels / density).toInt()
         val screenHeight = (displayMetrics.heightPixels / density).toInt()
 
-        return Config(
+        return LayoutConfig(
             Dimensions(screenWidth, screenHeight),
-            this.getColorScheme(),
-            this.getContentSizeCategory(fontScale),
             this.insets.get(),
             Dimensions(screenWidth, getStatusBarHeight()),
             Dimensions(screenWidth, getNavigationBarHeight())
