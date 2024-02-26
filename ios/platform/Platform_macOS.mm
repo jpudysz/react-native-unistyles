@@ -15,6 +15,7 @@
         self.initialContentSizeCategory = std::string([@"unspecified" UTF8String]);
         self.initialColorScheme = [self getColorScheme];
         self.initialStatusBar = [self getStatusBarDimensions];
+        self.initialNavigationBar = [self getNavigationBarDimensions];
         self.initialInsets = [self getInsets];
         
         [self setupListeners];
@@ -63,12 +64,14 @@
     Dimensions screen = {(int)window.frame.size.width, (int)window.frame.size.height};
     Insets insets = [self getInsets];
     Dimensions statusBar = [self getStatusBarDimensions];
+    Dimensions navigationBar = [self getNavigationBarDimensions];
 
     if (self.unistylesRuntime != nullptr) {
         ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange(
            screen,
            insets,
-           statusBar
+           statusBar,
+           navigationBar
         );
     }
 }
@@ -88,6 +91,10 @@
 }
 
 - (Dimensions)getStatusBarDimensions {
+    return {0, 0};
+}
+
+- (Dimensions)getNavigationBarDimensions {
     return {0, 0};
 }
 

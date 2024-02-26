@@ -21,14 +21,15 @@ export const RuntimeScreen: React.FunctionComponent = () => {
         setTheme,
         setAdaptiveThemes,
         insets,
-        statusBar
+        statusBar,
+        navigationBar
     } = UnistylesRuntime
     const { styles, theme } = useStyles(stylesheet)
     const { top, bottom, left, right } = useSafeAreaInsets()
 
     return (
         <DemoScreen>
-            <StatusBar translucent barStyle="dark-content" backgroundColor="transparent" />
+            <StatusBar translucent barStyle="light-content" backgroundColor="transparent" />
             <View style={styles.container}>
                 <ScrollView>
                     <Text style={styles.title}>
@@ -48,6 +49,14 @@ export const RuntimeScreen: React.FunctionComponent = () => {
                         </Text>
                         <Text style={styles.text(false)}>
                             {statusBar.width}x{statusBar.height}
+                        </Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Text style={styles.text(true)}>
+                            Navigation bar dimensions:
+                        </Text>
+                        <Text style={styles.text(false)}>
+                            {navigationBar.width}x{navigationBar.height}
                         </Text>
                     </View>
                     <View style={styles.row}>

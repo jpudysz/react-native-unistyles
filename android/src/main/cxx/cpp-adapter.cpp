@@ -19,7 +19,8 @@ Java_com_unistyles_UnistylesModule_nativeInstall(
         jstring colorScheme,
         jstring contentSizeCategory,
         jobject insets,
-        jobject statusBar
+        jobject statusBar,
+        jobject navigationBar
 ) {
     auto runtime = reinterpret_cast<facebook::jsi::Runtime *>(jsi);
 
@@ -44,7 +45,8 @@ Java_com_unistyles_UnistylesModule_nativeInstall(
         colorSchemeStr,
         contentSizeCategoryStr,
         jobjectToInsets(env, insets),
-        jobjectToDimensions(env, statusBar)
+        jobjectToDimensions(env, statusBar),
+        jobjectToDimensions(env, navigationBar)
     );
 
     unistylesRuntime->onThemeChange([=](const std::string &theme) {
@@ -57,7 +59,7 @@ Java_com_unistyles_UnistylesModule_nativeInstall(
         env->DeleteLocalRef(cls);
     });
 
-    unistylesRuntime->onLayoutChange([=](const std::string &breakpoint, const std::string &orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets) {
+    unistylesRuntime->onLayoutChange([=](const std::string &breakpoint, const std::string &orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets, Dimensions& navigationBar) {
         jstring breakpointStr = env->NewStringUTF(breakpoint.c_str());
         jstring orientationStr = env->NewStringUTF(orientation.c_str());
         jclass cls = env->GetObjectClass(unistylesModule);
@@ -65,13 +67,15 @@ Java_com_unistyles_UnistylesModule_nativeInstall(
         jmethodID dimensionsConstructor = env->GetMethodID(dimensionsClass, "<init>", "(II)V");
         jobject screenObj = env->NewObject(dimensionsClass, dimensionsConstructor, screen.width, screen.height);
         jobject statusBarObj = env->NewObject(dimensionsClass, dimensionsConstructor, statusBar.width, statusBar.height);
+        jobject navigationBarObj = env->NewObject(dimensionsClass, dimensionsConstructor, navigationBar.width, navigationBar.height);
 
         jclass insetsClass = env->FindClass("com/unistyles/Insets");
         jmethodID insetsConstructor = env->GetMethodID(insetsClass, "<init>", "(IIII)V");
         jobject insetsObj = env->NewObject(insetsClass, insetsConstructor, insets.left, insets.top, insets.right, insets.bottom);
-        jmethodID methodId = env->GetMethodID(cls, "onLayoutChange", "(Ljava/lang/String;Ljava/lang/String;Lcom/unistyles/Dimensions;Lcom/unistyles/Dimensions;Lcom/unistyles/Insets;)V");
+        jmethodID methodId = env->GetMethodID(cls, "onLayoutChange",
+                                              "(Ljava/lang/String;Ljava/lang/String;Lcom/unistyles/Dimensions;Lcom/unistyles/Dimensions;Lcom/unistyles/Insets;Lcom/unistyles/Dimensions;)V");
 
-        env->CallVoidMethod(unistylesModule, methodId, breakpointStr, orientationStr, screenObj, statusBarObj, insetsObj);
+        env->CallVoidMethod(unistylesModule, methodId, breakpointStr, orientationStr, screenObj, statusBarObj, insetsObj, navigationBarObj);
         env->DeleteLocalRef(breakpointStr);
         env->DeleteLocalRef(orientationStr);
         env->DeleteLocalRef(cls);
@@ -109,13 +113,14 @@ Java_com_unistyles_UnistylesModule_nativeDestroy(JNIEnv *env, jobject thiz) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_unistyles_UnistylesModule_nativeOnOrientationChange(JNIEnv *env, jobject thiz, jobject screen, jobject insets, jobject statusBar) {
+Java_com_unistyles_UnistylesModule_nativeOnOrientationChange(JNIEnv *env, jobject thiz, jobject screen, jobject insets, jobject statusBar, jobject navigationBar) {
     if (unistylesRuntime != nullptr) {
         Dimensions screenDimensions = jobjectToDimensions(env, screen);
         Dimensions statusBarDimensions = jobjectToDimensions(env, statusBar);
         Insets screenInsets = jobjectToInsets(env, insets);
+        Dimensions navigationBarDimensions = jobjectToDimensions(env, navigationBar);
 
-        unistylesRuntime->handleScreenSizeChange(screenDimensions, screenInsets, statusBarDimensions);
+        unistylesRuntime->handleScreenSizeChange(screenDimensions, screenInsets, statusBarDimensions, navigationBarDimensions);
     }
 }
 

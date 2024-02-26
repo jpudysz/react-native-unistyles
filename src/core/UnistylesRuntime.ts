@@ -93,6 +93,14 @@ export class UnistylesRuntime {
     }
 
     /**
+     * Get the navigation bar info (Android)
+     * @returns - The navigation bar size { width, height }
+     */
+    public get navigationBar() {
+        return this.unistylesBridge.navigationBar
+    }
+
+    /**
      * Get the screen orientation
      * @returns - The screen orientation
      */

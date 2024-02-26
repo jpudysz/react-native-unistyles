@@ -32,12 +32,13 @@ struct Insets {
 class JSI_EXPORT UnistylesRuntime : public jsi::HostObject {
 private:
     std::function<void(std::string)> onThemeChangeCallback;
-    std::function<void(std::string breakpoint, std::string orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets)> onLayoutChangeCallback;
+    std::function<void(std::string breakpoint, std::string orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets, Dimensions& navigationBar)> onLayoutChangeCallback;
     std::function<void(std::string)> onContentSizeCategoryChangeCallback;
     std::function<void()> onPluginChangeCallback;
 
     Dimensions screen;
     Dimensions statusBar;
+    Dimensions navigationBar;
     Insets insets;
     std::string colorScheme;
     std::string contentSizeCategory;
@@ -48,12 +49,14 @@ public:
         std::string colorScheme,
         std::string contentSizeCategory,
         Insets insets,
-        Dimensions statusBar
+        Dimensions statusBar,
+        Dimensions navigationBar
      ): screen(screen),
         colorScheme(colorScheme),
         contentSizeCategory(contentSizeCategory),
         insets(insets),
-        statusBar(statusBar) {}
+        statusBar(statusBar),
+        navigationBar(navigationBar) {}
 
     bool hasAdaptiveThemes;
     bool supportsAutomaticColorScheme;
@@ -68,7 +71,7 @@ public:
         this->onThemeChangeCallback = callback;
     }
 
-    void onLayoutChange(std::function<void(std::string breakpoint, std::string orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets)> callback) {
+    void onLayoutChange(std::function<void(std::string breakpoint, std::string orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets, Dimensions& navigationBar)> callback) {
         this->onLayoutChangeCallback = callback;
     }
 
@@ -84,7 +87,7 @@ public:
     void set(jsi::Runtime& runtime, const jsi::PropNameID& propNameId, const jsi::Value& value) override;
     std::vector<jsi::PropNameID> getPropertyNames(jsi::Runtime& runtime) override;
 
-    void handleScreenSizeChange(Dimensions& screen, Insets& insets, Dimensions& statusBar);
+    void handleScreenSizeChange(Dimensions& screen, Insets& insets, Dimensions& statusBar, Dimensions& navigationBar);
     void handleAppearanceChange(std::string colorScheme);
     void handleContentSizeCategoryChange(std::string contentSizeCategory);
 

@@ -8,7 +8,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.ViewTreeObserver
-import android.view.WindowManager
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactApplicationContext
@@ -68,15 +67,15 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
         val config = platform.getConfig()
 
-        // todo remove me 
+        // todo remove me
         Log.d("unistyes", "Emitting!")
 
         reactApplicationContext.runOnJSQueueThread {
             this.nativeOnOrientationChange(
                 config.screen,
                 config.insets,
-                config.statusBar
-                // todo add navigationBar
+                config.statusBar,
+                config.navigationBar
             )
             this.nativeOnAppearanceChange(config.colorScheme)
             this.nativeOnContentSizeCategoryChange(config.contentSizeCategory)
@@ -105,8 +104,8 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                     config.colorScheme,
                     config.contentSizeCategory,
                     config.insets,
-                    config.statusBar
-                    // todo add navigationBar
+                    config.statusBar,
+                    config.navigationBar
                 )
                 this.isCxxReady = true
 
@@ -127,16 +126,17 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         colorScheme: String,
         contentSizeCategory: String,
         insets: Insets,
-        statusBar: Dimensions
+        statusBar: Dimensions,
+        navigationBar: Dimensions
     )
     private external fun nativeDestroy()
-    private external fun nativeOnOrientationChange(screen: Dimensions, insets: Insets, statusBar: Dimensions)
+    private external fun nativeOnOrientationChange(screen: Dimensions, insets: Insets, statusBar: Dimensions, navigationBar: Dimensions)
     private external fun nativeOnAppearanceChange(colorScheme: String)
     private external fun nativeOnContentSizeCategoryChange(contentSizeCategory: String)
 
     //endregion
     //region Event emitter
-    private fun onLayoutChange(breakpoint: String, orientation: String, screen: Dimensions, statusBar: Dimensions, insets: Insets) {
+    private fun onLayoutChange(breakpoint: String, orientation: String, screen: Dimensions, statusBar: Dimensions, insets: Insets, navigationBar: Dimensions) {
         val body = Arguments.createMap().apply {
             putString("type", "layout")
             putMap("payload", Arguments.createMap().apply {
@@ -155,6 +155,10 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                     putInt("bottom", insets.bottom)
                     putInt("left", insets.left)
                     putInt("right", insets.right)
+                })
+                putMap("navigationBar", Arguments.createMap().apply {
+                    putInt("width", navigationBar.width)
+                    putInt("height", navigationBar.height)
                 })
             })
         }

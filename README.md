@@ -48,10 +48,13 @@
 [How to become a sponsor?](https://reactnativeunistyles.vercel.app/other/for-sponsors/)
 
 <a href="https://codemask.com">
-     <img src="https://avatars.githubusercontent.com/u/51229884?s=200&v=4" height="70px" width="70px" />
+    <img src="https://avatars.githubusercontent.com/u/51229884?s=200&v=4" height="70px" width="70px" alt="codemask" />
 </a>
 <a href="https://galaxies.dev">
-     <img src="https://avatars.githubusercontent.com/u/118431096?s=200&v=4" height="70px" width="70px" />
+     <img src="https://avatars.githubusercontent.com/u/118431096?s=200&v=4" height="70px" width="70px" alt="galaxies-dev" />
+</a>
+<a href="https://github.com/kmartinezmedia">
+     <img src="https://avatars.githubusercontent.com/u/6308123?s=200&v=4" height="70px" width="70px" alt="kmartinezmedia" />
 </a>
 
 
