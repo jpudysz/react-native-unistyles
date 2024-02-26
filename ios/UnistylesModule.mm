@@ -76,7 +76,8 @@ void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSel
         weakSelf.platform.initialColorScheme,
         weakSelf.platform.initialContentSizeCategory,
         weakSelf.platform.initialInsets,
-        weakSelf.platform.initialStatusBar
+        weakSelf.platform.initialStatusBar,
+        weakSelf.platform.initialNavigationBar
     );
 
     unistylesRuntime.get()->onThemeChange([=](std::string theme) {
@@ -90,7 +91,7 @@ void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSel
         [weakSelf emitEvent:@"__unistylesOnChange" withBody:body];
     });
 
-    unistylesRuntime.get()->onLayoutChange([=](std::string breakpoint, std::string orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets) {
+    unistylesRuntime.get()->onLayoutChange([=](std::string breakpoint, std::string orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets, Dimensions& navigationBar) {
         NSDictionary *body = @{
             @"type": @"layout",
             @"payload": @{
@@ -103,6 +104,10 @@ void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSel
                 @"statusBar": @{
                     @"width": @(statusBar.width),
                     @"height": @(statusBar.height)
+                },
+                @"navigationBar": @{
+                    @"width": @(navigationBar.width),
+                    @"height": @(navigationBar.height)
                 },
                 @"insets": @{
                     @"top": @(insets.top),

@@ -23,7 +23,8 @@ export const App: React.FunctionComponent = () => {
         removePlugin,
         updateTheme,
         insets,
-        statusBar
+        statusBar,
+        navigationBar
     } = UnistylesRuntime
 
     return (
@@ -56,6 +57,14 @@ export const App: React.FunctionComponent = () => {
                             </Text>
                             <Text style={styles.value}>
                                 {statusBar.width ?? '-'}x{statusBar.height ?? '-'}
+                            </Text>
+                        </View>
+                        <View style={styles.valueContainer}>
+                            <Text style={styles.valueName}>
+                                Navigation bar dimensions:
+                            </Text>
+                            <Text style={styles.value}>
+                                {navigationBar.width ?? '-'}x{navigationBar.height ?? '-'}
                             </Text>
                         </View>
                         <View style={styles.valueContainer}>

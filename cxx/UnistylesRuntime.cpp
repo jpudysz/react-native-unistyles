@@ -27,6 +27,7 @@ std::vector<jsi::PropNameID> UnistylesRuntime::getPropertyNames(jsi::Runtime& ru
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("enabledPlugins")));
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("insets")));
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("statusBar")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("navigationBar")));
 
     // setters
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("themes")));
@@ -256,6 +257,15 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
         return statusBar;
     }
 
+    if (propName == "navigationBar") {
+        auto navigationBarValue = jsi::Object(runtime);
+
+        navigationBarValue.setProperty(runtime, "width", this->navigationBar.width);
+        navigationBarValue.setProperty(runtime, "height", this->navigationBar.height);
+
+        return navigationBarValue;
+    }
+
     return jsi::Value::undefined();
 }
 
@@ -308,7 +318,7 @@ std::string UnistylesRuntime::getBreakpointFromScreenWidth(int width, const std:
     return sortedBreakpointPairs.empty() ? "" : sortedBreakpointPairs.back().first;
 }
 
-void UnistylesRuntime::handleScreenSizeChange(Dimensions& screen, Insets& insets, Dimensions& statusBar) {
+void UnistylesRuntime::handleScreenSizeChange(Dimensions& screen, Insets& insets, Dimensions& statusBar, Dimensions& navigationBar) {
     std::string breakpoint = this->getBreakpointFromScreenWidth(screen.width, this->sortedBreakpointPairs);
     bool shouldNotify = this->breakpoint != breakpoint || this->screen.width != screen.width || this->screen.height != screen.height;
     
@@ -316,13 +326,14 @@ void UnistylesRuntime::handleScreenSizeChange(Dimensions& screen, Insets& insets
     this->screen = {screen.width, screen.height};
     this->insets = {insets.top, insets.bottom, insets.left, insets.right};
     this->statusBar = {statusBar.width, statusBar.height};
+    this->navigationBar = {navigationBar.width, navigationBar.height};
 
     std::string orientation = screen.width > screen.height
         ? UnistylesOrientationLandscape
         : UnistylesOrientationPortrait;
 
     if (shouldNotify) {
-        this->onLayoutChangeCallback(breakpoint, orientation, screen, statusBar, insets);
+        this->onLayoutChangeCallback(breakpoint, orientation, screen, statusBar, insets, navigationBar);
     }
 }
 

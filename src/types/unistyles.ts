@@ -12,7 +12,7 @@ export type ScreenInsets = {
     left: number
 }
 
-export type StatusBarDimensions = {
+export type ScreenDimensions = {
     height: number,
     width: number
 }
@@ -36,7 +36,8 @@ export type UnistylesBridge = {
     contentSizeCategory: IOSContentSizeCategory | AndroidContentSizeCategory,
     sortedBreakpointPairs: Array<[keyof UnistylesBreakpoints, UnistylesBreakpoints[keyof UnistylesBreakpoints]]>,
     insets: ScreenInsets,
-    statusBar: StatusBarDimensions,
+    statusBar: ScreenDimensions,
+    navigationBar: ScreenDimensions
 
     // setters
     themes: Array<keyof UnistylesThemes>,
@@ -59,7 +60,8 @@ export type UnistylesMobileLayoutEvent = {
     type: UnistylesEventType.Layout,
     payload: {
         screen: ScreenSize,
-        statusBar: StatusBarDimensions,
+        statusBar: ScreenDimensions,
+        navigationBar: ScreenDimensions,
         intents: ScreenInsets,
         breakpoint: keyof UnistylesBreakpoints,
         orientation: typeof ScreenOrientation[keyof typeof ScreenOrientation]

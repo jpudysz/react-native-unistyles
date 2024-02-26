@@ -76,9 +76,10 @@
         Dimensions screen = {(int)mainScreen.bounds.size.width, (int)mainScreen.bounds.size.height};
         Insets insets = [self getInsets];
         Dimensions statusBar = [self getStatusBarDimensions];
+        Dimensions navigationBar = [self getNavigationBarDimensions];
 
         if (self.unistylesRuntime != nullptr) {
-            ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange(screen, insets, statusBar);
+            ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange(screen, insets, statusBar, navigationBar);
         }
     });
 }
@@ -110,6 +111,10 @@
     return {(int)statusBarFrame.size.width, (int)statusBarFrame.size.height};
 }
 
+- (Dimensions)getNavigationBarDimensions {
+    return {0, 0};
+}
+
 - (std::string)getContentSizeCategory:(UIContentSizeCategory)contentSizeCategory {
     if ([contentSizeCategory isEqualToString:UIContentSizeCategoryExtraExtraExtraLarge]) {
         return std::string([@"xxxLarge" UTF8String]);
@@ -137,6 +142,26 @@
     
     if ([contentSizeCategory isEqualToString:UIContentSizeCategoryExtraSmall]) {
         return std::string([@"xSmall" UTF8String]);
+    }
+    
+    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryAccessibilityMedium]) {
+        return std::string([@"accessibilityMedium" UTF8String]);
+    }
+    
+    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryAccessibilityLarge]) {
+        return std::string([@"accessibilityLarge" UTF8String]);
+    }
+    
+    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryAccessibilityExtraLarge]) {
+        return std::string([@"accessibilityExtraLarge" UTF8String]);
+    }
+    
+    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryAccessibilityExtraExtraLarge]) {
+        return std::string([@"accessibilityExtraExtraLarge" UTF8String]);
+    }
+    
+    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryAccessibilityExtraExtraExtraLarge]) {
+        return std::string([@"accessibilityExtraExtraExtraLarge" UTF8String]);
     }
     
     return std::string([@"unspecified" UTF8String]);

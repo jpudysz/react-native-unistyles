@@ -89,7 +89,8 @@ export default defineConfig({
                         },
                         {
                             label: 'Dimensions',
-                            link: '/reference/dimensions/'
+                            link: '/reference/dimensions/',
+                            badge: 'New'
                         },
                         {
                             label: 'Unistyles Registry',
@@ -97,11 +98,13 @@ export default defineConfig({
                         },
                         {
                             label: 'Unistyles Runtime',
-                            link: '/reference/unistyles-runtime/'
+                            link: '/reference/unistyles-runtime/',
+                            badge: 'New'
                         },
                         {
                             label: 'Content size category',
-                            link: '/reference/content-size-category/'
+                            link: '/reference/content-size-category/',
+                            badge: 'New'
                         },
                         {
                             label: 'Plugins',
@@ -160,7 +163,8 @@ export default defineConfig({
                         },
                         {
                             label: 'Sponsors',
-                            link: 'other/sponsors/'
+                            link: 'other/sponsors/',
+                            badge: 'New'
                         },
                         {
                             label: 'For Sponsors',

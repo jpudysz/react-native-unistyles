@@ -53,7 +53,9 @@ class UnistylesConfig(private val reactApplicationContext: ReactApplicationConte
             fontScale <= 1.0f -> "Default"
             fontScale <= 1.15f -> "Large"
             fontScale <= 1.3f -> "ExtraLarge"
-            else -> "Huge"
+            fontScale <= 1.5f -> "Huge"
+            fontScale <= 1.8 -> "ExtraHuge"
+            else -> "ExtraExtraHuge"
         }
 
         return contentSizeCategory

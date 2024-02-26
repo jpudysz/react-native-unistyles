@@ -16,6 +16,11 @@ export const ScreenOrientation = {
 } as const
 
 export enum IOSContentSizeCategory {
+    AccessibilityExtraExtraExtraLarge = 'accessibilityExtraExtraExtraLarge',
+    AccessibilityExtraExtraLarge = 'accessibilityExtraExtraLarge',
+    AccessibilityExtraLarge = 'accessibilityExtraLarge',
+    AccessibilityLarge = 'accessibilityLarge',
+    AccessibilityMedium = 'accessibilityMedium',
     ExtraExtraExtraLarge = 'xxxLarge',
     ExtraExtraLarge = 'xxLarge',
     ExtraLarge = 'xLarge',
@@ -31,7 +36,9 @@ export enum AndroidContentSizeCategory {
     Default = 'Default',
     Large = 'Large',
     ExtraLarge = 'ExtraLarge',
-    Huge = 'Huge'
+    Huge = 'Huge',
+    ExtraHuge = 'ExtraHuge',
+    ExtraExtraHuge = 'ExtraExtraHuge'
 }
 
 export enum UnistylesEventType {

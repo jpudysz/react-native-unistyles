@@ -21,6 +21,10 @@ export const useUnistyles = () => {
             width: unistyles.runtime.statusBar.width,
             height: unistyles.runtime.statusBar.height
         },
+        navigationBar: {
+            width: unistyles.runtime.navigationBar.width,
+            height: unistyles.runtime.navigationBar.height
+        },
         intents: {
             top: unistyles.runtime.insets.top,
             bottom: unistyles.runtime.insets.bottom,
@@ -47,7 +51,8 @@ export const useUnistyles = () => {
                             orientation: layoutEvent.payload.orientation,
                             screenSize: layoutEvent.payload.screen,
                             statusBar: layoutEvent.payload.statusBar,
-                            intents: layoutEvent.payload.intents
+                            intents: layoutEvent.payload.intents,
+                            navigationBar: layoutEvent.payload.navigationBar
                         })
                     }
                     case UnistylesEventType.Plugin: {
