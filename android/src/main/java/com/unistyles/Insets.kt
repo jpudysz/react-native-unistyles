@@ -84,7 +84,13 @@ class UnistylesInsets(private val reactApplicationContext: ReactApplicationConte
     }
 
     private fun getBottomInset(baseInsets: Insets, window: Window): Int {
-        return if (hasTranslucentNavigation(window) || hasFullScreenMode(window)) baseInsets.bottom else 0
+        val translucentNavigation = hasTranslucentNavigation(window)
+
+        if (hasFullScreenMode(window) && translucentNavigation) {
+            return baseInsets.bottom
+        }
+
+        return if (translucentNavigation) baseInsets.bottom else 0
     }
 
     private fun forceLandscapeInsets(baseInsets: Insets, window: Window): Boolean {

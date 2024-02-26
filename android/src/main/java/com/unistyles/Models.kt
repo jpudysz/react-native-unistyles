@@ -35,24 +35,14 @@ class Insets(var top: Int, var bottom: Int, var left: Int, var right: Int) {
     }
 }
 
-class Config(
+class LayoutConfig(
     val screen: Dimensions,
-    val colorScheme: String,
-    val contentSizeCategory: String,
     val insets: Insets,
     val statusBar: Dimensions,
     val navigationBar: Dimensions
 ) {
-    fun isEqual(config: Config): Boolean {
+    fun isEqual(config: LayoutConfig): Boolean {
         if (!this.screen.isEqual(config.screen)) {
-            return false
-        }
-
-        if (this.colorScheme != config.colorScheme) {
-            return false
-        }
-
-        if (this.contentSizeCategory != config.contentSizeCategory) {
             return false
         }
 
@@ -71,16 +61,29 @@ class Config(
         return buildString {
             append("screen=")
             append(screen)
-            append(" colorScheme=")
-            append(colorScheme)
-            append(" contentSizeCategory=")
-            append(contentSizeCategory)
             append(" insets=")
             append(insets)
             append(" statusBar=")
             append(statusBar)
             append(" navigationBar=")
             append(navigationBar)
+        }
+    }
+}
+
+class Config(
+    val colorScheme: String,
+    val contentSizeCategory: String,
+) {
+    var hasNewColorScheme: Boolean = false
+    var hasNewContentSizeCategory: Boolean = false
+
+    override fun toString(): String {
+        return buildString {
+            append(" colorScheme=")
+            append(colorScheme)
+            append(" contentSizeCategory=")
+            append(contentSizeCategory)
         }
     }
 }

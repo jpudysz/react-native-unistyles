@@ -8,6 +8,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.ViewTreeObserver
+import android.view.WindowManager
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactApplicationContext
@@ -18,10 +19,12 @@ import com.facebook.react.modules.core.DeviceEventManagerModule
 class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener {
     private var isCxxReady: Boolean = false
     private val platform: Platform = Platform(reactContext)
-    private val globalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+    private val preDrawListener = ViewTreeObserver.OnPreDrawListener {
         if (this.isCxxReady) {
-            this@UnistylesModule.onConfigChange()
+            this@UnistylesModule.onLayoutConfigChange()
         }
+
+        true
     }
 
     private val configurationChangeReceiver = object : BroadcastReceiver() {
@@ -46,14 +49,14 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     private fun setupLayoutListener() {
         val activity = currentActivity ?: return
-        activity.window.decorView.rootView.viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
+        activity.window.decorView.rootView.viewTreeObserver.addOnPreDrawListener(preDrawListener)
     }
 
     @Deprecated("Deprecated in Java")
     override fun onCatalystInstanceDestroy() {
         val activity = currentActivity ?: return
 
-        activity.window.decorView.rootView.viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
+        activity.window.decorView.rootView.viewTreeObserver.removeOnPreDrawListener(preDrawListener)
         reactApplicationContext.unregisterReceiver(configurationChangeReceiver)
         this.nativeDestroy()
     }
@@ -68,6 +71,27 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         val config = platform.getConfig()
 
         // todo remove me
+        Log.d("unistyes", "Emitting 2!")
+
+        reactApplicationContext.runOnJSQueueThread {
+            if (config.hasNewColorScheme) {
+                this.nativeOnAppearanceChange(config.colorScheme)
+            }
+
+            if (config.hasNewContentSizeCategory) {
+                this.nativeOnContentSizeCategoryChange(config.contentSizeCategory)
+            }
+        }
+    }
+
+    private fun onLayoutConfigChange() {
+        if (!platform.hasNewLayoutConfig()) {
+            return
+        }
+
+        val config = platform.getLayoutConfig()
+
+        // todo remove me
         Log.d("unistyes", "Emitting!")
 
         reactApplicationContext.runOnJSQueueThread {
@@ -77,8 +101,6 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                 config.statusBar,
                 config.navigationBar
             )
-            this.nativeOnAppearanceChange(config.colorScheme)
-            this.nativeOnContentSizeCategoryChange(config.contentSizeCategory)
         }
     }
 
@@ -89,6 +111,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         return try {
             System.loadLibrary("unistyles")
             val config = platform.getConfig()
+            val layoutConfig = platform.getLayoutConfig()
 
             // todo remove me
 //            val activity = currentActivity
@@ -100,12 +123,12 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             this.reactApplicationContext.javaScriptContextHolder?.let {
                 this.nativeInstall(
                     it.get(),
-                    config.screen,
+                    layoutConfig.screen,
                     config.colorScheme,
                     config.contentSizeCategory,
-                    config.insets,
-                    config.statusBar,
-                    config.navigationBar
+                    layoutConfig.insets,
+                    layoutConfig.statusBar,
+                    layoutConfig.navigationBar
                 )
                 this.isCxxReady = true
 
@@ -211,6 +234,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     fun removeListeners(count: Double) = Unit
     override fun onHostResume() {
         this.onConfigChange()
+        this.onLayoutConfigChange()
     }
 
     override fun onHostPause() {}
