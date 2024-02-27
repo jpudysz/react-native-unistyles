@@ -46,7 +46,6 @@ class UnistylesConfig(private val reactApplicationContext: ReactApplicationConte
         return this.lastLayoutConfig
     }
 
-    @SuppressLint("InternalInsetResource", "DiscouragedApi", "ObsoleteSdkInt")
     private fun getAppConfig(): Config {
         val fontScale = reactApplicationContext.resources.configuration.fontScale
 

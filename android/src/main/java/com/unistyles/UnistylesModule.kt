@@ -16,7 +16,6 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.modules.core.DeviceEventManagerModule
 
 class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener {
-    // debounce draw listener
     private val drawHandler = Handler(Looper.getMainLooper())
     private val debounceDuration = 250L
     private var runnable: Runnable? = null

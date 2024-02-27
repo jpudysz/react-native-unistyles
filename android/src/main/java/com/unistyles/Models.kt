@@ -13,6 +13,7 @@ class Dimensions(var width: Int, var height: Int) {
         return "${width}x${height}"
     }
 }
+
 class Insets(var top: Int, var bottom: Int, var left: Int, var right: Int) {
     fun isEqual(insets: Insets): Boolean {
         if (this.top != insets.top) {
