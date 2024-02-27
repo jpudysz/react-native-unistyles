@@ -176,6 +176,11 @@ const stylesheet = createStyleSheet(theme => ({
 If you specify a boolean variants like "true", there is no requirement to specify a "false" variant (and vice versa).
 You can mix boolean variants with other variants as well.
 
+:::caution
+Boolean variants respects other rules, eg. `false` is not equal to `default`. To select `false` variant you need to pass `false` as a value,
+to fallback to `default` variant you need to pass `undefined` or `{}`.
+:::
+
 ## Default variant
 
 You can define a `default` variant that will be used when you don't pass any variant to the `useStyles` hook:

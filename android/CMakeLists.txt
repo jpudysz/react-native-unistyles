@@ -6,6 +6,7 @@ add_library(unistyles
     SHARED
     ../cxx/UnistylesRuntime.cpp
     ./src/main/cxx/cpp-adapter.cpp
+    ./src/main/cxx/helpers.cpp
 )
 
 include_directories(

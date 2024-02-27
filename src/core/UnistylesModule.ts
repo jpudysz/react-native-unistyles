@@ -1,6 +1,6 @@
 import { NativeEventEmitter, NativeModules } from 'react-native'
 import type { UnistylesThemes, UnistylesBreakpoints } from 'react-native-unistyles'
-import type { ColorSchemeName } from '../types'
+import type { ColorSchemeName, ScreenInsets, ScreenDimensions } from '../types'
 import { normalizeWebStylesPlugin } from '../plugins'
 import { isServer } from '../common'
 
@@ -19,6 +19,20 @@ export class UnistylesBridgeWeb {
     #sortedBreakpointPairs: Array<[keyof UnistylesBreakpoints, number]> = []
     #breakpoint: keyof UnistylesBreakpoints = '' as keyof UnistylesBreakpoints
     #contentSizeCategory: string = 'unspecified'
+    #insets: ScreenInsets = {
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0
+    }
+    #statusBar: ScreenDimensions = {
+        height: 0,
+        width: 0
+    }
+    #navigationBar: ScreenDimensions = {
+        height: 0,
+        width: 0
+    }
 
     constructor() {
         if (!isServer) {
@@ -54,6 +68,12 @@ export class UnistylesBridgeWeb {
                         return this.#enabledPlugins
                     case 'colorScheme':
                         return this.#colorScheme
+                    case 'insets':
+                        return this.#insets
+                    case 'statusBar':
+                        return this.#statusBar
+                    case 'navigationBar':
+                        return this.#navigationBar
                     case 'useTheme':
                         return (themeName: keyof UnistylesThemes) => this.useTheme(themeName)
                     case 'updateTheme':

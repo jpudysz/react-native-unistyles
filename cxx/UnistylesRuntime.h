@@ -2,6 +2,7 @@
 
 #include <jsi/jsi.h>
 #include <vector>
+#include <map>
 
 using namespace facebook;
 
@@ -16,25 +17,46 @@ const std::string UnistylesErrorBreakpointsCannotBeEmpty = "You are trying to re
 const std::string UnistylesErrorBreakpointsMustStartFromZero = "You are trying to register breakpoints that don't start from 0";
 const std::string UnistylesErrorThemesCannotBeEmpty = "You are trying to register empty themes object";
 
+struct Dimensions {
+    int width;
+    int height;
+};
+
+struct Insets {
+    int top;
+    int bottom;
+    int left;
+    int right;
+};
+
 class JSI_EXPORT UnistylesRuntime : public jsi::HostObject {
 private:
     std::function<void(std::string)> onThemeChangeCallback;
-    std::function<void(std::string breakpoint, std::string orientation, int screenWidth, int screenHeight)> onLayoutChangeCallback;
+    std::function<void(std::string breakpoint, std::string orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets, Dimensions& navigationBar)> onLayoutChangeCallback;
     std::function<void(std::string)> onContentSizeCategoryChangeCallback;
     std::function<void()> onPluginChangeCallback;
 
-    int screenWidth;
-    int screenHeight;
+    Dimensions screen;
+    Dimensions statusBar;
+    Dimensions navigationBar;
+    Insets insets;
     std::string colorScheme;
     std::string contentSizeCategory;
 
 public:
     UnistylesRuntime(
-        int screenWidth,
-        int screenHeight,
+        Dimensions screen,
         std::string colorScheme,
-        std::string contentSizeCategory
-    ): screenWidth(screenWidth), screenHeight(screenHeight), colorScheme(colorScheme), contentSizeCategory(contentSizeCategory) {}
+        std::string contentSizeCategory,
+        Insets insets,
+        Dimensions statusBar,
+        Dimensions navigationBar
+     ): screen(screen),
+        colorScheme(colorScheme),
+        contentSizeCategory(contentSizeCategory),
+        insets(insets),
+        statusBar(statusBar),
+        navigationBar(navigationBar) {}
 
     bool hasAdaptiveThemes;
     bool supportsAutomaticColorScheme;
@@ -49,14 +71,14 @@ public:
         this->onThemeChangeCallback = callback;
     }
 
-    void onLayoutChange(std::function<void(std::string breakpoint, std::string orientation, int screenWidth, int screenHeight)> callback) {
+    void onLayoutChange(std::function<void(std::string breakpoint, std::string orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets, Dimensions& navigationBar)> callback) {
         this->onLayoutChangeCallback = callback;
     }
 
     void onPluginChange(std::function<void()> callback) {
         this->onPluginChangeCallback = callback;
     }
-    
+
     void onContentSizeCategoryChange(std::function<void(std::string)> callback) {
         this->onContentSizeCategoryChangeCallback = callback;
     }
@@ -65,7 +87,7 @@ public:
     void set(jsi::Runtime& runtime, const jsi::PropNameID& propNameId, const jsi::Value& value) override;
     std::vector<jsi::PropNameID> getPropertyNames(jsi::Runtime& runtime) override;
 
-    void handleScreenSizeChange(int width, int height);
+    void handleScreenSizeChange(Dimensions& screen, Insets& insets, Dimensions& statusBar, Dimensions& navigationBar);
     void handleAppearanceChange(std::string colorScheme);
     void handleContentSizeCategoryChange(std::string contentSizeCategory);
 

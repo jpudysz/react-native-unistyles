@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, ScrollView } from 'react-native'
+import { View, Text, ScrollView, StatusBar } from 'react-native'
 import { UnistylesRuntime, createStyleSheet, useStyles } from 'react-native-unistyles'
 import { Button, DemoScreen } from '../components'
 import { autoGuidelinePlugin } from '../plugins'
@@ -18,12 +18,16 @@ export const RuntimeScreen: React.FunctionComponent = () => {
         removePlugin,
         addPlugin,
         setTheme,
-        setAdaptiveThemes
+        setAdaptiveThemes,
+        insets,
+        statusBar,
+        navigationBar
     } = UnistylesRuntime
     const { styles, theme } = useStyles(stylesheet)
 
     return (
         <DemoScreen>
+            <StatusBar translucent barStyle="light-content" backgroundColor="transparent" />
             <View style={styles.container}>
                 <ScrollView>
                     <Text style={styles.title}>
@@ -35,6 +39,30 @@ export const RuntimeScreen: React.FunctionComponent = () => {
                         </Text>
                         <Text style={styles.text(false)}>
                             {screen.width}x{screen.height}
+                        </Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Text style={styles.text(true)}>
+                            Status bar dimensions:
+                        </Text>
+                        <Text style={styles.text(false)}>
+                            {statusBar.width}x{statusBar.height}
+                        </Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Text style={styles.text(true)}>
+                            Navigation bar dimensions:
+                        </Text>
+                        <Text style={styles.text(false)}>
+                            {navigationBar.width}x{navigationBar.height}
+                        </Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Text style={styles.text(true)}>
+                            Insets:
+                        </Text>
+                        <Text style={styles.text(false)}>
+                            T:{insets.top} B:{insets.bottom} R:{insets.right} L:{insets.left}
                         </Text>
                     </View>
                     <View style={styles.row}>
@@ -147,6 +175,10 @@ export const RuntimeScreen: React.FunctionComponent = () => {
                     <View style={styles.fakeSpacer} />
                 </ScrollView>
             </View>
+            <View style={styles.topInset} />
+            <View style={styles.bottomInset} />
+            <View style={styles.leftInset} />
+            <View style={styles.rightInset} />
         </DemoScreen>
     )
 }
@@ -193,5 +225,37 @@ const stylesheet = createStyleSheet(theme => ({
     },
     fakeSpacer: {
         height: 100
+    },
+    topInset: {
+        position: 'absolute',
+        top: UnistylesRuntime.insets.top,
+        left: 0,
+        right: 0,
+        height: 1,
+        backgroundColor: theme.colors.accent
+    },
+    bottomInset: {
+        position: 'absolute',
+        bottom: UnistylesRuntime.insets.bottom,
+        left: 0,
+        right: 0,
+        height: 1,
+        backgroundColor: theme.colors.accent
+    },
+    leftInset: {
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: UnistylesRuntime.insets.left,
+        width: 1,
+        backgroundColor: theme.colors.accent
+    },
+    rightInset: {
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        right: UnistylesRuntime.insets.right,
+        width: 1,
+        backgroundColor: theme.colors.accent
     }
 }))

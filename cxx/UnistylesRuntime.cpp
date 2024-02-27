@@ -25,6 +25,9 @@ std::vector<jsi::PropNameID> UnistylesRuntime::getPropertyNames(jsi::Runtime& ru
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("addPlugin")));
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("removePlugin")));
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("enabledPlugins")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("insets")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("statusBar")));
+    properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("navigationBar")));
 
     // setters
     properties.push_back(jsi::PropNameID::forUtf8(runtime, std::string("themes")));
@@ -36,17 +39,17 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
     std::string propName = propNameId.utf8(runtime);
 
     if (propName == "screenWidth") {
-        return jsi::Value(this->screenWidth);
+        return jsi::Value(this->screen.width);
     }
 
     if (propName == "screenHeight") {
-        return jsi::Value(this->screenHeight);
+        return jsi::Value(this->screen.height);
     }
 
     if (propName == "hasAdaptiveThemes") {
         return jsi::Value(this->hasAdaptiveThemes);
     }
-    
+
     if (propName == "contentSizeCategory") {
         return jsi::Value(jsi::String::createFromUtf8(runtime, this->contentSizeCategory));
     }
@@ -66,14 +69,14 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
     if (propName == "colorScheme") {
         return jsi::Value(jsi::String::createFromUtf8(runtime, this->colorScheme));
     }
-    
+
     if (propName == "enabledPlugins") {
         auto jsiArray = facebook::jsi::Array(runtime, this->pluginNames.size());
-        
+
         for (size_t i = 0; i < this->pluginNames.size(); i++) {
             jsiArray.setValueAtIndex(runtime, i, facebook::jsi::String::createFromUtf8(runtime, this->pluginNames[i]));
         }
-        
+
         return jsiArray;
     }
 
@@ -91,7 +94,7 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
 
         return jsi::Value(runtime, *sortedBreakpointEntriesArray);
     }
-    
+
     if (propName == "addPlugin") {
         return jsi::Function::createFromHostFunction(
             runtime,
@@ -100,19 +103,19 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
             [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
                 std::string pluginName = arguments[0].asString(runtime).utf8(runtime);
                 bool notify = arguments[1].asBool();
-                
+
                 this->pluginNames.push_back(pluginName);
-                
+
                 // registry enabled plugins won't notify listeners
                 if (notify) {
                     this->onPluginChangeCallback();
                 }
-                
+
                 return jsi::Value::undefined();
             }
         );
     }
-    
+
     if (propName == "removePlugin") {
         return jsi::Function::createFromHostFunction(
             runtime,
@@ -120,14 +123,14 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
             1,
             [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
                 std::string pluginName = arguments[0].asString(runtime).utf8(runtime);
-                
+
                 auto it = std::find(this->pluginNames.begin(), this->pluginNames.end(), pluginName);
-                
+
                 if (it != this->pluginNames.end()) {
                     this->pluginNames.erase(it);
                     this->onPluginChangeCallback();
                 }
- 
+
                 return jsi::Value::undefined();
             }
         );
@@ -169,7 +172,7 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
 
                 this->sortedBreakpointPairs = sortedBreakpointEntriesVec;
 
-                std::string breakpoint = this->getBreakpointFromScreenWidth(this->screenWidth, sortedBreakpointEntriesVec);
+                std::string breakpoint = this->getBreakpointFromScreenWidth(this->screen.width, sortedBreakpointEntriesVec);
 
                 this->breakpoint = breakpoint;
 
@@ -189,12 +192,12 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                     this->themeName = themeName;
                     this->onThemeChangeCallback(themeName);
                 }
-            
+
                 return jsi::Value::undefined();
             }
         );
     }
-    
+
     if (propName == "updateTheme") {
         return jsi::Function::createFromHostFunction(runtime,
             jsi::PropNameID::forAscii(runtime, "updateTheme"),
@@ -205,7 +208,7 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                 if (this->themeName == themeName) {
                     this->onThemeChangeCallback(themeName);
                 }
-            
+
                 return jsi::Value::undefined();
             }
         );
@@ -223,7 +226,7 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                 if (!enableAdaptiveThemes || !this->supportsAutomaticColorScheme) {
                     return jsi::Value::undefined();
                 }
-            
+
                 if (this->themeName != this->colorScheme) {
                     this->themeName = this->colorScheme;
                     this->onThemeChangeCallback(this->themeName);
@@ -232,6 +235,35 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                 return jsi::Value::undefined();
             }
         );
+    }
+
+    if (propName == "insets") {
+        auto insets = jsi::Object(runtime);
+
+        insets.setProperty(runtime, "top", this->insets.top);
+        insets.setProperty(runtime, "bottom", this->insets.bottom);
+        insets.setProperty(runtime, "left", this->insets.left);
+        insets.setProperty(runtime, "right", this->insets.right);
+
+        return insets;
+    }
+
+    if (propName == "statusBar") {
+        auto statusBar = jsi::Object(runtime);
+
+        statusBar.setProperty(runtime, "width", this->statusBar.width);
+        statusBar.setProperty(runtime, "height", this->statusBar.height);
+
+        return statusBar;
+    }
+
+    if (propName == "navigationBar") {
+        auto navigationBarValue = jsi::Object(runtime);
+
+        navigationBarValue.setProperty(runtime, "width", this->navigationBar.width);
+        navigationBarValue.setProperty(runtime, "height", this->navigationBar.height);
+
+        return navigationBarValue;
     }
 
     return jsi::Value::undefined();
@@ -286,20 +318,27 @@ std::string UnistylesRuntime::getBreakpointFromScreenWidth(int width, const std:
     return sortedBreakpointPairs.empty() ? "" : sortedBreakpointPairs.back().first;
 }
 
-void UnistylesRuntime::handleScreenSizeChange(int width, int height) {
-    std::string breakpoint = this->getBreakpointFromScreenWidth(width, this->sortedBreakpointPairs);
-    bool shouldNotify = this->breakpoint != breakpoint || this->screenWidth != width || this->screenHeight != height;
-    
-    this->breakpoint = breakpoint;
-    this->screenWidth = width;
-    this->screenHeight = height;
+void UnistylesRuntime::handleScreenSizeChange(Dimensions& screen, Insets& insets, Dimensions& statusBar, Dimensions& navigationBar) {
+    std::string breakpoint = this->getBreakpointFromScreenWidth(screen.width, this->sortedBreakpointPairs);
+    bool hasDifferentBreakpoint = this->breakpoint != breakpoint;
+    bool hasDifferentScreenDimensions = this->screen.width != screen.width || this->screen.height != screen.height;
+    bool hasDifferentInsets = this->insets.top != insets.top || this->insets.bottom != insets.bottom || this->insets.left != insets.left || this->insets.right != insets.right;
 
-    std::string orientation = width > height
+    // we don't need to check statusBar/navigationBar as they will only change on orientation change witch is equal to hasDifferentScreenDimensions
+    bool shouldNotify = hasDifferentBreakpoint || hasDifferentScreenDimensions || hasDifferentInsets;
+
+    this->breakpoint = breakpoint;
+    this->screen = {screen.width, screen.height};
+    this->insets = {insets.top, insets.bottom, insets.left, insets.right};
+    this->statusBar = {statusBar.width, statusBar.height};
+    this->navigationBar = {navigationBar.width, navigationBar.height};
+
+    std::string orientation = screen.width > screen.height
         ? UnistylesOrientationLandscape
         : UnistylesOrientationPortrait;
 
     if (shouldNotify) {
-        this->onLayoutChangeCallback(breakpoint, orientation, width, height);
+        this->onLayoutChangeCallback(breakpoint, orientation, screen, statusBar, insets, navigationBar);
     }
 }
 
@@ -309,7 +348,7 @@ void UnistylesRuntime::handleAppearanceChange(std::string colorScheme) {
     if (!this->supportsAutomaticColorScheme || !this->hasAdaptiveThemes) {
         return;
     }
-    
+
     if (this->themeName != this->colorScheme) {
         this->onThemeChangeCallback(this->colorScheme);
         this->themeName = this->colorScheme;
