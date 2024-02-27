@@ -8,7 +8,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.ViewTreeObserver
-import android.view.WindowManager
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactApplicationContext
@@ -116,12 +115,6 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             System.loadLibrary("unistyles")
             val config = platform.getConfig()
             val layoutConfig = platform.getLayoutConfig()
-
-            // todo remove me
-//            val activity = currentActivity
-//            activity?.runOnUiThread {
-//                activity.window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-//            }
 
             this.setupLayoutListener()
             this.reactApplicationContext.javaScriptContextHolder?.let {
