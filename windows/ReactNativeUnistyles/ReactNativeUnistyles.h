@@ -18,8 +18,7 @@ using namespace winrt::Windows::UI::Core;
 using namespace facebook;
 
 struct UIInitialInfo {
-    int screenWidth;
-    int screenHeight;
+    Dimensions screen;
     std::string colorScheme;
     std::string contentSizeCategory;
 };
@@ -39,7 +38,9 @@ struct Unistyles {
                 auto bounds = Window::Current().Bounds();
 
                 if (this->unistylesRuntime != nullptr) {
-                    ((UnistylesRuntime*)this->unistylesRuntime)->handleScreenSizeChange((int)bounds.Width, (int)bounds.Height, this->getInsets(), this->getStatusBarDimensions());
+                    Dimensions screenDimensions = Dimensions{(int)bounds.Width, (int)bounds.Height};
+
+                    ((UnistylesRuntime*)this->unistylesRuntime)->handleScreenSizeChange(screenDimensions, this->getInsets(), this->getStatusBarDimensions(), this->getNavigationBarDimensions());
                 }
             }));
 
@@ -80,8 +81,7 @@ struct Unistyles {
             UIInitialInfo uiMetadata;
             auto bounds = Window::Current().Bounds();
 
-            uiMetadata.screenWidth = bounds.Width;
-            uiMetadata.screenHeight = bounds.Height;
+            uiMetadata.screen = Dimensions{(int)bounds.Width, (int)bounds.Height};
             uiMetadata.colorScheme = this->getColorScheme();
             uiMetadata.contentSizeCategory = UnistylesUnspecifiedScheme;
 
@@ -91,12 +91,12 @@ struct Unistyles {
         UIInitialInfo uiInfo = uiInfoFuture.get();
 
         auto unistylesRuntime = std::make_shared<UnistylesRuntime>(
-            uiInfo.screenWidth,
-            uiInfo.screenHeight,
+            uiInfo.screen,
             uiInfo.colorScheme,
             uiInfo.contentSizeCategory,
             this->getInsets(),
-            this->getStatusBarDimensions()
+            this->getStatusBarDimensions(),
+            this->getNavigationBarDimensions()
         );
 
         unistylesRuntime->onThemeChange([this](std::string theme) {
@@ -110,16 +110,30 @@ struct Unistyles {
             this->OnThemeChange(payload);
         });
 
-        unistylesRuntime.get()->onLayoutChange([this](std::string breakpoint, std::string orientation, int width, int height) {
+        unistylesRuntime.get()->onLayoutChange([this](std::string breakpoint, std::string orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets, Dimensions& navigationBar) {
             auto payload = winrt::Microsoft::ReactNative::JSValueObject{
                 {"type", "layout"},
                 {"payload", winrt::Microsoft::ReactNative::JSValueObject{
                     {"breakpoint", breakpoint},
                     {"orientation", orientation},
                     {"screen", winrt::Microsoft::ReactNative::JSValueObject{
-                        {"width", width},
-                        {"height", height}
-                    }}
+                        {"width", screen.width},
+                        {"height", screen.height}
+                    }},
+                    {"statusBar", winrt::Microsoft::ReactNative::JSValueObject{
+                        {"width", statusBar.width},
+                        {"height", statusBar.height}
+                    }},
+                    {"navigationBar", winrt::Microsoft::ReactNative::JSValueObject{
+                        {"width", navigationBar.width},
+                        {"height", navigationBar.height}
+                    }},
+                    {"insets", winrt::Microsoft::ReactNative::JSValueObject{
+                        {"top", insets.top},
+                        {"bottom", insets.bottom},
+                        {"left", insets.left},
+                        {"right", insets.right}
+                    }},
                 }}
             };
 
@@ -195,24 +209,16 @@ struct Unistyles {
             return UnistylesUnspecifiedScheme;
         }
 
-        std::map<std::string, int>getInsets() {
-            std::map<std::string, int> insets;
-
-            insets.insert({ "top", 0 });
-            insets.insert({ "bottom", 0 });
-            insets.insert({ "left", 0 });
-            insets.insert({ "right", 0 });
-
-            return insets;
+        Insets getInsets() {
+            return Insets{ 0, 0, 0, 0 };
         }
 
-        std::map<std::string, int>getStatusBarDimensions() {
-            std::map<std::string, int> statusBar;
+        Dimensions getStatusBarDimensions() {
+            return {0, 0};
+        }
 
-            statusBar.insert({ "height", 0 });
-            statusBar.insert({ "width", 0 });
-
-            return statusBar;
+        Dimensions getNavigationBarDimensions() {
+            return { 0, 0 };
         }
 };
 
