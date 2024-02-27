@@ -49,7 +49,7 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
     if (propName == "hasAdaptiveThemes") {
         return jsi::Value(this->hasAdaptiveThemes);
     }
-    
+
     if (propName == "contentSizeCategory") {
         return jsi::Value(jsi::String::createFromUtf8(runtime, this->contentSizeCategory));
     }
@@ -69,14 +69,14 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
     if (propName == "colorScheme") {
         return jsi::Value(jsi::String::createFromUtf8(runtime, this->colorScheme));
     }
-    
+
     if (propName == "enabledPlugins") {
         auto jsiArray = facebook::jsi::Array(runtime, this->pluginNames.size());
-        
+
         for (size_t i = 0; i < this->pluginNames.size(); i++) {
             jsiArray.setValueAtIndex(runtime, i, facebook::jsi::String::createFromUtf8(runtime, this->pluginNames[i]));
         }
-        
+
         return jsiArray;
     }
 
@@ -94,7 +94,7 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
 
         return jsi::Value(runtime, *sortedBreakpointEntriesArray);
     }
-    
+
     if (propName == "addPlugin") {
         return jsi::Function::createFromHostFunction(
             runtime,
@@ -103,19 +103,19 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
             [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
                 std::string pluginName = arguments[0].asString(runtime).utf8(runtime);
                 bool notify = arguments[1].asBool();
-                
+
                 this->pluginNames.push_back(pluginName);
-                
+
                 // registry enabled plugins won't notify listeners
                 if (notify) {
                     this->onPluginChangeCallback();
                 }
-                
+
                 return jsi::Value::undefined();
             }
         );
     }
-    
+
     if (propName == "removePlugin") {
         return jsi::Function::createFromHostFunction(
             runtime,
@@ -123,14 +123,14 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
             1,
             [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
                 std::string pluginName = arguments[0].asString(runtime).utf8(runtime);
-                
+
                 auto it = std::find(this->pluginNames.begin(), this->pluginNames.end(), pluginName);
-                
+
                 if (it != this->pluginNames.end()) {
                     this->pluginNames.erase(it);
                     this->onPluginChangeCallback();
                 }
- 
+
                 return jsi::Value::undefined();
             }
         );
@@ -192,12 +192,12 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                     this->themeName = themeName;
                     this->onThemeChangeCallback(themeName);
                 }
-            
+
                 return jsi::Value::undefined();
             }
         );
     }
-    
+
     if (propName == "updateTheme") {
         return jsi::Function::createFromHostFunction(runtime,
             jsi::PropNameID::forAscii(runtime, "updateTheme"),
@@ -208,7 +208,7 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                 if (this->themeName == themeName) {
                     this->onThemeChangeCallback(themeName);
                 }
-            
+
                 return jsi::Value::undefined();
             }
         );
@@ -226,7 +226,7 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                 if (!enableAdaptiveThemes || !this->supportsAutomaticColorScheme) {
                     return jsi::Value::undefined();
                 }
-            
+
                 if (this->themeName != this->colorScheme) {
                     this->themeName = this->colorScheme;
                     this->onThemeChangeCallback(this->themeName);
@@ -236,24 +236,24 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
             }
         );
     }
-    
+
     if (propName == "insets") {
         auto insets = jsi::Object(runtime);
-        
+
         insets.setProperty(runtime, "top", this->insets.top);
         insets.setProperty(runtime, "bottom", this->insets.bottom);
         insets.setProperty(runtime, "left", this->insets.left);
         insets.setProperty(runtime, "right", this->insets.right);
-        
+
         return insets;
     }
-    
+
     if (propName == "statusBar") {
         auto statusBar = jsi::Object(runtime);
 
         statusBar.setProperty(runtime, "width", this->statusBar.width);
         statusBar.setProperty(runtime, "height", this->statusBar.height);
-        
+
         return statusBar;
     }
 
@@ -320,8 +320,13 @@ std::string UnistylesRuntime::getBreakpointFromScreenWidth(int width, const std:
 
 void UnistylesRuntime::handleScreenSizeChange(Dimensions& screen, Insets& insets, Dimensions& statusBar, Dimensions& navigationBar) {
     std::string breakpoint = this->getBreakpointFromScreenWidth(screen.width, this->sortedBreakpointPairs);
-    bool shouldNotify = this->breakpoint != breakpoint || this->screen.width != screen.width || this->screen.height != screen.height;
-    
+    bool hasDifferentBreakpoint = this->breakpoint != breakpoint;
+    bool hasDifferentScreenDimensions = this->screen.width != screen.width || this->screen.height != screen.height;
+    bool hasDifferentInsets = this->insets.top != insets.top || this->insets.bottom != insets.bottom || this->insets.left != insets.left || this->insets.right != insets.right;
+
+    // we don't need to check statusBar/navigationBar as they will only change on orientation change witch is equal to hasDifferentScreenDimensions
+    bool shouldNotify = hasDifferentBreakpoint || hasDifferentScreenDimensions || hasDifferentInsets;
+
     this->breakpoint = breakpoint;
     this->screen = {screen.width, screen.height};
     this->insets = {insets.top, insets.bottom, insets.left, insets.right};
@@ -343,7 +348,7 @@ void UnistylesRuntime::handleAppearanceChange(std::string colorScheme) {
     if (!this->supportsAutomaticColorScheme || !this->hasAdaptiveThemes) {
         return;
     }
-    
+
     if (this->themeName != this->colorScheme) {
         this->onThemeChangeCallback(this->colorScheme);
         this->themeName = this->colorScheme;

@@ -79,11 +79,6 @@ class Config(
     var hasNewContentSizeCategory: Boolean = false
 
     override fun toString(): String {
-        return buildString {
-            append(" colorScheme=")
-            append(colorScheme)
-            append(" contentSizeCategory=")
-            append(contentSizeCategory)
-        }
+        return "colorScheme=${colorScheme} contentSizeCategory:${contentSizeCategory}"
     }
 }
