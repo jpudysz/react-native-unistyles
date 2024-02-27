@@ -8,7 +8,9 @@ enum AppContentSizeCategory {
     Small = 'Small',
     Medium = 'Medium',
     Large = 'Large',
-    xLarge = 'xLarge'
+    xLarge = 'xLarge',
+    xxLarge = 'xxLarge',
+    xxxLarge = 'xxxLarge'
 }
 
 const getUnifiedContentSizeCategory = (contentSizeCategory: IOSContentSizeCategory | AndroidContentSizeCategory) => {
@@ -19,11 +21,19 @@ const getUnifiedContentSizeCategory = (contentSizeCategory: IOSContentSizeCatego
             case IOSContentSizeCategory.Small:
                 return AppContentSizeCategory.Small
             case IOSContentSizeCategory.Medium:
+            case IOSContentSizeCategory.AccessibilityMedium:
                 return AppContentSizeCategory.Medium
             case IOSContentSizeCategory.Large:
+            case IOSContentSizeCategory.AccessibilityLarge:
                 return AppContentSizeCategory.Large
-            default:
+            case IOSContentSizeCategory.ExtraLarge:
+            case IOSContentSizeCategory.AccessibilityExtraLarge:
                 return AppContentSizeCategory.xLarge
+            case IOSContentSizeCategory.ExtraExtraLarge:
+            case IOSContentSizeCategory.AccessibilityExtraExtraLarge:
+                return AppContentSizeCategory.xxLarge
+            default:
+                return AppContentSizeCategory.xxxLarge
         }
     }
 
@@ -34,8 +44,12 @@ const getUnifiedContentSizeCategory = (contentSizeCategory: IOSContentSizeCatego
             return AppContentSizeCategory.Medium
         case AndroidContentSizeCategory.Large:
             return AppContentSizeCategory.Large
-        default:
+        case AndroidContentSizeCategory.ExtraLarge:
             return AppContentSizeCategory.xLarge
+        case AndroidContentSizeCategory.Huge:
+            return AppContentSizeCategory.xxLarge
+        default:
+            return AppContentSizeCategory.xxxLarge
     }
 }
 
@@ -83,6 +97,14 @@ const stylesheet = createStyleSheet(theme => ({
                 xLarge: {
                     padding: 32,
                     backgroundColor: '#833471'
+                },
+                xxLarge: {
+                    padding: 64,
+                    backgroundColor: '#6F1E51'
+                },
+                xxxLarge: {
+                    padding: 128,
+                    backgroundColor: '#5B2C6F'
                 }
             }
         }

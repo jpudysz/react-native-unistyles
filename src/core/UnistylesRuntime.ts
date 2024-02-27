@@ -77,6 +77,30 @@ export class UnistylesRuntime {
     }
 
     /**
+     * Get the safe area insets
+     * @returns - The safe area insets { top, bottom, left, right }
+     */
+    public get insets() {
+        return this.unistylesBridge.insets
+    }
+
+    /**
+     * Get the status bar info
+     * @returns - The status bar size { width, height }
+     */
+    public get statusBar() {
+        return this.unistylesBridge.statusBar
+    }
+
+    /**
+     * Get the navigation bar info (Android)
+     * @returns - The navigation bar size { width, height }
+     */
+    public get navigationBar() {
+        return this.unistylesBridge.navigationBar
+    }
+
+    /**
      * Get the screen orientation
      * @returns - The screen orientation
      */

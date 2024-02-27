@@ -72,10 +72,12 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
 
 void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSelf) {
     auto unistylesRuntime = std::make_shared<UnistylesRuntime>(
-        (int)weakSelf.platform.initialWidth,
-        (int)weakSelf.platform.initialHeight,
+        weakSelf.platform.initialScreen,
         weakSelf.platform.initialColorScheme,
-        weakSelf.platform.initialContentSizeCategory
+        weakSelf.platform.initialContentSizeCategory,
+        weakSelf.platform.initialInsets,
+        weakSelf.platform.initialStatusBar,
+        weakSelf.platform.initialNavigationBar
     );
 
     unistylesRuntime.get()->onThemeChange([=](std::string theme) {
@@ -89,15 +91,29 @@ void registerUnistylesHostObject(jsi::Runtime &runtime, UnistylesModule* weakSel
         [weakSelf emitEvent:@"__unistylesOnChange" withBody:body];
     });
 
-    unistylesRuntime.get()->onLayoutChange([=](std::string breakpoint, std::string orientation, int width, int height) {
+    unistylesRuntime.get()->onLayoutChange([=](std::string breakpoint, std::string orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets, Dimensions& navigationBar) {
         NSDictionary *body = @{
             @"type": @"layout",
             @"payload": @{
                 @"breakpoint": cxxStringToNSString(breakpoint),
                 @"orientation": cxxStringToNSString(orientation),
                 @"screen": @{
-                    @"width": @(width),
-                    @"height": @(height)
+                    @"width": @(screen.width),
+                    @"height": @(screen.height)
+                },
+                @"statusBar": @{
+                    @"width": @(statusBar.width),
+                    @"height": @(statusBar.height)
+                },
+                @"navigationBar": @{
+                    @"width": @(navigationBar.width),
+                    @"height": @(navigationBar.height)
+                },
+                @"insets": @{
+                    @"top": @(insets.top),
+                    @"bottom": @(insets.bottom),
+                    @"left": @(insets.left),
+                    @"right": @(insets.right)
                 }
             }
         };

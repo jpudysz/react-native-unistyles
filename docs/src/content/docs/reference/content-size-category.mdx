@@ -28,6 +28,12 @@ and the available values are:
 
 `xSmall`, `Small`, `Medium`, `Large`, `xLarge`, `xxLarge`, `xxxLarge`, `unspecified`
 
+<Badge label="2.4.0" />
+
+In addition to above categories, you can also use the [Accessibility sizes](https://developer.apple.com/documentation/uikit/uicontentsizecategory#2901207), available values are:
+
+`accessibilityMedium`, `accessibilityLarge`, `accessibilityExtraLarge`, `accessibilityExtraExtraLarge`, `accessibilityExtraExtraExtraLarge`
+
 ### Android
 
 There is no direct equivalent to the iOS content size category on Android. The implementation is based on [Font Scale](https://developer.android.com/reference/android/content/res/Configuration#fontScale)
@@ -37,13 +43,15 @@ and the available values are:
 
 Mapping is based on the following table:
 
-| Value | Font Scale |
-| ----- | ---------- |
-| Small | \<= 0.85       |
-| Default | \<= 1.0       |
-| Large | \<= 1.15       |
-| ExtraLarge | \<= 1.3    |
-| Huge | >1.3      |
+| Version | Value | Font Scale |
+| ----- | ----- | ---------- |
+| - | Small | \<= 0.85       |
+| - | Default | \<= 1.0       |
+| - | Large | \<= 1.15       |
+| - | ExtraLarge | \<= 1.3    |
+| - | Huge | \<=1.5      |
+| <Badge label="2.4.0" /> | ExtraHuge | \<=1.8      |
+| <Badge label="2.4.0" /> | ExtraExtraHuge | >1.8      |
 
 :::tip[Your app restarts?]
 If you change the font scale in your Android settings, your app will restart by default. 
