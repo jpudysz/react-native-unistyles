@@ -58,7 +58,6 @@ class UnistylesConfig(private val reactApplicationContext: ReactApplicationConte
 
     private fun getAppLayoutConfig(): LayoutConfig {
         val displayMetrics = reactApplicationContext.resources.displayMetrics
-        val fontScale = reactApplicationContext.resources.configuration.fontScale
         val screenWidth = (displayMetrics.widthPixels / density).toInt()
         val screenHeight = (displayMetrics.heightPixels / density).toInt()
 

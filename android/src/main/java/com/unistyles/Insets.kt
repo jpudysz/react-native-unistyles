@@ -62,17 +62,18 @@ class UnistylesInsets(private val reactApplicationContext: ReactApplicationConte
     private fun hasTranslucentStatusBar(baseInsets: Insets): Boolean? {
         val window = reactApplicationContext.currentActivity?.window ?: return null
         val contentView = window.decorView.findViewById<View>(android.R.id.content) ?: return null
-        val visibleRect = Rect()
-        val drawingRect = Rect()
+        val decorViewLocation = IntArray(2)
+        val contentViewLocation = IntArray(2)
 
-        window.decorView.getGlobalVisibleRect(visibleRect)
-        contentView.getDrawingRect(drawingRect)
+        // decor view is a top level view with navigationBar and statusBar
+        window.decorView.getLocationOnScreen(decorViewLocation)
+        // content view is view without navigationBar and statusBar
+        contentView.getLocationOnScreen(contentViewLocation)
 
-        // height is equal to navigationBarHeight + statusBarHeight
-        val height = ((visibleRect.height() - contentView.height) / density).roundToInt()
+        val statusBarHeight = contentViewLocation[1] - decorViewLocation[1]
 
-        // status bar is translucent when height is not equal to topInset + bottomInset
-        return (baseInsets.top + baseInsets.bottom) != height
+        // if positions are the same, then the status bar is translucent
+        return statusBarHeight == 0
     }
 
     private fun getTopInset(baseInsets: Insets, statusBarTranslucent: Boolean, window: Window): Int {

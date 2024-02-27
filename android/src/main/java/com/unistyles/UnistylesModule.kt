@@ -17,14 +17,23 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.modules.core.DeviceEventManagerModule
 
 class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener {
+    // debounce draw listener
+    private val drawHandler = Handler(Looper.getMainLooper())
+    private val debounceDuration = 250L
+    private var runnable: Runnable? = null
+
     private var isCxxReady: Boolean = false
     private val platform: Platform = Platform(reactContext)
-    private val preDrawListener = ViewTreeObserver.OnPreDrawListener {
+    private val layoutListener = ViewTreeObserver.OnGlobalLayoutListener {
         if (this.isCxxReady) {
-            this@UnistylesModule.onLayoutConfigChange()
-        }
+            runnable?.let { drawHandler.removeCallbacks(it) }
 
-        true
+            runnable = Runnable {
+                this@UnistylesModule.onLayoutConfigChange()
+            }.also {
+                drawHandler.postDelayed(it, debounceDuration)
+            }
+        }
     }
 
     private val configurationChangeReceiver = object : BroadcastReceiver() {
@@ -49,15 +58,16 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     private fun setupLayoutListener() {
         val activity = currentActivity ?: return
-        activity.window.decorView.rootView.viewTreeObserver.addOnPreDrawListener(preDrawListener)
+        activity.window.decorView.rootView.viewTreeObserver.addOnGlobalLayoutListener(layoutListener)
     }
 
     @Deprecated("Deprecated in Java")
     override fun onCatalystInstanceDestroy() {
         val activity = currentActivity ?: return
 
-        activity.window.decorView.rootView.viewTreeObserver.removeOnPreDrawListener(preDrawListener)
+        activity.window.decorView.rootView.viewTreeObserver.removeOnGlobalLayoutListener(layoutListener)
         reactApplicationContext.unregisterReceiver(configurationChangeReceiver)
+        runnable?.let { drawHandler.removeCallbacks(it) }
         this.nativeDestroy()
     }
 
@@ -69,9 +79,6 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
 
         val config = platform.getConfig()
-
-        // todo remove me
-        Log.d("unistyes", "Emitting 2!")
 
         reactApplicationContext.runOnJSQueueThread {
             if (config.hasNewColorScheme) {
@@ -90,9 +97,6 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
 
         val config = platform.getLayoutConfig()
-
-        // todo remove me
-        Log.d("unistyes", "Emitting!")
 
         reactApplicationContext.runOnJSQueueThread {
             this.nativeOnOrientationChange(
