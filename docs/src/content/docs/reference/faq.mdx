@@ -81,13 +81,4 @@ If you encounter any issues with `array.prototype.at`, please consider using a [
 
 Yes, Unistyles supports both macOS with `react-native-macos` and Windows with `react-native-windows` packages. 
 
-### My release app is crashing on startup (Android) with ProGuard enabled
-
-It's essential to keep the Unistyles code from being obfuscated. Unistyles is using JNI with reflection, and ProGuard can break it.
-To fix this, add the following line to your `proguard-rules.pro` file:
-
-```proguard
--keep class com.unistyles.** { *; }
-```
-
 </Seo>
