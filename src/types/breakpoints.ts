@@ -1,5 +1,5 @@
 import type { ColorValue, OpaqueColorValue } from 'react-native'
-import type { UnistylesTheme } from '../types'
+import type { UnistylesLayout, UnistylesTheme } from '../types'
 import type { BreakpointsOrMediaQueries, ToDeepUnistyles } from './stylesheet'
 import type { TransformStyles } from './core'
 
@@ -56,6 +56,6 @@ type ParseStyleKeys<T> = T extends object
     ? { [K in keyof T]: ParseNestedObject<T[K]> }
     : never
 
-export type ReactNativeStyleSheet<T> = T extends (theme: UnistylesTheme) => infer R
+export type ReactNativeStyleSheet<T> = T extends (theme: UnistylesTheme, layout: UnistylesLayout) => infer R
     ? ParseStyleKeys<R>
     : ParseStyleKeys<T>
