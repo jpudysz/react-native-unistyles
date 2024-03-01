@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Text } from 'react-native'
-import { createStyleSheet, useStyles, UnistylesRuntime } from 'react-native-unistyles'
+import { createStyleSheet, useStyles } from 'react-native-unistyles'
 import { DemoScreen } from '../components'
 
 export const RuntimeWithStyleSheetScreen: React.FunctionComponent = () => {
@@ -25,7 +25,7 @@ export const RuntimeWithStyleSheetScreen: React.FunctionComponent = () => {
     )
 }
 
-const stylesheet = createStyleSheet(theme => ({
+const stylesheet = createStyleSheet((theme, layout) => ({
     container: {
         flex: 1,
         paddingTop: 50,
@@ -41,9 +41,9 @@ const stylesheet = createStyleSheet(theme => ({
         alignItems: 'center',
         padding: 20,
         marginTop: 50,
-        width: UnistylesRuntime.screen.width / 2,
-        height: UnistylesRuntime.screen.height / 2,
-        backgroundColor: UnistylesRuntime.orientation === 'portrait'
+        width: layout.screen.width / 2,
+        height: layout.screen.height / 2,
+        backgroundColor: layout.orientation === 'portrait'
             ? theme.colors.accent
             : theme.colors.oak
     }
