@@ -64,6 +64,22 @@ const stylesheet = createStyleSheet(theme => ({
 }))
 ```
 
+In addition to the `theme` argument, you can also accept the `layout` argument when passing a function, which can be useful to access screen orientation, dimensions, insets, and more.
+
+```ts /theme/
+const stylesheet = createStyleSheet((theme, layout) => ({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingTop: layout.insets.top,
+        backgroundColor: layout.orientation === 'portrait'
+            ? theme.colors.accent
+            : theme.colors.oak
+    },
+}))
+```
+
 Importantly, you'll receive the same TypeScript hints as with `StyleSheet.create`!
 
 </Seo>
