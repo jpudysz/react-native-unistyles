@@ -64,16 +64,16 @@ const stylesheet = createStyleSheet(theme => ({
 }))
 ```
 
-In addition to the `theme` argument, you can also accept the `layout` argument when passing a function, which can be useful to access screen orientation, dimensions, insets, and more.
+In addition to the `theme` argument, you can also accept the `runtime` argument when passing a function. This can be useful for accessing `UnistylesRuntime` and its properties (such as screen orientation, dimensions, insets, and more) without having to import this class directly.
 
-```ts /layout/
-const stylesheet = createStyleSheet((theme, layout) => ({
+```ts /runtime/
+const stylesheet = createStyleSheet((theme, runtime) => ({
     container: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingTop: layout.insets.top,
-        backgroundColor: layout.orientation === 'portrait'
+        paddingTop: runtime.insets.top,
+        backgroundColor: runtime.orientation === 'portrait'
             ? theme.colors.accent
             : theme.colors.oak
     },
