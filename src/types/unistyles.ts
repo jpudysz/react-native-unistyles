@@ -80,12 +80,3 @@ export type UnistylesDynamicTypeSizeEvent = {
 }
 
 export type UnistylesEvents = UnistylesThemeEvent | UnistylesMobileLayoutEvent | UnistylesPluginEvent | UnistylesDynamicTypeSizeEvent
-
-export type UnistylesLayout = {
-    breakpoint: keyof UnistylesBreakpoints,
-    orientation: (typeof ScreenOrientation)[keyof typeof ScreenOrientation],
-    screen: ScreenDimensions,
-    statusBar: ScreenDimensions,
-    navigationBar: ScreenDimensions,
-    insets: ScreenInsets,
-}

@@ -183,7 +183,7 @@ export const RuntimeScreen: React.FunctionComponent = () => {
     )
 }
 
-const stylesheet = createStyleSheet((theme, layout) => ({
+const stylesheet = createStyleSheet((theme, runtime) => ({
     container: {
         flex: 1,
         paddingTop: 50,
@@ -228,7 +228,7 @@ const stylesheet = createStyleSheet((theme, layout) => ({
     },
     topInset: {
         position: 'absolute',
-        top: layout.insets.top,
+        top: runtime.insets.top,
         left: 0,
         right: 0,
         height: 1,
@@ -236,7 +236,7 @@ const stylesheet = createStyleSheet((theme, layout) => ({
     },
     bottomInset: {
         position: 'absolute',
-        bottom: layout.insets.bottom,
+        bottom: runtime.insets.bottom,
         left: 0,
         right: 0,
         height: 1,
@@ -246,7 +246,7 @@ const stylesheet = createStyleSheet((theme, layout) => ({
         position: 'absolute',
         top: 0,
         bottom: 0,
-        left: layout.insets.left,
+        left: runtime.insets.left,
         width: 1,
         backgroundColor: theme.colors.accent
     },
@@ -254,7 +254,7 @@ const stylesheet = createStyleSheet((theme, layout) => ({
         position: 'absolute',
         top: 0,
         bottom: 0,
-        right: layout.insets.right,
+        right: runtime.insets.right,
         width: 1,
         backgroundColor: theme.colors.accent
     }

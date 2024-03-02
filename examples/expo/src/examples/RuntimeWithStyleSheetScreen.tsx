@@ -25,7 +25,7 @@ export const RuntimeWithStyleSheetScreen: React.FunctionComponent = () => {
     )
 }
 
-const stylesheet = createStyleSheet((theme, layout) => ({
+const stylesheet = createStyleSheet((theme, runtime) => ({
     container: {
         flex: 1,
         paddingTop: 50,
@@ -41,9 +41,9 @@ const stylesheet = createStyleSheet((theme, layout) => ({
         alignItems: 'center',
         padding: 20,
         marginTop: 50,
-        width: layout.screen.width / 2,
-        height: layout.screen.height / 2,
-        backgroundColor: layout.orientation === 'portrait'
+        width: runtime.screen.width / 2,
+        height: runtime.screen.height / 2,
+        backgroundColor: runtime.orientation === 'portrait'
             ? theme.colors.accent
             : theme.colors.oak
     }
