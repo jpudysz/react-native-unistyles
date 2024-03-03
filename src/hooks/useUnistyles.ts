@@ -13,7 +13,7 @@ export const useUnistyles = () => {
     const [layout, setLayout] = useState({
         breakpoint: unistyles.runtime.breakpoint,
         orientation: unistyles.runtime.orientation,
-        screenSize: {
+        screen: {
             width: unistyles.runtime.screen.width,
             height: unistyles.runtime.screen.height
         },
@@ -49,7 +49,7 @@ export const useUnistyles = () => {
                         return setLayout({
                             breakpoint: layoutEvent.payload.breakpoint,
                             orientation: layoutEvent.payload.orientation,
-                            screenSize: layoutEvent.payload.screen,
+                            screen: layoutEvent.payload.screen,
                             statusBar: layoutEvent.payload.statusBar,
                             insets: layoutEvent.payload.insets,
                             navigationBar: layoutEvent.payload.navigationBar
