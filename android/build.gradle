@@ -42,6 +42,7 @@ android {
                 arguments "-DANDROID_STL=c++_shared"
             }
         }
+        consumerProguardFiles 'proguard-rules.pro'
     }
 
     buildFeatures {
