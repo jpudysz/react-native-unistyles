@@ -1,6 +1,6 @@
 import type { UnistylesBridge, UnistylesConfig, UnistylesPlugin } from '../types'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
-import { isWeb, UnistylesError } from '../common'
+import { isDev, isWeb, UnistylesError } from '../common'
 import { cssMediaQueriesPlugin, normalizeWebStylesPlugin } from '../plugins'
 
 export class UnistyleRegistry {
@@ -87,12 +87,18 @@ export class UnistyleRegistry {
             throw new Error(UnistylesError.InvalidPluginName)
         }
 
-        if (this.plugins.some(({ name }) => name === plugin.name)) {
-            throw new Error(UnistylesError.DuplicatePluginName)
+        const isAlreadyRegistered = this.plugins.some(({ name }) => name === plugin.name)
+
+        if (!isAlreadyRegistered) {
+            this.plugins = [plugin].concat(this.plugins)
+            this.unistylesBridge.addPlugin(plugin.name, notify)
+
+            return
         }
 
-        this.plugins = [plugin].concat(this.plugins)
-        this.unistylesBridge.addPlugin(plugin.name, notify)
+        if (!isDev) {
+            throw new Error(UnistylesError.DuplicatePluginName)
+        }
     }
 
     public removePlugin = (plugin: UnistylesPlugin) => {
