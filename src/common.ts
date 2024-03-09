@@ -10,6 +10,7 @@ export const isAndroid = Platform.OS === 'android'
 export const isMobile = isIOS || isAndroid
 export const isServer = typeof window === 'undefined'
 export const isDev = process.env.NODE_ENV !== 'production'
+export const isTest = process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined || typeof jest !== 'undefined'
 
 export const ScreenOrientation = {
     Landscape: 'landscape',
