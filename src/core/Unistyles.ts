@@ -2,7 +2,8 @@ import { UnistylesModule } from './UnistylesModule'
 import { UnistylesRuntime } from './UnistylesRuntime'
 import { UnistyleRegistry } from './UnistyleRegistry'
 import type { UnistylesBridge } from '../types'
-import { UnistylesError, isWeb } from '../common'
+import { UnistylesError, isTest, isWeb } from '../common'
+import { UnistylesMockedBridge, UnistylesMockedRegistry, UnistylesMockedRuntime } from './mocks'
 
 class Unistyles {
     private _runtime: UnistylesRuntime
@@ -10,6 +11,14 @@ class Unistyles {
     private _bridge: UnistylesBridge
 
     constructor() {
+        if (isTest) {
+            this._bridge = new UnistylesMockedBridge() as unknown as UnistylesBridge
+            this._registry = new UnistylesMockedRegistry(this._bridge) as unknown as UnistyleRegistry
+            this._runtime = new UnistylesMockedRuntime(this._bridge, this._registry) as unknown as UnistylesRuntime
+
+            return
+        }
+
         const isInstalled = UnistylesModule?.install() ?? false
 
         if (!isInstalled) {

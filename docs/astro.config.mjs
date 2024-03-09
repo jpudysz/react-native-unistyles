@@ -123,6 +123,11 @@ export default defineConfig({
                             link: '/reference/debugging/'
                         },
                         {
+                            label: 'Testing',
+                            link: '/reference/testing/',
+                            badge: 'New'
+                        },
+                        {
                             label: 'Errors',
                             link: '/reference/errors/'
                         },
