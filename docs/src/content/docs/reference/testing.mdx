@@ -1,0 +1,66 @@
+---
+title: Testing
+---
+
+import Seo from '../../../components/Seo.astro'
+import Badge from '../../../components/Badge.astro'
+
+<Seo
+    seo={{
+        title: 'Testing',
+        description: 'How to test react-native-unistyles?'
+    }}
+>
+
+<Badge label="All platforms" />
+<Badge label="2.5.0" />
+
+Unistyles ships with own mocks that will help you to test your components that consume `useStyles` and `createStyleSheet`.
+
+### Using mocks
+
+In order to use the library mocks you need to either use `jest` or set `process.env.NODE_ENV` to `test`.
+
+```json /NODE_ENV=test/
+"scripts": {
+  "start": "react-native start",
+  "test": "NODE_ENV=test vitest"
+},
+```
+
+### NativeEventEmitter
+
+To mock `NativeEventEmitter` that is imported internally from `react-native` you can use the following code:
+
+1. Create `jest.setup.js` file:
+
+```javascript /NativeEventEmitter/
+jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter');
+```
+
+2. If you use `jest.config.js`:
+
+```diff lang="js"
+module.exports = {
+    preset: 'react-native',
++    setupFiles: ['./jest.setup.js'],
+};
+```
+
+3. If you use `jest` in `package.json`:
+
+```diff lang="json"
+{
+  "jest": {
+    "preset": "react-native",
++    "setupFiles": ["./jest.setup.js"]
+  }
+}
+```
+
+### Support
+
+Mocks support basic operations and are designed to mimic the setting of themes and breakpoints. 
+However, some operations, such as using `plugins` or `adaptiveThemes`, are not supported.
+
+</Seo>
