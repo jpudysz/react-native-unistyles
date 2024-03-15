@@ -58,6 +58,12 @@ module.exports = {
 }
 ```
 
+### Testing on web with JSDOM
+
+When utilizing JSDOM for testing purposes, it is required to provide the implementation 
+for `window.matchMedia`, as this functionality is absent in JSDOM, yet it is a dependency for Unistyles.
+
+For a comprehensive approach, refer to the official `jest` documentation on [mocking methods that are not implemented in JSDOM](https://jestjs.io/docs/manual-mocks#mocking-methods-which-are-not-implemented-in-jsdom).
 ### Support
 
 Mocks support basic operations and are designed to mimic the setting of themes and breakpoints. 
