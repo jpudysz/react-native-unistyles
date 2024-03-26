@@ -1,5 +1,5 @@
 {
-  "name": "win",
+  "name": "bare",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -7,19 +7,19 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest",
-    "windows": "react-native run-windows"
+    "test": "jest"
   },
   "dependencies": {
-    "react-native": "0.73.2",
-    "react-native-windows": "0.73.4"
+    "react": "18.2.0",
+    "react-native": "0.74.0-rc.5"
   },
   "devDependencies": {
-    "@babel/core": "7.23.6",
-    "@babel/preset-env": "7.23.6",
+    "@babel/core": "7.24.3",
+    "@babel/preset-env": "7.24.3",
     "@babel/runtime": "7.20.0",
-    "@react-native/babel-preset": "0.73.18",
-    "@react-native/metro-config": "0.73.2",
+    "@react-native/babel-preset": "0.74.76",
+    "@react-native/metro-config": "0.74.76",
+    "@react-native/typescript-config": "0.74.76",
     "@types/react": "18.2.71",
     "babel-plugin-module-resolver": "5.0.0",
     "typescript": "5.0.4"
