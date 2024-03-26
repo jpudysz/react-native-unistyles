@@ -141,10 +141,9 @@ export const App: React.FunctionComponent = () => {
                                             ...theme,
                                             colors: {
                                                 ...theme.colors,
-                                                typography:
-                          theme.colors.typography === '#000000'
-                              ? '#00d2d3'
-                              : '#000000'
+                                                typography: theme.colors.typography === '#000000'
+                                                    ? '#00d2d3'
+                                                    : '#000000'
                                             }
                                         }))
                                     case 'dark':
@@ -152,10 +151,9 @@ export const App: React.FunctionComponent = () => {
                                             ...theme,
                                             colors: {
                                                 ...theme.colors,
-                                                typography:
-                          theme.colors.typography === '#ffffff'
-                              ? '#00d2d3'
-                              : '#ffffff'
+                                                typography: theme.colors.typography === '#ffffff'
+                                                    ? '#00d2d3'
+                                                    : '#ffffff'
                                             }
                                         }))
                                     case 'premium':
@@ -164,10 +162,9 @@ export const App: React.FunctionComponent = () => {
                                             ...theme,
                                             colors: {
                                                 ...theme.colors,
-                                                typography:
-                          theme.colors.typography === '#76278f'
-                              ? '#000000'
-                              : '#76278f'
+                                                typography: theme.colors.typography === '#76278f'
+                                                    ? '#000000'
+                                                    : '#76278f'
                                             }
                                         }))
                                 }

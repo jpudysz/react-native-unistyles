@@ -20,7 +20,7 @@
     "@babel/runtime": "7.20.0",
     "@react-native/babel-preset": "0.73.18",
     "@react-native/metro-config": "0.73.2",
-    "@types/react": "18.2.45",
+    "@types/react": "18.2.71",
     "babel-plugin-module-resolver": "5.0.0",
     "typescript": "5.0.4"
   },

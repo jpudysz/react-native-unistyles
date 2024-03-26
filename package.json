@@ -113,9 +113,10 @@
     "examples/expo",
     "examples/macos",
     "examples/win",
+    "examples/bare",
     "docs"
   ],
-  "packageManager": "yarn@3.6.1",
+  "packageManager": "yarn@3.6.4",
   "engines": {
     "node": ">= 18.0.0"
   },
@@ -124,6 +125,8 @@
     "modulePathIgnorePatterns": [
       "<rootDir>/examples/expo/node_modules",
       "<rootDir>/examples/macos/node_modules",
+      "<rootDir>/examples/win/node_modules",
+      "<rootDir>/examples/bare/node_modules",
       "<rootDir>/docs/node_modules",
       "<rootDir>/lib/"
     ],
