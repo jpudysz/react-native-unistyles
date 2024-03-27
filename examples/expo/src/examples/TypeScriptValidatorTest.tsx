@@ -1,5 +1,5 @@
 import React from 'react'
-import { PlatformColor, View } from 'react-native'
+import { PlatformColor, View, Text } from 'react-native'
 import { mq, createStyleSheet, useStyles } from 'react-native-unistyles'
 
 export const TypeScriptValidatorTest: React.FunctionComponent = () => {
@@ -14,6 +14,7 @@ export const TypeScriptValidatorTest: React.FunctionComponent = () => {
             <View style={styles.nestedProps} />
             <View style={styles.dynamicContainer(1)} />
             <View style={styles.text} />
+            <Text style={styles.fontVariantsText} />
         </View>
     )
 }
@@ -148,5 +149,8 @@ const stylesheet = createStyleSheet(theme => ({
             width: 3,
             height: 3
         }
+    },
+    fontVariantsText: {
+        fontVariant: ['tabular-nums', 'small-caps']
     }
 }))

@@ -40,6 +40,12 @@ export const parseStyle = <T extends RNStyle>(
             return acc
         }
 
+        if (key === 'fontVariant' && Array.isArray(value)) {
+            acc[key] = value
+
+            return acc
+        }
+
         // values or platform colors
         if (typeof value !== 'object' || isPlatformColor(value)) {
             acc[key as keyof T] = value
