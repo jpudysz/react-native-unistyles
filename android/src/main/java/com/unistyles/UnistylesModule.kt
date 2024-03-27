@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -221,6 +222,26 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         reactApplicationContext
             .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
             .emit("__unistylesOnChange", body)
+    }
+
+    private fun onSetNavigationBarColor(color: String) {
+        val activity = currentActivity ?: return
+
+        if (platform.defaultNavigationBarColor == null) {
+            platform.defaultNavigationBarColor = activity.window.navigationBarColor
+        }
+
+        activity.window.navigationBarColor = if (color == "") platform.defaultNavigationBarColor!! else Color.parseColor(color)
+    }
+
+    private fun onSetStatusBarColor(color: String) {
+        val activity = currentActivity ?: return
+
+        if (platform.defaultStatusBarColor == null) {
+            platform.defaultStatusBarColor = activity.window.statusBarColor
+        }
+
+        activity.window.statusBarColor = if (color == "") platform.defaultStatusBarColor!! else Color.parseColor(color)
     }
 
     @ReactMethod

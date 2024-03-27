@@ -5,6 +5,9 @@ import com.facebook.react.bridge.ReactApplicationContext
 class Platform(reactApplicationContext: ReactApplicationContext) {
     private val config: UnistylesConfig = UnistylesConfig(reactApplicationContext)
 
+    var defaultNavigationBarColor: Int? = null
+    var defaultStatusBarColor: Int? = null
+
     fun hasNewLayoutConfig(): Boolean {
         return this.config.hasNewLayoutConfig()
     }

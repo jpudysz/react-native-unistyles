@@ -250,18 +250,46 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
 
     if (propName == "statusBar") {
         auto statusBar = jsi::Object(runtime);
+        auto setStatusBarColorFunction = jsi::Function::createFromHostFunction(runtime,
+           jsi::PropNameID::forAscii(runtime, "setColor"),
+           1,
+           [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
+               std::string color = arguments[0].asString(runtime).utf8(runtime);
+
+               if (this->onSetStatusBarColorCallback.has_value()) {
+                   this->onSetStatusBarColorCallback.value()(color);
+               }
+
+               return jsi::Value::undefined();
+           }
+        );
 
         statusBar.setProperty(runtime, "width", this->statusBar.width);
         statusBar.setProperty(runtime, "height", this->statusBar.height);
+        statusBar.setProperty(runtime, "setColor", setStatusBarColorFunction);
 
         return statusBar;
     }
 
     if (propName == "navigationBar") {
         auto navigationBarValue = jsi::Object(runtime);
+        auto setNavigationBarColorFunction = jsi::Function::createFromHostFunction(runtime,
+           jsi::PropNameID::forAscii(runtime, "setColor"),
+           1,
+           [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
+               std::string color = arguments[0].asString(runtime).utf8(runtime);
+
+               if (this->onSetStatusBarColorCallback.has_value()) {
+                   this->onSetNavigationBarColorCallback.value()(color);
+               }
+
+               return jsi::Value::undefined();
+           }
+        );
 
         navigationBarValue.setProperty(runtime, "width", this->navigationBar.width);
         navigationBarValue.setProperty(runtime, "height", this->navigationBar.height);
+        navigationBarValue.setProperty(runtime, "setColor", setNavigationBarColorFunction);
 
         return navigationBarValue;
     }

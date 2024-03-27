@@ -11,6 +11,7 @@
         "@typescript-eslint/no-empty-interface": 0,
         "no-duplicate-imports": 0,
         "functional/immutable-data": 0,
-        "no-underscore-dangle": 0
+        "no-underscore-dangle": 0,
+        "max-lines": 0
     }
 }
