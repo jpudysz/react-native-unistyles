@@ -86,18 +86,26 @@ export class UnistylesRuntime {
 
     /**
      * Get the status bar info
-     * @returns - The status bar size { width, height }
+     * @returns - The status bar api { width, height, setColor }
      */
     public get statusBar() {
-        return this.unistylesBridge.statusBar
+        return {
+            width: this.unistylesBridge.statusBar.width,
+            height: this.unistylesBridge.statusBar.height,
+            setColor: (color?: string) => this.unistylesBridge.statusBar.setColor(color ?? '')
+        }
     }
 
     /**
      * Get the navigation bar info (Android)
-     * @returns - The navigation bar size { width, height }
+     * @returns - The navigation bar api { width, height, setColor }
      */
     public get navigationBar() {
-        return this.unistylesBridge.navigationBar
+        return {
+            width: this.unistylesBridge.navigationBar.width,
+            height: this.unistylesBridge.navigationBar.height,
+            setColor: (color?: string) => this.unistylesBridge.navigationBar.setColor(color ?? '')
+        }
     }
 
     /**

@@ -17,6 +17,14 @@ export type ScreenDimensions = {
     width: number
 }
 
+interface StatusBar extends ScreenDimensions {
+    setColor(color?: string): void
+}
+
+interface NavigationBar extends ScreenDimensions {
+    setColor(color?: string): void
+}
+
 export type UnistylesConfig = {
     adaptiveThemes?: boolean,
     initialTheme?: keyof UnistylesThemes,
@@ -36,8 +44,8 @@ export type UnistylesBridge = {
     contentSizeCategory: IOSContentSizeCategory | AndroidContentSizeCategory,
     sortedBreakpointPairs: Array<[keyof UnistylesBreakpoints, UnistylesBreakpoints[keyof UnistylesBreakpoints]]>,
     insets: ScreenInsets,
-    statusBar: ScreenDimensions,
-    navigationBar: ScreenDimensions
+    statusBar: StatusBar,
+    navigationBar: NavigationBar
 
     // setters
     themes: Array<keyof UnistylesThemes>,
