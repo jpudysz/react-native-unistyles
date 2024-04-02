@@ -6906,17 +6906,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:18.2.46":
-  version: 18.2.46
-  resolution: "@types/react@npm:18.2.46"
-  dependencies:
-    "@types/prop-types": "*"
-    "@types/scheduler": "*"
-    csstype: ^3.0.2
-  checksum: cb0e4dc7f41988a059e1246a19ec377101f5b16097ec4bf7000ef3c431ec0c8c873f40e95075821f908db1f4e3352775f0f18cea53dcad14dce67c0f5110f2bd
-  languageName: node
-  linkType: hard
-
 "@types/react@npm:18.2.71":
   version: 18.2.71
   resolution: "@types/react@npm:18.2.71"
@@ -21238,7 +21227,7 @@ __metadata:
     "@release-it/conventional-changelog": 8.0.1
     "@testing-library/react-hooks": 8.0.1
     "@types/jest": 29.5.11
-    "@types/react": 18.2.46
+    "@types/react": 18.2.71
     "@typescript-eslint/eslint-plugin": 6.16.0
     "@typescript-eslint/eslint-plugin-tslint": 6.16.0
     "@typescript-eslint/parser": 6.16.0
