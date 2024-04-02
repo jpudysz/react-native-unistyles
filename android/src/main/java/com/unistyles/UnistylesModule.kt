@@ -21,7 +21,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private var runnable: Runnable? = null
 
     private var isCxxReady: Boolean = false
-    private val platform: Platform = Platform(reactContext)
+    private lateinit var platform: Platform
     private val layoutListener = ViewTreeObserver.OnGlobalLayoutListener {
         if (this.isCxxReady) {
             runnable?.let { drawHandler.removeCallbacks(it) }
@@ -112,6 +112,9 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     fun install(): Boolean {
         return try {
             System.loadLibrary("unistyles")
+
+            this.platform = Platform(reactApplicationContext)
+
             val config = platform.getConfig()
             val layoutConfig = platform.getLayoutConfig()
 
