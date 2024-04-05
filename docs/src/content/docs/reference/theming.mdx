@@ -294,4 +294,77 @@ export const UpdateTheme = ({ selectedColors }) => (
 )
 ```
 
+### Update statusBar color during runtime
+
+<Badge label="Android" />
+<Badge label="2.6.0" />
+
+Sometimes your app needs to dynamically change the status bar color, for example, when entering image preview or on some onboarding screens. You can easily update the color with `UnistylesRuntime` and for example the `useEffect` hook:
+
+```tsx /statusBar.setColor/
+import React, { useEffect } from 'react'
+import { UnistylesRuntime, useStyles } from 'react-native-unistyles'
+
+export const OnboardingScreen = () => {
+    const { theme } = useStyles()
+
+    useEffect(() => {
+        UnistylesRuntime.statusBar.setColor(theme.colors.primary)
+
+        return () => {
+            // set default color
+            UnistylesRuntime.statusBar.setColor(undefined)
+        }
+    }, [])
+
+    // your onboarding JSX
+    return ()
+}
+```
+:::tip[Colors]
+Unistyles supports only a few colors and hex values. Check the compability [here](#status-and-navigation-bar-colors)
+:::
+
+### Update navigationBar color during runtime
+
+<Badge label="Android" />
+<Badge label="2.6.0" />
+
+Just as with the `statusBar`, you can do the same with the `navigationBar` and set a specified color.
+
+```tsx /navigationBar.setColor/
+import React, { useEffect } from 'react'
+import { UnistylesRuntime, useStyles } from 'react-native-unistyles'
+
+export const ImagePreview = ({ imageUri }) => {
+    const { theme } = useStyles()
+
+    useEffect(() => {
+        UnistylesRuntime.navigationBar.setColor(theme.colors.black)
+
+        return () => {
+            // set default color
+            UnistylesRuntime.navigationBar.setColor(undefined)
+        }
+    }, [])
+
+    // your image preview JSX
+    return ()
+}
+```
+:::tip[Colors]
+Unistyles supports only a few colors and hex values. Check the compability [here](#status-and-navigation-bar-colors)
+:::
+
+### Status and Navigation bar colors
+
+Unistyles supports all 6- and 8-character hex colors with a `#` prefix, as well as some built-in colors:
+
+red, blue, green, black, white, gray, cyan, magenta, yellow, light gray, dark gray, grey, light grey, dark grey, aqua, fuchsia, lime, maroon, navy, olive, purple, silver, and teal.
+
+:::danger
+It's not possible to set a color for a **translucent** navigation bar.
+
+If you set an unsupported color or attempt to do so on a translucent navigation bar, Unistyles will silently fail.
+:::
 </Seo>
