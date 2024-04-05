@@ -6,9 +6,14 @@ import { Button, DemoScreen } from '../components'
 export const AndroidStatusBarNavigationBarScreen: React.FunctionComponent = () => {
     const { styles, theme } = useStyles(stylesheet)
 
-    useEffect(() => () => {
-        UnistylesRuntime.statusBar.setColor()
-        UnistylesRuntime.navigationBar.setColor()
+    useEffect(() => {
+        UnistylesRuntime.statusBar.setColor(theme.colors.aloes)
+        UnistylesRuntime.navigationBar.setColor(theme.colors.aloes)
+
+        return () => {
+            UnistylesRuntime.statusBar.setColor()
+            UnistylesRuntime.navigationBar.setColor()
+        }
     }, [])
 
     return (
@@ -25,12 +30,12 @@ export const AndroidStatusBarNavigationBarScreen: React.FunctionComponent = () =
                 <Button
                     color={theme.colors.accent}
                     title="Set status bar color"
-                    onPress={() => UnistylesRuntime.statusBar.setColor(theme.colors.accent)}
+                    onPress={() => UnistylesRuntime.statusBar.setColor(theme.colors.fog)}
                 />
                 <Button
                     color={theme.colors.accent}
                     title="Set navigation bar color"
-                    onPress={() => UnistylesRuntime.navigationBar.setColor(theme.colors.accent)}
+                    onPress={() => UnistylesRuntime.navigationBar.setColor(theme.colors.blood)}
                 />
             </View>
         </DemoScreen>
