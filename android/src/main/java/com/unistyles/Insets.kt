@@ -19,7 +19,7 @@ class UnistylesInsets(private val reactApplicationContext: ReactApplicationConte
 
     private fun getCurrentInsets(): Insets {
         val baseInsets = this.getBaseInsets()
-        val statusBarTranslucent = this.hasTranslucentStatusBar(baseInsets) ?: return baseInsets
+        val statusBarTranslucent = this.hasTranslucentStatusBar() ?: return baseInsets
         val window = reactApplicationContext.currentActivity?.window ?: return baseInsets
         val shouldModifyLandscapeInsets = this.forceLandscapeInsets(baseInsets, window)
 
@@ -48,7 +48,7 @@ class UnistylesInsets(private val reactApplicationContext: ReactApplicationConte
 
         // available from Android 6.0
         val window = reactApplicationContext.currentActivity?.window ?: return Insets(0, 0, 0, 0)
-        val systemInsets = window.decorView.rootWindowInsets
+        val systemInsets = window.decorView.rootWindowInsets ?: return Insets(0, 0, 0, 0)
 
         val top = (systemInsets.systemWindowInsetTop / density).roundToInt()
         val bottom = (systemInsets.systemWindowInsetBottom / density).roundToInt()
@@ -59,7 +59,7 @@ class UnistylesInsets(private val reactApplicationContext: ReactApplicationConte
     }
 
     // this function helps to detect statusBar translucent, as React Native is using weird API instead of windows flags
-    private fun hasTranslucentStatusBar(baseInsets: Insets): Boolean? {
+    private fun hasTranslucentStatusBar(): Boolean? {
         val window = reactApplicationContext.currentActivity?.window ?: return null
         val contentView = window.decorView.findViewById<View>(android.R.id.content) ?: return null
         val decorViewLocation = IntArray(2)
