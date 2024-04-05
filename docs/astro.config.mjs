@@ -65,7 +65,8 @@ export default defineConfig({
                         },
                         {
                             label: 'Theming',
-                            link: '/reference/theming/'
+                            link: '/reference/theming/',
+                            badge: 'New'
                         },
                         {
                             label: 'useInitialTheme',
@@ -89,8 +90,7 @@ export default defineConfig({
                         },
                         {
                             label: 'Dimensions',
-                            link: '/reference/dimensions/',
-                            badge: 'New'
+                            link: '/reference/dimensions/'
                         },
                         {
                             label: 'Unistyles Registry',
@@ -103,8 +103,7 @@ export default defineConfig({
                         },
                         {
                             label: 'Content size category',
-                            link: '/reference/content-size-category/',
-                            badge: 'New'
+                            link: '/reference/content-size-category/'
                         },
                         {
                             label: 'Plugins',
@@ -124,8 +123,7 @@ export default defineConfig({
                         },
                         {
                             label: 'Testing',
-                            link: '/reference/testing/',
-                            badge: 'New'
+                            link: '/reference/testing/'
                         },
                         {
                             label: 'Errors',
@@ -155,7 +153,8 @@ export default defineConfig({
                     items: [
                         {
                             label: 'All examples',
-                            link: '/examples/all'
+                            link: '/examples/all',
+                            badge: 'New'
                         }
                     ]
                 },
@@ -168,8 +167,7 @@ export default defineConfig({
                         },
                         {
                             label: 'Sponsors',
-                            link: 'other/sponsors/',
-                            badge: 'New'
+                            link: 'other/sponsors/'
                         },
                         {
                             label: 'For Sponsors',
