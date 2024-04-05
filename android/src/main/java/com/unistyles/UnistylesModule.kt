@@ -67,13 +67,14 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     @Deprecated("Deprecated in Java")
     override fun onCatalystInstanceDestroy() {
-        val activity = currentActivity ?: return
-
         this.stopLayoutListener()
         reactApplicationContext.unregisterReceiver(configurationChangeReceiver)
         runnable?.let { drawHandler.removeCallbacks(it) }
         reactApplicationContext.removeLifecycleEventListener(this)
-        this.nativeDestroy()
+
+        if (this.isCxxReady) {
+            this.nativeDestroy()
+        }
     }
 
     //endregion
@@ -144,7 +145,9 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
             false
         } catch (e: Exception) {
-            false
+            this.isCxxReady = false
+
+            return false
         }
     }
 
@@ -240,7 +243,6 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     override fun onHostResume() {
         if (isCxxReady) {
             this.onConfigChange()
-            this.onLayoutConfigChange()
         }
 
         this.setupLayoutListener()
