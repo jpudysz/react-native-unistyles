@@ -17,11 +17,11 @@ export type ScreenDimensions = {
     width: number
 }
 
-interface StatusBar extends ScreenDimensions {
+export interface StatusBar extends ScreenDimensions {
     setColor(color?: string): void
 }
 
-interface NavigationBar extends ScreenDimensions {
+export interface NavigationBar extends ScreenDimensions {
     setColor(color?: string): void
 }
 

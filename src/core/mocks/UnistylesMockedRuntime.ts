@@ -69,14 +69,16 @@ export class UnistylesMockedRuntime {
     public get statusBar() {
         return {
             height: 24,
-            width: 800
+            width: 800,
+            setColor: () => {}
         }
     }
 
     public get navigationBar() {
         return {
             height: 0,
-            width: 0
+            width: 0,
+            setColor: () => {}
         }
     }
 
