@@ -22,7 +22,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private var runnable: Runnable? = null
 
     private var isCxxReady: Boolean = false
-    private val platform: Platform = Platform(reactContext)
+    private lateinit var platform: Platform
     private val layoutListener = ViewTreeObserver.OnGlobalLayoutListener {
         if (this.isCxxReady) {
             runnable?.let { drawHandler.removeCallbacks(it) }
@@ -53,6 +53,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     //region Lifecycle
     init {
         reactApplicationContext.registerReceiver(configurationChangeReceiver, IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED))
+        reactApplicationContext.addLifecycleEventListener(this)
     }
 
     private fun setupLayoutListener() {
@@ -60,14 +61,21 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         activity.window.decorView.rootView.viewTreeObserver.addOnGlobalLayoutListener(layoutListener)
     }
 
+    private fun stopLayoutListener() {
+        val activity = currentActivity ?: return
+        activity.window.decorView.rootView.viewTreeObserver.removeOnGlobalLayoutListener(layoutListener)
+    }
+
     @Deprecated("Deprecated in Java")
     override fun onCatalystInstanceDestroy() {
-        val activity = currentActivity ?: return
-
-        activity.window.decorView.rootView.viewTreeObserver.removeOnGlobalLayoutListener(layoutListener)
+        this.stopLayoutListener()
         reactApplicationContext.unregisterReceiver(configurationChangeReceiver)
         runnable?.let { drawHandler.removeCallbacks(it) }
-        this.nativeDestroy()
+        reactApplicationContext.removeLifecycleEventListener(this)
+
+        if (this.isCxxReady) {
+            this.nativeDestroy()
+        }
     }
 
     //endregion
@@ -113,10 +121,12 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     fun install(): Boolean {
         return try {
             System.loadLibrary("unistyles")
+
+            this.platform = Platform(reactApplicationContext)
+
             val config = platform.getConfig()
             val layoutConfig = platform.getLayoutConfig()
 
-            this.setupLayoutListener()
             this.reactApplicationContext.javaScriptContextHolder?.let {
                 this.nativeInstall(
                     it.get(),
@@ -136,7 +146,9 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
             false
         } catch (e: Exception) {
-            false
+            this.isCxxReady = false
+
+            return false
         }
     }
 
@@ -250,11 +262,16 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     @ReactMethod
     fun removeListeners(count: Double) = Unit
     override fun onHostResume() {
-        this.onConfigChange()
-        this.onLayoutConfigChange()
+        if (isCxxReady) {
+            this.onConfigChange()
+        }
+
+        this.setupLayoutListener()
     }
 
-    override fun onHostPause() {}
+    override fun onHostPause() {
+        this.stopLayoutListener()
+    }
 
     override fun onHostDestroy() {}
     //endregion
