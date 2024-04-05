@@ -48,7 +48,7 @@ class UnistylesInsets(private val reactApplicationContext: ReactApplicationConte
 
         // available from Android 6.0
         val window = reactApplicationContext.currentActivity?.window ?: return Insets(0, 0, 0, 0)
-        val systemInsets = window.decorView.rootWindowInsets
+        val systemInsets = window.decorView.rootWindowInsets ?: return Insets(0, 0, 0, 0)
 
         val top = (systemInsets.systemWindowInsetTop / density).roundToInt()
         val bottom = (systemInsets.systemWindowInsetBottom / density).roundToInt()
