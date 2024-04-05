@@ -99,6 +99,26 @@ Java_com_unistyles_UnistylesModule_nativeInstall(
         env->DeleteLocalRef(cls);
     });
 
+    unistylesRuntime->onSetNavigationBarColor([=](const std::string &color) {
+        jstring colorStr = env->NewStringUTF(color.c_str());
+        jclass cls = env->GetObjectClass(unistylesModule);
+        jmethodID methodId = env->GetMethodID(cls, "onSetNavigationBarColor", "(Ljava/lang/String;)V");
+
+        env->CallVoidMethod(unistylesModule, methodId, colorStr);
+        env->DeleteLocalRef(colorStr);
+        env->DeleteLocalRef(cls);
+    });
+
+    unistylesRuntime->onSetStatusBarColor([=](const std::string &color) {
+        jstring colorStr = env->NewStringUTF(color.c_str());
+        jclass cls = env->GetObjectClass(unistylesModule);
+        jmethodID methodId = env->GetMethodID(cls, "onSetStatusBarColor", "(Ljava/lang/String;)V");
+
+        env->CallVoidMethod(unistylesModule, methodId, colorStr);
+        env->DeleteLocalRef(colorStr);
+        env->DeleteLocalRef(cls);
+    });
+
     jsi::Object hostObject = jsi::Object::createFromHostObject(*runtime, unistylesRuntime);
 
     runtime->global().setProperty(*runtime, "__UNISTYLES__", std::move(hostObject));
