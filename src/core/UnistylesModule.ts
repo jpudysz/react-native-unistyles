@@ -1,6 +1,6 @@
 import { NativeEventEmitter, NativeModules } from 'react-native'
 import type { UnistylesThemes, UnistylesBreakpoints } from 'react-native-unistyles'
-import type { ColorSchemeName, ScreenInsets, ScreenDimensions } from '../types'
+import type { ColorSchemeName, ScreenInsets, StatusBar, NavigationBar } from '../types'
 import { normalizeWebStylesPlugin } from '../plugins'
 import { isServer } from '../common'
 
@@ -25,13 +25,15 @@ export class UnistylesBridgeWeb {
         bottom: 0,
         left: 0
     }
-    #statusBar: ScreenDimensions = {
+    #statusBar: StatusBar = {
         height: 0,
-        width: 0
+        width: 0,
+        setColor: () => {}
     }
-    #navigationBar: ScreenDimensions = {
+    #navigationBar: NavigationBar = {
         height: 0,
-        width: 0
+        width: 0,
+        setColor: () => {}
     }
 
     constructor() {
