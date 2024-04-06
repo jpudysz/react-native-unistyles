@@ -871,6 +871,10 @@ PODS:
   - React-Mapbuffer (0.73.6-1):
     - glog
     - React-debug
+  - react-native-unistyles (2.6.0-rc.0):
+    - glog
+    - RCT-Folly (= 2022.05.16.00)
+    - React-Core
   - React-nativeconfig (0.73.6-1)
   - React-NativeModulesApple (0.73.6-1):
     - glog
@@ -1066,6 +1070,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector-modern`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
+  - react-native-unistyles (from `../../..`)
   - React-nativeconfig (from `../node_modules/react-native/ReactCommon`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -1151,6 +1156,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   React-Mapbuffer:
     :path: "../node_modules/react-native/ReactCommon"
+  react-native-unistyles:
+    :path: "../../.."
   React-nativeconfig:
     :path: "../node_modules/react-native/ReactCommon"
   React-NativeModulesApple:
@@ -1222,6 +1229,7 @@ SPEC CHECKSUMS:
   React-jsinspector: f36f0894aec7be6bc0000726d01e066b4ff90a00
   React-logger: 294fa3f76e67446ba1de86a56bdf06a50d232cc3
   React-Mapbuffer: 708d94a8c36f70e92e64d8372f32553628d6fca8
+  react-native-unistyles: 0ba7ad07b0274f0a714855f635c1b79eba803ba9
   React-nativeconfig: e36418be6cac07bee6a32c5b18c39c21c37da092
   React-NativeModulesApple: af82219c4cc8de8da7df43dd7d08eea604eca94c
   React-perflogger: f5930054a8be7346b91b96152d6316db0940fdb9

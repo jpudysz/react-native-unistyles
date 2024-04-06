@@ -1,48 +1,69 @@
 import React from 'react'
-// import { useStyles, createStyleSheet, UnistylesRuntime } from 'react-native-unistyles'
-import { View, Text, Pressable, StyleSheet } from 'react-native'
-// import './styles'
+import { useStyles, createStyleSheet, UnistylesRuntime } from 'react-native-unistyles'
+import { View, Text, Pressable } from 'react-native'
+import './styles'
 
-// todo link Unistyles
-export const App: React.FunctionComponent = () => (
-    <View style={styles.container}>
-        <Text style={styles.text}>
-            Hello
-            <Text style={styles.highlight}>
-                {` tvOS`}
+export const App: React.FunctionComponent = () => {
+    const { styles } = useStyles(stylesheet)
+
+    return (
+        <View style={styles.container}>
+            <Text style={styles.text}>
+                Hello
+                <Text style={styles.highlight}>
+                    {` tvOS`}
+                </Text>
             </Text>
-        </Text>
-        <Pressable
-            style={styles.cta}
-            onPress={() => {}}
-        >
-            <Text style={styles.text}>Switch theme</Text>
-        </Pressable>
-    </View>
-)
+            <View style={styles.playground}>
+                <Text style={styles.note}>
+                    <Text style={styles.bold}>
+                        {`${UnistylesRuntime.themeName} `}
+                    </Text>
+                    theme is cool
+                </Text>
+            </View>
+            <Pressable
+                style={styles.cta}
+                onPress={() => UnistylesRuntime.setTheme(UnistylesRuntime.themeName === 'light' ? 'dark' : 'light')}
+            >
+                <Text>Switch theme</Text>
+            </Pressable>
+        </View>
+    )
+}
 
-const styles = StyleSheet.create({
+const stylesheet = createStyleSheet((theme, rt) => ({
     container: {
         flex: 1,
-        paddingTop: 50,
+        paddingTop: rt.insets.top + 50,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'black'
+        backgroundColor: theme.colors.backgroundColor
     },
     text: {
         fontSize: 20,
-        color: 'white'
+        color: theme.colors.typography
     },
     highlight: {
         fontWeight: 'bold',
-        color: 'pink'
+        color: theme.colors.accent
+    },
+    note: {
+        color: theme.colors.typography
+    },
+    playground: {
+        flex: 1,
+        marginTop: 20
     },
     cta: {
-        backgroundColor: 'pink',
+        backgroundColor: theme.colors.accent,
         justifyContent: 'center',
         alignItems: 'center',
         padding: 10,
         borderRadius: 12,
-        marginBottom: 20
+        marginBottom: rt.insets.bottom + 20
+    },
+    bold: {
+        fontWeight: 'bold'
     }
-})
+}))
