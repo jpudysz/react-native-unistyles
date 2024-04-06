@@ -6,6 +6,8 @@
     #import "Platform_macOS.h"
 #elif TARGET_OS_IOS
     #import "Platform_iOS.h"
+#elif TARGET_OS_TV
+    #import "Platform_tvOS.h"
 #endif
 
 @interface UnistylesModule : RCTEventEmitter<RCTBridgeModule>

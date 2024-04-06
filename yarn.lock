@@ -25198,6 +25198,7 @@ __metadata:
     "@react-native/typescript-config": 0.73.1
     "@types/react": 18.2.74
     babel-jest: 29.6.3
+    babel-plugin-module-resolver: 5.0.0
     eslint: 8.19.0
     expo: 50.0.14
     react: 18.2.0
