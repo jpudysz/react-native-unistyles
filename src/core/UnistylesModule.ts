@@ -121,6 +121,10 @@ export class UnistylesBridgeWeb {
     }
 
     private updateTheme(themeName: keyof UnistylesThemes) {
+        if (!this.#themeName) {
+            this.#themeName = this.getTheme()
+        }
+
         if (this.#themeName === themeName) {
             this.emitThemeChange()
         }
@@ -164,7 +168,6 @@ export class UnistylesBridgeWeb {
     }
 
     private getTheme(): keyof UnistylesThemes {
-
         if (this.#themes.length === 1) {
             return this.#themes.at(0) as keyof UnistylesThemes
         }
