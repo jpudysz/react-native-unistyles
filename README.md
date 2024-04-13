@@ -32,7 +32,7 @@
 
 ## Features
 - 🚀 Shared core with C++ and JSI bindings
-- 🌉 Supports new architecture
+- 🌉 Supports new architecture and bridgeless mode
 - 🔥 Crazy performance, adds under 0.1 ms to your StyleSheet
 - 🎳 Share up to 100% of your styles across platforms in monorepo
 - 🎯 Doesn't introduce new components, everything is packed in one hook
