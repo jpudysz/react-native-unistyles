@@ -9,9 +9,11 @@
 [![platform - web](https://img.shields.io/badge/React_Native_Web-white?logo=react&logoColor=57BDDA&style=for-the-badge)](https://www.w3.org/)
 [![platform - ios](https://img.shields.io/badge/iOS-000?logo=apple&style=for-the-badge)](https://developer.apple.com/ios/)
 [![platform - macos](https://img.shields.io/badge/macOS-000?logo=apple&style=for-the-badge)](https://developer.apple.com/macos/)
+[![platform - appletv](https://img.shields.io/badge/Apple_TV-000?logo=apple&style=for-the-badge)](https://developer.apple.com/tvos/)
 [![platform - windows](https://img.shields.io/badge/windows-00a2ed?logo=windows&style=for-the-badge)](https://microsoft.github.io/react-native-windows/docs/getting-started)
 [![platform - ssr](https://img.shields.io/badge/SSR-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![platform - android](https://img.shields.io/badge/Android-44CD11?style=for-the-badge&logo=android&logoColor=white)](https://developer.android.com/)
+[![platform - androidtv](https://img.shields.io/badge/Android_TV-44CD11?style=for-the-badge&logo=android&logoColor=white)](https://www.android.com/intl/pl_pl/tv/)
 
 <a href="https://github.com/jpudysz?tab=followers">
     <img src="https://img.shields.io/github/followers/jpudysz?label=Follow%20%40jpudysz&style=social" />
@@ -56,7 +58,18 @@
 <a href="https://github.com/kmartinezmedia">
      <img src="https://avatars.githubusercontent.com/u/6308123?s=200&v=4" height="70px" width="70px" alt="kmartinezmedia" />
 </a>
+<a href="https://github.com/mobily">
+     <img src="https://avatars.githubusercontent.com/u/1467712?v=4" height="70px" width="70px" alt="mobily" />
+</a>
+<a href="https://github.com/levibuzolic">
+     <img src="https://avatars.githubusercontent.com/u/721323?v=4" height="70px" width="70px" alt="levibuzolic" />
+</a>
 
+## UI Kits
+
+<a href="https://stacks.grapp.dev/">
+     <img src="https://raw.githubusercontent.com/grapp-dev/stacks/main/assets/stacks-logo.png" height="70px" width="70px" alt="Stacks" />
+</a>
 
 ## Installation
 
@@ -66,7 +79,7 @@ yarn add react-native-unistyles
 
 ## Benchmarks
 
-<img src="https://reactnativeunistyles.vercel.app/_astro/benchmark-2.jAtWyu0v.png" />
+<img src="https://www.unistyl.es/_astro/benchmark-2.CMC1bK7S.png" />
 
 
 ## Discord
