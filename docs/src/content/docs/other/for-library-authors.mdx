@@ -17,14 +17,14 @@ Unistyles is highly extensible and can be utilized to build UI Kits and other ki
 
 `UnistylesRegistry` can be invoked lazily after resolving user-required configurations, such as themes and plugins.
 
-You can call `UnistylesRegistry` multiple times to override configurations. 
+You can call `UnistylesRegistry` multiple times to override configurations.
 However, keep in mind that `UnistylesRegistry` makes a roundtrip to C++, which can add up to **1ms** of additional setup time for Unistyles.
 
 To manipulate your config without replacing it, you should use [UnistylesRuntime](/reference/unistyles-runtime/).
 
 ## Timing
 
-Unistyles core does not have an asynchronous API. 
+Unistyles core does not have an asynchronous API.
 This means you can invoke `UnistylesRegistry` right before the first `useStyle` call:
 
 ```tsx
@@ -48,7 +48,7 @@ export const App: React.FunctionComponent = () => {
 ```
 
 :::tip
-Registering themes at runtime is also possible, although it is not yet implemented in the core. 
+Registering themes at runtime is also possible, although it is not yet implemented in the core.
 If you need this feature, please open a discussion.
 :::
 
@@ -70,18 +70,18 @@ You should expect re-renders only when:
 - Content size category (iOS), font scale (Android) changes.
 
 :::tip
-Storing library config in `UnistylesRuntime` is also a possibility. 
+Storing library config in `UnistylesRuntime` is also a possibility.
 If you need this feature, please open a discussion.
 :::
 
 ## No React Context
 
-Unistyles does not use the React Context API. This means that users do not need to wrap their app with a `Provider`, 
+Unistyles does not use the React Context API. This means that users do not need to wrap their app with a `Provider`,
 reducing boilerplate and making your library more user-friendly.
 
 ## New architecture ready
 
-Unistyles handles all native configurations and supports new architecture, 
+Unistyles handles all native configurations and supports new architecture,
 ensuring you don't need to worry about Fabric or other low-level concepts.
 
 Your UI Kit can support all React Native apps out of the box.
@@ -95,6 +95,7 @@ Unistyles is compatible with:
 - Android 5+
 - macOS 10.14+
 - Windows 10.0.16299.0
+- tvOS 9.0+
 
 ## CSS styles
 
@@ -102,7 +103,7 @@ There is ongoing work on custom CSS compiler that could
 entirely replace the React Native Web StyleSheet API,
 offering better Developer Experience (DX) and more predictable re-renders, e.g. with media queries.
 
-Unistyles 2.0 was developed with this feature in mind. 
+Unistyles 2.0 was developed with this feature in mind.
 If you are interested, please open a discussion and share your use case.
 
 ## Why choose Unistyles?

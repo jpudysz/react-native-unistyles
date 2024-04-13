@@ -48,7 +48,7 @@ If your app still doesn't automatically switch themes, ensure that:
 
 This should not occur, but if it does, please create a new issue in the GitHub repository.
 
-Unistyles is built with first-class support for TypeScript, inferring all the types for you. 
+Unistyles is built with first-class support for TypeScript, inferring all the types for you.
 There should be no need for extra steps. Please include your stylesheet and the error you're encountering in the issue.
 
 ### Does Unistyles support PlatformColor?
@@ -57,7 +57,7 @@ Yes, it does! You can even use PlatformColor in your themes!
 
 ### Are class components supported?
 
-No, the library only supports functional components. 
+No, the library only supports functional components.
 If you need support for class components, you would need to create a wrapper component.
 
 ### How to use Unistyles with Expo?
@@ -74,12 +74,12 @@ This behavior is default in Android. To prevent this, you need to add the follow
 
 ### Does Unistyles support JSC engine?
 
-Unistyles supports the JSC engine, although it is not recommended. 
+Unistyles supports the JSC engine, although it is not recommended.
 If you encounter any issues with `array.prototype.at`, please consider using a [polyfill](https://www.npmjs.com/package/array.prototype.at).
 
 ### Does Unistyles support desktop platforms?
 
-Yes, Unistyles supports both macOS with `react-native-macos` and Windows with `react-native-windows` packages. 
+Yes, Unistyles supports both macOS with `react-native-macos` and Windows with `react-native-windows` packages.
 
 ### My release app is crashing on startup (Android) with ProGuard enabled
 
@@ -89,5 +89,9 @@ To fix this, add the following line to your `proguard-rules.pro` file:
 ```proguard
 -keep class com.unistyles.** { *; }
 ```
+
+### Can I run Unistyles on my TV?
+
+Yes, Unistyles supports both android and apple tv with `react-native-tvos` package.
 
 </Seo>
