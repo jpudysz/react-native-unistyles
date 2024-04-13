@@ -1,0 +1,31 @@
+{
+  "name": "tv",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "apple-tv": "expo run:ios --scheme tv-tvOS --device \"Apple TV\"",
+    "android-tv": "expo run:android --device tv_api_34"
+  },
+  "dependencies": {
+    "expo": "50.0.14",
+    "react": "18.2.0",
+    "react-native": "npm:react-native-tvos@^0.73.6-1"
+  },
+  "devDependencies": {
+    "@babel/core": "7.24.3",
+    "@babel/preset-env": "7.24.3",
+    "@babel/runtime": "7.20.0",
+    "@react-native/babel-preset": "0.73.19",
+    "@react-native/eslint-config": "0.73.2",
+    "@react-native/metro-config": "0.73.3",
+    "@react-native/typescript-config": "0.73.1",
+    "@types/react": "18.2.74",
+    "babel-jest": "29.6.3",
+    "babel-plugin-module-resolver": "5.0.0",
+    "eslint": "8.19.0",
+    "typescript": "5.0.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

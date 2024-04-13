@@ -32,7 +32,7 @@ import Badge from '../../../components/Badge.astro'
       yarn expo prebuild --clean
       ```
     </TabItem>
-    <TabItem label="React Native">
+    <TabItem label="Bare">
       Library supports autolinking, to finish the setup run `pod install`:
 
       ```cmd
@@ -40,7 +40,7 @@ import Badge from '../../../components/Badge.astro'
       ```
     </TabItem>
     <TabItem label="Web">
-      
+
       Unistyles offers first-class support for React Native Web. To run the project, we recommend following the guidelines provided by <a href="https://docs.expo.dev/workflow/web/" target="_blank">Expo</a>:
 
       ```cmd
@@ -85,12 +85,21 @@ Remember to add this line to the `macos` folder, not the `ios` folder!
       Simply install the package and it will be autolinked.
 
     </TabItem>
+    <TabItem label="tvOS">
+      Please follow official instalation guide for <a href="https://github.com/react-native-tvos/react-native-tvos" target="_blank">react-native-tvOS</a>:
+
+      Then run `pod install`:
+
+      ```cmd title="macos"
+      pod install
+      ```
+    </TabItem>
    </Tabs>
 
    ### 3. Configure Unistyles with `UnistylesRegistry`
 
-    
-  Every step mentioned here is optional. If you don't want to use theming, breakpoints, or any other setting, you don't need to even call `UnistylesRegistry`. 
+
+  Every step mentioned here is optional. If you don't want to use theming, breakpoints, or any other setting, you don't need to even call `UnistylesRegistry`.
   You can jump directly into working on your components.
 
      <Card>
@@ -116,8 +125,8 @@ Remember to add this line to the `macos` folder, not the `ios` folder!
 
     ### 3.2 Define your theme(s)
 
-    
-You can define as many themes as you want. Each theme just needs to have a unique name and the same type. 
+
+You can define as many themes as you want. Each theme just needs to have a unique name and the same type.
 The library has no restrictions on the shape of the theme. You can use nested objects, functions, spread operators, and so on.
 
    ```ts
@@ -153,7 +162,7 @@ The library has no restrictions on the shape of the theme. You can use nested ob
 
     ### 3.3 Configure TypeScript
 
-    If you're using TypeScript, create types for your breakpoints and/or themes. 
+    If you're using TypeScript, create types for your breakpoints and/or themes.
     This step is required to achieve perfect Intellisense support across all StyleSheets.
 
     ```ts
@@ -227,7 +236,7 @@ To resolve this, simply follow the steps described below. You need to import som
     import { UnistylesRegistry } from 'react-native-unistyles'
     import { breakpoints } from './breakpoints'
     import { lightTheme, darkTheme } from './themes'
-    
+
     type AppBreakpoints = typeof breakpoints
     type AppThemes = {
       light: typeof lightTheme,
