@@ -17,6 +17,7 @@ const std::string UnistylesUnspecifiedScheme = "unspecified";
 const std::string UnistylesErrorBreakpointsCannotBeEmpty = "You are trying to register empty breakpoints object";
 const std::string UnistylesErrorBreakpointsMustStartFromZero = "You are trying to register breakpoints that don't start from 0";
 const std::string UnistylesErrorThemesCannotBeEmpty = "You are trying to register empty themes object";
+const std::string UnistylesErrorAdaptiveThemesNotSupported = "Your platform doesn't support adaptive themes";
 
 struct Dimensions {
     int width;
