@@ -10,10 +10,11 @@
 [![platform - ios](https://img.shields.io/badge/iOS-000?logo=apple&style=for-the-badge)](https://developer.apple.com/ios/)
 [![platform - macos](https://img.shields.io/badge/macOS-000?logo=apple&style=for-the-badge)](https://developer.apple.com/macos/)
 [![platform - appletv](https://img.shields.io/badge/Apple_TV-000?logo=apple&style=for-the-badge)](https://developer.apple.com/tvos/)
-[![platform - windows](https://img.shields.io/badge/windows-00a2ed?logo=windows&style=for-the-badge)](https://microsoft.github.io/react-native-windows/docs/getting-started)
-[![platform - ssr](https://img.shields.io/badge/SSR-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![platform - visionos](https://img.shields.io/badge/vision_os-000?logo=apple&style=for-the-badge)](https://developer.apple.com/visionos/)
 [![platform - android](https://img.shields.io/badge/Android-44CD11?style=for-the-badge&logo=android&logoColor=white)](https://developer.android.com/)
 [![platform - androidtv](https://img.shields.io/badge/Android_TV-44CD11?style=for-the-badge&logo=android&logoColor=white)](https://www.android.com/intl/pl_pl/tv/)
+[![platform - windows](https://img.shields.io/badge/windows-00a2ed?logo=windows&style=for-the-badge)](https://microsoft.github.io/react-native-windows/docs/getting-started)
+[![platform - ssr](https://img.shields.io/badge/SSR-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
 
 <a href="https://github.com/jpudysz?tab=followers">
     <img src="https://img.shields.io/github/followers/jpudysz?label=Follow%20%40jpudysz&style=social" />
