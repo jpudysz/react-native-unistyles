@@ -23,7 +23,7 @@ Unistyles will only throw errors when it is used incorrectly.
 *"Unistyles runtime is not available. Make sure you followed the installation instructions"*
 :::
 
-This error will be thrown if you try to use Unistyles before it was initialized. 
+This error will be thrown if you try to use Unistyles before it was initialized.
 Make sure you followed the installation [setup](/start/setup/).
 
 Still getting this error? Check [FAQ](/reference/faq/).
@@ -45,12 +45,22 @@ This situation can arise if you don't use TypeScript. Confirm that all your them
 ### ThemeNotSelected
 
 :::danger[ThemeNotSelected]
-*"Your themes are registered, but you didn't select the initial theme"*
+*"Your platform doesn't support adaptive themes"*
 :::
 
 This error is thrown if you have registered multiple themes but failed to select an initial one.
 
 Follow theming [guide](/reference/theming/) to learn how to select the initial theme.
+
+### AdaptiveThemesNotSupported
+
+:::danger[AdaptiveThemesNotSupported]
+*"Your platform doesn't support adaptive themes"*
+:::
+
+This error is thrown if you try to use adaptive themes on unsupported platform like visionOS.
+
+To fix this issue, you need to remove `adaptiveThemes` options from `UnistylesRegistry`.
 
 ### ThemesCannotBeEmpty
 

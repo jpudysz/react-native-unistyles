@@ -21,3 +21,6 @@ UnistylesRegistry
         dark: darkTheme,
         premium: premiumTheme
     })
+    .addConfig({
+        initialTheme: 'light'
+    })

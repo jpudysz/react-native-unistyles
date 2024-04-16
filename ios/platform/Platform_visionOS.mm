@@ -9,12 +9,10 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        // todo support multiple windows
-        UIWindowScene *firstScene = (UIWindowScene *)UIApplication.sharedApplication.connectedScenes.allObjects.firstObject;
+        UIWindow* mainWindow = [self getMainWindow];
         UIContentSizeCategory contentSizeCategory = [[UIApplication sharedApplication] preferredContentSizeCategory];
-        UIWindow* firstWindow = [[firstScene windows] firstObject];
 
-        self.initialScreen = {(int)firstWindow.bounds.size.width, (int)firstWindow.bounds.size.height};
+        self.initialScreen = {(int)mainWindow.bounds.size.width, (int)mainWindow.bounds.size.height};
         self.initialColorScheme = UnistylesUnspecifiedScheme;
         self.initialContentSizeCategory = [self getContentSizeCategory:contentSizeCategory];
         self.initialStatusBar = [self getStatusBarDimensions];
@@ -25,6 +23,27 @@
     return self;
 }
 
+- (UIWindow *)getMainWindow {
+    if (RCTRunningInAppExtension()) {
+      return nil;
+    }
+   
+    for (UIScene* scene in RCTSharedApplication().connectedScenes) {
+      if (scene.activationState != UISceneActivationStateForegroundActive || ![scene isKindOfClass:[UIWindowScene class]]) {
+        continue;
+      }
+      UIWindowScene *windowScene = (UIWindowScene *)scene;
+   
+      for (UIWindow *window in windowScene.windows) {
+        if (window.isKeyWindow) {
+          return window;
+        }
+      }
+    }
+   
+    return nil;
+}
+
 - (void)dealloc {
     if (self.unistylesRuntime != nullptr) {
         self.unistylesRuntime = nullptr;
@@ -33,6 +52,9 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                           name: UIContentSizeCategoryDidChangeNotification
                                           object: nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                          name: RCTWindowFrameDidChangeNotification
+                                          object: nil];
 }
 
 - (void)setupListeners {
@@ -40,8 +62,29 @@
                                              selector:@selector(onContentSizeCategoryChange:)
                                                  name:UIContentSizeCategoryDidChangeNotification
                                                object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onWindowResize:)
+                                                 name:RCTWindowFrameDidChangeNotification
+                                               object:nil];
 }
 
+- (void)onWindowResize:(NSNotification *)notification {
+    UIWindow* mainWindow = [self getMainWindow];
+
+    Dimensions screen = {(int)mainWindow.frame.size.width, (int)mainWindow.frame.size.height};
+    Insets insets = [self getInsets];
+    Dimensions statusBar = [self getStatusBarDimensions];
+    Dimensions navigationBar = [self getNavigationBarDimensions];
+
+    if (self.unistylesRuntime != nullptr) {
+        ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange(
+           screen,
+           insets,
+           statusBar,
+           navigationBar
+        );
+    }
+}
 
 - (void)onContentSizeCategoryChange:(NSNotification *)notification {
     UIContentSizeCategory contentSizeCategory = [[UIApplication sharedApplication] preferredContentSizeCategory];
