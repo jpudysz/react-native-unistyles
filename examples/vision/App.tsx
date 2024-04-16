@@ -71,8 +71,8 @@ const stylesheet = createStyleSheet(theme => ({
     },
     title: {
         fontSize: {
-            [mq.only.width(0, 1500)]: 80,
-            [mq.only.width(1500)]: 60
+            [mq.only.width(0, 1500)]: 60,
+            [mq.only.width(1500)]: 80
         },
         fontWeight: 'bold',
         color: theme.colors.typography,
