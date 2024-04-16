@@ -1,6 +1,7 @@
 #include <string>
 #include <map>
 #include <UnistylesRuntime.h>
+#import <UIKit/UIKit.h>
 
 @interface Platform : NSObject
 
@@ -15,9 +16,10 @@
 - (instancetype)init;
 
 - (void)setupListeners;
+- (UIWindow *)getMainWindow;
+- (std::string)getContentSizeCategory:(UIContentSizeCategory)contentSizeCategory;
 - (void)onContentSizeCategoryChange:(NSNotification *)notification;
-
-//- (std::string)getContentSizeCategory:(UIContentSizeCategory)contentSizeCategory;
+- (void)onWindowResize:(NSNotification *)notification;
 
 @end
 
