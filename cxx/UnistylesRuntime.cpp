@@ -220,6 +220,10 @@ jsi::Value UnistylesRuntime::get(jsi::Runtime& runtime, const jsi::PropNameID& p
             1,
             [this](jsi::Runtime &runtime, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
                 bool enableAdaptiveThemes = arguments[0].asBool();
+            
+                if (enableAdaptiveThemes && this->colorScheme == UnistylesUnspecifiedScheme) {
+                    throw jsi::JSError(runtime, UnistylesErrorAdaptiveThemesNotSupported);
+                }
 
                 this->hasAdaptiveThemes = enableAdaptiveThemes;
 

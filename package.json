@@ -44,6 +44,7 @@
     "react-native-windows",
     "react-native-web",
     "react-native-tvos",
+    "react-native-visionos",
     "expo"
   ],
   "repository": "https://github.com/jpudysz/react-native-unistyles",
@@ -119,6 +120,7 @@
     "examples/win",
     "examples/bare",
     "examples/tv",
+    "examples/vision",
     "docs"
   ],
   "packageManager": "yarn@3.6.4",
@@ -133,6 +135,7 @@
       "<rootDir>/examples/win/node_modules",
       "<rootDir>/examples/bare/node_modules",
       "<rootDir>/examples/tv/node_modules",
+      "<rootDir>/examples/vision/node_modules",
       "<rootDir>/docs/node_modules",
       "<rootDir>/lib/"
     ],

@@ -1,0 +1,5 @@
+export { Sun } from './Sun'
+export { Moon } from './Moon'
+export { Cloud } from './Cloud'
+export { Star } from './Star'
+export { Bird } from './Bird'
