@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import { UnistylesRuntime, createStyleSheet, useStyles  } from 'react-native-unistyles'
-import { Animated, Pressable } from 'react-native'
+import { Animated, Button, View } from 'react-native'
 import { Moon, Sun } from '../assets'
 
 type DayNightProps = {
@@ -9,7 +9,7 @@ type DayNightProps = {
 }
 
 export const DayNight: React.FunctionComponent<DayNightProps> = ({ onDay, onNight }) => {
-    const { styles } = useStyles(stylesheet)
+    const { styles, theme } = useStyles(stylesheet)
     const fadeOutAnimation = useRef(new Animated.Value(1))
     const fadeInAnimation = useRef(new Animated.Value(0))
     const scaleDownAnimation = useRef(new Animated.Value(1))
@@ -49,9 +49,7 @@ export const DayNight: React.FunctionComponent<DayNightProps> = ({ onDay, onNigh
     }
 
     return (
-        <Pressable
-            onPress={() => onToggle()}
-        >
+        <View>
             <Animated.View
                 style={{
                     transform: [{ scale: scaleDownAnimation.current }],
@@ -70,7 +68,14 @@ export const DayNight: React.FunctionComponent<DayNightProps> = ({ onDay, onNigh
             >
                 <Moon />
             </Animated.View>
-        </Pressable>
+            <View style={styles.button}>
+                <Button
+                    title="Toggle"
+                    onPress={onToggle}
+                    color={theme.colors.typography}
+                />
+            </View>
+        </View>
     )
 }
 
@@ -84,5 +89,11 @@ const stylesheet = createStyleSheet({
         position: 'absolute',
         right: 40,
         top: 40
+    },
+    button: {
+        maxWidth: 100,
+        top: 120,
+        left: 90,
+        backgroundColor: `rgba(255, 255, 255, 0.1)`
     }
 })
