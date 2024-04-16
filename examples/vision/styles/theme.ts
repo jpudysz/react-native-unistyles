@@ -1,7 +1,7 @@
 const sharedColors = {
     barbie: '#ff9ff3',
     oak: '#1dd1a1',
-    sky: '#48dbfb',
+    sky: '#213c85',
     fog: '#c8d6e5',
     aloes: '#00d2d3',
     blood: '#ff6b6b'
@@ -22,7 +22,7 @@ export const darkTheme = {
         ...sharedColors,
         backgroundColor: '#000000',
         typography: '#ffffff',
-        accent: sharedColors.barbie
+        accent: sharedColors.sky
     }
     // add any keys/functions/objects/arrays you want!
 }
