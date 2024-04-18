@@ -46,7 +46,7 @@ export const getInitialProps = async ({ renderPage }) => {
 
 ### Client side configuration
 
-To setup the listeners and Unistyles bindings, simply repeat the process, 
+To setup the listeners and Unistyles bindings, simply repeat the process,
 but this time with `_app.tsx` file.
 
 ```diff lang="tsx"
@@ -104,6 +104,37 @@ const stylesheet = ...
 :::tip
 If you are struggling with the working example, you can check out the [example repository](https://github.com/jpudysz/react-native-unistyles-ssr-exmaple).
 :::
+
+### Adaptive themes with SSR
+
+If you want to support [adaptiveThemes](/reference/theming/#adaptive-themes) in SRR you can't set it on server, because the server is unaware of your client's preferences.
+Instead, manually select either `light` or `dark` theme on the server:
+
+```diff lang="ts"
+UnistylesRegistry
+    .addBreakpoints(breakpoints)
+    .addThemes({
+        light: lightTheme,
+        dark: darkTheme
+    })
+    .addConfig({
+-        adaptiveThemes: true, // can't be used with SSR
++        initialTheme: 'light', // or dark
+        experimentalCSSMediaQueries: true
+    })
+```
+
+Then, on the client side, you can use the `UnistylesRuntime` to enable `adaptiveThemes` after the first render:
+
+```diff lang="ts"
+useEffect(() => {
+        // this will run only on client side
+        setIsClient(true)
++        UnistylesRuntime.setAdaptiveThemes(true)
+}, [])
+````
+
+The client will not notice the difference, and you will avoid hydration errors.
 
 :::caution
 SSR support is still experimental and may not work in all cases.
