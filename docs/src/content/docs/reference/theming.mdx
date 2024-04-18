@@ -22,7 +22,7 @@ Theming in `Unistyles` differs from other libraries as it doesn't impose any spe
 
 There is also no limit to the number of themes. You can even register dozens of them, for example, if your app sells some premium ones.
 
-Theming is optional. If you dont't register themes with [UnistylesRegistry](/reference/unistyles-registry) 
+Theming is optional. If you dont't register themes with [UnistylesRegistry](/reference/unistyles-registry)
 the library will use an empty object by default.
 
 ### Create a theme
@@ -185,6 +185,8 @@ UnistylesRegistry
     })
 ```
 
+In order to support `adaptiveThemes` with SSR, please follow [this](/reference/server-side-rendering/#adaptive-themes-with-ssr) guide.
+
 :::caution
 You shouldn't enable adaptive themes and set initial theme at the same time. It may cause unpredictable behavior.
 :::
@@ -245,7 +247,7 @@ If your app's theme is not changing based on device settings, please refer to th
 
 ### Change theme
 
-With Unistyles 2.0, we no longer use a React Context. However, this doesn't mean you can't change the theme. 
+With Unistyles 2.0, we no longer use a React Context. However, this doesn't mean you can't change the theme.
 In fact, it's even easier as you don't need to re-render the entire app.
 To change the theme at any time, simply call `setTheme` function:
 
@@ -270,7 +272,7 @@ UnistylesRuntime is a powerful feature, and you can learn more about it [here](/
 <Badge label="All platforms" />
 <Badge label="2.2.0" />
 
-Unistyles allows you to update your theme during runtime. This is useful if you want to show the user interface with default colors and later alter theme based on user preferences. 
+Unistyles allows you to update your theme during runtime. This is useful if you want to show the user interface with default colors and later alter theme based on user preferences.
 
 If you update the currently selected theme, it will be automatically applied, and Unistyles will notify all stylesheets about the change. Otherwise, theme will be updated silently.
 

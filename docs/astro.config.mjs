@@ -115,7 +115,8 @@ export default defineConfig({
                         },
                         {
                             label: 'Server side rendering',
-                            link: '/reference/server-side-rendering/'
+                            link: '/reference/server-side-rendering/',
+                            badge: 'New'
                         },
                         {
                             label: 'Debugging',
