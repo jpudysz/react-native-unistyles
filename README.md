@@ -1,4 +1,6 @@
 [<img alt="react-native-unistyles" src="assets/banner.png">](https://reactnativeunistyles.vercel.app/)
+[<img alt="react-native-unistyles-3.0" src="assets/v3.jpg">](https://github.com/jpudysz/react-native-unistyles/discussions/191)
+
 
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/jpudysz/react-native-unistyles?style=for-the-badge)
 [![npm downloads](https://img.shields.io/npm/dm/react-native-unistyles?style=for-the-badge)](https://www.npmjs.com/package/react-native-unistyles)
