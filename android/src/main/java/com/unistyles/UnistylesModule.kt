@@ -244,7 +244,9 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
 
         try {
-            activity.window.navigationBarColor = if (color == "") platform.defaultNavigationBarColor!! else Color.parseColor(color)
+            activity.runOnUiThread {
+                activity.window.navigationBarColor = if (color == "") platform.defaultNavigationBarColor!! else Color.parseColor(color)
+            }
         } catch (_: Exception) {
             Log.d("Unistyles", "Failed to set navigation bar color: $color")
         }
@@ -258,7 +260,9 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
 
         try {
-            activity.window.statusBarColor = if (color == "") platform.defaultStatusBarColor!! else Color.parseColor(color)
+            activity.runOnUiThread {
+                activity.window.statusBarColor = if (color == "") platform.defaultStatusBarColor!! else Color.parseColor(color)
+            }
         } catch (_: Exception) {
             Log.d("Unistyles", "Failed to set status bar color: $color")
         }
