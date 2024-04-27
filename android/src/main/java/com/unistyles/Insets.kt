@@ -87,18 +87,19 @@ class UnistylesInsets(private val reactApplicationContext: ReactApplicationConte
     @Suppress("DEPRECATION")
     private fun getBottomInset(baseInsets: Insets, window: Window): Int {
         val translucentNavigation = hasTranslucentNavigation(window)
+        val fullScreenMode = hasFullScreenMode(window)
 
         // Android 11 has inconsistent FLAG_LAYOUT_NO_LIMITS, which alone does nothing
         // https://stackoverflow.com/questions/64153785/android-11-window-setdecorfitssystemwindow-doesnt-show-screen-behind-status-a
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
-            if ((hasFullScreenMode(window) && translucentNavigation) || translucentNavigation) {
+            if ((fullScreenMode && translucentNavigation) || translucentNavigation) {
                 return baseInsets.bottom
             }
 
             return 0
         }
 
-        return if (hasTranslucentNavigation(window) || hasFullScreenMode(window)) baseInsets.bottom else 0
+        return if (translucentNavigation || fullScreenMode) baseInsets.bottom else 0
     }
 
     private fun forceLandscapeInsets(baseInsets: Insets, window: Window): Boolean {
@@ -133,6 +134,8 @@ class UnistylesInsets(private val reactApplicationContext: ReactApplicationConte
     }
 
     private fun hasFullScreenMode(window: Window): Boolean {
-        return (window.attributes.flags and WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS) == WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        val decorFitsSystemWindows = window.decorView.fitsSystemWindows
+
+        return (window.attributes.flags and WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS) == WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS || !decorFitsSystemWindows
     }
 }
