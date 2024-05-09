@@ -27,6 +27,11 @@ In order to use the library mocks you need to either use `jest` or set `process.
   "test": "NODE_ENV=test vitest"
 },
 ```
+Alternatively, you can import your Unistyles themes into `jest.setup.js`.
+```js
+// jest.setup.js
+import '../unistyles';
+```
 
 ### NativeEventEmitter
 
