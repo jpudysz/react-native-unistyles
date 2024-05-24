@@ -1,53 +1,13 @@
-#pragma once
-
+#include "UnistylesModel.h"
+#include "Macros.h"
 #include <jsi/jsi.h>
-#include <vector>
-#include <map>
-#include <optional>
 
 using namespace facebook;
 
-const std::string UnistylesOrientationPortrait = "portrait";
-const std::string UnistylesOrientationLandscape = "landscape";
+using Getter = std::function<jsi::Value(jsi::Runtime& rt, std::string)>;
+using Setter = std::function<std::optional<jsi::Value>(jsi::Runtime& rt, const jsi::Value&)>;
 
-const std::string UnistylesDarkScheme = "dark";
-const std::string UnistylesLightScheme = "light";
-const std::string UnistylesUnspecifiedScheme = "unspecified";
-
-const std::string UnistylesErrorBreakpointsCannotBeEmpty = "You are trying to register empty breakpoints object";
-const std::string UnistylesErrorBreakpointsMustStartFromZero = "You are trying to register breakpoints that don't start from 0";
-const std::string UnistylesErrorThemesCannotBeEmpty = "You are trying to register empty themes object";
-const std::string UnistylesErrorAdaptiveThemesNotSupported = "Your platform doesn't support adaptive themes";
-
-struct Dimensions {
-    int width;
-    int height;
-};
-
-struct Insets {
-    int top;
-    int bottom;
-    int left;
-    int right;
-};
-
-class JSI_EXPORT UnistylesRuntime : public jsi::HostObject {
-private:
-    std::function<void(std::string)> onThemeChangeCallback;
-    std::function<void(std::string breakpoint, std::string orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets, Dimensions& navigationBar)> onLayoutChangeCallback;
-    std::function<void(std::string)> onContentSizeCategoryChangeCallback;
-    std::function<void()> onPluginChangeCallback;
-    std::optional<std::function<void(std::string)>> onSetStatusBarColorCallback;
-    std::optional<std::function<void(std::string)>> onSetNavigationBarColorCallback;
-    
-    Dimensions screen;
-    Dimensions statusBar;
-    Dimensions navigationBar;
-    Insets insets;
-    std::string colorScheme;
-    std::string contentSizeCategory;
-    
-public:
+struct JSI_EXPORT UnistylesRuntime : public jsi::HostObject, UnistylesModel {
     UnistylesRuntime(
         Dimensions screen,
         std::string colorScheme,
@@ -55,54 +15,59 @@ public:
         Insets insets,
         Dimensions statusBar,
         Dimensions navigationBar
-     ): screen(screen),
-        colorScheme(colorScheme),
-        contentSizeCategory(contentSizeCategory),
-        insets(insets),
-        statusBar(statusBar),
-        navigationBar(navigationBar) {}
-
-    bool hasAdaptiveThemes;
-    bool supportsAutomaticColorScheme;
+    ) : UnistylesModel(screen, colorScheme, contentSizeCategory, insets, statusBar, navigationBar) {
+        this->getters = {
+            {"screenWidth", BIND_FN(getScreenWidth)},
+            {"screenHeight", BIND_FN(getScreenHeight)},
+            {"contentSizeCategory", BIND_FN(getContentSizeCategory)},
+            {"hasAdaptiveThemes", BIND_FN(hasEnabledAdaptiveThemes)},
+            {"themeName", BIND_FN(getThemeName)},
+            {"breakpoint", BIND_FN(getCurrentBreakpoint)},
+            {"colorScheme", BIND_FN(getColorScheme)},
+            {"sortedBreakpointPairs", BIND_FN(getSortedBreakpointPairs)},
+            {"useBreakpoints", BIND_FN(setBreakpoints)},
+            {"useTheme", BIND_FN(setActiveTheme)},
+            {"updateTheme", BIND_FN(updateTheme)},
+            {"useAdaptiveThemes", BIND_FN(useAdaptiveThemes)},
+            {"addPlugin", BIND_FN(addPlugin)},
+            {"removePlugin", BIND_FN(removePlugin)},
+            {"enabledPlugins", BIND_FN(getEnabledPlugins)},
+            {"insets", BIND_FN(getInsets)},
+            {"statusBar", BIND_FN(getStatusBar)},
+            {"navigationBar", BIND_FN(getNavigationBar)}
+        };
+        
+        this->setters = {
+            {"themes", BIND_FN(setThemes)}
+        };
+    };
+        
+    jsi::Value getScreenWidth(jsi::Runtime&, std::string);
+    jsi::Value getScreenHeight(jsi::Runtime&, std::string);
+    jsi::Value getContentSizeCategory(jsi::Runtime&, std::string);
+    jsi::Value hasEnabledAdaptiveThemes(jsi::Runtime&, std::string);
+    jsi::Value getThemeName(jsi::Runtime&, std::string);
+    jsi::Value getCurrentBreakpoint(jsi::Runtime&, std::string);
+    jsi::Value getColorScheme(jsi::Runtime&, std::string);
+    jsi::Value getSortedBreakpointPairs(jsi::Runtime&, std::string);
+    jsi::Value setBreakpoints(jsi::Runtime&, std::string);
+    jsi::Value setActiveTheme(jsi::Runtime&, std::string);
+    jsi::Value updateTheme(jsi::Runtime&, std::string);
+    jsi::Value useAdaptiveThemes(jsi::Runtime&, std::string);
+    jsi::Value addPlugin(jsi::Runtime&, std::string);
+    jsi::Value removePlugin(jsi::Runtime&, std::string);
+    jsi::Value getEnabledPlugins(jsi::Runtime&, std::string);
+    jsi::Value getInsets(jsi::Runtime&, std::string);
+    jsi::Value getStatusBar(jsi::Runtime&, std::string);
+    jsi::Value getNavigationBar(jsi::Runtime&, std::string);
     
-    std::string themeName;
-    std::string breakpoint;
-    std::vector<std::string> pluginNames;
-    std::vector<std::string> themes;
-    std::vector<std::pair<std::string, double>> sortedBreakpointPairs;
+    std::optional<jsi::Value> setThemes(jsi::Runtime&, const jsi::Value&);
     
-    void onThemeChange(std::function<void(std::string)> callback) {
-        this->onThemeChangeCallback = callback;
-    }
+    jsi::Value get(jsi::Runtime&, const jsi::PropNameID&) override;
+    void set(jsi::Runtime&, const jsi::PropNameID&, const jsi::Value&) override;
+    std::vector<jsi::PropNameID> getPropertyNames(jsi::Runtime&) override;
     
-    void onLayoutChange(std::function<void(std::string breakpoint, std::string orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets, Dimensions& navigationBar)> callback) {
-        this->onLayoutChangeCallback = callback;
-    }
-    
-    void onPluginChange(std::function<void()> callback) {
-        this->onPluginChangeCallback = callback;
-    }
-    
-    void onContentSizeCategoryChange(std::function<void(std::string)> callback) {
-        this->onContentSizeCategoryChangeCallback = callback;
-    }
-    
-    void onSetStatusBarColor(std::function<void(std::string color)> callback) {
-        this->onSetStatusBarColorCallback = callback;
-    }
-    
-    void onSetNavigationBarColor(std::function<void(std::string color)> callback) {
-        this->onSetNavigationBarColorCallback = callback;
-    }
-
-    jsi::Value get(jsi::Runtime&, const jsi::PropNameID& name) override;
-    void set(jsi::Runtime& runtime, const jsi::PropNameID& propNameId, const jsi::Value& value) override;
-    std::vector<jsi::PropNameID> getPropertyNames(jsi::Runtime& runtime) override;
-
-    void handleScreenSizeChange(Dimensions& screen, Insets& insets, Dimensions& statusBar, Dimensions& navigationBar);
-    void handleAppearanceChange(std::string colorScheme);
-    void handleContentSizeCategoryChange(std::string contentSizeCategory);
-
-    jsi::Value getThemeOrFail(jsi::Runtime&);
-    std::string getBreakpointFromScreenWidth(int width, const std::vector<std::pair<std::string, double>>& sortedBreakpointEntries);
+private:
+    std::map<std::string, Getter> getters;
+    std::map<std::string, Setter> setters;
 };
