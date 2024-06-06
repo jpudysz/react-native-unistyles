@@ -5,6 +5,8 @@ project(unistyles)
 add_library(unistyles
     SHARED
     ../cxx/UnistylesRuntime.cpp
+    ../cxx/UnistylesModel.cpp
+    ../cxx/UnistylesImpl.cpp
     ./src/main/cxx/cpp-adapter.cpp
     ./src/main/cxx/helpers.cpp
 )

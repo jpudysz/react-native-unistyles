@@ -1,3 +1,5 @@
+#pragma once
+
 #include "UnistylesModel.h"
 #include "Macros.h"
 #include <jsi/jsi.h>
@@ -36,12 +38,12 @@ struct JSI_EXPORT UnistylesRuntime : public jsi::HostObject, UnistylesModel {
             {"statusBar", BIND_FN(getStatusBar)},
             {"navigationBar", BIND_FN(getNavigationBar)}
         };
-        
+
         this->setters = {
             {"themes", BIND_FN(setThemes)}
         };
     };
-        
+
     jsi::Value getScreenWidth(jsi::Runtime&, std::string);
     jsi::Value getScreenHeight(jsi::Runtime&, std::string);
     jsi::Value getContentSizeCategory(jsi::Runtime&, std::string);
@@ -60,13 +62,13 @@ struct JSI_EXPORT UnistylesRuntime : public jsi::HostObject, UnistylesModel {
     jsi::Value getInsets(jsi::Runtime&, std::string);
     jsi::Value getStatusBar(jsi::Runtime&, std::string);
     jsi::Value getNavigationBar(jsi::Runtime&, std::string);
-    
+
     std::optional<jsi::Value> setThemes(jsi::Runtime&, const jsi::Value&);
-    
+
     jsi::Value get(jsi::Runtime&, const jsi::PropNameID&) override;
     void set(jsi::Runtime&, const jsi::PropNameID&, const jsi::Value&) override;
     std::vector<jsi::PropNameID> getPropertyNames(jsi::Runtime&) override;
-    
+
 private:
     std::map<std::string, Getter> getters;
     std::map<std::string, Setter> setters;

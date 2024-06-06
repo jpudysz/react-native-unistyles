@@ -11,6 +11,7 @@
     "@react-navigation/native": "6.1.9",
     "@react-navigation/native-stack": "6.9.17",
     "expo": "49.0.21",
+    "expo-navigation-bar": "2.3.0",
     "expo-splash-screen": "0.22.0",
     "expo-status-bar": "1.10.0",
     "old-unistyles": "npm:react-native-unistyles@1.2.0",

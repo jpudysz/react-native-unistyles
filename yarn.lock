@@ -13724,6 +13724,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-navigation-bar@npm:2.3.0":
+  version: 2.3.0
+  resolution: "expo-navigation-bar@npm:2.3.0"
+  dependencies:
+    "@react-native/normalize-color": ^2.0.0
+    debug: ^4.3.2
+  peerDependencies:
+    expo: "*"
+  checksum: 6f4afaaac7eb3e1ef9909ea09ad125efb64c4bba7022430a00d526941a551ac41639f57dce89a187aabb5e2cac85b24b6f03b6b788b8b086dc0e5fa675a9a1b8
+  languageName: node
+  linkType: hard
+
 "expo-pwa@npm:0.0.127":
   version: 0.0.127
   resolution: "expo-pwa@npm:0.0.127"
@@ -22491,6 +22503,7 @@ __metadata:
     babel-loader: 9.1.3
     babel-plugin-module-resolver: 5.0.0
     expo: 49.0.21
+    expo-navigation-bar: 2.3.0
     expo-splash-screen: 0.22.0
     expo-status-bar: 1.10.0
     old-unistyles: "npm:react-native-unistyles@1.2.0"

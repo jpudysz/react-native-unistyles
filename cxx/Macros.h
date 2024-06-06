@@ -1,3 +1,5 @@
+#pragma once
+
 #define HOST_FN(name, args, fn_body) \
     jsi::Function::createFromHostFunction(rt, \
         jsi::PropNameID::forAscii(rt, name), \
