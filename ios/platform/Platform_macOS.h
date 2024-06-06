@@ -15,7 +15,7 @@
 - (instancetype)init;
 
 - (void)setupListeners;
-- (void)onWindowResize;
+- (void)onWindowChange;
 - (void)onAppearanceChange;
 
 - (std::string)getColorScheme;
