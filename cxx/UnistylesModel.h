@@ -1,3 +1,5 @@
+#pragma once
+
 #include <jsi/jsi.h>
 #include <vector>
 #include <map>
