@@ -15,7 +15,7 @@
 - (instancetype)init;
 
 - (void)setupListeners;
-- (void)onOrientationChange:(NSNotification *)notification;
+- (void)onWindowChange:(NSNotification *)notification;
 - (void)onAppearanceChange:(NSNotification *)notification;
 - (void)onContentSizeCategoryChange:(NSNotification *)notification;
 
