@@ -39,16 +39,9 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                           name: RCTUserInterfaceStyleDidChangeNotification
                                           object: nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                          name: UIDeviceOrientationDidChangeNotification
-                                          object: nil];
 }
 
 - (void)setupListeners {
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onWindowChange:)
-                                                 name:UIDeviceOrientationDidChangeNotification
-                                               object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onWindowChange:)
                                                  name:RCTWindowFrameDidChangeNotification
