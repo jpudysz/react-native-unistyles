@@ -63,12 +63,12 @@
                                                  name:UIContentSizeCategoryDidChangeNotification
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onWindowResize:)
+                                             selector:@selector(onWindowChange:)
                                                  name:RCTWindowFrameDidChangeNotification
                                                object:nil];
 }
 
-- (void)onWindowResize:(NSNotification *)notification {
+- (void)onWindowChange:(NSNotification *)notification {
     UIWindow* mainWindow = [self getMainWindow];
 
     Dimensions screen = {(int)mainWindow.frame.size.width, (int)mainWindow.frame.size.height};

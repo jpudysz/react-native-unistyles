@@ -10,14 +10,14 @@
     self = [super init];
     if (self) {
         NSWindow *window = RCTSharedApplication().mainWindow;
-        
+
         self.initialScreen = {(int)window.frame.size.width, (int)window.frame.size.height};
         self.initialContentSizeCategory = std::string([@"unspecified" UTF8String]);
         self.initialColorScheme = [self getColorScheme];
         self.initialStatusBar = [self getStatusBarDimensions];
         self.initialNavigationBar = [self getNavigationBarDimensions];
         self.initialInsets = [self getInsets];
-        
+
         [self setupListeners];
     }
     return self;
@@ -27,16 +27,16 @@
     if (self.unistylesRuntime != nullptr) {
         self.unistylesRuntime = nullptr;
     }
-    
+
     NSWindow *window = RCTSharedApplication().mainWindow;
-    
+
     [window removeObserver:self forKeyPath:@"effectiveAppearance"];
     [window removeObserver:self forKeyPath:@"frame"];
 }
 
 - (void)setupListeners {
     NSWindow *window = RCTSharedApplication().mainWindow;
-    
+
     [window addObserver:self forKeyPath:@"effectiveAppearance" options:NSKeyValueObservingOptionNew context:nil];
     [window addObserver:self forKeyPath:@"frame" options:NSKeyValueObservingOptionNew context:nil];
 }
@@ -45,9 +45,9 @@
     if ([keyPath isEqualToString:@"effectiveAppearance"]) {
         return [self onAppearanceChange];
     }
-    
+
     if ([keyPath isEqualToString:@"frame"]) {
-        return [self onWindowResize];
+        return [self onWindowChange];
     }
 }
 
@@ -59,7 +59,7 @@
     }
 }
 
-- (void)onWindowResize {
+- (void)onWindowChange {
     NSWindow *window = RCTSharedApplication().mainWindow;
     Dimensions screen = {(int)window.frame.size.width, (int)window.frame.size.height};
     Insets insets = [self getInsets];
@@ -82,7 +82,7 @@
     if (appearance.name == NSAppearanceNameDarkAqua) {
         return UnistylesDarkScheme;
     }
-    
+
     return UnistylesLightScheme;
 }
 
