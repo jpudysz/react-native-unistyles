@@ -19,7 +19,7 @@
 - (UIWindow *)getMainWindow;
 - (std::string)getContentSizeCategory:(UIContentSizeCategory)contentSizeCategory;
 - (void)onContentSizeCategoryChange:(NSNotification *)notification;
-- (void)onWindowResize:(NSNotification *)notification;
+- (void)onWindowChange:(NSNotification *)notification;
 
 @end
 
