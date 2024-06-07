@@ -2,7 +2,6 @@
 #import "UnistylesRuntime.h"
 
 #import <React/RCTBridge+Private.h>
-#import <ReactCommon/RCTTurboModule.h>
 #import <jsi/jsi.h>
 
 using namespace facebook;
@@ -47,38 +46,30 @@ RCT_EXPORT_MODULE(Unistyles)
 #pragma mark - Core
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
-    RCTBridge* bridge = [RCTBridge currentBridge];
-    RCTCxxBridge* cxxBridge = (RCTCxxBridge*)bridge;
-
-    if (cxxBridge == nil) {
-        return @false;
-    }
-
-    auto jsiRuntime = (jsi::Runtime*)cxxBridge.runtime;
-
-    if (jsiRuntime == nil) {
-        return @false;
-    }
-
-    auto& runtime = *jsiRuntime;
-    auto callInvoker = bridge.jsCallInvoker;
     UnistylesModule *__weak weakSelf = self;
+    RCTBridge *bridge = self.bridge;
+    
+    if (bridge == nullptr) {
+        return @false;
+    }
 
-    registerUnistylesHostObject(runtime, callInvoker, weakSelf);
+    registerUnistylesHostObject(bridge, weakSelf);
 
     NSLog(@"Installed Unistyles 🦄!");
 
     return @true;
 }
 
-void registerUnistylesHostObject(jsi::Runtime &runtime, std::shared_ptr<react::CallInvoker> jsCallInvoker, UnistylesModule* weakSelf) {
-    auto unistylesRuntime = std::make_shared<UnistylesRuntime>(runtime, jsCallInvoker);
+void registerUnistylesHostObject(RCTBridge* bridge, UnistylesModule* weakSelf) {
+    std::shared_ptr<react::CallInvoker> callInvoker = bridge.jsCallInvoker;
+    jsi::Runtime* runtime = reinterpret_cast<jsi::Runtime*>(bridge.runtime);
+    auto unistylesRuntime = std::make_shared<UnistylesRuntime>(*runtime, callInvoker);
 
     [weakSelf.platform makeShared:unistylesRuntime.get()];
 
-    auto hostObject = jsi::Object::createFromHostObject(runtime, unistylesRuntime);
+    auto hostObject = jsi::Object::createFromHostObject(*runtime, unistylesRuntime);
 
-    runtime.global().setProperty(runtime, "__UNISTYLES__", std::move(hostObject));
+    runtime->global().setProperty(*runtime, "__UNISTYLES__", std::move(hostObject));
 }
 
 @end

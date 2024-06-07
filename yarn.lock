@@ -18772,9 +18772,9 @@ __metadata:
     "@react-native/metro-config": 0.73.2
     "@types/react": 18.2.71
     babel-plugin-module-resolver: 5.0.0
-    react: 18.2.0
-    react-native: 0.73.0
-    react-native-macos: 0.73.1
+    react: 18.3.1
+    react-native: 0.73.8
+    react-native-macos: 0.73.30
     typescript: 5.0.4
   languageName: unknown
   linkType: soft
@@ -22932,25 +22932,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-macos@npm:0.73.1":
-  version: 0.73.1
-  resolution: "react-native-macos@npm:0.73.1"
+"react-native-macos@npm:0.73.30":
+  version: 0.73.30
+  resolution: "react-native-macos@npm:0.73.30"
   dependencies:
     "@jest/create-cache-key-function": ^29.6.3
-    "@react-native-community/cli": 12.1.1
-    "@react-native-community/cli-platform-android": 12.1.1
-    "@react-native-community/cli-platform-ios": 12.1.1
+    "@react-native-community/cli": 12.3.6
+    "@react-native-community/cli-platform-android": 12.3.6
+    "@react-native-community/cli-platform-ios": 12.3.6
     "@react-native-mac/virtualized-lists": ^0.73.3
-    "@react-native/assets-registry": ^0.73.1
-    "@react-native/codegen": ^0.73.2
-    "@react-native/community-cli-plugin": ^0.73.10
-    "@react-native/gradle-plugin": ^0.73.4
-    "@react-native/js-polyfills": ^0.73.1
-    "@react-native/normalize-colors": ^0.73.2
+    "@react-native/assets-registry": 0.73.1
+    "@react-native/codegen": 0.73.3
+    "@react-native/community-cli-plugin": 0.73.17
+    "@react-native/gradle-plugin": 0.73.4
+    "@react-native/js-polyfills": 0.73.1
+    "@react-native/normalize-colors": 0.73.2
     abort-controller: ^3.0.0
     anser: ^1.4.9
     ansi-regex: ^5.0.0
     base64-js: ^1.5.1
+    chalk: ^4.0.0
     deprecated-react-native-prop-types: ^5.0.0
     event-target-shim: ^5.0.1
     flow-enums-runtime: ^0.0.6
@@ -22958,8 +22959,8 @@ __metadata:
     jest-environment-node: ^29.6.3
     jsc-android: ^250231.0.0
     memoize-one: ^5.0.0
-    metro-runtime: ^0.80.0
-    metro-source-map: ^0.80.0
+    metro-runtime: ^0.80.3
+    metro-source-map: ^0.80.3
     mkdirp: ^0.5.1
     nullthrows: ^1.1.1
     pretty-format: ^26.5.2
@@ -22977,7 +22978,7 @@ __metadata:
     react: 18.2.0
   bin:
     react-native-macos: cli.js
-  checksum: a09101054130ac9715a29f721313703434e55cf2676205acee8d151d0de6b1b2c2b9799a11ec28c48908f7d684f98e314c4f76faa764d26303106298ca79a8ee
+  checksum: fe6fe9d91dc8d1d01c69cbca71d47f593d150a1067172c533737dc36047c25c8b80302ced14aa4e5a29ef7c3afc7ffb8a0cfd3d02f87c3ebbbcfe6bedc597b92
   languageName: node
   linkType: hard
 
@@ -23254,55 +23255,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native@npm:0.73.0":
-  version: 0.73.0
-  resolution: "react-native@npm:0.73.0"
-  dependencies:
-    "@jest/create-cache-key-function": ^29.6.3
-    "@react-native-community/cli": 12.1.1
-    "@react-native-community/cli-platform-android": 12.1.1
-    "@react-native-community/cli-platform-ios": 12.1.1
-    "@react-native/assets-registry": ^0.73.1
-    "@react-native/codegen": ^0.73.2
-    "@react-native/community-cli-plugin": ^0.73.10
-    "@react-native/gradle-plugin": ^0.73.4
-    "@react-native/js-polyfills": ^0.73.1
-    "@react-native/normalize-colors": ^0.73.2
-    "@react-native/virtualized-lists": ^0.73.3
-    abort-controller: ^3.0.0
-    anser: ^1.4.9
-    ansi-regex: ^5.0.0
-    base64-js: ^1.5.1
-    deprecated-react-native-prop-types: ^5.0.0
-    event-target-shim: ^5.0.1
-    flow-enums-runtime: ^0.0.6
-    invariant: ^2.2.4
-    jest-environment-node: ^29.6.3
-    jsc-android: ^250231.0.0
-    memoize-one: ^5.0.0
-    metro-runtime: ^0.80.0
-    metro-source-map: ^0.80.0
-    mkdirp: ^0.5.1
-    nullthrows: ^1.1.1
-    pretty-format: ^26.5.2
-    promise: ^8.3.0
-    react-devtools-core: ^4.27.7
-    react-refresh: ^0.14.0
-    react-shallow-renderer: ^16.15.0
-    regenerator-runtime: ^0.13.2
-    scheduler: 0.24.0-canary-efb381bbf-20230505
-    stacktrace-parser: ^0.1.10
-    whatwg-fetch: ^3.0.0
-    ws: ^6.2.2
-    yargs: ^17.6.2
-  peerDependencies:
-    react: 18.2.0
-  bin:
-    react-native: cli.js
-  checksum: d988181d09ca53379d2e67b0928bf7b012b213b6ca1bde52ecff8881bcb36f8d78a767b7e85da629c018a0e326f29d468b9cc97c9196c46aa9a878c2859081b1
-  languageName: node
-  linkType: hard
-
 "react-native@npm:0.73.2":
   version: 0.73.2
   resolution: "react-native@npm:0.73.2"
@@ -23399,6 +23351,56 @@ __metadata:
   bin:
     react-native: cli.js
   checksum: 20e71c902f165c15add9f841bbc555c7b8495235122ccc42f5f1c5c0189c453651a450e59b6541188d8edb829a2aac524a1762501fb6ecebc4c89e9aa6667682
+  languageName: node
+  linkType: hard
+
+"react-native@npm:0.73.8":
+  version: 0.73.8
+  resolution: "react-native@npm:0.73.8"
+  dependencies:
+    "@jest/create-cache-key-function": ^29.6.3
+    "@react-native-community/cli": 12.3.6
+    "@react-native-community/cli-platform-android": 12.3.6
+    "@react-native-community/cli-platform-ios": 12.3.6
+    "@react-native/assets-registry": 0.73.1
+    "@react-native/codegen": 0.73.3
+    "@react-native/community-cli-plugin": 0.73.17
+    "@react-native/gradle-plugin": 0.73.4
+    "@react-native/js-polyfills": 0.73.1
+    "@react-native/normalize-colors": 0.73.2
+    "@react-native/virtualized-lists": 0.73.4
+    abort-controller: ^3.0.0
+    anser: ^1.4.9
+    ansi-regex: ^5.0.0
+    base64-js: ^1.5.1
+    chalk: ^4.0.0
+    deprecated-react-native-prop-types: ^5.0.0
+    event-target-shim: ^5.0.1
+    flow-enums-runtime: ^0.0.6
+    invariant: ^2.2.4
+    jest-environment-node: ^29.6.3
+    jsc-android: ^250231.0.0
+    memoize-one: ^5.0.0
+    metro-runtime: ^0.80.3
+    metro-source-map: ^0.80.3
+    mkdirp: ^0.5.1
+    nullthrows: ^1.1.1
+    pretty-format: ^26.5.2
+    promise: ^8.3.0
+    react-devtools-core: ^4.27.7
+    react-refresh: ^0.14.0
+    react-shallow-renderer: ^16.15.0
+    regenerator-runtime: ^0.13.2
+    scheduler: 0.24.0-canary-efb381bbf-20230505
+    stacktrace-parser: ^0.1.10
+    whatwg-fetch: ^3.0.0
+    ws: ^6.2.2
+    yargs: ^17.6.2
+  peerDependencies:
+    react: 18.2.0
+  bin:
+    react-native: cli.js
+  checksum: e6701ffed6c23f04f8a7336a3011b205ff05c069e5febfcd2b8026ca2b3633fb5716b0a024a0a81390a04f025fa16eb9068131b0851c669784a5dd0c9bc99fd7
   languageName: node
   linkType: hard
 
@@ -23606,6 +23608,15 @@ __metadata:
   dependencies:
     loose-envify: ^1.1.0
   checksum: 88e38092da8839b830cda6feef2e8505dec8ace60579e46aa5490fc3dc9bba0bd50336507dc166f43e3afc1c42939c09fe33b25fae889d6f402721dcd78fca1b
+  languageName: node
+  linkType: hard
+
+"react@npm:18.3.1":
+  version: 18.3.1
+  resolution: "react@npm:18.3.1"
+  dependencies:
+    loose-envify: ^1.1.0
+  checksum: a27bcfa8ff7c15a1e50244ad0d0c1cb2ad4375eeffefd266a64889beea6f6b64c4966c9b37d14ee32d6c9fcd5aa6ba183b6988167ab4d127d13e7cb5b386a376
   languageName: node
   linkType: hard
 

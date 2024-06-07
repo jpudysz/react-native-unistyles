@@ -1,7 +1,6 @@
 #if TARGET_OS_IOS
 
 #import "Platform_iOS.h"
-#import "UnistylesRuntime.h"
 #import <React/RCTAppearance.h>
 
 @implementation Platform
@@ -59,7 +58,7 @@
     });
     
     unistylesRuntime->setColorSchemeCallback([self](){
-        return [self getColorScheme];
+        return getColorScheme();
     });
     
     unistylesRuntime->setStatusBarDimensionsCallback([self](){
@@ -73,7 +72,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         unistylesRuntime->screen = [self getScreenDimensions];
         unistylesRuntime->contentSizeCategory = getContentSizeCategory();
-        unistylesRuntime->colorScheme = [self getColorScheme];
+        unistylesRuntime->colorScheme = getColorScheme();
         unistylesRuntime->statusBar = [self getStatusBarDimensions];
         unistylesRuntime->insets = [self getInsets];
     });
@@ -81,7 +80,7 @@
 
 - (void)onAppearanceChange:(NSNotification *)notification {
     if (self.unistylesRuntime != nullptr) {
-        ((UnistylesRuntime*)self.unistylesRuntime)->handleAppearanceChange([self getColorScheme]);
+        ((UnistylesRuntime*)self.unistylesRuntime)->handleAppearanceChange(getColorScheme());
     }
 }
 
