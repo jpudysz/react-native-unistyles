@@ -1,7 +1,6 @@
 #if TARGET_OS_OSX
 
 #import "Platform_macOS.h"
-#import "UnistylesRuntime.h"
 #import <React/RCTUtils.h>
 
 @implementation Platform
