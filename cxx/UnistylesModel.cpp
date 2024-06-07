@@ -13,27 +13,34 @@ std::string UnistylesModel::getBreakpointFromScreenWidth(int width, const std::v
     return sortedBreakpointPairs.empty() ? "" : sortedBreakpointPairs.back().first;
 }
 
-void UnistylesModel::handleScreenSizeChange(Dimensions& screen, Insets& insets, Dimensions& statusBar, Dimensions& navigationBar) {
+void UnistylesModel::handleScreenSizeChange(Dimensions& screen, std::optional<Insets> insets, std::optional<Dimensions> statusBar, std::optional<Dimensions> navigationBar) {
     std::string breakpoint = this->getBreakpointFromScreenWidth(screen.width, this->sortedBreakpointPairs);
     bool hasDifferentBreakpoint = this->breakpoint != breakpoint;
     bool hasDifferentScreenDimensions = this->screen.width != screen.width || this->screen.height != screen.height;
-    bool hasDifferentInsets = this->insets.top != insets.top || this->insets.bottom != insets.bottom || this->insets.left != insets.left || this->insets.right != insets.right;
+    bool hasDifferentInsets = insets.has_value()
+        ? this->insets.top != insets->top || this->insets.bottom != insets->bottom || this->insets.left != insets->left || this->insets.right != insets->right
+        : false;
 
     // we don't need to check statusBar/navigationBar as they will only change on orientation change witch is equal to hasDifferentScreenDimensions
     bool shouldNotify = hasDifferentBreakpoint || hasDifferentScreenDimensions || hasDifferentInsets;
 
     this->breakpoint = breakpoint;
     this->screen = {screen.width, screen.height};
-    this->insets = {insets.top, insets.bottom, insets.left, insets.right};
-    this->statusBar = {statusBar.width, statusBar.height};
-    this->navigationBar = {navigationBar.width, navigationBar.height};
-
-    std::string orientation = screen.width > screen.height
-        ? UnistylesOrientationLandscape
-        : UnistylesOrientationPortrait;
+    
+    if (insets.has_value()) {
+        this->insets = {insets->top, insets->bottom, insets->left, insets->right};
+    }
+    
+    if (statusBar.has_value()) {
+        this->statusBar = {statusBar->width, statusBar->height};
+    }
+    
+    if (navigationBar.has_value()) {
+        this->navigationBar = {navigationBar->width, navigationBar->height};
+    }
 
     if (shouldNotify) {
-        this->onLayoutChange(breakpoint, orientation, screen, statusBar, insets, navigationBar);
+        this->onLayoutChange();
     }
 }
 
@@ -94,6 +101,7 @@ std::vector<std::pair<std::string, double>> UnistylesModel::toSortedBreakpointPa
 // a little bit hacky, but works like Turbo Module emitDeviceEvent
 // it will be super easy to refactor for Unistyles 3.0
 // ref: https://github.com/facebook/react-native/pull/43375
+// ref: https://github.com/facebook/react-native/blob/b5fd041917d197f256433a41a126f0dff767c429/packages/react-native/ReactCommon/react/nativemodule/core/ReactCommon/TurboModule.cpp#L42
 void UnistylesModel::emitDeviceEvent(const std::string eventType, EventPayload payload) {
     this->callInvoker->invokeAsync([eventType, payload, this](){
         jsi::Value emitter = this->runtime.global().getProperty(this->runtime, "__rctDeviceEventEmitter");
@@ -139,31 +147,42 @@ void UnistylesModel::onPluginChange() {
     this->emitDeviceEvent("plugin", {});
 }
 
-void UnistylesModel::onLayoutChange(std::string breakpoint, std::string orientation, Dimensions &screen, Dimensions &statusBar, Insets &insets, Dimensions &navigationBar) {
+void UnistylesModel::onLayoutChange() {
     EventPayload payload;
+    std::string orientation = screen.width > screen.height
+        ? UnistylesOrientationLandscape
+        : UnistylesOrientationPortrait;
 
-    payload["breakpoint"] = breakpoint;
+    payload["breakpoint"] = this->breakpoint;
     payload["orientation"] = orientation;
 
     EventNestedValue screenPayload;
+    auto screen = this->screen;
+    
     screenPayload["width"] = screen.width;
     screenPayload["height"] = screen.height;
 
     payload["screen"] = screenPayload;
 
     EventNestedValue statusBarPayload;
+    auto statusBar = this->statusBar;
+    
     statusBarPayload["width"] = statusBar.width;
     statusBarPayload["height"] = statusBar.height;
 
     payload["statusBar"] = statusBarPayload;
 
     EventNestedValue navigationBarPayload;
+    auto navigationBar = this->navigationBar;
+    
     navigationBarPayload["width"] = navigationBar.width;
     navigationBarPayload["height"] = navigationBar.height;
 
     payload["navigationBar"] = navigationBarPayload;
 
     EventNestedValue insetsPayload;
+    auto insets = this->insets;
+    
     insetsPayload["top"] = insets.top;
     insetsPayload["bottom"] = insets.bottom;
     insetsPayload["left"] = insets.left;

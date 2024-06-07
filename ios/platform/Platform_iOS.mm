@@ -9,17 +9,6 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        UIViewController *presentedViewController = RCTPresentedViewController();
-        CGRect windowFrame = presentedViewController.view.window.frame;
-
-        UIContentSizeCategory contentSizeCategory = [[UIApplication sharedApplication] preferredContentSizeCategory];
-
-        self.initialScreen = {(int)windowFrame.size.width, (int)windowFrame.size.height};
-        self.initialColorScheme = [self getColorScheme];
-        self.initialContentSizeCategory = [self getContentSizeCategory:contentSizeCategory];
-        self.initialStatusBar = [self getStatusBarDimensions];
-        self.initialInsets = [self getInsets];
-
         [self setupListeners];
     }
     return self;
@@ -56,50 +45,62 @@
                                                object:nil];
 }
 
-- (void)onAppearanceChange:(NSNotification *)notification {
-    std::string colorScheme = [self getColorScheme];
+- (void)makeShared:(void*)runtime {
+    self.unistylesRuntime = runtime;
+    
+    auto unistylesRuntime = ((UnistylesRuntime*)self.unistylesRuntime);
+    
+    unistylesRuntime->setScreenDimensionsCallback([self](){
+        return [self getScreenDimensions];
+    });
+    
+    unistylesRuntime->setContentSizeCategoryCallback([](){
+        return getContentSizeCategory();
+    });
+    
+    unistylesRuntime->setColorSchemeCallback([self](){
+        return [self getColorScheme];
+    });
+    
+    unistylesRuntime->setStatusBarDimensionsCallback([self](){
+        return [self getStatusBarDimensions];
+    });
+    
+    unistylesRuntime->setInsetsCallback([self](){
+        return [self getInsets];
+    });
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        unistylesRuntime->screen = [self getScreenDimensions];
+        unistylesRuntime->contentSizeCategory = getContentSizeCategory();
+        unistylesRuntime->colorScheme = [self getColorScheme];
+        unistylesRuntime->statusBar = [self getStatusBarDimensions];
+        unistylesRuntime->insets = [self getInsets];
+    });
+}
 
+- (void)onAppearanceChange:(NSNotification *)notification {
     if (self.unistylesRuntime != nullptr) {
-        ((UnistylesRuntime*)self.unistylesRuntime)->handleAppearanceChange(colorScheme);
+        ((UnistylesRuntime*)self.unistylesRuntime)->handleAppearanceChange([self getColorScheme]);
     }
 }
 
 - (void)onContentSizeCategoryChange:(NSNotification *)notification {
-    UIContentSizeCategory contentSizeCategory = [[UIApplication sharedApplication] preferredContentSizeCategory];
-
     if (self.unistylesRuntime != nullptr) {
-        ((UnistylesRuntime*)self.unistylesRuntime)->handleContentSizeCategoryChange([self getContentSizeCategory:contentSizeCategory]);
+        ((UnistylesRuntime*)self.unistylesRuntime)->handleContentSizeCategoryChange(getContentSizeCategory());
     }
 }
 
 - (void)onWindowChange:(NSNotification *)notification {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        UIViewController *presentedViewController = RCTPresentedViewController();
-
-        CGRect windowFrame = presentedViewController.view.frame;
-        Dimensions screen = {(int)windowFrame.size.width, (int)windowFrame.size.height};
+        Dimensions screen = [self getScreenDimensions];
         Insets insets = [self getInsets];
         Dimensions statusBar = [self getStatusBarDimensions];
-        Dimensions navigationBar = [self getNavigationBarDimensions];
 
         if (self.unistylesRuntime != nullptr) {
-            ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange(screen, insets, statusBar, navigationBar);
+            ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange(screen, insets, statusBar, std::nullopt);
         }
     });
-}
-
-- (std::string)getColorScheme {
-    UIUserInterfaceStyle colorScheme = [UIScreen mainScreen].traitCollection.userInterfaceStyle;
-
-    switch (colorScheme) {
-        case UIUserInterfaceStyleLight:
-            return UnistylesLightScheme;
-        case UIUserInterfaceStyleDark:
-            return UnistylesDarkScheme;
-        case UIUserInterfaceStyleUnspecified:
-        default:
-            return UnistylesUnspecifiedScheme;
-    }
 }
 
 - (Insets)getInsets {
@@ -110,65 +111,18 @@
 }
 
 - (Dimensions)getStatusBarDimensions {
-    CGRect statusBarFrame = UIApplication.sharedApplication.statusBarFrame;
-
+    UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
+    CGRect statusBarFrame = window.windowScene.statusBarManager.statusBarFrame;
+ 
     return {(int)statusBarFrame.size.width, (int)statusBarFrame.size.height};
 }
 
-- (Dimensions)getNavigationBarDimensions {
-    return {0, 0};
-}
-
-- (std::string)getContentSizeCategory:(UIContentSizeCategory)contentSizeCategory {
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryExtraExtraExtraLarge]) {
-        return std::string([@"xxxLarge" UTF8String]);
-    }
-
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryExtraExtraLarge]) {
-        return std::string([@"xxLarge" UTF8String]);
-    }
-
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryExtraLarge]) {
-        return std::string([@"xLarge" UTF8String]);
-    }
-
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryLarge]) {
-        return std::string([@"Large" UTF8String]);
-    }
-
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryMedium]) {
-        return std::string([@"Medium" UTF8String]);
-    }
-
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategorySmall]) {
-        return std::string([@"Small" UTF8String]);
-    }
-
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryExtraSmall]) {
-        return std::string([@"xSmall" UTF8String]);
-    }
-
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryAccessibilityMedium]) {
-        return std::string([@"accessibilityMedium" UTF8String]);
-    }
-
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryAccessibilityLarge]) {
-        return std::string([@"accessibilityLarge" UTF8String]);
-    }
-
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryAccessibilityExtraLarge]) {
-        return std::string([@"accessibilityExtraLarge" UTF8String]);
-    }
-
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryAccessibilityExtraExtraLarge]) {
-        return std::string([@"accessibilityExtraExtraLarge" UTF8String]);
-    }
-
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryAccessibilityExtraExtraExtraLarge]) {
-        return std::string([@"accessibilityExtraExtraExtraLarge" UTF8String]);
-    }
-
-    return std::string([@"unspecified" UTF8String]);
+- (Dimensions)getScreenDimensions {
+    UIViewController *presentedViewController = RCTPresentedViewController();
+    CGRect windowFrame = presentedViewController.view.window.frame;
+    Dimensions screenDimension = {(int)windowFrame.size.width, (int)windowFrame.size.height};
+    
+    return screenDimension;
 }
 
 @end
