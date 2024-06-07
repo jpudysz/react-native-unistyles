@@ -33,7 +33,7 @@ void UnistylesModel::handleScreenSizeChange(Dimensions& screen, Insets& insets, 
         : UnistylesOrientationPortrait;
 
     if (shouldNotify) {
-        this->onLayoutChangeCallback(breakpoint, orientation, screen, statusBar, insets, navigationBar);
+        this->onLayoutChange(breakpoint, orientation, screen, statusBar, insets, navigationBar);
     }
 }
 
@@ -45,14 +45,14 @@ void UnistylesModel::handleAppearanceChange(std::string colorScheme) {
     }
 
     if (this->themeName != this->colorScheme) {
-        this->onThemeChangeCallback(this->colorScheme);
+        this->onThemeChange(this->colorScheme);
         this->themeName = this->colorScheme;
     }
 }
 
 void UnistylesModel::handleContentSizeCategoryChange(std::string contentSizeCategory) {
     this->contentSizeCategory = contentSizeCategory;
-    this->onContentSizeCategoryChangeCallback(contentSizeCategory);
+    this->onContentSizeCategoryChange(contentSizeCategory);
 }
 
 jsi::Value UnistylesModel::getThemeOrFail(jsi::Runtime& runtime) {
@@ -70,7 +70,7 @@ jsi::Value UnistylesModel::getThemeOrFail(jsi::Runtime& runtime) {
 std::vector<std::pair<std::string, double>> UnistylesModel::toSortedBreakpointPairs(jsi::Runtime& rt, jsi::Object& breakpointsObj) {
     jsi::Array propertyNames = breakpointsObj.getPropertyNames(rt);
     std::vector<std::pair<std::string, double>> sortedBreakpointEntriesVec;
-    
+
     for (size_t i = 0; i < propertyNames.size(rt); ++i) {
         jsi::Value propNameValue = propertyNames.getValueAtIndex(rt, i);
         std::string name = propNameValue.asString(rt).utf8(rt);
@@ -79,7 +79,7 @@ std::vector<std::pair<std::string, double>> UnistylesModel::toSortedBreakpointPa
 
         if (value.isNumber()) {
             double breakpointValue = value.asNumber();
-            
+
             sortedBreakpointEntriesVec.push_back(std::make_pair(name, breakpointValue));
         }
     }
@@ -87,6 +87,125 @@ std::vector<std::pair<std::string, double>> UnistylesModel::toSortedBreakpointPa
     std::sort(sortedBreakpointEntriesVec.begin(), sortedBreakpointEntriesVec.end(), [](const std::pair<std::string, double>& a, const std::pair<std::string, double>& b) {
         return a.second < b.second;
     });
-    
+
     return sortedBreakpointEntriesVec;
+}
+
+// a little bit hacky, but works like Turbo Module emitDeviceEvent
+// it will be super easy to refactor for Unistyles 3.0
+// ref: https://github.com/facebook/react-native/pull/43375
+void UnistylesModel::emitDeviceEvent(const std::string eventType, EventPayload payload) {
+    this->callInvoker->invokeAsync([eventType, payload, this](){
+        jsi::Value emitter = this->runtime.global().getProperty(this->runtime, "__rctDeviceEventEmitter");
+
+        if (emitter.isUndefined()) {
+            return;
+        }
+
+        jsi::Object emitterObject = emitter.asObject(runtime);
+        jsi::Function emitFunction = emitterObject.getPropertyAsFunction(runtime, "emit");
+
+        std::vector<jsi::Value> arguments;
+        jsi::Object event = jsi::Object(this->runtime);
+
+        event.setProperty(this->runtime, "type", jsi::String::createFromUtf8(this->runtime, eventType));
+
+        jsi::Object eventPayload = this->parseEventPayload(payload);
+
+        event.setProperty(this->runtime, "payload", eventPayload);
+
+        arguments.emplace_back(jsi::String::createFromAscii(runtime, "__unistylesOnChange"));
+        arguments.emplace_back(std::move(event));
+
+        emitFunction.callWithThis(runtime, emitterObject, (const jsi::Value*)arguments.data(), arguments.size());
+    });
+}
+
+void UnistylesModel::onThemeChange(std::string themeName) {
+    EventPayload payload;
+    payload["themeName"] = themeName;
+
+    this->emitDeviceEvent("theme", payload);
+}
+
+void UnistylesModel::onContentSizeCategoryChange(std::string contentSizeCategory) {
+    EventPayload payload;
+    payload["contentSizeCategory"] = contentSizeCategory;
+
+    this->emitDeviceEvent("dynamicTypeSize", payload);
+}
+
+void UnistylesModel::onPluginChange() {
+    this->emitDeviceEvent("plugin", {});
+}
+
+void UnistylesModel::onLayoutChange(std::string breakpoint, std::string orientation, Dimensions &screen, Dimensions &statusBar, Insets &insets, Dimensions &navigationBar) {
+    EventPayload payload;
+
+    payload["breakpoint"] = breakpoint;
+    payload["orientation"] = orientation;
+
+    EventNestedValue screenPayload;
+    screenPayload["width"] = screen.width;
+    screenPayload["height"] = screen.height;
+
+    payload["screen"] = screenPayload;
+
+    EventNestedValue statusBarPayload;
+    statusBarPayload["width"] = statusBar.width;
+    statusBarPayload["height"] = statusBar.height;
+
+    payload["statusBar"] = statusBarPayload;
+
+    EventNestedValue navigationBarPayload;
+    navigationBarPayload["width"] = navigationBar.width;
+    navigationBarPayload["height"] = navigationBar.height;
+
+    payload["navigationBar"] = navigationBarPayload;
+
+    EventNestedValue insetsPayload;
+    insetsPayload["top"] = insets.top;
+    insetsPayload["bottom"] = insets.bottom;
+    insetsPayload["left"] = insets.left;
+    insetsPayload["right"] = insets.right;
+
+    payload["insets"] = insetsPayload;
+
+    this->emitDeviceEvent("layout", payload);
+}
+
+jsi::Object UnistylesModel::parseEventPayload(EventPayload payload) {
+    jsi::Object eventPayload = jsi::Object(this->runtime);
+
+    for (const auto& [key, value] : payload) {
+        if (std::holds_alternative<std::string>(value)) {
+            eventPayload.setProperty(this->runtime, key.c_str(), jsi::String::createFromUtf8(this->runtime, std::get<std::string>(value)));
+        }
+
+        if (std::holds_alternative<int>(value)) {
+            eventPayload.setProperty(this->runtime, key.c_str(), std::get<int>(value));
+        }
+
+        if (std::holds_alternative<EventNestedValue>(value)) {
+            eventPayload.setProperty(this->runtime, key.c_str(), this->parseEventNestedPayload(std::get<EventNestedValue>(value)));
+        }
+    }
+
+    return eventPayload;
+}
+
+jsi::Object UnistylesModel::parseEventNestedPayload(EventNestedValue payload) {
+    jsi::Object eventPayload = jsi::Object(this->runtime);
+
+    for (const auto& [key, value] : payload) {
+        if (std::holds_alternative<std::string>(value)) {
+            eventPayload.setProperty(this->runtime, key.c_str(), jsi::String::createFromUtf8(this->runtime, std::get<std::string>(value)));
+        }
+
+        if (std::holds_alternative<int>(value)) {
+            eventPayload.setProperty(this->runtime, key.c_str(), std::get<int>(value));
+        }
+    }
+
+    return eventPayload;
 }

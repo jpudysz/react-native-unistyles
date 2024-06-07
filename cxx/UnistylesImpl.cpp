@@ -79,7 +79,7 @@ jsi::Value UnistylesRuntime::setActiveTheme(jsi::Runtime& rt, std::string fnName
 
         if (this->themeName != themeName) {
             this->themeName = themeName;
-            this->onThemeChangeCallback(themeName);
+            this->onThemeChange(themeName);
         }
 
         return jsi::Value::undefined();
@@ -91,7 +91,7 @@ jsi::Value UnistylesRuntime::updateTheme(jsi::Runtime& rt, std::string fnName) {
         std::string themeName = arguments[0].asString(rt).utf8(rt);
 
         if (this->themeName == themeName) {
-            this->onThemeChangeCallback(themeName);
+            this->onThemeChange(themeName);
         }
 
         return jsi::Value::undefined();
@@ -114,7 +114,7 @@ jsi::Value UnistylesRuntime::useAdaptiveThemes(jsi::Runtime& rt, std::string fnN
 
         if (this->themeName != this->colorScheme) {
             this->themeName = this->colorScheme;
-            this->onThemeChangeCallback(this->themeName);
+            this->onThemeChange(this->themeName);
         }
 
         return jsi::Value::undefined();
@@ -130,7 +130,7 @@ jsi::Value UnistylesRuntime::addPlugin(jsi::Runtime& rt, std::string fnName) {
 
         // registry enabled plugins won't notify listeners
         if (notify) {
-            this->onPluginChangeCallback();
+            this->onPluginChange();
         }
 
         return jsi::Value::undefined();
@@ -145,7 +145,7 @@ jsi::Value UnistylesRuntime::removePlugin(jsi::Runtime& rt, std::string fnName) 
 
         if (it != this->pluginNames.end()) {
             this->pluginNames.erase(it);
-            this->onPluginChangeCallback();
+            this->onPluginChange();
         }
 
         return jsi::Value::undefined();
