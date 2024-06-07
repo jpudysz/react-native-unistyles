@@ -2,6 +2,7 @@
 
 #include "UnistylesModel.h"
 #include "Macros.h"
+#include <ReactCommon/CallInvoker.h>
 #include <jsi/jsi.h>
 
 using namespace facebook;
@@ -16,8 +17,10 @@ struct JSI_EXPORT UnistylesRuntime : public jsi::HostObject, UnistylesModel {
         std::string contentSizeCategory,
         Insets insets,
         Dimensions statusBar,
-        Dimensions navigationBar
-    ) : UnistylesModel(screen, colorScheme, contentSizeCategory, insets, statusBar, navigationBar) {
+        Dimensions navigationBar,
+        jsi::Runtime& rt,
+        std::shared_ptr<react::CallInvoker> callInvoker
+    ) : UnistylesModel(screen, colorScheme, contentSizeCategory, insets, statusBar, navigationBar, rt, callInvoker) {
         this->getters = {
             {"screenWidth", BIND_FN(getScreenWidth)},
             {"screenHeight", BIND_FN(getScreenHeight)},

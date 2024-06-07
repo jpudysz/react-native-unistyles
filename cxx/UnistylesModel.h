@@ -1,6 +1,7 @@
 #pragma once
 
 #include <jsi/jsi.h>
+#include <ReactCommon/CallInvoker.h>
 #include <vector>
 #include <map>
 #include <optional>
@@ -31,11 +32,17 @@ struct Insets {
     int right;
 };
 
+using EventNestedValue = std::map<std::string, std::variant<std::string, int>>;
+using EventValue = std::variant<std::string, int>;
+using EventPayload = std::map<std::string, std::variant<std::string, int, EventNestedValue>>;
+
 struct UnistylesModel {
-    std::function<void(std::string)> onThemeChangeCallback;
-    std::function<void(std::string breakpoint, std::string orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets, Dimensions& navigationBar)> onLayoutChangeCallback;
-    std::function<void(std::string)> onContentSizeCategoryChangeCallback;
-    std::function<void()> onPluginChangeCallback;
+
+    void onThemeChange(std::string themeName);
+    void onPluginChange();
+    void onContentSizeCategoryChange(std::string contentSizeCategory);
+    void onLayoutChange(std::string breakpoint, std::string orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets, Dimensions& navigationBar);
+
     std::optional<std::function<void(std::string)>> onSetStatusBarColorCallback;
     std::optional<std::function<void(std::string)>> onSetNavigationBarColorCallback;
 
@@ -52,13 +59,17 @@ struct UnistylesModel {
         std::string contentSizeCategory,
         Insets insets,
         Dimensions statusBar,
-        Dimensions navigationBar
+        Dimensions navigationBar,
+        jsi::Runtime& rt,
+        std::shared_ptr<react::CallInvoker> callInvoker
     ): screen(screen),
         colorScheme(colorScheme),
         contentSizeCategory(contentSizeCategory),
         insets(insets),
         statusBar(statusBar),
-        navigationBar(navigationBar) {}
+        navigationBar(navigationBar),
+        runtime(rt),
+        callInvoker(callInvoker) {}
 
     bool hasAdaptiveThemes;
     bool supportsAutomaticColorScheme;
@@ -68,22 +79,6 @@ struct UnistylesModel {
     std::vector<std::string> pluginNames;
     std::vector<std::string> themes;
     std::vector<std::pair<std::string, double>> sortedBreakpointPairs;
-
-    void onThemeChange(std::function<void(std::string)> callback) {
-        this->onThemeChangeCallback = callback;
-    }
-
-    void onLayoutChange(std::function<void(std::string breakpoint, std::string orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets, Dimensions& navigationBar)> callback) {
-        this->onLayoutChangeCallback = callback;
-    }
-
-    void onPluginChange(std::function<void()> callback) {
-        this->onPluginChangeCallback = callback;
-    }
-
-    void onContentSizeCategoryChange(std::function<void(std::string)> callback) {
-        this->onContentSizeCategoryChangeCallback = callback;
-    }
 
     void onSetStatusBarColor(std::function<void(std::string color)> callback) {
         this->onSetStatusBarColorCallback = callback;
@@ -96,8 +91,15 @@ struct UnistylesModel {
     void handleScreenSizeChange(Dimensions& screen, Insets& insets, Dimensions& statusBar, Dimensions& navigationBar);
     void handleAppearanceChange(std::string colorScheme);
     void handleContentSizeCategoryChange(std::string contentSizeCategory);
+    void emitDeviceEvent(const std::string eventType, EventPayload payload);
+    jsi::Object parseEventPayload(EventPayload payload);
+    jsi::Object parseEventNestedPayload(EventNestedValue payload);
 
     jsi::Value getThemeOrFail(jsi::Runtime&);
     std::string getBreakpointFromScreenWidth(int width, const std::vector<std::pair<std::string, double>>& sortedBreakpointEntries);
     std::vector<std::pair<std::string, double>> toSortedBreakpointPairs(jsi::Runtime&, jsi::Object&);
+
+private:
+    jsi::Runtime& runtime;
+    std::shared_ptr<react::CallInvoker> callInvoker;
 };
