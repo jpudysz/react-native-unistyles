@@ -1,5 +1,4 @@
 #import "UnistylesModule.h"
-#import "UnistylesHelpers.h"
 #import "UnistylesRuntime.h"
 
 #import <React/RCTBridge+Private.h>
@@ -73,18 +72,9 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
 }
 
 void registerUnistylesHostObject(jsi::Runtime &runtime, std::shared_ptr<react::CallInvoker> jsCallInvoker, UnistylesModule* weakSelf) {
-    auto unistylesRuntime = std::make_shared<UnistylesRuntime>(
-        weakSelf.platform.initialScreen,
-        weakSelf.platform.initialColorScheme,
-        weakSelf.platform.initialContentSizeCategory,
-        weakSelf.platform.initialInsets,
-        weakSelf.platform.initialStatusBar,
-        weakSelf.platform.initialNavigationBar,
-        runtime,
-        jsCallInvoker
-    );
+    auto unistylesRuntime = std::make_shared<UnistylesRuntime>(runtime, jsCallInvoker);
 
-    weakSelf.platform.unistylesRuntime = unistylesRuntime.get();
+    [weakSelf.platform makeShared:unistylesRuntime.get()];
 
     auto hostObject = jsi::Object::createFromHostObject(runtime, unistylesRuntime);
 

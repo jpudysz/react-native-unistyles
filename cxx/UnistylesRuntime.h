@@ -11,16 +11,7 @@ using Getter = std::function<jsi::Value(jsi::Runtime& rt, std::string)>;
 using Setter = std::function<std::optional<jsi::Value>(jsi::Runtime& rt, const jsi::Value&)>;
 
 struct JSI_EXPORT UnistylesRuntime : public jsi::HostObject, UnistylesModel {
-    UnistylesRuntime(
-        Dimensions screen,
-        std::string colorScheme,
-        std::string contentSizeCategory,
-        Insets insets,
-        Dimensions statusBar,
-        Dimensions navigationBar,
-        jsi::Runtime& rt,
-        std::shared_ptr<react::CallInvoker> callInvoker
-    ) : UnistylesModel(screen, colorScheme, contentSizeCategory, insets, statusBar, navigationBar, rt, callInvoker) {
+    UnistylesRuntime(jsi::Runtime& rt, std::shared_ptr<react::CallInvoker> callInvoker) : UnistylesModel(rt, callInvoker) {
         this->getters = {
             {"screenWidth", BIND_FN(getScreenWidth)},
             {"screenHeight", BIND_FN(getScreenHeight)},
