@@ -60,7 +60,10 @@ android {
             "META-INF",
             "META-INF/**",
             "**/libjsi.so",
-            "**/libc++_shared.so"
+            "**/libc++_shared.so",
+            "**/libreact_nativemodule_core.so",
+            "**/libturbomodulejsijni.so",
+            "**/libfbjni.so"
         ]
     }
 }

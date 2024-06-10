@@ -9,12 +9,11 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.ViewTreeObserver
-import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
-import com.facebook.react.modules.core.DeviceEventManagerModule
+import com.facebook.react.turbomodule.core.interfaces.CallInvokerHolder
 
 class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener {
     private val drawHandler = Handler(Looper.getMainLooper())
@@ -66,8 +65,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         activity.window.decorView.rootView.viewTreeObserver.removeOnGlobalLayoutListener(layoutListener)
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onCatalystInstanceDestroy() {
+    override fun invalidate() {
         this.stopLayoutListener()
         reactApplicationContext.unregisterReceiver(configurationChangeReceiver)
         runnable?.let { drawHandler.removeCallbacks(it) }
@@ -124,24 +122,15 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
             this.platform = Platform(reactApplicationContext)
 
-            val config = platform.getConfig()
-            val layoutConfig = platform.getLayoutConfig()
+            this.reactApplicationContext.javaScriptContextHolder?.let { contextHolder ->
+                this.reactApplicationContext.catalystInstance.jsCallInvokerHolder?.let { callInvokerHolder: CallInvokerHolder ->
+                    this.nativeInstall(contextHolder.get(), callInvokerHolder)
+                    this.isCxxReady = true
 
-            this.reactApplicationContext.javaScriptContextHolder?.let {
-                this.nativeInstall(
-                    it.get(),
-                    layoutConfig.screen,
-                    config.colorScheme,
-                    config.contentSizeCategory,
-                    layoutConfig.insets,
-                    layoutConfig.statusBar,
-                    layoutConfig.navigationBar
-                )
-                this.isCxxReady = true
+                    Log.i(NAME, "Installed Unistyles \uD83E\uDD84!")
 
-                Log.i(NAME, "Installed Unistyles \uD83E\uDD84!")
-
-                return true
+                    return true
+                }
             }
 
             false
@@ -152,88 +141,36 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
     }
 
-    private external fun nativeInstall(
-        jsi: Long,
-        screen: Dimensions,
-        colorScheme: String,
-        contentSizeCategory: String,
-        insets: Insets,
-        statusBar: Dimensions,
-        navigationBar: Dimensions
-    )
+    private external fun nativeInstall(jsi: Long, callInvoker: CallInvokerHolder)
     private external fun nativeDestroy()
     private external fun nativeOnOrientationChange(screen: Dimensions, insets: Insets, statusBar: Dimensions, navigationBar: Dimensions)
     private external fun nativeOnAppearanceChange(colorScheme: String)
     private external fun nativeOnContentSizeCategoryChange(contentSizeCategory: String)
 
     //endregion
-    //region Event emitter
-    private fun onLayoutChange(breakpoint: String, orientation: String, screen: Dimensions, statusBar: Dimensions, insets: Insets, navigationBar: Dimensions) {
-        val body = Arguments.createMap().apply {
-            putString("type", "layout")
-            putMap("payload", Arguments.createMap().apply {
-                putString("breakpoint", breakpoint)
-                putString("orientation", orientation)
-                putMap("screen", Arguments.createMap().apply {
-                    putInt("width", screen.width)
-                    putInt("height", screen.height)
-                })
-                putMap("statusBar", Arguments.createMap().apply {
-                    putInt("width", statusBar.width)
-                    putInt("height", statusBar.height)
-                })
-                putMap("insets", Arguments.createMap().apply {
-                    putInt("top", insets.top)
-                    putInt("bottom", insets.bottom)
-                    putInt("left", insets.left)
-                    putInt("right", insets.right)
-                })
-                putMap("navigationBar", Arguments.createMap().apply {
-                    putInt("width", navigationBar.width)
-                    putInt("height", navigationBar.height)
-                })
-            })
-        }
 
-        reactApplicationContext
-            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-            .emit("__unistylesOnChange", body)
+    private fun getScreenDimensions(): Dimensions {
+        return platform.getScreenDimensions()
     }
 
-    private fun onThemeChange(themeName: String) {
-        val body = Arguments.createMap().apply {
-            putString("type", "theme")
-            putMap("payload", Arguments.createMap().apply {
-                putString("themeName", themeName)
-            })
-        }
-
-        reactApplicationContext
-            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-            .emit("__unistylesOnChange", body)
+    private fun getColorScheme(): String {
+        return platform.getColorScheme()
     }
 
-    private fun onPluginChange() {
-        val body = Arguments.createMap().apply {
-            putString("type", "plugin")
-        }
-
-        reactApplicationContext
-            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-            .emit("__unistylesOnChange", body)
+    private fun getStatusBarDimensions(): Dimensions {
+        return platform.getStatusBarDimensions()
     }
 
-    private fun onContentSizeCategoryChange(contentSizeCategory: String) {
-        val body = Arguments.createMap().apply {
-            putString("type", "dynamicTypeSize")
-            putMap("payload", Arguments.createMap().apply {
-                putString("contentSizeCategory", contentSizeCategory)
-            })
-        }
+    private fun getNavigationBarDimensions(): Dimensions {
+        return platform.getNavigationBarDimensions()
+    }
 
-        reactApplicationContext
-            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-            .emit("__unistylesOnChange", body)
+    private fun getContentSizeCategory(): String {
+        return platform.getContentSizeCategory()
+    }
+
+    private fun getInsets(): Insets {
+        return platform.getInsets()
     }
 
     private fun onSetNavigationBarColor(color: String) {

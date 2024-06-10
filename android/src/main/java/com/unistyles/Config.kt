@@ -47,11 +47,9 @@ class UnistylesConfig(private val reactApplicationContext: ReactApplicationConte
     }
 
     private fun getAppConfig(): Config {
-        val fontScale = reactApplicationContext.resources.configuration.fontScale
-
         return Config(
             this.getColorScheme(),
-            this.getContentSizeCategory(fontScale),
+            this.getContentSizeCategory(),
         )
     }
 
@@ -68,7 +66,17 @@ class UnistylesConfig(private val reactApplicationContext: ReactApplicationConte
         )
     }
 
-    private fun getContentSizeCategory(fontScale: Float): String {
+    fun getScreenDimensions(): Dimensions {
+        val displayMetrics = reactApplicationContext.resources.displayMetrics
+        val screenWidth = (displayMetrics.widthPixels / density).toInt()
+        val screenHeight = (displayMetrics.heightPixels / density).toInt()
+
+        return Dimensions(screenWidth, screenHeight)
+    }
+
+    fun getContentSizeCategory(): String {
+        val fontScale = reactApplicationContext.resources.configuration.fontScale
+
         val contentSizeCategory = when {
             fontScale <= 0.85f -> "Small"
             fontScale <= 1.0f -> "Default"
@@ -82,7 +90,7 @@ class UnistylesConfig(private val reactApplicationContext: ReactApplicationConte
         return contentSizeCategory
     }
 
-    private fun getColorScheme(): String {
+    fun getColorScheme(): String {
         val colorScheme = when (reactApplicationContext.resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK)) {
             Configuration.UI_MODE_NIGHT_YES -> "dark"
             Configuration.UI_MODE_NIGHT_NO -> "light"
@@ -90,6 +98,24 @@ class UnistylesConfig(private val reactApplicationContext: ReactApplicationConte
         }
 
         return colorScheme
+    }
+
+    fun getStatusBarDimensions(): Dimensions {
+        val displayMetrics = reactApplicationContext.resources.displayMetrics
+        val screenWidth = (displayMetrics.widthPixels / density).toInt()
+
+        return Dimensions(screenWidth, getStatusBarHeight())
+    }
+
+    fun getNavigationBarDimensions(): Dimensions {
+        val displayMetrics = reactApplicationContext.resources.displayMetrics
+        val screenWidth = (displayMetrics.widthPixels / density).toInt()
+
+        return Dimensions(screenWidth, getNavigationBarHeight())
+    }
+
+    fun getInsets(): Insets {
+        return this.insets.get()
     }
 
     @SuppressLint("InternalInsetResource", "DiscouragedApi")

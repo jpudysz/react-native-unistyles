@@ -1,3 +1,5 @@
+#pragma once
+
 #include <jni.h>
 #include <string>
 #include <map>
