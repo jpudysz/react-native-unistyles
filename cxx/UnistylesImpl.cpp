@@ -72,7 +72,7 @@ jsi::Value UnistylesRuntime::setBreakpoints(jsi::Runtime& rt, std::string fnName
         return jsi::Value::undefined();
     });
 }
-    
+
 jsi::Value UnistylesRuntime::setActiveTheme(jsi::Runtime& rt, std::string fnName) {
     return HOST_FN(fnName, 1, {
         std::string themeName = arguments[0].asString(rt).utf8(rt);
@@ -101,7 +101,7 @@ jsi::Value UnistylesRuntime::updateTheme(jsi::Runtime& rt, std::string fnName) {
 jsi::Value UnistylesRuntime::useAdaptiveThemes(jsi::Runtime& rt, std::string fnName) {
     return HOST_FN(fnName, 1, {
         bool enableAdaptiveThemes = arguments[0].asBool();
-    
+
         if (enableAdaptiveThemes && this->colorScheme == UnistylesUnspecifiedScheme) {
             throw jsi::JSError(rt, UnistylesErrorAdaptiveThemesNotSupported);
         }
@@ -178,8 +178,8 @@ jsi::Value UnistylesRuntime::getStatusBar(jsi::Runtime& rt, std::string fnName) 
     auto setStatusBarColorFunction = HOST_FN("setColor", 1, {
         std::string color = arguments[0].asString(rt).utf8(rt);
 
-        if (this->onSetStatusBarColorCallback.has_value()) {
-            this->onSetStatusBarColorCallback.value()(color);
+        if (this->setStatusBarColor.has_value()) {
+            this->setStatusBarColor.value()(color);
         }
 
         return jsi::Value::undefined();
@@ -197,8 +197,8 @@ jsi::Value UnistylesRuntime::getNavigationBar(jsi::Runtime& rt, std::string fnNa
     auto setNavigationBarColorFunction = HOST_FN("setColor", 1, {
         std::string color = arguments[0].asString(rt).utf8(rt);
 
-        if (this->onSetStatusBarColorCallback.has_value()) {
-            this->onSetNavigationBarColorCallback.value()(color);
+        if (this->setNavigationBarColor.has_value()) {
+            this->setNavigationBarColor.value()(color);
         }
 
         return jsi::Value::undefined();
@@ -236,6 +236,6 @@ std::optional<jsi::Value> UnistylesRuntime::setThemes(jsi::Runtime& rt, const js
     bool hasDarkTheme = std::find(themesVector.begin(), themesVector.end(), "dark") != themesVector.end();
 
     this->supportsAutomaticColorScheme = hasLightTheme && hasDarkTheme;
-    
+
     return std::nullopt;
 }

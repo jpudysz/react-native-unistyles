@@ -23,4 +23,28 @@ class Platform(reactApplicationContext: ReactApplicationContext) {
     fun getLayoutConfig(): LayoutConfig {
         return this.config.getLayoutConfig()
     }
+
+    fun getScreenDimensions(): Dimensions {
+        return this.config.getScreenDimensions()
+    }
+
+    fun getColorScheme(): String {
+        return this.config.getColorScheme()
+    }
+
+    fun getStatusBarDimensions(): Dimensions {
+        return this.config.getStatusBarDimensions()
+    }
+
+    fun getNavigationBarDimensions(): Dimensions {
+        return this.config.getNavigationBarDimensions()
+    }
+
+    fun getContentSizeCategory(): String {
+        return this.config.getContentSizeCategory()
+    }
+
+    fun getInsets(): Insets {
+        return this.config.getInsets()
+    }
 }

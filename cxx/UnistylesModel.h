@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <optional>
+#include <variant>
 
 using namespace facebook;
 
@@ -49,7 +50,10 @@ struct UnistylesModel {
     std::function<std::string()> getContentSizeCategory;
     std::function<std::string()> getColorScheme;
     std::function<Dimensions()> getStatusBarDimensions;
+    std::function<Dimensions()> getNavigationBarDimensions;
     std::function<Insets()> getInsets;
+    std::optional<std::function<void(std::string)>> setStatusBarColor;
+    std::optional<std::function<void(std::string)>> setNavigationBarColor;
 
     void setScreenDimensionsCallback(std::function<Dimensions()> callback) {
         this->getScreenDimensions = callback;
@@ -63,12 +67,18 @@ struct UnistylesModel {
     void setStatusBarDimensionsCallback(std::function<Dimensions()> callback) {
         this->getStatusBarDimensions = callback;
     }
+    void setNavigationBarDimensionsCallback(std::function<Dimensions()> callback) {
+        this->getNavigationBarDimensions = callback;
+    }
     void setInsetsCallback(std::function<Insets()> callback) {
         this->getInsets = callback;
     }
-
-    std::optional<std::function<void(std::string)>> onSetStatusBarColorCallback;
-    std::optional<std::function<void(std::string)>> onSetNavigationBarColorCallback;
+    void setStatusBarColorCallback(std::function<void(std::string color)> callback) {
+        this->setStatusBarColor = callback;
+    }
+    void setNavigationBarColorCallback(std::function<void(std::string color)> callback) {
+        this->setNavigationBarColor = callback;
+    }
 
     Dimensions screen = {0, 0};
     Dimensions statusBar = {0, 0};
@@ -87,14 +97,6 @@ struct UnistylesModel {
     std::vector<std::string> pluginNames;
     std::vector<std::string> themes;
     std::vector<std::pair<std::string, double>> sortedBreakpointPairs;
-
-    void onSetStatusBarColor(std::function<void(std::string color)> callback) {
-        this->onSetStatusBarColorCallback = callback;
-    }
-
-    void onSetNavigationBarColor(std::function<void(std::string color)> callback) {
-        this->onSetNavigationBarColorCallback = callback;
-    }
 
     void handleScreenSizeChange(Dimensions& screen, std::optional<Insets> insets, std::optional<Dimensions> statusBar, std::optional<Dimensions> navigationBar);
     void handleAppearanceChange(std::string colorScheme);
