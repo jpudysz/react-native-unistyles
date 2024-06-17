@@ -25,11 +25,11 @@ void makeShared(JNIEnv *env, jobject unistylesModule, std::shared_ptr<UnistylesR
         return getContentSizeCategory(env, unistylesModule);
     });
 
-    unistylesRuntime->setNavigationBarColorCallback([&](const std::string &color) {
+    unistylesRuntime->setNavigationBarColorCallback([=](const std::string &color) {
         setNavigationBarColor(env, unistylesModule, color);
     });
 
-    unistylesRuntime->setStatusBarColorCallback([&](const std::string &color) {
+    unistylesRuntime->setStatusBarColorCallback([=](const std::string &color) {
         setStatusBarColor(env, unistylesModule, color);
     });
 
