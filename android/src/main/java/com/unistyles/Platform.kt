@@ -10,13 +10,13 @@ import kotlin.math.max
 
 class Platform(private val reactApplicationContext: ReactApplicationContext) {
     private val displayMetrics: DisplayMetrics = reactApplicationContext.resources.displayMetrics
-    private val density: Float = reactApplicationContext.resources.displayMetrics.density
     private var insetsCompat: InsetsCompat = InsetsCompat.getDefaults()
 
     var defaultNavigationBarColor: Int? = null
     var defaultStatusBarColor: Int? = null
 
     fun getScreenDimensions(): Dimensions {
+        val density = reactApplicationContext.resources.displayMetrics.density
         val screenWidth = (displayMetrics.widthPixels / density).toInt()
         val screenHeight = (displayMetrics.heightPixels / density).toInt()
 
@@ -36,12 +36,14 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
     }
 
     fun getStatusBarDimensions(): Dimensions {
+        val density = reactApplicationContext.resources.displayMetrics.density
         val screenWidth = (displayMetrics.widthPixels / density).toInt()
 
         return Dimensions(screenWidth, getStatusBarHeight())
     }
 
     fun getNavigationBarDimensions(): Dimensions {
+        val density = reactApplicationContext.resources.displayMetrics.density
         val screenWidth = (displayMetrics.widthPixels / density).toInt()
 
         return Dimensions(screenWidth, getNavigationBarHeight())
@@ -84,6 +86,7 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
     }
 
     fun getInsets(): Insets {
+        val density = reactApplicationContext.resources.displayMetrics.density
         val top = max(this.insetsCompat.cutout.top, this.insetsCompat.statusBar.top)
         val bottom = this.insetsCompat.navigationBar.bottom
         val left = this.insetsCompat.statusBar.left
@@ -98,10 +101,14 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
     }
 
     private fun getStatusBarHeight(): Int {
+        val density = reactApplicationContext.resources.displayMetrics.density
+
         return (this.insetsCompat.statusBar.top / density).toInt()
     }
 
     private fun getNavigationBarHeight(): Int {
+        val density = reactApplicationContext.resources.displayMetrics.density
+
         return (this.insetsCompat.navigationBar.bottom / density).toInt()
     }
 }
