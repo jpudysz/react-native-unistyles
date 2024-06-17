@@ -2,8 +2,7 @@ import React, { useEffect } from 'react'
 import { UnistylesRegistry, UnistylesRuntime } from 'react-native-unistyles'
 import type { UnistylesThemes } from 'react-native-unistyles'
 import { useNavigation } from '@react-navigation/native'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { DemoGroup, DemoLink } from '../components'
 import { DemoNames, isWeb } from '../common'
 import type { NavigationProps } from '../common'
@@ -12,7 +11,6 @@ import { autoGuidelinePlugin } from '../plugins'
 
 export const HomeScreen = () => {
     const navigation = useNavigation<NavigationProps>()
-    const { top } = useSafeAreaInsets()
 
     useEffect(() => {
         if (isWeb) {
@@ -21,12 +19,12 @@ export const HomeScreen = () => {
     }, [])
 
     return (
-        <View
-            style={{
-                ...styles.container,
-                paddingTop: top
-            }}
-        >
+        <View style={styles.container}>
+            <StatusBar
+                translucent
+                barStyle="dark-content"
+                backgroundColor="#ff9ff3"
+            />
             <ScrollView contentContainerStyle={styles.list}>
                 <View style={styles.titleContainer}>
                     <Text style={styles.unicorn}>

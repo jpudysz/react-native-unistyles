@@ -26,15 +26,15 @@ void UnistylesModel::handleScreenSizeChange(Dimensions& screen, std::optional<In
 
     this->breakpoint = breakpoint;
     this->screen = {screen.width, screen.height};
-    
+
     if (insets.has_value()) {
         this->insets = {insets->top, insets->bottom, insets->left, insets->right};
     }
-    
+
     if (statusBar.has_value()) {
         this->statusBar = {statusBar->width, statusBar->height};
     }
-    
+
     if (navigationBar.has_value()) {
         this->navigationBar = {navigationBar->width, navigationBar->height};
     }
@@ -58,6 +58,10 @@ void UnistylesModel::handleAppearanceChange(std::string colorScheme) {
 }
 
 void UnistylesModel::handleContentSizeCategoryChange(std::string contentSizeCategory) {
+    if (this->contentSizeCategory == contentSizeCategory) {
+        return;
+    }
+
     this->contentSizeCategory = contentSizeCategory;
     this->onContentSizeCategoryChange(contentSizeCategory);
 }
@@ -158,7 +162,7 @@ void UnistylesModel::onLayoutChange() {
 
     EventNestedValue screenPayload;
     auto screen = this->screen;
-    
+
     screenPayload["width"] = screen.width;
     screenPayload["height"] = screen.height;
 
@@ -166,7 +170,7 @@ void UnistylesModel::onLayoutChange() {
 
     EventNestedValue statusBarPayload;
     auto statusBar = this->statusBar;
-    
+
     statusBarPayload["width"] = statusBar.width;
     statusBarPayload["height"] = statusBar.height;
 
@@ -174,7 +178,7 @@ void UnistylesModel::onLayoutChange() {
 
     EventNestedValue navigationBarPayload;
     auto navigationBar = this->navigationBar;
-    
+
     navigationBarPayload["width"] = navigationBar.width;
     navigationBarPayload["height"] = navigationBar.height;
 
@@ -182,7 +186,7 @@ void UnistylesModel::onLayoutChange() {
 
     EventNestedValue insetsPayload;
     auto insets = this->insets;
-    
+
     insetsPayload["top"] = insets.top;
     insetsPayload["bottom"] = insets.bottom;
     insetsPayload["left"] = insets.left;
