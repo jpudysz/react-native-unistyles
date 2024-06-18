@@ -45,11 +45,11 @@ void makeShared(JNIEnv *env, jobject unistylesModule, std::shared_ptr<UnistylesR
     unistylesRuntime->navigationBar = getNavigationBarDimensions(env, unistylesModule);
 }
 
-Dimensions getScreenDimensions(JNIEnv *env, jobject unistylesModule) {
+Screen getScreenDimensions(JNIEnv *env, jobject unistylesModule) {
     jclass cls = env->GetObjectClass(unistylesModule);
-    jmethodID methodId = env->GetMethodID(cls, "getScreenDimensions", "()Lcom/unistyles/Dimensions;");
-    jobject dimensionsObj = env->CallObjectMethod(unistylesModule, methodId);
-    Dimensions screenDimensions = jobjectToDimensions(env, dimensionsObj);
+    jmethodID methodId = env->GetMethodID(cls, "getScreenDimensions", "()Lcom/unistyles/Screen;");
+    jobject screenObj = env->CallObjectMethod(unistylesModule, methodId);
+    Screen screenDimensions = jobjectToScreen(env, screenObj);
 
     return screenDimensions;
 }

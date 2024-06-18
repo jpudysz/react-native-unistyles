@@ -2,25 +2,25 @@ package com.unistyles
 
 import android.content.res.Configuration
 import android.graphics.Rect
-import android.util.DisplayMetrics
 import android.view.View
 import androidx.core.view.WindowInsetsCompat
 import com.facebook.react.bridge.ReactApplicationContext
 import kotlin.math.max
 
 class Platform(private val reactApplicationContext: ReactApplicationContext) {
-    private val displayMetrics: DisplayMetrics = reactApplicationContext.resources.displayMetrics
     private var insetsCompat: InsetsCompat = InsetsCompat.getDefaults()
 
     var defaultNavigationBarColor: Int? = null
     var defaultStatusBarColor: Int? = null
+    var orientation: Int = reactApplicationContext.resources.configuration.orientation
 
-    fun getScreenDimensions(): Dimensions {
-        val density = reactApplicationContext.resources.displayMetrics.density
-        val screenWidth = (displayMetrics.widthPixels / density).toInt()
-        val screenHeight = (displayMetrics.heightPixels / density).toInt()
+    fun getScreenDimensions(): Screen {
+        val displayMetrics = reactApplicationContext.resources.displayMetrics
+        val fontScale = reactApplicationContext.resources.configuration.fontScale
+        val screenWidth = (displayMetrics.widthPixels / displayMetrics.density).toInt()
+        val screenHeight = (displayMetrics.heightPixels / displayMetrics.density).toInt()
 
-        return Dimensions(screenWidth, screenHeight)
+        return Screen(screenWidth, screenHeight, displayMetrics.density, fontScale)
     }
 
     fun getColorScheme(): String {
@@ -36,15 +36,15 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
     }
 
     fun getStatusBarDimensions(): Dimensions {
-        val density = reactApplicationContext.resources.displayMetrics.density
-        val screenWidth = (displayMetrics.widthPixels / density).toInt()
+        val displayMetrics = reactApplicationContext.resources.displayMetrics
+        val screenWidth = (displayMetrics.widthPixels / displayMetrics.density).toInt()
 
         return Dimensions(screenWidth, getStatusBarHeight())
     }
 
     fun getNavigationBarDimensions(): Dimensions {
-        val density = reactApplicationContext.resources.displayMetrics.density
-        val screenWidth = (displayMetrics.widthPixels / density).toInt()
+        val displayMetrics = reactApplicationContext.resources.displayMetrics
+        val screenWidth = (displayMetrics.widthPixels / displayMetrics.density).toInt()
 
         return Dimensions(screenWidth, getNavigationBarHeight())
     }

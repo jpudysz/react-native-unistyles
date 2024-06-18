@@ -13,19 +13,23 @@ std::string UnistylesModel::getBreakpointFromScreenWidth(int width, const std::v
     return sortedBreakpointPairs.empty() ? "" : sortedBreakpointPairs.back().first;
 }
 
-void UnistylesModel::handleScreenSizeChange(Dimensions& screen, std::optional<Insets> insets, std::optional<Dimensions> statusBar, std::optional<Dimensions> navigationBar) {
+void UnistylesModel::handleScreenSizeChange(Screen& screen, std::optional<Insets> insets, std::optional<Dimensions> statusBar, std::optional<Dimensions> navigationBar) {
     std::string breakpoint = this->getBreakpointFromScreenWidth(screen.width, this->sortedBreakpointPairs);
     bool hasDifferentBreakpoint = this->breakpoint != breakpoint;
     bool hasDifferentScreenDimensions = this->screen.width != screen.width || this->screen.height != screen.height;
+    bool hasDifferentPixelRatio = this->pixelRatio != screen.pixelRatio;
+    bool hasDifferentFontScale = this->fontScale != screen.fontScale;
     bool hasDifferentInsets = insets.has_value()
         ? this->insets.top != insets->top || this->insets.bottom != insets->bottom || this->insets.left != insets->left || this->insets.right != insets->right
         : false;
 
     // we don't need to check statusBar/navigationBar as they will only change on orientation change witch is equal to hasDifferentScreenDimensions
-    bool shouldNotify = hasDifferentBreakpoint || hasDifferentScreenDimensions || hasDifferentInsets;
+    bool shouldNotify = hasDifferentBreakpoint || hasDifferentScreenDimensions || hasDifferentInsets || hasDifferentPixelRatio || hasDifferentFontScale;
 
     this->breakpoint = breakpoint;
     this->screen = {screen.width, screen.height};
+    this->pixelRatio = screen.pixelRatio;
+    this->fontScale = screen.fontScale;
 
     if (insets.has_value()) {
         this->insets = {insets->top, insets->bottom, insets->left, insets->right};

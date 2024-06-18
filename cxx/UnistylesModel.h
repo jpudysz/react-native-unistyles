@@ -6,6 +6,7 @@
 #include <map>
 #include <optional>
 #include <variant>
+#include <math.h>
 
 using namespace facebook;
 
@@ -24,6 +25,13 @@ const std::string UnistylesErrorAdaptiveThemesNotSupported = "Your platform does
 struct Dimensions {
     int width;
     int height;
+};
+
+struct Screen {
+    int width;
+    int height;
+    float pixelRatio;
+    float fontScale;
 };
 
 struct Insets {
@@ -46,7 +54,7 @@ struct UnistylesModel {
     jsi::Object parseEventPayload(EventPayload payload);
     jsi::Object parseEventNestedPayload(EventNestedValue payload);
 
-    std::function<Dimensions()> getScreenDimensions;
+    std::function<Screen()> getScreenDimensions;
     std::function<std::string()> getContentSizeCategory;
     std::function<std::string()> getColorScheme;
     std::function<Dimensions()> getStatusBarDimensions;
@@ -56,7 +64,7 @@ struct UnistylesModel {
     std::optional<std::function<void(std::string)>> setNavigationBarColor;
     std::optional<std::function<void(bool)>> setNavigationBarHidden;
 
-    void setScreenDimensionsCallback(std::function<Dimensions()> callback) {
+    void setScreenDimensionsCallback(std::function<Screen()> callback) {
         this->getScreenDimensions = callback;
     }
     void setContentSizeCategoryCallback(std::function<std::string()> callback) {
@@ -84,10 +92,12 @@ struct UnistylesModel {
         this->setNavigationBarHidden = callback;
     }
 
-    Dimensions screen = {0, 0};
+    Screen screen = {0, 0};
     Dimensions statusBar = {0, 0};
     Dimensions navigationBar = {0, 0};
     Insets insets = {0, 0, 0, 0};
+    float pixelRatio = 1.0;
+    float fontScale = 1.0;
     std::string colorScheme = UnistylesUnspecifiedScheme;
     std::string contentSizeCategory = UnistylesUnspecifiedScheme;
 
@@ -102,7 +112,7 @@ struct UnistylesModel {
     std::vector<std::string> themes;
     std::vector<std::pair<std::string, double>> sortedBreakpointPairs;
 
-    void handleScreenSizeChange(Dimensions& screen, std::optional<Insets> insets, std::optional<Dimensions> statusBar, std::optional<Dimensions> navigationBar);
+    void handleScreenSizeChange(Screen& screen, std::optional<Insets> insets, std::optional<Dimensions> statusBar, std::optional<Dimensions> navigationBar);
     void handleAppearanceChange(std::string colorScheme);
     void handleContentSizeCategoryChange(std::string contentSizeCategory);
 
