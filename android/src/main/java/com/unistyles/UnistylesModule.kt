@@ -164,7 +164,13 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
         try {
             activity.runOnUiThread {
-                activity.window.navigationBarColor = if (color == "") platform.defaultNavigationBarColor!! else Color.parseColor(color)
+                val nextColor = when {
+                    color == "" -> platform.defaultNavigationBarColor!!
+                    color == "transparent" -> Color.TRANSPARENT
+                    else -> Color.parseColor(color)
+                }
+
+                activity.window.navigationBarColor = nextColor
             }
         } catch (_: Exception) {
             Log.d("Unistyles", "Failed to set navigation bar color: $color")

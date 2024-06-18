@@ -9,6 +9,8 @@ import type { NavigationProps } from '../common'
 import { breakpoints, darkTheme, lightTheme, premiumTheme } from '../styles'
 import { autoGuidelinePlugin } from '../plugins'
 
+UnistylesRuntime.navigationBar.setColor('transparent')
+
 export const HomeScreen = () => {
     const navigation = useNavigation<NavigationProps>()
 
@@ -23,7 +25,7 @@ export const HomeScreen = () => {
             <StatusBar
                 translucent
                 barStyle="dark-content"
-                backgroundColor="#ff9ff3"
+                backgroundColor="transparent"
             />
             <ScrollView contentContainerStyle={styles.list}>
                 <View style={styles.titleContainer}>
