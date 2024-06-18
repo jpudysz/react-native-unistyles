@@ -33,7 +33,8 @@ export class UnistylesBridgeWeb {
     #navigationBar: NavigationBar = {
         height: 0,
         width: 0,
-        setColor: () => {}
+        setColor: () => {},
+        setHidden: () => {}
     }
 
     constructor() {

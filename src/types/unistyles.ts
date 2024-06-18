@@ -22,7 +22,8 @@ export interface StatusBar extends ScreenDimensions {
 }
 
 export interface NavigationBar extends ScreenDimensions {
-    setColor(color?: string): void
+    setColor(color?: string): void,
+    setHidden(hidden: boolean): void
 }
 
 export type UnistylesConfig = {

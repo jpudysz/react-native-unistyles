@@ -104,7 +104,8 @@ export class UnistylesRuntime {
         return {
             width: this.unistylesBridge.navigationBar.width,
             height: this.unistylesBridge.navigationBar.height,
-            setColor: (color?: string) => this.unistylesBridge.navigationBar.setColor(color ?? '')
+            setColor: (color?: string) => this.unistylesBridge.navigationBar.setColor(color ?? ''),
+            setHidden: (hidden: boolean) => this.unistylesBridge.navigationBar.setHidden(hidden)
         }
     }
 
