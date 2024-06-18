@@ -38,11 +38,8 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
             val newConfig = context.resources.configuration
 
-            if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                this@UnistylesModule.onLayoutConfigChange()
-            }
-
-            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (newConfig.orientation != platform.orientation) {
+                platform.orientation = newConfig.orientation
                 this@UnistylesModule.onLayoutConfigChange()
             }
         }
@@ -127,13 +124,13 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     private external fun nativeInstall(jsi: Long, callInvoker: CallInvokerHolder)
     private external fun nativeDestroy()
-    private external fun nativeOnOrientationChange(screen: Dimensions, insets: Insets, statusBar: Dimensions, navigationBar: Dimensions)
+    private external fun nativeOnOrientationChange(screen: Screen, insets: Insets, statusBar: Dimensions, navigationBar: Dimensions)
     private external fun nativeOnAppearanceChange(colorScheme: String)
     private external fun nativeOnContentSizeCategoryChange(contentSizeCategory: String)
 
     //endregion
 
-    private fun getScreenDimensions(): Dimensions {
+    private fun getScreenDimensions(): Screen {
         return platform.getScreenDimensions()
     }
 
@@ -158,24 +155,24 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     private fun onSetNavigationBarColor(color: String) {
-        val activity = currentActivity ?: return
-
-        if (platform.defaultNavigationBarColor == null) {
-            platform.defaultNavigationBarColor = activity.window.navigationBarColor
-        }
-
-        try {
-            activity.runOnUiThread {
-                val nextColor = when {
-                    color == "" -> platform.defaultNavigationBarColor!!
-                    color == "transparent" -> Color.TRANSPARENT
-                    else -> Color.parseColor(color)
-                }
-
-                activity.window.navigationBarColor = nextColor
+        this.reactApplicationContext.currentActivity?.let { activity ->
+            if (platform.defaultNavigationBarColor == null) {
+                platform.defaultNavigationBarColor = activity.window.navigationBarColor
             }
-        } catch (_: Exception) {
-            Log.d("Unistyles", "Failed to set navigation bar color: $color")
+
+            try {
+                activity.runOnUiThread {
+                    val nextColor = when {
+                        color == "" -> platform.defaultNavigationBarColor!!
+                        color == "transparent" -> Color.TRANSPARENT
+                        else -> Color.parseColor(color)
+                    }
+
+                    activity.window.navigationBarColor = nextColor
+                }
+            } catch (_: Exception) {
+                Log.d("Unistyles", "Failed to set navigation bar color: $color")
+            }
         }
     }
 
@@ -194,18 +191,18 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     private fun onSetStatusBarColor(color: String) {
-        val activity = currentActivity ?: return
-
-        if (platform.defaultStatusBarColor == null) {
-            platform.defaultStatusBarColor = activity.window.statusBarColor
-        }
-
-        try {
-            activity.runOnUiThread {
-                activity.window.statusBarColor = if (color == "") platform.defaultStatusBarColor!! else Color.parseColor(color)
+        this.reactApplicationContext.currentActivity?.let { activity ->
+            if (platform.defaultStatusBarColor == null) {
+                platform.defaultStatusBarColor = activity.window.statusBarColor
             }
-        } catch (_: Exception) {
-            Log.d("Unistyles", "Failed to set status bar color: $color")
+
+            try {
+                activity.runOnUiThread {
+                    activity.window.statusBarColor = if (color == "") platform.defaultStatusBarColor!! else Color.parseColor(color)
+                }
+            } catch (_: Exception) {
+                Log.d("Unistyles", "Failed to set status bar color: $color")
+            }
         }
     }
 

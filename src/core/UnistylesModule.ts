@@ -36,6 +36,8 @@ export class UnistylesBridgeWeb {
         setColor: () => {},
         setHidden: () => {}
     }
+    #pixelRatio = 1.0
+    #fontScale = 1.0
 
     constructor() {
         if (!isServer) {
@@ -77,6 +79,10 @@ export class UnistylesBridgeWeb {
                         return this.#statusBar
                     case 'navigationBar':
                         return this.#navigationBar
+                    case 'pixelRatio':
+                        return this.#pixelRatio
+                    case 'fontScale':
+                        return this.#fontScale
                     case 'useTheme':
                         return (themeName: keyof UnistylesThemes) => this.useTheme(themeName)
                     case 'updateTheme':

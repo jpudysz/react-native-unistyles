@@ -124,6 +124,22 @@ export class UnistylesRuntime {
     }
 
     /**
+     * Get the pixel ratio
+     * @returns - The pixel ratio
+     */
+    public get pixelRatio() {
+        return this.unistylesBridge.pixelRatio
+    }
+
+    /**
+     * Get the font scale
+     * @returns - The font scale
+     */
+    public get fontScale() {
+        return this.unistylesBridge.fontScale
+    }
+
+    /**
      * Switch to a different theme
      * @param name - The name of the theme to switch to
      * @returns - boolean indicating if the theme was switched

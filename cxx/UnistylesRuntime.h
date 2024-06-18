@@ -30,7 +30,9 @@ struct JSI_EXPORT UnistylesRuntime : public jsi::HostObject, UnistylesModel {
             {"enabledPlugins", BIND_FN(getEnabledPlugins)},
             {"insets", BIND_FN(getInsets)},
             {"statusBar", BIND_FN(getStatusBar)},
-            {"navigationBar", BIND_FN(getNavigationBar)}
+            {"navigationBar", BIND_FN(getNavigationBar)},
+            {"pixelRatio", BIND_FN(getPixelRatio)},
+            {"fontScale", BIND_FN(getFontScale)}
         };
 
         this->setters = {
@@ -56,6 +58,8 @@ struct JSI_EXPORT UnistylesRuntime : public jsi::HostObject, UnistylesModel {
     jsi::Value getInsets(jsi::Runtime&, std::string);
     jsi::Value getStatusBar(jsi::Runtime&, std::string);
     jsi::Value getNavigationBar(jsi::Runtime&, std::string);
+    jsi::Value getPixelRatio(jsi::Runtime&, std::string);
+    jsi::Value getFontScale(jsi::Runtime&, std::string);
 
     std::optional<jsi::Value> setThemes(jsi::Runtime&, const jsi::Value&);
 

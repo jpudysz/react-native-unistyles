@@ -14,6 +14,23 @@ Dimensions jobjectToDimensions(JNIEnv *env, jobject dimensionObj) {
     return Dimensions{width, height};
 }
 
+Screen jobjectToScreen(JNIEnv *env, jobject screenObj) {
+    jclass screenClass = env->FindClass("com/unistyles/Screen");
+    jfieldID widthFieldID = env->GetFieldID(screenClass, "width", "I");
+    jfieldID heightFieldID = env->GetFieldID(screenClass, "height", "I");
+    jfieldID pixelRatioFieldID = env->GetFieldID(screenClass, "pixelRatio", "F");
+    jfieldID scaleFieldID = env->GetFieldID(screenClass, "fontScale", "F");
+
+    int width = env->GetIntField(screenObj, widthFieldID);
+    int height = env->GetIntField(screenObj, heightFieldID);
+    float pixelRatio = env->GetFloatField(screenObj, pixelRatioFieldID);
+    float fontScale = env->GetFloatField(screenObj, scaleFieldID);
+
+    env->DeleteLocalRef(screenClass);
+
+    return Screen{width, height, pixelRatio, fontScale};
+}
+
 Insets jobjectToInsets(JNIEnv *env, jobject insetsObj) {
     jclass insetsClass = env->FindClass("com/unistyles/Insets");
     jfieldID leftFieldID = env->GetFieldID(insetsClass, "left", "I");

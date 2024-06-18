@@ -46,7 +46,9 @@ export type UnistylesBridge = {
     sortedBreakpointPairs: Array<[keyof UnistylesBreakpoints, UnistylesBreakpoints[keyof UnistylesBreakpoints]]>,
     insets: ScreenInsets,
     statusBar: StatusBar,
-    navigationBar: NavigationBar
+    navigationBar: NavigationBar,
+    pixelRatio: number,
+    fontScale: number
 
     // setters
     themes: Array<keyof UnistylesThemes>,

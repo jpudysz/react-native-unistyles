@@ -22,7 +22,9 @@ export const RuntimeScreen: React.FunctionComponent = () => {
         setAdaptiveThemes,
         insets,
         statusBar,
-        navigationBar
+        navigationBar,
+        pixelRatio,
+        fontScale
     } = UnistylesRuntime
     const { styles, theme } = useStyles(stylesheet)
     const safeAreaInsets = useSafeAreaInsets()
@@ -57,6 +59,22 @@ export const RuntimeScreen: React.FunctionComponent = () => {
                         </Text>
                         <Text style={styles.text(false)}>
                             {navigationBar.width}x{navigationBar.height}
+                        </Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Text style={styles.text(true)}>
+                            Pixel ratio:
+                        </Text>
+                        <Text style={styles.text(false)}>
+                            {pixelRatio}
+                        </Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Text style={styles.text(true)}>
+                            Font scale:
+                        </Text>
+                        <Text style={styles.text(false)}>
+                            {fontScale}
                         </Text>
                     </View>
                     <View style={styles.row}>

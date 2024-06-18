@@ -1,36 +1,26 @@
 package com.unistyles
 
-class Dimensions(var width: Int, var height: Int) {
-    fun isEqual(dimensions: Dimensions): Boolean {
-        if (this.width != dimensions.width) {
-            return false
-        }
-
-        return this.height == dimensions.height
-    }
-
+class Dimensions(
+    var width: Int,
+    var height: Int
+) {
     override fun toString(): String {
         return "${width}x${height}"
     }
 }
 
-class Insets(var top: Int, var bottom: Int, var left: Int, var right: Int) {
-    fun isEqual(insets: Insets): Boolean {
-        if (this.top != insets.top) {
-            return false
-        }
-
-        if (this.bottom != insets.bottom) {
-            return false
-        }
-
-        if (this.left != insets.left) {
-            return false
-        }
-
-        return this.right == insets.right
+class Screen(
+    var width: Int,
+    var height: Int,
+    var pixelRatio: Float,
+    var fontScale: Float
+) {
+    override fun toString(): String {
+        return "${width}x${height} ${pixelRatio} ${fontScale}"
     }
+}
 
+class Insets(var top: Int, var bottom: Int, var left: Int, var right: Int) {
     override fun toString(): String {
         return "T:${top}B:${bottom}L:${left}R:${right}"
     }

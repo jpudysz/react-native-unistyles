@@ -45,7 +45,7 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_unistyles_UnistylesModule_nativeOnOrientationChange(JNIEnv *env, jobject thiz, jobject screen, jobject insets, jobject statusBar, jobject navigationBar) {
     if (unistylesRuntime != nullptr) {
-        Dimensions screenDimensions = jobjectToDimensions(env, screen);
+        Screen screenDimensions = jobjectToScreen(env, screen);
         Dimensions statusBarDimensions = jobjectToDimensions(env, statusBar);
         Insets screenInsets = jobjectToInsets(env, insets);
         Dimensions navigationBarDimensions = jobjectToDimensions(env, navigationBar);

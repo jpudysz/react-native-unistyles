@@ -221,6 +221,14 @@ jsi::Value UnistylesRuntime::getNavigationBar(jsi::Runtime& rt, std::string fnNa
     return navigationBarValue;
 }
 
+jsi::Value UnistylesRuntime::getPixelRatio(jsi::Runtime& rt, std::string fnName) {
+    return jsi::Value(roundf(this->pixelRatio * 100)/ 100);
+}
+
+jsi::Value UnistylesRuntime::getFontScale(jsi::Runtime& rt, std::string fnName) {
+    return jsi::Value(roundf(this->fontScale * 100) / 100);
+}
+
 std::optional<jsi::Value> UnistylesRuntime::setThemes(jsi::Runtime& rt, const jsi::Value& value) {
     jsi::Array themes = value.asObject(rt).asArray(rt);
     std::vector<std::string> themesVector;
