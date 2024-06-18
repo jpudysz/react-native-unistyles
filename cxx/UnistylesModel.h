@@ -54,6 +54,7 @@ struct UnistylesModel {
     std::function<Insets()> getInsets;
     std::optional<std::function<void(std::string)>> setStatusBarColor;
     std::optional<std::function<void(std::string)>> setNavigationBarColor;
+    std::optional<std::function<void(bool)>> setNavigationBarHidden;
 
     void setScreenDimensionsCallback(std::function<Dimensions()> callback) {
         this->getScreenDimensions = callback;
@@ -78,6 +79,9 @@ struct UnistylesModel {
     }
     void setNavigationBarColorCallback(std::function<void(std::string color)> callback) {
         this->setNavigationBarColor = callback;
+    }
+    void setNavigationBarHiddenCallback(std::function<void(bool hidden)> callback) {
+        this->setNavigationBarHidden = callback;
     }
 
     Dimensions screen = {0, 0};

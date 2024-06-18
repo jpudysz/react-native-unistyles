@@ -33,6 +33,10 @@ void makeShared(JNIEnv *env, jobject unistylesModule, std::shared_ptr<UnistylesR
         setStatusBarColor(env, unistylesModule, color);
     });
 
+    unistylesRuntime->setNavigationBarHiddenCallback([=](bool hidden) {
+        setNavigationBarHidden(env, unistylesModule, hidden);
+    });
+
     unistylesRuntime->screen = getScreenDimensions(env, unistylesModule);
     unistylesRuntime->contentSizeCategory = getContentSizeCategory(env, unistylesModule);
     unistylesRuntime->colorScheme = getColorScheme(env, unistylesModule);
@@ -122,5 +126,13 @@ void setNavigationBarColor(JNIEnv *env, jobject unistylesModule, std::string col
 
     env->CallVoidMethod(unistylesModule, methodId, colorStr);
     env->DeleteLocalRef(colorStr);
+    env->DeleteLocalRef(cls);
+}
+
+void setNavigationBarHidden(JNIEnv *env, jobject unistylesModule, bool hidden) {
+    jclass cls = env->GetObjectClass(unistylesModule);
+    jmethodID methodId = env->GetMethodID(cls, "setNavigationBarHidden", "(Z)V");
+
+    env->CallVoidMethod(unistylesModule, methodId, hidden);
     env->DeleteLocalRef(cls);
 }

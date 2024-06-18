@@ -203,10 +203,20 @@ jsi::Value UnistylesRuntime::getNavigationBar(jsi::Runtime& rt, std::string fnNa
 
         return jsi::Value::undefined();
     });
+    auto setHiddenFunction = HOST_FN("setHidden", 1, {
+        bool hidden = arguments[0].asBool();
+
+        if (this->setNavigationBarHidden.has_value()) {
+            this->setNavigationBarHidden.value()(hidden);
+        }
+
+        return jsi::Value::undefined();
+    });
 
     navigationBarValue.setProperty(rt, "width", this->navigationBar.width);
     navigationBarValue.setProperty(rt, "height", this->navigationBar.height);
     navigationBarValue.setProperty(rt, "setColor", setNavigationBarColorFunction);
+    navigationBarValue.setProperty(rt, "setHidden", setHiddenFunction);
 
     return navigationBarValue;
 }

@@ -12,6 +12,8 @@ import android.util.Log
 import android.view.View
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
@@ -174,6 +176,20 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             }
         } catch (_: Exception) {
             Log.d("Unistyles", "Failed to set navigation bar color: $color")
+        }
+    }
+
+    private fun setNavigationBarHidden(isHidden: Boolean) {
+        this.reactApplicationContext.currentActivity?.let { activity ->
+            WindowInsetsControllerCompat(activity.window, activity.window.decorView).apply {
+                activity.runOnUiThread {
+                    if (isHidden) {
+                        hide(WindowInsetsCompat.Type.navigationBars())
+                    } else {
+                        show(WindowInsetsCompat.Type.navigationBars())
+                    }
+                }
+            }
         }
     }
 
