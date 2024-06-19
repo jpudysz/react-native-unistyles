@@ -140,6 +140,14 @@ export class UnistylesRuntime {
     }
 
     /**
+     * Set the root view background color
+     * @param color - The color to set
+     */
+    public setRootViewBackgroundColor = (color: string) => {
+        this.unistylesBridge.setRootViewBackgroundColor(color)
+    }
+
+    /**
      * Switch to a different theme
      * @param name - The name of the theme to switch to
      * @returns - boolean indicating if the theme was switched

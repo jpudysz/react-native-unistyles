@@ -95,6 +95,8 @@ export class UnistylesBridgeWeb {
                         return (pluginName: string, notify: boolean) => this.addPlugin(pluginName, notify)
                     case 'removePlugin':
                         return (pluginName: string) => this.removePlugin(pluginName)
+                    case 'setRootViewBackgroundColor':
+                        return (color: string) => this.setRootViewBackgroundColor(color)
                     default:
                         return Reflect.get(this, prop)
                 }
@@ -233,6 +235,10 @@ export class UnistylesBridgeWeb {
         }
 
         return 'light'
+    }
+
+    private setRootViewBackgroundColor(color: string) {
+        document.body.style.backgroundColor = color
     }
 
     private emitPluginChange() {
