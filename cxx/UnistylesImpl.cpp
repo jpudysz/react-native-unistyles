@@ -257,3 +257,15 @@ std::optional<jsi::Value> UnistylesRuntime::setThemes(jsi::Runtime& rt, const js
 
     return std::nullopt;
 }
+
+jsi::Value UnistylesRuntime::setRootBackgroundColor(jsi::Runtime& rt, std::string fnName) {
+    return HOST_FN(fnName, 1, {
+        std::string color = arguments[0].asString(rt).utf8(rt);
+
+        if (this->setRootViewBackgroundColor.has_value()) {
+            this->setRootViewBackgroundColor.value()(color);
+        }
+
+        return jsi::Value::undefined();
+    });
+}

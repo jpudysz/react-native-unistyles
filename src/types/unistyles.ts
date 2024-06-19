@@ -57,7 +57,8 @@ export type UnistylesBridge = {
     updateTheme(name: keyof UnistylesThemes): void,
     useAdaptiveThemes(enable: boolean): void,
     addPlugin(pluginName: string, notify: boolean): void,
-    removePlugin(pluginName: string): void
+    removePlugin(pluginName: string): void,
+    setRootViewBackgroundColor(color: string): void
 }
 
 export type UnistylesThemeEvent = {

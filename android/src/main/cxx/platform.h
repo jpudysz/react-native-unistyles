@@ -9,6 +9,7 @@ std::string getColorScheme(JNIEnv *env, jobject unistylesModule);
 Dimensions getStatusBarDimensions(JNIEnv *env, jobject unistylesModule);
 Dimensions getNavigationBarDimensions(JNIEnv *env, jobject unistylesModule);
 void setNavigationBarHidden(JNIEnv *env, jobject unistylesModule, bool hidden);
+void setRootViewBackgroundColor(JNIEnv *env, jobject unistylesModule, std::string color);
 Insets getInsets(JNIEnv *env, jobject unistylesModule);
 std::string getContentSizeCategory(JNIEnv *env, jobject unistylesModule);
 

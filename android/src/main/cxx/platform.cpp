@@ -37,6 +37,10 @@ void makeShared(JNIEnv *env, jobject unistylesModule, std::shared_ptr<UnistylesR
         setNavigationBarHidden(env, unistylesModule, hidden);
     });
 
+    unistylesRuntime->setRootViewBackgroundColorCallback([=](const std::string &color) {
+        setRootViewBackgroundColor(env, unistylesModule, color);
+    });
+
     unistylesRuntime->screen = getScreenDimensions(env, unistylesModule);
     unistylesRuntime->contentSizeCategory = getContentSizeCategory(env, unistylesModule);
     unistylesRuntime->colorScheme = getColorScheme(env, unistylesModule);
@@ -131,8 +135,18 @@ void setNavigationBarColor(JNIEnv *env, jobject unistylesModule, std::string col
 
 void setNavigationBarHidden(JNIEnv *env, jobject unistylesModule, bool hidden) {
     jclass cls = env->GetObjectClass(unistylesModule);
-    jmethodID methodId = env->GetMethodID(cls, "setNavigationBarHidden", "(Z)V");
+    jmethodID methodId = env->GetMethodID(cls, "onSetNavigationBarHidden", "(Z)V");
 
     env->CallVoidMethod(unistylesModule, methodId, hidden);
+    env->DeleteLocalRef(cls);
+}
+
+void setRootViewBackgroundColor(JNIEnv *env, jobject unistylesModule, std::string color) {
+    jstring colorStr = env->NewStringUTF(color.c_str());
+    jclass cls = env->GetObjectClass(unistylesModule);
+    jmethodID methodId = env->GetMethodID(cls, "onSetRootViewBackgroundColor", "(Ljava/lang/String;)V");
+
+    env->CallVoidMethod(unistylesModule, methodId, colorStr);
+    env->DeleteLocalRef(colorStr);
     env->DeleteLocalRef(cls);
 }

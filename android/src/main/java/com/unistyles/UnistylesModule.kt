@@ -4,12 +4,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.res.Configuration
 import android.graphics.Color
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -162,10 +163,16 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
             try {
                 activity.runOnUiThread {
-                    val nextColor = when {
-                        color == "" -> platform.defaultNavigationBarColor!!
-                        color == "transparent" -> Color.TRANSPARENT
-                        else -> Color.parseColor(color)
+                    val nextColor = when (color) {
+                        "" -> platform.defaultNavigationBarColor!!
+                        "transparent" -> Color.TRANSPARENT
+                        else -> {
+                            if (color.length == 10) {
+                                ColorUtils.setAlphaComponent(Color.parseColor(color.substring(0, 7)), (255 * (color.substring(7).toFloat() / 100)).toInt())
+                            } else {
+                                Color.parseColor(color)
+                            }
+                        }
                     }
 
                     activity.window.navigationBarColor = nextColor
@@ -176,7 +183,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
     }
 
-    private fun setNavigationBarHidden(isHidden: Boolean) {
+    private fun onSetNavigationBarHidden(isHidden: Boolean) {
         this.reactApplicationContext.currentActivity?.let { activity ->
             WindowInsetsControllerCompat(activity.window, activity.window.decorView).apply {
                 activity.runOnUiThread {
@@ -202,6 +209,20 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                 }
             } catch (_: Exception) {
                 Log.d("Unistyles", "Failed to set status bar color: $color")
+            }
+        }
+    }
+
+    private fun onSetRootViewBackgroundColor(color: String) {
+        this.reactApplicationContext.currentActivity?.let { activity ->
+            activity.window?.decorView?.let { decorView ->
+                try {
+                    activity.runOnUiThread {
+                        decorView.setBackgroundColor(Color.parseColor(color))
+                    }
+                } catch (_: Exception) {
+                    Log.d("Unistyles", "Failed to set root view background color: $color")
+                }
             }
         }
     }
