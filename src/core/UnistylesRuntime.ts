@@ -10,6 +10,30 @@ export class UnistylesRuntime {
     constructor(private unistylesBridge: UnistylesBridge, private unistylesRegistry: UnistyleRegistry) {}
 
     /**
+     * Get the mini runtime injected to creteStyleSheet
+     * @returns - The mini runtime
+     */
+    public get miniRuntime() {
+        return {
+            contentSizeCategory: this.contentSizeCategory,
+            breakpoint: this.breakpoint,
+            screen: this.screen,
+            insets: this.insets,
+            statusBar: {
+                width: this.statusBar.width,
+                height: this.statusBar.height
+            },
+            navigationBar: {
+                width: this.navigationBar.width,
+                height: this.navigationBar.height
+            },
+            orientation: this.orientation,
+            pixelRatio: this.pixelRatio,
+            fontScale: this.fontScale
+        }
+    }
+
+    /**
      * Get the current color scheme
      * @returns - The current color scheme
      */

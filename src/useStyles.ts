@@ -26,7 +26,7 @@ export const useStyles = <ST extends StyleSheetWithSuperPowers>(
     const { theme, layout, plugins } = useUnistyles()
     const variants = useVariants(variantsMap)
     const parsedStyles = useMemo(() => typeof stylesheet === 'function'
-        ? stylesheet(theme, unistyles.runtime)
+        ? stylesheet(theme, unistyles.runtime.miniRuntime)
         : stylesheet, [theme, stylesheet, layout])
 
     const dynamicStyleSheet = useMemo(() => Object
