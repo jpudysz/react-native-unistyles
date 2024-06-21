@@ -7,6 +7,7 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.core.view.WindowInsetsCompat
 import com.facebook.react.bridge.ReactApplicationContext
+import kotlin.math.roundToInt
 
 class Platform(private val reactApplicationContext: ReactApplicationContext) {
     private var insets: Insets = Insets(0, 0, 0, 0)
@@ -18,8 +19,8 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
     fun getScreenDimensions(): Screen {
         val displayMetrics = reactApplicationContext.resources.displayMetrics
         val fontScale = reactApplicationContext.resources.configuration.fontScale
-        val screenWidth = (displayMetrics.widthPixels / displayMetrics.density).toInt()
-        val screenHeight = (displayMetrics.heightPixels / displayMetrics.density).toInt()
+        val screenWidth = (displayMetrics.widthPixels / displayMetrics.density).roundToInt()
+        val screenHeight = (displayMetrics.heightPixels / displayMetrics.density).roundToInt()
 
         return Screen(screenWidth, screenHeight, displayMetrics.density, fontScale)
     }
@@ -38,14 +39,14 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
 
     fun getStatusBarDimensions(): Dimensions {
         val displayMetrics = reactApplicationContext.resources.displayMetrics
-        val screenWidth = (displayMetrics.widthPixels / displayMetrics.density).toInt()
+        val screenWidth = (displayMetrics.widthPixels / displayMetrics.density).roundToInt()
 
         return Dimensions(screenWidth, getStatusBarHeight())
     }
 
     fun getNavigationBarDimensions(): Dimensions {
         val displayMetrics = reactApplicationContext.resources.displayMetrics
-        val screenWidth = (displayMetrics.widthPixels / displayMetrics.density).toInt()
+        val screenWidth = (displayMetrics.widthPixels / displayMetrics.density).roundToInt()
 
         return Dimensions(screenWidth, getNavigationBarHeight())
     }
@@ -98,22 +99,22 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
         val density = reactApplicationContext.resources.displayMetrics.density
 
         return Insets(
-            (this.insets.top / density).toInt(),
-            (this.insets.bottom / density).toInt(),
-            (this.insets.left / density).toInt(),
-            (this.insets.right / density).toInt()
+            (this.insets.top / density).roundToInt(),
+            (this.insets.bottom / density).roundToInt(),
+            (this.insets.left / density).roundToInt(),
+            (this.insets.right / density).roundToInt()
         )
     }
 
     private fun getStatusBarHeight(): Int {
         val density = reactApplicationContext.resources.displayMetrics.density
 
-        return (this.insets.top / density).toInt()
+        return (this.insets.top / density).roundToInt()
     }
 
     private fun getNavigationBarHeight(): Int {
         val density = reactApplicationContext.resources.displayMetrics.density
 
-        return (this.insets.bottom / density).toInt()
+        return (this.insets.bottom / density).roundToInt()
     }
 }
