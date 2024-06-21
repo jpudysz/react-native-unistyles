@@ -184,10 +184,20 @@ jsi::Value UnistylesRuntime::getStatusBar(jsi::Runtime& rt, std::string fnName) 
 
         return jsi::Value::undefined();
     });
+    auto setStatusBarHiddenFunction = HOST_FN("setHidden", 1, {
+        bool hidden = arguments[0].asBool();
+
+        if (this->setStatusBarHidden.has_value()) {
+            this->setStatusBarHidden.value()(hidden);
+        }
+
+        return jsi::Value::undefined();
+    });
 
     statusBar.setProperty(rt, "width", this->statusBar.width);
     statusBar.setProperty(rt, "height", this->statusBar.height);
     statusBar.setProperty(rt, "setColor", setStatusBarColorFunction);
+    statusBar.setProperty(rt, "setHidden", setStatusBarHiddenFunction);
 
     return statusBar;
 }
@@ -256,6 +266,18 @@ std::optional<jsi::Value> UnistylesRuntime::setThemes(jsi::Runtime& rt, const js
     this->supportsAutomaticColorScheme = hasLightTheme && hasDarkTheme;
 
     return std::nullopt;
+}
+
+jsi::Value UnistylesRuntime::setImmersiveModeEnabled(jsi::Runtime& rt, std::string fnName) {
+    return HOST_FN(fnName, 1, {
+        bool enabled = arguments[0].asBool();
+
+        if (this->setImmersiveMode.has_value()) {
+            this->setImmersiveMode.value()(enabled);
+        }
+
+        return jsi::Value::undefined();
+    });
 }
 
 jsi::Value UnistylesRuntime::setRootBackgroundColor(jsi::Runtime& rt, std::string fnName) {

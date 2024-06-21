@@ -86,19 +86,20 @@ export class UnistylesRuntime {
 
     /**
      * Get the status bar info
-     * @returns - The status bar api { width, height, setColor }
+     * @returns - The status bar api { width, height, setColor, setHidden }
      */
     public get statusBar() {
         return {
             width: this.unistylesBridge.statusBar.width,
             height: this.unistylesBridge.statusBar.height,
-            setColor: (color?: string) => this.unistylesBridge.statusBar.setColor(color ?? '')
+            setColor: (color?: string) => this.unistylesBridge.statusBar.setColor(color ?? ''),
+            setHidden: (hidden: boolean) => this.unistylesBridge.statusBar.setHidden(hidden)
         }
     }
 
     /**
      * Get the navigation bar info (Android)
-     * @returns - The navigation bar api { width, height, setColor }
+     * @returns - The navigation bar api { width, height, setColor, setHidden }
      */
     public get navigationBar() {
         return {
@@ -137,6 +138,14 @@ export class UnistylesRuntime {
      */
     public get fontScale() {
         return this.unistylesBridge.fontScale
+    }
+
+    /**
+     * Get the immersive mode (both status bar and navigation bar hidden (Android))
+     * @param isEnabled
+     */
+    public setImmersiveMode(isEnabled: boolean) {
+        return this.unistylesBridge.setImmersiveMode(isEnabled)
     }
 
     /**
