@@ -58,119 +58,75 @@ void makeShared(JNIEnv *env, jobject unistylesModule, std::shared_ptr<UnistylesR
 }
 
 Screen getScreenDimensions(JNIEnv *env, jobject unistylesModule) {
-    jclass cls = env->GetObjectClass(unistylesModule);
-    jmethodID methodId = env->GetMethodID(cls, "getScreenDimensions", "()Lcom/unistyles/Screen;");
-    jobject screenObj = env->CallObjectMethod(unistylesModule, methodId);
-    Screen screenDimensions = jobjectToScreen(env, screenObj);
+    jobject result = JNI_callPlatform(env, unistylesModule, "getScreenDimensions", "()Lcom/unistyles/Screen;");
+    Screen screenDimensions = jobjectToScreen(env, result);
 
     return screenDimensions;
 }
 
 std::string getColorScheme(JNIEnv *env, jobject unistylesModule) {
-    jclass cls = env->GetObjectClass(unistylesModule);
-    jmethodID methodId = env->GetMethodID(cls, "getColorScheme", "()Ljava/lang/String;");
-    jstring colorScheme = (jstring) env->CallObjectMethod(unistylesModule, methodId);
+    jstring colorScheme = (jstring) JNI_callPlatform(env, unistylesModule, "getColorScheme", "()Ljava/lang/String;");
     const char *colorSchemeChars = env->GetStringUTFChars(colorScheme, nullptr);
     std::string colorSchemeStr = std::string(colorSchemeChars);
 
     env->ReleaseStringUTFChars(colorScheme, colorSchemeChars);
     env->DeleteLocalRef(colorScheme);
-    env->DeleteLocalRef(cls);
 
     return colorSchemeStr;
 }
 
 Dimensions getStatusBarDimensions(JNIEnv *env, jobject unistylesModule) {
-    jclass cls = env->GetObjectClass(unistylesModule);
-    jmethodID methodId = env->GetMethodID(cls, "getStatusBarDimensions", "()Lcom/unistyles/Dimensions;");
-    jobject dimensionsObj = env->CallObjectMethod(unistylesModule, methodId);
+    jobject dimensionsObj = JNI_callPlatform(env, unistylesModule, "getStatusBarDimensions", "()Lcom/unistyles/Dimensions;");
     Dimensions statusBarDimensions = jobjectToDimensions(env, dimensionsObj);
 
     return statusBarDimensions;
 }
 
 Dimensions getNavigationBarDimensions(JNIEnv *env, jobject unistylesModule) {
-    jclass cls = env->GetObjectClass(unistylesModule);
-    jmethodID methodId = env->GetMethodID(cls, "getNavigationBarDimensions", "()Lcom/unistyles/Dimensions;");
-    jobject dimensionsObj = env->CallObjectMethod(unistylesModule, methodId);
+    jobject dimensionsObj = JNI_callPlatform(env, unistylesModule, "getNavigationBarDimensions", "()Lcom/unistyles/Dimensions;");
     Dimensions navigationBarDimensions = jobjectToDimensions(env, dimensionsObj);
 
     return navigationBarDimensions;
 }
 
 Insets getInsets(JNIEnv *env, jobject unistylesModule) {
-    jclass cls = env->GetObjectClass(unistylesModule);
-    jmethodID methodId = env->GetMethodID(cls, "getInsets", "()Lcom/unistyles/Insets;");
-    jobject insetsObj = env->CallObjectMethod(unistylesModule, methodId);
+    jobject insetsObj = JNI_callPlatform(env, unistylesModule, "getInsets", "()Lcom/unistyles/Insets;");
     Insets insets = jobjectToInsets(env, insetsObj);
 
     return insets;
 }
 
 std::string getContentSizeCategory(JNIEnv *env, jobject unistylesModule) {
-    jclass cls = env->GetObjectClass(unistylesModule);
-    jmethodID methodId = env->GetMethodID(cls, "getContentSizeCategory", "()Ljava/lang/String;");
-    jstring contentSizeCategory = (jstring) env->CallObjectMethod(unistylesModule, methodId);
+    jstring contentSizeCategory = (jstring) JNI_callPlatform(env, unistylesModule, "getContentSizeCategory", "()Ljava/lang/String;");
     const char *contentSizeCategoryChars = env->GetStringUTFChars(contentSizeCategory, nullptr);
     std::string contentSizeCategoryStr = std::string(contentSizeCategoryChars);
 
     env->ReleaseStringUTFChars(contentSizeCategory, contentSizeCategoryChars);
     env->DeleteLocalRef(contentSizeCategory);
-    env->DeleteLocalRef(cls);
 
     return contentSizeCategoryStr;
 }
 
 void setStatusBarColor(JNIEnv *env, jobject unistylesModule, std::string color) {
-    jstring colorStr = env->NewStringUTF(color.c_str());
-    jclass cls = env->GetObjectClass(unistylesModule);
-    jmethodID methodId = env->GetMethodID(cls, "onSetStatusBarColor", "(Ljava/lang/String;)V");
-
-    env->CallVoidMethod(unistylesModule, methodId, colorStr);
-    env->DeleteLocalRef(colorStr);
-    env->DeleteLocalRef(cls);
+    JNI_callPlatformWithString(env, unistylesModule, "onSetStatusBarColor", "(Ljava/lang/String;)V", color);
 }
 
 void setNavigationBarColor(JNIEnv *env, jobject unistylesModule, std::string color) {
-    jstring colorStr = env->NewStringUTF(color.c_str());
-    jclass cls = env->GetObjectClass(unistylesModule);
-    jmethodID methodId = env->GetMethodID(cls, "onSetNavigationBarColor", "(Ljava/lang/String;)V");
-
-    env->CallVoidMethod(unistylesModule, methodId, colorStr);
-    env->DeleteLocalRef(colorStr);
-    env->DeleteLocalRef(cls);
+    JNI_callPlatformWithString(env, unistylesModule, "onSetNavigationBarColor", "(Ljava/lang/String;)V", color);
 }
 
 void setNavigationBarHidden(JNIEnv *env, jobject unistylesModule, bool hidden) {
-    jclass cls = env->GetObjectClass(unistylesModule);
-    jmethodID methodId = env->GetMethodID(cls, "onSetNavigationBarHidden", "(Z)V");
-
-    env->CallVoidMethod(unistylesModule, methodId, hidden);
-    env->DeleteLocalRef(cls);
+    JNI_callPlatformWithBool(env, unistylesModule, "onSetNavigationBarHidden", "(Z)V", hidden);
 }
 
 void setStatusBarHidden(JNIEnv *env, jobject unistylesModule, bool hidden) {
-    jclass cls = env->GetObjectClass(unistylesModule);
-    jmethodID methodId = env->GetMethodID(cls, "onSetStatusBarHidden", "(Z)V");
-
-    env->CallVoidMethod(unistylesModule, methodId, hidden);
-    env->DeleteLocalRef(cls);
+    JNI_callPlatformWithBool(env, unistylesModule, "onSetStatusBarHidden", "(Z)V", hidden);
 }
 
 void setImmersiveMode(JNIEnv *env, jobject unistylesModule, bool enabled) {
-    jclass cls = env->GetObjectClass(unistylesModule);
-    jmethodID methodId = env->GetMethodID(cls, "onSetImmersiveMode", "(Z)V");
-
-    env->CallVoidMethod(unistylesModule, methodId, enabled);
-    env->DeleteLocalRef(cls);
+    JNI_callPlatformWithBool(env, unistylesModule, "onSetImmersiveMode", "(Z)V", enabled);
 }
 
 void setRootViewBackgroundColor(JNIEnv *env, jobject unistylesModule, std::string color) {
-    jstring colorStr = env->NewStringUTF(color.c_str());
-    jclass cls = env->GetObjectClass(unistylesModule);
-    jmethodID methodId = env->GetMethodID(cls, "onSetRootViewBackgroundColor", "(Ljava/lang/String;)V");
-
-    env->CallVoidMethod(unistylesModule, methodId, colorStr);
-    env->DeleteLocalRef(colorStr);
-    env->DeleteLocalRef(cls);
+    JNI_callPlatformWithString(env, unistylesModule, "onSetRootViewBackgroundColor", "(Ljava/lang/String;)V", color);
 }
