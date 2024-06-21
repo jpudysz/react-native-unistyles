@@ -10,6 +10,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -20,6 +21,7 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.turbomodule.core.interfaces.CallInvokerHolder
+import androidx.core.graphics.Insets as AndroidInsets
 
 class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener {
     private var isCxxReady: Boolean = false
@@ -186,11 +188,51 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private fun onSetNavigationBarHidden(isHidden: Boolean) {
         this.reactApplicationContext.currentActivity?.let { activity ->
             WindowInsetsControllerCompat(activity.window, activity.window.decorView).apply {
-                activity.runOnUiThread {
-                    if (isHidden) {
-                        hide(WindowInsetsCompat.Type.navigationBars())
-                    } else {
-                        show(WindowInsetsCompat.Type.navigationBars())
+                activity.window?.decorView?.let { decorView ->
+                    activity.runOnUiThread {
+                        if (isHidden) {
+                            // below Android 11, we need to use window flags to hide the navigation bar
+                            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+                                @Suppress("DEPRECATION")
+                                decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+                            } else {
+                                hide(WindowInsetsCompat.Type.navigationBars())
+                                systemBarsBehavior =
+                                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                            }
+
+                            // dispatch new insets to invoke the insets listener
+                            val newInsets = WindowInsetsCompat.Builder()
+                                .setInsets(WindowInsetsCompat.Type.navigationBars(), AndroidInsets.of(0, 0, 0, 0))
+                                .build()
+
+                            ViewCompat.dispatchApplyWindowInsets(activity.findViewById(android.R.id.content), newInsets)
+                        } else {
+                            show(WindowInsetsCompat.Type.navigationBars())
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun onSetStatusBarHidden(isHidden: Boolean) {
+        this.reactApplicationContext.currentActivity?.let { activity ->
+            WindowInsetsControllerCompat(activity.window, activity.window.decorView).apply {
+                activity.window?.let { window ->
+                    activity.runOnUiThread {
+                        if (isHidden) {
+                            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+                                @Suppress("DEPRECATION")
+                                window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                                window.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN)
+                            } else {
+                                hide(WindowInsetsCompat.Type.statusBars())
+                            }
+                        } else {
+                            show(WindowInsetsCompat.Type.statusBars())
+                        }
                     }
                 }
             }
@@ -205,12 +247,30 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
             try {
                 activity.runOnUiThread {
-                    activity.window.statusBarColor = if (color == "") platform.defaultStatusBarColor!! else Color.parseColor(color)
+                    val nextColor = when (color) {
+                        "" -> platform.defaultNavigationBarColor!!
+                        "transparent" -> Color.TRANSPARENT
+                        else -> {
+                            if (color.length == 10) {
+                                ColorUtils.setAlphaComponent(Color.parseColor(color.substring(0, 7)), (255 * (color.substring(7).toFloat() / 100)).toInt())
+                            } else {
+                                Color.parseColor(color)
+                            }
+                        }
+                    }
+
+                    activity.window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+                    activity.window.statusBarColor = nextColor
                 }
             } catch (_: Exception) {
                 Log.d("Unistyles", "Failed to set status bar color: $color")
             }
         }
+    }
+
+    private fun onSetImmersiveMode(isEnabled: Boolean) {
+        this.onSetStatusBarHidden(isEnabled)
+        this.onSetNavigationBarHidden(isEnabled)
     }
 
     private fun onSetRootViewBackgroundColor(color: String) {
@@ -240,6 +300,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     @ReactMethod
     fun removeListeners(count: Double) = Unit
+
     override fun onHostResume() {
         if (isCxxReady) {
             this.onConfigChange()
@@ -247,16 +308,14 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
         this.reactApplicationContext.currentActivity?.let { activity ->
             activity.findViewById<View>(android.R.id.content)?.let { mainView ->
-                activity.window?.decorView?.let { decorView ->
-                    ViewCompat.setOnApplyWindowInsetsListener(mainView) { _, insets ->
-                        this.platform.setInsetsCompat(insets, decorView)
+                ViewCompat.setOnApplyWindowInsetsListener(mainView) { _, insets ->
+                    this.platform.setInsetsCompat(insets, activity.window)
 
-                        if (this.isCxxReady) {
-                            this.onLayoutConfigChange()
-                        }
-
-                        insets
+                    if (this.isCxxReady) {
+                        this.onLayoutConfigChange()
                     }
+
+                    insets
                 }
             }
         }

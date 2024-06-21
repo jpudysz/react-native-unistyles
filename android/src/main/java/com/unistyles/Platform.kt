@@ -2,13 +2,14 @@ package com.unistyles
 
 import android.content.res.Configuration
 import android.graphics.Rect
-import android.view.View
+import android.os.Build
+import android.view.Window
+import android.view.WindowManager
 import androidx.core.view.WindowInsetsCompat
 import com.facebook.react.bridge.ReactApplicationContext
-import kotlin.math.max
 
 class Platform(private val reactApplicationContext: ReactApplicationContext) {
-    private var insetsCompat: InsetsCompat = InsetsCompat.getDefaults()
+    private var insets: Insets = Insets(0, 0, 0, 0)
 
     var defaultNavigationBarColor: Int? = null
     var defaultStatusBarColor: Int? = null
@@ -65,50 +66,54 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
         return contentSizeCategory
     }
 
-    fun setInsetsCompat(insetsCompat: WindowInsetsCompat, decorView: View) {
-        val statusBar = insetsCompat.getInsets(WindowInsetsCompat.Type.statusBars())
-        val navigationBar = insetsCompat.getInsets(WindowInsetsCompat.Type.navigationBars())
-        val cutout = insetsCompat.getInsets(WindowInsetsCompat.Type.displayCutout())
+    fun setInsetsCompat(insetsCompat: WindowInsetsCompat, window: Window) {
+        // below Android 11, we need to use window flags to detect status bar visibility
+        val isStatusBarVisible = when(Build.VERSION.SDK_INT) {
+            in 30..Int.MAX_VALUE -> {
+                insetsCompat.isVisible(WindowInsetsCompat.Type.statusBars())
+            }
+            else -> {
+                @Suppress("DEPRECATION")
+                window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN != WindowManager.LayoutParams.FLAG_FULLSCREEN
+            }
+        }
+        // React Native is forcing insets to make status bar translucent
+        // so we need to calculate top inset manually, as WindowInsetCompat will always return 0
+        val statusBarTopInset = when(isStatusBarVisible) {
+            true -> {
+                val visibleRect = Rect()
 
-        // get the visible frame of the window to detect translucent status bar
-        // react native (and expo) are setting top inset to 0
-        // so there is no other way to detect if status bar is hidden or translucent
-        val visibleFrame = Rect()
-        decorView.getWindowVisibleDisplayFrame(visibleFrame)
+                window.decorView.getWindowVisibleDisplayFrame(visibleRect)
 
-        val visibleTopFrame = max(visibleFrame.top, statusBar.top)
+                visibleRect.top
+            }
+            false -> 0
+        }
 
-        this.insetsCompat = InsetsCompat(
-            Insets(visibleTopFrame, statusBar.bottom, statusBar.left, statusBar.right),
-            Insets(navigationBar.top, navigationBar.bottom, navigationBar.left, navigationBar.right),
-            Insets(cutout.top, cutout.bottom, cutout.left, cutout.right)
-        )
+        val insets = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+
+        this.insets = Insets(statusBarTopInset, insets.bottom, insets.left, insets.right)
     }
-
     fun getInsets(): Insets {
         val density = reactApplicationContext.resources.displayMetrics.density
-        val top = max(this.insetsCompat.cutout.top, this.insetsCompat.statusBar.top)
-        val bottom = this.insetsCompat.navigationBar.bottom
-        val left = this.insetsCompat.statusBar.left
-        val right = this.insetsCompat.statusBar.right
 
         return Insets(
-            (top / density).toInt(),
-            (bottom / density).toInt(),
-            (left / density).toInt(),
-            (right / density).toInt()
+            (this.insets.top / density).toInt(),
+            (this.insets.bottom / density).toInt(),
+            (this.insets.left / density).toInt(),
+            (this.insets.right / density).toInt()
         )
     }
 
     private fun getStatusBarHeight(): Int {
         val density = reactApplicationContext.resources.displayMetrics.density
 
-        return (this.insetsCompat.statusBar.top / density).toInt()
+        return (this.insets.top / density).toInt()
     }
 
     private fun getNavigationBarHeight(): Int {
         val density = reactApplicationContext.resources.displayMetrics.density
 
-        return (this.insetsCompat.navigationBar.bottom / density).toInt()
+        return (this.insets.bottom / density).toInt()
     }
 }

@@ -63,6 +63,8 @@ struct UnistylesModel {
     std::optional<std::function<void(std::string)>> setStatusBarColor;
     std::optional<std::function<void(std::string)>> setNavigationBarColor;
     std::optional<std::function<void(bool)>> setNavigationBarHidden;
+    std::optional<std::function<void(bool)>> setStatusBarHidden;
+    std::optional<std::function<void(bool)>> setImmersiveMode;
     std::optional<std::function<void(std::string)>> setRootViewBackgroundColor;
 
     void setScreenDimensionsCallback(std::function<Screen()> callback) {
@@ -91,6 +93,12 @@ struct UnistylesModel {
     }
     void setNavigationBarHiddenCallback(std::function<void(bool hidden)> callback) {
         this->setNavigationBarHidden = callback;
+    }
+    void setStatusBarHiddenCallback(std::function<void(bool hidden)> callback) {
+        this->setStatusBarHidden = callback;
+    }
+    void setImmersiveModeCallback(std::function<void(bool enabled)> callback) {
+        this->setImmersiveMode = callback;
     }
     void setRootViewBackgroundColorCallback(std::function<void(std::string color)> callback) {
         this->setRootViewBackgroundColor = callback;

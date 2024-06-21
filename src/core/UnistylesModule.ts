@@ -28,7 +28,8 @@ export class UnistylesBridgeWeb {
     #statusBar: StatusBar = {
         height: 0,
         width: 0,
-        setColor: () => {}
+        setColor: () => {},
+        setHidden: () => {}
     }
     #navigationBar: NavigationBar = {
         height: 0,
@@ -97,6 +98,8 @@ export class UnistylesBridgeWeb {
                         return (pluginName: string) => this.removePlugin(pluginName)
                     case 'setRootViewBackgroundColor':
                         return (color: string) => this.setRootViewBackgroundColor(color)
+                    case 'setImmersiveMode':
+                        return () => {}
                     default:
                         return Reflect.get(this, prop)
                 }

@@ -2,14 +2,15 @@ import React, { useEffect } from 'react'
 import { UnistylesRegistry, UnistylesRuntime } from 'react-native-unistyles'
 import type { UnistylesThemes } from 'react-native-unistyles'
 import { useNavigation } from '@react-navigation/native'
-import { ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { DemoGroup, DemoLink } from '../components'
 import { DemoNames, isWeb } from '../common'
 import type { NavigationProps } from '../common'
 import { breakpoints, darkTheme, lightTheme, premiumTheme } from '../styles'
 import { autoGuidelinePlugin } from '../plugins'
 
-UnistylesRuntime.navigationBar.setColor('transparent')
+UnistylesRuntime.statusBar.setColor('#50000000')
+UnistylesRuntime.navigationBar.setColor('#50000000')
 
 export const HomeScreen = () => {
     const navigation = useNavigation<NavigationProps>()
@@ -22,11 +23,6 @@ export const HomeScreen = () => {
 
     return (
         <View style={styles.container}>
-            <StatusBar
-                translucent
-                barStyle="dark-content"
-                backgroundColor="transparent"
-            />
             <ScrollView contentContainerStyle={styles.list}>
                 <View style={styles.titleContainer}>
                     <Text style={styles.unicorn}>
@@ -350,6 +346,23 @@ export const HomeScreen = () => {
                                 })
 
                             navigation.navigate(DemoNames.Runtime)
+                        }}
+                    />
+                    <DemoLink
+                        description="Layout"
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addBreakpoints(breakpoints)
+                                .addConfig({
+                                    initialTheme: 'light'
+                                })
+
+                            navigation.navigate(DemoNames.Layout)
                         }}
                     />
                     <DemoLink

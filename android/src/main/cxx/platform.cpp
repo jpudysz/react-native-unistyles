@@ -37,6 +37,14 @@ void makeShared(JNIEnv *env, jobject unistylesModule, std::shared_ptr<UnistylesR
         setNavigationBarHidden(env, unistylesModule, hidden);
     });
 
+    unistylesRuntime->setStatusBarHiddenCallback([=](bool hidden) {
+        setStatusBarHidden(env, unistylesModule, hidden);
+    });
+
+    unistylesRuntime->setImmersiveModeCallback([=](bool enabled) {
+        setImmersiveMode(env, unistylesModule, enabled);
+    });
+
     unistylesRuntime->setRootViewBackgroundColorCallback([=](const std::string &color) {
         setRootViewBackgroundColor(env, unistylesModule, color);
     });
@@ -138,6 +146,22 @@ void setNavigationBarHidden(JNIEnv *env, jobject unistylesModule, bool hidden) {
     jmethodID methodId = env->GetMethodID(cls, "onSetNavigationBarHidden", "(Z)V");
 
     env->CallVoidMethod(unistylesModule, methodId, hidden);
+    env->DeleteLocalRef(cls);
+}
+
+void setStatusBarHidden(JNIEnv *env, jobject unistylesModule, bool hidden) {
+    jclass cls = env->GetObjectClass(unistylesModule);
+    jmethodID methodId = env->GetMethodID(cls, "onSetStatusBarHidden", "(Z)V");
+
+    env->CallVoidMethod(unistylesModule, methodId, hidden);
+    env->DeleteLocalRef(cls);
+}
+
+void setImmersiveMode(JNIEnv *env, jobject unistylesModule, bool enabled) {
+    jclass cls = env->GetObjectClass(unistylesModule);
+    jmethodID methodId = env->GetMethodID(cls, "onSetImmersiveMode", "(Z)V");
+
+    env->CallVoidMethod(unistylesModule, methodId, enabled);
     env->DeleteLocalRef(cls);
 }
 

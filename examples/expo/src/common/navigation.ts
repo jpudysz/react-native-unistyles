@@ -29,7 +29,8 @@ export enum DemoNames {
     ContentSizeCategoryScreen = 'ContentSizeCategoryScreen',
     BooleanVariants = 'BooleanVariantsScreen',
     UpdateTheme = 'UpdateThemeScreen',
-    AndroidStatusBarNavigationBar = 'AndroidStatusBarNavigationBarScreen'
+    AndroidStatusBarNavigationBar = 'AndroidStatusBarNavigationBarScreen',
+    Layout = 'LayoutScreen'
 }
 
 export type DemoStackParams = {
@@ -61,7 +62,8 @@ export type DemoStackParams = {
     [DemoNames.ContentSizeCategoryScreen]: undefined,
     [DemoNames.BooleanVariants]: undefined,
     [DemoNames.UpdateTheme]: undefined,
-    [DemoNames.AndroidStatusBarNavigationBar]: undefined
+    [DemoNames.AndroidStatusBarNavigationBar]: undefined,
+    [DemoNames.Layout]: undefined
 }
 
 export type NavigationProps<S extends DemoNames = DemoNames.Home> = NavigationProp<DemoStackParams, S>
