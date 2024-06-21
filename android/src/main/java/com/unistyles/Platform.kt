@@ -1,19 +1,25 @@
 package com.unistyles
 
 import android.content.res.Configuration
+import android.graphics.Color
 import android.graphics.Rect
 import android.os.Build
+import android.util.Log
+import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import androidx.core.graphics.ColorUtils
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.facebook.react.bridge.ReactApplicationContext
 import kotlin.math.roundToInt
 
 class Platform(private val reactApplicationContext: ReactApplicationContext) {
     private var insets: Insets = Insets(0, 0, 0, 0)
+    private var defaultNavigationBarColor: Int? = null
+    private var defaultStatusBarColor: Int? = null
 
-    var defaultNavigationBarColor: Int? = null
-    var defaultStatusBarColor: Int? = null
     var orientation: Int = reactApplicationContext.resources.configuration.orientation
 
     fun getScreenDimensions(): Screen {
@@ -95,6 +101,7 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
 
         this.insets = Insets(statusBarTopInset, insets.bottom, insets.left, insets.right)
     }
+
     fun getInsets(): Insets {
         val density = reactApplicationContext.resources.displayMetrics.density
 
@@ -116,5 +123,135 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
         val density = reactApplicationContext.resources.displayMetrics.density
 
         return (this.insets.bottom / density).roundToInt()
+    }
+
+    fun onSetNavigationBarColor(color: String) {
+        this.reactApplicationContext.currentActivity?.let { activity ->
+            if (this.defaultNavigationBarColor == null) {
+                this.defaultNavigationBarColor = activity.window.navigationBarColor
+            }
+
+            try {
+                activity.runOnUiThread {
+                    val nextColor = when (color) {
+                        "" -> this.defaultNavigationBarColor!!
+                        "transparent" -> Color.TRANSPARENT
+                        else -> {
+                            if (color.length == 10) {
+                                ColorUtils.setAlphaComponent(Color.parseColor(color.substring(0, 7)), (255 * (color.substring(7).toFloat() / 100)).toInt())
+                            } else {
+                                Color.parseColor(color)
+                            }
+                        }
+                    }
+
+                    activity.window.navigationBarColor = nextColor
+                }
+            } catch (_: Exception) {
+                Log.d("Unistyles", "Failed to set navigation bar color: $color")
+            }
+        }
+    }
+
+    fun onSetNavigationBarHidden(isHidden: Boolean) {
+        this.reactApplicationContext.currentActivity?.let { activity ->
+            WindowInsetsControllerCompat(activity.window, activity.window.decorView).apply {
+                activity.window?.decorView?.let { decorView ->
+                    activity.runOnUiThread {
+                        if (isHidden) {
+                            // below Android 11, we need to use window flags to hide the navigation bar
+                            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+                                @Suppress("DEPRECATION")
+                                decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+                            } else {
+                                hide(WindowInsetsCompat.Type.navigationBars())
+                                systemBarsBehavior =
+                                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                            }
+
+                            // dispatch new insets to invoke the insets listener
+                            val newInsets = WindowInsetsCompat.Builder()
+                                .setInsets(WindowInsetsCompat.Type.navigationBars(), androidx.core.graphics.Insets.of(0, 0, 0, 0))
+                                .build()
+
+                            ViewCompat.dispatchApplyWindowInsets(activity.findViewById(android.R.id.content), newInsets)
+                        } else {
+                            show(WindowInsetsCompat.Type.navigationBars())
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun onSetStatusBarHidden(isHidden: Boolean) {
+        this.reactApplicationContext.currentActivity?.let { activity ->
+            WindowInsetsControllerCompat(activity.window, activity.window.decorView).apply {
+                activity.window?.let { window ->
+                    activity.runOnUiThread {
+                        if (isHidden) {
+                            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+                                @Suppress("DEPRECATION")
+                                window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                                window.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN)
+                            } else {
+                                hide(WindowInsetsCompat.Type.statusBars())
+                            }
+                        } else {
+                            show(WindowInsetsCompat.Type.statusBars())
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun onSetStatusBarColor(color: String) {
+        this.reactApplicationContext.currentActivity?.let { activity ->
+            if (this.defaultStatusBarColor == null) {
+                this.defaultStatusBarColor = activity.window.statusBarColor
+            }
+
+            try {
+                activity.runOnUiThread {
+                    val nextColor = when (color) {
+                        "" -> this.defaultNavigationBarColor!!
+                        "transparent" -> Color.TRANSPARENT
+                        else -> {
+                            if (color.length == 10) {
+                                ColorUtils.setAlphaComponent(Color.parseColor(color.substring(0, 7)), (255 * (color.substring(7).toFloat() / 100)).toInt())
+                            } else {
+                                Color.parseColor(color)
+                            }
+                        }
+                    }
+
+                    activity.window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+                    activity.window.statusBarColor = nextColor
+                }
+            } catch (_: Exception) {
+                Log.d("Unistyles", "Failed to set status bar color: $color")
+            }
+        }
+    }
+
+    fun onSetImmersiveMode(isEnabled: Boolean) {
+        this.onSetStatusBarHidden(isEnabled)
+        this.onSetNavigationBarHidden(isEnabled)
+    }
+
+    fun onSetRootViewBackgroundColor(color: String) {
+        this.reactApplicationContext.currentActivity?.let { activity ->
+            activity.window?.decorView?.let { decorView ->
+                try {
+                    activity.runOnUiThread {
+                        decorView.setBackgroundColor(Color.parseColor(color))
+                    }
+                } catch (_: Exception) {
+                    Log.d("Unistyles", "Failed to set root view background color: $color")
+                }
+            }
+        }
     }
 }

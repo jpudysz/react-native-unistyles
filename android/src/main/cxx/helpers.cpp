@@ -48,6 +48,50 @@ Insets jobjectToInsets(JNIEnv *env, jobject insetsObj) {
     return Insets{top, bottom, left, right};
 }
 
+void JNI_callPlatformWithString(JNIEnv *env, jobject unistylesModule, std::string name, std::string sig, std::string param) {
+    jclass cls = env->GetObjectClass(unistylesModule);
+    jfieldID platformFieldId = env->GetFieldID(cls, "platform", "Lcom/unistyles/Platform;");
+    jobject platformInstance = env->GetObjectField(unistylesModule, platformFieldId);
+    jclass platformClass = env->GetObjectClass(platformInstance);
+    jstring strParam = env->NewStringUTF(param.c_str());
+    jmethodID methodId = env->GetMethodID(platformClass, name.c_str(), sig.c_str());
+
+    env->CallVoidMethod(platformInstance, methodId, strParam);
+
+    env->DeleteLocalRef(cls);
+    env->DeleteLocalRef(platformInstance);
+    env->DeleteLocalRef(platformClass);
+    env->DeleteLocalRef(strParam);
+}
+
+void JNI_callPlatformWithBool(JNIEnv *env, jobject unistylesModule, std::string name, std::string sig, bool param) {
+    jclass cls = env->GetObjectClass(unistylesModule);
+    jfieldID platformFieldId = env->GetFieldID(cls, "platform", "Lcom/unistyles/Platform;");
+    jobject platformInstance = env->GetObjectField(unistylesModule, platformFieldId);
+    jclass platformClass = env->GetObjectClass(platformInstance);
+    jmethodID methodId = env->GetMethodID(platformClass, name.c_str(), sig.c_str());
+
+    env->CallVoidMethod(platformInstance, methodId, param);
+    env->DeleteLocalRef(cls);
+    env->DeleteLocalRef(platformInstance);
+    env->DeleteLocalRef(platformClass);
+}
+
+jobject JNI_callPlatform(JNIEnv *env, jobject unistylesModule, std::string name, std::string sig) {
+    jclass cls = env->GetObjectClass(unistylesModule);
+    jfieldID platformFieldId = env->GetFieldID(cls, "platform", "Lcom/unistyles/Platform;");
+    jobject platformInstance = env->GetObjectField(unistylesModule, platformFieldId);
+    jclass platformClass = env->GetObjectClass(platformInstance);
+    jmethodID methodId = env->GetMethodID(platformClass, name.c_str(), sig.c_str());
+    jobject result = env->CallObjectMethod(platformInstance, methodId);
+
+    env->DeleteLocalRef(cls);
+    env->DeleteLocalRef(platformInstance);
+    env->DeleteLocalRef(platformClass);
+
+    return result;
+}
+
 void throwKotlinException(
     JNIEnv *env,
     const char *message
