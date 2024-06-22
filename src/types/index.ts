@@ -1,5 +1,6 @@
 export * from './normalizer'
 export * from './unistyles'
+export * from './color'
 export type { Optional, Nullable } from './common'
 export type {
     NestedStylePairs,

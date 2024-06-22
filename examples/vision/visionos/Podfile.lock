@@ -881,7 +881,7 @@ PODS:
   - React-Mapbuffer (0.73.10):
     - glog
     - React-debug
-  - react-native-unistyles (2.6.0):
+  - react-native-unistyles (2.8.0-beta.1):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
@@ -1273,7 +1273,7 @@ SPEC CHECKSUMS:
   React-jsinspector: d0270713e52b3797a62d01e3027573a18a20341f
   React-logger: b9d776e95e27d2466e720dd7de4115cfc47d412a
   React-Mapbuffer: 0c67d6e60225d91e20a27e65ae8f8391b740ecb6
-  react-native-unistyles: ccd679ad3643e05f42ac7a8072a8a48a9f4c6edb
+  react-native-unistyles: 5cf3cd5dda34e23914659b23ff0edbf8a4752b32
   React-nativeconfig: 5c702993ba5b4016d481edb6490b48217f11b6df
   React-NativeModulesApple: 69648222e318b949728a6f43b4d929603d618b8f
   React-perflogger: 27f9b7e9ad34a2abe2b0f5fae6e100b16604485c
@@ -1299,7 +1299,7 @@ SPEC CHECKSUMS:
   ReactCommon: 0c2cdd6a193b8ce7c05105b66b881c41bf014308
   RNSVG: 50cf2c7018e57cf5d3522d98d0a3a4dd6bf9d093
   SocketRocket: 0ba3e799f983d2dfa878777017659ef6c866e5c6
-  Yoga: a2d1866030ed66b042bdd302fe0541f5b107f3b6
+  Yoga: 472631194fd999deb51b1d65cb10bf3075f32cb9
 
 PODFILE CHECKSUM: 77a9ee015132edc85e89ca062bc19be7a4df1a71
 

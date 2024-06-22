@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { ScreenOrientation } from '../../common'
-import type { UnistylesBridge, UnistylesPlugin } from '../../types'
+import type { Color, UnistylesBridge, UnistylesPlugin } from '../../types'
 import type { UnistylesThemes } from '../../global'
 import type { UnistylesMockedRegistry } from './UnistylesMockedRegistry'
 import type { UnistyleRegistry } from '../UnistyleRegistry'
@@ -66,11 +66,20 @@ export class UnistylesMockedRuntime {
         }
     }
 
+    public get pixelRatio() {
+        return 1.0
+    }
+
+    public get fontScale() {
+        return 1.0
+    }
+
     public get statusBar() {
         return {
             height: 24,
             width: 800,
-            setColor: () => {}
+            setColor: () => {},
+            setHidden: () => {}
         }
     }
 
@@ -78,7 +87,8 @@ export class UnistylesMockedRuntime {
         return {
             height: 0,
             width: 0,
-            setColor: () => {}
+            setColor: () => {},
+            setHidden: () => {}
         }
     }
 
@@ -91,4 +101,6 @@ export class UnistylesMockedRuntime {
     public setAdaptiveThemes = (enabled: boolean) => {}
     public addPlugin = (plugin: UnistylesPlugin) => {}
     public removePlugin = (plugin: UnistylesPlugin) => {}
+    public setRootViewBackgroundColor = (color?: Color | string) => {}
+    public setImmersiveMode = (isEnabled: boolean) => {}
 }

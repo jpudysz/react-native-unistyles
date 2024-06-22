@@ -4,43 +4,40 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.Color
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.ViewTreeObserver
-import com.facebook.react.bridge.Arguments
+import android.view.View
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
-import com.facebook.react.modules.core.DeviceEventManagerModule
+import com.facebook.react.turbomodule.core.interfaces.CallInvokerHolder
 
 class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener {
-    private val drawHandler = Handler(Looper.getMainLooper())
-    private val debounceDuration = 250L
-    private var runnable: Runnable? = null
-
     private var isCxxReady: Boolean = false
-    private lateinit var platform: Platform
-    private val layoutListener = ViewTreeObserver.OnGlobalLayoutListener {
-        if (this.isCxxReady) {
-            runnable?.let { drawHandler.removeCallbacks(it) }
-
-            runnable = Runnable {
-                this@UnistylesModule.onLayoutConfigChange()
-            }.also {
-                drawHandler.postDelayed(it, debounceDuration)
-            }
-        }
-    }
+    private var platform: Platform = Platform(reactContext)
 
     private val configurationChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == Intent.ACTION_CONFIGURATION_CHANGED && this@UnistylesModule.isCxxReady) {
+            if (!this@UnistylesModule.isCxxReady) {
+                return
+            }
+
+            if (intent.action == Intent.ACTION_CONFIGURATION_CHANGED) {
                 Handler(Looper.getMainLooper()).postDelayed({
                     this@UnistylesModule.onConfigChange()
                 }, 10)
+            }
+
+            val newConfig = context.resources.configuration
+
+            if (newConfig.orientation != platform.orientation) {
+                platform.orientation = newConfig.orientation
+
+                this@UnistylesModule.onLayoutConfigChange()
             }
         }
     }
@@ -50,27 +47,13 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         const val NAME = "Unistyles"
     }
 
-    //region Lifecycle
     init {
         reactApplicationContext.registerReceiver(configurationChangeReceiver, IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED))
         reactApplicationContext.addLifecycleEventListener(this)
     }
 
-    private fun setupLayoutListener() {
-        val activity = currentActivity ?: return
-        activity.window.decorView.rootView.viewTreeObserver.addOnGlobalLayoutListener(layoutListener)
-    }
-
-    private fun stopLayoutListener() {
-        val activity = currentActivity ?: return
-        activity.window.decorView.rootView.viewTreeObserver.removeOnGlobalLayoutListener(layoutListener)
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onCatalystInstanceDestroy() {
-        this.stopLayoutListener()
+    override fun invalidate() {
         reactApplicationContext.unregisterReceiver(configurationChangeReceiver)
-        runnable?.let { drawHandler.removeCallbacks(it) }
         reactApplicationContext.removeLifecycleEventListener(this)
 
         if (this.isCxxReady) {
@@ -78,70 +61,46 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
     }
 
-    //endregion
-    //region Event handlers
     private fun onConfigChange() {
-        if (!platform.hasNewConfig()) {
-            return
-        }
-
-        val config = platform.getConfig()
+        val colorScheme = this.platform.getColorScheme()
+        val contentSizeCategory = this.platform.getContentSizeCategory()
 
         reactApplicationContext.runOnJSQueueThread {
-            if (config.hasNewColorScheme) {
-                this.nativeOnAppearanceChange(config.colorScheme)
-            }
-
-            if (config.hasNewContentSizeCategory) {
-                this.nativeOnContentSizeCategoryChange(config.contentSizeCategory)
-            }
+            this.nativeOnAppearanceChange(colorScheme)
+            this.nativeOnContentSizeCategoryChange(contentSizeCategory)
         }
     }
 
     private fun onLayoutConfigChange() {
-        if (!platform.hasNewLayoutConfig()) {
-            return
-        }
-
-        val config = platform.getLayoutConfig()
+        val screen = this.platform.getScreenDimensions()
+        val insets = this.platform.getInsets()
+        val statusBar = this.platform.getStatusBarDimensions()
+        val navigationBar = this.platform.getNavigationBarDimensions()
 
         reactApplicationContext.runOnJSQueueThread {
             this.nativeOnOrientationChange(
-                config.screen,
-                config.insets,
-                config.statusBar,
-                config.navigationBar
+                screen,
+                insets,
+                statusBar,
+                navigationBar
             )
         }
     }
 
-    //endregion
-    //region Core
     @ReactMethod(isBlockingSynchronousMethod = true)
     fun install(): Boolean {
         return try {
             System.loadLibrary("unistyles")
 
-            this.platform = Platform(reactApplicationContext)
+            this.reactApplicationContext.javaScriptContextHolder?.let { contextHolder ->
+                this.reactApplicationContext.catalystInstance.jsCallInvokerHolder?.let { callInvokerHolder: CallInvokerHolder ->
+                    this.nativeInstall(contextHolder.get(), callInvokerHolder)
+                    this.isCxxReady = true
 
-            val config = platform.getConfig()
-            val layoutConfig = platform.getLayoutConfig()
+                    Log.i(NAME, "Installed Unistyles \uD83E\uDD84!")
 
-            this.reactApplicationContext.javaScriptContextHolder?.let {
-                this.nativeInstall(
-                    it.get(),
-                    layoutConfig.screen,
-                    config.colorScheme,
-                    config.contentSizeCategory,
-                    layoutConfig.insets,
-                    layoutConfig.statusBar,
-                    layoutConfig.navigationBar
-                )
-                this.isCxxReady = true
-
-                Log.i(NAME, "Installed Unistyles \uD83E\uDD84!")
-
-                return true
+                    return true
+                }
             }
 
             false
@@ -152,119 +111,17 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
     }
 
-    private external fun nativeInstall(
-        jsi: Long,
-        screen: Dimensions,
-        colorScheme: String,
-        contentSizeCategory: String,
-        insets: Insets,
-        statusBar: Dimensions,
-        navigationBar: Dimensions
-    )
+    private external fun nativeInstall(jsi: Long, callInvoker: CallInvokerHolder)
     private external fun nativeDestroy()
-    private external fun nativeOnOrientationChange(screen: Dimensions, insets: Insets, statusBar: Dimensions, navigationBar: Dimensions)
+    private external fun nativeOnOrientationChange(screen: Screen, insets: Insets, statusBar: Dimensions, navigationBar: Dimensions)
     private external fun nativeOnAppearanceChange(colorScheme: String)
     private external fun nativeOnContentSizeCategoryChange(contentSizeCategory: String)
 
-    //endregion
-    //region Event emitter
-    private fun onLayoutChange(breakpoint: String, orientation: String, screen: Dimensions, statusBar: Dimensions, insets: Insets, navigationBar: Dimensions) {
-        val body = Arguments.createMap().apply {
-            putString("type", "layout")
-            putMap("payload", Arguments.createMap().apply {
-                putString("breakpoint", breakpoint)
-                putString("orientation", orientation)
-                putMap("screen", Arguments.createMap().apply {
-                    putInt("width", screen.width)
-                    putInt("height", screen.height)
-                })
-                putMap("statusBar", Arguments.createMap().apply {
-                    putInt("width", statusBar.width)
-                    putInt("height", statusBar.height)
-                })
-                putMap("insets", Arguments.createMap().apply {
-                    putInt("top", insets.top)
-                    putInt("bottom", insets.bottom)
-                    putInt("left", insets.left)
-                    putInt("right", insets.right)
-                })
-                putMap("navigationBar", Arguments.createMap().apply {
-                    putInt("width", navigationBar.width)
-                    putInt("height", navigationBar.height)
-                })
-            })
-        }
-
-        reactApplicationContext
-            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-            .emit("__unistylesOnChange", body)
-    }
-
-    private fun onThemeChange(themeName: String) {
-        val body = Arguments.createMap().apply {
-            putString("type", "theme")
-            putMap("payload", Arguments.createMap().apply {
-                putString("themeName", themeName)
-            })
-        }
-
-        reactApplicationContext
-            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-            .emit("__unistylesOnChange", body)
-    }
-
-    private fun onPluginChange() {
-        val body = Arguments.createMap().apply {
-            putString("type", "plugin")
-        }
-
-        reactApplicationContext
-            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-            .emit("__unistylesOnChange", body)
-    }
-
-    private fun onContentSizeCategoryChange(contentSizeCategory: String) {
-        val body = Arguments.createMap().apply {
-            putString("type", "dynamicTypeSize")
-            putMap("payload", Arguments.createMap().apply {
-                putString("contentSizeCategory", contentSizeCategory)
-            })
-        }
-
-        reactApplicationContext
-            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-            .emit("__unistylesOnChange", body)
-    }
-
-    private fun onSetNavigationBarColor(color: String) {
-        val activity = currentActivity ?: return
-
-        if (platform.defaultNavigationBarColor == null) {
-            platform.defaultNavigationBarColor = activity.window.navigationBarColor
-        }
-
-        try {
+    private fun enableEdgeToEdge() {
+        this.reactApplicationContext.currentActivity?.let { activity ->
             activity.runOnUiThread {
-                activity.window.navigationBarColor = if (color == "") platform.defaultNavigationBarColor!! else Color.parseColor(color)
+                WindowCompat.setDecorFitsSystemWindows(activity.window, false)
             }
-        } catch (_: Exception) {
-            Log.d("Unistyles", "Failed to set navigation bar color: $color")
-        }
-    }
-
-    private fun onSetStatusBarColor(color: String) {
-        val activity = currentActivity ?: return
-
-        if (platform.defaultStatusBarColor == null) {
-            platform.defaultStatusBarColor = activity.window.statusBarColor
-        }
-
-        try {
-            activity.runOnUiThread {
-                activity.window.statusBarColor = if (color == "") platform.defaultStatusBarColor!! else Color.parseColor(color)
-            }
-        } catch (_: Exception) {
-            Log.d("Unistyles", "Failed to set status bar color: $color")
         }
     }
 
@@ -273,18 +130,36 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     @ReactMethod
     fun removeListeners(count: Double) = Unit
+
     override fun onHostResume() {
+        this.enableEdgeToEdge()
+
         if (isCxxReady) {
             this.onConfigChange()
         }
 
-        this.setupLayoutListener()
+        this.reactApplicationContext.currentActivity?.let { activity ->
+            activity.findViewById<View>(android.R.id.content)?.let { mainView ->
+                ViewCompat.setOnApplyWindowInsetsListener(mainView) { _, insets ->
+                    this.platform.setInsetsCompat(insets, activity.window)
+
+                    if (this.isCxxReady) {
+                        this.onLayoutConfigChange()
+                    }
+
+                    insets
+                }
+            }
+        }
     }
 
     override fun onHostPause() {
-        this.stopLayoutListener()
+        this.reactApplicationContext.currentActivity?.let { activity ->
+            activity.window?.decorView?.let { view ->
+                ViewCompat.setOnApplyWindowInsetsListener(view, null)
+            }
+        }
     }
 
     override fun onHostDestroy() {}
-    //endregion
 }

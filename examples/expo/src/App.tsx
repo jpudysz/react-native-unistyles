@@ -10,7 +10,14 @@ const Stack = createNativeStackNavigator<DemoStackParams>()
 
 export const App: React.FunctionComponent = () => (
     <SafeAreaProvider>
-        <NavigationContainer>
+        <NavigationContainer
+            theme={{
+                // @ts-ignore
+                colors: {
+                    background: 'transparent'
+                }
+            }}
+        >
             <Stack.Navigator
                 initialRouteName={DemoNames.Home}
                 screenOptions={{
@@ -34,6 +41,7 @@ export const App: React.FunctionComponent = () => (
                 <Stack.Screen name={DemoNames.AutoGuidelinePlugin} component={Screens.AutoGuidelinePluginScreen} />
                 <Stack.Screen name={DemoNames.HighContrastPlugin} component={Screens.HighContrastPluginScreen} />
                 <Stack.Screen name={DemoNames.Runtime} component={Screens.RuntimeScreen} />
+                <Stack.Screen name={DemoNames.Layout} component={Screens.LayoutScreen} />
                 <Stack.Screen name={DemoNames.RuntimeWithStyleSheet} component={Screens.RuntimeWithStyleSheetScreen} />
                 <Stack.Screen name={DemoNames.Benchmark} component={Screens.BenchmarkScreen} />
                 <Stack.Screen name={DemoNames.BenchmarkAllFeatures} component={Screens.BenchmarkUnistylesAllFeaturesScreen} />
