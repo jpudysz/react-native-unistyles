@@ -1,6 +1,6 @@
 import { NativeEventEmitter, NativeModules } from 'react-native'
 import type { UnistylesThemes, UnistylesBreakpoints } from 'react-native-unistyles'
-import type { ColorSchemeName, ScreenInsets, StatusBar, NavigationBar } from '../types'
+import type { ColorSchemeName, ScreenInsets, StatusBar, NavigationBar, Color } from '../types'
 import { normalizeWebStylesPlugin } from '../plugins'
 import { isServer } from '../common'
 
@@ -97,7 +97,7 @@ export class UnistylesBridgeWeb {
                     case 'removePlugin':
                         return (pluginName: string) => this.removePlugin(pluginName)
                     case 'setRootViewBackgroundColor':
-                        return (color: string) => this.setRootViewBackgroundColor(color)
+                        return (color: Color | string) => this.setRootViewBackgroundColor(color)
                     case 'setImmersiveMode':
                         return () => {}
                     default:
@@ -240,8 +240,8 @@ export class UnistylesBridgeWeb {
         return 'light'
     }
 
-    private setRootViewBackgroundColor(color: string) {
-        document.body.style.backgroundColor = color
+    private setRootViewBackgroundColor(color?: Color | string) {
+        document.body.style.backgroundColor = color as string
     }
 
     private emitPluginChange() {
