@@ -9,7 +9,7 @@ Dimensions jobjectToDimensions(JNIEnv *env, jobject dimensionObj);
 Screen jobjectToScreen(JNIEnv *env, jobject screenObj);
 Insets jobjectToInsets(JNIEnv *env, jobject insetsObj);
 
-void JNI_callPlatformWithString(JNIEnv *env, jobject unistylesModule, std::string name, std::string sig, std::string param);
+void JNI_callPlatformWithColor(JNIEnv *env, jobject unistylesModule, std::string name, std::string sig, std::string param, float alpha);
 jobject JNI_callPlatform(JNIEnv *env, jobject unistylesModule, std::string name, std::string sig);
 void JNI_callPlatformWithBool(JNIEnv *env, jobject unistylesModule, std::string name, std::string sig, bool param);
 

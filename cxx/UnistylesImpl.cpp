@@ -177,9 +177,10 @@ jsi::Value UnistylesRuntime::getStatusBar(jsi::Runtime& rt, std::string fnName) 
     auto statusBar = jsi::Object(rt);
     auto setStatusBarColorFunction = HOST_FN("setColor", 1, {
         std::string color = arguments[0].asString(rt).utf8(rt);
+        float alpha = arguments[1].asNumber();
 
         if (this->setStatusBarColor.has_value()) {
-            this->setStatusBarColor.value()(color);
+            this->setStatusBarColor.value()(color, alpha);
         }
 
         return jsi::Value::undefined();
@@ -206,9 +207,10 @@ jsi::Value UnistylesRuntime::getNavigationBar(jsi::Runtime& rt, std::string fnNa
     auto navigationBarValue = jsi::Object(rt);
     auto setNavigationBarColorFunction = HOST_FN("setColor", 1, {
         std::string color = arguments[0].asString(rt).utf8(rt);
+        float alpha = arguments[1].asNumber();
 
         if (this->setNavigationBarColor.has_value()) {
-            this->setNavigationBarColor.value()(color);
+            this->setNavigationBarColor.value()(color, alpha);
         }
 
         return jsi::Value::undefined();
@@ -283,9 +285,10 @@ jsi::Value UnistylesRuntime::setImmersiveModeEnabled(jsi::Runtime& rt, std::stri
 jsi::Value UnistylesRuntime::setRootBackgroundColor(jsi::Runtime& rt, std::string fnName) {
     return HOST_FN(fnName, 1, {
         std::string color = arguments[0].asString(rt).utf8(rt);
+        float alpha = arguments[1].asNumber();
 
         if (this->setRootViewBackgroundColor.has_value()) {
-            this->setRootViewBackgroundColor.value()(color);
+            this->setRootViewBackgroundColor.value()(color, alpha);
         }
 
         return jsi::Value::undefined();

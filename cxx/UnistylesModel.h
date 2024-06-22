@@ -60,12 +60,12 @@ struct UnistylesModel {
     std::function<Dimensions()> getStatusBarDimensions;
     std::function<Dimensions()> getNavigationBarDimensions;
     std::function<Insets()> getInsets;
-    std::optional<std::function<void(std::string)>> setStatusBarColor;
-    std::optional<std::function<void(std::string)>> setNavigationBarColor;
+    std::optional<std::function<void(std::string, float alpha)>> setStatusBarColor;
+    std::optional<std::function<void(std::string, float alpha)>> setNavigationBarColor;
     std::optional<std::function<void(bool)>> setNavigationBarHidden;
     std::optional<std::function<void(bool)>> setStatusBarHidden;
     std::optional<std::function<void(bool)>> setImmersiveMode;
-    std::optional<std::function<void(std::string)>> setRootViewBackgroundColor;
+    std::optional<std::function<void(std::string, float alpha)>> setRootViewBackgroundColor;
 
     void setScreenDimensionsCallback(std::function<Screen()> callback) {
         this->getScreenDimensions = callback;
@@ -85,10 +85,10 @@ struct UnistylesModel {
     void setInsetsCallback(std::function<Insets()> callback) {
         this->getInsets = callback;
     }
-    void setStatusBarColorCallback(std::function<void(std::string color)> callback) {
+    void setStatusBarColorCallback(std::function<void(std::string color, float alpha)> callback) {
         this->setStatusBarColor = callback;
     }
-    void setNavigationBarColorCallback(std::function<void(std::string color)> callback) {
+    void setNavigationBarColorCallback(std::function<void(std::string color, float alpha)> callback) {
         this->setNavigationBarColor = callback;
     }
     void setNavigationBarHiddenCallback(std::function<void(bool hidden)> callback) {
@@ -100,7 +100,7 @@ struct UnistylesModel {
     void setImmersiveModeCallback(std::function<void(bool enabled)> callback) {
         this->setImmersiveMode = callback;
     }
-    void setRootViewBackgroundColorCallback(std::function<void(std::string color)> callback) {
+    void setRootViewBackgroundColorCallback(std::function<void(std::string color, float alpha)> callback) {
         this->setRootViewBackgroundColor = callback;
     }
 

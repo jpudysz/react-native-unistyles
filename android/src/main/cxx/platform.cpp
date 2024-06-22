@@ -25,12 +25,12 @@ void makeShared(JNIEnv *env, jobject unistylesModule, std::shared_ptr<UnistylesR
         return getContentSizeCategory(env, unistylesModule);
     });
 
-    unistylesRuntime->setNavigationBarColorCallback([=](const std::string &color) {
-        setNavigationBarColor(env, unistylesModule, color);
+    unistylesRuntime->setNavigationBarColorCallback([=](const std::string &color, float alpha) {
+        setNavigationBarColor(env, unistylesModule, color, alpha);
     });
 
-    unistylesRuntime->setStatusBarColorCallback([=](const std::string &color) {
-        setStatusBarColor(env, unistylesModule, color);
+    unistylesRuntime->setStatusBarColorCallback([=](const std::string &color, float alpha) {
+        setStatusBarColor(env, unistylesModule, color, alpha);
     });
 
     unistylesRuntime->setNavigationBarHiddenCallback([=](bool hidden) {
@@ -45,8 +45,8 @@ void makeShared(JNIEnv *env, jobject unistylesModule, std::shared_ptr<UnistylesR
         setImmersiveMode(env, unistylesModule, enabled);
     });
 
-    unistylesRuntime->setRootViewBackgroundColorCallback([=](const std::string &color) {
-        setRootViewBackgroundColor(env, unistylesModule, color);
+    unistylesRuntime->setRootViewBackgroundColorCallback([=](const std::string &color, float alpha) {
+        setRootViewBackgroundColor(env, unistylesModule, color, alpha);
     });
 
     unistylesRuntime->screen = getScreenDimensions(env, unistylesModule);
@@ -107,12 +107,12 @@ std::string getContentSizeCategory(JNIEnv *env, jobject unistylesModule) {
     return contentSizeCategoryStr;
 }
 
-void setStatusBarColor(JNIEnv *env, jobject unistylesModule, std::string color) {
-    JNI_callPlatformWithString(env, unistylesModule, "onSetStatusBarColor", "(Ljava/lang/String;)V", color);
+void setStatusBarColor(JNIEnv *env, jobject unistylesModule, std::string color, float alpha) {
+    JNI_callPlatformWithColor(env, unistylesModule, "onSetStatusBarColor", "(Ljava/lang/String;F)V", color, alpha);
 }
 
-void setNavigationBarColor(JNIEnv *env, jobject unistylesModule, std::string color) {
-    JNI_callPlatformWithString(env, unistylesModule, "onSetNavigationBarColor", "(Ljava/lang/String;)V", color);
+void setNavigationBarColor(JNIEnv *env, jobject unistylesModule, std::string color, float alpha) {
+    JNI_callPlatformWithColor(env, unistylesModule, "onSetNavigationBarColor", "(Ljava/lang/String;F)V", color, alpha);
 }
 
 void setNavigationBarHidden(JNIEnv *env, jobject unistylesModule, bool hidden) {
@@ -127,6 +127,6 @@ void setImmersiveMode(JNIEnv *env, jobject unistylesModule, bool enabled) {
     JNI_callPlatformWithBool(env, unistylesModule, "onSetImmersiveMode", "(Z)V", enabled);
 }
 
-void setRootViewBackgroundColor(JNIEnv *env, jobject unistylesModule, std::string color) {
-    JNI_callPlatformWithString(env, unistylesModule, "onSetRootViewBackgroundColor", "(Ljava/lang/String;)V", color);
+void setRootViewBackgroundColor(JNIEnv *env, jobject unistylesModule, std::string color, float alpha) {
+    JNI_callPlatformWithColor(env, unistylesModule, "onSetRootViewBackgroundColor", "(Ljava/lang/String;F)V", color, alpha);
 }

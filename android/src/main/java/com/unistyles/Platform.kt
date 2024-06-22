@@ -17,8 +17,8 @@ import kotlin.math.roundToInt
 
 class Platform(private val reactApplicationContext: ReactApplicationContext) {
     private var insets: Insets = Insets(0, 0, 0, 0)
-    private var defaultNavigationBarColor: Int? = null
-    private var defaultStatusBarColor: Int? = null
+    private var defaultNavigationBarColor: Int = -1
+    private var defaultStatusBarColor: Int = -1
 
     var orientation: Int = reactApplicationContext.resources.configuration.orientation
 
@@ -125,27 +125,15 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
         return (this.insets.bottom / density).roundToInt()
     }
 
-    fun onSetNavigationBarColor(color: String) {
+    fun onSetNavigationBarColor(color: String, alpha: Float) {
         this.reactApplicationContext.currentActivity?.let { activity ->
-            if (this.defaultNavigationBarColor == null) {
+            if (this.defaultNavigationBarColor == -1) {
                 this.defaultNavigationBarColor = activity.window.navigationBarColor
             }
 
             try {
                 activity.runOnUiThread {
-                    val nextColor = when (color) {
-                        "" -> this.defaultNavigationBarColor!!
-                        "transparent" -> Color.TRANSPARENT
-                        else -> {
-                            if (color.length == 10) {
-                                ColorUtils.setAlphaComponent(Color.parseColor(color.substring(0, 7)), (255 * (color.substring(7).toFloat() / 100)).toInt())
-                            } else {
-                                Color.parseColor(color)
-                            }
-                        }
-                    }
-
-                    activity.window.navigationBarColor = nextColor
+                    activity.window.navigationBarColor = parseColor(color, alpha, this.defaultNavigationBarColor)
                 }
             } catch (_: Exception) {
                 Log.d("Unistyles", "Failed to set navigation bar color: $color")
@@ -157,11 +145,11 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
         this.reactApplicationContext.currentActivity?.let { activity ->
             WindowInsetsControllerCompat(activity.window, activity.window.decorView).apply {
                 activity.window?.decorView?.let { decorView ->
+                    @Suppress("DEPRECATION")
                     activity.runOnUiThread {
                         if (isHidden) {
                             // below Android 11, we need to use window flags to hide the navigation bar
                             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
-                                @Suppress("DEPRECATION")
                                 decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                                     or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
                             } else {
@@ -189,10 +177,10 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
         this.reactApplicationContext.currentActivity?.let { activity ->
             WindowInsetsControllerCompat(activity.window, activity.window.decorView).apply {
                 activity.window?.let { window ->
+                    @Suppress("DEPRECATION")
                     activity.runOnUiThread {
                         if (isHidden) {
                             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
-                                @Suppress("DEPRECATION")
                                 window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                                 window.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN)
                             } else {
@@ -207,28 +195,16 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
         }
     }
 
-    fun onSetStatusBarColor(color: String) {
+    fun onSetStatusBarColor(color: String, alpha: Float) {
         this.reactApplicationContext.currentActivity?.let { activity ->
-            if (this.defaultStatusBarColor == null) {
+            if (this.defaultStatusBarColor == -1) {
                 this.defaultStatusBarColor = activity.window.statusBarColor
             }
 
             try {
                 activity.runOnUiThread {
-                    val nextColor = when (color) {
-                        "" -> this.defaultNavigationBarColor!!
-                        "transparent" -> Color.TRANSPARENT
-                        else -> {
-                            if (color.length == 10) {
-                                ColorUtils.setAlphaComponent(Color.parseColor(color.substring(0, 7)), (255 * (color.substring(7).toFloat() / 100)).toInt())
-                            } else {
-                                Color.parseColor(color)
-                            }
-                        }
-                    }
-
                     activity.window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-                    activity.window.statusBarColor = nextColor
+                    activity.window.statusBarColor = parseColor(color, alpha, this.defaultStatusBarColor)
                 }
             } catch (_: Exception) {
                 Log.d("Unistyles", "Failed to set status bar color: $color")
@@ -241,17 +217,33 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
         this.onSetNavigationBarHidden(isEnabled)
     }
 
-    fun onSetRootViewBackgroundColor(color: String) {
+    fun onSetRootViewBackgroundColor(color: String, alpha: Float) {
         this.reactApplicationContext.currentActivity?.let { activity ->
             activity.window?.decorView?.let { decorView ->
                 try {
                     activity.runOnUiThread {
-                        decorView.setBackgroundColor(Color.parseColor(color))
+                        decorView.rootView.setBackgroundColor(parseColor(color, alpha, Color.WHITE))
                     }
                 } catch (_: Exception) {
                     Log.d("Unistyles", "Failed to set root view background color: $color")
                 }
             }
         }
+    }
+
+    private fun parseColor(color: String, alpha: Float, defaultColor: Int): Int {
+        if (color == "") {
+            return defaultColor
+        }
+
+        if (color == "transparent") {
+            return Color.TRANSPARENT
+        }
+
+        if (alpha == 1.toFloat()) {
+            return Color.parseColor(color)
+        }
+
+        return ColorUtils.setAlphaComponent(Color.parseColor(color), (255 * alpha).toInt())
     }
 }

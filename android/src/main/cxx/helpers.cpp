@@ -48,7 +48,7 @@ Insets jobjectToInsets(JNIEnv *env, jobject insetsObj) {
     return Insets{top, bottom, left, right};
 }
 
-void JNI_callPlatformWithString(JNIEnv *env, jobject unistylesModule, std::string name, std::string sig, std::string param) {
+void JNI_callPlatformWithColor(JNIEnv *env, jobject unistylesModule, std::string name, std::string sig, std::string param, float alpha) {
     jclass cls = env->GetObjectClass(unistylesModule);
     jfieldID platformFieldId = env->GetFieldID(cls, "platform", "Lcom/unistyles/Platform;");
     jobject platformInstance = env->GetObjectField(unistylesModule, platformFieldId);
@@ -56,7 +56,7 @@ void JNI_callPlatformWithString(JNIEnv *env, jobject unistylesModule, std::strin
     jstring strParam = env->NewStringUTF(param.c_str());
     jmethodID methodId = env->GetMethodID(platformClass, name.c_str(), sig.c_str());
 
-    env->CallVoidMethod(platformInstance, methodId, strParam);
+    env->CallVoidMethod(platformInstance, methodId, strParam, static_cast<jfloat>(alpha));
 
     env->DeleteLocalRef(cls);
     env->DeleteLocalRef(platformInstance);
