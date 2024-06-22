@@ -104,7 +104,7 @@ struct UnistylesModel {
         this->setRootViewBackgroundColor = callback;
     }
 
-    Screen screen = {0, 0};
+    Dimensions screen = {0, 0};
     Dimensions statusBar = {0, 0};
     Dimensions navigationBar = {0, 0};
     Insets insets = {0, 0, 0, 0};

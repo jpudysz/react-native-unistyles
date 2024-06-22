@@ -14,5 +14,7 @@
 - (void)onWindowChange:(NSNotification *)notification;
 - (void)onAppearanceChange:(NSNotification *)notification;
 - (void)onContentSizeCategoryChange:(NSNotification *)notification;
+- (void)setStatusBarHidden:(bool)isHidden;
+- (void)setRootViewBackgroundColor:(std::string)color alpha:(float)alpha;
 
 @end

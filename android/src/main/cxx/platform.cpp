@@ -49,12 +49,16 @@ void makeShared(JNIEnv *env, jobject unistylesModule, std::shared_ptr<UnistylesR
         setRootViewBackgroundColor(env, unistylesModule, color, alpha);
     });
 
-    unistylesRuntime->screen = getScreenDimensions(env, unistylesModule);
+    Screen screen = getScreenDimensions(env, unistylesModule);
+
+    unistylesRuntime->screen = Dimensions{screen.width, screen.height};
     unistylesRuntime->contentSizeCategory = getContentSizeCategory(env, unistylesModule);
     unistylesRuntime->colorScheme = getColorScheme(env, unistylesModule);
     unistylesRuntime->statusBar = getStatusBarDimensions(env, unistylesModule);
     unistylesRuntime->insets = getInsets(env, unistylesModule);
     unistylesRuntime->navigationBar = getNavigationBarDimensions(env, unistylesModule);
+    unistylesRuntime->fontScale = screen.fontScale;
+    unistylesRuntime->pixelRatio = screen.pixelRatio;
 }
 
 Screen getScreenDimensions(JNIEnv *env, jobject unistylesModule) {
