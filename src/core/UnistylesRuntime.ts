@@ -1,13 +1,38 @@
 import { ScreenOrientation, UnistylesError } from '../common'
-import type { UnistylesBridge, UnistylesPlugin } from '../types'
+import type { Color, UnistylesBridge, UnistylesPlugin } from '../types'
 import type { UnistylesThemes } from '../global'
 import type { UnistyleRegistry } from './UnistyleRegistry'
+import { parseColor } from '../utils'
 
 /**
  * Utility to interact with the Unistyles during runtime
  */
 export class UnistylesRuntime {
     constructor(private unistylesBridge: UnistylesBridge, private unistylesRegistry: UnistyleRegistry) {}
+
+    /**
+     * Get the mini runtime injected to creteStyleSheet
+     * @returns - The mini runtime
+     */
+    public get miniRuntime() {
+        return {
+            contentSizeCategory: this.contentSizeCategory,
+            breakpoint: this.breakpoint,
+            screen: this.screen,
+            insets: this.insets,
+            statusBar: {
+                width: this.statusBar.width,
+                height: this.statusBar.height
+            },
+            navigationBar: {
+                width: this.navigationBar.width,
+                height: this.navigationBar.height
+            },
+            orientation: this.orientation,
+            pixelRatio: this.pixelRatio,
+            fontScale: this.fontScale
+        }
+    }
 
     /**
      * Get the current color scheme
@@ -86,25 +111,27 @@ export class UnistylesRuntime {
 
     /**
      * Get the status bar info
-     * @returns - The status bar api { width, height, setColor }
+     * @returns - The status bar api { width, height, setColor, setHidden }
      */
     public get statusBar() {
         return {
             width: this.unistylesBridge.statusBar.width,
             height: this.unistylesBridge.statusBar.height,
-            setColor: (color?: string) => this.unistylesBridge.statusBar.setColor(color ?? '')
+            setColor: (color?: Color, alpha?: number) => this.unistylesBridge.statusBar.setColor(...parseColor(color, alpha)),
+            setHidden: (hidden: boolean) => this.unistylesBridge.statusBar.setHidden(hidden)
         }
     }
 
     /**
      * Get the navigation bar info (Android)
-     * @returns - The navigation bar api { width, height, setColor }
+     * @returns - The navigation bar api { width, height, setColor, setHidden }
      */
     public get navigationBar() {
         return {
             width: this.unistylesBridge.navigationBar.width,
             height: this.unistylesBridge.navigationBar.height,
-            setColor: (color?: string) => this.unistylesBridge.navigationBar.setColor(color ?? '')
+            setColor: (color?: Color, alpha?: number) => this.unistylesBridge.navigationBar.setColor(...parseColor(color, alpha)),
+            setHidden: (hidden: boolean) => this.unistylesBridge.navigationBar.setHidden(hidden)
         }
     }
 
@@ -120,6 +147,41 @@ export class UnistylesRuntime {
         }
 
         return ScreenOrientation.Portrait
+    }
+
+    /**
+     * Get the pixel ratio
+     * @returns - The pixel ratio
+     */
+    public get pixelRatio() {
+        return this.unistylesBridge.pixelRatio
+    }
+
+    /**
+     * Get the font scale
+     * @returns - The font scale
+     */
+    public get fontScale() {
+        const fontScale = this.unistylesBridge.fontScale
+
+        return fontScale === 1.0 ? 1 : fontScale.toFixed(2)
+    }
+
+    /**
+     * Get the immersive mode (both status bar and navigation bar hidden (Android))
+     * @param isEnabled
+     */
+    public setImmersiveMode(isEnabled: boolean) {
+        return this.unistylesBridge.setImmersiveMode(isEnabled)
+    }
+
+    /**
+     * Set the root view background color
+     * @param color - The color to set
+     * @param alpha - Color alpha - default is 1
+     */
+    public setRootViewBackgroundColor = (color?: Color, alpha?: number) => {
+        this.unistylesBridge.setRootViewBackgroundColor(...parseColor(color, alpha))
     }
 
     /**

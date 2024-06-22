@@ -18,11 +18,13 @@ export type ScreenDimensions = {
 }
 
 export interface StatusBar extends ScreenDimensions {
-    setColor(color?: string): void
+    setColor(color?: string, alpha?: number): void,
+    setHidden(hidden: boolean): void
 }
 
 export interface NavigationBar extends ScreenDimensions {
-    setColor(color?: string): void
+    setColor(color?: string, alpha?: number): void,
+    setHidden(hidden: boolean): void
 }
 
 export type UnistylesConfig = {
@@ -45,7 +47,9 @@ export type UnistylesBridge = {
     sortedBreakpointPairs: Array<[keyof UnistylesBreakpoints, UnistylesBreakpoints[keyof UnistylesBreakpoints]]>,
     insets: ScreenInsets,
     statusBar: StatusBar,
-    navigationBar: NavigationBar
+    navigationBar: NavigationBar,
+    pixelRatio: number,
+    fontScale: number
 
     // setters
     themes: Array<keyof UnistylesThemes>,
@@ -54,7 +58,9 @@ export type UnistylesBridge = {
     updateTheme(name: keyof UnistylesThemes): void,
     useAdaptiveThemes(enable: boolean): void,
     addPlugin(pluginName: string, notify: boolean): void,
-    removePlugin(pluginName: string): void
+    removePlugin(pluginName: string): void,
+    setRootViewBackgroundColor(color?: string, alpha?: number): void,
+    setImmersiveMode(isEnabled: boolean): void
 }
 
 export type UnistylesThemeEvent = {

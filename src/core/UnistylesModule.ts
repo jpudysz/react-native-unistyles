@@ -1,6 +1,6 @@
 import { NativeEventEmitter, NativeModules } from 'react-native'
 import type { UnistylesThemes, UnistylesBreakpoints } from 'react-native-unistyles'
-import type { ColorSchemeName, ScreenInsets, StatusBar, NavigationBar } from '../types'
+import type { ColorSchemeName, ScreenInsets, StatusBar, NavigationBar, Color } from '../types'
 import { normalizeWebStylesPlugin } from '../plugins'
 import { isServer } from '../common'
 
@@ -28,13 +28,17 @@ export class UnistylesBridgeWeb {
     #statusBar: StatusBar = {
         height: 0,
         width: 0,
-        setColor: () => {}
+        setColor: () => {},
+        setHidden: () => {}
     }
     #navigationBar: NavigationBar = {
         height: 0,
         width: 0,
-        setColor: () => {}
+        setColor: () => {},
+        setHidden: () => {}
     }
+    #pixelRatio = 1.0
+    #fontScale = 1.0
 
     constructor() {
         if (!isServer) {
@@ -76,6 +80,10 @@ export class UnistylesBridgeWeb {
                         return this.#statusBar
                     case 'navigationBar':
                         return this.#navigationBar
+                    case 'pixelRatio':
+                        return this.#pixelRatio
+                    case 'fontScale':
+                        return this.#fontScale
                     case 'useTheme':
                         return (themeName: keyof UnistylesThemes) => this.useTheme(themeName)
                     case 'updateTheme':
@@ -88,6 +96,10 @@ export class UnistylesBridgeWeb {
                         return (pluginName: string, notify: boolean) => this.addPlugin(pluginName, notify)
                     case 'removePlugin':
                         return (pluginName: string) => this.removePlugin(pluginName)
+                    case 'setRootViewBackgroundColor':
+                        return (color: Color | string) => this.setRootViewBackgroundColor(color)
+                    case 'setImmersiveMode':
+                        return () => {}
                     default:
                         return Reflect.get(this, prop)
                 }
@@ -226,6 +238,10 @@ export class UnistylesBridgeWeb {
         }
 
         return 'light'
+    }
+
+    private setRootViewBackgroundColor(color?: Color | string) {
+        document.body.style.backgroundColor = color as string
     }
 
     private emitPluginChange() {

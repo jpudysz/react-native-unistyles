@@ -1,5 +1,6 @@
 #import <React/RCTBridgeModule.h>
 #import <React/RCTEventEmitter.h>
+#import <ReactCommon/RCTRuntimeExecutor.h>
 #import <string>
 
 #if TARGET_OS_OSX
@@ -11,6 +12,13 @@
 #elif TARGET_OS_VISION
     #import "Platform_visionOS.h"
 #endif
+
+@interface RCTBridge (BridgeWithRuntime)
+
+- (void *)runtime;
+- (std::shared_ptr<facebook::react::CallInvoker>)jsCallInvoker;
+
+@end
 
 @interface UnistylesModule : RCTEventEmitter<RCTBridgeModule>
 

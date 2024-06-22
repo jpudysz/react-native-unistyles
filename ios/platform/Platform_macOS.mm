@@ -1,7 +1,6 @@
 #if TARGET_OS_OSX
 
 #import "Platform_macOS.h"
-#import "UnistylesRuntime.h"
 #import <React/RCTUtils.h>
 
 @implementation Platform
@@ -9,15 +8,6 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        NSWindow *window = RCTSharedApplication().mainWindow;
-
-        self.initialScreen = {(int)window.frame.size.width, (int)window.frame.size.height};
-        self.initialContentSizeCategory = std::string([@"unspecified" UTF8String]);
-        self.initialColorScheme = [self getColorScheme];
-        self.initialStatusBar = [self getStatusBarDimensions];
-        self.initialNavigationBar = [self getNavigationBarDimensions];
-        self.initialInsets = [self getInsets];
-
         [self setupListeners];
     }
     return self;
@@ -41,6 +31,25 @@
     [window addObserver:self forKeyPath:@"frame" options:NSKeyValueObservingOptionNew context:nil];
 }
 
+- (void)makeShared:(void*)runtime {
+    self.unistylesRuntime = runtime;
+    
+    auto unistylesRuntime = ((UnistylesRuntime*)self.unistylesRuntime);
+    
+    unistylesRuntime->setScreenDimensionsCallback([self](){
+        return [self getScreenDimensions];
+    });
+    
+    unistylesRuntime->setColorSchemeCallback([self](){
+        return [self getColorScheme];
+    });
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        unistylesRuntime->screen = [self getScreenDimensions];
+        unistylesRuntime->colorScheme = [self getColorScheme];
+    });
+}
+
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
     if ([keyPath isEqualToString:@"effectiveAppearance"]) {
         return [self onAppearanceChange];
@@ -60,18 +69,14 @@
 }
 
 - (void)onWindowChange {
-    NSWindow *window = RCTSharedApplication().mainWindow;
-    Dimensions screen = {(int)window.frame.size.width, (int)window.frame.size.height};
-    Insets insets = [self getInsets];
-    Dimensions statusBar = [self getStatusBarDimensions];
-    Dimensions navigationBar = [self getNavigationBarDimensions];
-
+    Dimensions screen = [self getScreenDimensions];
+    
     if (self.unistylesRuntime != nullptr) {
         ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange(
            screen,
-           insets,
-           statusBar,
-           navigationBar
+           std::nullopt,
+           std::nullopt,
+           std::nullopt
         );
     }
 }
@@ -86,16 +91,11 @@
     return UnistylesLightScheme;
 }
 
-- (Insets)getInsets {
-    return {0, 0, 0, 0};
-}
-
-- (Dimensions)getStatusBarDimensions {
-    return {0, 0};
-}
-
-- (Dimensions)getNavigationBarDimensions {
-    return {0, 0};
+- (Dimensions)getScreenDimensions {
+    NSWindow *window = RCTSharedApplication().mainWindow;
+    Dimensions screenDimension = {(int)window.frame.size.width, (int)window.frame.size.height};
+    
+    return screenDimension;
 }
 
 @end

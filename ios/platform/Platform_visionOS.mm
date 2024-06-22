@@ -9,15 +9,6 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        UIWindow* mainWindow = [self getMainWindow];
-        UIContentSizeCategory contentSizeCategory = [[UIApplication sharedApplication] preferredContentSizeCategory];
-
-        self.initialScreen = {(int)mainWindow.bounds.size.width, (int)mainWindow.bounds.size.height};
-        self.initialColorScheme = UnistylesUnspecifiedScheme;
-        self.initialContentSizeCategory = [self getContentSizeCategory:contentSizeCategory];
-        self.initialStatusBar = [self getStatusBarDimensions];
-        self.initialInsets = [self getInsets];
-        
         [self setupListeners];
     }
     return self;
@@ -68,97 +59,51 @@
                                                object:nil];
 }
 
-- (void)onWindowChange:(NSNotification *)notification {
-    UIWindow* mainWindow = [self getMainWindow];
+- (void)makeShared:(void*)runtime {
+    self.unistylesRuntime = runtime;
+    
+    auto unistylesRuntime = ((UnistylesRuntime*)self.unistylesRuntime);
+    
+    unistylesRuntime->setScreenDimensionsCallback([self](){
+        return [self getScreenDimensions];
+    });
+    
+    unistylesRuntime->setContentSizeCategoryCallback([](){
+        return getContentSizeCategory();
+    });
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        unistylesRuntime->screen = [self getScreenDimensions];
+        unistylesRuntime->contentSizeCategory = getContentSizeCategory();
+    });
+}
 
-    Dimensions screen = {(int)mainWindow.frame.size.width, (int)mainWindow.frame.size.height};
-    Insets insets = [self getInsets];
-    Dimensions statusBar = [self getStatusBarDimensions];
-    Dimensions navigationBar = [self getNavigationBarDimensions];
+- (void)onWindowChange:(NSNotification *)notification {
+    Dimensions screen = [self getScreenDimensions];
 
     if (self.unistylesRuntime != nullptr) {
         ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange(
            screen,
-           insets,
-           statusBar,
-           navigationBar
+           std::nullopt,
+           std::nullopt,
+           std::nullopt
         );
     }
 }
 
 - (void)onContentSizeCategoryChange:(NSNotification *)notification {
-    UIContentSizeCategory contentSizeCategory = [[UIApplication sharedApplication] preferredContentSizeCategory];
-
     if (self.unistylesRuntime != nullptr) {
-        ((UnistylesRuntime*)self.unistylesRuntime)->handleContentSizeCategoryChange([self getContentSizeCategory:contentSizeCategory]);
+        ((UnistylesRuntime*)self.unistylesRuntime)->handleContentSizeCategoryChange(getContentSizeCategory());
     }
 }
 
-- (Insets)getInsets {
-    return {0, 0, 0, 0};
-}
-
-- (Dimensions)getStatusBarDimensions {
-    return {0, 0};
-}
-
-- (Dimensions)getNavigationBarDimensions {
-    return {0, 0};
-}
-
-- (std::string)getContentSizeCategory:(UIContentSizeCategory)contentSizeCategory {
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryExtraExtraExtraLarge]) {
-        return std::string([@"xxxLarge" UTF8String]);
-    }
+- (Dimensions)getScreenDimensions {
+    UIWindow* mainWindow = [self getMainWindow];
+    Dimensions screenDimension = {(int)mainWindow.frame.size.width, (int)mainWindow.frame.size.height};
     
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryExtraExtraLarge]) {
-        return std::string([@"xxLarge" UTF8String]);
-    }
-    
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryExtraLarge]) {
-        return std::string([@"xLarge" UTF8String]);
-    }
-    
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryLarge]) {
-        return std::string([@"Large" UTF8String]);
-    }
-    
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryMedium]) {
-        return std::string([@"Medium" UTF8String]);
-    }
-    
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategorySmall]) {
-        return std::string([@"Small" UTF8String]);
-    }
-    
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryExtraSmall]) {
-        return std::string([@"xSmall" UTF8String]);
-    }
-    
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryAccessibilityMedium]) {
-        return std::string([@"accessibilityMedium" UTF8String]);
-    }
-    
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryAccessibilityLarge]) {
-        return std::string([@"accessibilityLarge" UTF8String]);
-    }
-    
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryAccessibilityExtraLarge]) {
-        return std::string([@"accessibilityExtraLarge" UTF8String]);
-    }
-    
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryAccessibilityExtraExtraLarge]) {
-        return std::string([@"accessibilityExtraExtraLarge" UTF8String]);
-    }
-    
-    if ([contentSizeCategory isEqualToString:UIContentSizeCategoryAccessibilityExtraExtraExtraLarge]) {
-        return std::string([@"accessibilityExtraExtraExtraLarge" UTF8String]);
-    }
-    
-    return std::string([@"unspecified" UTF8String]);
+    return screenDimension;
 }
 
 @end
-
 
 #endif
