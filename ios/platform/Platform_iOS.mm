@@ -46,35 +46,51 @@
 
 - (void)makeShared:(void*)runtime {
     self.unistylesRuntime = runtime;
-    
+
     auto unistylesRuntime = ((UnistylesRuntime*)self.unistylesRuntime);
-    
+
     unistylesRuntime->setScreenDimensionsCallback([self](){
         return [self getScreenDimensions];
     });
-    
+
     unistylesRuntime->setContentSizeCategoryCallback([](){
         return getContentSizeCategory();
     });
-    
+
     unistylesRuntime->setColorSchemeCallback([self](){
         return getColorScheme();
     });
-    
+
     unistylesRuntime->setStatusBarDimensionsCallback([self](){
         return [self getStatusBarDimensions];
     });
-    
+
     unistylesRuntime->setInsetsCallback([self](){
         return [self getInsets];
     });
-    
+
+    unistylesRuntime->setStatusBarHiddenCallback([self](bool hidden){
+        return [self setStatusBarHidden:hidden];
+    });
+
+    unistylesRuntime->setImmersiveModeCallback([self](bool hidden){
+        return [self setStatusBarHidden:hidden];
+    });
+
+    unistylesRuntime->setRootViewBackgroundColorCallback([self](const std::string &color, float alpha){
+        return [self setRootViewBackgroundColor:color alpha:alpha];
+    });
+
     dispatch_async(dispatch_get_main_queue(), ^{
-        unistylesRuntime->screen = [self getScreenDimensions];
+        Screen screen = [self getScreenDimensions];
+
+        unistylesRuntime->screen = Dimensions({ screen.width, screen.height });
         unistylesRuntime->contentSizeCategory = getContentSizeCategory();
         unistylesRuntime->colorScheme = getColorScheme();
         unistylesRuntime->statusBar = [self getStatusBarDimensions];
         unistylesRuntime->insets = [self getInsets];
+        unistylesRuntime->pixelRatio = screen.pixelRatio;
+        unistylesRuntime->fontScale = screen.fontScale;
     });
 }
 
@@ -92,7 +108,7 @@
 
 - (void)onWindowChange:(NSNotification *)notification {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        Dimensions screen = [self getScreenDimensions];
+        Screen screen = [self getScreenDimensions];
         Insets insets = [self getInsets];
         Dimensions statusBar = [self getStatusBarDimensions];
 
@@ -112,16 +128,43 @@
 - (Dimensions)getStatusBarDimensions {
     UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
     CGRect statusBarFrame = window.windowScene.statusBarManager.statusBarFrame;
- 
+
     return {(int)statusBarFrame.size.width, (int)statusBarFrame.size.height};
 }
 
-- (Dimensions)getScreenDimensions {
+- (Screen)getScreenDimensions {
     UIViewController *presentedViewController = RCTPresentedViewController();
     CGRect windowFrame = presentedViewController.view.window.frame;
-    Dimensions screenDimension = {(int)windowFrame.size.width, (int)windowFrame.size.height};
-    
-    return screenDimension;
+    int width = (int)windowFrame.size.width;
+    int height = (int)windowFrame.size.height;
+    float pixelRatio = presentedViewController.view.window.screen.scale;
+    float fontScale = getFontScale();
+
+    return Screen({width, height, pixelRatio, fontScale});
+}
+
+- (void)setStatusBarHidden:(bool)isHidden {
+    // forward it to React Native ViewController
+    dispatch_async(dispatch_get_main_queue(), ^{
+        #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        [RCTSharedApplication() setStatusBarHidden:isHidden animated:true];
+    });
+}
+
+- (void)setRootViewBackgroundColor:(std::string)color alpha:(float)alpha {
+    UIViewController *presentedViewController = RCTPresentedViewController();
+    NSString *colorString = [NSString stringWithUTF8String:color.c_str()];
+    UIColor *backgroundColor = colorFromHexString(colorString, alpha);
+
+    if (backgroundColor == nil) {
+        NSLog(@"🦄 Unistyles: Couldn't set rootView to %@ color", colorString);
+
+        return;
+    }
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        presentedViewController.view.backgroundColor = backgroundColor;
+    });
 }
 
 @end
