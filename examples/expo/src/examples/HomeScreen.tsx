@@ -9,8 +9,9 @@ import type { NavigationProps } from '../common'
 import { breakpoints, darkTheme, lightTheme, premiumTheme } from '../styles'
 import { autoGuidelinePlugin } from '../plugins'
 
-UnistylesRuntime.statusBar.setColor('#50000000')
-UnistylesRuntime.navigationBar.setColor('#50000000')
+UnistylesRuntime.statusBar.setColor('#000000', 0.2)
+UnistylesRuntime.navigationBar.setColor('#000000', 0.2)
+UnistylesRuntime.setRootViewBackgroundColor('#ff9ff3')
 
 export const HomeScreen = () => {
     const navigation = useNavigation<NavigationProps>()

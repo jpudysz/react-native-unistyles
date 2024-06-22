@@ -18,7 +18,7 @@ import com.facebook.react.turbomodule.core.interfaces.CallInvokerHolder
 
 class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener {
     private var isCxxReady: Boolean = false
-    private lateinit var platform: Platform
+    private var platform: Platform = Platform(reactContext)
 
     private val configurationChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -47,7 +47,6 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         const val NAME = "Unistyles"
     }
 
-    //region Lifecycle
     init {
         reactApplicationContext.registerReceiver(configurationChangeReceiver, IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED))
         reactApplicationContext.addLifecycleEventListener(this)
@@ -62,8 +61,6 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
     }
 
-    //endregion
-    //region Event handlers
     private fun onConfigChange() {
         val colorScheme = this.platform.getColorScheme()
         val contentSizeCategory = this.platform.getContentSizeCategory()
@@ -95,7 +92,6 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         return try {
             System.loadLibrary("unistyles")
 
-            this.platform = Platform(reactApplicationContext)
             this.reactApplicationContext.javaScriptContextHolder?.let { contextHolder ->
                 this.reactApplicationContext.catalystInstance.jsCallInvokerHolder?.let { callInvokerHolder: CallInvokerHolder ->
                     this.nativeInstall(contextHolder.get(), callInvokerHolder)

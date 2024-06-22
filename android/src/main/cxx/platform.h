@@ -11,9 +11,8 @@ Dimensions getNavigationBarDimensions(JNIEnv *env, jobject unistylesModule);
 void setNavigationBarHidden(JNIEnv *env, jobject unistylesModule, bool hidden);
 void setStatusBarHidden(JNIEnv *env, jobject unistylesModule, bool hidden);
 void setImmersiveMode(JNIEnv *env, jobject unistylesModule, bool hidden);
-void setRootViewBackgroundColor(JNIEnv *env, jobject unistylesModule, std::string color);
+void setRootViewBackgroundColor(JNIEnv *env, jobject unistylesModule, std::string color, float alpha);
 Insets getInsets(JNIEnv *env, jobject unistylesModule);
 std::string getContentSizeCategory(JNIEnv *env, jobject unistylesModule);
-
-void setNavigationBarColor(JNIEnv *env, jobject unistylesModule, std::string color);
-void setStatusBarColor(JNIEnv *env, jobject unistylesModule, std::string color);
+void setNavigationBarColor(JNIEnv *env, jobject unistylesModule, std::string color, float alpha);
+void setStatusBarColor(JNIEnv *env, jobject unistylesModule, std::string color, float alpha);

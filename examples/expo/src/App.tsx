@@ -10,7 +10,14 @@ const Stack = createNativeStackNavigator<DemoStackParams>()
 
 export const App: React.FunctionComponent = () => (
     <SafeAreaProvider>
-        <NavigationContainer>
+        <NavigationContainer
+            theme={{
+                // @ts-ignore
+                colors: {
+                    background: 'transparent'
+                }
+            }}
+        >
             <Stack.Navigator
                 initialRouteName={DemoNames.Home}
                 screenOptions={{

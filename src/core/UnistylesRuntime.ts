@@ -1,7 +1,8 @@
 import { ScreenOrientation, UnistylesError } from '../common'
-import type { UnistylesBridge, UnistylesPlugin } from '../types'
+import type { Color, UnistylesBridge, UnistylesPlugin } from '../types'
 import type { UnistylesThemes } from '../global'
 import type { UnistyleRegistry } from './UnistyleRegistry'
+import { parseColor } from '../utils'
 
 /**
  * Utility to interact with the Unistyles during runtime
@@ -116,7 +117,7 @@ export class UnistylesRuntime {
         return {
             width: this.unistylesBridge.statusBar.width,
             height: this.unistylesBridge.statusBar.height,
-            setColor: (color?: string) => this.unistylesBridge.statusBar.setColor(color ?? ''),
+            setColor: (color?: Color, alpha?: number) => this.unistylesBridge.statusBar.setColor(...parseColor(color, alpha)),
             setHidden: (hidden: boolean) => this.unistylesBridge.statusBar.setHidden(hidden)
         }
     }
@@ -129,7 +130,7 @@ export class UnistylesRuntime {
         return {
             width: this.unistylesBridge.navigationBar.width,
             height: this.unistylesBridge.navigationBar.height,
-            setColor: (color?: string) => this.unistylesBridge.navigationBar.setColor(color ?? ''),
+            setColor: (color?: Color, alpha?: number) => this.unistylesBridge.navigationBar.setColor(...parseColor(color, alpha)),
             setHidden: (hidden: boolean) => this.unistylesBridge.navigationBar.setHidden(hidden)
         }
     }
@@ -175,9 +176,10 @@ export class UnistylesRuntime {
     /**
      * Set the root view background color
      * @param color - The color to set
+     * @param alpha - Color alpha - default is 1
      */
-    public setRootViewBackgroundColor = (color: string) => {
-        this.unistylesBridge.setRootViewBackgroundColor(color)
+    public setRootViewBackgroundColor = (color?: Color, alpha?: number) => {
+        this.unistylesBridge.setRootViewBackgroundColor(...parseColor(color, alpha))
     }
 
     /**
