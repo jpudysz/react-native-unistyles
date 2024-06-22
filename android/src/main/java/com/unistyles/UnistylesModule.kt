@@ -96,8 +96,6 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             System.loadLibrary("unistyles")
 
             this.platform = Platform(reactApplicationContext)
-            this.enableEdgeToEdge()
-
             this.reactApplicationContext.javaScriptContextHolder?.let { contextHolder ->
                 this.reactApplicationContext.catalystInstance.jsCallInvokerHolder?.let { callInvokerHolder: CallInvokerHolder ->
                     this.nativeInstall(contextHolder.get(), callInvokerHolder)
@@ -138,6 +136,8 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     fun removeListeners(count: Double) = Unit
 
     override fun onHostResume() {
+        this.enableEdgeToEdge()
+
         if (isCxxReady) {
             this.onConfigChange()
         }
