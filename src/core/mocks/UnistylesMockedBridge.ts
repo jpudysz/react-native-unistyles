@@ -14,6 +14,8 @@ export class UnistylesMockedBridge {
     public contentSizeCategory() {}
     public sortedBreakpointPairs() {}
     public insets() {}
+    public pixelRatio() {}
+    public fontScale() {}
     public statusBar() {}
     public navigationBar() {}
     public themes(themes: Array<keyof UnistylesThemes>) {}
@@ -23,4 +25,6 @@ export class UnistylesMockedBridge {
     public useAdaptiveThemes(enable: boolean) {}
     public addPlugin(pluginName: string, notify: boolean) {}
     public removePlugin(pluginName: string) {}
+    public setRootViewBackgroundColor(color?: string, alpha?: number) {}
+    public setImmersiveMode(isEnabled: boolean) {}
 }
