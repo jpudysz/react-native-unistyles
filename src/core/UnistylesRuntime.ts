@@ -117,7 +117,11 @@ export class UnistylesRuntime {
         return {
             width: this.unistylesBridge.statusBar.width,
             height: this.unistylesBridge.statusBar.height,
-            setColor: (color?: Color, alpha?: number) => this.unistylesBridge.statusBar.setColor(...parseColor(color, alpha)),
+            setColor: (color?: Color, alpha?: number) => {
+                const [parsedColor, parsedAlpha] = parseColor(color, alpha)
+
+                this.unistylesBridge.statusBar.setColor(parsedColor, parsedAlpha)
+            },
             setHidden: (hidden: boolean) => this.unistylesBridge.statusBar.setHidden(hidden)
         }
     }
@@ -130,7 +134,11 @@ export class UnistylesRuntime {
         return {
             width: this.unistylesBridge.navigationBar.width,
             height: this.unistylesBridge.navigationBar.height,
-            setColor: (color?: Color, alpha?: number) => this.unistylesBridge.navigationBar.setColor(...parseColor(color, alpha)),
+            setColor: (color?: Color, alpha?: number) => {
+                const [parsedColor, parsedAlpha] = parseColor(color, alpha)
+
+                this.unistylesBridge.navigationBar.setColor(parsedColor, parsedAlpha)
+            },
             setHidden: (hidden: boolean) => this.unistylesBridge.navigationBar.setHidden(hidden)
         }
     }
@@ -181,7 +189,9 @@ export class UnistylesRuntime {
      * @param alpha - Color alpha - default is 1
      */
     public setRootViewBackgroundColor = (color?: Color, alpha?: number) => {
-        this.unistylesBridge.setRootViewBackgroundColor(...parseColor(color, alpha))
+        const [parsedColor, parsedAlpha] = parseColor(color, alpha)
+
+        this.unistylesBridge.setRootViewBackgroundColor(parsedColor, parsedAlpha)
     }
 
     /**
