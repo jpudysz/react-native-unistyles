@@ -36,10 +36,10 @@
       ]
     ],
     "android": {
-      "package": "com.anonymous.MyTVProject"
+      "package": "com.anonymous.tv"
     },
     "ios": {
-      "bundleIdentifier": "com.anonymous.MyTVProject"
+      "bundleIdentifier": "com.anonymous.tv"
     }
   }
 }
