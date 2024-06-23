@@ -4,7 +4,7 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "apple-tv": "EXPO_TV=1 expo run:ios --scheme tv-tvOS --device \"Apple TV\"",
+    "apple-tv": "EXPO_TV=1 expo run:ios --scheme tv --device \"Apple TV 4K (3rd generation) (at 1080p)\"",
     "android-tv": "EXPO_TV=1 expo run:android --device tv_api_34",
     "prebuild": "EXPO_TV=1 expo prebuild --clean",
     "android": "expo run:android",
