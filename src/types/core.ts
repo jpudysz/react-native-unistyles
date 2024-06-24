@@ -1,6 +1,6 @@
 import type {
     MatrixTransform,
-    PerpectiveTransform,
+    PerspectiveTransform,
     RotateTransform,
     RotateXTransform,
     RotateYTransform,
@@ -22,7 +22,7 @@ export type ShadowOffset = {
 }
 
 export type TransformStyles =
-    & PerpectiveTransform
+    & PerspectiveTransform
     & RotateTransform
     & RotateXTransform
     & RotateYTransform
