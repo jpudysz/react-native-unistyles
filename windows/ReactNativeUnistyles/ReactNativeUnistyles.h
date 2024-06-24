@@ -10,6 +10,7 @@
 #include <winrt/Windows.UI.Core.h>
 #include <winrt/Windows.UI.ViewManagement.h>
 #include "UnistylesRuntime.h"
+#include <TurboModuleProvider.h>
 
 using namespace winrt::Windows::UI::ViewManagement;
 using namespace winrt::Microsoft::ReactNative;
@@ -33,7 +34,7 @@ struct Unistyles {
     void Initialize(ReactContext const &reactContext) noexcept {
         m_reactContext = reactContext;
 
-        m_reactContext.UIDispatcher().Post([this]() mutable {
+        /*m_reactContext.UIDispatcher().Post([this]() mutable {
             this->windowSizeChange = Window::Current().CoreWindow().SizeChanged(TypedEventHandler<CoreWindow, WindowSizeChangedEventArgs>([=](CoreWindow const sender, WindowSizeChangedEventArgs const&) {
                 auto bounds = Window::Current().Bounds();
 
@@ -51,7 +52,7 @@ struct Unistyles {
                     ((UnistylesRuntime*)this->unistylesRuntime)->handleAppearanceChange(this->getColorScheme());
                 }
             }));
-        });
+        });*/
     }
     
     REACT_SYNC_METHOD(install)
@@ -67,90 +68,87 @@ struct Unistyles {
         }
 
         auto& runtime = *jsiRuntime;
+        auto callInvoker = MakeAbiCallInvoker(m_reactContext.Handle().JSDispatcher());
 
-        registerUnistylesHostObject(runtime);
+        registerUnistylesHostObject(runtime, callInvoker);
 
         return true;
     }
 
-    void registerUnistylesHostObject(jsi::Runtime& runtime) {
-        std::promise<UIInitialInfo> uiInfoPromise;
-        auto uiInfoFuture = uiInfoPromise.get_future();
+    void registerUnistylesHostObject(jsi::Runtime& runtime, std::shared_ptr<facebook::react::CallInvoker> callInvoker) {
+        //std::promise<UIInitialInfo> uiInfoPromise;
+        //auto uiInfoFuture = uiInfoPromise.get_future();
 
-        m_reactContext.UIDispatcher().Post([this, promise = std::move(uiInfoPromise)]() mutable {
-            UIInitialInfo uiMetadata;
-            auto bounds = Window::Current().Bounds();
+        //m_reactContext.UIDispatcher().Post([this, promise = std::move(uiInfoPromise)]() mutable {
+        //    UIInitialInfo uiMetadata;
+        //    auto bounds = Window::Current().Bounds();
 
-            uiMetadata.screen = Dimensions{(int)bounds.Width, (int)bounds.Height};
-            uiMetadata.colorScheme = this->getColorScheme();
-            uiMetadata.contentSizeCategory = UnistylesUnspecifiedScheme;
+        //    uiMetadata.screen = Dimensions{(int)bounds.Width, (int)bounds.Height};
+        //    uiMetadata.colorScheme = this->getColorScheme();
+        //    uiMetadata.contentSizeCategory = UnistylesUnspecifiedScheme;
 
-            promise.set_value(std::move(uiMetadata));
-        });
+        //    promise.set_value(std::move(uiMetadata));
+        //});
 
-        UIInitialInfo uiInfo = uiInfoFuture.get();
+        //UIInitialInfo uiInfo = uiInfoFuture.get();
 
         auto unistylesRuntime = std::make_shared<UnistylesRuntime>(
-            uiInfo.screen,
-            uiInfo.colorScheme,
-            uiInfo.contentSizeCategory,
-            this->getInsets(),
-            this->getStatusBarDimensions(),
-            this->getNavigationBarDimensions()
+            runtime,
+            callInvoker
         );
 
-        unistylesRuntime->onThemeChange([this](std::string theme) {
-            winrt::hstring themeName = winrt::to_hstring(theme);
+        //unistylesRuntime->onThemeChange([this](std::string theme) {
+        //    winrt::hstring themeName = winrt::to_hstring(theme);
 
-            auto payload = winrt::Microsoft::ReactNative::JSValueObject{
-                {"type", "theme"},
-                {"payload", winrt::Microsoft::ReactNative::JSValueObject{{"themeName", winrt::to_string(themeName)}}}
-            };
+        //    auto payload = winrt::Microsoft::ReactNative::JSValueObject{
+        //        {"type", "theme"},
+        //        {"payload", winrt::Microsoft::ReactNative::JSValueObject{{"themeName", winrt::to_string(themeName)}}}
+        //    };
 
-            this->OnThemeChange(payload);
-        });
+        //    this->OnThemeChange(payload);
+        //});
 
-        unistylesRuntime.get()->onLayoutChange([this](std::string breakpoint, std::string orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets, Dimensions& navigationBar) {
-            auto payload = winrt::Microsoft::ReactNative::JSValueObject{
-                {"type", "layout"},
-                {"payload", winrt::Microsoft::ReactNative::JSValueObject{
-                    {"breakpoint", breakpoint},
-                    {"orientation", orientation},
-                    {"screen", winrt::Microsoft::ReactNative::JSValueObject{
-                        {"width", screen.width},
-                        {"height", screen.height}
-                    }},
-                    {"statusBar", winrt::Microsoft::ReactNative::JSValueObject{
-                        {"width", statusBar.width},
-                        {"height", statusBar.height}
-                    }},
-                    {"navigationBar", winrt::Microsoft::ReactNative::JSValueObject{
-                        {"width", navigationBar.width},
-                        {"height", navigationBar.height}
-                    }},
-                    {"insets", winrt::Microsoft::ReactNative::JSValueObject{
-                        {"top", insets.top},
-                        {"bottom", insets.bottom},
-                        {"left", insets.left},
-                        {"right", insets.right}
-                    }},
-                }}
-            };
+        //unistylesRuntime.get()->onLayoutChange([this](std::string breakpoint, std::string orientation, Dimensions& screen, Dimensions& statusBar, Insets& insets, Dimensions& navigationBar) {
+        //    auto payload = winrt::Microsoft::ReactNative::JSValueObject{
+        //        {"type", "layout"},
+        //        {"payload", winrt::Microsoft::ReactNative::JSValueObject{
+        //            {"breakpoint", breakpoint},
+        //            {"orientation", orientation},
+        //            {"screen", winrt::Microsoft::ReactNative::JSValueObject{
+        //                {"width", screen.width},
+        //                {"height", screen.height}
+        //            }},
+        //            {"statusBar", winrt::Microsoft::ReactNative::JSValueObject{
+        //                {"width", statusBar.width},
+        //                {"height", statusBar.height}
+        //            }},
+        //            {"navigationBar", winrt::Microsoft::ReactNative::JSValueObject{
+        //                {"width", navigationBar.width},
+        //                {"height", navigationBar.height}
+        //            }},
+        //            {"insets", winrt::Microsoft::ReactNative::JSValueObject{
+        //                {"top", insets.top},
+        //                {"bottom", insets.bottom},
+        //                {"left", insets.left},
+        //                {"right", insets.right}
+        //            }},
+        //        }}
+        //    };
 
-            this->OnLayoutChange(payload);
-        });
+        //    this->OnLayoutChange(payload);
+        //});
 
-        unistylesRuntime.get()->onPluginChange([this]() {
-            auto payload = winrt::Microsoft::ReactNative::JSValueObject{
-                {"type", "plugin"}
-            };
+        //unistylesRuntime.get()->onPluginChange([this]() {
+        //    auto payload = winrt::Microsoft::ReactNative::JSValueObject{
+        //        {"type", "plugin"}
+        //    };
 
-            this->OnPluginChange(payload);
-        });
+        //    this->OnPluginChange(payload);
+        //});
 
-        unistylesRuntime.get()->onContentSizeCategoryChange([this](std::string contentSizeCategory) {
-            // not available on windows
-        });
+        //unistylesRuntime.get()->onContentSizeCategoryChange([this](std::string contentSizeCategory) {
+        //    // not available on windows
+        //});
 
         this->unistylesRuntime = unistylesRuntime.get();
 
