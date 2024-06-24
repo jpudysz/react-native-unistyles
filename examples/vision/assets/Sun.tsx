@@ -1,3 +1,4 @@
+import React from 'react'
 import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg'
 
 export const Sun = () => (

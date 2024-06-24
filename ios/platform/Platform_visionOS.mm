@@ -73,13 +73,17 @@
     });
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        unistylesRuntime->screen = [self getScreenDimensions];
+        Screen screen = [self getScreenDimensions];
+        
+        unistylesRuntime->screen = Dimensions({screen.width, screen.height});
         unistylesRuntime->contentSizeCategory = getContentSizeCategory();
+        unistylesRuntime->pixelRatio = screen.pixelRatio;
+        unistylesRuntime->fontScale = screen.fontScale;
     });
 }
 
 - (void)onWindowChange:(NSNotification *)notification {
-    Dimensions screen = [self getScreenDimensions];
+    Screen screen = [self getScreenDimensions];
 
     if (self.unistylesRuntime != nullptr) {
         ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange(
@@ -97,11 +101,14 @@
     }
 }
 
-- (Dimensions)getScreenDimensions {
+- (Screen)getScreenDimensions {
     UIWindow* mainWindow = [self getMainWindow];
-    Dimensions screenDimension = {(int)mainWindow.frame.size.width, (int)mainWindow.frame.size.height};
+    int width = (int)mainWindow.frame.size.width;
+    int height = (int)mainWindow.frame.size.height;
+    float pixelRatio = 1.0;
+    float fontScale = getFontScale();
     
-    return screenDimension;
+    return Screen({width, height, pixelRatio, fontScale});
 }
 
 @end

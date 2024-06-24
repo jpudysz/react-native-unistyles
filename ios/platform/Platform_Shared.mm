@@ -112,17 +112,21 @@ float getFontScale() {
 }
 
 std::string getColorScheme() {
-    UIUserInterfaceStyle colorScheme = [UIScreen mainScreen].traitCollection.userInterfaceStyle;
+    #if !TARGET_OS_VISION
+        UIUserInterfaceStyle colorScheme = [UIScreen mainScreen].traitCollection.userInterfaceStyle;
 
-    switch (colorScheme) {
-        case UIUserInterfaceStyleLight:
-            return UnistylesLightScheme;
-        case UIUserInterfaceStyleDark:
-            return UnistylesDarkScheme;
-        case UIUserInterfaceStyleUnspecified:
-        default:
-            return UnistylesUnspecifiedScheme;
-    }
+        switch (colorScheme) {
+            case UIUserInterfaceStyleLight:
+                return UnistylesLightScheme;
+            case UIUserInterfaceStyleDark:
+                return UnistylesDarkScheme;
+            case UIUserInterfaceStyleUnspecified:
+            default:
+                return UnistylesUnspecifiedScheme;
+        }
+    #endif
+    
+    return UnistylesUnspecifiedScheme;
 }
 
 UIColor* colorFromHexString(NSString* hexString, float alpha) {
