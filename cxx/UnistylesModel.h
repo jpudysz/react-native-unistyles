@@ -7,6 +7,7 @@
 #include <optional>
 #include <variant>
 #include <math.h>
+#include <algorithm>
 
 using namespace facebook;
 
