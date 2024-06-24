@@ -39,9 +39,9 @@
 
 - (void)makeShared:(void*)runtime {
     self.unistylesRuntime = runtime;
-    
+
     auto unistylesRuntime = ((UnistylesRuntime*)self.unistylesRuntime);
-    
+
     unistylesRuntime->setScreenDimensionsCallback([self](){
         return [self getScreenDimensions];
     });
@@ -49,15 +49,19 @@
     unistylesRuntime->setColorSchemeCallback([](){
         return getColorScheme();
     });
-    
+
     unistylesRuntime->setContentSizeCategoryCallback([](){
         return getContentSizeCategory();
     });
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
-        unistylesRuntime->screen = [self getScreenDimensions];
+        Screen screen = [self getScreenDimensions];
+
+        unistylesRuntime->screen = Dimensions({screen.width, screen.height});
         unistylesRuntime->contentSizeCategory = getContentSizeCategory();
         unistylesRuntime->colorScheme = getColorScheme();
+        unistylesRuntime->pixelRatio = screen.pixelRatio;
+        unistylesRuntime->fontScale = screen.fontScale;
     });
 }
 
@@ -73,11 +77,14 @@
     }
 }
 
-- (Dimensions)getScreenDimensions {
+- (Screen)getScreenDimensions {
     UIScreen *screen = [UIScreen mainScreen];
-    Dimensions screenDimension = {(int)screen.bounds.size.width, (int)screen.bounds.size.height};
-    
-    return screenDimension;
+    int width = (int)screen.bounds.size.width;
+    int height = (int)screen.bounds.size.height;
+    float pixelRatio = screen.scale;
+    float fontScale = getFontScale();
+
+    return Screen({width, height, pixelRatio, fontScale});
 }
 
 @end

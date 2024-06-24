@@ -103,6 +103,12 @@ export const App: React.FunctionComponent = () => {
                     <Text style={styles.statsText}>
                         {UnistylesRuntime.orientation}
                     </Text>
+                    <Text style={styles.statsText}>
+                        Font scale: {UnistylesRuntime.fontScale}
+                    </Text>
+                    <Text style={styles.statsText}>
+                        Pixel ratio: {UnistylesRuntime.pixelRatio}
+                    </Text>
                 </View>
             </ImageBackground>
         </View>
