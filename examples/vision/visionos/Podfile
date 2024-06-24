@@ -20,9 +20,6 @@ target 'vision' do
 
   use_react_native!(
     :path => config[:reactNativePath],
-    # todo
-    # https://github.com/callstack/react-native-visionos/issues/128
-    :hermes_enabled => false,
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )

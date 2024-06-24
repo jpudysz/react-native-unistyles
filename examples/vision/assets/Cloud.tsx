@@ -1,3 +1,4 @@
+import React from 'react'
 import Svg, { Path, Defs, RadialGradient, Stop } from 'react-native-svg'
 
 export const Cloud = () => (
