@@ -13,5 +13,8 @@
         "functional/immutable-data": 0,
         "no-underscore-dangle": 0,
         "max-lines": 0
-    }
+    },
+    "ignorePatterns": [
+        "examples/vision/visionos"
+    ]
 }
