@@ -23,7 +23,7 @@ const config = {
         extraNodeModules: modules.reduce((acc, name) => ({
             ...acc,
             [name]: path.join(__dirname, 'node_modules', name)
-        }), {}),
+        }), {})
         // resolveRequest: getPlatformResolver({
         //     platformNameMap: { visionos: '@callstack/react-native-visionos' }
         // })

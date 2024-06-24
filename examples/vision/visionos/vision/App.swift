@@ -8,6 +8,5 @@ struct visionApp: App {
   
   var body: some Scene {
     RCTMainWindow(moduleName: "vision")
-      .defaultSize(CGSize(width: 1000, height: 800))
   }
 }
