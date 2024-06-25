@@ -1,6 +1,6 @@
 #import <React/RCTBridgeModule.h>
 #import <React/RCTEventEmitter.h>
-#import <ReactCommon/RCTRuntimeExecutor.h>
+
 #import <string>
 
 #if TARGET_OS_OSX

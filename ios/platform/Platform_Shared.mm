@@ -1,3 +1,5 @@
+#if TARGET_OS_TV || TARGET_OS_VISION || TARGET_OS_IOS
+
 #include "Platform_Shared.h"
 
 std::string getContentSizeCategory() {
@@ -154,3 +156,5 @@ UIColor* colorFromHexString(NSString* hexString, float alpha) {
                     blue:(rgbValue & 0x0000FF) / 255.0
                     alpha:alpha];
 }
+
+#endif
