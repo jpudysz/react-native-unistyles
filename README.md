@@ -18,19 +18,23 @@
 [![platform - windows](https://img.shields.io/badge/windows-00a2ed?logo=windows&style=for-the-badge)](https://microsoft.github.io/react-native-windows/docs/getting-started)
 [![platform - ssr](https://img.shields.io/badge/SSR-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
 
-<a href="https://github.com/jpudysz?tab=followers">
-    <img src="https://img.shields.io/github/followers/jpudysz?label=Follow%20%40jpudysz&style=social" />
-</a>
-<br/>
-<a href="https://twitter.com/jpudysz">
-    <img src="https://img.shields.io/twitter/follow/jpudysz?label=Follow%20%40jpudysz&style=social" />
-</a>
 
+## Installation
+
+```shell
+yarn add react-native-unistyles
+```
+Install CocoaPods dependencies / generate native folders with Expo:
+
+```shell
+pod install
+npx expo prebuild
+```
 
 ## [Documentation](https://reactnativeunistyles.vercel.app/)
 - [Start here](https://reactnativeunistyles.vercel.app/start/introduction/)
 - [API](https://reactnativeunistyles.vercel.app/reference/create-stylesheet/)
-- [Show case](https://reactnativeunistyles.vercel.app/show-case/projects/)
+- [Migration from StyleSheet](https://reactnativeunistyles.vercel.app/start/migration-from-stylesheet/)
 - [Examples](https://reactnativeunistyles.vercel.app/examples/all/)
 
 ## Features
@@ -39,10 +43,10 @@
 - 🔥 Crazy performance, adds under 0.1 ms to your StyleSheet
 - 🎳 Share up to 100% of your styles across platforms in monorepo
 - 🎯 Doesn't introduce new components, everything is packed in one hook
-- ⚛️ No React Context
+- ⚛️ No React Context, no React Native events
 - 🖥️ Supports custom breakpoints, css-like media queries and variants
 - 🎨 Register multiple themes and change them with single function call
-- 🥳 Compatible with most popular platforms
+- 🥳 Compatible with all React Native platforms
 - 🛡️ ~99% Test coverage
 - 🔌 Extend stylesheets with your own plugins
 - ⚔️ No 3rd party dependencies
@@ -58,37 +62,34 @@
 <a href="https://galaxies.dev">
      <img src="https://avatars.githubusercontent.com/u/118431096?s=200&v=4" height="70px" width="70px" alt="galaxies-dev" />
 </a>
-<a href="https://github.com/kmartinezmedia">
-     <img src="https://avatars.githubusercontent.com/u/6308123?s=200&v=4" height="70px" width="70px" alt="kmartinezmedia" />
-</a>
 <a href="https://github.com/mobily">
      <img src="https://avatars.githubusercontent.com/u/1467712?v=4" height="70px" width="70px" alt="mobily" />
+</a>
+<a href="https://github.com/abanobboles">
+     <img src="https://avatars.githubusercontent.com/u/9078953?v=4" height="70px" width="70px" alt="abanobboles" />
+</a>
+<a href="https://github.com/mwarger">
+     <img src="https://avatars.githubusercontent.com/u/686823?v=4" height="70px" width="70px" alt="mwarger" />
+</a>
+
+
+## Past sponsors
+
+<a href="https://github.com/kmartinezmedia">
+     <img src="https://avatars.githubusercontent.com/u/6308123?s=200&v=4" height="70px" width="70px" alt="kmartinezmedia" />
 </a>
 <a href="https://github.com/levibuzolic">
      <img src="https://avatars.githubusercontent.com/u/721323?v=4" height="70px" width="70px" alt="levibuzolic" />
 </a>
-
-## UI Kits
-
-<a href="https://stacks.grapp.dev/">
-     <img src="https://raw.githubusercontent.com/grapp-dev/stacks/main/assets/stacks-logo.png" height="70px" width="70px" alt="Stacks" />
+<a href="https://github.com/claudesortwell">
+     <img src="https://avatars.githubusercontent.com/u/41422239?v=4" height="70px" width="70px" alt="claudesortwell" />
 </a>
-
-## Installation
-
-```shell
-yarn add react-native-unistyles
-```
-
-## Benchmarks
-
-<img src="https://www.unistyl.es/_astro/benchmark-2.CMC1bK7S.png" />
-
-
-## Discord
-Looking for help or you want to chat with me?
-
-[Join Discord](https://discord.gg/akGHf27P4C)
+<a href="https://github.com/luoxuhai">
+     <img src="https://avatars.githubusercontent.com/u/37284154?v=4" height="70px" width="70px" alt="luoxuhai" />
+</a>
+<a href="https://github.com">
+     <img src="https://avatars.githubusercontent.com/u/113348625?v=4" height="70px" width="70px" alt="anonymous" />
+</a>
 
 ## Sponsor my work
 
@@ -99,6 +100,19 @@ Github: https://github.com/sponsors/jpudysz
 Ko-fi: https://ko-fi.com/jpudysz
 
 Your support is greatly appreciated and helps me dedicate more time and resources to creating quality libraries. Thank you for all the support!
+
+
+## UI Kits
+
+<a href="https://stacks.grapp.dev/">
+     <img src="https://raw.githubusercontent.com/grapp-dev/stacks/main/assets/stacks-logo.png" height="70px" width="70px" alt="Stacks" />
+</a>
+
+## Discord
+Looking for help or you want to chat with me?
+
+[Join Discord](https://discord.gg/akGHf27P4C)
+
 
 ## License
 

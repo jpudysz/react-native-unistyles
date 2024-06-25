@@ -6,6 +6,10 @@ import expressiveCode from 'astro-expressive-code'
 // https://astro.build/config
 export default defineConfig({
     integrations: [
+        expressiveCode({
+            theme: 'github-dark-dimmed',
+            languages: ['typescript', 'tsx']
+        }),
         starlight({
             title: 'Unistyles',
             description: 'React Native StyleSheet 2.0',
@@ -66,6 +70,11 @@ export default defineConfig({
                         {
                             label: 'Theming',
                             link: '/reference/theming/',
+                            badge: 'Updated'
+                        },
+                        {
+                            label: 'Edge to edge layout',
+                            link: '/reference/edge-to-edge/',
                             badge: 'New'
                         },
                         {
@@ -82,7 +91,8 @@ export default defineConfig({
                         },
                         {
                             label: 'Variants',
-                            link: '/reference/variants/'
+                            link: '/reference/variants/',
+                            badge: 'Updated'
                         },
                         {
                             label: 'Compound variants',
@@ -90,7 +100,8 @@ export default defineConfig({
                         },
                         {
                             label: 'Dimensions',
-                            link: '/reference/dimensions/'
+                            link: '/reference/dimensions/',
+                            badge: 'Updated'
                         },
                         {
                             label: 'Unistyles Registry',
@@ -99,7 +110,7 @@ export default defineConfig({
                         {
                             label: 'Unistyles Runtime',
                             link: '/reference/unistyles-runtime/',
-                            badge: 'New'
+                            badge: 'Updated'
                         },
                         {
                             label: 'Content size category',
@@ -115,8 +126,7 @@ export default defineConfig({
                         },
                         {
                             label: 'Server side rendering',
-                            link: '/reference/server-side-rendering/',
-                            badge: 'New'
+                            link: '/reference/server-side-rendering/'
                         },
                         {
                             label: 'Debugging',
@@ -137,25 +147,12 @@ export default defineConfig({
                     ]
                 },
                 {
-                    label: 'Show case',
-                    items: [
-                        {
-                            label: 'Projects',
-                            link: '/show-case/projects/'
-                        },
-                        {
-                            label: 'UI Kits',
-                            link: '/show-case/ui-kits/'
-                        }
-                    ]
-                },
-                {
                     label: 'Examples',
                     items: [
                         {
                             label: 'All examples',
                             link: '/examples/all',
-                            badge: 'New'
+                            badge: 'Updated'
                         }
                     ]
                 },
@@ -165,10 +162,6 @@ export default defineConfig({
                         {
                             label: 'For library authors',
                             link: '/other/for-library-authors/'
-                        },
-                        {
-                            label: 'Sponsors',
-                            link: 'other/sponsors/'
                         },
                         {
                             label: 'For Sponsors',
@@ -190,10 +183,6 @@ export default defineConfig({
                 }
             ]
         }),
-        sitemap(),
-        expressiveCode({
-            theme: 'github-dark-dimmed',
-            languages: ['typescript', 'tsx']
-        })
+        sitemap()
     ]
 })

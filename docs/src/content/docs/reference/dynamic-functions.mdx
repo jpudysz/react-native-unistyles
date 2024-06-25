@@ -27,14 +27,14 @@ const stylesheet = createStyleSheet(theme => ({
     container: () => ({
         backgroundColor: theme.colors.background,
         flex: 1,
-        justifyContent: 'center,
+        justifyContent: 'center',
         alignItems: 'center'
 -    }
 +    })
 }))
 ```
 
-Now, you can pass any number of arguments, all with TypeScript hints:
+Now, you can pass **any** number of arguments, and all with TypeScript hints:
 
 ```tsx /maxWidth/ /isOdd/
 export const Example = ({ maxWidth, isOdd, children }) => {

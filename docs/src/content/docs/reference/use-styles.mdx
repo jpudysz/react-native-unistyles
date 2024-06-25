@@ -1,7 +1,7 @@
 ---
 title: useStyles
 ---
-import { Card } from '@astrojs/starlight/components'
+import { Card, Aside } from '@astrojs/starlight/components'
 import Seo from '../../../components/Seo.astro'
 import Badge from '../../../components/Badge.astro'
 
@@ -37,7 +37,7 @@ To learn more about variants follow [this guide](/reference/variants/).
 
 ### Basic usage (no arguments)
 
-If you need to access your `theme` or the current `breakpoint` in your component you can call `useStyles` without any arguments.
+If you need to access your `theme` or the current `breakpoint` in your component you can call `useStyles` without any arguments:
 
 ```tsx
 const { theme, breakpoint } = useStyles()
@@ -52,7 +52,10 @@ For more advanced usage, pass your `stylesheet` generated with [createStyleSheet
 const { styles, theme, breakpoint } = useStyles(stylesheet)
 ```
 
-The `styles` returned are compatible with any React Native component and satisfy the TypeScript type requirements.
+<Aside>
+    The `styles` object  is compatible with **any** React Native component and satisfy the TypeScript type requirements. It also means that you can mix styles with other libraries like Reanimated.
+</Aside>
+
 
 ### Basic usage (breakpoint)
 
@@ -94,7 +97,7 @@ Unistyles has no `Hidden` and `Visible` components. It's just an idea to show yo
 ### Basic usage (theme)
 
 
-Sometimes, you may need to access your `theme` values outside of the stylesheet. 
+Sometimes, you may need to access your `theme` values outside of the stylesheet.
 An example of this could be when working with a built-in React Native Button component.
 
 ```tsx /theme/
