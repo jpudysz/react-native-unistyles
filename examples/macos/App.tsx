@@ -24,7 +24,9 @@ export const App: React.FunctionComponent = () => {
         updateTheme,
         insets,
         statusBar,
-        navigationBar
+        navigationBar,
+        pixelRatio,
+        fontScale
     } = UnistylesRuntime
 
     return (
@@ -129,6 +131,22 @@ export const App: React.FunctionComponent = () => {
                             </Text>
                             <Text style={styles.value}>
                                 {enabledPlugins.length > 0 ? enabledPlugins.join(', ') : '-'}
+                            </Text>
+                        </View>
+                        <View style={styles.valueContainer}>
+                            <Text style={styles.valueName}>
+                                Pixel ratio:
+                            </Text>
+                            <Text style={styles.value}>
+                                {pixelRatio}
+                            </Text>
+                        </View>
+                        <View style={styles.valueContainer}>
+                            <Text style={styles.valueName}>
+                                Font scale:
+                            </Text>
+                            <Text style={styles.value}>
+                                {fontScale}
                             </Text>
                         </View>
                     </View>

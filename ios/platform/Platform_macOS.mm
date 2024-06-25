@@ -45,8 +45,12 @@
     });
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        unistylesRuntime->screen = [self getScreenDimensions];
+        Screen screen = [self getScreenDimensions];
+        
+        unistylesRuntime->screen = Dimensions({screen.width, screen.height});
         unistylesRuntime->colorScheme = [self getColorScheme];
+        unistylesRuntime->fontScale = screen.fontScale;
+        unistylesRuntime->pixelRatio = screen.pixelRatio;
     });
 }
 
@@ -69,7 +73,7 @@
 }
 
 - (void)onWindowChange {
-    Dimensions screen = [self getScreenDimensions];
+    Screen screen = [self getScreenDimensions];
     
     if (self.unistylesRuntime != nullptr) {
         ((UnistylesRuntime*)self.unistylesRuntime)->handleScreenSizeChange(
@@ -91,11 +95,21 @@
     return UnistylesLightScheme;
 }
 
-- (Dimensions)getScreenDimensions {
+- (Screen)getScreenDimensions {
     NSWindow *window = RCTSharedApplication().mainWindow;
-    Dimensions screenDimension = {(int)window.frame.size.width, (int)window.frame.size.height};
+    int width = (int)window.frame.size.width;
+    int height = (int)window.frame.size.height;
+    float pixelRatio = window.backingScaleFactor;
+    float fontScale = [self getFontScale];
     
-    return screenDimension;
+    return Screen({width, height, pixelRatio, fontScale});
+}
+
+- (float)getFontScale {
+    NSFont *systemFont = [NSFont systemFontOfSize:[NSFont systemFontSize]];
+    CGFloat systemFontScale = systemFont.pointSize / 13.0;
+    
+    return systemFontScale;
 }
 
 @end
