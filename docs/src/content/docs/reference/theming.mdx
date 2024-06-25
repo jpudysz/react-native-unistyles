@@ -1,7 +1,7 @@
 ---
 title: Theming
 ---
-
+import { Card, Aside } from '@astrojs/starlight/components'
 import Seo from '../../../components/Seo.astro'
 import Badge from '../../../components/Badge.astro'
 
@@ -50,6 +50,10 @@ const myTheme = {
     ...getMyColors()
 }
 ```
+
+<Aside>
+    It's also possible to update the theme during runtime. Please check `updateTheme` method in the [UnistylesRuntime](/reference/unistyles-runtime) guide.
+</Aside>
 
 If you use TypeScript you need to override the library's type:
 
@@ -106,17 +110,24 @@ using your first `useStyles` hook:
 ```tsx /useInitialTheme/
 import { useInitialTheme, useStyles } from 'react-native-unistyles'
 
-// can be read from any storage eg. MMKV/SQL/FileSystem/Appearance
-const userTheme = ...
+const App = () => {
+    // can be read from any storage eg. stan-js/MMKV/SQL
+    const { userTheme } = useStore()
 
-useInitialTheme(userTheme)
+    // pass theme name to useInitialTheme hook
+    useInitialTheme(userTheme)
 
-// useInitialTheme must be called before the first useStyles hook
-// it's so fast that you can even call it in the same component!
-const { styles } = useStyles(stylesheet)
+    // useInitialTheme must be called before the first useStyles hook
+    // it's so fast that you can even call it in the same component!
+    const { styles } = useStyles(stylesheet)
+
+    return (
+        // your app's JSX
+    )
+}
 ```
 
-- Use adaptive themes, as mentioned below
+- Use adaptive themes, which are described below
 
 :::danger
 Without a selected theme, Unistyles will throw an error:
@@ -188,7 +199,9 @@ UnistylesRegistry
 In order to support `adaptiveThemes` with SSR, please follow [this](/reference/server-side-rendering/#adaptive-themes-with-ssr) guide.
 
 :::caution
-You shouldn't enable adaptive themes and set initial theme at the same time. It may cause unpredictable behavior.
+You shouldn’t enable adaptive themes and set the initial theme at the same time. It may cause unpredictable behavior.
+
+With adaptive themes enabled, Unistyles automatically manages your themes. Setting themes manually is not recommended and may interfere with the automatic theme switching.
 :::
 
 ### Toggle adaptive themes during runtime
@@ -299,7 +312,7 @@ export const UpdateTheme = ({ selectedColors }) => (
 ### Update statusBar color during runtime
 
 <Badge label="Android" />
-<Badge label="2.6.0" />
+<Badge label="2.6.0 - 2.8.0" />
 
 Sometimes your app needs to dynamically change the status bar color, for example, when entering image preview or on some onboarding screens. You can easily update the color with `UnistylesRuntime` and for example the `useEffect` hook:
 
@@ -312,6 +325,8 @@ export const OnboardingScreen = () => {
 
     useEffect(() => {
         UnistylesRuntime.statusBar.setColor(theme.colors.primary)
+        // or with alpha channel
+        UnistylesRuntime.statusBar.setColor(theme.colors.primary, 0.5)
 
         return () => {
             // set default color
@@ -324,13 +339,13 @@ export const OnboardingScreen = () => {
 }
 ```
 :::tip[Colors]
-Unistyles supports only a few colors and hex values. Check the compability [here](#status-and-navigation-bar-colors)
+Unistyles supports built-in Android colors and hex values with alpha channel. Check the compability [here](#status-and-navigation-bar-colors)
 :::
 
 ### Update navigationBar color during runtime
 
 <Badge label="Android" />
-<Badge label="2.6.0" />
+<Badge label="2.6.0 - 2.8.0" />
 
 Just as with the `statusBar`, you can do the same with the `navigationBar` and set a specified color.
 
@@ -343,6 +358,8 @@ export const ImagePreview = ({ imageUri }) => {
 
     useEffect(() => {
         UnistylesRuntime.navigationBar.setColor(theme.colors.black)
+        // or with 8-digit hex value eg. #50000000
+        UnistylesRuntime.navigationBar.setColor(theme.colors.halfBlack)
 
         return () => {
             // set default color
@@ -355,18 +372,51 @@ export const ImagePreview = ({ imageUri }) => {
 }
 ```
 :::tip[Colors]
-Unistyles supports only a few colors and hex values. Check the compability [here](#status-and-navigation-bar-colors)
+Unistyles supports built-in Android colors and hex values with alpha channel. Check the compability [here](#status-and-navigation-bar-colors)
 :::
 
-### Status and Navigation bar colors
+### Update rootView background color during runtime
+
+<Badge label="iOS" /> <Badge label="Android" /> <Badge label="Web" />
+<Badge label="2.8.0" />
+
+You can also change dynamically the root view background color with `UnistylesRuntime`:
+
+```tsx /UnistylesRuntime.setRootViewBackgroundColor/
+import { UnistylesRuntime } from 'react-native-unistyles'
+
+// update the theme at any time
+export const UpdateTheme = ({ selectedColors }) => (
+    <Button
+        title="Update theme"
+        onPress={() => UnistylesRuntime.setRootViewBackgroundColor(theme.colors.primary)}
+    />
+)
+```
+
+Changing rootView background color is useful when your app supports different orientations and you want to match the background color with your theme while transitioning.
+
+:::tip[Colors]
+Unistyles supports built-in Android colors and hex values with alpha channel. Check the compability [here](#status-and-navigation-bar-colors)
+:::
+
+### System bars and rootView colors
 
 Unistyles supports all 6- and 8-character hex colors with a `#` prefix, as well as some built-in colors:
 
-red, blue, green, black, white, gray, cyan, magenta, yellow, light gray, dark gray, grey, light grey, dark grey, aqua, fuchsia, lime, maroon, navy, olive, purple, silver, and teal.
+translucent red, blue, green, black, white, gray, cyan, magenta, yellow, light gray, dark gray, grey, light grey, dark grey, aqua, fuchsia, lime, maroon, navy, olive, purple, silver, and teal.
 
-:::danger
-It's not possible to set a color for a **translucent** navigation bar.
+<Badge label="2.8.0" />
 
-If you set an unsupported color or attempt to do so on a translucent navigation bar, Unistyles will silently fail.
-:::
+Since version 2.8.0, Unistyles supports optional alpha value that can easily convert hex values to transparency.
+
+```tsx
+UnistylesRuntime.statusBar.setColor(theme.colors.black) // #000000
+UnistylesRuntime.statusBar.setColor(theme.colors.halfBlack) // #80000000
+UnistylesRuntime.navigationBar.setColor(theme.colors.halfBlack, 0.5) // #000000 , 0.5 opacity
+UnistylesRuntime.navigationBar.setColor('red', 0.5) // opacity will be ignored
+UnistylesRuntime.statusBar.setColor(theme.colors.halfBlack, 0.2) // opacity will be ignored
+```
+In case of any issue in parsing Unistyles will silently fail without a crash.
+
 </Seo>

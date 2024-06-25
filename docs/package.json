@@ -9,18 +9,18 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/sitemap": "3.0.4",
-    "@astrojs/starlight": "0.15.1",
-    "@fontsource-variable/nunito": "5.0.17",
-    "astro": "4.0.8",
-    "astro-expressive-code": "0.30.1",
-    "astro-seo": "0.8.0",
-    "autoprefixer": "10.4.16",
-    "motion": "10.16.4",
+    "@astrojs/sitemap": "3.1.6",
+    "@astrojs/starlight": "0.24.4",
+    "@fontsource-variable/nunito": "5.0.19",
+    "astro": "4.11.1",
+    "astro-expressive-code": "0.35.3",
+    "astro-seo": "0.8.4",
+    "autoprefixer": "10.4.19",
+    "motion": "10.18.0",
     "postcss-easing-gradients": "3.0.1",
     "postcss-nested": "6.0.1",
-    "sharp": "0.33.1",
-    "swiper": "11.0.5"
+    "sharp": "0.33.4",
+    "swiper": "11.1.4"
   },
   "private": true,
   "devDependencies": {

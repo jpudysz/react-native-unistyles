@@ -80,6 +80,9 @@ const stylesheet = createStyleSheet((theme, runtime) => ({
 }))
 ```
 
+Since version 2.8.0, the library will inject `mini runtime` which is a subset of the original `UnistylesRuntime` without methods like `setTheme` or `setRootViewBackgroundColor`, which are not useful when defining your stylesheets.
+
+
 Importantly, you'll receive the same TypeScript hints as with `StyleSheet.create`!
 
 </Seo>

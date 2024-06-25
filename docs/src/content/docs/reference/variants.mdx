@@ -18,7 +18,7 @@ import Badge from '../../../components/Badge.astro'
 Variants were the most requested feature in version 1.0 and are now available to use!
 You can mix them with other Unistyles features like [media queries](/reference/media-queries/) and [breakpoints](/reference/breakpoints/).
 
-## Basic usage
+### Basic usage
 
 Variants are objects that can be nested in any style object:
 
@@ -39,7 +39,7 @@ const stylesheet = createStyleSheet(theme => ({
 }))
 ```
 
-Variants contain `groups` of atomic variants. 
+Variants contain `groups` of atomic variants.
 
 To define a group, first you need to name it and then define variants within it:
 
@@ -96,7 +96,7 @@ const stylesheet = createStyleSheet(theme => ({
 }
 ```
 
-## Selecting variants
+### Selecting variants
 
 With your named groups, you can now select any variant from your stylesheet using the `useStyles` hook:
 
@@ -119,7 +119,7 @@ const stylesheet = ...
 
 TypeScript will provide perfect autocompletion for your variants, ensuring accuracy!
 
-## Selecting variants with boolean values
+### Selecting variants with boolean values
 
 <Badge label="All platforms" />
 <Badge label="2.1.0" />
@@ -166,7 +166,7 @@ const stylesheet = createStyleSheet(theme => ({
                 true: {
                     borderColor: theme.colors.primary
                 }
-                // you can also skip "false" here 
+                // you can also skip "false" here
             }
         }
     }
@@ -181,7 +181,7 @@ Boolean variants respects other rules, eg. `false` is not equal to `default`. To
 to fallback to `default` variant you need to pass `undefined` or `{}`.
 :::
 
-## Default variant
+###Default variant
 
 You can define a `default` variant that will be used when you don't pass any variant to the `useStyles` hook:
 
@@ -206,7 +206,7 @@ const stylesheet = createStyleSheet(theme => ({
 }
 ```
 
-## Options to select the variant
+###Options to select the variant
 
 If you pass `undefined` or `empty object` Unsityles will try to find the `default` variant in your stylesheet:
 
@@ -231,7 +231,7 @@ const { styles } = useStyles(stylesheet, {
 })
 ```
 
-## Pass variants as component props
+### Pass variants as component props
 
 Variants were designed to be used as component props:
 
@@ -239,20 +239,9 @@ Variants were designed to be used as component props:
 import React from 'react'
 import { useStyles } from 'react-native-unistyles'
 
-enum Color {
-    primary = 'primary',
-    secondary = 'secondary'
-}
-
-enum Size {
-    small = 'small',
-    medium = 'medium',
-    large = 'large'
-}
-
 type ComponentProps = {
-    color: Color
-    size: Size
+    color: 'primary' | 'secondary'
+    size: 'small' | 'medium' | 'large'
 }
 
 const Component: React.FunctionComponent = ({ color, size }) => {
@@ -267,11 +256,35 @@ const Component: React.FunctionComponent = ({ color, size }) => {
 }
 ```
 
-:::tip
-Unistyles will automatically re-render if your variant props change.
-:::
+### Infer TypeScript type for your variants
 
-## Defining the same variant across multiple styles
+<Badge label="All platforms" />
+<Badge label="2.8.0" />
+
+Instead of using `enum` or `strings` with `|` , you can use `UnistylesVariants` to infer the type of your variants:
+
+```tsx /UnistylesVariants/
+import React from 'react'
+import { useStyles, UnistylesVariants } from 'react-native-unistyles'
+
+type ComponentProps = = UnistylesVariants<typeof stylesheet>
+
+const Component: React.FunctionComponent = ({ color, size }) => {
+    const { styles } = useStyles(stylesheet, {
+        color,
+        size
+    })
+
+    return (
+        <View style={styles.container} />
+    )
+}
+
+// infers type of your variants from the stylesheet below
+const stylesheet = ...
+```
+
+### Defining the same variant across multiple styles
 
 It's possible to define the same variant group across multiple styles:
 
@@ -316,7 +329,7 @@ const stylesheet = createStyleSheet(theme => ({
 ```
 
 :::caution
-Unistyles will work as intended, selecting the correct variant for each style. 
+Unistyles will work as intended, selecting the correct variant for each style.
 However, you need to repeat all your options like `small`, `medium`, and `large` in each style to avoid TypeScript errors.
 :::
 

@@ -2,7 +2,7 @@
 title: Introduction
 ---
 
-import { Card, Tabs, TabItem, CardGrid, Icon } from '@astrojs/starlight/components'
+import { Card, Tabs, TabItem, CardGrid, Icon, Steps } from '@astrojs/starlight/components'
 import Seo from '../../../components/Seo.astro'
 import Logo from '../../../assets/logo.svg'
 
@@ -20,20 +20,28 @@ import Logo from '../../../assets/logo.svg'
     />
 </div>
 
-:::tip
-- If you find any bug, please create an issue [here](https://github.com/jpudysz/react-native-unistyles/issues).
-- Do you have a feature request? Create a new [discussion](https://github.com/jpudysz/react-native-unistyles/discussions).
-- Are you looking for real-time chat? Join our [discord](https://discord.gg/akGHf27P4C).
-:::
-
-  
 Unistyles is a cross-platform library that enables you to share up to 100% of your styles across all platforms.
-It combines the simplicity of `StyleSheet` with the performance of `C++`. 
+It combines the simplicity of `StyleSheet` with the performance of `C++`.
 
-**`Unistyles` is a superset of `StyleSheet`** similar to how `TypeScript` is a superset of `JavaScript`. 
+**`Unistyles` is a superset of `StyleSheet`** similar to how `TypeScript` is a superset of `JavaScript`.
 If you're familiar with styling in React Native, then you already know how to use `Unistyles`.
 
+
 ### Quick demo
+
+
+<Steps>
+
+1. Import Unistyles
+
+2. Define your StyleSheet with `createStyleSheet`
+
+3. Use `useStyles` hook to access styles
+
+4. That's it! No providers, no context!
+
+</Steps>
+
 
 ```tsx title="Demo.tsx"  /import.*unistyles'/ /const { styles }.*/ /const stylesheet.*/
 import React from 'react'
