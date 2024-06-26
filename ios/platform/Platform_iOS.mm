@@ -108,6 +108,18 @@
 
 - (void)onWindowChange:(NSNotification *)notification {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        UIApplicationState appState = [UIApplication sharedApplication].applicationState;
+
+
+        /*
+            We can still receive events when the app is backgrounding, and this can result in a new smaller screen size being computed erronesouly.
+            When the app is brought back to the foreground this can result in jank as the correct screen size is recomputed.
+            Avoiding this behavior is as simple as making sure the appState is not background before recomputing our screen size.
+        */
+        if (appState == UIApplicationStateBackground) {
+            return;
+        }
+
         Screen screen = [self getScreenDimensions];
         Insets insets = [self getInsets];
         Dimensions statusBar = [self getStatusBarDimensions];
