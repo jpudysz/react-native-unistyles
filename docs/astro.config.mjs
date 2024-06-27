@@ -105,7 +105,8 @@ export default defineConfig({
                         },
                         {
                             label: 'Unistyles Registry',
-                            link: '/reference/unistyles-registry/'
+                            link: '/reference/unistyles-registry/',
+                            badge: 'Updated'
                         },
                         {
                             label: 'Unistyles Runtime',

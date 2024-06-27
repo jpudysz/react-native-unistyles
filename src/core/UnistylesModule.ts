@@ -6,6 +6,7 @@ import { isServer } from '../common'
 
 export class UnistylesBridgeWeb {
     #timerRef?: ReturnType<typeof setTimeout> = undefined
+    #windowResizeDebounceTimeMs: number = 100
     #hasAdaptiveThemes: boolean = false
     #supportsAutomaticColorScheme = false
     #screenWidth = isServer ? undefined : window.innerWidth
@@ -100,6 +101,12 @@ export class UnistylesBridgeWeb {
                         return (color: Color | string) => this.setRootViewBackgroundColor(color)
                     case 'setImmersiveMode':
                         return () => {}
+                    case 'setWindowResizeDebounceTimeMs':
+                        return (timeMs: number) => {
+                            if (timeMs >= 0) {
+                                this.#windowResizeDebounceTimeMs = timeMs
+                            }
+                        }
                     default:
                         return Reflect.get(this, prop)
                 }
@@ -188,16 +195,21 @@ export class UnistylesBridgeWeb {
     }
 
     private setupListeners() {
+        const onResize = () => {
+            this.#screenWidth = window.innerWidth
+            this.#screenHeight = window.innerHeight
+            this.#breakpoint = this.getBreakpointFromScreenWidth(this.#screenWidth)
+
+            this.emitLayoutChange()
+        }
+
         window.addEventListener('resize', () => {
+            if (this.#windowResizeDebounceTimeMs === 0) {
+                return onResize()
+            }
+
             clearTimeout(this.#timerRef)
-
-            this.#timerRef = setTimeout(() => {
-                this.#screenWidth = window.innerWidth
-                this.#screenHeight = window.innerHeight
-                this.#breakpoint = this.getBreakpointFromScreenWidth(this.#screenWidth)
-
-                this.emitLayoutChange()
-            }, 100)
+            this.#timerRef = setTimeout(onResize, this.#windowResizeDebounceTimeMs)
         })
 
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {

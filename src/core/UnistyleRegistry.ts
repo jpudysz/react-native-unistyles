@@ -60,6 +60,10 @@ export class UnistyleRegistry {
             this.unistylesBridge.addPlugin(cssMediaQueriesPlugin.name, false)
         }
 
+        if (config.windowResizeDebounceTimeMs !== undefined) {
+            this.unistylesBridge.setWindowResizeDebounceTimeMs(config.windowResizeDebounceTimeMs)
+        }
+
         return {
             addBreakpoints: this.addBreakpoints,
             addThemes: this.addThemes
