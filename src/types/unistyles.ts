@@ -31,7 +31,8 @@ export type UnistylesConfig = {
     adaptiveThemes?: boolean,
     initialTheme?: keyof UnistylesThemes,
     plugins?: Array<UnistylesPlugin>,
-    experimentalCSSMediaQueries?: boolean
+    experimentalCSSMediaQueries?: boolean,
+    windowResizeDebounceTimeMs?: number
 }
 
 export type UnistylesBridge = {
@@ -61,6 +62,9 @@ export type UnistylesBridge = {
     removePlugin(pluginName: string): void,
     setRootViewBackgroundColor(color?: string, alpha?: number): void,
     setImmersiveMode(isEnabled: boolean): void
+
+    // web only
+    setWindowResizeDebounceTimeMs(timeMs: number): void
 }
 
 export type UnistylesThemeEvent = {
