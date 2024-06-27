@@ -343,7 +343,8 @@ export const HomeScreen = () => {
                                 })
                                 .addBreakpoints(breakpoints)
                                 .addConfig({
-                                    initialTheme: 'light'
+                                    initialTheme: 'light',
+                                    windowResizeDebounceTimeMs: 0
                                 })
 
                             navigation.navigate(DemoNames.Runtime)
