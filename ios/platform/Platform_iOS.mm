@@ -108,6 +108,12 @@
 
 - (void)onWindowChange:(NSNotification *)notification {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        UIApplicationState appState = [UIApplication sharedApplication].applicationState;
+
+        if (appState == UIApplicationStateBackground) {
+            return;
+        }
+
         Screen screen = [self getScreenDimensions];
         Insets insets = [self getInsets];
         Dimensions statusBar = [self getStatusBarDimensions];
