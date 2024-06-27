@@ -170,9 +170,7 @@ export class UnistylesRuntime {
      * @returns - The font scale
      */
     public get fontScale() {
-        const fontScale = this.unistylesBridge.fontScale
-
-        return fontScale === 1.0 ? 1 : fontScale.toFixed(2)
+        return parseFloat(this.unistylesBridge.fontScale.toFixed(2))
     }
 
     /**

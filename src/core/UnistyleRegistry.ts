@@ -60,7 +60,7 @@ export class UnistyleRegistry {
             this.unistylesBridge.addPlugin(cssMediaQueriesPlugin.name, false)
         }
 
-        if (config.windowResizeDebounceTimeMs !== undefined) {
+        if (isWeb && config.windowResizeDebounceTimeMs !== undefined) {
             this.unistylesBridge.setWindowResizeDebounceTimeMs(config.windowResizeDebounceTimeMs)
         }
 
