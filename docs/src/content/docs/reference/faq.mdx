@@ -44,6 +44,11 @@ If your app still doesn't automatically switch themes, ensure that:
 - You have phone with iOS 13+ or Android 10+
 - Your device supports dark mode
 
+### My Android app is not edgeToEdge
+
+Please check other libraries used in the app that might interfere with the edge-to-edge layout. One example is [react-native-keyboard-controller](https://kirillzyusko.github.io/react-native-keyboard-controller/docs/api/keyboard-provider#props), which requires both `statusBarTranslucent` and `navigationBarTranslucent` to be set to `true`.
+
+
 ### I'm getting some TypeScript error for my stylesheet
 
 This should not occur, but if it does, please create a new issue in the GitHub repository.
