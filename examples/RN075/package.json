@@ -1,0 +1,32 @@
+{
+  "name": "RN075",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "lint": "eslint .",
+    "start": "react-native start"
+  },
+  "dependencies": {
+    "react": "19.0.0-rc-fb9a90fa48-20240614",
+    "react-native": "0.75.0-rc.2"
+  },
+  "devDependencies": {
+    "@babel/core": "7.24.7",
+    "@babel/preset-env": "7.24.7",
+    "@babel/runtime": "7.24.7",
+    "@react-native/babel-preset": "0.75.0-rc.2",
+    "@react-native/eslint-config": "0.75.0-rc.2",
+    "@react-native/metro-config": "0.75.0-rc.2",
+    "@react-native/typescript-config": "0.75.0-rc.2",
+    "@types/react": "18.3.3",
+    "babel-jest": "29.7.0",
+    "babel-plugin-module-resolver": "5.0.2",
+    "eslint": "8.57.0",
+    "typescript": "5.5.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

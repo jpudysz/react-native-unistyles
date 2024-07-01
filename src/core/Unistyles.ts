@@ -1,6 +1,7 @@
 import { UnistylesModule } from './UnistylesModule'
 import { UnistylesRuntime } from './UnistylesRuntime'
 import { UnistyleRegistry } from './UnistyleRegistry'
+import { UnistylesStyleSheet } from './StyleSheet'
 import type { UnistylesBridge } from '../types'
 import { UnistylesError, isTest, isWeb } from '../common'
 import { UnistylesMockedBridge, UnistylesMockedRegistry, UnistylesMockedRuntime } from './mocks'
@@ -38,6 +39,12 @@ class Unistyles {
 
     public get runtime() {
         return this._runtime
+    }
+
+    public get styleSheet() {
+        // @ts-ignore
+        // eslint-disable-next-line no-undef
+        return global.__UNISTYLES__STYLESHEET__ as UnistylesStyleSheet
     }
 }
 

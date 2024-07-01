@@ -30,6 +30,7 @@ const UnistylesRegistry = {
 }
 
 const UnistylesRuntime = unistyles.runtime
+const StyleSheet = unistyles.styleSheet
 
 export {
     mq,
@@ -40,7 +41,8 @@ export {
     AndroidContentSizeCategory,
     IOSContentSizeCategory,
     UnistylesRegistry,
-    UnistylesRuntime
+    UnistylesRuntime,
+    StyleSheet
 }
 
 export type {
