@@ -122,6 +122,7 @@
     "examples/bare",
     "examples/tv",
     "examples/vision",
+    "examples/RN075",
     "docs"
   ],
   "packageManager": "yarn@3.6.4",
