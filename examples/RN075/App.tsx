@@ -6,14 +6,18 @@ export const App = () => (
     <View
         // style={styles.container}
         ref={ref => {
-            ref && styles.container.addNode(ref._nativeTag)
+            if (ref) {
+                console.log(ref.__nativeTag)
+                styles.container.addNode(ref.__nativeTag)
+            }
         }}
     >
         <Text
             ref={ref => {
                 if (ref) {
-                    console.log(ref.viewConfig.uiViewClassName)
-                    styles.text.addNode(ref._nativeTag)
+                    console.log(ref.__nativeTag)
+                    console.log(ref._viewConfig.uiViewClassName)
+                    styles.text.addNode(ref.__nativeTag)
                 }
             }}
         >
