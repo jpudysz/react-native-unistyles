@@ -7,6 +7,8 @@ add_library(unistyles
     ../cxx/UnistylesRuntime.cpp
     ../cxx/UnistylesModel.cpp
     ../cxx/UnistylesImpl.cpp
+    ../cxx/StyleSheet.cpp
+    ../cxx/StyleSheetImpl.cpp
     ./src/main/cxx/cpp-adapter.cpp
     ./src/main/cxx/helpers.cpp
     ./src/main/cxx/platform.cpp
@@ -29,6 +31,7 @@ find_package(fbjni REQUIRED CONFIG)
 target_link_libraries(unistyles
     ReactAndroid::jsi
     ReactAndroid::turbomodulejsijni
+    ReactAndroid::folly_runtime
     ReactAndroid::react_nativemodule_core
     android
     fbjni::fbjni
