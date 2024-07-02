@@ -2,7 +2,7 @@
 title: FAQ
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components'
+import { Card, CardGrid, Steps } from '@astrojs/starlight/components'
 import Seo from '../../../components/Seo.astro'
 
 <Seo
@@ -44,10 +44,37 @@ If your app still doesn't automatically switch themes, ensure that:
 - You have phone with iOS 13+ or Android 10+
 - Your device supports dark mode
 
-### My Android app is not edgeToEdge
+### My Android app is not edgeToEdge or insets are incorrect
 
-Please check other libraries used in the app that might interfere with the edge-to-edge layout. One example is [react-native-keyboard-controller](https://kirillzyusko.github.io/react-native-keyboard-controller/docs/api/keyboard-provider#props), which requires both `statusBarTranslucent` and `navigationBarTranslucent` to be set to `true`.
+Please check libraries used in your app that might interfere with the edge-to-edge layout.
+Before submitting an issue, verify insets reported by Unistyles **with and without** other libraries.
 
+<Steps>
+
+1. `react-native-keyboard-controller`
+
+    Library assumes that your app is not edge-to-edge and adds padding. To fix this, it requires both `statusBarTranslucent` and `navigationBarTranslucent` to be set to `true` [docs](https://kirillzyusko.github.io/react-native-keyboard-controller/docs/api/keyboard-provider#props).
+
+2. `react-native-screens` and `react-navigation`
+
+    It's not possible to detect if your app runs in edge-to-edge mode. If you enable `statusBarTranslucent`, `react-native-screens` sets always `topInsets` to `0`.
+    To prevent this, remove any occurrences of `statusBarTranslucent` from your navigators:
+
+    ```diff lang="tsx"
+         <Stack
+            screenOptions={{
+                headerShown: false,
+    -            statusBarTranslucent: true,
+                contentStyle: styles.content
+            }}
+         >
+            // your screens
+        </Stack>
+    ```
+
+3. `react-native-avoid-softinput` with `setShouldMimicIOSBehavior` as reported [here](https://github.com/mateusz1913/react-native-avoid-softinput/issues/200#issuecomment-2007527099)
+
+</Steps>
 
 ### I'm getting some TypeScript error for my stylesheet
 
