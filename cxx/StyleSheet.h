@@ -19,10 +19,12 @@ struct JSI_EXPORT StyleSheet : public jsi::HostObject {
     StyleSheet() {
         this->getters = {
             {"create", MAP_FN(create)},
+            {"addConfig", MAP_FN(addConfig)},
         };
     }
     
     jsi::Value create(jsi::Runtime&, std::string);
+    jsi::Value addConfig(jsi::Runtime&, std::string);
     
     jsi::Value get(jsi::Runtime&, const jsi::PropNameID&) override;
     void set(jsi::Runtime&, const jsi::PropNameID&, const jsi::Value&) override;
