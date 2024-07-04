@@ -17,7 +17,7 @@ export const App = () => (
                 if (ref) {
                     console.log(ref.__nativeTag)
                     console.log(ref._viewConfig.uiViewClassName)
-                    styles.text.addNode(ref.__nativeTag)
+                    // styles.text.addNode(ref.__nativeTag)
                 }
             }}
         >
