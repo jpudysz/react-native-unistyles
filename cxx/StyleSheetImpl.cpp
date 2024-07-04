@@ -1,30 +1,10 @@
 #include "StyleSheet.h"
 #include <jsi/jsi.h>
+#include "ShadowTreeTraverser.h"
 #include <react/renderer/uimanager/UIManagerBinding.h>
 #include <react/renderer/uimanager/UIManager.h>
-#include <react/renderer/core/ShadowNodeFragment.h>
 
-using namespace facebook;
-
-std::pair<std::shared_ptr<const facebook::react::ShadowNode>, std::shared_ptr<const facebook::react::ShadowNode>>
-findShadowNodeAndParentForTag(int nativeTag, const std::shared_ptr<const facebook::react::ShadowNode>& node,
-                              const std::shared_ptr<const facebook::react::ShadowNode>& parent = nullptr) {
-    if (node->getTag() == nativeTag) {
-        return {node, parent};
-    }
-
-    auto& children = node->getChildren();
-    
-    for (const auto& child : children) {
-        auto result = findShadowNodeAndParentForTag(nativeTag, child, node);
-
-        if (result.first != nullptr) {
-            return result;
-        }
-    }
-    
-    return {nullptr, nullptr};
-}
+using namespace facebook::react;
 
 jsi::Value StyleSheet::create(jsi::Runtime& rt, std::string fnName) {
     return jsi::Function::createFromHostFunction(
@@ -61,45 +41,27 @@ jsi::Value StyleSheet::create(jsi::Runtime& rt, std::string fnName) {
                     stylesProps.asObject(rt).setProperty(rt, jsi::PropNameID::forUtf8(rt, "flex"), jsi::Value(1));
                     stylesProps.asObject(rt).setProperty(rt, jsi::PropNameID::forUtf8(rt, "justifyContent"), jsi::String::createFromUtf8(rt, "center"));
                     stylesProps.asObject(rt).setProperty(rt, jsi::PropNameID::forUtf8(rt, "alignItems"), jsi::String::createFromUtf8(rt, "center"));
-                    stylesProps.asObject(rt).setProperty(rt, jsi::PropNameID::forUtf8(rt, "backgroundColor"),jsi::String::createFromUtf8(rt, "#000000"));
 
                     auto rawProps = facebook::react::RawProps(rt, stylesProps);
-                    
+
                     // todo assume single surface for now
                     shadowTreeRegistry.enumerate([nativeTag, &rawProps](const facebook::react::ShadowTree& shadowTree, bool& stop){
-                        auto transaction = [nativeTag, &rawProps](const facebook::react::RootShadowNode& oldRootShadowNode)->facebook::react::RootShadowNode::Unshared {
-                            auto rootNode = oldRootShadowNode.ShadowNode::clone(facebook::react::ShadowNodeFragment{});
-                            auto [targetNode, parentNode] = findShadowNodeAndParentForTag(nativeTag, rootNode);
-                            
+                        auto transaction = [nativeTag, &rawProps](const facebook::react::RootShadowNode& oldRootShadowNode) {
+                            auto traverser = ShadowTreeTraverser{oldRootShadowNode};
+                            auto targetNode = traverser.findShadowNode(nativeTag);
+                           
                             if (!targetNode) {
-                                return std::static_pointer_cast<facebook::react::RootShadowNode>(rootNode);
+                                return std::static_pointer_cast<facebook::react::RootShadowNode>(traverser.getShadowTree());
                             }
+                      
+                            auto newShadowNode = traverser.cloneShadowNodeWithNewProps(targetNode, rawProps);
+                      
+                            traverser.replaceShadowNode(newShadowNode);
                             
-                            auto& componentDescriptor = targetNode->getComponentDescriptor();
-                            facebook::react::PropsParserContext parserContext{
-                                targetNode->getSurfaceId(),
-                                *targetNode->getContextContainer()
-                            };
-                            auto newProps = componentDescriptor.cloneProps(parserContext, targetNode->getProps(), std::move(rawProps));
-                            auto newNode = targetNode->clone({
-                                newProps,
-                                std::make_shared<facebook::react::ShadowNode::ListOfShared>(targetNode->getChildren()),
-                                targetNode->getState()
-                            });
-                            
-                            if (!parentNode->getSealed()) {
-                                auto& parentNodeNonConst = const_cast<facebook::react::ShadowNode&>(*parentNode);
-                                parentNodeNonConst.replaceChild(*targetNode, std::move(newNode));
-
-                                static_cast<facebook::react::YogaLayoutableShadowNode *>(&parentNodeNonConst)
-                                          ->updateYogaChildren();
-                            }
-        
-                            return std::static_pointer_cast<facebook::react::RootShadowNode>(rootNode);
+                            return traverser.getShadowTree();
                         };
 
                         shadowTree.commit(transaction, {false, true});
-                        
                         stop = true;
                     });
 
