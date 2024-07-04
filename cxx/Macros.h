@@ -9,4 +9,4 @@
     ); \
 
 #define BIND_FN(fn) std::bind(&UnistylesRuntime::fn, this, std::placeholders::_1, std::placeholders::_2)
-#define BINF_FN_2(fn) std::bind(&StyleSheet::fn, this, std::placeholders::_1, std::placeholders::_2)
+#define MAP_FN(fn) std::bind(&StyleSheet::fn, this, std::placeholders::_1, std::placeholders::_2)

@@ -18,7 +18,7 @@ struct JSI_EXPORT StyleSheet : public jsi::HostObject {
     
     StyleSheet() {
         this->getters = {
-            {"create", BINF_FN_2(create)},
+            {"create", MAP_FN(create)},
         };
     }
     
