@@ -9,6 +9,7 @@ add_library(unistyles
     ../cxx/UnistylesImpl.cpp
     ../cxx/StyleSheet.cpp
     ../cxx/StyleSheetImpl.cpp
+    ../cxx/ShadowTreeTraverser.cpp
     ./src/main/cxx/cpp-adapter.cpp
     ./src/main/cxx/helpers.cpp
     ./src/main/cxx/platform.cpp
@@ -17,6 +18,8 @@ add_library(unistyles
 include_directories(
     ../cxx
 )
+
+string(APPEND CMAKE_CXX_FLAGS " -DFOLLY_NO_CONFIG")
 
 set_target_properties(unistyles PROPERTIES
     CXX_STANDARD 20
@@ -31,7 +34,6 @@ find_package(fbjni REQUIRED CONFIG)
 target_link_libraries(unistyles
     ReactAndroid::jsi
     ReactAndroid::turbomodulejsijni
-    ReactAndroid::folly_runtime
     ReactAndroid::react_nativemodule_core
     android
     fbjni::fbjni

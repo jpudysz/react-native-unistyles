@@ -31,12 +31,12 @@ if (isNewArchitectureEnabled()) {
 }
 
 android {
-    compileSdkVersion safeExtGet('compileSdkVersion', 33)
+    compileSdkVersion safeExtGet('compileSdkVersion', 34)
     namespace "com.unistyles"
 
     defaultConfig {
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
-        minSdkVersion safeExtGet('minSdkVersion', 21)
+        minSdkVersion safeExtGet('minSdkVersion', 23)
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_STL=c++_shared"

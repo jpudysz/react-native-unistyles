@@ -1,7 +1,6 @@
 #include "StyleSheet.h"
 #include <jsi/jsi.h>
 #include "ShadowTreeTraverser.h"
-#include <react/renderer/uimanager/UIManagerBinding.h>
 #include <react/renderer/uimanager/UIManager.h>
 
 using namespace facebook::react;
@@ -59,10 +58,10 @@ jsi::Value StyleSheet::create(jsi::Runtime& rt, std::string fnName) {
 
             return jsi::Value(nativeTag);
         });
-        
+
         auto removeNodeHostFn = HOST_FN("removeNode", 1, {
             auto nativeTag = arguments[0].asNumber();
-            
+
             return jsi::Value(nativeTag);
         });
 
