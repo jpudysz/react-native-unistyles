@@ -99,7 +99,12 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
 
         val insets = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
 
-        this.insets = Insets(statusBarTopInset, insets.bottom, insets.left, insets.right)
+        // reports inset bottom as 0 when keyboard is visible
+        // otherwise it will break other libraries that manipulates bottom insets
+        val imeInsets = insetsCompat.getInsets(WindowInsetsCompat.Type.ime())
+        val insetsBottom = if (imeInsets.bottom > 0) 0 else insets.bottom
+
+        this.insets = Insets(statusBarTopInset, insetsBottom, insets.left, insets.right)
     }
 
     fun getInsets(): Insets {
