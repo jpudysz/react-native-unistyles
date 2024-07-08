@@ -12,6 +12,26 @@ export class UnistylesMockedRuntime {
         this.unistylesRegistry = unistylesRegistry as unknown as UnistylesMockedRegistry
     }
 
+    public get miniRuntime() {
+        return {
+            contentSizeCategory: this.contentSizeCategory,
+            breakpoint: this.breakpoint,
+            screen: this.screen,
+            insets: this.insets,
+            statusBar: {
+                width: this.statusBar.width,
+                height: this.statusBar.height
+            },
+            navigationBar: {
+                width: this.navigationBar.width,
+                height: this.navigationBar.height
+            },
+            orientation: this.orientation,
+            pixelRatio: this.pixelRatio,
+            fontScale: this.fontScale
+        }
+    }
+
     public get colorScheme() {
         return 'dark'
     }
