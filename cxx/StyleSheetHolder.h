@@ -10,16 +10,19 @@ enum class StyleSheetType {
     ThemableWithMiniRuntime
 };
 
-class StyleSheetHolder {
+struct StyleSheetHolder {
     int tag;
     StyleSheetType type;
     jsi::Object value;
     folly::fbvector<Unistyle> styles {};
-    
-public:
+
     StyleSheetHolder(
         int tag,
         StyleSheetType type,
         jsi::Object value
-    ): tag{tag}, type{type}, value{std::move(value)} {}
+    ): tag{tag}, type{type}, value{std::move(value)} {
+        this->compute();
+    }
+    
+    void compute();
 };

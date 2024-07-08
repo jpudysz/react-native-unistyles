@@ -37,29 +37,10 @@ jsi::Value StyleSheet::create(jsi::Runtime& rt, std::string fnName) {
          jsi::PropNameID::forAscii(rt, "addConfig"),
          1,
          [this, &fnName](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
-        auto maybeStylesheet = arguments[0].getObject(rt);
-        jsi::Object& stylesheet = maybeStylesheet;
-             
-        styleSheetRegistry.add(std::move(stylesheet));
-
-        // todo testing dynamic functions
-        if (maybeStylesheet.isFunction(rt)) {
-            auto getCurrentThemeFn = rt.global().getProperty(rt, jsi::PropNameID::forUtf8(rt, "__UNISTYLES__GET_SELECTED_THEME__"));
-
-            if (getCurrentThemeFn.isUndefined()) {
-                // throw error
-                return jsi::Value::undefined();
-            }
-
-            auto theme = getCurrentThemeFn.asObject(rt).asFunction(rt).call(rt, jsi::String::createFromUtf8(rt, "light"));
-            auto miniRuntime = jsi::Object(rt);
-            miniRuntime.setProperty(rt, jsi::PropNameID::forUtf8(rt, "insets"), unistylesRuntime->getInsets(rt, ""));
-
-            stylesheet = maybeStylesheet.asFunction(rt).call(rt, std::move(theme), std::move(miniRuntime)).asObject(rt);
-        }
-
-        jsi::Array propertyNames = stylesheet.getPropertyNames(rt);
-        size_t length = propertyNames.size(rt);
+            auto stylesheet = arguments[0].getObject(rt);
+            int styleSheetTag = styleSheetRegistry.add(std::move(stylesheet));
+           jsi::Object parsedStyleSheet = styleSheetRegistry.parse(styleSheetTag);
+    
 
         jsi::Object styles(rt);
 
@@ -107,9 +88,13 @@ jsi::Value StyleSheet::create(jsi::Runtime& rt, std::string fnName) {
             return jsi::Value(nativeTag);
         });
 
+             
+         jsi::Array propertyNames = parsedStyleSheet.getPropertyNames(rt);
+         size_t length = propertyNames.size(rt);
+             
         for (size_t i = 0; i < length; i++) {
             auto propertyName = propertyNames.getValueAtIndex(rt, i).asString(rt).utf8(rt);
-            auto propertyValue = stylesheet.getProperty(rt, propertyName.c_str()).asObject(rt);
+            auto propertyValue = parsedStyleSheet.getProperty(rt, propertyName.c_str()).asObject(rt);
 
 
             defineFunctionProperty(rt, propertyValue, "addNode", addNodeHostFn);
@@ -138,26 +123,15 @@ folly::dynamic findInTheme(const folly::dynamic& theme, const std::vector<std::s
 }
 
 
-jsi::Value StyleSheet::addConfig(jsi::Runtime& rt, std::string fnName) {
+jsi::Value StyleSheet::configure(jsi::Runtime& rt, std::string fnName) {
     return jsi::Function::createFromHostFunction(
          rt,
-         jsi::PropNameID::forAscii(rt, "addConfig"),
+         jsi::PropNameID::forAscii(rt, "configure"),
          1,
          [this, &fnName](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
              auto config = arguments[0].asObject(rt);
 
-             // convenient way, but doesn't support functions
-             folly::dynamic dynamicConfig = jsi::dynamicFromValue(rt, jsi::Value(rt, config));
-             folly::dynamic themes = dynamicConfig["themes"];
-
-
-             if (themes.isObject()) {
-                 for (const auto& pair : themes.items()) {
-                     std::string themeName = pair.first.asString();
-                     folly::dynamic theme = pair.second;
-                     std::string typography = findInTheme(theme, {"colors", "typography"}).asString();
-                 }
-             }
+            // todo
 
              return jsi::Value::undefined();
         });
