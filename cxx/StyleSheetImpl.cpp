@@ -39,6 +39,8 @@ jsi::Value StyleSheet::create(jsi::Runtime& rt, std::string fnName) {
          [this, &fnName](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
         auto maybeStylesheet = arguments[0].getObject(rt);
         jsi::Object& stylesheet = maybeStylesheet;
+             
+        styleSheetRegistry.add(std::move(stylesheet));
 
         // todo testing dynamic functions
         if (maybeStylesheet.isFunction(rt)) {
@@ -50,8 +52,10 @@ jsi::Value StyleSheet::create(jsi::Runtime& rt, std::string fnName) {
             }
 
             auto theme = getCurrentThemeFn.asObject(rt).asFunction(rt).call(rt, jsi::String::createFromUtf8(rt, "light"));
+            auto miniRuntime = jsi::Object(rt);
+            miniRuntime.setProperty(rt, jsi::PropNameID::forUtf8(rt, "insets"), unistylesRuntime->getInsets(rt, ""));
 
-            stylesheet = maybeStylesheet.asFunction(rt).call(rt, std::move(theme)).asObject(rt);
+            stylesheet = maybeStylesheet.asFunction(rt).call(rt, std::move(theme), std::move(miniRuntime)).asObject(rt);
         }
 
         jsi::Array propertyNames = stylesheet.getPropertyNames(rt);

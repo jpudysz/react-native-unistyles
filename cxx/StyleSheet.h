@@ -1,7 +1,9 @@
 #pragma once
 
 #include <jsi/jsi.h>
+#include "UnistylesRuntime.h"
 #include "Macros.h"
+#include "StyleSheetRegistry.h"
 #include <map>
 
 using namespace facebook;
@@ -16,11 +18,13 @@ struct JSI_EXPORT StyleSheet : public jsi::HostObject {
         this->updateView = callback;
     }
     
-    StyleSheet() {
+    StyleSheet(jsi::Runtime& rt, std::shared_ptr<UnistylesRuntime> unistylesRuntime): styleSheetRegistry(rt) {
         this->getters = {
             {"create", MAP_FN(create)},
             {"addConfig", MAP_FN(addConfig)},
         };
+        
+        this->unistylesRuntime = unistylesRuntime;
     }
     
     jsi::Value create(jsi::Runtime&, std::string);
@@ -33,4 +37,6 @@ struct JSI_EXPORT StyleSheet : public jsi::HostObject {
 private:
     std::map<std::string, Getter> getters;
     std::map<std::string, Setter> setters;
+    std::shared_ptr<UnistylesRuntime> unistylesRuntime;
+    StyleSheetRegistry styleSheetRegistry;
 };

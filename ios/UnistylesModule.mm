@@ -65,7 +65,7 @@ void registerUnistylesHostObject(RCTBridge* bridge, UnistylesModule* weakSelf) {
     jsi::Runtime* runtime = reinterpret_cast<jsi::Runtime*>(bridge.runtime);
     
     auto unistylesRuntime = std::make_shared<UnistylesRuntime>(*runtime, callInvoker);
-    auto styleSheet = std::make_shared<StyleSheet>();
+    auto styleSheet = std::make_shared<StyleSheet>(*runtime, unistylesRuntime);
 
     [weakSelf.platform makeShared:unistylesRuntime.get()];
 
