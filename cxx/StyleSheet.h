@@ -18,17 +18,17 @@ struct JSI_EXPORT StyleSheet : public jsi::HostObject {
         this->updateView = callback;
     }
     
-    StyleSheet(jsi::Runtime& rt, std::shared_ptr<UnistylesRuntime> unistylesRuntime): styleSheetRegistry(rt) {
+    StyleSheet(jsi::Runtime& rt, std::shared_ptr<UnistylesRuntime> unistylesRuntime): styleSheetRegistry(rt, unistylesRuntime) {
         this->getters = {
             {"create", MAP_FN(create)},
-            {"addConfig", MAP_FN(addConfig)},
+            {"configure", MAP_FN(configure)},
         };
         
         this->unistylesRuntime = unistylesRuntime;
     }
     
     jsi::Value create(jsi::Runtime&, std::string);
-    jsi::Value addConfig(jsi::Runtime&, std::string);
+    jsi::Value configure(jsi::Runtime&, std::string);
     
     jsi::Value get(jsi::Runtime&, const jsi::PropNameID&) override;
     void set(jsi::Runtime&, const jsi::PropNameID&, const jsi::Value&) override;

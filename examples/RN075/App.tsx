@@ -13,7 +13,7 @@ const sharedColors = {
 }
 
 // todo extend me
-StyleSheet.addConfig({
+StyleSheet.configure({
     themes: {
         light: {
             colors: {
@@ -39,7 +39,7 @@ export const App = () => {
 
     return (
         <View
-            // style={styles.container}
+            style={styles.container}
             ref={ref => {
                 if (ref) {
                     console.log(ref.__nativeTag)
@@ -48,7 +48,7 @@ export const App = () => {
             }}
         >
             <Text
-                // style={styles.text}
+                style={styles.text}
                 ref={ref => {
                     if (ref) {
                         console.log(ref.__nativeTag)

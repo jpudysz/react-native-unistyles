@@ -9,5 +9,5 @@ const create = <S extends StyleSheetWithSuperPowers>(stylesheet: S): S => styles
 
 export type UnistylesStyleSheet = {
     create: typeof create,
-    addConfig(config: UnistylesConfig): void
+    configure(config: UnistylesConfig): void
 }
