@@ -9,8 +9,8 @@ using namespace facebook;
 struct StyleSheetRegistry {
     StyleSheetRegistry(jsi::Runtime& rt, std::shared_ptr<UnistylesRuntime> unistylesRuntime): rt{rt}, unistylesRuntime{unistylesRuntime} {}
     
-    int add(jsi::Object styleSheet);
-    jsi::Object parse(int styleSheetTag);
+    StyleSheetHolder& add(jsi::Object styleSheet);
+    jsi::Object parse(StyleSheetHolder& styleSheet);
     
 private:
     jsi::Value getCurrentTheme();

@@ -40,13 +40,13 @@ void StyleSheetRegistry::addStyleSheetFunction(jsi::Function styleSheetFunction,
     return;
 }
 
-int StyleSheetRegistry::add(jsi::Object styleSheet) {
+StyleSheetHolder& StyleSheetRegistry::add(jsi::Object styleSheet) {
     static int tag = 0;
     
     if (styleSheet.isFunction(rt)) {
         addStyleSheetFunction(styleSheet.asFunction(rt), ++tag);
     
-        return tag;
+        return this->styleSheets.back();
     }
     
     // stylesheet is static
@@ -57,7 +57,7 @@ int StyleSheetRegistry::add(jsi::Object styleSheet) {
     };
     this->styleSheets.push_back(std::move(st));
     
-    return tag;
+    return this->styleSheets.back();
 }
 
 jsi::Value StyleSheetRegistry::getCurrentTheme() {
@@ -69,7 +69,10 @@ jsi::Value StyleSheetRegistry::getCurrentTheme() {
         return jsi::Value::undefined();
     }
 
-    auto theme = getCurrentThemeFn.asObject(rt).asFunction(rt).call(rt, jsi::String::createFromUtf8(rt, unistylesRuntime->themeName));
+    auto theme = getCurrentThemeFn
+        .asObject(rt)
+        .asFunction(rt)
+        .call(rt, jsi::String::createFromUtf8(rt, unistylesRuntime->themeName));
     
     return theme;
 }
@@ -77,32 +80,21 @@ jsi::Value StyleSheetRegistry::getCurrentTheme() {
 jsi::Value StyleSheetRegistry::getMiniRuntime() {
     auto miniRuntime = jsi::Object(rt);
 
-    // todo extend me!
+    // todo extend me to equal mini runtime!
     // todo make fn name optional
     miniRuntime.setProperty(rt, jsi::PropNameID::forUtf8(rt, "insets"), unistylesRuntime->getInsets(rt, ""));
     
     return miniRuntime;
 }
 
-jsi::Object StyleSheetRegistry::parse(int styleSheetTag) {
-    auto it = std::find_if(styleSheets.rbegin(), styleSheets.rend(), [styleSheetTag](StyleSheetHolder& st){
-        return st.tag == styleSheetTag;
-    });
-    
-    if (it != styleSheets.rbegin()) {
-        // todo throw error
-        
-        return jsi::Object(rt);
+jsi::Object StyleSheetRegistry::parse(StyleSheetHolder& styleSheet) {
+    // nothing to do here
+    if (styleSheet.type == StyleSheetType::Static) {
+        return jsi::Value(rt, styleSheet.value).asObject(rt);
     }
     
-    auto styleSheet = it.base() - 1;
-
-    // sorry pal, nothing to do here
-    if (styleSheet->type == StyleSheetType::Static) {
-        return jsi::Value(rt, styleSheet->value).asObject(rt);
-    }
-    
-    // first stylesheet may have empty theme na runtime
+    // first iteration may have empty theme and runtime
+    // also, we had to wait for user selection
     if (currentTheme.isUndefined()) {
         currentTheme = getCurrentTheme();
     }
@@ -111,7 +103,10 @@ jsi::Object StyleSheetRegistry::parse(int styleSheetTag) {
         miniRuntime = getMiniRuntime();
     }
     
-    auto parsedStyleSheet = styleSheet->value.asFunction(rt).call(rt, std::move(currentTheme), std::move(miniRuntime)).asObject(rt);
+    auto parsedStyleSheet = styleSheet.value.asFunction(rt).call(rt, std::move(currentTheme), std::move(miniRuntime)).asObject(rt);
+    
+    styleSheet.compute(rt, parsedStyleSheet);
     
     return parsedStyleSheet;
 }
+
