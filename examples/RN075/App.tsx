@@ -34,43 +34,51 @@ StyleSheet.addConfig({
     } as UnistylesThemes
 })
 
-export const App = () => (
-    <View
-        // style={styles.container}
-        ref={ref => {
-            if (ref) {
-                console.log(ref.__nativeTag)
-                styles.container.addNode(ref.__nativeTag)
-            }
-        }}
-    >
-        <Text
-            // style={styles.text}
+export const App = () => {
+    console.log(`Dynamic function:${JSON.stringify(styles.dynamicText(10))}`)
+
+    return (
+        <View
+            // style={styles.container}
             ref={ref => {
                 if (ref) {
                     console.log(ref.__nativeTag)
-                    console.log(ref._viewConfig.uiViewClassName)
-                    // styles.text.addNode(ref.__nativeTag)
+                    styles.container.addNode(ref.__nativeTag)
                 }
             }}
         >
-            Hello world from RN 0.75
-        </Text>
-    </View>
-)
+            <Text
+                // style={styles.text}
+                ref={ref => {
+                    if (ref) {
+                        console.log(ref.__nativeTag)
+                        console.log(ref._viewConfig.uiViewClassName)
+                        // styles.text.addNode(ref.__nativeTag)
+                    }
+                }}
+            >
+                Hello world from RN 0.75
+            </Text>
+        </View>
+    )
+}
 
-const styles = StyleSheet.create(theme => {
+const styles = StyleSheet.create((theme, rt) => {
     const result = {
         container: {
             flex: 1,
             justifyContent: 'center',
             alignItems: 'center',
+            paddingBottom: rt.insets.bottom,
             paddingHorizontal: theme.gap(2)
         },
         text: {
             fontSize: 20,
             fontWeight: 'bold'
-        }
+        },
+        dynamicText: (paddingLeft: number) => ({
+            paddingLeft: rt.insets.bottom + paddingLeft
+        })
     }
 
     console.log(result)
