@@ -3,6 +3,7 @@
 #include <jsi/jsi.h>
 #include "UnistylesRuntime.h"
 #include "Macros.h"
+#include "Helpers.h"
 #include "StyleSheetRegistry.h"
 #include <map>
 

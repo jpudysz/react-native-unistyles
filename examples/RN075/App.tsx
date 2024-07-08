@@ -41,19 +41,22 @@ export const App = () => {
         <View
             style={styles.container}
             ref={ref => {
-                if (ref) {
-                    console.log(ref.__nativeTag)
-                    styles.container.addNode(ref.__nativeTag)
+                console.log(ref.__nativeTag)
+                styles.container.addNode(ref.__nativeTag)
+
+                return () => {
+                    styles.container.removeNode(ref.__nativeTag)
                 }
             }}
         >
             <Text
                 style={styles.text}
                 ref={ref => {
-                    if (ref) {
-                        console.log(ref.__nativeTag)
-                        console.log(ref._viewConfig.uiViewClassName)
-                        // styles.text.addNode(ref.__nativeTag)
+                    console.log(ref.__nativeTag)
+                    console.log(ref._viewConfig.uiViewClassName)
+
+                    return () => {
+                        styles.container.removeNode(ref.__nativeTag)
                     }
                 }}
             >

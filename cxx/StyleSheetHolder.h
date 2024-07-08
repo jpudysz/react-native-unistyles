@@ -1,5 +1,6 @@
 #include <folly/FBVector.h>
 #include <jsi/jsi.h>
+#include <jsi/JSIDynamic.h>
 #include "Unistyle.h"
 
 using namespace facebook;
@@ -20,9 +21,7 @@ struct StyleSheetHolder {
         int tag,
         StyleSheetType type,
         jsi::Object value
-    ): tag{tag}, type{type}, value{std::move(value)} {
-        this->compute();
-    }
+    ): tag{tag}, type{type}, value{std::move(value)} {}
     
-    void compute();
+    void compute(jsi::Runtime&, jsi::Object&);
 };
