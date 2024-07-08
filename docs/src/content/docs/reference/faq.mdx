@@ -74,6 +74,11 @@ Before submitting an issue, verify insets reported by Unistyles **with and witho
 
 3. `react-native-avoid-softinput` with `setShouldMimicIOSBehavior` as reported [here](https://github.com/mateusz1913/react-native-avoid-softinput/issues/200#issuecomment-2007527099)
 
+4. `react-native-reanimated` with `useAnimatedKeyboard`
+
+    You must set `isStatusBarTranslucent` to `true` in your `useAnimatedKeyboard` [hook](https://docs.swmansion.com/react-native-reanimated/docs/device/useAnimatedKeyboard#arguments)
+    as keeping default value will interfere with Unistyles.
+
 </Steps>
 
 ### I'm getting some TypeScript error for my stylesheet
