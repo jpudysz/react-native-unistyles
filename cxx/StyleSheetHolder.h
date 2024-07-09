@@ -4,6 +4,7 @@
 #include <jsi/jsi.h>
 #include <jsi/JSIDynamic.h>
 #include "Unistyle.h"
+#include "Helpers.h"
 
 using namespace facebook;
 
@@ -25,5 +26,5 @@ struct StyleSheetHolder {
         jsi::Object value
     ): tag{tag}, type{type}, value{std::move(value)} {}
     
-    void compute(jsi::Runtime&, jsi::Object&);
+    void parseStyles(jsi::Runtime&, jsi::Object&);
 };

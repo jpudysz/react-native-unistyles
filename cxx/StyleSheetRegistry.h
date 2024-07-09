@@ -6,6 +6,7 @@
 #include "StyleSheetHolder.h"
 #include "UnistylesRuntime.h"
 #include "Helpers.h"
+#include "Consts.h"
 
 using namespace facebook;
 
@@ -13,7 +14,7 @@ struct StyleSheetRegistry {
     StyleSheetRegistry(jsi::Runtime& rt, std::shared_ptr<UnistylesRuntime> unistylesRuntime): rt{rt}, unistylesRuntime{unistylesRuntime} {}
     
     StyleSheetHolder& add(jsi::Object);
-    jsi::Object parse(StyleSheetHolder&);
+    jsi::Object dereferenceStyleSheet(StyleSheetHolder&);
     
 private:
     jsi::Value getCurrentTheme();

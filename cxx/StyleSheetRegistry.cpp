@@ -87,8 +87,8 @@ jsi::Value StyleSheetRegistry::getMiniRuntime() {
     return miniRuntime;
 }
 
-jsi::Object StyleSheetRegistry::parse(StyleSheetHolder& styleSheet) {
-    // nothing to do here
+jsi::Object StyleSheetRegistry::dereferenceStyleSheet(StyleSheetHolder& styleSheet) {
+    // nothing to do here, stylesheet is already an object
     if (styleSheet.type == StyleSheetType::Static) {
         return jsi::Value(rt, styleSheet.value).asObject(rt);
     }
@@ -103,79 +103,67 @@ jsi::Object StyleSheetRegistry::parse(StyleSheetHolder& styleSheet) {
         miniRuntime = getMiniRuntime();
     }
 
+    // dereference from function
     auto parsedStyleSheet = styleSheet
         .value
         .asFunction(rt)
         .call(rt, std::move(currentTheme), std::move(miniRuntime)).asObject(rt);
 
-    styleSheet.compute(rt, parsedStyleSheet);
+    styleSheet.parseStyles(rt, parsedStyleSheet);
 
     return wrapInHostFunction(styleSheet, parsedStyleSheet);
 }
 
+// Function wraps any dynamic function with proxy to memoize the last arguments
+// it also moves the original function to new object's key and uses host function as the replacement for the original one
 jsi::Object StyleSheetRegistry::wrapInHostFunction(StyleSheetHolder& holder, jsi::Object& stylesheet) {
-    jsi::Array propertyNames = stylesheet.getPropertyNames(rt);
-    size_t length = propertyNames.size(rt);
-
-    for (size_t i = 0; i < length; i++) {
-        auto propertyName = propertyNames.getValueAtIndex(rt, i).asString(rt).utf8(rt);
-        auto propertyValue = stylesheet.getProperty(rt, propertyName.c_str()).asObject(rt);
-
+    unistyles::helpers::enumerateJSIObject(rt, stylesheet, [&](const std::string& propertyName, jsi::Object& propertyValue){
         if (!propertyValue.isFunction(rt)) {
-            continue;
+            return;
         }
 
-        auto hostFn = jsi::Function::createFromHostFunction(
-            rt,
-            jsi::PropNameID::forAscii(rt, propertyName),
-            1,
-            [this, propertyName, &propertyValue, &holder, &stylesheet](
-                jsi::Runtime &rt,
-                const jsi::Value &thisVal,
-                const jsi::Value *arguments,
-                size_t count
-            ) -> jsi::Value {
-                // call proxy function
-                auto result = thisVal
-                    .asObject(rt)
-                    .getProperty(rt, ("__unistyles__proxy_" + propertyName).c_str())
-                    .asObject(rt)
-                    .asFunction(rt)
-                    .call(rt, arguments, count);
+        // proxy function
+        auto hostFn = unistyles::helpers::createHostFunction(rt, propertyName, 1, [&, propertyName](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count){
+            // call original function function
+            auto result = thisVal
+                .asObject(rt)
+                .getProperty(rt, jsi::String::createFromUtf8(rt, PROXY_FN_PREFIX + propertyName))
+                .asObject(rt)
+                .asFunction(rt)
+                .call(rt, arguments, count);
 
-                auto it = std::find_if(
-                    holder.styles.begin(),
-                    holder.styles.end(),
-                    [&propertyName](const Unistyle& style) {
-                        return style.name == propertyName;
-                    }
-                );
-
-                // already there, just update metadata
-                if (it != holder.styles.end()) {
-                    it->count = count;
-                    it->arguments = jsi::dynamicFromValue(rt, arguments);
-
-                    return result;
+            auto it = std::find_if(
+                holder.styles.begin(),
+                holder.styles.end(),
+                [&propertyName](const Unistyle& style) {
+                    return style.name == propertyName;
                 }
+            );
 
-                // todo get it from babel
-                folly::fbvector<StyleDependencies> deps {StyleDependencies::Theme, StyleDependencies::Screen};
-                folly::dynamic parsedStyle = jsi::dynamicFromValue(rt, result);
-                Unistyle style = {UnistyleType::DynamicFunction, propertyName, parsedStyle, deps};
-
-                style.count = count;
-                style.arguments = jsi::dynamicFromValue(rt, arguments);
-
-                holder.styles.push_back(std::move(style));
+            // styles have been already created, just update metadata
+            if (it != holder.styles.end()) {
+                it->count = count;
+                it->arguments = jsi::dynamicFromValue(rt, arguments);
 
                 return result;
             }
-        );
 
-        unistyles::helpers::defineFunctionProperty(rt, stylesheet, "__unistyles__proxy_" + propertyName, std::move(propertyValue));
+            // todo get it from babel
+            folly::fbvector<StyleDependencies> deps {StyleDependencies::Theme, StyleDependencies::Screen};
+            folly::dynamic parsedStyle = jsi::dynamicFromValue(rt, result);
+            Unistyle style = {UnistyleType::DynamicFunction, propertyName, parsedStyle, deps};
+
+            style.count = count;
+            style.arguments = jsi::dynamicFromValue(rt, arguments);
+
+            holder.styles.push_back(std::move(style));
+
+            return result;
+        });
+
+        unistyles::helpers::defineFunctionProperty(rt, stylesheet, PROXY_FN_PREFIX + propertyName, std::move(propertyValue));
         stylesheet.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), hostFn);
-    }
+    });
 
     return std::move(stylesheet);
 }
