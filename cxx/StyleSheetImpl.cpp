@@ -12,7 +12,7 @@ jsi::Value StyleSheet::create(jsi::Runtime& rt, std::string fnName) {
         [this, &fnName](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) -> jsi::Value {
             auto stylesheet = arguments[0].getObject(rt);
             auto& addedStyleSheet = styleSheetRegistry.add(std::move(stylesheet));
-            auto parsedStyleSheet = styleSheetRegistry.parse(addedStyleSheet);
+            auto parsedStyleSheet = styleSheetRegistry.dereferenceStyleSheet(addedStyleSheet);
 
             jsi::Array propertyNames = parsedStyleSheet.getPropertyNames(rt);
             size_t length = propertyNames.size(rt);
