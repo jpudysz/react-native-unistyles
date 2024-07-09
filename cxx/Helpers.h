@@ -1,6 +1,7 @@
 #pragma once
 
 #include <jsi/jsi.h>
+#include "Consts.h"
 
 using namespace facebook;
 
@@ -21,13 +22,13 @@ void defineFunctionProperty(facebook::jsi::Runtime& rt, facebook::jsi::Object& o
     defineProperty.call(rt, object, facebook::jsi::String::createFromAscii(rt, propName.c_str()), descriptor);
 }
 
-void enumerateJSIObject(jsi::Runtime& rt, const jsi::Object& obj, std::function<void(const std::string& propertyName, jsi::Object& propertyValue)> callback) {
+void enumerateJSIObject(jsi::Runtime& rt, const jsi::Object& obj, std::function<void(const std::string& propertyName, jsi::Value& propertyValue)> callback) {
     jsi::Array propertyNames = obj.getPropertyNames(rt);
     size_t length = propertyNames.size(rt);
 
     for (size_t i = 0; i < length; i++) {
         auto propertyName = propertyNames.getValueAtIndex(rt, i).asString(rt).utf8(rt);
-        auto propertyValue = obj.getProperty(rt, propertyName.c_str()).asObject(rt);
+        auto propertyValue = obj.getProperty(rt, propertyName.c_str());
 
         callback(propertyName, propertyValue);
     }
@@ -48,5 +49,19 @@ auto createHostFunction(
         std::move(callback)
     );
 }
+
+// todo extend me
+static StyleDependencies getDependencyForString(const std::string& dep) {
+    if (dep == "$0") {
+        return StyleDependencies::Theme;
+    }
+    
+    if (dep == "$1") {
+        return StyleDependencies::Insets;
+    }
+    
+    return StyleDependencies::Noop;
+}
+
 
 }
