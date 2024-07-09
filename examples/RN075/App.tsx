@@ -78,14 +78,17 @@ const styles = StyleSheet.create((theme, rt) => {
             justifyContent: 'center',
             alignItems: 'center',
             paddingBottom: rt.insets.bottom,
-            paddingHorizontal: theme.gap(2)
+            paddingHorizontal: theme.gap(2),
+            __unistyles__dependencies_: ['$0', '$1']
         },
         text: {
             fontSize: 20,
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            __unistyles__dependencies_: []
         },
         dynamicText: (paddingLeft: number) => ({
-            paddingLeft: rt.insets.bottom + paddingLeft
+            paddingLeft: rt.insets.bottom + paddingLeft,
+            __unistyles__dependencies_: ['$1']
         })
     }
 

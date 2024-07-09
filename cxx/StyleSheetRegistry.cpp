@@ -117,8 +117,10 @@ jsi::Object StyleSheetRegistry::dereferenceStyleSheet(StyleSheetHolder& styleShe
 // Function wraps any dynamic function with proxy to memoize the last arguments
 // it also moves the original function to new object's key and uses host function as the replacement for the original one
 jsi::Object StyleSheetRegistry::wrapInHostFunction(StyleSheetHolder& holder, jsi::Object& stylesheet) {
-    unistyles::helpers::enumerateJSIObject(rt, stylesheet, [&](const std::string& propertyName, jsi::Object& propertyValue){
-        if (!propertyValue.isFunction(rt)) {
+    jsi::Object mergedStyles = jsi::Object(rt);
+
+    unistyles::helpers::enumerateJSIObject(rt, stylesheet, [&](const std::string& propertyName, jsi::Value& propertyValue){
+        if (!propertyValue.asObject(rt).isFunction(rt)) {
             return;
         }
 
@@ -142,28 +144,26 @@ jsi::Object StyleSheetRegistry::wrapInHostFunction(StyleSheetHolder& holder, jsi
 
             // styles have been already created, just update metadata
             if (it != holder.styles.end()) {
-                it->count = count;
-                it->arguments = jsi::dynamicFromValue(rt, arguments);
+                it->addDynamicFunctionMetadata(count, jsi::dynamicFromValue(rt, arguments));
 
                 return result;
             }
 
-            // todo get it from babel
-            folly::fbvector<StyleDependencies> deps {StyleDependencies::Theme, StyleDependencies::Screen};
-            folly::dynamic parsedStyle = jsi::dynamicFromValue(rt, result);
-            Unistyle style = {UnistyleType::DynamicFunction, propertyName, parsedStyle, deps};
-
-            style.count = count;
-            style.arguments = jsi::dynamicFromValue(rt, arguments);
-
-            holder.styles.push_back(std::move(style));
-
-            return result;
+            Unistyle unistyle = {rt, UnistyleType::DynamicFunction, propertyName, std::move(result)};
+            
+            unistyle.addDynamicFunctionMetadata(count, jsi::dynamicFromValue(rt, arguments));
+            holder.styles.push_back(std::move(unistyle));
+ 
+            return jsi::Value(rt, holder.styles.back().style);
         });
 
-        unistyles::helpers::defineFunctionProperty(rt, stylesheet, PROXY_FN_PREFIX + propertyName, std::move(propertyValue));
-        stylesheet.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), hostFn);
+        unistyles::helpers::defineFunctionProperty(rt, mergedStyles, PROXY_FN_PREFIX + propertyName, std::move(propertyValue));
+        mergedStyles.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), hostFn);
     });
+    
+    for (const auto& unistyle : holder.styles) {
+        mergedStyles.setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle.name), unistyle.style);
+    }
 
-    return std::move(stylesheet);
+    return mergedStyles;
 }
