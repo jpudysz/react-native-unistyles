@@ -13,12 +13,6 @@ using Getter = std::function<jsi::Value(jsi::Runtime& rt, std::string)>;
 using Setter = std::function<std::optional<jsi::Value>(jsi::Runtime& rt, const jsi::Value&)>;
 
 struct JSI_EXPORT StyleSheet : public jsi::HostObject {
-    std::function<void(int nativeTag)> updateView;
-    
-    void setOnViewUpdate(std::function<void(int nativeTag)> callback) {
-        this->updateView = callback;
-    }
-    
     StyleSheet(jsi::Runtime& rt, std::shared_ptr<UnistylesRuntime> unistylesRuntime): styleSheetRegistry(rt, unistylesRuntime) {
         this->getters = {
             {"create", MAP_FN(create)},

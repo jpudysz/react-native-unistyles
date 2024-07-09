@@ -6,17 +6,17 @@ void StyleSheetRegistry::addStyleSheetFunction(jsi::Function styleSheetFunction,
     // stylesheet is still static, remove the function
     if (numberOfArgs == 0) {
         auto staticStylesheet = styleSheetFunction.call(rt).asObject(rt);
-        
+
         StyleSheetHolder st {
             nextTag,
             StyleSheetType::Static,
             std::move(staticStylesheet)
         };
         this->styleSheets.push_back(std::move(st));
-        
+
         return;
     }
-    
+
     // stylesheet depends only on theme
     if (numberOfArgs == 1) {
         StyleSheetHolder st {
@@ -25,10 +25,10 @@ void StyleSheetRegistry::addStyleSheetFunction(jsi::Function styleSheetFunction,
             std::move(styleSheetFunction)
         };
         this->styleSheets.push_back(std::move(st));
-        
+
         return;
     }
-    
+
     // stylesheet depends on theme and mini runtime
     StyleSheetHolder st {
         nextTag,
@@ -36,19 +36,19 @@ void StyleSheetRegistry::addStyleSheetFunction(jsi::Function styleSheetFunction,
         std::move(styleSheetFunction)
     };
     this->styleSheets.push_back(std::move(st));
-    
+
     return;
 }
 
 StyleSheetHolder& StyleSheetRegistry::add(jsi::Object styleSheet) {
     static int tag = 0;
-    
+
     if (styleSheet.isFunction(rt)) {
         addStyleSheetFunction(styleSheet.asFunction(rt), ++tag);
-    
+
         return this->styleSheets.back();
     }
-    
+
     // stylesheet is static
     StyleSheetHolder st {
         ++tag,
@@ -56,7 +56,7 @@ StyleSheetHolder& StyleSheetRegistry::add(jsi::Object styleSheet) {
         std::move(styleSheet)
     };
     this->styleSheets.push_back(std::move(st));
-    
+
     return this->styleSheets.back();
 }
 
@@ -73,7 +73,7 @@ jsi::Value StyleSheetRegistry::getCurrentTheme() {
         .asObject(rt)
         .asFunction(rt)
         .call(rt, jsi::String::createFromUtf8(rt, unistylesRuntime->themeName));
-    
+
     return theme;
 }
 
@@ -83,7 +83,7 @@ jsi::Value StyleSheetRegistry::getMiniRuntime() {
     // todo extend me to equal mini runtime!
     // todo make fn name optional
     miniRuntime.setProperty(rt, jsi::PropNameID::forUtf8(rt, "insets"), unistylesRuntime->getInsets(rt, ""));
-    
+
     return miniRuntime;
 }
 
@@ -92,21 +92,90 @@ jsi::Object StyleSheetRegistry::parse(StyleSheetHolder& styleSheet) {
     if (styleSheet.type == StyleSheetType::Static) {
         return jsi::Value(rt, styleSheet.value).asObject(rt);
     }
-    
+
     // first iteration may have empty theme and runtime
     // also, we had to wait for user selection
     if (currentTheme.isUndefined()) {
         currentTheme = getCurrentTheme();
     }
-    
+
     if (miniRuntime.isUndefined()) {
         miniRuntime = getMiniRuntime();
     }
-    
-    auto parsedStyleSheet = styleSheet.value.asFunction(rt).call(rt, std::move(currentTheme), std::move(miniRuntime)).asObject(rt);
-    
+
+    auto parsedStyleSheet = styleSheet
+        .value
+        .asFunction(rt)
+        .call(rt, std::move(currentTheme), std::move(miniRuntime)).asObject(rt);
+
     styleSheet.compute(rt, parsedStyleSheet);
-    
-    return parsedStyleSheet;
+
+    return wrapInHostFunction(styleSheet, parsedStyleSheet);
 }
 
+jsi::Object StyleSheetRegistry::wrapInHostFunction(StyleSheetHolder& holder, jsi::Object& stylesheet) {
+    jsi::Array propertyNames = stylesheet.getPropertyNames(rt);
+    size_t length = propertyNames.size(rt);
+
+    for (size_t i = 0; i < length; i++) {
+        auto propertyName = propertyNames.getValueAtIndex(rt, i).asString(rt).utf8(rt);
+        auto propertyValue = stylesheet.getProperty(rt, propertyName.c_str()).asObject(rt);
+
+        if (!propertyValue.isFunction(rt)) {
+            continue;
+        }
+
+        auto hostFn = jsi::Function::createFromHostFunction(
+            rt,
+            jsi::PropNameID::forAscii(rt, propertyName),
+            1,
+            [this, propertyName, &propertyValue, &holder, &stylesheet](
+                jsi::Runtime &rt,
+                const jsi::Value &thisVal,
+                const jsi::Value *arguments,
+                size_t count
+            ) -> jsi::Value {
+                // call proxy function
+                auto result = thisVal
+                    .asObject(rt)
+                    .getProperty(rt, ("__unistyles__proxy_" + propertyName).c_str())
+                    .asObject(rt)
+                    .asFunction(rt)
+                    .call(rt, arguments, count);
+
+                auto it = std::find_if(
+                    holder.styles.begin(),
+                    holder.styles.end(),
+                    [&propertyName](const Unistyle& style) {
+                        return style.name == propertyName;
+                    }
+                );
+
+                // already there, just update metadata
+                if (it != holder.styles.end()) {
+                    it->count = count;
+                    it->arguments = jsi::dynamicFromValue(rt, arguments);
+
+                    return result;
+                }
+
+                // todo get it from babel
+                folly::fbvector<StyleDependencies> deps {StyleDependencies::Theme, StyleDependencies::Screen};
+                folly::dynamic parsedStyle = jsi::dynamicFromValue(rt, result);
+                Unistyle style = {UnistyleType::DynamicFunction, propertyName, parsedStyle, deps};
+
+                style.count = count;
+                style.arguments = jsi::dynamicFromValue(rt, arguments);
+
+                holder.styles.push_back(std::move(style));
+
+                return result;
+            }
+        );
+
+        unistyles::helpers::defineFunctionProperty(rt, stylesheet, "__unistyles__proxy_" + propertyName, std::move(propertyValue));
+        stylesheet.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), hostFn);
+    }
+
+    return std::move(stylesheet);
+}

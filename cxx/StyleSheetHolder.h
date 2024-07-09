@@ -1,3 +1,5 @@
+#pragma once
+
 #include <folly/FBVector.h>
 #include <jsi/jsi.h>
 #include <jsi/JSIDynamic.h>

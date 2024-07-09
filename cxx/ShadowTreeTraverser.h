@@ -1,3 +1,5 @@
+#pragma once
+
 #include <numeric>
 #include <jsi/jsi.h>
 #include <react/renderer/uimanager/UIManagerBinding.h>

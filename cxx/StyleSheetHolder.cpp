@@ -9,7 +9,7 @@ void StyleSheetHolder::compute(jsi::Runtime& rt, jsi::Object& stylesheet) {
         auto propertyName = propertyNames.getValueAtIndex(rt, i).asString(rt).utf8(rt);
         auto propertyValue = stylesheet.getProperty(rt, propertyName.c_str()).asObject(rt);
         
-        // todo handle host function
+        // dynamic functions are handled in the next step
         if (propertyValue.isFunction(rt)) {
             continue;
         }
@@ -19,7 +19,7 @@ void StyleSheetHolder::compute(jsi::Runtime& rt, jsi::Object& stylesheet) {
         // todo get it from babel
         folly::fbvector<StyleDependencies> deps {StyleDependencies::Theme, StyleDependencies::Screen};
         
-        Unistyle style = {propertyName, parsedStyle, deps};
+        Unistyle style = {UnistyleType::Object, propertyName, parsedStyle, deps};
         
         this->styles.push_back(std::move(style));
     }
