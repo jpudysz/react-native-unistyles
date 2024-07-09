@@ -1,21 +1,25 @@
+#pragma once
+
 #include <folly/FBVector.h>
 #include <folly/dynamic.h>
 #include <jsi/jsi.h>
 #include "StyleSheetHolder.h"
 #include "UnistylesRuntime.h"
+#include "Helpers.h"
 
 using namespace facebook;
 
 struct StyleSheetRegistry {
     StyleSheetRegistry(jsi::Runtime& rt, std::shared_ptr<UnistylesRuntime> unistylesRuntime): rt{rt}, unistylesRuntime{unistylesRuntime} {}
     
-    StyleSheetHolder& add(jsi::Object styleSheet);
-    jsi::Object parse(StyleSheetHolder& styleSheet);
+    StyleSheetHolder& add(jsi::Object);
+    jsi::Object parse(StyleSheetHolder&);
     
 private:
     jsi::Value getCurrentTheme();
     jsi::Value getMiniRuntime();
-    void addStyleSheetFunction(jsi::Function styleSheetFunction, int nextTag);
+    jsi::Object wrapInHostFunction(StyleSheetHolder&, jsi::Object&);
+    void addStyleSheetFunction(jsi::Function, int);
     
     jsi::Runtime& rt;
     jsi::Value currentTheme;

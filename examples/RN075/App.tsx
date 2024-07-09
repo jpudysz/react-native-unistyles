@@ -1,5 +1,5 @@
-import React from 'react'
-import { View, Text } from 'react-native'
+import React, { useState } from 'react'
+import { View, Text, Button } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 import type { UnistylesThemes } from 'react-native-unistyles'
 
@@ -35,6 +35,7 @@ StyleSheet.configure({
 })
 
 export const App = () => {
+    const [isTextHidden, setIsTextHidden] = useState(false)
     console.log(`Dynamic function:${JSON.stringify(styles.dynamicText(10))}`)
 
     return (
@@ -49,19 +50,23 @@ export const App = () => {
                 }
             }}
         >
-            <Text
-                style={styles.text}
-                ref={ref => {
-                    console.log(ref.__nativeTag)
-                    console.log(ref._viewConfig.uiViewClassName)
+            {!isTextHidden && (
+                <Text
+                    style={styles.text}
+                    ref={ref => {
+                        console.log(ref.__nativeTag)
+                        console.log(ref._viewConfig.uiViewClassName)
+                        styles.text.addNode(ref.__nativeTag)
 
-                    return () => {
-                        styles.container.removeNode(ref.__nativeTag)
-                    }
-                }}
-            >
-                Hello world from RN 0.75
-            </Text>
+                        return () => {
+                            styles.text.removeNode(ref.__nativeTag)
+                        }
+                    }}
+                >
+                    Hello world from RN 0.75
+                </Text>
+            )}
+            <Button title="Toggle text" onPress={() => setIsTextHidden(!isTextHidden)} />
         </View>
     )
 }
