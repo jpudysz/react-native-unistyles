@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { View, Text, Button } from 'react-native'
-import { StyleSheet } from 'react-native-unistyles'
+import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
 import type { UnistylesThemes } from 'react-native-unistyles'
 
 const sharedColors = {
@@ -14,6 +14,19 @@ const sharedColors = {
 
 // todo extend me
 StyleSheet.configure({
+    settings: {
+        adaptiveThemes: false,
+        initialTheme: 'dark'
+    },
+    breakpoints: {
+        xs: 0,
+        sm: 576,
+        md: 768,
+        lg: 992,
+        xl: 1200,
+        superLarge: 2000,
+        tvLike: 4000
+    },
     themes: {
         light: {
             colors: {
