@@ -1,5 +1,6 @@
 #pragma once
 
+#include <folly/dynamic.h>
 #include <jsi/jsi.h>
 #include "Consts.h"
 
@@ -55,18 +56,28 @@ static StyleDependencies getDependencyForString(const std::string& dep) {
     if (dep == "$0") {
         return StyleDependencies::Theme;
     }
-    
+
     if (dep == "$1") {
         return StyleDependencies::Insets;
     }
-    
+
     return StyleDependencies::Noop;
 }
 
 void assertThat(jsi::Runtime& runtime, bool condition, const std::string& message) {
     if (!condition) {
-        throw jsi::JSError(runtime, message);
+        throw jsi::JSError(runtime, "[Unistyles] " + message);
     }
+}
+
+folly::dynamic getIfExists(folly::dynamic& object, std::string key) {
+    auto it = object.find(key);
+
+    if (it != object.items().end()) {
+        return it->second;
+    }
+
+    return nullptr;
 }
 
 }

@@ -24,6 +24,8 @@ struct JSI_EXPORT StyleSheet : public jsi::HostObject {
     
     jsi::Value create(jsi::Runtime&, std::string);
     jsi::Value configure(jsi::Runtime&, std::string);
+    void parseSettings(jsi::Runtime&, folly::dynamic& settings);
+    void parseBreakpoints(jsi::Runtime& rt, jsi::Object &breakpoints);
     
     jsi::Value get(jsi::Runtime&, const jsi::PropNameID&) override;
     void set(jsi::Runtime&, const jsi::PropNameID&, const jsi::Value&) override;
