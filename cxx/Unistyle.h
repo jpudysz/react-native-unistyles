@@ -12,7 +12,6 @@ struct Unistyle {
     std::string name;
     UnistyleType type;
     jsi::Value rawStyle;
-    jsi::Object style;
     folly::fbvector<int> nativeTags {};
     folly::fbvector<StyleDependencies> dependencies;
 
@@ -21,12 +20,17 @@ struct Unistyle {
     std::optional<folly::dynamic> arguments;
 
     Unistyle(
-        jsi::Runtime& rt,
         UnistyleType type,
         std::string name,
         jsi::Value rawStyle
-    ): name{name}, rawStyle{std::move(rawStyle)}, type{type}, style{jsi::Object(rt)} {
-        this->parseStyle(rt);
+    ): name{name}, rawStyle{std::move(rawStyle)}, type{type} {}
+    
+    Unistyle(Unistyle &&src) {
+        this->name = std::move(src.name);
+        this->type = src.type;
+        this->rawStyle = std::move(src.rawStyle);
+        this->nativeTags = std::move(src.nativeTags);
+        this->dependencies = std::move(src.dependencies);
     }
 
     void addDynamicFunctionMetadata(size_t count, folly::dynamic arguments) {
@@ -56,50 +60,57 @@ struct Unistyle {
         return parsedDependencies;
     }
 
-    void parseStyle(jsi::Runtime& rt) {
+    jsi::Object parseStyle(jsi::Runtime& rt) {
         auto style = this->rawStyle.asObject(rt);
+        auto parsedStyle = jsi::Object(rt);
+        
+        jsi::Array propertyNames = style.getPropertyNames(rt);
+        size_t length = propertyNames.size(rt);
 
-        this->style = jsi::Object(rt);
+        for (size_t i = 0; i < length; i++) {
+            auto propertyName = propertyNames.getValueAtIndex(rt, i).asString(rt).utf8(rt);
+            auto propertyValue = style.getProperty(rt, propertyName.c_str());
 
-        unistyles::helpers::enumerateJSIObject(rt, style, [&, this](const std::string& propertyName, jsi::Value& propertyValue){
             // parse dependencies only once
             if (this->dependencies.empty() && propertyName == STYLE_DEPENDENCIES) {
                 this->dependencies = this->parseDependencies(rt, propertyValue.asObject(rt));
 
-                return;
+                continue;;
             }
-
+            
             if (propertyValue.isNumber() || propertyValue.isString()) {
-                this->style.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), propertyValue);
+               parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), propertyValue);
 
-                return;
-            }
+               continue;
+           }
 
-            if (propertyValue.isNull() || propertyValue.isUndefined()) {
-                this->style.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), propertyValue);
+           if (propertyValue.isNull() || propertyValue.isUndefined()) {
+               parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), propertyValue);
 
-                return;
-            }
+               continue;
+           }
 
-            if (!propertyValue.isObject()) {
-                return;
-            }
+           if (!propertyValue.isObject()) {
+               continue;
+           }
 
-            auto obj = propertyValue.asObject(rt);
+           auto obj = propertyValue.asObject(rt);
 
-            if (obj.isFunction(rt)) {
-                this->style.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), obj);
+           if (obj.isFunction(rt)) {
+               parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), obj);
 
-                return;
-            }
+               continue;
+           }
 
-            if (obj.isArray(rt)) {
-                // todo handle
+           if (obj.isArray(rt)) {
+               // todo handle
 
-                return;
-            }
+               continue;
+           }
 
-            this->style.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), obj);
-        });
+           parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), propertyValue);
+        }
+
+        return parsedStyle;
     }
 };
