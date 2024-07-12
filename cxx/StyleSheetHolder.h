@@ -25,6 +25,4 @@ struct StyleSheetHolder {
         StyleSheetType type,
         jsi::Object value
     ): tag{tag}, type{type}, value{std::move(value)} {}
-    
-    void parseStyles(jsi::Runtime&, jsi::Object&);
 };

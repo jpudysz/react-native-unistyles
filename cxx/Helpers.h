@@ -8,7 +8,7 @@ using namespace facebook;
 namespace unistyles::helpers {
 
 template<typename FunctionType>
-void defineFunctionProperty(facebook::jsi::Runtime& rt, facebook::jsi::Object& object, const std::string& propName, FunctionType&& function) {
+void defineFunctionProperty(jsi::Runtime& rt, jsi::Object& object, const std::string& propName, FunctionType&& function) {
     auto global = rt.global();
     auto objectConstructor = global.getPropertyAsObject(rt, "Object");
     auto defineProperty = objectConstructor.getPropertyAsFunction(rt, "defineProperty");
@@ -22,13 +22,13 @@ void defineFunctionProperty(facebook::jsi::Runtime& rt, facebook::jsi::Object& o
     defineProperty.call(rt, object, facebook::jsi::String::createFromAscii(rt, propName.c_str()), descriptor);
 }
 
-void enumerateJSIObject(jsi::Runtime& rt, const jsi::Object& obj, std::function<void(const std::string& propertyName, jsi::Value& propertyValue)> callback) {
+void enumerateJSIObject(jsi::Runtime& rt, const jsi::Object& obj, std::function<void(const std::string& propertyName, jsi::Object& propertyValue)> callback) {
     jsi::Array propertyNames = obj.getPropertyNames(rt);
     size_t length = propertyNames.size(rt);
 
     for (size_t i = 0; i < length; i++) {
         auto propertyName = propertyNames.getValueAtIndex(rt, i).asString(rt).utf8(rt);
-        auto propertyValue = obj.getProperty(rt, propertyName.c_str());
+        auto propertyValue = obj.getProperty(rt, propertyName.c_str()).asObject(rt);
 
         callback(propertyName, propertyValue);
     }
@@ -41,7 +41,7 @@ auto createHostFunction(
     const std::string& name,
     size_t numberOfArguments,
     JSIFunction&& callback
-) -> jsi::Value {
+) {
     return jsi::Function::createFromHostFunction(
         rt,
         jsi::PropNameID::forUtf8(rt, name),
@@ -63,5 +63,10 @@ static StyleDependencies getDependencyForString(const std::string& dep) {
     return StyleDependencies::Noop;
 }
 
+void assertThat(jsi::Runtime& runtime, bool condition, const std::string& message) {
+    if (!condition) {
+        throw jsi::JSError(runtime, message);
+    }
+}
 
 }

@@ -109,8 +109,6 @@ jsi::Object StyleSheetRegistry::dereferenceStyleSheet(StyleSheetHolder& styleShe
         .asFunction(rt)
         .call(rt, std::move(currentTheme), std::move(miniRuntime)).asObject(rt);
 
-    styleSheet.parseStyles(rt, parsedStyleSheet);
-
     return wrapInHostFunction(styleSheet, parsedStyleSheet);
 }
 
@@ -119,8 +117,13 @@ jsi::Object StyleSheetRegistry::dereferenceStyleSheet(StyleSheetHolder& styleShe
 jsi::Object StyleSheetRegistry::wrapInHostFunction(StyleSheetHolder& holder, jsi::Object& stylesheet) {
     jsi::Object mergedStyles = jsi::Object(rt);
 
-    unistyles::helpers::enumerateJSIObject(rt, stylesheet, [&](const std::string& propertyName, jsi::Value& propertyValue){
-        if (!propertyValue.asObject(rt).isFunction(rt)) {
+    unistyles::helpers::enumerateJSIObject(rt, stylesheet, [&](const std::string& propertyName, jsi::Object& propertyValue){
+        // value is not a function, simply create unistyle
+        if (!propertyValue.isFunction(rt)) {
+            Unistyle unistyle{UnistyleType::Object, propertyName, std::move(propertyValue)};
+            
+            holder.styles.push_back(std::move(unistyle));
+            
             return;
         }
 
@@ -149,20 +152,20 @@ jsi::Object StyleSheetRegistry::wrapInHostFunction(StyleSheetHolder& holder, jsi
                 return result;
             }
 
-            Unistyle unistyle = {rt, UnistyleType::DynamicFunction, propertyName, std::move(result)};
+            Unistyle unistyle{UnistyleType::DynamicFunction, propertyName, std::move(result)};
             
             unistyle.addDynamicFunctionMetadata(count, jsi::dynamicFromValue(rt, arguments));
             holder.styles.push_back(std::move(unistyle));
  
-            return jsi::Value(rt, holder.styles.back().style);
+            return jsi::Value(rt, holder.styles.back().parseStyle(rt));
         });
 
         unistyles::helpers::defineFunctionProperty(rt, mergedStyles, PROXY_FN_PREFIX + propertyName, std::move(propertyValue));
         mergedStyles.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), hostFn);
     });
     
-    for (const auto& unistyle : holder.styles) {
-        mergedStyles.setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle.name), unistyle.style);
+    for (Unistyle& unistyle : holder.styles) {
+        mergedStyles.setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle.name), unistyle.parseStyle(rt));
     }
 
     return mergedStyles;
