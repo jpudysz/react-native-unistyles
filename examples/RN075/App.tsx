@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { View, Text, Button } from 'react-native'
-import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
+import { StyleSheet } from 'react-native-unistyles'
 import type { UnistylesThemes } from 'react-native-unistyles'
 
 const sharedColors = {
@@ -88,7 +88,10 @@ const styles = StyleSheet.create((theme, rt) => {
     const result = {
         container: {
             flex: 1,
-            justifyContent: 'center',
+            justifyContent: {
+                xs: 'center',
+                md: 'flex-start'
+            },
             alignItems: 'center',
             paddingBottom: rt.insets.bottom,
             paddingHorizontal: theme.gap(2),

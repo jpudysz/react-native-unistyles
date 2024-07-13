@@ -120,7 +120,7 @@ jsi::Object StyleSheetRegistry::wrapInHostFunction(StyleSheetHolder& holder, jsi
     unistyles::helpers::enumerateJSIObject(rt, stylesheet, [&](const std::string& propertyName, jsi::Object& propertyValue){
         // value is not a function, simply create unistyle
         if (!propertyValue.isFunction(rt)) {
-            Unistyle unistyle{UnistyleType::Object, propertyName, std::move(propertyValue)};
+            Unistyle unistyle{UnistyleType::Object, propertyName, std::move(propertyValue), this->unistylesRuntime};
             
             holder.styles.push_back(std::move(unistyle));
             
@@ -152,7 +152,7 @@ jsi::Object StyleSheetRegistry::wrapInHostFunction(StyleSheetHolder& holder, jsi
                 return result;
             }
 
-            Unistyle unistyle{UnistyleType::DynamicFunction, propertyName, std::move(result)};
+            Unistyle unistyle{UnistyleType::DynamicFunction, propertyName, std::move(result), this->unistylesRuntime};
             
             unistyle.addDynamicFunctionMetadata(count, jsi::dynamicFromValue(rt, arguments));
             holder.styles.push_back(std::move(unistyle));
