@@ -94,4 +94,25 @@ jsi::Object& mergeJSIObjects(jsi::Runtime&rt, jsi::Object& obj1, jsi::Object& ob
     return obj1;
 }
 
+bool containsAllPairs(jsi::Runtime& rt, Variants& variants, jsi::Object& compoundVariant) {
+    if (variants.empty()) {
+        return false;
+    }
+    
+    for (auto it = variants.cbegin(); it != variants.cend(); ++it) {
+        auto variantKey = it->first;
+        auto variantValue = it->second;
+        
+        if (!compoundVariant.hasProperty(rt, variantKey.c_str())) {
+            return false;
+        }
+        
+        if (compoundVariant.getProperty(rt, variantKey.c_str()).asString(rt).utf8(rt) != variantValue) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
 }

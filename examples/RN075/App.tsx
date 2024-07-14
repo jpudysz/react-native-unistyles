@@ -128,6 +128,15 @@ const styles = StyleSheet.create((theme, rt) => {
                     }
                 }
             },
+            compoundVariants: [
+                {
+                    size: 'small',
+                    bold: true,
+                    styles: {
+                        color: 'orange'
+                    }
+                }
+            ],
             __unistyles__dependencies_: []
         },
         dynamicText: (paddingLeft: number) => ({
