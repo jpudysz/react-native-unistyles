@@ -7,7 +7,7 @@ using namespace unistyles::helpers;
 
 // Base Unistyles function that
 // - registers stylesheet
-// - attaches addNode, removeNode functions
+// - attaches addNode, removeNode and addVariants functions
 // - returns pardes stylesheet to React (on first render)
 jsi::Value StyleSheet::create(jsi::Runtime& rt, std::string fnName) {
     return createHostFunction(rt, "create", 1, [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count){
@@ -58,6 +58,16 @@ jsi::Value StyleSheet::create(jsi::Runtime& rt, std::string fnName) {
             defineFunctionProperty(rt, propertyValue, "addNode", addNodeHostFn);
             defineFunctionProperty(rt, propertyValue, "removeNode", removeNodeHostFn);
         });
+        
+        auto addVariantsFn = createHostFunction(rt, "addVariants", 1, [&registeredStyleSheet](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count){
+            registeredStyleSheet.addVariants(rt, jsi::Value(rt, arguments[0]));
+            
+            // todo trigger event
+
+            return jsi::Value::undefined();
+        });
+        
+        defineFunctionProperty(rt, parsedStyleSheet, "addVariants", addVariantsFn);
 
         return jsi::Value(rt, parsedStyleSheet);
     });

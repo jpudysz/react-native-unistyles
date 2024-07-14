@@ -66,7 +66,7 @@ struct Unistyle {
         return parsedDependencies;
     }
 
-    jsi::Object parseStyle(jsi::Runtime& rt) {
+    jsi::Object parseStyle(jsi::Runtime& rt, Variants& variants) {
         auto style = this->rawStyle.asObject(rt);
         auto parsedStyle = jsi::Object(rt);
 
@@ -116,12 +116,27 @@ struct Unistyle {
 
                 continue;
             }
+            
+            auto propertyValueObject = propertyValue.asObject(rt);
 
             // todo check other styles that are objects as of 0.75
             // 'shadowOffset' or 'textShadowOffset' or 'PlatformColor'
-            // 'variants' or 'compoundVariants'
+
+            if (propertyName == "variants") {
+                auto parsedVariant = this->parseVariants(rt, variants, propertyValueObject);
+                
+                unistyles::helpers::mergeJSIObjects(rt, parsedStyle, parsedVariant);
+                
+                continue;
+            }
+            
+            if (propertyName == "compoundVariants") {
+                // todo!
+                continue;
+            }
+            
             // 'mq' or 'breakpoints'
-            auto valueFromBreakpoint = getValueFromBreakpoints(rt, propertyValue.asObject(rt));
+            auto valueFromBreakpoint = getValueFromBreakpoints(rt, propertyValueObject);
             
             parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), parseNestedStyle(rt, valueFromBreakpoint));
         }
@@ -150,7 +165,7 @@ struct Unistyle {
         return jsi::Value::undefined();
     }
 
-    jsi::Value getValueFromBreakpoints(jsi::Runtime& rt, jsi::Object&& obj) {
+    jsi::Value getValueFromBreakpoints(jsi::Runtime& rt, jsi::Object& obj) {
         auto hasBreakpoints = !this->unistylesRuntime->sortedBreakpointPairs.empty();
         auto currentBreakpoint = this->unistylesRuntime->breakpoint;
         auto currentOrientation = this->unistylesRuntime->screen.width > this->unistylesRuntime->screen.height
@@ -199,5 +214,47 @@ struct Unistyle {
         }
 
         return jsi::Value::undefined();
+    }
+    
+    jsi::Object parseVariants(jsi::Runtime& rt, Variants& variants, jsi::Object& obj) {
+        jsi::Object parsedVariant = jsi::Object(rt);
+        
+        jsi::Array propertyNames = obj.getPropertyNames(rt);
+        size_t length = propertyNames.size(rt);
+
+        for (size_t i = 0; i < length; i++) {
+            auto groupName = propertyNames.getValueAtIndex(rt, i).asString(rt).utf8(rt);
+            auto groupValue = obj.getProperty(rt, groupName.c_str()).asObject(rt);
+
+            auto it = std::find_if(
+                variants.cbegin(),
+                variants.cend(),
+                [&groupName](auto& variant){
+                    return variant.first == groupName;
+                }
+            );
+            
+            auto selectedVariant = it != variants.end()
+                ? std::make_optional(it->second)
+                : std::nullopt;
+            
+            auto styles = this->getStylesForVariant(rt, groupValue, selectedVariant);
+            
+            unistyles::helpers::mergeJSIObjects(rt, parsedVariant, styles);
+        }
+        
+        return parsedVariant;
+    }
+    
+    jsi::Object getStylesForVariant(jsi::Runtime& rt, jsi::Object& groupValue, std::optional<std::string> selectedVariant) {
+        auto selectedVariantKey = selectedVariant.has_value()
+            ? selectedVariant.value().c_str()
+            : "default";
+        
+        if (groupValue.hasProperty(rt, selectedVariantKey)) {
+            return groupValue.getProperty(rt, selectedVariantKey).asObject(rt);
+        }
+        
+        return jsi::Object(rt);
     }
 };

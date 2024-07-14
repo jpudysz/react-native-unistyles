@@ -157,7 +157,7 @@ jsi::Object StyleSheetRegistry::wrapInHostFunction(StyleSheetHolder& holder, jsi
             unistyle.addDynamicFunctionMetadata(count, jsi::dynamicFromValue(rt, arguments));
             holder.styles.push_back(std::move(unistyle));
  
-            return jsi::Value(rt, holder.styles.back().parseStyle(rt));
+            return jsi::Value(rt, holder.styles.back().parseStyle(rt, holder.variants));
         });
 
         unistyles::helpers::defineFunctionProperty(rt, mergedStyles, PROXY_FN_PREFIX + propertyName, std::move(propertyValue));
@@ -165,7 +165,7 @@ jsi::Object StyleSheetRegistry::wrapInHostFunction(StyleSheetHolder& holder, jsi
     });
     
     for (Unistyle& unistyle : holder.styles) {
-        mergedStyles.setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle.name), unistyle.parseStyle(rt));
+        mergedStyles.setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle.name), unistyle.parseStyle(rt, holder.variants));
     }
 
     return mergedStyles;
