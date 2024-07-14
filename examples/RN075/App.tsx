@@ -47,9 +47,15 @@ StyleSheet.configure({
     } as UnistylesThemes
 })
 
+const useVariants = (styles, variants) => {
+    styles.addVariants(variants)
+}
+
 export const App = () => {
     const [isTextHidden, setIsTextHidden] = useState(false)
     console.log(`Dynamic function:${JSON.stringify(styles.dynamicText(10))}`)
+
+    useVariants(styles, undefined)
 
     return (
         <View
@@ -98,8 +104,30 @@ const styles = StyleSheet.create((theme, rt) => {
             __unistyles__dependencies_: ['$0', '$1']
         },
         text: {
-            fontSize: 20,
             fontWeight: 'bold',
+            variants: {
+                size: {
+                    small: {
+                        fontSize: 12
+                    },
+                    medium: {
+                        fontSize: 14
+                    },
+                    large: {
+                        fontSize: 18
+                    }
+                },
+                bold: {
+                    true: {
+                        fontWeight: 'bold'
+                    }
+                },
+                color: {
+                    default: {
+                        color: 'red'
+                    }
+                }
+            },
             __unistyles__dependencies_: []
         },
         dynamicText: (paddingLeft: number) => ({

@@ -80,4 +80,18 @@ folly::dynamic getIfExists(folly::dynamic& object, std::string key) {
     return nullptr;
 }
 
+jsi::Object& mergeJSIObjects(jsi::Runtime&rt, jsi::Object& obj1, jsi::Object& obj2) {
+    jsi::Array propertyNames = obj2.getPropertyNames(rt);
+    size_t length = propertyNames.size(rt);
+
+    for (size_t i = 0; i < length; i++) {
+        auto propertyName = propertyNames.getValueAtIndex(rt, i).asString(rt).utf8(rt);
+        auto propertyValue = obj2.getProperty(rt, propertyName.c_str());
+
+        obj1.setProperty(rt, propertyName.c_str(), propertyValue);
+    }
+    
+    return obj1;
+}
+
 }
