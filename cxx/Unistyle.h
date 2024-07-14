@@ -81,7 +81,7 @@ struct Unistyle {
             if (this->dependencies.empty() && propertyName == STYLE_DEPENDENCIES) {
                 this->dependencies = this->parseDependencies(rt, propertyValue.asObject(rt));
 
-                continue;;
+                continue;
             }
 
             if (propertyValue.isNumber() || propertyValue.isString()) {
@@ -121,10 +121,33 @@ struct Unistyle {
             // 'shadowOffset' or 'textShadowOffset' or 'PlatformColor'
             // 'variants' or 'compoundVariants'
             // 'mq' or 'breakpoints'
-            parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), getValueFromBreakpoints(rt, propertyValue.asObject(rt)));
+            auto valueFromBreakpoint = getValueFromBreakpoints(rt, propertyValue.asObject(rt));
+            
+            parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), parseNestedStyle(rt, valueFromBreakpoint));
         }
 
         return parsedStyle;
+    }
+    
+    jsi::Value parseNestedStyle(jsi::Runtime& rt, jsi::Value& nestedStyle) {
+        if (nestedStyle.isString() || nestedStyle.isNumber() || nestedStyle.isUndefined() || nestedStyle.isNull()) {
+            return jsi::Value(rt, nestedStyle);
+        }
+        
+        if (!nestedStyle.isObject()) {
+            return jsi::Value::undefined();
+        }
+        
+        auto nestedObjectStyle = nestedStyle.asObject(rt);
+        
+        if (nestedObjectStyle.isArray(rt)) {
+            // todo
+            
+            return jsi::Value::undefined();
+        }
+        
+        // todo here is a new object, parse it
+        return jsi::Value::undefined();
     }
 
     jsi::Value getValueFromBreakpoints(jsi::Runtime& rt, jsi::Object&& obj) {
