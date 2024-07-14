@@ -69,6 +69,9 @@ struct Unistyle {
     jsi::Object parseStyle(jsi::Runtime& rt, Variants& variants) {
         auto style = this->rawStyle.asObject(rt);
         auto parsedStyle = jsi::Object(rt);
+        
+        // we need to be sure that compoundVariants are parsed after variants
+        bool shouldParseCompoundVariants = style.hasProperty(rt, "compoundVariants") && style.hasProperty(rt, "variants");
 
         jsi::Array propertyNames = style.getPropertyNames(rt);
         size_t length = propertyNames.size(rt);
@@ -101,39 +104,43 @@ struct Unistyle {
                 continue;
             }
 
-            auto obj = propertyValue.asObject(rt);
-
-            if (obj.isFunction(rt)) {
-                parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), obj);
-
-                continue;
-            }
-
-            // todo check other styles that are arrays as of 0.75
-            // 'transform' or 'fontVariant'
-            if (obj.isArray(rt)) {
-                // todo handle
-
-                continue;
-            }
-            
             auto propertyValueObject = propertyValue.asObject(rt);
 
-            // todo check other styles that are objects as of 0.75
-            // 'shadowOffset' or 'textShadowOffset' or 'PlatformColor'
+            if (propertyValueObject.isFunction(rt)) {
+                parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), propertyValueObject);
+
+                continue;
+            }
 
             if (propertyName == "variants") {
                 auto parsedVariant = this->parseVariants(rt, variants, propertyValueObject);
                 
                 unistyles::helpers::mergeJSIObjects(rt, parsedStyle, parsedVariant);
                 
+                if (shouldParseCompoundVariants) {
+                    auto compoundVariants = style.getProperty(rt, "compoundVariants").asObject(rt);
+                    auto parsedCompoundVariants = this->parseCompoundVariants(rt, variants, compoundVariants);
+                    
+                    unistyles::helpers::mergeJSIObjects(rt, parsedStyle, parsedCompoundVariants);
+                }
+                
                 continue;
             }
             
+            // compoundVariants are computed soon after variants
             if (propertyName == "compoundVariants") {
-                // todo!
                 continue;
             }
+     
+            if (propertyValueObject.isArray(rt)) {
+                // todo check other styles that are arrays as of 0.75
+                // 'transform' or 'fontVariant'
+                
+                continue;
+            }
+            
+            // todo check other styles that are objects as of 0.75
+            // 'shadowOffset' or 'textShadowOffset' or 'PlatformColor'
             
             // 'mq' or 'breakpoints'
             auto valueFromBreakpoint = getValueFromBreakpoints(rt, propertyValueObject);
@@ -256,5 +263,33 @@ struct Unistyle {
         }
         
         return jsi::Object(rt);
+    }
+    
+    jsi::Object parseCompoundVariants(jsi::Runtime& rt, Variants& variants, jsi::Object& obj) {
+        if (!obj.isArray(rt)) {
+            return jsi::Object(rt);
+        }
+        
+        auto array = obj.asArray(rt);
+        jsi::Object parsedCompoundVariants = jsi::Object(rt);
+        size_t length = array.length(rt);
+        
+        for (size_t i = 0; i < length; i++) {
+            jsi::Value value = array.getValueAtIndex(rt, i);
+            
+            if (!value.isObject()) {
+                continue;
+            }
+            
+            auto valueObject = value.asObject(rt);
+            
+            if (unistyles::helpers::containsAllPairs(rt, variants, valueObject)) {
+                auto styles = valueObject.getPropertyAsObject(rt, "styles");
+                
+                unistyles::helpers::mergeJSIObjects(rt, parsedCompoundVariants, styles);
+            }
+        }
+        
+        return parsedCompoundVariants;
     }
 };
