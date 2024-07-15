@@ -1,9 +1,11 @@
 package com.unistyles
 
+import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Build
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
 import android.view.Window
@@ -22,13 +24,38 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
 
     var orientation: Int = reactApplicationContext.resources.configuration.orientation
 
+    @Suppress("DEPRECATION")
     fun getScreenDimensions(): Screen {
+        // function takes in count edge-to-edge layout
         val displayMetrics = reactApplicationContext.resources.displayMetrics
         val fontScale = reactApplicationContext.resources.configuration.fontScale
-        val screenWidth = (displayMetrics.widthPixels / displayMetrics.density).roundToInt()
-        val screenHeight = (displayMetrics.heightPixels / displayMetrics.density).roundToInt()
 
-        return Screen(screenWidth, screenHeight, displayMetrics.density, fontScale)
+        when {
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.R -> {
+                val windowManager = reactApplicationContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+                val metrics = DisplayMetrics()
+
+                windowManager.defaultDisplay.getRealMetrics(metrics)
+
+                val screenWidth = (metrics.widthPixels / metrics.density).roundToInt()
+                val screenHeight = (metrics.heightPixels / metrics.density).roundToInt()
+
+                return Screen(screenWidth, screenHeight, metrics.density, fontScale)
+            }
+            else -> {
+                reactApplicationContext.currentActivity?.windowManager?.currentWindowMetrics?.bounds?.let {
+                    val boundsWidth = (it.width() / displayMetrics.density).roundToInt()
+                    val boundsHeight = (it.height() / displayMetrics.density).roundToInt()
+
+                    return Screen(boundsWidth, boundsHeight, displayMetrics.density, fontScale)
+                } ?: run {
+                    val screenWidth = (displayMetrics.widthPixels / displayMetrics.density).roundToInt()
+                    val screenHeight = (displayMetrics.heightPixels / displayMetrics.density).roundToInt()
+
+                    return Screen(screenWidth, screenHeight, displayMetrics.density, fontScale)
+                }
+            }
+        }
     }
 
     fun getColorScheme(): String {
