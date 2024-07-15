@@ -72,7 +72,6 @@ npx expo prebuild
      <img src="https://avatars.githubusercontent.com/u/686823?v=4" height="70px" width="70px" alt="mwarger" />
 </a>
 
-
 ## Past sponsors
 
 <a href="https://github.com/kmartinezmedia">
@@ -107,6 +106,10 @@ Your support is greatly appreciated and helps me dedicate more time and resource
 <a href="https://stacks.grapp.dev/">
      <img src="https://raw.githubusercontent.com/grapp-dev/stacks/main/assets/stacks-logo.png" height="70px" width="70px" alt="Stacks" />
 </a>
+
+## Plugins
+
+[eslint-plugin-react-native-unistyles](https://github.com/RodSarhan/eslint-plugin-react-native-unistyles)
 
 ## Discord
 Looking for help or you want to chat with me?
