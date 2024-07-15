@@ -2,14 +2,13 @@ import { NativeEventEmitter, NativeModules } from 'react-native'
 import { useEffect, useState } from 'react'
 import { unistyles } from '../core'
 import { UnistylesEventType } from '../common'
-import type { UnistylesDynamicTypeSizeEvent, UnistylesEvents, UnistylesMobileLayoutEvent, UnistylesThemeEvent } from '../types'
+import type { UnistylesEvents, UnistylesMobileLayoutEvent, UnistylesThemeEvent } from '../types'
 
 const unistylesEvents = new NativeEventEmitter(NativeModules.Unistyles)
 
 export const useUnistyles = () => {
     const [plugins, setPlugins] = useState(unistyles.runtime.enabledPlugins)
     const [theme, setTheme] = useState(unistyles.registry.getTheme(unistyles.runtime.themeName))
-    const [contentSizeCategory, setContentSizeCategory] = useState(unistyles.runtime.contentSizeCategory)
     const [layout, setLayout] = useState({
         breakpoint: unistyles.runtime.breakpoint,
         orientation: unistyles.runtime.orientation,
@@ -58,11 +57,6 @@ export const useUnistyles = () => {
                     case UnistylesEventType.Plugin: {
                         return setPlugins(unistyles.runtime.enabledPlugins)
                     }
-                    case UnistylesEventType.DynamicTypeSize: {
-                        const dynamicTypeSizeEvent = event as UnistylesDynamicTypeSizeEvent
-
-                        return setContentSizeCategory(dynamicTypeSizeEvent.payload.contentSizeCategory)
-                    }
                     default:
                         return
                 }
@@ -75,7 +69,6 @@ export const useUnistyles = () => {
     return {
         plugins,
         theme,
-        layout,
-        contentSizeCategory
+        layout
     }
 }
