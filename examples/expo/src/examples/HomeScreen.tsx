@@ -490,6 +490,23 @@ export const HomeScreen = () => {
                             navigation.navigate(DemoNames.AndroidStatusBarNavigationBar)
                         }}
                     />
+                    <DemoLink
+                        description="Keyboard screen"
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    dark: darkTheme,
+                                    premium: premiumTheme
+                                })
+                                .addBreakpoints(breakpoints)
+                                .addConfig({
+                                    initialTheme: 'light'
+                                })
+
+                            navigation.navigate(DemoNames.Keyboard)
+                        }}
+                    />
                 </DemoGroup>
                 <DemoGroup title="Benchmark">
                     <DemoLink
