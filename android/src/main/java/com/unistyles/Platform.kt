@@ -73,7 +73,7 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
         return contentSizeCategory
     }
 
-    fun setInsetsCompat(insetsCompat: WindowInsetsCompat, window: Window) {
+    fun setInsetsCompat(insetsCompat: WindowInsetsCompat, window: Window, animatedBottomInsets: Int?) {
         // below Android 11, we need to use window flags to detect status bar visibility
         val isStatusBarVisible = when(Build.VERSION.SDK_INT) {
             in 30..Int.MAX_VALUE -> {
@@ -98,13 +98,24 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
         }
 
         val insets = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
-
-        // reports inset bottom as 0 when keyboard is visible
-        // otherwise it will break other libraries that manipulates bottom insets
         val imeInsets = insetsCompat.getInsets(WindowInsetsCompat.Type.ime())
-        val insetsBottom = if (imeInsets.bottom > 0) 0 else insets.bottom
 
-        this.insets = Insets(statusBarTopInset, insetsBottom, insets.left, insets.right)
+        // Android 10 and below - set bottom insets to 0 while keyboard is visible and use default bottom insets otherwise
+        // Android 11 and above - animate bottom insets while keyboard is appearing and disappearing
+        val insetBottom = when(imeInsets.bottom > 0) {
+            true -> {
+                if (Build.VERSION.SDK_INT >= 30 && animatedBottomInsets != null) {
+                    animatedBottomInsets
+                } else {
+                    0
+                }
+            }
+            else -> {
+                insets.bottom
+            }
+        }
+
+        this.insets = Insets(statusBarTopInset, insetBottom, insets.left, insets.right)
     }
 
     fun getInsets(): Insets {

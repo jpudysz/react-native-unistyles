@@ -4,17 +4,21 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsAnimationCompat
+import androidx.core.view.WindowInsetsCompat
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.turbomodule.core.interfaces.CallInvokerHolder
+import kotlin.math.roundToInt
 
 class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener {
     private var isCxxReady: Boolean = false
@@ -141,13 +145,60 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         this.reactApplicationContext.currentActivity?.let { activity ->
             activity.findViewById<View>(android.R.id.content)?.let { mainView ->
                 ViewCompat.setOnApplyWindowInsetsListener(mainView) { _, insets ->
-                    this.platform.setInsetsCompat(insets, activity.window)
+                    this.platform.setInsetsCompat(insets, activity.window, null)
 
                     if (this.isCxxReady) {
                         this.onLayoutConfigChange()
                     }
 
                     insets
+                }
+
+                if (Build.VERSION.SDK_INT >= 30) {
+                    ViewCompat.setWindowInsetsAnimationCallback(
+                        mainView,
+                        object : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP) {
+                            var initialBottomInsets = 0
+                            var isGoingUp = false
+
+                            override fun onPrepare(animation: WindowInsetsAnimationCompat) {
+                                val insets = ViewCompat.getRootWindowInsets(mainView)
+                                val isKeyboardVisible = insets?.isVisible(WindowInsetsCompat.Type.ime()) ?: false
+
+                                if (!isKeyboardVisible) {
+                                    val density = reactApplicationContext.resources.displayMetrics.density
+
+                                    initialBottomInsets = (this@UnistylesModule.platform.getInsets().bottom * density).roundToInt()
+                                }
+
+                                isGoingUp = !isKeyboardVisible
+                            }
+
+                            override fun onProgress(
+                                insets: WindowInsetsCompat,
+                                runningAnimations: List<WindowInsetsAnimationCompat>
+                            ): WindowInsetsCompat {
+                                runningAnimations.firstOrNull()?.let { animation ->
+                                    val progress = animation.fraction
+                                    val nextBottomInset = if (isGoingUp) {
+                                        (initialBottomInsets - (progress * initialBottomInsets).roundToInt())
+                                    } else {
+                                        // enable this in Unistyles 3.0 to get real time bottom insets
+                                        // initialBottomInsets - (initialBottomInsets - (progress * initialBottomInsets).roundToInt())
+                                        initialBottomInsets
+                                    }
+
+                                    this@UnistylesModule.platform.setInsetsCompat(insets, activity.window, nextBottomInset)
+
+                                    if (!isGoingUp) {
+                                        this@UnistylesModule.onLayoutConfigChange()
+                                    }
+                                }
+
+                                return insets
+                            }
+                        }
+                    )
                 }
             }
         }
@@ -157,6 +208,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         this.reactApplicationContext.currentActivity?.let { activity ->
             activity.window?.decorView?.let { view ->
                 ViewCompat.setOnApplyWindowInsetsListener(view, null)
+                ViewCompat.setWindowInsetsAnimationCallback(view, null)
             }
         }
     }
