@@ -84,6 +84,7 @@ export class UnistylesRuntime {
 
     /**
      * Get the names of currently enabled plugins
+     * @deprecated - Plugins will be removed in the next major release
      * @returns - The names of currently enabled plugins
      */
     public get enabledPlugins() {
@@ -231,6 +232,7 @@ export class UnistylesRuntime {
 
     /**
      * Enable a plugin
+     * @deprecated - Plugins will be removed in the next major release
      * @param plugin - Plugin that conforms to UnistylesPlugin interface
      */
     public addPlugin = (plugin: UnistylesPlugin) => {
@@ -239,6 +241,7 @@ export class UnistylesRuntime {
 
     /**
      * Disable a plugin
+     * @deprecated - Plugins will be removed in the next major release
      * @param plugin - Plugin that conforms to UnistylesPlugin interface
      */
     public removePlugin = (plugin: UnistylesPlugin) => {
