@@ -2,6 +2,12 @@
   "version": 1,
   "dependencies": {
     "native,Version=v0.0": {
+      "Microsoft.JavaScript.Hermes": {
+        "type": "Direct",
+        "requested": "[0.1.21, )",
+        "resolved": "0.1.21",
+        "contentHash": "5njCh+3eXTLOv7+8nOnp6nJ5C0r6it5ze54c0nuWleeDptuK8t3dEDB79XTU4D5DKNvAPlqJpgXRDOak5nYIug=="
+      },
       "Microsoft.ReactNative": {
         "type": "Direct",
         "requested": "[0.74.9, )",
@@ -36,6 +42,14 @@
         "type": "Transitive",
         "resolved": "1.0.1264.42",
         "contentHash": "7OBUTkzQ5VI/3gb0ufi5U4zjuCowAJwQg2li0zXXzqkM+S1kmOlivTy1R4jAW+gY5Vyg510M+qMAESCQUjrfgA=="
+      },
+      "reactnativeunistyles": {
+        "type": "Project",
+        "dependencies": {
+          "Microsoft.ReactNative": "[0.74.9, )",
+          "Microsoft.ReactNative.Cxx": "[0.74.9, )",
+          "Microsoft.UI.Xaml": "[2.8.0, )"
+        }
       }
     },
     "native,Version=v0.0/win10-arm": {
