@@ -69,7 +69,7 @@ struct Unistyle {
     jsi::Object parseStyle(jsi::Runtime& rt, Variants& variants) {
         auto style = this->rawStyle.asObject(rt);
         auto parsedStyle = jsi::Object(rt);
-        
+
         // we need to be sure that compoundVariants are parsed after variants
         bool shouldParseCompoundVariants = style.hasProperty(rt, "compoundVariants") && style.hasProperty(rt, "variants");
 
@@ -87,89 +87,126 @@ struct Unistyle {
                 continue;
             }
 
-            if (propertyValue.isNumber() || propertyValue.isString()) {
+            // for primitives do nothing
+            if (propertyValue.isNumber() || propertyValue.isString() || propertyValue.isUndefined() || propertyValue.isNull()) {
                 parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), propertyValue);
 
                 continue;
             }
 
-            if (propertyValue.isNull() || propertyValue.isUndefined()) {
-                parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), propertyValue);
-
-                continue;
-            }
-
-            // ignore non objects at this point
+            // ignore non objects
             if (!propertyValue.isObject()) {
                 continue;
             }
 
             auto propertyValueObject = propertyValue.asObject(rt);
 
+            // ignore any functions as values
             if (propertyValueObject.isFunction(rt)) {
-                parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), propertyValueObject);
-
                 continue;
             }
 
             if (propertyName == "variants") {
                 auto parsedVariant = this->parseVariants(rt, variants, propertyValueObject);
-                
+
                 unistyles::helpers::mergeJSIObjects(rt, parsedStyle, parsedVariant);
-                
+
                 if (shouldParseCompoundVariants) {
                     auto compoundVariants = style.getProperty(rt, "compoundVariants").asObject(rt);
                     auto parsedCompoundVariants = this->parseCompoundVariants(rt, variants, compoundVariants);
-                    
+
                     unistyles::helpers::mergeJSIObjects(rt, parsedStyle, parsedCompoundVariants);
                 }
-                
+
                 continue;
             }
-            
+
             // compoundVariants are computed soon after variants
             if (propertyName == "compoundVariants") {
                 continue;
             }
-     
-            if (propertyValueObject.isArray(rt)) {
-                // todo check other styles that are arrays as of 0.75
-                // 'transform' or 'fontVariant'
-                
+
+            if (propertyName == "transform" && propertyValueObject.isArray(rt)) {
+                parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), parseTransforms(rt, propertyValueObject));
+
                 continue;
             }
-            
-            // todo check other styles that are objects as of 0.75
-            // 'shadowOffset' or 'textShadowOffset' or 'PlatformColor'
-            
+
+            if (propertyName == "fontVariant" && propertyValueObject.isArray(rt)) {
+                parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), propertyValue);
+
+                continue;
+            }
+
+            if (propertyName == "shadowOffset" || propertyName == "textShadowOffset") {
+                parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), parseNestedStyle(rt, propertyValue));
+
+                continue;
+            }
+
+            if (unistyles::helpers::isPlatformColor(rt, propertyValueObject)) {
+                parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), propertyValueObject);
+
+                continue;
+            }
+
             // 'mq' or 'breakpoints'
             auto valueFromBreakpoint = getValueFromBreakpoints(rt, propertyValueObject);
-            
+
             parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), parseNestedStyle(rt, valueFromBreakpoint));
         }
 
         return parsedStyle;
     }
-    
+
     jsi::Value parseNestedStyle(jsi::Runtime& rt, jsi::Value& nestedStyle) {
         if (nestedStyle.isString() || nestedStyle.isNumber() || nestedStyle.isUndefined() || nestedStyle.isNull()) {
             return jsi::Value(rt, nestedStyle);
         }
-        
+
         if (!nestedStyle.isObject()) {
             return jsi::Value::undefined();
         }
-        
+
         auto nestedObjectStyle = nestedStyle.asObject(rt);
-        
-        if (nestedObjectStyle.isArray(rt)) {
-            // todo
-            
+
+        if (nestedObjectStyle.isArray(rt) || nestedObjectStyle.isFunction(rt)) {
             return jsi::Value::undefined();
         }
-        
-        // todo here is a new object, parse it
-        return jsi::Value::undefined();
+
+        jsi::Object parsedStyle = jsi::Object(rt);
+
+        jsi::Array propertyNames = nestedObjectStyle.getPropertyNames(rt);
+        size_t length = propertyNames.size(rt);
+
+        for (size_t i = 0; i < length; i++) {
+            auto propertyName = propertyNames.getValueAtIndex(rt, i).asString(rt).utf8(rt);
+            auto propertyValue = nestedObjectStyle.getProperty(rt, propertyName.c_str());
+
+            if (propertyValue.isString() || propertyValue.isNumber() || propertyValue.isUndefined() || propertyValue.isNull()) {
+                parsedStyle.setProperty(rt, propertyName.c_str(), propertyValue);
+
+                continue;
+            }
+
+            if (!propertyValue.isObject()) {
+                parsedStyle.setProperty(rt, propertyName.c_str(), jsi::Value::undefined());
+
+                continue;
+            }
+
+            auto nestedObjectStyle = nestedStyle.asObject(rt);
+
+            if (nestedObjectStyle.isArray(rt) || nestedObjectStyle.isFunction(rt)) {
+                parsedStyle.setProperty(rt, propertyName.c_str(), jsi::Value::undefined());
+
+                continue;
+            }
+
+            parsedStyle.setProperty(rt, propertyName.c_str(), getValueFromBreakpoints(rt, nestedObjectStyle));
+        }
+
+        return parsedStyle;
     }
 
     jsi::Value getValueFromBreakpoints(jsi::Runtime& rt, jsi::Object& obj) {
@@ -222,10 +259,10 @@ struct Unistyle {
 
         return jsi::Value::undefined();
     }
-    
+
     jsi::Object parseVariants(jsi::Runtime& rt, Variants& variants, jsi::Object& obj) {
         jsi::Object parsedVariant = jsi::Object(rt);
-        
+
         jsi::Array propertyNames = obj.getPropertyNames(rt);
         size_t length = propertyNames.size(rt);
 
@@ -240,56 +277,80 @@ struct Unistyle {
                     return variant.first == groupName;
                 }
             );
-            
+
             auto selectedVariant = it != variants.end()
                 ? std::make_optional(it->second)
                 : std::nullopt;
-            
+
             auto styles = this->getStylesForVariant(rt, groupValue, selectedVariant);
-            
+
             unistyles::helpers::mergeJSIObjects(rt, parsedVariant, styles);
         }
-        
+
         return parsedVariant;
     }
-    
+
     jsi::Object getStylesForVariant(jsi::Runtime& rt, jsi::Object& groupValue, std::optional<std::string> selectedVariant) {
         auto selectedVariantKey = selectedVariant.has_value()
             ? selectedVariant.value().c_str()
             : "default";
-        
+
         if (groupValue.hasProperty(rt, selectedVariantKey)) {
             return groupValue.getProperty(rt, selectedVariantKey).asObject(rt);
         }
-        
+
         return jsi::Object(rt);
     }
-    
+
     jsi::Object parseCompoundVariants(jsi::Runtime& rt, Variants& variants, jsi::Object& obj) {
         if (!obj.isArray(rt)) {
             return jsi::Object(rt);
         }
-        
+
         auto array = obj.asArray(rt);
         jsi::Object parsedCompoundVariants = jsi::Object(rt);
         size_t length = array.length(rt);
-        
+
         for (size_t i = 0; i < length; i++) {
             jsi::Value value = array.getValueAtIndex(rt, i);
-            
+
             if (!value.isObject()) {
                 continue;
             }
-            
+
             auto valueObject = value.asObject(rt);
-            
+
             if (unistyles::helpers::containsAllPairs(rt, variants, valueObject)) {
                 auto styles = valueObject.getPropertyAsObject(rt, "styles");
-                
+
                 unistyles::helpers::mergeJSIObjects(rt, parsedCompoundVariants, styles);
             }
         }
-        
+
         return parsedCompoundVariants;
+    }
+
+    jsi::Value parseTransforms(jsi::Runtime& rt, jsi::Object& obj) {
+        if (!obj.isArray(rt)) {
+            return jsi::Value::undefined();
+        }
+
+        jsi::Array transforms = obj.asArray(rt);
+        jsi::Array parsedTransforms = jsi::Array(rt, transforms.length(rt));
+
+        size_t length = transforms.length(rt);
+
+        for (size_t i = 0; i < length; i++) {
+            jsi::Value value = transforms.getValueAtIndex(rt, i);
+
+            if (!value.isObject()) {
+                parsedTransforms.setValueAtIndex(rt, i, jsi::Value::undefined());
+                continue;
+            }
+
+            parsedTransforms.setValueAtIndex(rt, i, parseNestedStyle(rt, value));
+        }
+
+        return parsedTransforms;
     }
 };

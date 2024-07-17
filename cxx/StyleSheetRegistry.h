@@ -14,6 +14,7 @@ struct StyleSheetRegistry {
     StyleSheetRegistry(jsi::Runtime& rt, std::shared_ptr<UnistylesRuntime> unistylesRuntime): rt{rt}, unistylesRuntime{unistylesRuntime} {}
     
     StyleSheetHolder& add(jsi::Object);
+    StyleSheetHolder& getStyleSheet(int styleSheetId);
     jsi::Object dereferenceStyleSheet(StyleSheetHolder&);
     
 private:

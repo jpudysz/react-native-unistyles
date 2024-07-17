@@ -60,6 +60,16 @@ StyleSheetHolder& StyleSheetRegistry::add(jsi::Object styleSheet) {
     return this->styleSheets.back();
 }
 
+StyleSheetHolder& StyleSheetRegistry::getStyleSheet(int styleSheetId) {
+    for (auto& stylesheet : this->styleSheets) {
+        if (stylesheet.tag == styleSheetId) {
+            return stylesheet;
+        }
+    }
+    
+    throw std::runtime_error("StyleSheet with id: " + std::to_string(styleSheetId) + " cannot be found.");
+}
+
 jsi::Value StyleSheetRegistry::getCurrentTheme() {
     // todo move me to const
     auto getCurrentThemeFn = rt.global().getProperty(rt, jsi::PropNameID::forUtf8(rt, "__UNISTYLES__GET_SELECTED_THEME__"));

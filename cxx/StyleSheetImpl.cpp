@@ -8,14 +8,18 @@ using namespace unistyles::helpers;
 // Base Unistyles function that
 // - registers stylesheet
 // - attaches addNode, removeNode and addVariants functions
+// - attaches unique StyleSheet ID
 // - returns pardes stylesheet to React (on first render)
 jsi::Value StyleSheet::create(jsi::Runtime& rt, std::string fnName) {
     return createHostFunction(rt, "create", 1, [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count){
         assertThat(rt, count == 1, "StyleSheet.create must be called with one argument");
         assertThat(rt, arguments[0].isObject(), "StyleSheet.create must be called with object or function");
 
+        auto styleSheetId = thisVal.asObject(rt).getProperty(rt, "__id");
         auto rawStyleSheet = arguments[0].asObject(rt);
-        auto& registeredStyleSheet = styleSheetRegistry.add(std::move(rawStyleSheet));
+        auto& registeredStyleSheet = styleSheetId.isUndefined()
+            ? styleSheetRegistry.add(std::move(rawStyleSheet))
+            : styleSheetRegistry.getStyleSheet(styleSheetId.asNumber());
         auto parsedStyleSheet = styleSheetRegistry.dereferenceStyleSheet(registeredStyleSheet);
 
         enumerateJSIObject(rt, parsedStyleSheet, [&](const std::string& propertyName, jsi::Object& propertyValue){
@@ -68,6 +72,10 @@ jsi::Value StyleSheet::create(jsi::Runtime& rt, std::string fnName) {
         });
         
         defineFunctionProperty(rt, parsedStyleSheet, "addVariants", addVariantsFn);
+
+        auto thisStyleSheet = thisVal.asObject(rt);
+
+        defineFunctionProperty(rt, thisStyleSheet, "__id", jsi::Value(registeredStyleSheet.tag));
 
         return jsi::Value(rt, parsedStyleSheet);
     });
