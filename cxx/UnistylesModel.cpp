@@ -67,7 +67,6 @@ void UnistylesModel::handleContentSizeCategoryChange(std::string contentSizeCate
     }
 
     this->contentSizeCategory = contentSizeCategory;
-    this->onContentSizeCategoryChange(contentSizeCategory);
 }
 
 jsi::Value UnistylesModel::getThemeOrFail(jsi::Runtime& runtime) {
@@ -142,13 +141,6 @@ void UnistylesModel::onThemeChange(std::string themeName) {
     payload["themeName"] = themeName;
 
     this->emitDeviceEvent("theme", payload);
-}
-
-void UnistylesModel::onContentSizeCategoryChange(std::string contentSizeCategory) {
-    EventPayload payload;
-    payload["contentSizeCategory"] = contentSizeCategory;
-
-    this->emitDeviceEvent("dynamicTypeSize", payload);
 }
 
 void UnistylesModel::onPluginChange() {

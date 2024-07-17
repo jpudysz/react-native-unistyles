@@ -46,8 +46,7 @@ export enum AndroidContentSizeCategory {
 export enum UnistylesEventType {
     Theme = 'theme',
     Layout = 'layout',
-    Plugin = 'plugin',
-    DynamicTypeSize = 'dynamicTypeSize'
+    Plugin = 'plugin'
 }
 
 export enum UnistylesError {

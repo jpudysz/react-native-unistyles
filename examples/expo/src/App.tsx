@@ -58,6 +58,7 @@ export const App: React.FunctionComponent = () => (
                 <Stack.Screen name={DemoNames.BooleanVariants} component={Screens.BooleanVariantsScreen} />
                 <Stack.Screen name={DemoNames.UpdateTheme} component={Screens.UpdateThemeScreen} />
                 <Stack.Screen name={DemoNames.AndroidStatusBarNavigationBar} component={Screens.AndroidStatusBarNavigationBarScreen} />
+                <Stack.Screen name={DemoNames.Keyboard} component={Screens.KeyboardScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     </SafeAreaProvider>

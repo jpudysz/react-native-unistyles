@@ -12,8 +12,9 @@ import Badge from '../../../components/Badge.astro'
     }}
 >
 
-<Badge label="All platforms" />
-<Badge label="2.0.0" />
+<Badge label="All platforms" striketrough />
+<Badge label="2.0.0" striketrough />
+<Badge label="Deprecated in 2.9.0" />
 
 If you find that Unistyles lacks certain features, you can easily extend its functionality with plugins.
 
@@ -173,7 +174,7 @@ export const fontWeightPlugin: UnistylesPlugin = {
         if ('fontWeight' in styles) {
              // in this case we should add fontFamily
         }
-        
+
         return styles
     }
 }
@@ -198,7 +199,7 @@ export const fontWeightPlugin: UnistylesPlugin = {
 +                }
 +            }
         }
-        
+
         return styles
     }
 }

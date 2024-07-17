@@ -90,11 +90,4 @@ export type UnistylesPluginEvent = {
     type: UnistylesEventType.Plugin
 }
 
-export type UnistylesDynamicTypeSizeEvent = {
-    type: UnistylesEventType.DynamicTypeSize,
-    payload: {
-        contentSizeCategory: IOSContentSizeCategory | AndroidContentSizeCategory
-    }
-}
-
-export type UnistylesEvents = UnistylesThemeEvent | UnistylesMobileLayoutEvent | UnistylesPluginEvent | UnistylesDynamicTypeSizeEvent
+export type UnistylesEvents = UnistylesThemeEvent | UnistylesMobileLayoutEvent | UnistylesPluginEvent
