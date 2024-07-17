@@ -115,4 +115,15 @@ bool containsAllPairs(jsi::Runtime& rt, Variants& variants, jsi::Object& compoun
     return true;
 }
 
+bool isPlatformColor(jsi::Runtime& rt, jsi::Object& maybePlatformColor) {
+    auto isIOSPlatformColor = maybePlatformColor.hasProperty(rt, "semantic") && maybePlatformColor.getProperty(rt, "semantic").isObject();
+    
+    if (isIOSPlatformColor) {
+        return true;
+    }
+    
+    // Android
+    return maybePlatformColor.hasProperty(rt, "resource_paths") && maybePlatformColor.getProperty(rt, "resource_paths").isObject();
+}
+
 }

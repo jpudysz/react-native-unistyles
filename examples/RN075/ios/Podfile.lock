@@ -1237,7 +1237,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-unistyles (2.8.1):
+  - react-native-unistyles (2.8.4):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1756,7 +1756,7 @@ SPEC CHECKSUMS:
   React-logger: 4519165efa410d66bd66cfcc3d1affaab6328505
   React-Mapbuffer: 9296d429e276349c7191b02aea83290e46023597
   React-microtasksnativemodule: 4fd6ef9b81209ab7bc51d6144fe899823c7cf5de
-  react-native-unistyles: 02c16a7153bb9cf6323277fa983bb138aa97fc6a
+  react-native-unistyles: d642f5b036e1421f12e28c04266139062294c357
   React-nativeconfig: 19c11c393ea8d14e3e172df7f97a909014a6ec11
   React-NativeModulesApple: c254c827b10bdffba1f0c6a5d952a9cb50b5d00c
   React-perflogger: ed334ad2e4363e9a4c593473030e0be2263e1165
