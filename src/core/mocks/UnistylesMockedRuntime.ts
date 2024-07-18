@@ -28,7 +28,8 @@ export class UnistylesMockedRuntime {
             },
             orientation: this.orientation,
             pixelRatio: this.pixelRatio,
-            fontScale: this.fontScale
+            fontScale: this.fontScale,
+            hairlineWidth: this.hairlineWidth
         }
     }
 
@@ -88,6 +89,10 @@ export class UnistylesMockedRuntime {
 
     public get pixelRatio() {
         return 1.0
+    }
+
+    public get hairlineWidth() {
+        return 0.333333
     }
 
     public get fontScale() {
