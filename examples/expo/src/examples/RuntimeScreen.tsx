@@ -23,7 +23,8 @@ export const RuntimeScreen: React.FunctionComponent = () => {
         statusBar,
         navigationBar,
         pixelRatio,
-        fontScale
+        fontScale,
+        hairlineWidth
     } = UnistylesRuntime
     const { styles, theme } = useStyles(stylesheet)
 
@@ -72,6 +73,14 @@ export const RuntimeScreen: React.FunctionComponent = () => {
                         </Text>
                         <Text style={styles.text(false)}>
                             {fontScale}
+                        </Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Text style={styles.text(true)}>
+                            Hairline width:
+                        </Text>
+                        <Text style={styles.text(false)}>
+                            {hairlineWidth}
                         </Text>
                     </View>
                     <View style={styles.row}>
