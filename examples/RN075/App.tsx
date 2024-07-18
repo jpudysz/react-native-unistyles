@@ -123,7 +123,7 @@ const styles = StyleSheet.create((theme, rt) => ({
             },
             color: {
                 default: {
-                    color: 'red'
+                    color: '#ffffff'
                 }
             }
         },
@@ -132,7 +132,17 @@ const styles = StyleSheet.create((theme, rt) => ({
                 size: 'small',
                 bold: true,
                 styles: {
-                    color: theme.colors.barbie
+                    color: theme.colors.barbie,
+                    paddingHorizontal: {
+                        sm: 10,
+                        md: 10,
+                        lg: 10
+                    },
+                    paddingVertical: {
+                        sm: 10,
+                        md: 10,
+                        lg: 10
+                    }
                 }
             }
         ],
