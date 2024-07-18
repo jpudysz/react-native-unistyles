@@ -60,14 +60,20 @@ StyleSheetHolder& StyleSheetRegistry::add(jsi::Object styleSheet) {
     return this->styleSheets.back();
 }
 
-StyleSheetHolder& StyleSheetRegistry::getStyleSheet(int styleSheetId) {
-    for (auto& stylesheet : this->styleSheets) {
-        if (stylesheet.tag == styleSheetId) {
-            return stylesheet;
+void StyleSheetRegistry::remove(int styleSheetId) {
+    auto it = std::find_if(
+        this->styleSheets.cbegin(),
+        this->styleSheets.cend(),
+        [styleSheetId](auto& holder){
+            return holder.tag == styleSheetId;
         }
+    );
+    
+    if (it == this->styleSheets.cend()) {
+        throw std::runtime_error("StyleSheet with id: " + std::to_string(styleSheetId) + " cannot be found.");
     }
     
-    throw std::runtime_error("StyleSheet with id: " + std::to_string(styleSheetId) + " cannot be found.");
+    this->styleSheets.erase(it);
 }
 
 jsi::Value StyleSheetRegistry::getCurrentTheme() {
@@ -139,7 +145,7 @@ jsi::Object StyleSheetRegistry::wrapInHostFunction(StyleSheetHolder& holder, jsi
 
         // proxy function
         auto hostFn = unistyles::helpers::createHostFunction(rt, propertyName, 1, [&, propertyName](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count){
-            // call original function function
+            // call original function
             auto result = thisVal
                 .asObject(rt)
                 .getProperty(rt, jsi::String::createFromUtf8(rt, PROXY_FN_PREFIX + propertyName))
@@ -157,14 +163,14 @@ jsi::Object StyleSheetRegistry::wrapInHostFunction(StyleSheetHolder& holder, jsi
 
             // styles have been already created, just update metadata
             if (it != holder.styles.end()) {
-                it->addDynamicFunctionMetadata(count, jsi::dynamicFromValue(rt, arguments));
+                it->addDynamicFunctionMetadata(rt, count, arguments);
 
                 return result;
             }
 
             Unistyle unistyle{UnistyleType::DynamicFunction, propertyName, std::move(result), this->unistylesRuntime};
             
-            unistyle.addDynamicFunctionMetadata(count, jsi::dynamicFromValue(rt, arguments));
+            unistyle.addDynamicFunctionMetadata(rt, count, arguments);
             holder.styles.push_back(std::move(unistyle));
  
             return jsi::Value(rt, holder.styles.back().parseStyle(rt, holder.variants));
@@ -173,9 +179,17 @@ jsi::Object StyleSheetRegistry::wrapInHostFunction(StyleSheetHolder& holder, jsi
         unistyles::helpers::defineFunctionProperty(rt, mergedStyles, PROXY_FN_PREFIX + propertyName, std::move(propertyValue));
         mergedStyles.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), hostFn);
     });
-    
+
     for (Unistyle& unistyle : holder.styles) {
-        mergedStyles.setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle.name), unistyle.parseStyle(rt, holder.variants));
+        if (unistyle.type == UnistyleType::Object) {
+            mergedStyles.setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle.name), unistyle.parseStyle(rt, holder.variants));
+            
+            continue;
+        }
+        
+        if (unistyle.type == UnistyleType::DynamicFunction) {
+            // do nothing, it's already proxied with Host Function
+        }
     }
 
     return mergedStyles;

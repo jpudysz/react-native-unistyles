@@ -18,8 +18,8 @@ struct Unistyle {
     folly::fbvector<StyleDependencies> dependencies;
 
     // for dynamic functions
-    std::optional<size_t> count;
-    std::optional<folly::dynamic> arguments;
+    size_t count;
+    folly::fbvector<folly::dynamic> arguments {};
 
     std::shared_ptr<UnistylesRuntime> unistylesRuntime;
 
@@ -39,9 +39,48 @@ struct Unistyle {
         this->unistylesRuntime = src.unistylesRuntime;
     }
 
-    void addDynamicFunctionMetadata(size_t count, folly::dynamic arguments) {
+    void addDynamicFunctionMetadata(jsi::Runtime& rt, size_t count, const jsi::Value* arguments) {
         this->count = count;
-        this->arguments = arguments;
+        
+        for (size_t i = 0; i < count; i++) {
+            auto& arg = arguments[i];
+            
+            if (arg.isBool()) {
+                this->arguments.push_back(folly::dynamic(arg.asBool()));
+                
+                continue;
+            }
+            
+            if (arg.isNumber()) {
+                this->arguments.push_back(folly::dynamic(arg.asNumber()));
+                
+                continue;
+            }
+            
+            if (arg.isString()) {
+                this->arguments.push_back(folly::dynamic(arg.asString(rt).utf8(rt)));
+                
+                continue;
+            }
+            
+            if (arg.isUndefined()) {
+                this->arguments.push_back(folly::dynamic());
+                
+                continue;
+            }
+            
+            if (arg.isNull()) {
+                this->arguments.push_back(folly::dynamic(nullptr));
+                
+                continue;
+            }
+            
+            if (arg.isObject()) {
+                this->arguments.push_back(jsi::dynamicFromValue(rt, arg));
+                
+                continue;
+            }
+        }
     }
 
     folly::fbvector<StyleDependencies> parseDependencies(jsi::Runtime& rt, const jsi::Object& propertyValue) {
@@ -70,8 +109,9 @@ struct Unistyle {
         auto style = this->rawStyle.asObject(rt);
         auto parsedStyle = jsi::Object(rt);
 
-        // we need to be sure that compoundVariants are parsed after variants
-        bool shouldParseCompoundVariants = style.hasProperty(rt, "compoundVariants") && style.hasProperty(rt, "variants");
+        // we need to be sure that compoundVariants are parsed after variants after every other style
+        bool shouldParseVariants = style.hasProperty(rt, "variants");
+        bool shouldParseCompoundVariants = style.hasProperty(rt, "compoundVariants") && shouldParseVariants;
 
         jsi::Array propertyNames = style.getPropertyNames(rt);
         size_t length = propertyNames.size(rt);
@@ -106,18 +146,8 @@ struct Unistyle {
                 continue;
             }
 
+            // variants are computed soon after all styles
             if (propertyName == "variants") {
-                auto parsedVariant = this->parseVariants(rt, variants, propertyValueObject);
-
-                unistyles::helpers::mergeJSIObjects(rt, parsedStyle, parsedVariant);
-
-                if (shouldParseCompoundVariants) {
-                    auto compoundVariants = style.getProperty(rt, "compoundVariants").asObject(rt);
-                    auto parsedCompoundVariants = this->parseCompoundVariants(rt, variants, compoundVariants);
-
-                    unistyles::helpers::mergeJSIObjects(rt, parsedStyle, parsedCompoundVariants);
-                }
-
                 continue;
             }
 
@@ -154,6 +184,20 @@ struct Unistyle {
             auto valueFromBreakpoint = getValueFromBreakpoints(rt, propertyValueObject);
 
             parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), parseNestedStyle(rt, valueFromBreakpoint));
+        }
+        
+        if (shouldParseVariants) {
+            auto propertyValueObject = style.getProperty(rt, "variants").asObject(rt);
+            auto parsedVariant = this->parseVariants(rt, variants, propertyValueObject);
+            
+            unistyles::helpers::mergeJSIObjects(rt, parsedStyle, parsedVariant);
+
+            if (shouldParseCompoundVariants) {
+                auto compoundVariants = style.getProperty(rt, "compoundVariants").asObject(rt);
+                auto parsedCompoundVariants = this->parseCompoundVariants(rt, variants, compoundVariants);
+
+                unistyles::helpers::mergeJSIObjects(rt, parsedStyle, parsedCompoundVariants);
+            }
         }
 
         return parsedStyle;
@@ -195,7 +239,7 @@ struct Unistyle {
                 continue;
             }
 
-            auto nestedObjectStyle = nestedStyle.asObject(rt);
+            auto nestedObjectStyle = propertyValue.asObject(rt);
 
             if (nestedObjectStyle.isArray(rt) || nestedObjectStyle.isFunction(rt)) {
                 parsedStyle.setProperty(rt, propertyName.c_str(), jsi::Value::undefined());

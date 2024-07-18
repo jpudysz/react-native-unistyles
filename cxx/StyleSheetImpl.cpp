@@ -16,10 +16,14 @@ jsi::Value StyleSheet::create(jsi::Runtime& rt, std::string fnName) {
         assertThat(rt, arguments[0].isObject(), "StyleSheet.create must be called with object or function");
 
         auto styleSheetId = thisVal.asObject(rt).getProperty(rt, "__id");
+        
+        // this might happen only when hot reloading
+        if (!styleSheetId.isUndefined()) {
+            styleSheetRegistry.remove(styleSheetId.asNumber());
+        }
+        
         auto rawStyleSheet = arguments[0].asObject(rt);
-        auto& registeredStyleSheet = styleSheetId.isUndefined()
-            ? styleSheetRegistry.add(std::move(rawStyleSheet))
-            : styleSheetRegistry.getStyleSheet(styleSheetId.asNumber());
+        auto& registeredStyleSheet = styleSheetRegistry.add(std::move(rawStyleSheet));
         auto parsedStyleSheet = styleSheetRegistry.dereferenceStyleSheet(registeredStyleSheet);
 
         enumerateJSIObject(rt, parsedStyleSheet, [&](const std::string& propertyName, jsi::Object& propertyValue){
