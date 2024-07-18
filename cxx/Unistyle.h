@@ -241,9 +241,22 @@ struct Unistyle {
 
             auto nestedObjectStyle = propertyValue.asObject(rt);
 
-            if (nestedObjectStyle.isArray(rt) || nestedObjectStyle.isFunction(rt)) {
+            if (nestedObjectStyle.isFunction(rt)) {
                 parsedStyle.setProperty(rt, propertyName.c_str(), jsi::Value::undefined());
 
+                continue;
+            }
+            
+            // possible with variants and compoundVariants
+            if (nestedObjectStyle.isArray(rt) && propertyName == "transform") {
+                parsedStyle.setProperty(rt, propertyName.c_str(), parseTransforms(rt, nestedObjectStyle));
+                
+                continue;
+            }
+            
+            if (nestedObjectStyle.isArray(rt) && propertyName == "fontVariant") {
+                parsedStyle.setProperty(rt, propertyName.c_str(), propertyValue);
+                
                 continue;
             }
 
@@ -327,23 +340,29 @@ struct Unistyle {
                 : std::nullopt;
 
             auto styles = this->getStylesForVariant(rt, groupValue, selectedVariant);
+            
+            if (styles.isUndefined() || !styles.isObject()) {
+                continue;
+            }
+            
+            auto parsedNestedStyles = parseNestedStyle(rt, styles).asObject(rt);
 
-            unistyles::helpers::mergeJSIObjects(rt, parsedVariant, styles);
+            unistyles::helpers::mergeJSIObjects(rt, parsedVariant, parsedNestedStyles);
         }
 
         return parsedVariant;
     }
 
-    jsi::Object getStylesForVariant(jsi::Runtime& rt, jsi::Object& groupValue, std::optional<std::string> selectedVariant) {
+    jsi::Value getStylesForVariant(jsi::Runtime& rt, jsi::Object& groupValue, std::optional<std::string> selectedVariant) {
         auto selectedVariantKey = selectedVariant.has_value()
             ? selectedVariant.value().c_str()
             : "default";
 
         if (groupValue.hasProperty(rt, selectedVariantKey)) {
-            return groupValue.getProperty(rt, selectedVariantKey).asObject(rt);
+            return groupValue.getProperty(rt, selectedVariantKey);
         }
 
-        return jsi::Object(rt);
+        return jsi::Value::undefined();
     }
 
     jsi::Object parseCompoundVariants(jsi::Runtime& rt, Variants& variants, jsi::Object& obj) {
