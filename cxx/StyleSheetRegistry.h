@@ -12,17 +12,18 @@ using namespace facebook;
 
 struct StyleSheetRegistry {
     StyleSheetRegistry(jsi::Runtime& rt, std::shared_ptr<UnistylesRuntime> unistylesRuntime): rt{rt}, unistylesRuntime{unistylesRuntime} {}
-    
+
     StyleSheetHolder& add(jsi::Object);
     void remove(int styleSheetId);
     jsi::Object dereferenceStyleSheet(StyleSheetHolder&);
-    
+    folly::fbvector<const Unistyle*> getStylesWithDependencies(std::vector<StyleDependency>&);
+
 private:
     jsi::Value getCurrentTheme();
     jsi::Value getMiniRuntime();
     jsi::Object wrapInHostFunction(StyleSheetHolder&, jsi::Object&);
     void addStyleSheetFunction(jsi::Function, int);
-    
+
     jsi::Runtime& rt;
     jsi::Value currentTheme;
     jsi::Value miniRuntime;

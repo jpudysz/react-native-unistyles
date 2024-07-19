@@ -47,14 +47,17 @@ StyleSheet.configure({
     } as UnistylesThemes
 })
 
-const useVariants = (styles, variants) => {
-    styles.addVariants(variants)
-}
+const useVariants = (styles, variants) => styles.__unistyles__addVariants(variants)
 
 export const App = () => {
     const [isTextHidden, setIsTextHidden] = useState(false)
 
-    useVariants(styles, undefined)
+    useVariants(styles, {
+        size: 'small',
+        bold: true
+    })
+
+    console.log(styles)
 
     return (
         <View
@@ -99,11 +102,10 @@ const styles = StyleSheet.create((theme, rt) => ({
         alignItems: 'center',
         paddingBottom: rt.insets.bottom,
         paddingHorizontal: theme.gap(2),
-        __unistyles__dependencies_: ['$0', '$1']
+        __unistyles__dependencies_: [0, 1, 3]
     },
     text: {
         color: PlatformColor('systemTealColor'),
-        fontWeight: 'bold',
         variants: {
             size: {
                 small: {
@@ -123,7 +125,7 @@ const styles = StyleSheet.create((theme, rt) => ({
             },
             color: {
                 default: {
-                    color: '#ffffff'
+                    color: theme.colors.typography
                 }
             }
         },
@@ -132,24 +134,24 @@ const styles = StyleSheet.create((theme, rt) => ({
                 size: 'small',
                 bold: true,
                 styles: {
-                    color: theme.colors.barbie,
+                    color: 'red',
                     paddingHorizontal: {
-                        sm: 10,
+                        xs: 10,
                         md: 10,
                         lg: 10
                     },
                     paddingVertical: {
-                        sm: 10,
+                        xs: 10,
                         md: 10,
                         lg: 10
                     }
                 }
             }
         ],
-        __unistyles__dependencies_: ['$0', '$2']
+        __unistyles__dependencies_: [0, 1, 2]
     },
     dynamicText: (paddingLeft: number) => ({
         paddingLeft: rt.insets.bottom + paddingLeft,
-        __unistyles__dependencies_: ['$1']
+        __unistyles__dependencies_: [3]
     })
 }))

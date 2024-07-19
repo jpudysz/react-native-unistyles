@@ -14,8 +14,9 @@ struct Unistyle {
     std::string name;
     UnistyleType type;
     jsi::Value rawStyle;
+    bool hasVariants;
     folly::fbvector<int> nativeTags {};
-    folly::fbvector<StyleDependencies> dependencies;
+    folly::fbvector<StyleDependency> dependencies;
 
     // for dynamic functions
     size_t count;
@@ -83,8 +84,8 @@ struct Unistyle {
         }
     }
 
-    folly::fbvector<StyleDependencies> parseDependencies(jsi::Runtime& rt, const jsi::Object& propertyValue) {
-        folly::fbvector<StyleDependencies> parsedDependencies;
+    folly::fbvector<StyleDependency> parseDependencies(jsi::Runtime& rt, const jsi::Object& propertyValue) {
+        folly::fbvector<StyleDependency> parsedDependencies;
 
         if (!propertyValue.isArray(rt)) {
             // todo throw error
@@ -97,9 +98,9 @@ struct Unistyle {
 
         for (size_t i = 0; i < length; i++) {
             jsi::Value element = deps.getValueAtIndex(rt, i);
-            std::string str = element.asString(rt).utf8(rt);
+            StyleDependency dependency = static_cast<StyleDependency>(element.asNumber());
 
-            parsedDependencies.push_back(unistyles::helpers::getDependencyForString(str));
+            parsedDependencies.push_back(dependency);
         }
 
         return parsedDependencies;
@@ -121,9 +122,14 @@ struct Unistyle {
             auto propertyValue = style.getProperty(rt, propertyName.c_str());
 
             // parse dependencies only once
-            if (this->dependencies.empty() && propertyName == STYLE_DEPENDENCIES) {
+            if (propertyName == STYLE_DEPENDENCIES && this->dependencies.empty()) {
                 this->dependencies = this->parseDependencies(rt, propertyValue.asObject(rt));
+                this->hasVariants = std::find(this->dependencies.cbegin(), this->dependencies.cend(), StyleDependency::Variants) != this->dependencies.end();
 
+                continue;
+            }
+            
+            if (propertyName == STYLE_DEPENDENCIES && !this->dependencies.empty()) {
                 continue;
             }
 
@@ -186,7 +192,7 @@ struct Unistyle {
             parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), parseNestedStyle(rt, valueFromBreakpoint));
         }
         
-        if (shouldParseVariants) {
+        if (shouldParseVariants && !variants.empty()) {
             auto propertyValueObject = style.getProperty(rt, "variants").asObject(rt);
             auto parsedVariant = this->parseVariants(rt, variants, propertyValueObject);
             
@@ -226,7 +232,7 @@ struct Unistyle {
         for (size_t i = 0; i < length; i++) {
             auto propertyName = propertyNames.getValueAtIndex(rt, i).asString(rt).utf8(rt);
             auto propertyValue = nestedObjectStyle.getProperty(rt, propertyName.c_str());
-
+   
             if (propertyValue.isString() || propertyValue.isNumber() || propertyValue.isUndefined() || propertyValue.isNull()) {
                 parsedStyle.setProperty(rt, propertyName.c_str(), propertyValue);
 
@@ -384,9 +390,10 @@ struct Unistyle {
             auto valueObject = value.asObject(rt);
 
             if (unistyles::helpers::containsAllPairs(rt, variants, valueObject)) {
-                auto styles = valueObject.getPropertyAsObject(rt, "styles");
-
-                unistyles::helpers::mergeJSIObjects(rt, parsedCompoundVariants, styles);
+                auto styles = valueObject.getProperty(rt, "styles");
+                auto parsedNestedStyles = parseNestedStyle(rt, styles).asObject(rt);
+                
+                unistyles::helpers::mergeJSIObjects(rt, parsedCompoundVariants, parsedNestedStyles);
             }
         }
 
