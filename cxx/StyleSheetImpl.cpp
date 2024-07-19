@@ -16,12 +16,12 @@ jsi::Value StyleSheet::create(jsi::Runtime& rt, std::string fnName) {
         assertThat(rt, arguments[0].isObject(), "StyleSheet.create must be called with object or function");
 
         auto styleSheetId = thisVal.asObject(rt).getProperty(rt, "__id");
-        
+
         // this might happen only when hot reloading
         if (!styleSheetId.isUndefined()) {
             styleSheetRegistry.remove(styleSheetId.asNumber());
         }
-        
+
         auto rawStyleSheet = arguments[0].asObject(rt);
         auto& registeredStyleSheet = styleSheetRegistry.add(std::move(rawStyleSheet));
         auto parsedStyleSheet = styleSheetRegistry.dereferenceStyleSheet(registeredStyleSheet);
@@ -66,22 +66,30 @@ jsi::Value StyleSheet::create(jsi::Runtime& rt, std::string fnName) {
             defineFunctionProperty(rt, propertyValue, "addNode", addNodeHostFn);
             defineFunctionProperty(rt, propertyValue, "removeNode", removeNodeHostFn);
         });
-        
-        auto addVariantsFn = createHostFunction(rt, "addVariants", 1, [&registeredStyleSheet](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count){
-            registeredStyleSheet.addVariants(rt, jsi::Value(rt, arguments[0]));
-            
-            // todo trigger event
 
-            return jsi::Value::undefined();
+        auto addVariantsFn = createHostFunction(rt, ADD_VARIANTS_FN, 1, [this, &registeredStyleSheet](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count){
+            registeredStyleSheet.addVariants(rt, jsi::Value(rt, arguments[0]));
+            jsi::Object stylesWithVariants = jsi::Object(rt);
+            
+            for (auto& style: registeredStyleSheet.styles) {
+                if (style.hasVariants) {
+                    stylesWithVariants.setProperty(rt, style.name.c_str(), style.parseStyle(rt, registeredStyleSheet.variants));
+                }
+            }
+
+            return stylesWithVariants;
         });
-        
-        defineFunctionProperty(rt, parsedStyleSheet, "addVariants", addVariantsFn);
+
+        defineFunctionProperty(rt, parsedStyleSheet, ADD_VARIANTS_FN, addVariantsFn);
 
         auto thisStyleSheet = thisVal.asObject(rt);
 
         defineFunctionProperty(rt, thisStyleSheet, "__id", jsi::Value(registeredStyleSheet.tag));
 
-        return jsi::Value(rt, parsedStyleSheet);
+        auto style = std::make_shared<HostStyle>(parsedStyleSheet);
+        auto styleHostObject = jsi::Object::createFromHostObject(rt, style);
+
+        return styleHostObject;
     });
 }
 
@@ -148,4 +156,15 @@ void StyleSheet::parseBreakpoints(jsi::Runtime& rt, jsi::Object &breakpoints) {
     std::string breakpoint = this->unistylesRuntime->getBreakpointFromScreenWidth(this->unistylesRuntime->screen.width, sortedBreakpoints);
 
     this->unistylesRuntime->breakpoint = breakpoint;
+}
+
+void StyleSheet::emitEvent(jsi::Runtime&, std::vector<StyleDependency> dependencies) {
+    auto styles = this->styleSheetRegistry.getStylesWithDependencies(dependencies);
+
+    for (const Unistyle* unistyle : styles) {
+        auto styleToUpdate = const_cast<Unistyle*>(unistyle);
+        
+        // todo batch mutate shadow tree
+        // todo batch update native views
+    }
 }

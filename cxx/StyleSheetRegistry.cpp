@@ -68,11 +68,11 @@ void StyleSheetRegistry::remove(int styleSheetId) {
             return holder.tag == styleSheetId;
         }
     );
-    
+
     if (it == this->styleSheets.cend()) {
         throw std::runtime_error("StyleSheet with id: " + std::to_string(styleSheetId) + " cannot be found.");
     }
-    
+
     this->styleSheets.erase(it);
 }
 
@@ -137,9 +137,9 @@ jsi::Object StyleSheetRegistry::wrapInHostFunction(StyleSheetHolder& holder, jsi
         // value is not a function, simply create unistyle
         if (!propertyValue.isFunction(rt)) {
             Unistyle unistyle{UnistyleType::Object, propertyName, std::move(propertyValue), this->unistylesRuntime};
-            
+
             holder.styles.push_back(std::move(unistyle));
-            
+
             return;
         }
 
@@ -169,10 +169,10 @@ jsi::Object StyleSheetRegistry::wrapInHostFunction(StyleSheetHolder& holder, jsi
             }
 
             Unistyle unistyle{UnistyleType::DynamicFunction, propertyName, std::move(result), this->unistylesRuntime};
-            
+
             unistyle.addDynamicFunctionMetadata(rt, count, arguments);
             holder.styles.push_back(std::move(unistyle));
- 
+
             return jsi::Value(rt, holder.styles.back().parseStyle(rt, holder.variants));
         });
 
@@ -183,14 +183,36 @@ jsi::Object StyleSheetRegistry::wrapInHostFunction(StyleSheetHolder& holder, jsi
     for (Unistyle& unistyle : holder.styles) {
         if (unistyle.type == UnistyleType::Object) {
             mergedStyles.setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle.name), unistyle.parseStyle(rt, holder.variants));
-            
+
             continue;
         }
-        
+
         if (unistyle.type == UnistyleType::DynamicFunction) {
             // do nothing, it's already proxied with Host Function
         }
     }
 
     return mergedStyles;
+}
+
+folly::fbvector<const Unistyle*> StyleSheetRegistry::getStylesWithDependencies(std::vector<StyleDependency>& dependencies) {
+    folly::fbvector<const Unistyle*> stylesToUpdate;
+
+    for (const auto& holder : this->styleSheets) {
+        for (const Unistyle& style : holder.styles) {
+            bool hasAnyOfDependencies = std::any_of(
+                style.dependencies.begin(),
+                style.dependencies.end(),
+                [&dependencies](StyleDependency dep) {
+                    return std::find(dependencies.begin(), dependencies.end(), dep) != dependencies.end();
+                }
+            );
+
+            if (hasAnyOfDependencies) {
+                stylesToUpdate.push_back(&style);
+            }
+        }
+    }
+
+    return stylesToUpdate;
 }

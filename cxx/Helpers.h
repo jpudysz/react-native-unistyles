@@ -51,19 +51,6 @@ auto createHostFunction(
     );
 }
 
-// todo extend me
-static StyleDependencies getDependencyForString(const std::string& dep) {
-    if (dep == "$0") {
-        return StyleDependencies::Theme;
-    }
-
-    if (dep == "$1") {
-        return StyleDependencies::Insets;
-    }
-
-    return StyleDependencies::Noop;
-}
-
 void assertThat(jsi::Runtime& runtime, bool condition, const std::string& message) {
     if (!condition) {
         throw jsi::JSError(runtime, "[Unistyles] " + message);
@@ -99,6 +86,16 @@ bool containsAllPairs(jsi::Runtime& rt, Variants& variants, jsi::Object& compoun
         return false;
     }
     
+    jsi::Array propertyNames = compoundVariant.getPropertyNames(rt);
+    size_t length = propertyNames.size(rt);
+    size_t allConditions = compoundVariant.hasProperty(rt, "styles")
+        ? length - 1
+        : length;
+    
+    if (allConditions != variants.size()) {
+        return false;
+    }
+    
     for (auto it = variants.cbegin(); it != variants.cend(); ++it) {
         auto variantKey = it->first;
         auto variantValue = it->second;
@@ -107,7 +104,12 @@ bool containsAllPairs(jsi::Runtime& rt, Variants& variants, jsi::Object& compoun
             return false;
         }
         
-        if (compoundVariant.getProperty(rt, variantKey.c_str()).asString(rt).utf8(rt) != variantValue) {
+        auto property = compoundVariant.getProperty(rt, variantKey.c_str());
+        auto propertyName = property.isBool()
+            ? (property.asBool() ? "true" : "false")
+            : property.asString(rt).utf8(rt);
+
+        if (propertyName != variantValue) {
             return false;
         }
     }
