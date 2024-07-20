@@ -11,10 +11,12 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import androidx.core.graphics.ColorUtils
+import androidx.core.text.TextUtilsCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.facebook.react.bridge.ReactApplicationContext
+import java.util.Locale
 import kotlin.math.roundToInt
 
 class Platform(private val reactApplicationContext: ReactApplicationContext) {
@@ -75,6 +77,19 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
         val screenWidth = (displayMetrics.widthPixels / displayMetrics.density).roundToInt()
 
         return Dimensions(screenWidth, getStatusBarHeight())
+    }
+
+    fun getIsRTL(): Boolean {
+        // forced by React Native
+        val sharedPrefs = reactApplicationContext.getSharedPreferences(
+            "com.facebook.react.modules.i18nmanager.I18nUtil",
+            Context.MODE_PRIVATE
+        )
+        val hasForcedRtl = sharedPrefs.getBoolean("RCTI18nUtil_forceRTL", false)
+        // user preferences
+        val isRtl = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == ViewCompat.LAYOUT_DIRECTION_RTL
+
+        return hasForcedRtl || isRtl
     }
 
     fun getNavigationBarDimensions(): Dimensions {

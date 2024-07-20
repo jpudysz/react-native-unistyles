@@ -294,3 +294,7 @@ jsi::Value UnistylesRuntime::setRootBackgroundColor(jsi::Runtime& rt, std::strin
         return jsi::Value::undefined();
     });
 }
+
+jsi::Value UnistylesRuntime::getIsRtl(jsi::Runtime& rt, std::string fnName) {
+    return jsi::Value(this->rtl);
+}
