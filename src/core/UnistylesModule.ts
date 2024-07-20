@@ -40,13 +40,15 @@ export class UnistylesBridgeWeb {
     }
     #pixelRatio = 1.0
     #fontScale = 1.0
-    #hairlineWidth = 0.333333
+    #hairlineWidth = 1
+    #rtl = false
 
     constructor() {
         if (!isServer) {
             this.setupListeners()
             this.#screenWidth = window.innerWidth
             this.#screenHeight = window.innerHeight
+            this.#rtl = window.getComputedStyle(document.documentElement).direction === 'rtl'
         }
     }
 
@@ -88,6 +90,8 @@ export class UnistylesBridgeWeb {
                         return this.#fontScale
                     case 'hairlineWidth':
                         return this.#hairlineWidth
+                    case 'rtl':
+                        return this.#rtl
                     case 'useTheme':
                         return (themeName: keyof UnistylesThemes) => this.useTheme(themeName)
                     case 'updateTheme':
