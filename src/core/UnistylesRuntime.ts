@@ -2,7 +2,7 @@ import { ScreenOrientation, UnistylesError } from '../common'
 import type { Color, UnistylesBridge, UnistylesPlugin } from '../types'
 import type { UnistylesThemes } from '../global'
 import type { UnistyleRegistry } from './UnistyleRegistry'
-import { parseColor } from '../utils'
+import { parseColor } from '../utils/parseColor'
 
 /**
  * Utility to interact with the Unistyles during runtime
