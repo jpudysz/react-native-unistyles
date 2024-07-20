@@ -14,7 +14,10 @@ export type {
     StyleSheetWithSuperPowers,
     StyleSheet,
     AllAvailableKeys,
-    UnistylesValues
+    UnistylesValues,
+    UnistyleText,
+    UnistyleView,
+    UnistyleImage
 } from './stylesheet'
 export type { ReactNativeStyleSheet } from './breakpoints'
 export type { ExtractVariantNames } from './variants'
