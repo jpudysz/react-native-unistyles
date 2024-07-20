@@ -29,7 +29,8 @@ export class UnistylesMockedRuntime {
             orientation: this.orientation,
             pixelRatio: this.pixelRatio,
             fontScale: this.fontScale,
-            hairlineWidth: this.hairlineWidth
+            hairlineWidth: this.hairlineWidth,
+            rtl: this.rtl
         }
     }
 
@@ -61,6 +62,10 @@ export class UnistylesMockedRuntime {
         return firstBreakpoint
             ? firstBreakpoint.at(0)
             : undefined
+    }
+
+    public get rtl() {
+        return false
     }
 
     public get breakpoints() {

@@ -11,6 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "extra": {
+      "supportsRTL": true
+    },
     "assetBundlePatterns": [
       "**/*"
     ],
