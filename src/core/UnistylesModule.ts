@@ -40,6 +40,7 @@ export class UnistylesBridgeWeb {
     }
     #pixelRatio = 1.0
     #fontScale = 1.0
+    #hairlineWidth = 0.333333
 
     constructor() {
         if (!isServer) {
@@ -85,6 +86,8 @@ export class UnistylesBridgeWeb {
                         return this.#pixelRatio
                     case 'fontScale':
                         return this.#fontScale
+                    case 'hairlineWidth':
+                        return this.#hairlineWidth
                     case 'useTheme':
                         return (themeName: keyof UnistylesThemes) => this.useTheme(themeName)
                     case 'updateTheme':
