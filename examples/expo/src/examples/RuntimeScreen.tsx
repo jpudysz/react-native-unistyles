@@ -24,7 +24,8 @@ export const RuntimeScreen: React.FunctionComponent = () => {
         navigationBar,
         pixelRatio,
         fontScale,
-        hairlineWidth
+        hairlineWidth,
+        rtl
     } = UnistylesRuntime
     const { styles, theme } = useStyles(stylesheet)
 
@@ -81,6 +82,14 @@ export const RuntimeScreen: React.FunctionComponent = () => {
                         </Text>
                         <Text style={styles.text(false)}>
                             {hairlineWidth}
+                        </Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Text style={styles.text(true)}>
+                            RTL
+                        </Text>
+                        <Text style={styles.text(false)}>
+                            {String(rtl)}
                         </Text>
                     </View>
                     <View style={styles.row}>
@@ -257,7 +266,7 @@ const stylesheet = createStyleSheet((theme, runtime) => ({
         top: runtime.insets.top,
         left: 0,
         right: 0,
-        height: 1,
+        height: runtime.hairlineWidth,
         backgroundColor: theme.colors.accent
     },
     bottomInset: {
@@ -265,7 +274,7 @@ const stylesheet = createStyleSheet((theme, runtime) => ({
         bottom: runtime.insets.bottom,
         left: 0,
         right: 0,
-        height: 1,
+        height: runtime.hairlineWidth,
         backgroundColor: theme.colors.accent
     },
     leftInset: {
@@ -273,7 +282,7 @@ const stylesheet = createStyleSheet((theme, runtime) => ({
         top: 0,
         bottom: 0,
         left: runtime.insets.left,
-        width: 1,
+        width: runtime.hairlineWidth,
         backgroundColor: theme.colors.accent
     },
     rightInset: {
@@ -281,7 +290,7 @@ const stylesheet = createStyleSheet((theme, runtime) => ({
         top: 0,
         bottom: 0,
         right: runtime.insets.right,
-        width: 1,
+        width: runtime.hairlineWidth,
         backgroundColor: theme.colors.accent
     }
 }))

@@ -91,6 +91,7 @@
         unistylesRuntime->insets = [self getInsets];
         unistylesRuntime->pixelRatio = screen.pixelRatio;
         unistylesRuntime->fontScale = screen.fontScale;
+        unistylesRuntime->rtl = [self isRtl];
     });
 }
 
@@ -147,6 +148,15 @@
     float fontScale = getFontScale();
 
     return Screen({width, height, pixelRatio, fontScale});
+}
+
+- (bool)isRtl {
+    // forced by React Native
+    BOOL hasForcedRtl = [[NSUserDefaults standardUserDefaults] boolForKey:@"RCTI18nUtil_forceRTL"];
+    // user preferences
+    BOOL isRtl = [UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
+    
+    return hasForcedRtl || isRtl;
 }
 
 - (void)setStatusBarHidden:(bool)isHidden {

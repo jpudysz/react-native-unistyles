@@ -31,7 +31,8 @@ export class UnistylesRuntime {
             orientation: this.orientation,
             pixelRatio: this.pixelRatio,
             fontScale: this.fontScale,
-            hairlineWidth: this.hairlineWidth
+            hairlineWidth: this.hairlineWidth,
+            rtl: this.rtl
         }
     }
 
@@ -41,6 +42,14 @@ export class UnistylesRuntime {
      */
     public get colorScheme() {
         return this.unistylesBridge.colorScheme
+    }
+
+    /**
+     * Get the layout direction
+     * @returns - Boolean indicating if the layout direction is RTL
+     */
+    public get rtl() {
+        return this.unistylesBridge.rtl
     }
 
     /**
