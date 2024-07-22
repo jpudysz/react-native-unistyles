@@ -1,7 +1,7 @@
 import { unistyles } from './core'
 import { mq } from './utils'
 import { useInitialTheme } from './hooks'
-import type { UnistylesPlugin, UnistylesValues, UnistyleText, UnistyleView, UnistyleImage, ExtractVariantNames } from './types'
+import type { UnistylesPlugin, UnistylesValues, UnistyleText, UnistyleView, UnistyleImage, ExtractVariantNames, UnistylesTheme } from './types'
 import type { UnistylesThemes, UnistylesBreakpoints } from './global'
 import { ScreenOrientation, AndroidContentSizeCategory, IOSContentSizeCategory } from './common'
 import { useStyles } from './useStyles'
@@ -44,6 +44,7 @@ export {
 }
 
 export type {
+    UnistylesTheme,
     UnistylesThemes,
     UnistylesBreakpoints,
     UnistylesPlugin,
