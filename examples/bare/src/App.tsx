@@ -2,6 +2,7 @@ import React from 'react'
 import { useStyles, createStyleSheet, UnistylesRuntime } from 'react-native-unistyles'
 import { View, Text, Pressable } from 'react-native'
 import './styles'
+import type { UnistyleText } from '../../../lib/typescript/src'
 
 export const App: React.FunctionComponent = () => {
     const { styles } = useStyles(stylesheet)
@@ -32,6 +33,12 @@ export const App: React.FunctionComponent = () => {
     )
 }
 
+const fonts: {bold: UnistyleText} = {
+    bold: {
+        fontWeight: 'bold'
+    }
+}
+
 const stylesheet = createStyleSheet((theme, rt) => ({
     container: {
         flex: 1,
@@ -45,8 +52,8 @@ const stylesheet = createStyleSheet((theme, rt) => ({
         color: theme.colors.typography
     },
     highlight: {
-        fontWeight: 'bold',
-        color: theme.colors.accent
+        color: theme.colors.accent,
+        ...fonts.bold
     },
     note: {
         color: theme.colors.typography
@@ -63,7 +70,5 @@ const stylesheet = createStyleSheet((theme, rt) => ({
         borderRadius: 12,
         marginBottom: rt.insets.bottom + 20
     },
-    bold: {
-        fontWeight: 'bold'
-    }
+    bold: fonts.bold
 }))

@@ -43,8 +43,9 @@ export type UnistylesValues = {
     [propName in NestedKeys]?: UnistyleNestedStyles[propName]
 }
 
+type StyleSheetValues = UnistylesValues | UnistyleText | UnistyleImage | UnistyleView
 export type StyleSheet = {
-    [styleName: string]: UnistylesValues | ((...args: any) => UnistylesValues)
+    [styleName: string]: StyleSheetValues | ((...args: any) => StyleSheetValues)
 }
 
 export type StyleSheetWithSuperPowers = ((theme: UnistylesTheme, miniRuntime: UnistylesMiniRuntime) => StyleSheet) | StyleSheet
