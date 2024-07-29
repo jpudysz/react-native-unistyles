@@ -48,7 +48,7 @@ export class UnistylesBridgeWeb {
             this.setupListeners()
             this.#screenWidth = window.innerWidth
             this.#screenHeight = window.innerHeight
-            this.#rtl = window.getComputedStyle(document.documentElement).direction === 'rtl'
+            this.#rtl = document.documentElement.dir === 'rtl'
         }
     }
 
@@ -232,6 +232,13 @@ export class UnistylesBridgeWeb {
                 this.#themeName = this.#colorScheme as keyof UnistylesThemes
                 this.emitThemeChange()
             }
+        })
+
+        new MutationObserver(() => {
+            this.#rtl = document.documentElement.dir === 'rtl'
+        }).observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['dir']
         })
     }
 
