@@ -81,6 +81,7 @@
         return [self setRootViewBackgroundColor:color alpha:alpha];
     });
 
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{
         Screen screen = [self getScreenDimensions];
 
@@ -92,7 +93,11 @@
         unistylesRuntime->pixelRatio = screen.pixelRatio;
         unistylesRuntime->fontScale = screen.fontScale;
         unistylesRuntime->rtl = [self isRtl];
+
+        dispatch_semaphore_signal(semaphore);
     });
+
+    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
 }
 
 - (void)onAppearanceChange:(NSNotification *)notification {
@@ -155,7 +160,7 @@
     BOOL hasForcedRtl = [[NSUserDefaults standardUserDefaults] boolForKey:@"RCTI18nUtil_forceRTL"];
     // user preferences
     BOOL isRtl = [UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
-    
+
     return hasForcedRtl || isRtl;
 }
 
