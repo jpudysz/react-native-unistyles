@@ -84,7 +84,9 @@ coverage
 docs/dist
 
 # cxx
-cxx/tests/.idea/
 cxx/tests/cmake-build-debug/
+cxx/tests/cmake-build-release/
+cxx/tests/Testing/
 cxx/tests/hermes/
 cxx/tests/hermes-debug/
+cxx/tests/cmake-build-debug-coverage/

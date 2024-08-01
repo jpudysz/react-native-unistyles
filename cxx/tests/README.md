@@ -7,31 +7,29 @@ brew cmake
 brew ninja
 ```
 
-2. Download Hermes
+2. Run setup script
 
 ```sh
-$ git clone https://github.com/facebook/hermes.git
+./setup.sh
 ```
 
-3. Build hermes
+3. Run tests
 
 ```sh
-mkdir hermes-debug
-cd hermes-debug
-cmake -G Ninja -DHERMES_BUILD_APPLE_FRAMEWORK=OFF -DCMAKE_BUILD_TYPE=Debug ../
-ninja
+./cmake-build-debug/unistyles-tests
 ```
 
-4. Build tests
+4. Build release (optional)
 
 ```sh
-mkdir build
-cd build
-cmake ..
+mkdir cmake-build-release
+cmake -B ./cmake-build-release -DCMAKE_BUILD_TYPE=Release
+cmake --build ./cmake-build-release --target unistyles-tests -j 10
+./cmake-build-release/unistyles-tests
 ```
 
-5. Run tests
+5. Create watcher
 
 ```sh
-ctest
+cmake --build ./cmake-build-debug --target unistyles-tests -j 10 && ./cmake-build-debug/unistyles-tests
 ```
