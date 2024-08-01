@@ -29,6 +29,7 @@
     "verbatimModuleSyntax": true
   },
   "exclude": [
-    "examples/vision/visionos"
+    "examples/vision/visionos",
+    "cxx/tests"
   ]
 }

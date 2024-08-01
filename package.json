@@ -139,7 +139,8 @@
       "<rootDir>/examples/tv/node_modules",
       "<rootDir>/examples/vision/node_modules",
       "<rootDir>/docs/node_modules",
-      "<rootDir>/lib/"
+      "<rootDir>/lib/",
+      "<rootDir>/cxx/tests"
     ],
     "testMatch": [
       "**/*.spec.(ts|tsx)"
@@ -173,7 +174,8 @@
   "eslintIgnore": [
     "node_modules/",
     "lib/",
-    "src/utils/hash32.ts"
+    "src/utils/hash32.ts",
+    "cxx/tests"
   ],
   "react-native-builder-bob": {
     "source": "src",
