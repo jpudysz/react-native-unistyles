@@ -1,7 +1,7 @@
 import { UnistylesModule } from './UnistylesModule'
 import { UnistylesRuntime } from './UnistylesRuntime'
 import { UnistyleRegistry } from './UnistyleRegistry'
-import { UnistylesStyleSheet } from './StyleSheet'
+import type { UnistylesStyleSheet } from './StyleSheet'
 import type { UnistylesBridge } from '../types'
 import { UnistylesError, isTest, isWeb } from '../common'
 import { UnistylesMockedBridge, UnistylesMockedRegistry, UnistylesMockedRuntime } from './mocks'

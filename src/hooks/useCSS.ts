@@ -14,6 +14,7 @@ export const useCSS = <T>(stylesheet: ReactNativeStyleSheet<T>) => {
         Object
             .entries(stylesheet)
             .forEach(([_key, value]) => {
+                // biome-ignore lint/style/noNonNullAssertion: this function will be dropped in 3.0
                 Object.entries(value!)
                     .forEach(([prop, val]) => {
                         if (!val.toString().includes('@media')) {

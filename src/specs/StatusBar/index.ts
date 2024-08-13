@@ -1,4 +1,4 @@
-import { type StatusBar as StatusBarSpec } from './StatusBar.nitro'
+import type { StatusBar as StatusBarSpec } from './StatusBar.nitro'
 import type { StatusBarStyle } from '../types'
 
 export interface StatusBar extends StatusBarSpec {

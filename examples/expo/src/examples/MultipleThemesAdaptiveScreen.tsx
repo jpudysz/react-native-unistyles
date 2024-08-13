@@ -36,8 +36,8 @@ export const MultipleThemesAdaptiveScreen: React.FunctionComponent = () => {
                             case 'dark': {
                                 return UnistylesRuntime.setTheme('premium')
                             }
-                            default:
-                            case 'premium': {
+                            case 'premium':
+                            default: {
                                 return UnistylesRuntime.setTheme('light')
                             }
                         }

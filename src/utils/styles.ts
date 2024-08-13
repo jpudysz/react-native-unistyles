@@ -55,10 +55,12 @@ export const parseStyle = <T extends RNStyle>(
 
         if (key === 'variants') {
             return {
+                // biome-ignore lint/performance/noAccumulatingSpread: this function will be dropped in 3.0
                 ...acc,
                 ...(Object
                     .keys(value) as Array<keyof typeof value>)
                     .reduce((acc, key) => ({
+                        // biome-ignore lint/performance/noAccumulatingSpread: this function will be dropped in 3.0
                         ...acc,
                         // this will parse the styles of the selected variant (or default if it is undefined), if selected variant has no styles then it will fallback to default styles
                         ...parseStyle((value)[key][variant[key as keyof typeof variant]?.toString() || 'default'] ?? (value)[key].default ?? {})
@@ -69,12 +71,14 @@ export const parseStyle = <T extends RNStyle>(
         // don't parse media queries and breakpoints
         if (!parseMediaQueries) {
             return {
+                // biome-ignore lint/performance/noAccumulatingSpread: this function will be dropped in 3.0
                 ...acc,
                 [key]: value
             }
         }
 
         return {
+            // biome-ignore lint/performance/noAccumulatingSpread: this function will be dropped in 3.0
             ...acc,
             [key]: getValueForBreakpoint(value as Record<string, RNValue>)
         }

@@ -40,7 +40,7 @@ export class UnistylesMockedRegistry {
         return this.themes[forName]
     }
 
-    public addPlugin = (plugin: UnistylesPlugin, notify: boolean = true) => {}
+    public addPlugin = (plugin: UnistylesPlugin, notify = true) => {}
     public removePlugin = (plugin: UnistylesPlugin) => {}
     public updateTheme = (name: keyof UnistylesThemes, theme: UnistylesThemes[keyof UnistylesThemes]) => {}
     public hasTheme = (name: keyof UnistylesThemes) => true

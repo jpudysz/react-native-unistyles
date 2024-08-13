@@ -195,9 +195,9 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
                     ...styles.difference,
                     color: difference === 'N/A'
                         ? 'black'
-                        : parseFloat(difference) < 5.00
+                        : Number.parseFloat(difference) < 5.00
                             ? 'green'
-                            : parseFloat(difference) < 10.00
+                            : Number.parseFloat(difference) < 10.00
                                 ? 'orange'
                                 : 'red'
                 }}
@@ -207,7 +207,7 @@ export const Benchmark: React.FunctionComponent<BenchmarkProps> = ({
             <Text style={styles.difference}>
                 Cost per view: {difference === 'N/A'
                     ? 'N/A'
-                    : `+${(parseFloat(difference) / boxes).toFixed(4)} ms`
+                    : `+${(Number.parseFloat(difference) / boxes).toFixed(4)} ms`
                 }
             </Text>
             <View style={styles.fakeSpacer} />

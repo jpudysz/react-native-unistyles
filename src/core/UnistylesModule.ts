@@ -6,8 +6,8 @@ import { isServer } from '../common'
 
 export class UnistylesBridgeWeb {
     #timerRef?: ReturnType<typeof setTimeout> = undefined
-    #windowResizeDebounceTimeMs: number = 100
-    #hasAdaptiveThemes: boolean = false
+    #windowResizeDebounceTimeMs = 100
+    #hasAdaptiveThemes = false
     #supportsAutomaticColorScheme = false
     #screenWidth = isServer ? undefined : window.innerWidth
     #screenHeight = isServer ? undefined : window.innerHeight
@@ -19,7 +19,7 @@ export class UnistylesBridgeWeb {
     #unistylesEvents = new NativeEventEmitter(NativeModules.Unistyles)
     #sortedBreakpointPairs: Array<[keyof UnistylesBreakpoints, number]> = []
     #breakpoint: keyof UnistylesBreakpoints = '' as keyof UnistylesBreakpoints
-    #contentSizeCategory: string = 'unspecified'
+    #contentSizeCategory = 'unspecified'
     #insets: ScreenInsets = {
         top: 0,
         right: 0,
