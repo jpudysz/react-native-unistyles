@@ -6,7 +6,7 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "tsc": "node_modules/typescript/bin/tsc --noEmit",
-    "lint": "",
+    "lint": "biome check",
     "prepare": "husky && bob build",
     "precommit": "concurrently 'yarn tsc' 'yarn lint' 'yarn test'",
     "release": "release-it"
@@ -58,6 +58,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.8.3",
     "@commitlint/config-conventional": "19.2.2",
     "@react-native/normalize-colors": "0.74.87",
     "@release-it/conventional-changelog": "8.0.1",

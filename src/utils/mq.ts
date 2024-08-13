@@ -39,18 +39,18 @@ const getMQValue = (value: Nullable<MQValue>) => {
  */
 export const mq: MQHandler = {
     only: {
-        width: (wMin: Nullable<MQValue> = 0, wMax: MQValue = Infinity) => (`:w[${getMQValue(wMin)}, ${getMQValue(wMax)}]` as unknown as symbol),
-        height: (hMin: Nullable<MQValue> = 0, hMax: MQValue = Infinity) => (`:h[${getMQValue(hMin)}, ${getMQValue(hMax)}]` as unknown as symbol)
+        width: (wMin: Nullable<MQValue> = 0, wMax: MQValue = Number.POSITIVE_INFINITY) => (`:w[${getMQValue(wMin)}, ${getMQValue(wMax)}]` as unknown as symbol),
+        height: (hMin: Nullable<MQValue> = 0, hMax: MQValue = Number.POSITIVE_INFINITY) => (`:h[${getMQValue(hMin)}, ${getMQValue(hMax)}]` as unknown as symbol)
     },
-    width: (wMin: Nullable<MQValue> = 0, wMax: MQValue = Infinity) => ({
+    width: (wMin: Nullable<MQValue> = 0, wMax: MQValue = Number.POSITIVE_INFINITY) => ({
         and: {
-            height: (hMin: Nullable<MQValue> = 0, hMax: MQValue = Infinity) =>
+            height: (hMin: Nullable<MQValue> = 0, hMax: MQValue = Number.POSITIVE_INFINITY) =>
                 (`:w[${getMQValue(wMin)}, ${getMQValue(wMax)}]:h[${getMQValue(hMin)}, ${getMQValue(hMax)}]` as unknown as symbol)
         }
     }),
-    height: (hMin: Nullable<MQValue> = 0, hMax: MQValue = Infinity) => ({
+    height: (hMin: Nullable<MQValue> = 0, hMax: MQValue = Number.POSITIVE_INFINITY) => ({
         and: {
-            width: (wMin: Nullable<MQValue> = 0, wMax: MQValue = Infinity) =>
+            width: (wMin: Nullable<MQValue> = 0, wMax: MQValue = Number.POSITIVE_INFINITY) =>
                 (`:w[${getMQValue(wMin)}, ${getMQValue(wMax)}]:h[${getMQValue(hMin)}, ${getMQValue(hMax)}]` as unknown as symbol)
         }
     })

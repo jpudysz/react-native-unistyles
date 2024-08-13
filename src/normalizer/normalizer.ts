@@ -9,7 +9,7 @@ type Preprocessor = {
     createTransformValue(transforms: Required<Transforms>): string,
 }
 
-export const normalizeColor = (color: string, opacity: number = 1) => {
+export const normalizeColor = (color: string, opacity = 1) => {
     // If the opacity is 1 there's no need to normalize the color
     if (opacity === 1) {
         return color
@@ -27,8 +27,8 @@ export const normalizeColor = (color: string, opacity: number = 1) => {
     if (hex.length === 8) {
         const [r = 0, g = 0, b = 0, a = 1] = hex
             .split(/(?=(?:..)*$)/)
-            .map(x => parseInt(x, 16))
-            .filter(num => !isNaN(num))
+            .map(x => Number.parseInt(x, 16))
+            .filter(num => !Number.isNaN(num))
 
         return `rgba(${r},${g},${b},${((a as number) / 255) * opacity})`
     }

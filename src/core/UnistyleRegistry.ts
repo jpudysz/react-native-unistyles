@@ -86,7 +86,7 @@ export class UnistyleRegistry {
         throw new Error(UnistylesError.ThemeNotSelected)
     }
 
-    public addPlugin = (plugin: UnistylesPlugin, notify: boolean = true) => {
+    public addPlugin = (plugin: UnistylesPlugin, notify = true) => {
         if (plugin.name.startsWith('__unistyles')) {
             throw new Error(UnistylesError.InvalidPluginName)
         }

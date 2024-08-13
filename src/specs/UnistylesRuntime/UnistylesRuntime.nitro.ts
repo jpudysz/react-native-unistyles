@@ -1,4 +1,4 @@
-import { type HybridObject } from 'react-native-nitro-modules'
+import type { HybridObject } from 'react-native-nitro-modules'
 import type { Dimensions, Insets } from '../types'
 
 type ColorScheme = 'light' | 'dark' | 'unspecified'

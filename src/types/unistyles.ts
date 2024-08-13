@@ -1,4 +1,4 @@
-import { UnistylesEventType, ScreenOrientation, IOSContentSizeCategory, AndroidContentSizeCategory } from '../common'
+import type { UnistylesEventType, ScreenOrientation, IOSContentSizeCategory, AndroidContentSizeCategory } from '../common'
 import type { UnistylesThemes, UnistylesBreakpoints } from '../global'
 import type { ScreenSize } from './core'
 import type { UnistylesPlugin } from './plugin'

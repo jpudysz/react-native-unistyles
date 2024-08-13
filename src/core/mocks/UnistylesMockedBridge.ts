@@ -2,8 +2,6 @@
 import type { UnistylesThemes, UnistylesBreakpoints } from '../../global'
 
 export class UnistylesMockedBridge {
-    constructor() {}
-
     public screenWidth() {}
     public screenHeight() {}
     public enabledPlugins() {}

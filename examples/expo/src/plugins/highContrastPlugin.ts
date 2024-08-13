@@ -14,9 +14,9 @@ export const highContrastPlugin: UnistylesPlugin = {
                     return [key, value]
                 }
 
-                const r = parseInt(value.slice(1, 3), 16)
-                const g = parseInt(value.slice(3, 5), 16)
-                const b = parseInt(value.slice(5, 7), 16)
+                const r = Number.parseInt(value.slice(1, 3), 16)
+                const g = Number.parseInt(value.slice(3, 5), 16)
+                const b = Number.parseInt(value.slice(5, 7), 16)
 
                 const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255
 

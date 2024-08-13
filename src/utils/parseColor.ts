@@ -9,7 +9,7 @@ const parseAlpha = (alpha: number) => {
     return alpha
 }
 
-export const parseColor = (color?: Color, alpha: number = 1): [string, number] => {
+export const parseColor = (color?: Color, alpha = 1): [string, number] => {
     if (!color) {
         return ['', 1]
     }

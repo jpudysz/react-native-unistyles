@@ -22,9 +22,10 @@ export const createMediaQueryForStyles = (styles: RNStyle, runtime: UnistylesRun
             const mediaQueriesStyles = getMediaQueriesFromMQ(prop, value as Record<string, RNValue>, className)
 
             return {
+                // biome-ignore lint/performance/noAccumulatingSpread: this function will be dropped in 3.0
                 ...acc,
                 [prop]: `
-                    ${breakpointsStyles} 
+                    ${breakpointsStyles}
                     ${mediaQueriesStyles}
                 `.trim()
             }
@@ -41,7 +42,7 @@ const getMaxWidthMediaQuery = (width: UnistylesParsedMq['width']): string => {
         return ''
     }
 
-    if (width.to === Infinity) {
+    if (width.to === Number.POSITIVE_INFINITY) {
         return ''
     }
 
@@ -53,7 +54,7 @@ const getMaxHeightMediaQuery = (height: UnistylesParsedMq['height']): string => 
         return ''
     }
 
-    if (height.to === Infinity) {
+    if (height.to === Number.POSITIVE_INFINITY) {
         return ''
     }
 

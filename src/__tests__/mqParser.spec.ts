@@ -255,7 +255,7 @@ describe('mqParser', () => {
                 {
                     width: {
                         from: 100,
-                        to: Infinity
+                        to: Number.POSITIVE_INFINITY
                     },
                     height: undefined
                 },
@@ -270,7 +270,7 @@ describe('mqParser', () => {
                     width: undefined,
                     height: {
                         from: 0,
-                        to: Infinity
+                        to: Number.POSITIVE_INFINITY
                     }
                 },
                 {
@@ -290,17 +290,17 @@ describe('mqParser', () => {
                     },
                     height: {
                         from: 0,
-                        to: Infinity
+                        to: Number.POSITIVE_INFINITY
                     }
                 },
                 {
                     width: {
                         from: 100,
-                        to: Infinity
+                        to: Number.POSITIVE_INFINITY
                     },
                     height: {
                         from: 0,
-                        to: Infinity
+                        to: Number.POSITIVE_INFINITY
                     }
                 }
             ]

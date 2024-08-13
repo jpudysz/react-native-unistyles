@@ -34,12 +34,14 @@ export const useStyles = <ST extends StyleSheetWithSuperPowers>(
         .reduce((acc, [key, value]) => {
             if (typeof value === 'function') {
                 return {
+                    // biome-ignore lint/performance/noAccumulatingSpread: this function will be dropped in 3.0
                     ...acc,
                     [key]: proxifyFunction(key, value, variants)
                 }
             }
 
             return StyleSheet.create({
+                // biome-ignore lint/performance/noAccumulatingSpread: this function will be dropped in 3.0
                 ...acc,
                 [key]: withPlugins(key, parseStyle(
                     value,

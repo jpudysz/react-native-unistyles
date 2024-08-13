@@ -181,7 +181,7 @@ export class UnistylesRuntime {
      * @returns - The font scale
      */
     public get fontScale() {
-        return parseFloat(this.unistylesBridge.fontScale.toFixed(2))
+        return Number.parseFloat(this.unistylesBridge.fontScale.toFixed(2))
     }
 
     /**
