@@ -4,9 +4,9 @@
   "description": "Level up your React Native StyleSheet",
   "scripts": {
     "test": "jest",
-    "test:coverage": "jest --coverage",
+    "test:coverage": "jest --passWithNoTests --coverage",
     "tsc": "node_modules/typescript/bin/tsc --noEmit",
-    "lint": "biome check",
+    "lint": "biome lint",
     "prepare": "husky && bob build",
     "precommit": "concurrently 'yarn tsc' 'yarn lint' 'yarn test'",
     "release": "release-it"
@@ -103,28 +103,16 @@
     "@types/mime": "3.0.4"
   },
   "workspaces": [
-    "examples/expo",
-    "examples/macos",
-    "examples/win",
-    "examples/bare",
-    "examples/tv",
-    "examples/vision",
     "examples/RN075",
     "docs"
   ],
   "packageManager": "yarn@3.6.4",
   "engines": {
-    "node": ">= 18.0.0"
+    "node": ">= 20.0.0"
   },
   "jest": {
     "preset": "react-native",
     "modulePathIgnorePatterns": [
-      "<rootDir>/examples/expo/node_modules",
-      "<rootDir>/examples/macos/node_modules",
-      "<rootDir>/examples/win/node_modules",
-      "<rootDir>/examples/bare/node_modules",
-      "<rootDir>/examples/tv/node_modules",
-      "<rootDir>/examples/vision/node_modules",
       "<rootDir>/docs/node_modules",
       "<rootDir>/lib/",
       "<rootDir>/cxx/tests"

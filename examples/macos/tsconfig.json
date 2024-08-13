@@ -1,8 +1,0 @@
-{
-  "extends": "expo/tsconfig.base",
-  "references": [
-    {
-      "path": "../../"
-    }
-  ]
-}
