@@ -8,7 +8,7 @@
     "tsc": "node_modules/typescript/bin/tsc --noEmit",
     "lint": "biome lint",
     "prepare": "husky && bob build",
-    "precommit": "concurrently 'yarn tsc' 'yarn lint' 'yarn test'",
+    "precommit": "concurrently 'bun tsc' 'bun lint' 'bun test'",
     "release": "release-it"
   },
   "main": "lib/commonjs/index",
@@ -106,7 +106,7 @@
     "examples/RN075",
     "docs"
   ],
-  "packageManager": "yarn@3.6.4",
+  "packageManager": "bun@1.1.22",
   "engines": {
     "node": ">= 20.0.0"
   },
