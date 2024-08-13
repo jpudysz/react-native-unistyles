@@ -3,8 +3,19 @@
 #include <map>
 #include <ReactCommon/CallInvokerHolder.h>
 #include "UnistylesRuntime.h"
+#include "StyleSheet.h"
 #include "helpers.h"
 #include "platform.h"
+
+#include <NitroModules/HybridObjectRegistry.hpp>
+#include <HybridUnistylesRuntime.h>
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
+    HybridObjectRegistry::registerHybridObjectConstructor(
+            "UnistylesRuntime", []() -> std::shared_ptr<HybridObject> { return std::make_shared<HybridUnistylesRuntime>(); });
+
+    return JNI_VERSION_1_2;
+}
 
 using namespace facebook;
 
@@ -28,10 +39,14 @@ Java_com_unistyles_UnistylesModule_nativeInstall(JNIEnv *env, jobject thiz, jlon
     }
 
     unistylesRuntime = std::make_shared<UnistylesRuntime>(*runtime, callInvoker);
+    auto styleSheet = std::make_shared<StyleSheet>(*runtime, unistylesRuntime);
+
     makeShared(env, unistylesModule, unistylesRuntime);
 
     jsi::Object hostObject = jsi::Object::createFromHostObject(*runtime, unistylesRuntime);
+    jsi::Object styleSheetHostObject = jsi::Object::createFromHostObject(*runtime, styleSheet);
     runtime->global().setProperty(*runtime, "__UNISTYLES__", std::move(hostObject));
+    runtime->global().setProperty(*runtime, "__UNISTYLES__STYLESHEET__", std::move(styleSheetHostObject));
 }
 
 extern "C"

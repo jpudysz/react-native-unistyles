@@ -1,0 +1,11 @@
+{
+  "logLevel": "debug",
+  "cxxNamespace": ["unistyles"],
+  "ios": {
+    "iosModulename": "Unistyles"
+  },
+  "android": {
+    "androidNamespace": ["unistyles"],
+    "androidCxxLibName": "unistyles"
+  }
+}

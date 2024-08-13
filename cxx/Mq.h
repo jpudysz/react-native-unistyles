@@ -18,13 +18,13 @@ struct UnistylesParsedMq {
     std::optional<UnistylesParsedMqDimension> height;
 };
 
-bool isMq(const std::string& mq) {
+inline bool isMq(const std::string& mq) {
     std::regex pattern(R"(:([hw])\[(\d+)(?:,\s*(\d+|Infinity))?\])");
 
     return std::regex_search(mq, pattern);
 }
 
-bool isValidMq(const UnistylesParsedMq& parsedMq) {
+inline bool isValidMq(const UnistylesParsedMq& parsedMq) {
     if (parsedMq.width && parsedMq.height) {
         return parsedMq.width->from <= parsedMq.width->to && parsedMq.height->from <= parsedMq.height->to;
     }
@@ -40,7 +40,7 @@ bool isValidMq(const UnistylesParsedMq& parsedMq) {
     return false;
 }
 
-UnistylesParsedMq parseMq(const std::string& mq) {
+inline UnistylesParsedMq parseMq(const std::string& mq) {
     const std::regex UNISTYLES_WIDTH_REGEX(R"(:(w)\[(\d+)(?:,\s*(\d+|Infinity))?\])");
     const std::regex UNISTYLES_HEIGHT_REGEX(R"(:(h)\[(\d+)(?:,\s*(\d+|Infinity))?\])");
 
@@ -68,15 +68,15 @@ UnistylesParsedMq parseMq(const std::string& mq) {
     return result;
 }
 
-bool isWithinTheWidth(const UnistylesParsedMqDimension& width, double screenWidth) {
+inline bool isWithinTheWidth(const UnistylesParsedMqDimension& width, double screenWidth) {
     return screenWidth >= width.from && screenWidth <= width.to;
 }
 
-bool isWithinTheHeight(const UnistylesParsedMqDimension& height, double screenHeight) {
+inline bool isWithinTheHeight(const UnistylesParsedMqDimension& height, double screenHeight) {
     return screenHeight >= height.from && screenHeight <= height.to;
 }
 
-bool isWithinTheWidthAndHeight(const UnistylesParsedMq& parsedMq, const Dimensions& screenSize) {
+inline bool isWithinTheWidthAndHeight(const UnistylesParsedMq& parsedMq, const Dimensions& screenSize) {
     if (parsedMq.width && parsedMq.height) {
         return isWithinTheWidth(*parsedMq.width, screenSize.width) &&
         isWithinTheHeight(*parsedMq.height, screenSize.height);
@@ -93,7 +93,7 @@ bool isWithinTheWidthAndHeight(const UnistylesParsedMq& parsedMq, const Dimensio
     return false;
 }
 
-bool getFrom(const std::string& key, Dimensions& screenSize) {
+inline bool getFrom(const std::string& key, Dimensions& screenSize) {
     if (!isMq(key)) {
         return false;
     }

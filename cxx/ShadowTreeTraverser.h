@@ -2,7 +2,7 @@
 
 #include <numeric>
 #include <jsi/jsi.h>
-#include <react/renderer/uimanager/UIManagerBinding.h>
+#include <react/renderer/uimanager/UIManager.h>
 
 using namespace facebook::react;
 

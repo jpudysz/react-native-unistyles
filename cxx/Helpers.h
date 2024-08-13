@@ -9,7 +9,7 @@ using namespace facebook;
 namespace unistyles::helpers {
 
 template<typename FunctionType>
-void defineFunctionProperty(jsi::Runtime& rt, jsi::Object& object, const std::string& propName, FunctionType&& function) {
+inline void defineFunctionProperty(jsi::Runtime& rt, jsi::Object& object, const std::string& propName, FunctionType&& function) {
     auto global = rt.global();
     auto objectConstructor = global.getPropertyAsObject(rt, "Object");
     auto defineProperty = objectConstructor.getPropertyAsFunction(rt, "defineProperty");
@@ -23,7 +23,7 @@ void defineFunctionProperty(jsi::Runtime& rt, jsi::Object& object, const std::st
     defineProperty.call(rt, object, facebook::jsi::String::createFromAscii(rt, propName.c_str()), descriptor);
 }
 
-void enumerateJSIObject(jsi::Runtime& rt, const jsi::Object& obj, std::function<void(const std::string& propertyName, jsi::Object& propertyValue)> callback) {
+inline void enumerateJSIObject(jsi::Runtime& rt, const jsi::Object& obj, std::function<void(const std::string& propertyName, jsi::Object& propertyValue)> callback) {
     jsi::Array propertyNames = obj.getPropertyNames(rt);
     size_t length = propertyNames.size(rt);
 
@@ -37,7 +37,7 @@ void enumerateJSIObject(jsi::Runtime& rt, const jsi::Object& obj, std::function<
 
 using JSIFunction = std::function<jsi::Value(jsi::Runtime&, const jsi::Value&, const jsi::Value*, size_t)>;
 
-auto createHostFunction(
+inline auto createHostFunction(
     jsi::Runtime& rt,
     const std::string& name,
     size_t numberOfArguments,
@@ -51,13 +51,13 @@ auto createHostFunction(
     );
 }
 
-void assertThat(jsi::Runtime& runtime, bool condition, const std::string& message) {
+inline void assertThat(jsi::Runtime& runtime, bool condition, const std::string& message) {
     if (!condition) {
         throw jsi::JSError(runtime, "[Unistyles] " + message);
     }
 }
 
-folly::dynamic getIfExists(folly::dynamic& object, std::string key) {
+inline folly::dynamic getIfExists(folly::dynamic& object, std::string key) {
     auto it = object.find(key);
 
     if (it != object.items().end()) {
@@ -67,7 +67,7 @@ folly::dynamic getIfExists(folly::dynamic& object, std::string key) {
     return nullptr;
 }
 
-jsi::Object& mergeJSIObjects(jsi::Runtime&rt, jsi::Object& obj1, jsi::Object& obj2) {
+inline jsi::Object& mergeJSIObjects(jsi::Runtime&rt, jsi::Object& obj1, jsi::Object& obj2) {
     jsi::Array propertyNames = obj2.getPropertyNames(rt);
     size_t length = propertyNames.size(rt);
 
@@ -77,33 +77,33 @@ jsi::Object& mergeJSIObjects(jsi::Runtime&rt, jsi::Object& obj1, jsi::Object& ob
 
         obj1.setProperty(rt, propertyName.c_str(), propertyValue);
     }
-    
+
     return obj1;
 }
 
-bool containsAllPairs(jsi::Runtime& rt, Variants& variants, jsi::Object& compoundVariant) {
+inline bool containsAllPairs(jsi::Runtime& rt, Variants& variants, jsi::Object& compoundVariant) {
     if (variants.empty()) {
         return false;
     }
-    
+
     jsi::Array propertyNames = compoundVariant.getPropertyNames(rt);
     size_t length = propertyNames.size(rt);
     size_t allConditions = compoundVariant.hasProperty(rt, "styles")
         ? length - 1
         : length;
-    
+
     if (allConditions != variants.size()) {
         return false;
     }
-    
+
     for (auto it = variants.cbegin(); it != variants.cend(); ++it) {
         auto variantKey = it->first;
         auto variantValue = it->second;
-        
+
         if (!compoundVariant.hasProperty(rt, variantKey.c_str())) {
             return false;
         }
-        
+
         auto property = compoundVariant.getProperty(rt, variantKey.c_str());
         auto propertyName = property.isBool()
             ? (property.asBool() ? "true" : "false")
@@ -113,17 +113,17 @@ bool containsAllPairs(jsi::Runtime& rt, Variants& variants, jsi::Object& compoun
             return false;
         }
     }
-    
+
     return true;
 }
 
-bool isPlatformColor(jsi::Runtime& rt, jsi::Object& maybePlatformColor) {
+inline bool isPlatformColor(jsi::Runtime& rt, jsi::Object& maybePlatformColor) {
     auto isIOSPlatformColor = maybePlatformColor.hasProperty(rt, "semantic") && maybePlatformColor.getProperty(rt, "semantic").isObject();
-    
+
     if (isIOSPlatformColor) {
         return true;
     }
-    
+
     // Android
     return maybePlatformColor.hasProperty(rt, "resource_paths") && maybePlatformColor.getProperty(rt, "resource_paths").isObject();
 }
