@@ -261,11 +261,9 @@ describe('styles', () => {
                 semantic: {}
             }
             const obj5 = {
-                // eslint-disable-next-line camelcase
                 resource_paths: true
             }
             const obj6 = {
-                // eslint-disable-next-line camelcase
                 resource_paths: {}
             }
 
@@ -291,11 +289,9 @@ describe('styles', () => {
                 semantic: {}
             }
             const obj5 = {
-                // eslint-disable-next-line camelcase
                 resource_paths: true
             }
             const obj6 = {
-                // eslint-disable-next-line camelcase
                 resource_paths: {}
             }
 
