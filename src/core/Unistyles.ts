@@ -27,14 +27,12 @@ class Unistyles {
         }
 
         // @ts-ignore
-        // eslint-disable-next-line no-undef
         this._bridge = (isWeb ? globalThis : global).__UNISTYLES__ as UnistylesBridge
         this._registry = new UnistyleRegistry(this._bridge)
         this._runtime = new UnistylesRuntime(this._bridge, this._registry)
 
         // todo example implementation POC
         // @ts-ignore
-        // eslint-disable-next-line no-undef
         global.__UNISTYLES__GET_SELECTED_THEME__ = (themeName: string) => {
             console.log(themeName)
 
@@ -59,7 +57,6 @@ class Unistyles {
 
     public get styleSheet() {
         // @ts-ignore
-        // eslint-disable-next-line no-undef
         return global.__UNISTYLES__STYLESHEET__ as UnistylesStyleSheet
     }
 }

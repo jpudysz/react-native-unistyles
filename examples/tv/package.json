@@ -22,13 +22,11 @@
     "@babel/runtime": "7.24.7",
     "@react-native-tvos/config-tv": "0.0.10",
     "@react-native/babel-preset": "0.74.84",
-    "@react-native/eslint-config": "0.74.84",
     "@react-native/metro-config": "0.74.84",
     "@react-native/typescript-config": "0.74.84",
     "@types/react": "18.3.3",
     "babel-jest": "29.7.0",
     "babel-plugin-module-resolver": "5.0.2",
-    "eslint": "8.57.0",
     "typescript": "5.5.2"
   },
   "engines": {

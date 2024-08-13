@@ -54,7 +54,6 @@ export class UnistylesBridgeWeb {
 
     public install() {
         // @ts-ignore
-        // eslint-disable-next-line no-undef
         globalThis.__UNISTYLES__ = new Proxy({}, {
             get: (_target, prop) => {
                 switch (prop) {

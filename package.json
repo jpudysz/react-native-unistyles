@@ -1,12 +1,12 @@
 {
   "name": "react-native-unistyles",
-  "version": "2.9.1",
+  "version": "3.0.0-alpha.1",
   "description": "Level up your React Native StyleSheet",
   "scripts": {
     "test": "jest",
     "test:coverage": "jest --coverage",
     "tsc": "node_modules/typescript/bin/tsc --noEmit",
-    "lint": "eslint . --ext .ts,.tsx",
+    "lint": "",
     "prepare": "husky && bob build",
     "precommit": "concurrently 'yarn tsc' 'yarn lint' 'yarn test'",
     "release": "release-it"
@@ -59,29 +59,13 @@
   },
   "devDependencies": {
     "@commitlint/config-conventional": "19.2.2",
-    "@react-native/eslint-config": "0.74.84",
-    "@react-native/normalize-colors": "0.74.84",
+    "@react-native/normalize-colors": "0.74.87",
     "@release-it/conventional-changelog": "8.0.1",
     "@testing-library/react-hooks": "8.0.1",
     "@types/jest": "29.5.12",
     "@types/react": "18.3.3",
-    "@typescript-eslint/eslint-plugin": "6.21.0",
-    "@typescript-eslint/eslint-plugin-tslint": "6.21.0",
-    "@typescript-eslint/parser": "6.21.0",
     "commitlint": "19.3.0",
     "concurrently": "8.2.2",
-    "eslint": "8.57.0",
-    "eslint-config-codemask": "1.1.7",
-    "eslint-plugin-functional": "6.6.0",
-    "eslint-plugin-import": "2.29.1",
-    "eslint-plugin-jsdoc": "46.10.1",
-    "eslint-plugin-jsx-a11y": "6.9.0",
-    "eslint-plugin-nested-if": "1.0.0",
-    "eslint-plugin-no-else": "0.2.2",
-    "eslint-plugin-no-loops": "0.4.0",
-    "eslint-plugin-prefer-arrow": "1.2.3",
-    "eslint-plugin-react": "7.34.3",
-    "eslint-plugin-react-hooks": "4.6.2",
     "husky": "9.0.11",
     "jest": "29.7.0",
     "metro-react-native-babel-preset": "0.77.0",
@@ -173,12 +157,6 @@
       }
     }
   },
-  "eslintIgnore": [
-    "node_modules/",
-    "lib/",
-    "src/utils/hash32.ts",
-    "cxx/tests"
-  ],
   "react-native-builder-bob": {
     "source": "src",
     "output": "lib",

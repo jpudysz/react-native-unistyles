@@ -1,4 +1,3 @@
-// eslint-disable-next-line camelcase
 import { murmurhash2_32_gc } from './hash32'
 
 export const generateReactNativeWebId = (key: string, value: string): string => {
