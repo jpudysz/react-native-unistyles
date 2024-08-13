@@ -40,12 +40,15 @@ export class UnistylesBridgeWeb {
     }
     #pixelRatio = 1.0
     #fontScale = 1.0
+    #hairlineWidth = 1
+    #rtl = false
 
     constructor() {
         if (!isServer) {
             this.setupListeners()
             this.#screenWidth = window.innerWidth
             this.#screenHeight = window.innerHeight
+            this.#rtl = document.documentElement.dir === 'rtl'
         }
     }
 
@@ -85,6 +88,10 @@ export class UnistylesBridgeWeb {
                         return this.#pixelRatio
                     case 'fontScale':
                         return this.#fontScale
+                    case 'hairlineWidth':
+                        return this.#hairlineWidth
+                    case 'rtl':
+                        return this.#rtl
                     case 'useTheme':
                         return (themeName: keyof UnistylesThemes) => this.useTheme(themeName)
                     case 'updateTheme':
@@ -225,6 +232,13 @@ export class UnistylesBridgeWeb {
                 this.#themeName = this.#colorScheme as keyof UnistylesThemes
                 this.emitThemeChange()
             }
+        })
+
+        new MutationObserver(() => {
+            this.#rtl = document.documentElement.dir === 'rtl'
+        }).observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['dir']
         })
     }
 

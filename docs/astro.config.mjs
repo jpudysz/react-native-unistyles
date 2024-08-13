@@ -69,13 +69,12 @@ export default defineConfig({
                         },
                         {
                             label: 'Theming',
-                            link: '/reference/theming/',
-                            badge: 'Updated'
+                            link: '/reference/theming/'
                         },
                         {
                             label: 'Edge to edge layout',
                             link: '/reference/edge-to-edge/',
-                            badge: 'New'
+                            badge: 'Updated'
                         },
                         {
                             label: 'useInitialTheme',
@@ -91,8 +90,7 @@ export default defineConfig({
                         },
                         {
                             label: 'Variants',
-                            link: '/reference/variants/',
-                            badge: 'Updated'
+                            link: '/reference/variants/'
                         },
                         {
                             label: 'Compound variants',
@@ -100,18 +98,16 @@ export default defineConfig({
                         },
                         {
                             label: 'Dimensions',
-                            link: '/reference/dimensions/',
-                            badge: 'Updated'
+                            link: '/reference/dimensions/'
                         },
                         {
                             label: 'Unistyles Registry',
-                            link: '/reference/unistyles-registry/',
-                            badge: 'Updated'
+                            link: '/reference/unistyles-registry/'
                         },
                         {
                             label: 'Unistyles Runtime',
                             link: '/reference/unistyles-runtime/',
-                            badge: 'Updated'
+                            badge: 'New'
                         },
                         {
                             label: 'Content size category',

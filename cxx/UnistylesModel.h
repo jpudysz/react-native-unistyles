@@ -110,6 +110,7 @@ struct UnistylesModel {
     Insets insets = {0, 0, 0, 0};
     float pixelRatio = 1.0;
     float fontScale = 1.0;
+    bool rtl = false;
     std::string colorScheme = UnistylesUnspecifiedScheme;
     std::string contentSizeCategory = UnistylesUnspecifiedScheme;
 

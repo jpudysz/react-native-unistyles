@@ -50,7 +50,8 @@ export type UnistylesBridge = {
     statusBar: StatusBar,
     navigationBar: NavigationBar,
     pixelRatio: number,
-    fontScale: number
+    fontScale: number,
+    rtl: boolean
 
     // setters
     themes: Array<keyof UnistylesThemes>,
