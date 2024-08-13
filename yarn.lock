@@ -12370,6 +12370,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-localization@npm:15.0.3":
+  version: 15.0.3
+  resolution: "expo-localization@npm:15.0.3"
+  dependencies:
+    rtl-detect: ^1.0.2
+  peerDependencies:
+    expo: "*"
+  checksum: ef89bf201146452cdae9f591550f20b584a8de7a6a0cdc160d62c3337563c8c2e6cb67cff372f9da77f4303fafc34f1867af7cf766c57313f3fb36ba5e292c84
+  languageName: node
+  linkType: hard
+
 "expo-modules-autolinking@npm:1.11.1":
   version: 1.11.1
   resolution: "expo-modules-autolinking@npm:1.11.1"
@@ -20676,6 +20687,7 @@ __metadata:
     babel-loader: 9.1.3
     babel-plugin-module-resolver: 5.0.0
     expo: 51.0.10
+    expo-localization: 15.0.3
     expo-navigation-bar: 3.0.5
     expo-splash-screen: 0.27.4
     expo-status-bar: 1.12.1
@@ -22003,6 +22015,13 @@ __metadata:
   bin:
     rollup: dist/bin/rollup
   checksum: 54cde921e763017ce952ba76ec77d58dd9c01e3536c3be628d4af8c59d9b2f0e1e6a11b30fda44845c7b74098646cd972feb3bcd2f4a35d3293366f2eeb0a39e
+  languageName: node
+  linkType: hard
+
+"rtl-detect@npm:^1.0.2":
+  version: 1.1.2
+  resolution: "rtl-detect@npm:1.1.2"
+  checksum: 4a43a1e5df0617eb86d5485640b318787d12b86acf53d840a3b2ff701ee941e95479d4e9ae97e907569ec763d1c47218cb87639bc87bcdad60a85747e5270cf0
   languageName: node
   linkType: hard
 

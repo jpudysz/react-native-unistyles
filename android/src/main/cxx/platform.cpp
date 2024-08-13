@@ -59,6 +59,7 @@ void makeShared(JNIEnv *env, jobject unistylesModule, std::shared_ptr<UnistylesR
     unistylesRuntime->navigationBar = getNavigationBarDimensions(env, unistylesModule);
     unistylesRuntime->fontScale = screen.fontScale;
     unistylesRuntime->pixelRatio = screen.pixelRatio;
+    unistylesRuntime->rtl = getIsRTL(env, unistylesModule);
 }
 
 Screen getScreenDimensions(JNIEnv *env, jobject unistylesModule) {
@@ -77,6 +78,21 @@ std::string getColorScheme(JNIEnv *env, jobject unistylesModule) {
     env->DeleteLocalRef(colorScheme);
 
     return colorSchemeStr;
+}
+
+bool getIsRTL(JNIEnv *env, jobject unistylesModule) {
+    jclass cls = env->GetObjectClass(unistylesModule);
+    jfieldID platformFieldId = env->GetFieldID(cls, "platform", "Lcom/unistyles/Platform;");
+    jobject platformInstance = env->GetObjectField(unistylesModule, platformFieldId);
+    jclass platformClass = env->GetObjectClass(platformInstance);
+    jmethodID methodId = env->GetMethodID(platformClass, "getIsRTL", "()Z");
+    jboolean result = env->CallBooleanMethod(platformInstance, methodId);
+
+    env->DeleteLocalRef(cls);
+    env->DeleteLocalRef(platformInstance);
+    env->DeleteLocalRef(platformClass);
+
+    return result;
 }
 
 Dimensions getStatusBarDimensions(JNIEnv *env, jobject unistylesModule) {

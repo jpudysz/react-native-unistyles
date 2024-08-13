@@ -28,7 +28,9 @@ export class UnistylesMockedRuntime {
             },
             orientation: this.orientation,
             pixelRatio: this.pixelRatio,
-            fontScale: this.fontScale
+            fontScale: this.fontScale,
+            hairlineWidth: this.hairlineWidth,
+            rtl: this.rtl
         }
     }
 
@@ -62,6 +64,10 @@ export class UnistylesMockedRuntime {
             : undefined
     }
 
+    public get rtl() {
+        return false
+    }
+
     public get breakpoints() {
         return this.unistylesRegistry.breakpoints
     }
@@ -88,6 +94,10 @@ export class UnistylesMockedRuntime {
 
     public get pixelRatio() {
         return 1.0
+    }
+
+    public get hairlineWidth() {
+        return 0.333333
     }
 
     public get fontScale() {
