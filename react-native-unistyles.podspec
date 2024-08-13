@@ -21,5 +21,8 @@ Pod::Spec.new do |s|
     "CLANG_CXX_LANGUAGE_STANDARD" => "c++20"
   }
 
+  load 'nitrogen/generated/ios/Unistyles+autolinking.rb'
+  add_nitrogen_files(s)
+
   install_modules_dependencies(s)
 end

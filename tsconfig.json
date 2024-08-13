@@ -13,6 +13,7 @@
       "esnext",
       "dom"
     ],
+    "noEmit": true,
     "module": "esnext",
     "moduleResolution": "Bundler",
     "noFallthroughCasesInSwitch": true,

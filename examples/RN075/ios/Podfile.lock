@@ -7,6 +7,27 @@ PODS:
   - hermes-engine (0.75.0-rc.4):
     - hermes-engine/Pre-built (= 0.75.0-rc.4)
   - hermes-engine/Pre-built (0.75.0-rc.4)
+  - NitroModules (0.3.0):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - RCT-Folly (2024.01.01.00):
     - boost
     - DoubleConversion
@@ -1241,6 +1262,7 @@ PODS:
     - DoubleConversion
     - glog
     - hermes-engine
+    - NitroModules
     - RCT-Folly (= 2024.01.01.00)
     - RCTRequired
     - RCTTypeSafety
@@ -1527,6 +1549,7 @@ DEPENDENCIES:
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
+  - NitroModules (from `../node_modules/react-native-nitro-modules`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCT-Folly/Fabric (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
@@ -1605,6 +1628,8 @@ EXTERNAL SOURCES:
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
     :tag: hermes-2024-07-01-RNv0.75.0-1edbe36ce92fef2c4d427f5c4e104f2758f4b692
+  NitroModules:
+    :path: "../node_modules/react-native-nitro-modules"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTDeprecation:
@@ -1725,9 +1750,10 @@ SPEC CHECKSUMS:
   DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
   FBLazyVector: abd8ca0c46f3123c35991eab132ce1cc5478a496
   fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
-  glog: 69ef571f3de08433d766d614c73a9838a06bf7eb
+  glog: fdfdfe5479092de0c4bdbebedd9056951f092c4f
   hermes-engine: 6f5b6ffaedbbed262e36f6367d91068231204cbf
-  RCT-Folly: 4464f4d875961fce86008d45f4ecf6cef6de0740
+  NitroModules: a619d09b708f41e6be4527c3e8b3308f113ed45f
+  RCT-Folly: 02617c592a293bd6d418e0a88ff4ee1f88329b47
   RCTDeprecation: 3c7e2ec22d9faa9ea271c60232b197f871d033d8
   RCTRequired: 5b0d43d7ad21a98d94ba6631c46664edefd7e215
   RCTTypeSafety: 5c24dd64651dd4f48fe4909ef3ab201f9e39bfd6
@@ -1756,7 +1782,7 @@ SPEC CHECKSUMS:
   React-logger: 4519165efa410d66bd66cfcc3d1affaab6328505
   React-Mapbuffer: 9296d429e276349c7191b02aea83290e46023597
   React-microtasksnativemodule: 4fd6ef9b81209ab7bc51d6144fe899823c7cf5de
-  react-native-unistyles: d642f5b036e1421f12e28c04266139062294c357
+  react-native-unistyles: c9f59567ed2587eb85c226db9d4f6a86254e6fd8
   React-nativeconfig: 19c11c393ea8d14e3e172df7f97a909014a6ec11
   React-NativeModulesApple: c254c827b10bdffba1f0c6a5d952a9cb50b5d00c
   React-perflogger: ed334ad2e4363e9a4c593473030e0be2263e1165

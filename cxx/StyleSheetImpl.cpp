@@ -1,6 +1,5 @@
 #include "StyleSheet.h"
 #include <jsi/jsi.h>
-#include <react/renderer/uimanager/UIManager.h>
 
 using namespace facebook::react;
 using namespace unistyles::helpers;
@@ -70,7 +69,7 @@ jsi::Value StyleSheet::create(jsi::Runtime& rt, std::string fnName) {
         auto addVariantsFn = createHostFunction(rt, ADD_VARIANTS_FN, 1, [this, &registeredStyleSheet](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count){
             registeredStyleSheet.addVariants(rt, jsi::Value(rt, arguments[0]));
             jsi::Object stylesWithVariants = jsi::Object(rt);
-            
+
             for (auto& style: registeredStyleSheet.styles) {
                 if (style.hasVariants) {
                     stylesWithVariants.setProperty(rt, style.name.c_str(), style.parseStyle(rt, registeredStyleSheet.variants));
@@ -163,7 +162,7 @@ void StyleSheet::emitEvent(jsi::Runtime&, std::vector<StyleDependency> dependenc
 
     for (const Unistyle* unistyle : styles) {
         auto styleToUpdate = const_cast<Unistyle*>(unistyle);
-        
+
         // todo batch mutate shadow tree
         // todo batch update native views
     }
