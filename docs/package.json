@@ -10,20 +10,17 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "3.1.6",
-    "@astrojs/starlight": "0.24.4",
+    "@astrojs/starlight": "0.25.5",
     "@fontsource-variable/nunito": "5.0.19",
-    "astro": "4.11.1",
-    "astro-expressive-code": "0.35.3",
+    "astro": "4.13.3",
+    "astro-expressive-code": "0.35.6",
     "astro-seo": "0.8.4",
-    "autoprefixer": "10.4.19",
+    "autoprefixer": "10.4.20",
     "motion": "10.18.0",
     "postcss-easing-gradients": "3.0.1",
-    "postcss-nested": "6.0.1",
+    "postcss-nested": "6.2.0",
     "sharp": "0.33.4",
-    "swiper": "11.1.4"
+    "swiper": "11.1.9"
   },
-  "private": true,
-  "devDependencies": {
-    "@types/swiper": "6.0.0"
-  }
+  "private": true
 }

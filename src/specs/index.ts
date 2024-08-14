@@ -3,9 +3,9 @@ import type { NavigationBar } from './NavigtionBar'
 import type { StatusBar } from './StatusBar'
 import type { UnistylesRuntime } from './UnistylesRuntime'
 
-const HybridUnistylesRuntime = NitroModules.get<UnistylesRuntime>('UnistylesRuntime')
-const HybridStatusBar = NitroModules.get<StatusBar>('StatusBar')
-const HybridNavigationBar = NitroModules.get<NavigationBar>('NavigationBar')
+const HybridUnistylesRuntime = NitroModules.createHybridObject<UnistylesRuntime>('UnistylesRuntime')
+const HybridStatusBar = NitroModules.createHybridObject<StatusBar>('StatusBar')
+const HybridNavigationBar = NitroModules.createHybridObject<NavigationBar>('NavigationBar')
 
 HybridUnistylesRuntime.statusBar = HybridStatusBar
 HybridUnistylesRuntime.navigationBar = HybridNavigationBar

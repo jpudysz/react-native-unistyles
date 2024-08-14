@@ -6,6 +6,8 @@ add_library(unistyles
     SHARED
     ../cxx/HostStyle.cpp
     ../cxx/HybridUnistylesRuntime.cpp
+    ../cxx/HybridStatusBar.cpp
+    ../cxx/HybridNavigationBar.cpp
     ../cxx/ShadowTreeTraverser.cpp
     ../cxx/StyleSheet.cpp
     ../cxx/StyleSheetImpl.cpp

@@ -97,7 +97,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             System.loadLibrary("unistyles")
 
             this.reactApplicationContext.javaScriptContextHolder?.let { contextHolder ->
-                this.reactApplicationContext.catalystInstance.jSCallInvokerHolder?.let { callInvokerHolder: CallInvokerHolder ->
+                this.reactApplicationContext.catalystInstance.jsCallInvokerHolder?.let { callInvokerHolder: CallInvokerHolder ->
                     this.nativeInstall(contextHolder.get(), callInvokerHolder)
                     this.isCxxReady = true
 
