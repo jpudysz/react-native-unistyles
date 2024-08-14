@@ -1,0 +1,27 @@
+{
+  "name": "boost",
+  "version": "1.84.0",
+  "license": {
+    "type": "Boost Software License",
+    "file": "LICENSE_1_0.txt"
+  },
+  "homepage": "http://www.boost.org",
+  "summary": "Boost provides free peer-reviewed portable C++ source libraries.",
+  "authors": "Rene Rivera",
+  "source": {
+    "git": "https://github.com/react-native-community/boost-for-react-native",
+    "tag": "v1.84.0"
+  },
+  "platforms": {
+    "ios": "13.4"
+  },
+  "requires_arc": false,
+  "source_files": "boost/**/*.{hpp,cpp}",
+  "module_name": "boost",
+  "header_dir": "boost",
+  "preserve_paths": "boost",
+  "header_mappings_dir": "boost/boost",
+  "resource_bundles": {
+    "boost_privacy": "boost/PrivacyInfo.xcprivacy"
+  }
+}

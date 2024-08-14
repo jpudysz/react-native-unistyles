@@ -1,0 +1,6 @@
+module react_nativemodule_featureflags {
+  umbrella header "React-featureflagsnativemodule-umbrella.h"
+
+  export *
+  module * { export * }
+}

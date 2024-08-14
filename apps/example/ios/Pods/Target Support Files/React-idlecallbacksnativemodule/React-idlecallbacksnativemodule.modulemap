@@ -1,0 +1,6 @@
+module react_nativemodule_idlecallbacks {
+  umbrella header "React-idlecallbacksnativemodule-umbrella.h"
+
+  export *
+  module * { export * }
+}

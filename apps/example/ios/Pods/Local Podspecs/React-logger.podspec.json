@@ -1,0 +1,26 @@
+{
+  "name": "React-logger",
+  "version": "0.75.0-rc.7",
+  "summary": "-",
+  "homepage": "https://reactnative.dev/",
+  "license": "MIT",
+  "authors": "Meta Platforms, Inc. and its affiliates",
+  "platforms": {
+    "ios": "13.4"
+  },
+  "source": {
+    "git": "https://github.com/facebook/react-native.git",
+    "tag": "v0.75.0-rc.7"
+  },
+  "source_files": "*.{cpp,h}",
+  "compiler_flags": "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -DFOLLY_CFG_NO_COROUTINES=1 -DFOLLY_HAVE_CLOCK_GETTIME=1 -Wno-comma -Wno-shorten-64-to-32 -Wno-documentation",
+  "pod_target_xcconfig": {
+    "HEADER_SEARCH_PATHS": ""
+  },
+  "header_dir": "logger",
+  "dependencies": {
+    "glog": [
+
+    ]
+  }
+}

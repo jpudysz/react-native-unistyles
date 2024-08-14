@@ -1,0 +1,6 @@
+module react_nativemodule_microtasks {
+  umbrella header "React-microtasksnativemodule-umbrella.h"
+
+  export *
+  module * { export * }
+}

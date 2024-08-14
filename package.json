@@ -67,18 +67,18 @@
     "@types/react": "18.3.3",
     "commitlint": "19.3.0",
     "concurrently": "8.2.2",
-    "husky": "9.0.11",
+    "husky": "9.1.4",
     "jest": "29.7.0",
     "metro-react-native-babel-preset": "0.77.0",
-    "nitro-codegen": "0.3.0",
+    "nitro-codegen": "0.4.0",
     "react": "18.3.1",
-    "react-native": "0.74.2",
-    "react-native-builder-bob": "0.23.2",
-    "react-native-nitro-modules": "0.3.0",
+    "react-native": "0.75.0-rc.7",
+    "react-native-builder-bob": "0.29.1",
+    "react-native-nitro-modules": "0.4.0",
     "react-native-web": "0.19.12",
     "react-test-renderer": "18.3.1",
-    "release-it": "17.4.0",
-    "typescript": "5.3.3"
+    "release-it": "17.6.0",
+    "typescript": "5.5.4"
   },
   "peerDependencies": {
     "@react-native/normalize-colors": "*",
@@ -103,10 +103,10 @@
     "@types/mime": "3.0.4"
   },
   "workspaces": [
-    "examples/RN075",
+    "example",
     "docs"
   ],
-  "packageManager": "bun@1.1.22",
+  "packageManager": "yarn@3.6.1",
   "engines": {
     "node": ">= 20.0.0"
   },

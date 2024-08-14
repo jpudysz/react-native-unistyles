@@ -1,0 +1,6 @@
+module NitroModules {
+  umbrella header "NitroModules-umbrella.h"
+
+  export *
+  module * { export * }
+}

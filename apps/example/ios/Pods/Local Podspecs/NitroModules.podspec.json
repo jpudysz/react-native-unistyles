@@ -1,0 +1,103 @@
+{
+  "name": "NitroModules",
+  "version": "0.3.0",
+  "summary": "Insanely fast native C++, Swift or Kotlin modules with a statically compiled binding layer to JSI.",
+  "homepage": "https://github.com/mrousavy/react-native-nitro#readme",
+  "license": "MIT",
+  "authors": "Marc Rousavy <me@mrousavy.com> (https://github.com/mrousavy)",
+  "platforms": {
+    "ios": "13.4"
+  },
+  "source": {
+    "git": "https://github.com/mrousavy/react-native-nitro.git",
+    "tag": "0.3.0"
+  },
+  "source_files": [
+    "cpp/**/*.{h,hpp}",
+    "cpp/**/*.{c,cpp}",
+    "ios/**/*.{h,hpp}",
+    "ios/**/*.{c,cpp}",
+    "ios/**/*.{m,mm}",
+    "ios/**/*.swift"
+  ],
+  "public_header_files": [
+    "cpp/core/AnyMap.hpp",
+    "cpp/core/ArrayBuffer.hpp",
+    "cpp/core/HybridObject.hpp",
+    "cpp/registry/HybridObjectRegistry.hpp",
+    "cpp/jsi/JSIConverter.hpp",
+    "cpp/threading/Dispatcher.hpp",
+    "cpp/utils/NitroHash.hpp",
+    "cpp/utils/NitroDefines.hpp",
+    "ios/core/HybridContext.hpp"
+  ],
+  "pod_target_xcconfig": {
+    "CLANG_CXX_LANGUAGE_STANDARD": "c++20",
+    "SWIFT_OBJC_INTEROP_MODE": "objcxx",
+    "HEADER_SEARCH_PATHS": "\"$(PODS_ROOT)/boost\" \"$(PODS_ROOT)/Headers/Private/Yoga\"",
+    "OTHER_CPLUSPLUSFLAGS": "$(inherited) -DRCT_NEW_ARCH_ENABLED=1 -DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -DFOLLY_CFG_NO_COROUTINES=1 -DFOLLY_HAVE_CLOCK_GETTIME=1 -Wno-comma -Wno-shorten-64-to-32"
+  },
+  "compiler_flags": "-DRCT_NEW_ARCH_ENABLED=1 -DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -DFOLLY_CFG_NO_COROUTINES=1 -DFOLLY_HAVE_CLOCK_GETTIME=1 -Wno-comma -Wno-shorten-64-to-32",
+  "dependencies": {
+    "React-Core": [
+
+    ],
+    "RCT-Folly": [
+      "2024.01.01.00"
+    ],
+    "glog": [
+
+    ],
+    "React-RCTFabric": [
+
+    ],
+    "ReactCodegen": [
+
+    ],
+    "RCTRequired": [
+
+    ],
+    "RCTTypeSafety": [
+
+    ],
+    "ReactCommon/turbomodule/bridging": [
+
+    ],
+    "ReactCommon/turbomodule/core": [
+
+    ],
+    "React-NativeModulesApple": [
+
+    ],
+    "Yoga": [
+
+    ],
+    "React-Fabric": [
+
+    ],
+    "React-graphics": [
+
+    ],
+    "React-utils": [
+
+    ],
+    "React-featureflags": [
+
+    ],
+    "React-debug": [
+
+    ],
+    "React-ImageManager": [
+
+    ],
+    "React-rendererdebug": [
+
+    ],
+    "DoubleConversion": [
+
+    ],
+    "hermes-engine": [
+
+    ]
+  }
+}

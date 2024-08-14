@@ -1,0 +1,231 @@
+{
+  "name": "React-FabricComponents",
+  "version": "0.75.0-rc.7",
+  "summary": "Fabric Components for React Native.",
+  "homepage": "https://reactnative.dev/",
+  "license": "MIT",
+  "authors": "Meta Platforms, Inc. and its affiliates",
+  "platforms": {
+    "ios": "13.4"
+  },
+  "source": {
+    "git": "https://github.com/facebook/react-native.git",
+    "tag": "v0.75.0-rc.7"
+  },
+  "source_files": "dummyFile.cpp",
+  "pod_target_xcconfig": {
+    "USE_HEADERMAP": "YES",
+    "CLANG_CXX_LANGUAGE_STANDARD": "c++20",
+    "DEFINES_MODULE": "YES",
+    "HEADER_SEARCH_PATHS": "\"$(PODS_ROOT)/boost\" \"$(PODS_TARGET_SRCROOT)/ReactCommon\" \"$(PODS_ROOT)/RCT-Folly\" \"$(PODS_ROOT)/Headers/Private/Yoga\" \"$(PODS_TARGET_SRCROOT)\" \"$(PODS_ROOT)/DoubleConversion\" \"$(PODS_ROOT)/fmt/include\" \"${PODS_CONFIGURATION_BUILD_DIR}/React-rendererdebug/React_rendererdebug.framework/Headers\" \"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers\" \"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers/react/renderer/graphics/platform/ios\" \"${PODS_CONFIGURATION_BUILD_DIR}/React-Fabric/React_Fabric.framework/Headers\" \"${PODS_CONFIGURATION_BUILD_DIR}/React-Fabric/React_Fabric.framework/Headers/react/renderer/components/view/platform/cxx\" \"${PODS_CONFIGURATION_BUILD_DIR}/React-Fabric/React_Fabric.framework/Headers/react/renderer/imagemanager/platform/ios\" \"${PODS_CONFIGURATION_BUILD_DIR}/ReactCodegen/ReactCodegen.framework/Headers\" \"${PODS_CONFIGURATION_BUILD_DIR}/ReactCodegen/ReactCodegen.framework/Headers/build/generated/ios\""
+  },
+  "dependencies": {
+    "RCT-Folly/Fabric": [
+      "2024.01.01.00"
+    ],
+    "React-jsiexecutor": [
+
+    ],
+    "RCTRequired": [
+
+    ],
+    "RCTTypeSafety": [
+
+    ],
+    "ReactCommon/turbomodule/core": [
+
+    ],
+    "React-jsi": [
+
+    ],
+    "React-logger": [
+
+    ],
+    "glog": [
+
+    ],
+    "DoubleConversion": [
+
+    ],
+    "fmt": [
+      "9.1.0"
+    ],
+    "React-Core": [
+
+    ],
+    "React-debug": [
+
+    ],
+    "React-featureflags": [
+
+    ],
+    "React-utils": [
+
+    ],
+    "React-runtimescheduler": [
+
+    ],
+    "React-cxxreact": [
+
+    ],
+    "Yoga": [
+
+    ],
+    "React-rendererdebug": [
+
+    ],
+    "React-graphics": [
+
+    ],
+    "React-Fabric": [
+
+    ],
+    "ReactCodegen": [
+
+    ],
+    "hermes-engine": [
+
+    ]
+  },
+  "script_phases": [
+    {
+      "name": "[RN]Check rncore",
+      "execution_position": "before_compile",
+      "script": "echo \"Checking whether Codegen has run...\"\nrncorePath=\"$REACT_NATIVE_PATH/ReactCommon/react/renderer/components/rncore\"\n\nif [[ ! -d \"$rncorePath\" ]]; then\n  echo 'error: Codegen did not run properly in your project. Please reinstall cocoapods with `bundle exec pod install`.'\n  exit 1\nfi\n"
+    }
+  ],
+  "subspecs": [
+    {
+      "name": "components",
+      "subspecs": [
+        {
+          "name": "inputaccessory",
+          "dependencies": {
+            "RCT-Folly/Fabric": [
+              "2024.01.01.00"
+            ]
+          },
+          "compiler_flags": "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -DFOLLY_CFG_NO_COROUTINES=1 -DFOLLY_HAVE_CLOCK_GETTIME=1 -Wno-comma -Wno-shorten-64-to-32",
+          "source_files": "react/renderer/components/inputaccessory/**/*.{m,mm,cpp,h}",
+          "exclude_files": "react/renderer/components/inputaccessory/tests",
+          "header_dir": "react/renderer/components/inputaccessory"
+        },
+        {
+          "name": "modal",
+          "dependencies": {
+            "RCT-Folly/Fabric": [
+              "2024.01.01.00"
+            ]
+          },
+          "compiler_flags": "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -DFOLLY_CFG_NO_COROUTINES=1 -DFOLLY_HAVE_CLOCK_GETTIME=1 -Wno-comma -Wno-shorten-64-to-32",
+          "source_files": "react/renderer/components/modal/**/*.{m,mm,cpp,h}",
+          "exclude_files": "react/renderer/components/modal/tests",
+          "header_dir": "react/renderer/components/modal"
+        },
+        {
+          "name": "rncore",
+          "dependencies": {
+            "RCT-Folly/Fabric": [
+              "2024.01.01.00"
+            ]
+          },
+          "compiler_flags": "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -DFOLLY_CFG_NO_COROUTINES=1 -DFOLLY_HAVE_CLOCK_GETTIME=1 -Wno-comma -Wno-shorten-64-to-32",
+          "source_files": "react/renderer/components/rncore/**/*.{m,mm,cpp,h}",
+          "header_dir": "react/renderer/components/rncore"
+        },
+        {
+          "name": "safeareaview",
+          "dependencies": {
+            "RCT-Folly/Fabric": [
+              "2024.01.01.00"
+            ]
+          },
+          "compiler_flags": "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -DFOLLY_CFG_NO_COROUTINES=1 -DFOLLY_HAVE_CLOCK_GETTIME=1 -Wno-comma -Wno-shorten-64-to-32",
+          "source_files": "react/renderer/components/safeareaview/**/*.{m,mm,cpp,h}",
+          "exclude_files": "react/renderer/components/safeareaview/tests",
+          "header_dir": "react/renderer/components/safeareaview"
+        },
+        {
+          "name": "scrollview",
+          "dependencies": {
+            "RCT-Folly/Fabric": [
+              "2024.01.01.00"
+            ]
+          },
+          "compiler_flags": "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -DFOLLY_CFG_NO_COROUTINES=1 -DFOLLY_HAVE_CLOCK_GETTIME=1 -Wno-comma -Wno-shorten-64-to-32",
+          "source_files": "react/renderer/components/scrollview/**/*.{m,mm,cpp,h}",
+          "exclude_files": "react/renderer/components/scrollview/tests",
+          "header_dir": "react/renderer/components/scrollview"
+        },
+        {
+          "name": "text",
+          "dependencies": {
+            "RCT-Folly/Fabric": [
+              "2024.01.01.00"
+            ]
+          },
+          "compiler_flags": "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -DFOLLY_CFG_NO_COROUTINES=1 -DFOLLY_HAVE_CLOCK_GETTIME=1 -Wno-comma -Wno-shorten-64-to-32",
+          "source_files": "react/renderer/components/text/**/*.{m,mm,cpp,h}",
+          "exclude_files": "react/renderer/components/text/tests",
+          "header_dir": "react/renderer/components/text"
+        },
+        {
+          "name": "iostextinput",
+          "dependencies": {
+            "RCT-Folly/Fabric": [
+              "2024.01.01.00"
+            ]
+          },
+          "compiler_flags": "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -DFOLLY_CFG_NO_COROUTINES=1 -DFOLLY_HAVE_CLOCK_GETTIME=1 -Wno-comma -Wno-shorten-64-to-32",
+          "source_files": "react/renderer/components/textinput/platform/ios/**/*.{m,mm,cpp,h}",
+          "header_dir": "react/renderer/components/iostextinput"
+        },
+        {
+          "name": "textinput",
+          "dependencies": {
+            "RCT-Folly/Fabric": [
+              "2024.01.01.00"
+            ]
+          },
+          "compiler_flags": "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -DFOLLY_CFG_NO_COROUTINES=1 -DFOLLY_HAVE_CLOCK_GETTIME=1 -Wno-comma -Wno-shorten-64-to-32",
+          "source_files": "react/renderer/components/textinput/*.{m,mm,cpp,h}",
+          "header_dir": "react/renderer/components/textinput"
+        },
+        {
+          "name": "unimplementedview",
+          "dependencies": {
+            "RCT-Folly/Fabric": [
+              "2024.01.01.00"
+            ]
+          },
+          "compiler_flags": "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -DFOLLY_CFG_NO_COROUTINES=1 -DFOLLY_HAVE_CLOCK_GETTIME=1 -Wno-comma -Wno-shorten-64-to-32",
+          "source_files": "react/renderer/components/unimplementedview/**/*.{m,mm,cpp,h}",
+          "exclude_files": "react/renderer/components/unimplementedview/tests",
+          "header_dir": "react/renderer/components/unimplementedview"
+        }
+      ]
+    },
+    {
+      "name": "textlayoutmanager",
+      "dependencies": {
+        "RCT-Folly/Fabric": [
+          "2024.01.01.00"
+        ],
+        "React-Fabric": [
+
+        ]
+      },
+      "compiler_flags": "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -DFOLLY_CFG_NO_COROUTINES=1 -DFOLLY_HAVE_CLOCK_GETTIME=1 -Wno-comma -Wno-shorten-64-to-32",
+      "source_files": [
+        "react/renderer/textlayoutmanager/platform/ios/**/*.{m,mm,cpp,h}",
+        "react/renderer/textlayoutmanager/*.{m,mm,cpp,h}"
+      ],
+      "exclude_files": [
+        "react/renderer/textlayoutmanager/tests",
+        "react/renderer/textlayoutmanager/platform/android",
+        "react/renderer/textlayoutmanager/platform/cxx"
+      ],
+      "header_dir": "react/renderer/textlayoutmanager"
+    }
+  ]
+}

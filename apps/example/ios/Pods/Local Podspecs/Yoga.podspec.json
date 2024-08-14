@@ -1,0 +1,85 @@
+{
+  "name": "Yoga",
+  "version": "0.0.0",
+  "license": {
+    "type": "MIT"
+  },
+  "homepage": "https://yogalayout.dev",
+  "documentation_url": "https://yogalayout.dev/docs/",
+  "summary": "Yoga is a cross-platform layout engine which implements Flexbox.",
+  "description": "Yoga is a cross-platform layout engine enabling maximum collaboration within your team by implementing an API many designers are familiar with, and opening it up to developers across different platforms.",
+  "authors": "Facebook",
+  "source": {
+    "git": "https://github.com/facebook/react-native.git",
+    "tag": "v0.75.0-rc.7"
+  },
+  "module_name": "yoga",
+  "header_dir": "yoga",
+  "requires_arc": false,
+  "pod_target_xcconfig": {
+    "DEFINES_MODULE": "YES"
+  },
+  "compiler_flags": [
+    "-fno-omit-frame-pointer",
+    "-fexceptions",
+    "-Wall",
+    "-Werror",
+    "-std=c++20",
+    "-fPIC"
+  ],
+  "platforms": {
+    "ios": "13.4"
+  },
+  "source_files": "yoga/**/*.{cpp,h}",
+  "header_mappings_dir": "yoga",
+  "public_header_files": "yoga/*.h",
+  "private_header_files": [
+    "yoga/algorithm/AbsoluteLayout.h",
+    "yoga/algorithm/Align.h",
+    "yoga/algorithm/Baseline.h",
+    "yoga/algorithm/BoundAxis.h",
+    "yoga/algorithm/Cache.h",
+    "yoga/algorithm/CalculateLayout.h",
+    "yoga/algorithm/FlexDirection.h",
+    "yoga/algorithm/FlexLine.h",
+    "yoga/algorithm/PixelGrid.h",
+    "yoga/algorithm/SizingMode.h",
+    "yoga/algorithm/TrailingPosition.h",
+    "yoga/config/Config.h",
+    "yoga/debug/AssertFatal.h",
+    "yoga/debug/Log.h",
+    "yoga/enums/Align.h",
+    "yoga/enums/Dimension.h",
+    "yoga/enums/Direction.h",
+    "yoga/enums/Display.h",
+    "yoga/enums/Edge.h",
+    "yoga/enums/Errata.h",
+    "yoga/enums/ExperimentalFeature.h",
+    "yoga/enums/FlexDirection.h",
+    "yoga/enums/Gutter.h",
+    "yoga/enums/Justify.h",
+    "yoga/enums/LogLevel.h",
+    "yoga/enums/MeasureMode.h",
+    "yoga/enums/NodeType.h",
+    "yoga/enums/Overflow.h",
+    "yoga/enums/PhysicalEdge.h",
+    "yoga/enums/PositionType.h",
+    "yoga/enums/Unit.h",
+    "yoga/enums/Wrap.h",
+    "yoga/enums/YogaEnums.h",
+    "yoga/event/event.h",
+    "yoga/node/CachedMeasurement.h",
+    "yoga/node/LayoutResults.h",
+    "yoga/node/Node.h",
+    "yoga/numeric/Comparison.h",
+    "yoga/numeric/FloatOptional.h",
+    "yoga/style/SmallValueBuffer.h",
+    "yoga/style/Style.h",
+    "yoga/style/StyleLength.h",
+    "yoga/style/StyleValueHandle.h",
+    "yoga/style/StyleValuePool.h"
+  ],
+  "preserve_paths": [
+    "yoga/**/*.h"
+  ]
+}

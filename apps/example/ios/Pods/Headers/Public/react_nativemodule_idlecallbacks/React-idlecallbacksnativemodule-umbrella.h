@@ -1,0 +1,1 @@
+../../../Target Support Files/React-idlecallbacksnativemodule/React-idlecallbacksnativemodule-umbrella.h
