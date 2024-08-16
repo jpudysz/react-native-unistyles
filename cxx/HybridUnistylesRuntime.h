@@ -2,7 +2,9 @@
 
 #include "HybridUnistylesRuntimeSpec.hpp"
 #include "HybridNativePlatformSpec.hpp"
-#include "Unistyles-Swift.h"
+// todo remove me
+#include <NitroModules/HybridContext.hpp>
+#include "Unistyles-Swift-Cxx-Umbrella.hpp"
 
 using namespace margelo::nitro::unistyles;
 
@@ -22,7 +24,7 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec  {
     void setAdaptiveThemes(bool isEnabled) override;
     void setImmersiveMode(bool isEnabled) override;
     void setRootViewBackgroundColor(const std::optional<std::string> &hex, std::optional<double> alpha) override;
-    
+
 private:
-    Unistyles::HybridNativePlatformSpecCxx platform;
+    Unistyles::HybridNativePlatformSpecCxx nativePlatform = Unistyles::NativePlatform::create();
 };
