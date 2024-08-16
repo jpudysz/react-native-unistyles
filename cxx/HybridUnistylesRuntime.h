@@ -1,10 +1,12 @@
 #pragma once
 
 #include "HybridUnistylesRuntimeSpec.hpp"
+#include "HybridNativePlatformSpec.hpp"
+#include "Unistyles-Swift.h"
 
 using namespace margelo::nitro::unistyles;
 
-struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
+struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec  {
     ColorScheme getColorScheme() override;
     bool getHasAdaptiveThemes() override;
     Dimensions getScreen() override;
@@ -20,4 +22,7 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     void setAdaptiveThemes(bool isEnabled) override;
     void setImmersiveMode(bool isEnabled) override;
     void setRootViewBackgroundColor(const std::optional<std::string> &hex, std::optional<double> alpha) override;
+    
+private:
+    Unistyles::HybridNativePlatformSpecCxx platform;
 };

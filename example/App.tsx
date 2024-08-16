@@ -6,7 +6,7 @@ export const App = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.text}>
-                {UnistylesRuntime.name}
+                {UnistylesRuntime.fontScale}
             </Text>
         </View>
     )
