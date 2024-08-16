@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { UnistylesRuntime } from 'react-native-unistyles';
 export const App = () => {
     return (React.createElement(View, { style: styles.container },
-        React.createElement(Text, { style: styles.text }, UnistylesRuntime.name)));
+        React.createElement(Text, { style: styles.text }, UnistylesRuntime.fontScale)));
 };
 const styles = StyleSheet.create({
     container: {

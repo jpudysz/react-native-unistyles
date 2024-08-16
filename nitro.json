@@ -1,5 +1,4 @@
 {
-  "logLevel": "debug",
   "cxxNamespace": ["unistyles"],
   "ios": {
     "iosModulename": "Unistyles"

@@ -3,7 +3,7 @@ require "json"
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 
 Pod::Spec.new do |s|
-  s.name         = package["name"]
+  s.name         = "Unistyles"
   s.version      = package["version"]
   s.summary      = package["description"]
   s.homepage     = package["homepage"]
@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => package["repository"], :tag => "#{s.version}" }
 
   s.source_files = [
-    "ios/**/*.{h,mm}",
+    "ios/**/*.{swift,h,mm}",
     "cxx/*.{h,cpp}"
   ]
   s.pod_target_xcconfig = {
