@@ -39,8 +39,7 @@ double HybridUnistylesRuntime::getPixelRatio() {
 };
 
 double HybridUnistylesRuntime::getFontScale() {
-    return this->platform->getFontScale();
-//    return 1.0;
+    return this->nativePlatform.getFontScale();
 };
 
 void HybridUnistylesRuntime::setTheme(const std::string &themeName) {};
