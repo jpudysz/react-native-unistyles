@@ -13,7 +13,7 @@ bool HybridUnistylesRuntime::getHasAdaptiveThemes() {
 };
 
 Dimensions HybridUnistylesRuntime::getScreen() {
-    return Dimensions{600, 200};
+    return this->nativePlatform.getScreenDimensions();
 };
 
 std::string HybridUnistylesRuntime::getThemeName() {

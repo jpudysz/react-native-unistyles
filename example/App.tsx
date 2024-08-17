@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput } from 'react-native'
 import { UnistylesRuntime } from 'react-native-unistyles'
 
 const start = performance.now();
-const fontScale = UnistylesRuntime.fontScale
+const screen = UnistylesRuntime.screen
 const end = performance.now();
 
 console.log(`Function took ${end - start} milliseconds.`);
@@ -11,7 +11,8 @@ console.log(`Function took ${end - start} milliseconds.`);
 export const App = () => {
     const {
         insets,
-        colorScheme
+        colorScheme,
+        fontScale
     } = UnistylesRuntime
 
     return (
@@ -25,6 +26,9 @@ export const App = () => {
             </Text>
             <Text style={styles.text}>
                 fontScale: {fontScale}
+            </Text>
+            <Text style={styles.text}>
+                screen: {screen.width}x{screen.height}
             </Text>
         </View>
     )

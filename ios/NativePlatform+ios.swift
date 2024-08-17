@@ -12,7 +12,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
 
     func getColorScheme() throws -> ColorScheme {
         let interfaceStyle = UIScreen.main.traitCollection.userInterfaceStyle
-        
+
         switch (interfaceStyle) {
         case .dark:
             return ColorScheme.dark
@@ -29,7 +29,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         DispatchQueue.main.sync {
             let contentSizeCategory = UIApplication.shared.preferredContentSizeCategory
             let defaultMultiplier: CGFloat = 17.0
-            
+
             switch contentSizeCategory {
             case .extraExtraExtraLarge:
                 return 23.0 / defaultMultiplier
@@ -58,6 +58,21 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
             default:
                 return 1.0
             }
+        }
+    }
+
+    func getScreenDimensions() throws -> Dimensions {
+        DispatchQueue.main.sync {
+            guard let presentedViewController = RCTPresentedViewController(),
+                  let windowFrame = presentedViewController.view.window?.frame else {
+                // this should never happen, but it's better to return zeros
+                return Dimensions(width: 0, height: 0)
+            }
+            
+            let width = windowFrame.size.width
+            let height = windowFrame.size.height
+            
+            return Dimensions(width: width, height: height)
         }
     }
 

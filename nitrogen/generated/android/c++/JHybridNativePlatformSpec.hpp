@@ -41,6 +41,7 @@ namespace margelo::nitro::unistyles {
     ColorScheme getColorScheme() override;
     double getFontScale() override;
     std::string getContentSizeCategory() override;
+    Dimensions getScreenDimensions() override;
     void setRootViewBackgroundColor(const std::optional<std::string>& hex, std::optional<double> alpha) override;
     void setNavigationBarBackgroundColor(const std::optional<std::string>& hex, std::optional<double> alpha) override;
     void setNavigationBarHidden(bool isHidden) override;

@@ -45,6 +45,10 @@ abstract class HybridNativePlatformSpec: HybridObject() {
   
   @DoNotStrip
   @Keep
+  abstract fun getScreenDimensions(): com.margelo.nitro.unistyles.Dimensions
+  
+  @DoNotStrip
+  @Keep
   abstract fun setRootViewBackgroundColor(hex: String?, alpha: Double?): Unit
   
   @DoNotStrip
