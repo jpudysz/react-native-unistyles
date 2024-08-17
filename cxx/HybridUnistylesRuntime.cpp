@@ -3,8 +3,10 @@
 using namespace margelo::nitro::unistyles;
 
 ColorScheme HybridUnistylesRuntime::getColorScheme() {
-    return ColorScheme::LIGHT;
-};
+    int colorScheme = this->nativePlatform.getColorScheme();
+    
+    return static_cast<ColorScheme>(colorScheme);
+}
 
 bool HybridUnistylesRuntime::getHasAdaptiveThemes() {
     return false;
