@@ -12,6 +12,7 @@
 
 #include "JInsets.hpp"
 #include "JColorScheme.hpp"
+#include "JDimensions.hpp"
 #include "JStatusBarStyle.hpp"
 
 namespace margelo::nitro::unistyles {
@@ -50,6 +51,10 @@ namespace margelo::nitro::unistyles {
   std::string JHybridNativePlatformSpec::getContentSizeCategory() {
     static const auto method = _javaPart->getClass()->getMethod<std::string()>("getContentSizeCategory");
     throw std::runtime_error("getContentSizeCategory(...) is not yet implemented!");
+  }
+  Dimensions JHybridNativePlatformSpec::getScreenDimensions() {
+    static const auto method = _javaPart->getClass()->getMethod<JDimensions()>("getScreenDimensions");
+    throw std::runtime_error("getScreenDimensions(...) is not yet implemented!");
   }
   void JHybridNativePlatformSpec::setRootViewBackgroundColor(const std::optional<std::string>& hex, std::optional<double> alpha) {
     static const auto method = _javaPart->getClass()->getMethod<void(std::optional<std::string>, std::optional<double>)>("setRootViewBackgroundColor");

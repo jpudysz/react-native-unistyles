@@ -1,5 +1,5 @@
 import type { HybridObject } from 'react-native-nitro-modules'
-import type { Insets } from './types'
+import type { Dimensions, Insets } from './types'
 
 type StatusBarStyle = 'default' | 'light' | 'dark'
 type ColorScheme = 'dark' | 'light' | 'unspecified'
@@ -9,6 +9,7 @@ export interface NativePlatform extends HybridObject<{ ios: 'swift', android: 'k
     getColorScheme(): ColorScheme,
     getFontScale(): number,
     getContentSizeCategory(): string,
+    getScreenDimensions(): Dimensions
 
     setRootViewBackgroundColor(hex?: string, alpha?: number): void,
     setNavigationBarBackgroundColor?(hex?: string, alpha?: number): void,

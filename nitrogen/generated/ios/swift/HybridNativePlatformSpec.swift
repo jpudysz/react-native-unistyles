@@ -37,6 +37,7 @@ public protocol HybridNativePlatformSpec: HybridObjectSpec {
   func getColorScheme() throws -> ColorScheme
   func getFontScale() throws -> Double
   func getContentSizeCategory() throws -> String
+  func getScreenDimensions() throws -> Dimensions
   func setRootViewBackgroundColor(hex: String?, alpha: Double?) throws -> Void
   func setNavigationBarBackgroundColor(hex: String?, alpha: Double?) throws -> Void
   func setNavigationBarHidden(isHidden: Bool) throws -> Void

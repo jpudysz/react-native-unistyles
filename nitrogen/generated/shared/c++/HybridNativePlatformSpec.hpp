@@ -18,12 +18,15 @@
 namespace margelo::nitro::unistyles { struct Insets; }
 // Forward declaration of `ColorScheme` to properly resolve imports.
 namespace margelo::nitro::unistyles { enum class ColorScheme; }
+// Forward declaration of `Dimensions` to properly resolve imports.
+namespace margelo::nitro::unistyles { struct Dimensions; }
 // Forward declaration of `StatusBarStyle` to properly resolve imports.
 namespace margelo::nitro::unistyles { enum class StatusBarStyle; }
 
 #include "Insets.hpp"
 #include "ColorScheme.hpp"
 #include <string>
+#include "Dimensions.hpp"
 #include <optional>
 #include "StatusBarStyle.hpp"
 
@@ -59,6 +62,7 @@ namespace margelo::nitro::unistyles {
       virtual ColorScheme getColorScheme() = 0;
       virtual double getFontScale() = 0;
       virtual std::string getContentSizeCategory() = 0;
+      virtual Dimensions getScreenDimensions() = 0;
       virtual void setRootViewBackgroundColor(const std::optional<std::string>& hex, std::optional<double> alpha) = 0;
       virtual void setNavigationBarBackgroundColor(const std::optional<std::string>& hex, std::optional<double> alpha) = 0;
       virtual void setNavigationBarHidden(bool isHidden) = 0;
