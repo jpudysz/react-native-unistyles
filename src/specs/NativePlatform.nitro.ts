@@ -1,8 +1,10 @@
 import type { HybridObject } from 'react-native-nitro-modules'
+import type { Insets } from './types'
 
 type StatusBarStyle = 'default' | 'light' | 'dark'
 
 export interface NativePlatform extends HybridObject<{ ios: 'swift', android: 'kotlin' }> {
+    getInsets(): Insets,
     getColorScheme(): string,
     getFontScale(): number,
     getContentSizeCategory(): string,

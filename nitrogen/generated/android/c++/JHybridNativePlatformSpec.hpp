@@ -37,6 +37,7 @@ namespace margelo::nitro::unistyles {
 
   public:
     // Methods
+    Insets getInsets() override;
     std::string getColorScheme() override;
     double getFontScale() override;
     std::string getContentSizeCategory() override;

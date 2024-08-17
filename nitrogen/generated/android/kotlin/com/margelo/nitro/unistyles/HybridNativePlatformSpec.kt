@@ -29,6 +29,10 @@ abstract class HybridNativePlatformSpec: HybridObject() {
   // Methods
   @DoNotStrip
   @Keep
+  abstract fun getInsets(): com.margelo.nitro.unistyles.Insets
+  
+  @DoNotStrip
+  @Keep
   abstract fun getColorScheme(): String
   
   @DoNotStrip

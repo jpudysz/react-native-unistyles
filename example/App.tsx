@@ -1,12 +1,19 @@
 import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, TextInput } from 'react-native'
 import { UnistylesRuntime } from 'react-native-unistyles'
+
+const start = performance.now();
+const insets = UnistylesRuntime.insets
+const end = performance.now();
+
+console.log(`Function took ${end - start} milliseconds.`);
 
 export const App = () => {
     return (
         <View style={styles.container}>
+            <TextInput placeholder="Xxx" />
             <Text style={styles.text}>
-                {UnistylesRuntime.fontScale}
+                T:{insets.top}xB:{insets.bottom}xL:{insets.left}xR:{insets.right}
             </Text>
         </View>
     )

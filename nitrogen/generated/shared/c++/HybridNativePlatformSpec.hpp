@@ -14,9 +14,12 @@
 #error NitroModules cannot be found! Are you sure you installed NitroModules properly?
 #endif
 
+// Forward declaration of `Insets` to properly resolve imports.
+namespace margelo::nitro::unistyles { struct Insets; }
 // Forward declaration of `StatusBarStyle` to properly resolve imports.
 namespace margelo::nitro::unistyles { enum class StatusBarStyle; }
 
+#include "Insets.hpp"
 #include <string>
 #include <optional>
 #include "StatusBarStyle.hpp"
@@ -49,6 +52,7 @@ namespace margelo::nitro::unistyles {
 
     public:
       // Methods
+      virtual Insets getInsets() = 0;
       virtual std::string getColorScheme() = 0;
       virtual double getFontScale() = 0;
       virtual std::string getContentSizeCategory() = 0;

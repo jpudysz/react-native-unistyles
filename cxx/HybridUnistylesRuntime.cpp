@@ -27,7 +27,7 @@ std::string HybridUnistylesRuntime::getBreakpoint() {
 };
 
 Insets HybridUnistylesRuntime::getInsets() {
-    return Insets{20, 0, 0, 0, 0};
+    return this->nativePlatform.getInsets();
 };
 
 Orientation HybridUnistylesRuntime::getOrientation() {

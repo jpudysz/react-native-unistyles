@@ -22,6 +22,20 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         return "unspecified"
     }
 
+    // todo handle IME animation
+    func getInsets() throws -> Insets {
+        DispatchQueue.main.sync {
+            guard let window = UIApplication.shared.windows.first else {
+                // this should never happen, but it's better to return zeros
+                return Insets(top: 0, bottom: 0, left: 0, right: 0, ime: 0)
+            }
+
+            let safeArea = window.safeAreaInsets
+
+            return Insets(top: safeArea.top, bottom: safeArea.bottom, left: safeArea.left, right: safeArea.right, ime: 0)
+        }
+    }
+
     func setRootViewBackgroundColor(hex: String?, alpha: Double?) throws {
         //todo
     }
