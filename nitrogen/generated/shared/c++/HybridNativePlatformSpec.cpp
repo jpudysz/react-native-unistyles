@@ -15,6 +15,7 @@ namespace margelo::nitro::unistyles {
     HybridObject::loadHybridMethods();
     // load custom methods/properties
     registerHybrids(this, [](Prototype& prototype) {
+      prototype.registerHybridMethod("getInsets", &HybridNativePlatformSpec::getInsets);
       prototype.registerHybridMethod("getColorScheme", &HybridNativePlatformSpec::getColorScheme);
       prototype.registerHybridMethod("getFontScale", &HybridNativePlatformSpec::getFontScale);
       prototype.registerHybridMethod("getContentSizeCategory", &HybridNativePlatformSpec::getContentSizeCategory);

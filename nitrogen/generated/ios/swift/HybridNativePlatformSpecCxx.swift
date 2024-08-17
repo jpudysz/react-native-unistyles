@@ -64,6 +64,17 @@ public final class HybridNativePlatformSpecCxx {
 
   // Methods
   @inline(__always)
+  public func getInsets() -> Insets {
+    do {
+      let result = try self.implementation.getInsets()
+      return result
+    } catch {
+      let message = "\(error.localizedDescription)"
+      fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
+    }
+  }
+  
+  @inline(__always)
   public func getColorScheme() -> std.string {
     do {
       let result = try self.implementation.getColorScheme()

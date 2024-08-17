@@ -34,6 +34,7 @@ namespace margelo::nitro::unistyles { enum class StatusBarStyle; }
 
 // Common Swift bridges for C++ types
 #include <NitroModules/ArrayBufferHolder.hpp>
+#include <NitroModules/PromiseHolder.hpp>
 
 // Forward declarations of Swift defined types
 

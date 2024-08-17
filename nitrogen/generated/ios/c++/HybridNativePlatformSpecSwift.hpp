@@ -13,9 +13,12 @@
 // Forward declaration of `HybridNativePlatformSpecCxx` to properly resolve imports.
 namespace Unistyles { class HybridNativePlatformSpecCxx; }
 
+// Forward declaration of `Insets` to properly resolve imports.
+namespace margelo::nitro::unistyles { struct Insets; }
 // Forward declaration of `StatusBarStyle` to properly resolve imports.
 namespace margelo::nitro::unistyles { enum class StatusBarStyle; }
 
+#include "Insets.hpp"
 #include <string>
 #include <optional>
 #include "StatusBarStyle.hpp"
@@ -61,6 +64,10 @@ namespace margelo::nitro::unistyles {
 
   public:
     // Methods
+    inline Insets getInsets() override {
+      auto value = _swiftPart.getInsets();
+      return value;
+    }
     inline std::string getColorScheme() override {
       auto value = _swiftPart.getColorScheme();
       return value;

@@ -10,6 +10,7 @@
 
 
 
+#include "JInsets.hpp"
 #include "JStatusBarStyle.hpp"
 
 namespace margelo::nitro::unistyles {
@@ -33,6 +34,10 @@ namespace margelo::nitro::unistyles {
   
 
   // Methods
+  Insets JHybridNativePlatformSpec::getInsets() {
+    static const auto method = _javaPart->getClass()->getMethod<JInsets()>("getInsets");
+    throw std::runtime_error("getInsets(...) is not yet implemented!");
+  }
   std::string JHybridNativePlatformSpec::getColorScheme() {
     static const auto method = _javaPart->getClass()->getMethod<std::string()>("getColorScheme");
     throw std::runtime_error("getColorScheme(...) is not yet implemented!");
