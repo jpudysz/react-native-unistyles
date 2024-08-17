@@ -77,7 +77,38 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     }
 
     func getContentSizeCategory() throws -> String {
-        return "unspecified"
+        DispatchQueue.main.sync {
+            let contentSizeCategory = UIApplication.shared.preferredContentSizeCategory
+            
+            switch contentSizeCategory {
+            case .extraExtraExtraLarge:
+                return "xxxLarge"
+            case .extraExtraLarge:
+                return "xxLarge"
+            case .extraLarge:
+                return "xLarge"
+            case .large:
+                return "Large"
+            case .medium:
+                return "Medium"
+            case .small:
+                return "Small"
+            case .extraSmall:
+                return "xSmall"
+            case .accessibilityMedium:
+                return "accessibilityMedium"
+            case .accessibilityLarge:
+                return "accessibilityLarge"
+            case .accessibilityExtraLarge:
+                return "accessibilityExtraLarge"
+            case .accessibilityExtraExtraLarge:
+                return "accessibilityExtraExtraLarge"
+            case .accessibilityExtraExtraExtraLarge:
+                return "accessibilityExtraExtraExtraLarge"
+            default:
+                return "unspecified"
+            }
+        }
     }
 
     // todo handle IME animation
