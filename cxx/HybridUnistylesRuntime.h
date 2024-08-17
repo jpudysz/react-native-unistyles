@@ -11,6 +11,7 @@ using namespace margelo::nitro::unistyles;
 struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec  {
     ColorScheme getColorScheme() override;
     bool getHasAdaptiveThemes() override;
+    bool getRtl() override;
     Dimensions getScreen() override;
     std::string getThemeName() override;
     std::string getContentSizeCategory() override;

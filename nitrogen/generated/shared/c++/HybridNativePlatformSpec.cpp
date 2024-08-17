@@ -20,6 +20,7 @@ namespace margelo::nitro::unistyles {
       prototype.registerHybridMethod("getFontScale", &HybridNativePlatformSpec::getFontScale);
       prototype.registerHybridMethod("getContentSizeCategory", &HybridNativePlatformSpec::getContentSizeCategory);
       prototype.registerHybridMethod("getScreenDimensions", &HybridNativePlatformSpec::getScreenDimensions);
+      prototype.registerHybridMethod("getPrefersRtlDirection", &HybridNativePlatformSpec::getPrefersRtlDirection);
       prototype.registerHybridMethod("setRootViewBackgroundColor", &HybridNativePlatformSpec::setRootViewBackgroundColor);
       prototype.registerHybridMethod("setNavigationBarBackgroundColor", &HybridNativePlatformSpec::setNavigationBarBackgroundColor);
       prototype.registerHybridMethod("setNavigationBarHidden", &HybridNativePlatformSpec::setNavigationBarHidden);

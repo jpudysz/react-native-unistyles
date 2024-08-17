@@ -9,7 +9,8 @@ export interface NativePlatform extends HybridObject<{ ios: 'swift', android: 'k
     getColorScheme(): ColorScheme,
     getFontScale(): number,
     getContentSizeCategory(): string,
-    getScreenDimensions(): Dimensions
+    getScreenDimensions(): Dimensions,
+    getPrefersRtlDirection(): boolean,
 
     setRootViewBackgroundColor(hex?: string, alpha?: number): void,
     setNavigationBarBackgroundColor?(hex?: string, alpha?: number): void,

@@ -28,6 +28,10 @@ std::string HybridUnistylesRuntime::getBreakpoint() {
     return "md";
 };
 
+bool HybridUnistylesRuntime::getRtl() {
+    return this->nativePlatform.getPrefersRtlDirection();
+}
+
 Insets HybridUnistylesRuntime::getInsets() {
     return this->nativePlatform.getInsets();
 };

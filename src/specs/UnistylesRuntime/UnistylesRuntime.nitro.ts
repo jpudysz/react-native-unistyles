@@ -15,6 +15,7 @@ export interface UnistylesRuntime extends HybridObject<{ ios: 'c++', android: 'c
     readonly orientation: Orientation,
     readonly pixelRatio: number,
     readonly fontScale: number,
+    readonly rtl: boolean,
 
     setTheme(themeName: string): void,
     setAdaptiveThemes(isEnabled: boolean): void,

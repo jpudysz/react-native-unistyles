@@ -90,6 +90,10 @@ namespace margelo::nitro::unistyles {
       auto value = _swiftPart.getScreenDimensions();
       return value;
     }
+    inline bool getPrefersRtlDirection() override {
+      auto value = _swiftPart.getPrefersRtlDirection();
+      return value;
+    }
     inline void setRootViewBackgroundColor(const std::optional<std::string>& hex, std::optional<double> alpha) override {
       _swiftPart.setRootViewBackgroundColor(hex, alpha);
     }

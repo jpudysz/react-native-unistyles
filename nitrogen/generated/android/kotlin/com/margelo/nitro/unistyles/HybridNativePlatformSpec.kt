@@ -49,6 +49,10 @@ abstract class HybridNativePlatformSpec: HybridObject() {
   
   @DoNotStrip
   @Keep
+  abstract fun getPrefersRtlDirection(): Boolean
+  
+  @DoNotStrip
+  @Keep
   abstract fun setRootViewBackgroundColor(hex: String?, alpha: Double?): Unit
   
   @DoNotStrip

@@ -119,6 +119,17 @@ public final class HybridNativePlatformSpecCxx {
   }
   
   @inline(__always)
+  public func getPrefersRtlDirection() -> Bool {
+    do {
+      let result = try self.implementation.getPrefersRtlDirection()
+      return result
+    } catch {
+      let message = "\(error.localizedDescription)"
+      fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
+    }
+  }
+  
+  @inline(__always)
   public func setRootViewBackgroundColor(hex: bridge.std__optional_std__string_, alpha: bridge.std__optional_double_) -> Void {
     do {
       try self.implementation.setRootViewBackgroundColor(hex: { () -> String? in
