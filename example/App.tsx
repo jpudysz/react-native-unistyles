@@ -3,13 +3,16 @@ import { View, Text, StyleSheet, TextInput } from 'react-native'
 import { UnistylesRuntime } from 'react-native-unistyles'
 
 const start = performance.now();
-const colorScheme = UnistylesRuntime.colorScheme
+const fontScale = UnistylesRuntime.fontScale
 const end = performance.now();
 
 console.log(`Function took ${end - start} milliseconds.`);
 
 export const App = () => {
-    const insets = UnistylesRuntime.insets
+    const {
+        insets,
+        colorScheme
+    } = UnistylesRuntime
 
     return (
         <View style={styles.container}>
@@ -19,6 +22,9 @@ export const App = () => {
             </Text>
             <Text style={styles.text}>
                 colorScheme: {colorScheme}
+            </Text>
+            <Text style={styles.text}>
+                fontScale: {fontScale}
             </Text>
         </View>
     )
