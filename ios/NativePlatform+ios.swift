@@ -10,8 +10,19 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         return getSizeOf(self)
     }
 
-    func getColorScheme() throws -> String {
-        return "dark"
+    func getColorScheme() throws -> ColorScheme {
+        let interfaceStyle = UIScreen.main.traitCollection.userInterfaceStyle
+        
+        switch (interfaceStyle) {
+        case .dark:
+            return ColorScheme.dark
+        case .light:
+            return ColorScheme.light
+        case .unspecified:
+            return ColorScheme.unspecified
+        default:
+            return ColorScheme.unspecified
+        }
     }
 
     func getFontScale() throws -> Double {
