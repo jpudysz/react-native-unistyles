@@ -64,6 +64,7 @@ namespace margelo::nitro::unistyles {
       virtual Orientation getOrientation() = 0;
       virtual double getPixelRatio() = 0;
       virtual double getFontScale() = 0;
+      virtual bool getRtl() = 0;
 
     public:
       // Methods

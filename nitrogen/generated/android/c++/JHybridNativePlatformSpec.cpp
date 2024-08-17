@@ -56,6 +56,10 @@ namespace margelo::nitro::unistyles {
     static const auto method = _javaPart->getClass()->getMethod<JDimensions()>("getScreenDimensions");
     throw std::runtime_error("getScreenDimensions(...) is not yet implemented!");
   }
+  bool JHybridNativePlatformSpec::getPrefersRtlDirection() {
+    static const auto method = _javaPart->getClass()->getMethod<bool()>("getPrefersRtlDirection");
+    throw std::runtime_error("getPrefersRtlDirection(...) is not yet implemented!");
+  }
   void JHybridNativePlatformSpec::setRootViewBackgroundColor(const std::optional<std::string>& hex, std::optional<double> alpha) {
     static const auto method = _javaPart->getClass()->getMethod<void(std::optional<std::string>, std::optional<double>)>("setRootViewBackgroundColor");
     throw std::runtime_error("setRootViewBackgroundColor(...) is not yet implemented!");

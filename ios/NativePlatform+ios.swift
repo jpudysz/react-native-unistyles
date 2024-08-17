@@ -124,6 +124,15 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
             return Insets(top: safeArea.top, bottom: safeArea.bottom, left: safeArea.left, right: safeArea.right, ime: 0)
         }
     }
+    
+    func getPrefersRtlDirection() throws -> Bool {
+        DispatchQueue.main.sync {
+            let hasForcedRtl = UserDefaults.standard.bool(forKey: "RCTI18nUtil_forceRTL")
+            let isRtl = UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
+            
+            return hasForcedRtl || isRtl
+        }
+    }
 
     func setRootViewBackgroundColor(hex: String?, alpha: Double?) throws {
         //todo

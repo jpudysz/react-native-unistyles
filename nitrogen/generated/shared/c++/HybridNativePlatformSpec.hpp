@@ -63,6 +63,7 @@ namespace margelo::nitro::unistyles {
       virtual double getFontScale() = 0;
       virtual std::string getContentSizeCategory() = 0;
       virtual Dimensions getScreenDimensions() = 0;
+      virtual bool getPrefersRtlDirection() = 0;
       virtual void setRootViewBackgroundColor(const std::optional<std::string>& hex, std::optional<double> alpha) = 0;
       virtual void setNavigationBarBackgroundColor(const std::optional<std::string>& hex, std::optional<double> alpha) = 0;
       virtual void setNavigationBarHidden(bool isHidden) = 0;

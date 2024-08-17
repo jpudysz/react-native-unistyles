@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput } from 'react-native'
 import { UnistylesRuntime } from 'react-native-unistyles'
 
 const start = performance.now();
-const contentSizeCategory = UnistylesRuntime.contentSizeCategory
+const rtl = UnistylesRuntime.rtl
 const end = performance.now();
 
 console.log(`Function took ${end - start} milliseconds.`);
@@ -13,7 +13,8 @@ export const App = () => {
         insets,
         colorScheme,
         fontScale,
-        screen
+        screen,
+        contentSizeCategory
     } = UnistylesRuntime
 
     return (
@@ -33,6 +34,9 @@ export const App = () => {
             </Text>
             <Text style={styles.text}>
                 contentSizeCategory: {contentSizeCategory}
+            </Text>
+            <Text style={styles.text}>
+                rtl: {rtl ? 'true' : 'false'}
             </Text>
         </View>
     )
