@@ -21,7 +21,7 @@ std::string HybridUnistylesRuntime::getThemeName() {
 };
 
 std::string HybridUnistylesRuntime::getContentSizeCategory() {
-    return "unspecified";
+    return this->nativePlatform.getContentSizeCategory();
 };
 
 std::string HybridUnistylesRuntime::getBreakpoint() {
