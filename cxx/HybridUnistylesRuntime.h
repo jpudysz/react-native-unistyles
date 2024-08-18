@@ -9,6 +9,8 @@
 using namespace margelo::nitro::unistyles;
 
 struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec  {
+    HybridUnistylesRuntime(Unistyles::HybridNativePlatformSpecCxx _nativePlatform): nativePlatform{_nativePlatform} {}
+
     ColorScheme getColorScheme() override;
     bool getHasAdaptiveThemes() override;
     bool getRtl() override;
@@ -27,5 +29,5 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec  {
     void setRootViewBackgroundColor(const std::optional<std::string> &hex, std::optional<double> alpha) override;
 
 private:
-    Unistyles::HybridNativePlatformSpecCxx nativePlatform = Unistyles::NativePlatform::create();
+    Unistyles::HybridNativePlatformSpecCxx nativePlatform;
 };

@@ -1,16 +1,14 @@
 #include "HybridStatusBar.h"
 
-void HybridStatusBar::setStyle(StatusBarStyle style) {};
-
-void HybridStatusBar::setBackgroundColor(const std::optional<std::string> &hex, std::optional<double> alpha) {};
-
-void HybridStatusBar::setHidden(bool isHidden) {};
+void HybridStatusBar::setBackgroundColor(const std::optional<std::string> &hex, std::optional<double> alpha) {
+    this->nativePlatform.setStatusBarBackgroundColor(hex, alpha);
+};
 
 double HybridStatusBar::getWidth() {
-    return 360;
+    return this->nativePlatform.getStatusBarDimensions().width;
 }
 
 double HybridStatusBar::getHeight() {
-    return 20;
+    return this->nativePlatform.getStatusBarDimensions().height;
 }
 

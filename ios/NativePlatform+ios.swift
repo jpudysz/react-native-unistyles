@@ -133,6 +133,20 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
             return hasForcedRtl || isRtl
         }
     }
+    
+    func getStatusBarDimensions() throws -> Dimensions {
+        DispatchQueue.main.sync {
+            guard let window = UIApplication.shared.windows.first,
+                  let statusBarManager = window.windowScene?.statusBarManager else {
+                // this should never happen, but it's better to return defaults
+                return Dimensions(width: 0, height: 0)
+            }
+            
+            let statusBarSize = statusBarManager.statusBarFrame.size
+
+            return Dimensions(width: statusBarSize.width, height: statusBarSize.height)
+        }
+    }
 
     func setRootViewBackgroundColor(hex: String?, alpha: Double?) throws {
         //todo
@@ -146,16 +160,8 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         // todo
     }
 
-    func setStatusBarStyle(style: margelo.nitro.unistyles.StatusBarStyle) throws {
-        // todo
-    }
-
-    func setStatusBarHidden(isHidden: Bool) throws {
-        // todo
-    }
-
     func setStatusBarBackgroundColor(hex: String?, alpha: Double?) throws {
-        // todo
+        // not implemented for iOS and there is no such API
     }
 
     func setImmersiveMode(isEnabled: Bool) throws {
