@@ -40,6 +40,7 @@ namespace margelo::nitro::unistyles {
     Insets getInsets() override;
     ColorScheme getColorScheme() override;
     double getFontScale() override;
+    double getPixelRatio() override;
     std::string getContentSizeCategory() override;
     Dimensions getScreenDimensions() override;
     Dimensions getStatusBarDimensions() override;

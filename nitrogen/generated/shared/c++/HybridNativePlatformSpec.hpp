@@ -58,6 +58,7 @@ namespace margelo::nitro::unistyles {
       virtual Insets getInsets() = 0;
       virtual ColorScheme getColorScheme() = 0;
       virtual double getFontScale() = 0;
+      virtual double getPixelRatio() = 0;
       virtual std::string getContentSizeCategory() = 0;
       virtual Dimensions getScreenDimensions() = 0;
       virtual Dimensions getStatusBarDimensions() = 0;

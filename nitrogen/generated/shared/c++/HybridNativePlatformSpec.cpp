@@ -18,6 +18,7 @@ namespace margelo::nitro::unistyles {
       prototype.registerHybridMethod("getInsets", &HybridNativePlatformSpec::getInsets);
       prototype.registerHybridMethod("getColorScheme", &HybridNativePlatformSpec::getColorScheme);
       prototype.registerHybridMethod("getFontScale", &HybridNativePlatformSpec::getFontScale);
+      prototype.registerHybridMethod("getPixelRatio", &HybridNativePlatformSpec::getPixelRatio);
       prototype.registerHybridMethod("getContentSizeCategory", &HybridNativePlatformSpec::getContentSizeCategory);
       prototype.registerHybridMethod("getScreenDimensions", &HybridNativePlatformSpec::getScreenDimensions);
       prototype.registerHybridMethod("getStatusBarDimensions", &HybridNativePlatformSpec::getStatusBarDimensions);

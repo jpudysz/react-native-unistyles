@@ -36,6 +36,7 @@ public protocol HybridNativePlatformSpec: HybridObjectSpec {
   func getInsets() throws -> Insets
   func getColorScheme() throws -> ColorScheme
   func getFontScale() throws -> Double
+  func getPixelRatio() throws -> Double
   func getContentSizeCategory() throws -> String
   func getScreenDimensions() throws -> Dimensions
   func getStatusBarDimensions() throws -> Dimensions

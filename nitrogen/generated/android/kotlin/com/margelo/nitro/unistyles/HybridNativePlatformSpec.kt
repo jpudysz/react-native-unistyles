@@ -41,6 +41,10 @@ abstract class HybridNativePlatformSpec: HybridObject() {
   
   @DoNotStrip
   @Keep
+  abstract fun getPixelRatio(): Double
+  
+  @DoNotStrip
+  @Keep
   abstract fun getContentSizeCategory(): String
   
   @DoNotStrip

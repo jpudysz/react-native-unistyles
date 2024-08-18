@@ -97,6 +97,17 @@ public final class HybridNativePlatformSpecCxx {
   }
   
   @inline(__always)
+  public func getPixelRatio() -> Double {
+    do {
+      let result = try self.implementation.getPixelRatio()
+      return result
+    } catch {
+      let message = "\(error.localizedDescription)"
+      fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
+    }
+  }
+  
+  @inline(__always)
   public func getContentSizeCategory() -> std.string {
     do {
       let result = try self.implementation.getContentSizeCategory()
