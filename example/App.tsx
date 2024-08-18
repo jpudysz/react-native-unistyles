@@ -75,6 +75,14 @@ export const App = () => {
                     }}
                 />
             </View>
+            <View style={styles.row}>
+                <Button
+                    title="Set root view background color"
+                    onPress={() => {
+                        UnistylesRuntime.setRootViewBackgroundColor('#ff0000')
+                    }}
+                />
+            </View>
         </View>
     )
 }

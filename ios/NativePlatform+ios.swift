@@ -68,10 +68,10 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
                 // this should never happen, but it's better to return zeros
                 return Dimensions(width: 0, height: 0)
             }
-            
+
             let width = windowFrame.size.width
             let height = windowFrame.size.height
-            
+
             return Dimensions(width: width, height: height)
         }
     }
@@ -79,7 +79,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     func getContentSizeCategory() throws -> String {
         DispatchQueue.main.sync {
             let contentSizeCategory = UIApplication.shared.preferredContentSizeCategory
-            
+
             switch contentSizeCategory {
             case .extraExtraExtraLarge:
                 return "xxxLarge"
@@ -124,16 +124,16 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
             return Insets(top: safeArea.top, bottom: safeArea.bottom, left: safeArea.left, right: safeArea.right, ime: 0)
         }
     }
-    
+
     func getPrefersRtlDirection() throws -> Bool {
         DispatchQueue.main.sync {
             let hasForcedRtl = UserDefaults.standard.bool(forKey: "RCTI18nUtil_forceRTL")
             let isRtl = UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
-            
+
             return hasForcedRtl || isRtl
         }
     }
-    
+
     func getStatusBarDimensions() throws -> Dimensions {
         DispatchQueue.main.sync {
             guard let window = UIApplication.shared.windows.first,
@@ -141,13 +141,13 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
                 // this should never happen, but it's better to return defaults
                 return Dimensions(width: 0, height: 0)
             }
-            
+
             let statusBarSize = statusBarManager.statusBarFrame.size
 
             return Dimensions(width: statusBarSize.width, height: statusBarSize.height)
         }
     }
-    
+
     func getPixelRatio() throws -> Double {
         DispatchQueue.main.sync {
             guard let presentedViewController = RCTPresentedViewController(),
@@ -155,26 +155,28 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
                 // this should never happen, but it's better to return default
                 return 1;
             }
-            
+
             return window.screen.scale
         }
     }
 
     func setRootViewBackgroundColor(hex: String?, alpha: Double?) throws {
-        //todo
+        DispatchQueue.main.async {
+            guard let presentedViewController = RCTPresentedViewController(),
+                  let backgroundColor = colorFromHexString(hex ?? "", alpha: alpha ?? 1) else {
+                print("🦄 Unistyles: Couldn't set rootView backgroundColor")
+
+                return
+            }
+
+            presentedViewController.view.backgroundColor = backgroundColor
+        }
     }
 
-    func setNavigationBarBackgroundColor(hex: String?, alpha: Double?) throws {
-        // todo
-    }
-
-    func setNavigationBarHidden(isHidden: Bool) throws {
-        // todo
-    }
-
-    func setStatusBarBackgroundColor(hex: String?, alpha: Double?) throws {
-        // not implemented for iOS and there is no such API
-    }
+    // not implemented for iOS as there are no such APIs
+    func setNavigationBarBackgroundColor(hex: String?, alpha: Double?) throws {}
+    func setNavigationBarHidden(isHidden: Bool) throws {}
+    func setStatusBarBackgroundColor(hex: String?, alpha: Double?) throws {}
 
     func setImmersiveMode(isEnabled: Bool) throws {
         // todo
