@@ -11,14 +11,16 @@ using namespace margelo::nitro;
 @implementation UnistylesModule
 
 + (void)load  {
-    HybridObjectRegistry::registerHybridObjectConstructor("UnistylesRuntime", []() -> std::shared_ptr<HybridObject>{
-        return std::make_shared<HybridUnistylesRuntime>();
+    auto nativePlatform = Unistyles::NativePlatform::create();
+    
+    HybridObjectRegistry::registerHybridObjectConstructor("UnistylesRuntime", [nativePlatform]() -> std::shared_ptr<HybridObject>{
+        return std::make_shared<HybridUnistylesRuntime>(nativePlatform);
     });
-    HybridObjectRegistry::registerHybridObjectConstructor("StatusBar", []() -> std::shared_ptr<HybridObject>{
-        return std::make_shared<HybridStatusBar>();
+    HybridObjectRegistry::registerHybridObjectConstructor("StatusBar", [nativePlatform]() -> std::shared_ptr<HybridObject>{
+        return std::make_shared<HybridStatusBar>(nativePlatform);
     });
-    HybridObjectRegistry::registerHybridObjectConstructor("NavigationBar", []() -> std::shared_ptr<HybridObject>{
-        return std::make_shared<HybridNavigationBar>();
+    HybridObjectRegistry::registerHybridObjectConstructor("NavigationBar", [nativePlatform]() -> std::shared_ptr<HybridObject>{
+        return std::make_shared<HybridNavigationBar>(nativePlatform);
     });
 }
 

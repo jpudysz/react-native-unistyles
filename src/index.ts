@@ -1,2 +1,2 @@
-export { UnistylesRuntime } from './specs'
+export * from './specs'
 export type { UnistylesThemes, UnistylesBreakpoints } from './global'
