@@ -1,1 +1,0 @@
-../../../../../boost/boost/multi_index/detail/restore_wstrict_aliasing.hpp

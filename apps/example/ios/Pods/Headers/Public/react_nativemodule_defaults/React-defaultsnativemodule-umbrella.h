@@ -1,1 +1,0 @@
-../../../Target Support Files/React-defaultsnativemodule/React-defaultsnativemodule-umbrella.h

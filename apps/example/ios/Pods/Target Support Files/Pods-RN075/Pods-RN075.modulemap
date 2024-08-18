@@ -1,6 +1,0 @@
-module Pods_RN075 {
-  umbrella header "Pods-RN075-umbrella.h"
-
-  export *
-  module * { export * }
-}

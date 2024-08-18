@@ -1,6 +1,0 @@
-module folly {
-  umbrella header "RCT-Folly-umbrella.h"
-
-  export *
-  module * { export * }
-}

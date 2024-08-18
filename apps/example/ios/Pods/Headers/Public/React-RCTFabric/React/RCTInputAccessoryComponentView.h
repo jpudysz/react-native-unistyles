@@ -1,1 +1,0 @@
-../../../../../../../../node_modules/react-native/React/Fabric/Mounting/ComponentViews/InputAccessory/RCTInputAccessoryComponentView.h
