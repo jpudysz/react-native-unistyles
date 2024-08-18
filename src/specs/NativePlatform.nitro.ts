@@ -7,6 +7,7 @@ export interface NativePlatform extends HybridObject<{ ios: 'swift', android: 'k
     getInsets(): Insets,
     getColorScheme(): ColorScheme,
     getFontScale(): number,
+    getPixelRatio(): number,
     getContentSizeCategory(): string,
     getScreenDimensions(): Dimensions,
     getStatusBarDimensions(): Dimensions,

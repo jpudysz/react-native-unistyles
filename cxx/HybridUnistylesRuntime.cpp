@@ -41,7 +41,7 @@ Orientation HybridUnistylesRuntime::getOrientation() {
 };
 
 double HybridUnistylesRuntime::getPixelRatio() {
-    return 1.0;
+    return this->nativePlatform.getPixelRatio();
 };
 
 double HybridUnistylesRuntime::getFontScale() {

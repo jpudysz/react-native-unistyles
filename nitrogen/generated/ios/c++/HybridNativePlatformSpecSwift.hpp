@@ -79,6 +79,10 @@ namespace margelo::nitro::unistyles {
       auto value = _swiftPart.getFontScale();
       return value;
     }
+    inline double getPixelRatio() override {
+      auto value = _swiftPart.getPixelRatio();
+      return value;
+    }
     inline std::string getContentSizeCategory() override {
       auto value = _swiftPart.getContentSizeCategory();
       return value;

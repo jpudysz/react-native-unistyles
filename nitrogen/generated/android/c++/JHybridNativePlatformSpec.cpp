@@ -47,6 +47,10 @@ namespace margelo::nitro::unistyles {
     static const auto method = _javaPart->getClass()->getMethod<double()>("getFontScale");
     throw std::runtime_error("getFontScale(...) is not yet implemented!");
   }
+  double JHybridNativePlatformSpec::getPixelRatio() {
+    static const auto method = _javaPart->getClass()->getMethod<double()>("getPixelRatio");
+    throw std::runtime_error("getPixelRatio(...) is not yet implemented!");
+  }
   std::string JHybridNativePlatformSpec::getContentSizeCategory() {
     static const auto method = _javaPart->getClass()->getMethod<std::string()>("getContentSizeCategory");
     throw std::runtime_error("getContentSizeCategory(...) is not yet implemented!");

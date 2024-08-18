@@ -147,6 +147,18 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
             return Dimensions(width: statusBarSize.width, height: statusBarSize.height)
         }
     }
+    
+    func getPixelRatio() throws -> Double {
+        DispatchQueue.main.sync {
+            guard let presentedViewController = RCTPresentedViewController(),
+                  let window = presentedViewController.view.window else {
+                // this should never happen, but it's better to return default
+                return 1;
+            }
+            
+            return window.screen.scale
+        }
+    }
 
     func setRootViewBackgroundColor(hex: String?, alpha: Double?) throws {
         //todo

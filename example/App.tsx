@@ -3,8 +3,7 @@ import { View, Text, StyleSheet, TextInput, Button } from 'react-native'
 import { UnistylesRuntime, StatusBarStyle } from 'react-native-unistyles'
 
 const start = performance.now();
-const width = UnistylesRuntime.statusBar.width
-const height = UnistylesRuntime.statusBar.height
+const pixelRatio = UnistylesRuntime.pixelRatio
 const end = performance.now();
 
 console.log(`Function took ${end - start} milliseconds.`);
@@ -17,6 +16,8 @@ export const App = () => {
         screen,
         contentSizeCategory,
         rtl,
+        statusBar,
+        pixelRatio
     } = UnistylesRuntime
 
     return (
@@ -41,19 +42,22 @@ export const App = () => {
                 rtl: {rtl ? 'true' : 'false'}
             </Text>
             <Text style={styles.text}>
-                status bar: {width}x{height}
+                status bar: {statusBar.width}x{statusBar.height}
+            </Text>
+            <Text style={styles.text}>
+                pixel ratio: {pixelRatio}
             </Text>
             <View style={styles.row}>
                 <Button
                     title="Hide status bar"
                     onPress={() => {
-                        UnistylesRuntime.statusBar.setHidden(true)
+                        statusBar.setHidden(true)
                     }}
                 />
                 <Button
                     title="Show status bar"
                     onPress={() => {
-                        UnistylesRuntime.statusBar.setHidden(false)
+                        statusBar.setHidden(false)
                     }}
                 />
             </View>
@@ -61,13 +65,13 @@ export const App = () => {
                 <Button
                     title="Set status bar light"
                     onPress={() => {
-                        UnistylesRuntime.statusBar.setStyle(StatusBarStyle.Light)
+                        statusBar.setStyle(StatusBarStyle.Light)
                     }}
                 />
                 <Button
                     title="Set status bar dark"
                     onPress={() => {
-                        UnistylesRuntime.statusBar.setStyle(StatusBarStyle.Dark)
+                        statusBar.setStyle(StatusBarStyle.Dark)
                     }}
                 />
             </View>
