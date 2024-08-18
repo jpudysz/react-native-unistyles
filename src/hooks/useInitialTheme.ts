@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
-import { unistyles } from '../core'
+import { UnistylesRuntime } from '../specs'
 import type { UnistylesThemes } from '../global'
 
 export const useInitialTheme = (forName: keyof UnistylesThemes) => {
     useMemo(() => {
-        if (!unistyles.runtime.themeName) {
-            unistyles.runtime.setTheme(forName)
+        if (!UnistylesRuntime.themeName) {
+            UnistylesRuntime.setTheme(forName)
         }
     }, [])
 }

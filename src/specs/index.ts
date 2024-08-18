@@ -2,7 +2,7 @@ import { NitroModules } from 'react-native-nitro-modules'
 import { StatusBar as NativeStatusBar } from 'react-native'
 import type { NavigationBar } from './NavigtionBar'
 import type { StatusBar, StatusBarHiddenAnimation } from './StatusBar'
-import type { UnistylesRuntime } from './UnistylesRuntime'
+import type { UnistylesRuntime, MiniRuntime } from './UnistylesRuntime'
 import { StatusBarStyle, ColorScheme, Orientation } from './types'
 
 const HybridUnistylesRuntime = NitroModules.createHybridObject<UnistylesRuntime>('UnistylesRuntime')
@@ -39,4 +39,8 @@ export {
     StatusBarStyle,
     ColorScheme,
     Orientation
+}
+
+export type {
+    MiniRuntime
 }
