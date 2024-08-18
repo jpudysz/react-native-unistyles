@@ -37,6 +37,12 @@ Insets HybridUnistylesRuntime::getInsets() {
 };
 
 Orientation HybridUnistylesRuntime::getOrientation() {
+    auto screenDimensions = this->getScreen();
+    
+    if (screenDimensions.width > screenDimensions.height) {
+        return Orientation::LANDSCAPE;
+    }
+    
     return Orientation::PORTRAIT;
 };
 

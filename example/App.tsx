@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, Button } from 'react-native'
 import { UnistylesRuntime, StatusBarStyle } from 'react-native-unistyles'
 
 const start = performance.now();
-const pixelRatio = UnistylesRuntime.pixelRatio
+UnistylesRuntime.orientation
 const end = performance.now();
 
 console.log(`Function took ${end - start} milliseconds.`);
@@ -17,7 +17,8 @@ export const App = () => {
         contentSizeCategory,
         rtl,
         statusBar,
-        pixelRatio
+        pixelRatio,
+        orientation
     } = UnistylesRuntime
 
     return (
@@ -46,6 +47,9 @@ export const App = () => {
             </Text>
             <Text style={styles.text}>
                 pixel ratio: {pixelRatio}
+            </Text>
+            <Text style={styles.text}>
+                orientation: {orientation}
             </Text>
             <View style={styles.row}>
                 <Button

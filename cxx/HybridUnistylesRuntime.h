@@ -8,7 +8,7 @@
 
 using namespace margelo::nitro::unistyles;
 
-struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec  {
+struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     HybridUnistylesRuntime(Unistyles::HybridNativePlatformSpecCxx _nativePlatform): nativePlatform{_nativePlatform} {}
 
     ColorScheme getColorScheme() override;
