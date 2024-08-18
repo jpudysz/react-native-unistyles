@@ -51,4 +51,7 @@ double HybridUnistylesRuntime::getFontScale() {
 void HybridUnistylesRuntime::setTheme(const std::string &themeName) {};
 void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {};
 void HybridUnistylesRuntime::setImmersiveMode(bool isEnabled) {};
-void HybridUnistylesRuntime::setRootViewBackgroundColor(const std::optional<std::string> &hex, std::optional<double> alpha) {};
+
+void HybridUnistylesRuntime::setRootViewBackgroundColor(const std::optional<std::string> &hex, std::optional<double> alpha) {
+    this->nativePlatform.setRootViewBackgroundColor(hex, alpha);
+};
