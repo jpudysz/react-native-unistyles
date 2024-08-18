@@ -177,10 +177,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     func setNavigationBarBackgroundColor(hex: String?, alpha: Double?) throws {}
     func setNavigationBarHidden(isHidden: Bool) throws {}
     func setStatusBarBackgroundColor(hex: String?, alpha: Double?) throws {}
-
-    func setImmersiveMode(isEnabled: Bool) throws {
-        // todo
-    }
+    func setImmersiveMode(isEnabled: Bool) throws {}
 }
 
 #endif

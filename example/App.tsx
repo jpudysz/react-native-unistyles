@@ -83,6 +83,14 @@ export const App = () => {
                     }}
                 />
             </View>
+            <View style={styles.row}>
+                <Button
+                    title="Set immersive mode"
+                    onPress={() => {
+                        UnistylesRuntime.setImmersiveMode(true)
+                    }}
+                />
+            </View>
         </View>
     )
 }
