@@ -2,6 +2,7 @@
 #import "HybridUnistylesRuntime.h"
 #import "HybridStatusBar.h"
 #import "HybridNavigationBar.h"
+#import "HybridStyleSheet.h"
 
 using namespace margelo::nitro;
 
@@ -21,6 +22,9 @@ using namespace margelo::nitro;
     });
     HybridObjectRegistry::registerHybridObjectConstructor("NavigationBar", [nativePlatform]() -> std::shared_ptr<HybridObject>{
         return std::make_shared<HybridNavigationBar>(nativePlatform);
+    });
+    HybridObjectRegistry::registerHybridObjectConstructor("StyleSheet", [nativePlatform]() -> std::shared_ptr<HybridObject>{
+        return std::make_shared<HybridStyleSheet>(nativePlatform);
     });
 }
 

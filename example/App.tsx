@@ -1,6 +1,6 @@
 import React from 'react'
-import { View, Text, StyleSheet, TextInput, Button } from 'react-native'
-import { UnistylesRuntime, StatusBarStyle } from 'react-native-unistyles'
+import { View, Text, TextInput, Button } from 'react-native'
+import { UnistylesRuntime, StatusBarStyle, StyleSheet } from 'react-native-unistyles'
 
 const start = performance.now();
 UnistylesRuntime.orientation
