@@ -4,7 +4,7 @@
 // todo remove me
 #include <NitroModules/HybridContext.hpp>
 #include "Unistyles-Swift-Cxx-Umbrella.hpp"
-#include "assert.h"
+#include "UnistylesHelpers.h"
 
 using namespace margelo::nitro::unistyles;
 
