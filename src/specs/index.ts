@@ -3,12 +3,14 @@ import { StatusBar as NativeStatusBar } from 'react-native'
 import type { NavigationBar } from './NavigtionBar'
 import type { StatusBar, StatusBarHiddenAnimation } from './StatusBar'
 import type { UnistylesRuntime, MiniRuntime } from './UnistylesRuntime'
+import type { StyleSheet } from './StyleSheet'
 import { StatusBarStyle, ColorScheme, Orientation } from './types'
 import { isIOS } from '../common'
 
 const HybridUnistylesRuntime = NitroModules.createHybridObject<UnistylesRuntime>('UnistylesRuntime')
 const HybridStatusBar = NitroModules.createHybridObject<StatusBar>('StatusBar')
 const HybridNavigationBar = NitroModules.createHybridObject<NavigationBar>('NavigationBar')
+const HybridStyleSheet = NitroModules.createHybridObject<StyleSheet>('StyleSheet')
 
 HybridStatusBar.setStyle = (style: StatusBarStyle, animated?: boolean) => {
     switch (style) {
@@ -33,6 +35,7 @@ HybridUnistylesRuntime.statusBar = HybridStatusBar
 HybridUnistylesRuntime.navigationBar = HybridNavigationBar
 
 export {
+    HybridStyleSheet as StyleSheet,
     HybridUnistylesRuntime as UnistylesRuntime
 }
 

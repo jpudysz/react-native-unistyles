@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
 
   s.source_files = [
     "ios/**/*.{swift,h,mm}",
-    "cxx/*.{h,cpp}"
+    "cxx/**/*.{h,cpp,hpp}"
   ]
   s.pod_target_xcconfig = {
     "CLANG_CXX_LANGUAGE_STANDARD" => "c++20"
