@@ -5,6 +5,7 @@
 #include <NitroModules/HybridContext.hpp>
 #include "Unistyles-Swift-Cxx-Umbrella.hpp"
 #include "UnistylesHelpers.h"
+#include "StyleSheetRegistry.h"
 
 using namespace margelo::nitro::unistyles;
 
@@ -18,7 +19,7 @@ struct HybridStyleSheet: public HybridStyleSheetSpec {
     
     void loadHybridMethods() override {
         HybridStyleSheetSpec::loadHybridMethods();
-        
+
         registerHybrids(this, [](Prototype& prototype) {
             prototype.registerHybridMethod("create", &HybridStyleSheet::create);
         });
@@ -26,5 +27,6 @@ struct HybridStyleSheet: public HybridStyleSheetSpec {
     
 private:
     Unistyles::HybridNativePlatformSpecCxx nativePlatform;
+    core::StyleSheetRegistry styleSheetRegistry{};
 };
 
