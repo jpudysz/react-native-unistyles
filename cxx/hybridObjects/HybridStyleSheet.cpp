@@ -13,6 +13,7 @@ jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal,
     
     jsi::Object rawStyleSheet = arguments[0].asObject(rt);
     core::StyleSheet& registeredStyleSheet = styleSheetRegistry.add(rt, std::move(rawStyleSheet));
+    auto parsedStyleSheet = styleSheetRegistry.parse(rt, registeredStyleSheet);
     
     // todo
     

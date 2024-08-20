@@ -17,12 +17,15 @@ struct StyleSheetRegistry {
     StyleSheetRegistry& operator=(StyleSheetRegistry&&) = default;
     
     StyleSheet& add(jsi::Runtime& rt, jsi::Object rawStyleSheet);
-    StyleSheet& addFromFunction(jsi::Runtime& rt, unsigned int tag, jsi::Function styleSheetFn);
-    StyleSheet& addFromObject(jsi::Runtime &rt, unsigned int tag, jsi::Object rawStyleSheet);
+    jsi::Object parse(jsi::Runtime &rt, const StyleSheet& styleSheet);
     void remove(unsigned int tag);
-
+    
 private:
     folly::fbvector<StyleSheet> styleSheets{};
+    
+    StyleSheet& addFromFunction(jsi::Runtime& rt, unsigned int tag, jsi::Function styleSheetFn);
+    StyleSheet& addFromObject(jsi::Runtime& rt, unsigned int tag, jsi::Object rawStyleSheet);
+    jsi::Object unwrapStyleSheet(jsi::Runtime& rt, const StyleSheet& styleSheet);
 };
 
 }

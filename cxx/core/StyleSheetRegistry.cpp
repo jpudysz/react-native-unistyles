@@ -58,3 +58,24 @@ void StyleSheetRegistry::remove(unsigned int tag) {
 
     this->styleSheets.erase(it);
 }
+
+jsi::Object StyleSheetRegistry::parse(jsi::Runtime &rt, const StyleSheet &styleSheet) {
+    jsi::Object unwrapedStyleSheet = this->unwrapStyleSheet(rt, styleSheet);
+    
+    return unwrapedStyleSheet;
+}
+
+jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, const StyleSheet &styleSheet) {
+    // firstly we need to get object representation of user's StyleSheet
+    // StyleSheet can be a function or an object
+    
+    // StyleSheet is already an object
+    if (styleSheet.type == StyleSheetType::Static) {
+        return jsi::Value(rt, styleSheet.rawValue).asObject(rt);
+    }
+    
+    // StyleSheet is a function
+    
+    // todo get miniRuntime and theme
+    return jsi::Object(rt);
+}
