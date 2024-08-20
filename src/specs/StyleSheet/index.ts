@@ -1,32 +1,28 @@
+import { StyleSheet as NativeStyleSheet } from 'react-native'
 import type { StyleSheet as StyleSheetSpec } from './StyleSheet.nitro'
-import type { StyleSheetWithSuperPowers } from '../../types'
-import type { UnistylesThemes } from '../../global'
+import type { StyleSheetWithSuperPowers, UnistylesTheme } from '../../types'
+import type { UnistylesBreakpoints, UnistylesThemes } from '../../global'
 
-type AbsoluteFillObject = {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0
+type UnistylesSettings = {
+    adaptiveThemes?: boolean,
+    initialTheme?: UnistylesTheme
 }
 
 type UnistylesConfig = {
-    themes: UnistylesThemes
+    settings?: UnistylesSettings,
+    themes?: UnistylesThemes,
+    breakpoints?: UnistylesBreakpoints
 }
 
 const create = <S extends StyleSheetWithSuperPowers>(stylesheet: S): S => stylesheet
 
-export type UnistylesStyleSheet = {
+export interface StyleSheet extends StyleSheetSpec {
+    absoluteFillObject: typeof NativeStyleSheet.absoluteFillObject,
+    absoluteFill: typeof NativeStyleSheet.absoluteFill,
+    compose: typeof NativeStyleSheet.compose,
+    flatten: typeof NativeStyleSheet.flatten,
+
+    // overridden methods
     create: typeof create,
     configure(config: UnistylesConfig): void
-}
-
-// todo implement me
-export interface StyleSheet extends StyleSheetSpec {
-    hairlineWidth: number,
-    absoluteFillObject: AbsoluteFillObject,
-    absoluteFill: AbsoluteFillObject,
-    compose: VoidFunction,
-    flatten: VoidFunction,
-    create: typeof create
 }

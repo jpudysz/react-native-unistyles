@@ -1,5 +1,5 @@
 import { NitroModules } from 'react-native-nitro-modules'
-import { StatusBar as NativeStatusBar } from 'react-native'
+import { StatusBar as NativeStatusBar, StyleSheet as NativeStyleSheet } from 'react-native'
 import type { NavigationBar } from './NavigtionBar'
 import type { StatusBar, StatusBarHiddenAnimation } from './StatusBar'
 import type { UnistylesRuntime, MiniRuntime } from './UnistylesRuntime'
@@ -33,6 +33,11 @@ if (isIOS) {
 
 HybridUnistylesRuntime.statusBar = HybridStatusBar
 HybridUnistylesRuntime.navigationBar = HybridNavigationBar
+
+HybridStyleSheet.absoluteFillObject = NativeStyleSheet.absoluteFillObject
+HybridStyleSheet.absoluteFill = NativeStyleSheet.absoluteFill
+HybridStyleSheet.flatten = NativeStyleSheet.flatten
+HybridStyleSheet.compose = NativeStyleSheet.compose
 
 export {
     HybridStyleSheet as StyleSheet,
