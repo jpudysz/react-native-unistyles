@@ -28,6 +28,11 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     void setImmersiveMode(bool isEnabled) override;
     void setRootViewBackgroundColor(const std::optional<std::string> &hex, std::optional<double> alpha) override;
 
+    // internals
+    bool hasAdaptiveThemes = false;
+    std::optional<std::string> initialTheme = std::nullopt;
+    std::vector<std::pair<std::string, double>> sortedBreakpointPairs{};
+
 private:
     Unistyles::HybridNativePlatformSpecCxx nativePlatform;
 };

@@ -13,9 +13,10 @@ using namespace margelo::nitro;
 
 + (void)load  {
     auto nativePlatform = Unistyles::NativePlatform::create();
-    
-    HybridObjectRegistry::registerHybridObjectConstructor("UnistylesRuntime", [nativePlatform]() -> std::shared_ptr<HybridObject>{
-        return std::make_shared<HybridUnistylesRuntime>(nativePlatform);
+    auto unistylesRuntime = std::make_shared<HybridUnistylesRuntime>(nativePlatform);
+
+    HybridObjectRegistry::registerHybridObjectConstructor("UnistylesRuntime", [unistylesRuntime]() -> std::shared_ptr<HybridObject>{
+        return unistylesRuntime;
     });
     HybridObjectRegistry::registerHybridObjectConstructor("StatusBar", [nativePlatform]() -> std::shared_ptr<HybridObject>{
         return std::make_shared<HybridStatusBar>(nativePlatform);
@@ -23,8 +24,8 @@ using namespace margelo::nitro;
     HybridObjectRegistry::registerHybridObjectConstructor("NavigationBar", [nativePlatform]() -> std::shared_ptr<HybridObject>{
         return std::make_shared<HybridNavigationBar>(nativePlatform);
     });
-    HybridObjectRegistry::registerHybridObjectConstructor("StyleSheet", [nativePlatform]() -> std::shared_ptr<HybridObject>{
-        return std::make_shared<HybridStyleSheet>(nativePlatform);
+    HybridObjectRegistry::registerHybridObjectConstructor("StyleSheet", [nativePlatform, unistylesRuntime]() -> std::shared_ptr<HybridObject>{
+        return std::make_shared<HybridStyleSheet>(nativePlatform, unistylesRuntime);
     });
 }
 
