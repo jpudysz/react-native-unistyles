@@ -99,6 +99,13 @@ export const App = () => {
     )
 }
 
+StyleSheet.configure({
+    settings: {
+        adaptiveThemes: true,
+        initialTheme: undefined
+    }
+})
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
