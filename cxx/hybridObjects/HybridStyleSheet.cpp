@@ -1,5 +1,12 @@
 #include "HybridStyleSheet.h"
 
+double HybridStyleSheet::getHairlineWidth() {
+    auto pixelRatio = this->nativePlatform.getPixelRatio();
+    auto nearestPixel = static_cast<int>(std::trunc(pixelRatio * 0.4));
+    
+    return nearestPixel / pixelRatio;
+}
+
 jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
     helpers::assertThat(rt, count == 1, "StyleSheet.create must be called with one argument");
     helpers::assertThat(rt, arguments[0].isObject(), "StyleSheet.create must be called with object or function");
@@ -18,4 +25,10 @@ jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal,
     // todo
     
     return jsi::Object(rt);
+}
+
+jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
+    // todo implement me
+    
+    return jsi::Value::undefined();
 }

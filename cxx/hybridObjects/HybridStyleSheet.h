@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include "HybridStyleSheetSpec.hpp"
 // todo remove me
 #include <NitroModules/HybridContext.hpp>
@@ -16,14 +17,21 @@ struct HybridStyleSheet: public HybridStyleSheetSpec {
                       const jsi::Value& thisValue,
                       const jsi::Value* args,
                       size_t count);
+    jsi::Value configure(jsi::Runtime& rt,
+                      const jsi::Value& thisValue,
+                      const jsi::Value* args,
+                      size_t count);
     
     void loadHybridMethods() override {
         HybridStyleSheetSpec::loadHybridMethods();
 
         registerHybrids(this, [](Prototype& prototype) {
             prototype.registerHybridMethod("create", &HybridStyleSheet::create);
+            prototype.registerHybridMethod("configure", &HybridStyleSheet::configure);
         });
     };
+    
+    double getHairlineWidth() override;
     
 private:
     Unistyles::HybridNativePlatformSpecCxx nativePlatform;
