@@ -95,6 +95,10 @@ namespace margelo::nitro::unistyles {
       auto value = _swiftPart.getStatusBarDimensions();
       return value;
     }
+    inline Dimensions getNavigationBarDimensions() override {
+      auto value = _swiftPart.getNavigationBarDimensions();
+      return value;
+    }
     inline bool getPrefersRtlDirection() override {
       auto value = _swiftPart.getPrefersRtlDirection();
       return value;

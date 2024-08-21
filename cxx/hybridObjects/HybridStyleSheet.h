@@ -46,8 +46,6 @@ private:
     void parseThemes(jsi::Runtime& rt, jsi::Object themes);
     void verifyAndSelectTheme(jsi::Runtime &rt);
     void setThemeFromColorScheme();
-    jsi::Object& getCurrentTheme();
-    std::shared_ptr<HybridMiniRuntime> getMiniRuntime();
 
     Unistyles::HybridNativePlatformSpecCxx nativePlatform;
     std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime;

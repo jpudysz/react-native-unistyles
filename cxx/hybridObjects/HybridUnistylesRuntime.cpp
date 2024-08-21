@@ -79,3 +79,11 @@ void HybridUnistylesRuntime::setImmersiveMode(bool isEnabled) {};
 void HybridUnistylesRuntime::setRootViewBackgroundColor(const std::optional<std::string> &hex, std::optional<double> alpha) {
     this->nativePlatform.setRootViewBackgroundColor(hex, alpha);
 };
+
+Dimensions HybridUnistylesRuntime::getStatusBarDimensions() {
+    return this->nativePlatform.getStatusBarDimensions();
+}
+
+Dimensions HybridUnistylesRuntime::getNavigationBarDimensions() {
+    return this->nativePlatform.getNavigationBarDimensions();
+}

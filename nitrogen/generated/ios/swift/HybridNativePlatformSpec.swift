@@ -40,6 +40,7 @@ public protocol HybridNativePlatformSpec: HybridObjectSpec {
   func getContentSizeCategory() throws -> String
   func getScreenDimensions() throws -> Dimensions
   func getStatusBarDimensions() throws -> Dimensions
+  func getNavigationBarDimensions() throws -> Dimensions
   func getPrefersRtlDirection() throws -> Bool
   func setRootViewBackgroundColor(hex: String?, alpha: Double?) throws -> Void
   func setNavigationBarBackgroundColor(hex: String?, alpha: Double?) throws -> Void

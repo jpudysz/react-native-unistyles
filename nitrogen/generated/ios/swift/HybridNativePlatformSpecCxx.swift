@@ -141,6 +141,17 @@ public final class HybridNativePlatformSpecCxx {
   }
   
   @inline(__always)
+  public func getNavigationBarDimensions() -> Dimensions {
+    do {
+      let result = try self.implementation.getNavigationBarDimensions()
+      return result
+    } catch {
+      let message = "\(error.localizedDescription)"
+      fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
+    }
+  }
+  
+  @inline(__always)
   public func getPrefersRtlDirection() -> Bool {
     do {
       let result = try self.implementation.getPrefersRtlDirection()

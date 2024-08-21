@@ -63,6 +63,10 @@ namespace margelo::nitro::unistyles {
     static const auto method = _javaPart->getClass()->getMethod<JDimensions()>("getStatusBarDimensions");
     throw std::runtime_error("getStatusBarDimensions(...) is not yet implemented!");
   }
+  Dimensions JHybridNativePlatformSpec::getNavigationBarDimensions() {
+    static const auto method = _javaPart->getClass()->getMethod<JDimensions()>("getNavigationBarDimensions");
+    throw std::runtime_error("getNavigationBarDimensions(...) is not yet implemented!");
+  }
   bool JHybridNativePlatformSpec::getPrefersRtlDirection() {
     static const auto method = _javaPart->getClass()->getMethod<bool()>("getPrefersRtlDirection");
     throw std::runtime_error("getPrefersRtlDirection(...) is not yet implemented!");

@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, TextInput, Button } from 'react-native'
+import { View, Text, TextInput, Button, StyleSheet as NativeStyleSheet } from 'react-native'
 import { UnistylesRuntime, StatusBarStyle, StyleSheet } from 'react-native-unistyles'
 import { breakpoints, darkTheme, lightTheme, premiumTheme } from './unistyles'
 
@@ -145,7 +145,8 @@ StyleSheet.configure({
     }
 })
 
-const styles = StyleSheet.create({
+const start1 = performance.now()
+NativeStyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
@@ -155,9 +156,37 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: 16,
-        color: 'red'
+        color: '#000000'
     },
     row: {
         flexDirection: 'row'
     }
 })
+const end1 = performance.now()
+
+console.log('Native parsing styles:')
+
+console.log('time: ', end1 - start1, 'ms')
+
+const start2 = performance.now()
+const styles = StyleSheet.create(theme => ({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingTop: 50,
+        paddingHorizontal: 20
+    },
+    text: {
+        fontSize: 16,
+        color: theme?.colors?.typography
+    },
+    row: {
+        flexDirection: 'row'
+    }
+}))
+const end2 = performance.now()
+
+console.log('Unistyles parsing styles:')
+console.log(styles)
+console.log('time: ', end2 - start2, 'ms')
