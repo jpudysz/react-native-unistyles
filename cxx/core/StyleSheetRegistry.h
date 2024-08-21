@@ -3,7 +3,7 @@
 #include <jsi/jsi.h>
 #include <folly/FBVector.h>
 #include "StyleSheet.h"
-#include "UnistylesHelpers.h"
+#include "Helpers.h"
 
 namespace margelo::nitro::unistyles::core {
 

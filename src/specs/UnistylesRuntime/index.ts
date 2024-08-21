@@ -1,6 +1,6 @@
 import type { UnistylesRuntime as UnistylesRuntimeSpec } from './UnistylesRuntime.nitro'
 import type { AppBreakpoint, AppTheme, AppThemeName, ColorScheme, Dimensions, Insets, Orientation } from '../types'
-import type { AndroidContentSizeCategory, IOSContentSizeCategory } from '../../common'
+import type { AndroidContentSizeCategory, IOSContentSizeCategory } from '../../types'
 import type { StatusBar } from '../StatusBar'
 import type { NavigationBar } from '../NavigtionBar'
 

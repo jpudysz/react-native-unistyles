@@ -1,6 +1,7 @@
 #pragma once
 
 #include <jsi/jsi.h>
+#include <unordered_set>
 
 using namespace facebook;
 
@@ -8,7 +9,7 @@ namespace margelo::nitro::unistyles::helpers {
 
 inline void assertThat(jsi::Runtime& rt, bool condition, const std::string& message) {
     if (!condition) {
-        throw jsi::JSError(rt, "[Unistyles] " + message);
+        throw jsi::JSError(rt, "[Unistyles]: " + message);
     }
 }
 
@@ -22,6 +23,21 @@ inline void enumerateJSIObject(jsi::Runtime& rt, const jsi::Object& obj, std::fu
 
         callback(propertyName, propertyValue);
     }
+}
+
+template <typename T>
+inline bool vecPairsContainsKeys(std::vector<std::pair<std::string, T>>& vec, std::vector<std::string>&& keys) {
+    std::unordered_set<std::string> availableKeys(keys.begin(), keys.end());
+    
+    for (const auto& pair : vec) {
+        availableKeys.erase(pair.first);
+
+        if (availableKeys.empty()) {
+            return true;
+        }
+    }
+    
+    return false;
 }
 
 }

@@ -1,12 +1,7 @@
 import React from 'react'
 import { View, Text, TextInput, Button } from 'react-native'
 import { UnistylesRuntime, StatusBarStyle, StyleSheet } from 'react-native-unistyles'
-
-const start = performance.now();
-UnistylesRuntime.breakpoint
-const end = performance.now();
-
-console.log(`Function took ${end - start} milliseconds.`);
+import { breakpoints, darkTheme, lightTheme, premiumTheme } from './unistyles'
 
 export const App = () => {
     const {
@@ -20,7 +15,10 @@ export const App = () => {
         pixelRatio,
         orientation,
         themeName,
-        breakpoint
+        breakpoint,
+        hasAdaptiveThemes,
+        navigationBar,
+        // updateTheme
     } = UnistylesRuntime
 
     return (
@@ -48,6 +46,9 @@ export const App = () => {
                 status bar: {statusBar.width}x{statusBar.height}
             </Text>
             <Text style={styles.text}>
+                navigation bar: {navigationBar.width}x{navigationBar.height}
+            </Text>
+            <Text style={styles.text}>
                 pixel ratio: {pixelRatio}
             </Text>
             <Text style={styles.text}>
@@ -58,6 +59,9 @@ export const App = () => {
             </Text>
             <Text style={styles.text}>
                 current breakpoint: {breakpoint}
+            </Text>
+            <Text style={styles.text}>
+                has adaptive themes: {hasAdaptiveThemes ? 'true' : 'false'}
             </Text>
             <View style={styles.row}>
                 <Button
@@ -103,6 +107,27 @@ export const App = () => {
                     }}
                 />
             </View>
+            <View style={styles.row}>
+                <Button
+                    title="Change theme"
+                    onPress={() => {
+                        switch (themeName) {
+                            case 'light':
+                                return UnistylesRuntime.setTheme('dark')
+                            case 'dark':
+                                return UnistylesRuntime.setTheme('premium')
+                            case 'premium':
+                                return UnistylesRuntime.setTheme('light')
+                        }
+                    }}
+                />
+                <Button
+                    title="Toggle adaptive themes"
+                    onPress={() => {
+                        UnistylesRuntime.setAdaptiveThemes(!hasAdaptiveThemes)
+                    }}
+                />
+            </View>
         </View>
     )
 }
@@ -110,16 +135,13 @@ export const App = () => {
 StyleSheet.configure({
     settings: {
         adaptiveThemes: true,
-        initialTheme: 'dark'
+        // initialTheme: 'dark'
     },
-    breakpoints: {
-        xs: 0,
-        sm: 576,
-        md: 768,
-        lg: 992,
-        xl: 1200,
-        superLarge: 2000,
-        tvLike: 4000
+    breakpoints,
+    themes: {
+        light: lightTheme,
+        dark: darkTheme,
+        premium: premiumTheme
     }
 })
 

@@ -6,7 +6,7 @@
 // todo remove me
 #include <NitroModules/HybridContext.hpp>
 #include "Unistyles-Swift-Cxx-Umbrella.hpp"
-#include "UnistylesHelpers.h"
+#include "Helpers.h"
 #include "Breakpoints.h"
 #include "StyleSheetRegistry.h"
 
@@ -40,6 +40,8 @@ private:
     void parseSettings(jsi::Runtime& rt, jsi::Object settings);
     void parseBreakpoints(jsi::Runtime& rt, jsi::Object breakpoints);
     void parseThemes(jsi::Runtime& rt, jsi::Object themes);
+    void verifyAndSelectTheme(jsi::Runtime &rt);
+    void setThemeFromColorScheme();
     
     Unistyles::HybridNativePlatformSpecCxx nativePlatform;
     std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime;
