@@ -160,3 +160,28 @@ void HybridStyleSheet::setThemeFromColorScheme() {
             throw std::runtime_error("[Unistyles]: Unable to set adaptive theme as your device doesn't support it.");
     }
 }
+
+jsi::Object& HybridStyleSheet::getCurrentTheme() {
+    auto currentTheme = this->unistylesRuntime->currentThemeName;
+    auto registeredThemesCount = this->unistylesRuntime->themePairs.size();
+    
+    // if user registered a theme, but failed to select initial one
+    if (!currentTheme.has_value() && registeredThemesCount > 0) {
+        throw std::runtime_error("[Unistyles]: You registered " + std::to_string(registeredThemesCount) + " themes, but you didn't select any.");
+    }
+    
+    auto it = std::find_if(this->unistylesRuntime->themePairs.begin(), this->unistylesRuntime->themePairs.end(), [&currentTheme](auto& pair){
+        return pair.first == currentTheme.value();
+    });
+    
+    // this should never happen
+    if (it == this->unistylesRuntime->themePairs.end()) {
+        throw std::runtime_error("[Unistyles]: tried to select '" + std::string(currentTheme.value()) + "' theme, but it wansn't registered.");
+    }
+    
+    return it->second;
+}
+
+std::shared_ptr<HybridMiniRuntime> HybridStyleSheet::getMiniRuntime() {
+    return this->miniRuntime;
+}
