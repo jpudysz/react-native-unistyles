@@ -7,6 +7,7 @@
 #include <NitroModules/HybridContext.hpp>
 #include "Unistyles-Swift-Cxx-Umbrella.hpp"
 #include "UnistylesHelpers.h"
+#include "Breakpoints.h"
 #include "StyleSheetRegistry.h"
 
 using namespace margelo::nitro::unistyles;

@@ -15,9 +15,9 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     bool getHasAdaptiveThemes() override;
     bool getRtl() override;
     Dimensions getScreen() override;
-    std::string getThemeName() override;
+    std::optional<std::string> getThemeName() override;
     std::string getContentSizeCategory() override;
-    std::string getBreakpoint() override;
+    std::optional<std::string> getBreakpoint() override;
     Insets getInsets() override;
     Orientation getOrientation() override;
     double getPixelRatio() override;
@@ -29,8 +29,9 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     void setRootViewBackgroundColor(const std::optional<std::string> &hex, std::optional<double> alpha) override;
 
     // internals
-    bool hasAdaptiveThemes = false;
-    std::optional<std::string> initialTheme = std::nullopt;
+    bool enableAdaptiveThemes = false;
+    std::optional<std::string> currentThemeName = std::nullopt;
+    std::optional<std::string> currentBreakpointName = std::nullopt;
     std::vector<std::pair<std::string, double>> sortedBreakpointPairs{};
 
 private:
