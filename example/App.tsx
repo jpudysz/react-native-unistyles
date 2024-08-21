@@ -3,7 +3,7 @@ import { View, Text, TextInput, Button } from 'react-native'
 import { UnistylesRuntime, StatusBarStyle, StyleSheet } from 'react-native-unistyles'
 
 const start = performance.now();
-UnistylesRuntime.orientation
+UnistylesRuntime.breakpoint
 const end = performance.now();
 
 console.log(`Function took ${end - start} milliseconds.`);
@@ -18,7 +18,9 @@ export const App = () => {
         rtl,
         statusBar,
         pixelRatio,
-        orientation
+        orientation,
+        themeName,
+        breakpoint
     } = UnistylesRuntime
 
     return (
@@ -50,6 +52,12 @@ export const App = () => {
             </Text>
             <Text style={styles.text}>
                 orientation: {orientation}
+            </Text>
+            <Text style={styles.text}>
+                current theme: {themeName}
+            </Text>
+            <Text style={styles.text}>
+                current breakpoint: {breakpoint}
             </Text>
             <View style={styles.row}>
                 <Button
@@ -102,7 +110,16 @@ export const App = () => {
 StyleSheet.configure({
     settings: {
         adaptiveThemes: true,
-        initialTheme: undefined
+        initialTheme: 'dark'
+    },
+    breakpoints: {
+        xs: 0,
+        sm: 576,
+        md: 768,
+        lg: 992,
+        xl: 1200,
+        superLarge: 2000,
+        tvLike: 4000
     }
 })
 

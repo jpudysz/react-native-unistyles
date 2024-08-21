@@ -64,7 +64,7 @@ void HybridStyleSheet::parseSettings(jsi::Runtime &rt, jsi::Object settings) {
         if (propertyName == "adaptiveThemes") {
             helpers::assertThat(rt, propertyValue.isBool(), "The adaptiveThemes configuration must be of boolean type.");
             
-            this->unistylesRuntime->hasAdaptiveThemes = propertyValue.asBool();
+            this->unistylesRuntime->enableAdaptiveThemes = propertyValue.asBool();
             
             return;
         }
@@ -72,7 +72,7 @@ void HybridStyleSheet::parseSettings(jsi::Runtime &rt, jsi::Object settings) {
         if (propertyName == "initialTheme") {
             helpers::assertThat(rt, propertyValue.isString(), "The initialTheme configuration must be of string type.");
             
-            this->unistylesRuntime->initialTheme = propertyValue.asString(rt).utf8(rt);
+            this->unistylesRuntime->currentThemeName = propertyValue.asString(rt).utf8(rt);
             
             return;
         }
@@ -82,9 +82,16 @@ void HybridStyleSheet::parseSettings(jsi::Runtime &rt, jsi::Object settings) {
 }
 
 void HybridStyleSheet::parseBreakpoints(jsi::Runtime &rt, jsi::Object breakpoints){
-    helpers::enumerateJSIObject(rt, breakpoints, [&](const std::string& propertyName, jsi::Value& propertyValue){
-        // todo
-    });
+    helpers::Breakpoints sortedBreakpoints = helpers::jsiBreakpointsToVecPairs(rt, std::move(breakpoints));
+    
+    helpers::assertThat(rt, sortedBreakpoints.size() > 0, "registered breakpoints can't be empty");
+    helpers::assertThat(rt, sortedBreakpoints.front().second == 0, "first breakpoint must start from 0");
+    
+    this->unistylesRuntime->sortedBreakpointPairs = std::move(sortedBreakpoints);
+    this->unistylesRuntime->currentBreakpointName = helpers::getBreakpointFromScreenWidth(
+        this->nativePlatform.getScreenDimensions().width,
+        this->unistylesRuntime->sortedBreakpointPairs
+    );
 }
 
 void HybridStyleSheet::parseThemes(jsi::Runtime &rt, jsi::Object themes) {

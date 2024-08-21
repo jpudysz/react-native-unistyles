@@ -9,6 +9,7 @@ ColorScheme HybridUnistylesRuntime::getColorScheme() {
 }
 
 bool HybridUnistylesRuntime::getHasAdaptiveThemes() {
+    // todo
     return false;
 };
 
@@ -16,16 +17,16 @@ Dimensions HybridUnistylesRuntime::getScreen() {
     return this->nativePlatform.getScreenDimensions();
 };
 
-std::string HybridUnistylesRuntime::getThemeName() {
-    return "light";
+std::optional<std::string> HybridUnistylesRuntime::getThemeName() {
+    return this->currentThemeName;
 };
 
 std::string HybridUnistylesRuntime::getContentSizeCategory() {
     return this->nativePlatform.getContentSizeCategory();
 };
 
-std::string HybridUnistylesRuntime::getBreakpoint() {
-    return "md";
+std::optional<std::string> HybridUnistylesRuntime::getBreakpoint() {
+    return this->currentBreakpointName;
 };
 
 bool HybridUnistylesRuntime::getRtl() {
