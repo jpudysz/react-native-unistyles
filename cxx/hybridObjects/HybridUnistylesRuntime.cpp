@@ -9,8 +9,11 @@ ColorScheme HybridUnistylesRuntime::getColorScheme() {
 }
 
 bool HybridUnistylesRuntime::getHasAdaptiveThemes() {
-    // todo
-    return false;
+    if (!this->prefersAdaptiveThemes.has_value()) {
+        return false;
+    }
+    
+    return this->prefersAdaptiveThemes.value() && this->canHaveAdaptiveThemes;
 };
 
 Dimensions HybridUnistylesRuntime::getScreen() {
@@ -55,8 +58,22 @@ double HybridUnistylesRuntime::getFontScale() {
     return this->nativePlatform.getFontScale();
 };
 
-void HybridUnistylesRuntime::setTheme(const std::string &themeName) {};
-void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {};
+void HybridUnistylesRuntime::setTheme(const std::string &themeName) {
+    if (this->getHasAdaptiveThemes()) {
+        throw std::runtime_error("[Unistyles]: You're trying to set theme to: '" + std::string(themeName) + "', but adaptiveThemes are enabled.");
+    }
+    
+    if (!helpers::vecPairsContainsKeys(this->themePairs, {themeName})) {
+        throw std::runtime_error("[Unistyles]: You're trying to set theme to: '" + std::string(themeName) + "', but it wasn't registered.");
+    }
+    
+    this->currentThemeName = themeName;
+};
+
+void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
+    this->prefersAdaptiveThemes = isEnabled;
+};
+
 void HybridUnistylesRuntime::setImmersiveMode(bool isEnabled) {};
 
 void HybridUnistylesRuntime::setRootViewBackgroundColor(const std::optional<std::string> &hex, std::optional<double> alpha) {

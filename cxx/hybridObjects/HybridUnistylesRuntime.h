@@ -5,6 +5,7 @@
 // todo remove me
 #include <NitroModules/HybridContext.hpp>
 #include "Unistyles-Swift-Cxx-Umbrella.hpp"
+#include "Helpers.h"
 
 using namespace margelo::nitro::unistyles;
 
@@ -29,10 +30,13 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     void setRootViewBackgroundColor(const std::optional<std::string> &hex, std::optional<double> alpha) override;
 
     // internals
-    bool enableAdaptiveThemes = false;
+    std::optional<bool> prefersAdaptiveThemes;
+    bool canHaveAdaptiveThemes = false;
+    std::optional<std::string> initialThemeName = std::nullopt;
     std::optional<std::string> currentThemeName = std::nullopt;
     std::optional<std::string> currentBreakpointName = std::nullopt;
     std::vector<std::pair<std::string, double>> sortedBreakpointPairs{};
+    std::vector<std::pair<std::string, jsi::Object>> themePairs{};
 
 private:
     Unistyles::HybridNativePlatformSpecCxx nativePlatform;
