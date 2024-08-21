@@ -29,6 +29,7 @@ target_sources(
   ../nitrogen/generated/shared/c++/HybridNavigationBarSpec.cpp
   ../nitrogen/generated/shared/c++/HybridStatusBarSpec.cpp
   ../nitrogen/generated/shared/c++/HybridStyleSheetSpec.cpp
+  ../nitrogen/generated/shared/c++/HybridMiniRuntimeSpec.cpp
   ../nitrogen/generated/shared/c++/HybridUnistylesRuntimeSpec.cpp
   # Android-specific Nitrogen C++ sources
   ../nitrogen/generated/android/c++/JHybridNativePlatformSpec.cpp
