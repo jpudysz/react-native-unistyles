@@ -45,13 +45,9 @@ bool HybridMiniRuntime::getRtl() {
 }
 
 Dimensions HybridMiniRuntime::getStatusBar() {
-    // todo
-    
-    return Dimensions(30, 40);
+    return this->unistylesRuntime->getStatusBarDimensions();
 }
 
 Dimensions HybridMiniRuntime::getNavigationBar() {
-    // todo
-    
-    return Dimensions(20, 30);
+    return this->unistylesRuntime->getNavigationBarDimensions();
 }

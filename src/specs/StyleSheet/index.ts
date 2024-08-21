@@ -1,11 +1,11 @@
 import type { StyleSheet as NativeStyleSheet } from 'react-native'
 import type { StyleSheet as StyleSheetSpec } from './StyleSheet.nitro'
-import type { StyleSheetWithSuperPowers, UnistylesTheme } from '../../types'
+import type { StyleSheetWithSuperPowers } from '../../types'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../../global'
 
 type UnistylesSettings = {
     adaptiveThemes?: boolean,
-    initialTheme?: UnistylesTheme
+    initialTheme?: keyof UnistylesThemes
 }
 
 type UnistylesConfig = {

@@ -57,6 +57,10 @@ abstract class HybridNativePlatformSpec: HybridObject() {
   
   @DoNotStrip
   @Keep
+  abstract fun getNavigationBarDimensions(): com.margelo.nitro.unistyles.Dimensions
+  
+  @DoNotStrip
+  @Keep
   abstract fun getPrefersRtlDirection(): Boolean
   
   @DoNotStrip

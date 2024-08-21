@@ -172,6 +172,10 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
             presentedViewController.view.backgroundColor = backgroundColor
         }
     }
+    
+    func getNavigationBarDimensions() throws -> Dimensions {
+        return Dimensions(width: 0, height: 0);
+    }
 
     // not implemented for iOS as there are no such APIs
     func setNavigationBarBackgroundColor(hex: String?, alpha: Double?) throws {}
