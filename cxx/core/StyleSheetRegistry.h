@@ -3,6 +3,7 @@
 #include <jsi/jsi.h>
 #include <folly/FBVector.h>
 #include "StyleSheet.h"
+#include "HybridMiniRuntime.h"
 #include "Helpers.h"
 
 namespace margelo::nitro::unistyles::core {
@@ -11,6 +12,7 @@ using namespace facebook;
 
 struct StyleSheetRegistry {
     StyleSheetRegistry() = default;
+
     StyleSheetRegistry(const StyleSheetRegistry&) = delete;
     StyleSheetRegistry(StyleSheetRegistry&&) = delete;
     StyleSheetRegistry& operator=(const StyleSheetRegistry&) = delete;

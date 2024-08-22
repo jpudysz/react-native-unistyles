@@ -77,20 +77,23 @@ jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, const StyleSh
     }
 
     // StyleSheet is a function
-
-    if (styleSheet.type == StyleSheetType::Themable) {
-        return styleSheet.rawValue
-            .asFunction(rt)
-            .call(rt, jsi::Object(rt))
-            .asObject(rt);
-    }
-
-////    auto miniRuntime = this->getMiniRuntime().get()->toObject(rt);
+    // todo
+    
+    return jsi::Object(rt);
+//    auto& theme = this->getCurrentThemeName();
+//
+//
+//    if (styleSheet.type == StyleSheetType::Themable) {
+//        return styleSheet.rawValue
+//            .asFunction(rt)
+//            .call(rt, std::move(theme))
+//            .asObject(rt);
+//    }
+//
+//    auto miniRuntime = this->getMiniRuntime().get()->toObject(rt);
 //
 //    return styleSheet.rawValue
 //        .asFunction(rt)
-//        .call(rt, jsi::Object(rt), std::move(miniRuntime))
+//        .call(rt, std::move(theme), std::move(miniRuntime))
 //        .asObject(rt);
-
-    return jsi::Object(rt);
 }

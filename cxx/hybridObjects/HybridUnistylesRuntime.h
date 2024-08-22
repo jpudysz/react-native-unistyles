@@ -32,14 +32,14 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     // internals
     Dimensions getStatusBarDimensions();
     Dimensions getNavigationBarDimensions();
-    
+
     std::optional<bool> prefersAdaptiveThemes;
     bool canHaveAdaptiveThemes = false;
     std::optional<std::string> initialThemeName = std::nullopt;
     std::optional<std::string> currentThemeName = std::nullopt;
     std::optional<std::string> currentBreakpointName = std::nullopt;
     std::vector<std::pair<std::string, double>> sortedBreakpointPairs{};
-    std::vector<std::pair<std::string, jsi::Value>> themePairs{};
+    std::vector<std::string> registeredThemeNames{};
 
 private:
     Unistyles::HybridNativePlatformSpecCxx nativePlatform;

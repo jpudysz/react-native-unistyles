@@ -99,21 +99,23 @@ void HybridStyleSheet::parseBreakpoints(jsi::Runtime &rt, jsi::Object breakpoint
 }
 
 void HybridStyleSheet::parseThemes(jsi::Runtime &rt, jsi::Object themes) {
+    // todo clean available themes
+    
     helpers::enumerateJSIObject(rt, themes, [&](const std::string& propertyName, jsi::Value& propertyValue){
         helpers::assertThat(rt, propertyValue.isObject(), "registered theme must be an object.");
 
-        this->unistylesRuntime->themePairs.emplace_back(std::move(propertyName), std::move(propertyValue));
+        // todo register theme names
     });
 }
 
 void HybridStyleSheet::verifyAndSelectTheme(jsi::Runtime &rt) {
     // Set metadata about adaptive themes
-    bool canHaveAdaptiveThemes = helpers::vecPairsContainsKeys(this->unistylesRuntime->themePairs, {"light", "dark"});
+    bool canHaveAdaptiveThemes = helpers::vecContainsKeys(this->unistylesRuntime->registeredThemeNames, {"light", "dark"});
     this->unistylesRuntime->canHaveAdaptiveThemes = canHaveAdaptiveThemes;
 
     bool hasInitialTheme = this->unistylesRuntime->initialThemeName.has_value();
     bool hasAdaptiveThemes = this->unistylesRuntime->getHasAdaptiveThemes();
-    bool hasSingleTheme = this->unistylesRuntime->themePairs.size();
+    bool hasSingleTheme = this->unistylesRuntime->registeredThemeNames.size();
 
     // user didn't select initial theme nor can have adaptive themes, and registered more than 1 theme
     //  do nothing user must select initial theme during runtime
@@ -122,9 +124,9 @@ void HybridStyleSheet::verifyAndSelectTheme(jsi::Runtime &rt) {
     }
 
     // user didn't select initial theme nor can have adaptive themes, but registered exactly 1 theme
-    // preselect it
+    // preselect it!
     if (!hasInitialTheme && !hasAdaptiveThemes && hasSingleTheme) {
-        this->unistylesRuntime->currentThemeName = this->unistylesRuntime->themePairs.at(0).first;
+        this->unistylesRuntime->currentThemeName = this->unistylesRuntime->registeredThemeNames.at(0);
 
         return;
     }
@@ -146,7 +148,7 @@ void HybridStyleSheet::verifyAndSelectTheme(jsi::Runtime &rt) {
     // user only selected initial theme
     // validate if following theme exist
     std::string selectedTheme = this->unistylesRuntime->initialThemeName.value();
-    bool hasRegisteredTheme = helpers::vecPairsContainsKeys(this->unistylesRuntime->themePairs, {selectedTheme});
+    bool hasRegisteredTheme = helpers::vecContainsKeys(this->unistylesRuntime->registeredThemeNames, {selectedTheme});
 
     helpers::assertThat(rt, hasRegisteredTheme, "initial theme '" + selectedTheme + "' has not been registered.");
 
