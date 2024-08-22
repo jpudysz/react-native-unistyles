@@ -179,7 +179,7 @@ const styles = StyleSheet.create(theme => ({
     },
     text: {
         fontSize: 16,
-        color: theme?.colors?.typography
+        color: theme.colors.typography
     },
     row: {
         flexDirection: 'row'

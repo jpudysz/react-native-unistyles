@@ -4,7 +4,7 @@ using namespace margelo::nitro::unistyles;
 
 ColorScheme HybridUnistylesRuntime::getColorScheme() {
     int colorScheme = this->nativePlatform.getColorScheme();
-    
+
     return static_cast<ColorScheme>(colorScheme);
 }
 
@@ -12,7 +12,7 @@ bool HybridUnistylesRuntime::getHasAdaptiveThemes() {
     if (!this->prefersAdaptiveThemes.has_value()) {
         return false;
     }
-    
+
     return this->prefersAdaptiveThemes.value() && this->canHaveAdaptiveThemes;
 };
 
@@ -42,11 +42,11 @@ Insets HybridUnistylesRuntime::getInsets() {
 
 Orientation HybridUnistylesRuntime::getOrientation() {
     auto screenDimensions = this->getScreen();
-    
+
     if (screenDimensions.width > screenDimensions.height) {
         return Orientation::LANDSCAPE;
     }
-    
+
     return Orientation::PORTRAIT;
 };
 
@@ -62,11 +62,11 @@ void HybridUnistylesRuntime::setTheme(const std::string &themeName) {
     if (this->getHasAdaptiveThemes()) {
         throw std::runtime_error("[Unistyles]: You're trying to set theme to: '" + std::string(themeName) + "', but adaptiveThemes are enabled.");
     }
-    
-    if (!helpers::vecPairsContainsKeys(this->themePairs, {themeName})) {
+
+    if (!helpers::vecContainsKeys(this->registeredThemeNames, {themeName})) {
         throw std::runtime_error("[Unistyles]: You're trying to set theme to: '" + std::string(themeName) + "', but it wasn't registered.");
     }
-    
+
     this->currentThemeName = themeName;
 };
 
