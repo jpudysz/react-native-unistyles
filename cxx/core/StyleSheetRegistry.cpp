@@ -77,23 +77,41 @@ jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, const StyleSh
     }
 
     // StyleSheet is a function
-    // todo
     
-    return jsi::Object(rt);
-//    auto& theme = this->getCurrentThemeName();
-//
-//
-//    if (styleSheet.type == StyleSheetType::Themable) {
-//        return styleSheet.rawValue
-//            .asFunction(rt)
-//            .call(rt, std::move(theme))
-//            .asObject(rt);
-//    }
-//
-//    auto miniRuntime = this->getMiniRuntime().get()->toObject(rt);
-//
-//    return styleSheet.rawValue
-//        .asFunction(rt)
-//        .call(rt, std::move(theme), std::move(miniRuntime))
-//        .asObject(rt);
+    auto theme = this->getCurrentTheme(rt);
+
+    if (styleSheet.type == StyleSheetType::Themable) {
+        return styleSheet.rawValue
+            .asFunction(rt)
+            .call(rt, std::move(theme))
+            .asObject(rt);
+    }
+
+    auto miniRuntime = this->getMiniRuntime(rt);
+
+    return styleSheet.rawValue
+        .asFunction(rt)
+        .call(rt, std::move(theme), std::move(miniRuntime))
+        .asObject(rt);
+}
+
+jsi::Object StyleSheetRegistry::getCurrentTheme(jsi::Runtime& rt) {
+    auto currentThemeName = this->miniRuntime.get()->getThemeName();
+    
+    if (!currentThemeName.has_value()) {
+        // at this point, if we don't have a theme, then we should return a default (empty object)
+        return jsi::Object(rt);
+    }
+    
+    auto globalKey = jsi::PropNameID::forUtf8(rt, std::string(helpers::GLOBAL_THEME_PREFIX + currentThemeName.value()));
+    
+    if (!rt.global().hasProperty(rt, globalKey)) {
+        throw std::runtime_error("Theme '" + currentThemeName.value() + "' is not accessible from C++.");
+    }
+    
+    return rt.global().getProperty(rt, globalKey).asObject(rt);
+}
+
+jsi::Object StyleSheetRegistry::getMiniRuntime(jsi::Runtime& rt) {
+    return this->miniRuntime.get()->toObject(rt).asObject(rt);
 }

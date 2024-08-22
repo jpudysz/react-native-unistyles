@@ -99,12 +99,15 @@ void HybridStyleSheet::parseBreakpoints(jsi::Runtime &rt, jsi::Object breakpoint
 }
 
 void HybridStyleSheet::parseThemes(jsi::Runtime &rt, jsi::Object themes) {
-    // todo clean available themes
-    
+    // this function can be triggered second time during hot reloading
+    // simply destroy previously referenced themes
+    this->unistylesRuntime->registeredThemeNames.clear();
+
     helpers::enumerateJSIObject(rt, themes, [&](const std::string& propertyName, jsi::Value& propertyValue){
         helpers::assertThat(rt, propertyValue.isObject(), "registered theme must be an object.");
+        helpers::defineHiddenProperty(rt, rt.global(), ::helpers::GLOBAL_THEME_PREFIX + propertyName, propertyValue.asObject(rt));
 
-        // todo register theme names
+        this->unistylesRuntime->registeredThemeNames.emplace_back(propertyName);
     });
 }
 
