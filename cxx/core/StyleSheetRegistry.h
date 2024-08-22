@@ -5,13 +5,14 @@
 #include "StyleSheet.h"
 #include "HybridMiniRuntime.h"
 #include "Helpers.h"
+#include "Constants.h"
 
 namespace margelo::nitro::unistyles::core {
 
 using namespace facebook;
 
 struct StyleSheetRegistry {
-    StyleSheetRegistry() = default;
+    StyleSheetRegistry(std::shared_ptr<HybridMiniRuntime> miniRuntime): miniRuntime{miniRuntime} {}
 
     StyleSheetRegistry(const StyleSheetRegistry&) = delete;
     StyleSheetRegistry(StyleSheetRegistry&&) = delete;
@@ -24,10 +25,13 @@ struct StyleSheetRegistry {
 
 private:
     folly::fbvector<StyleSheet> styleSheets{};
+    std::shared_ptr<HybridMiniRuntime> miniRuntime;
 
     StyleSheet& addFromFunction(jsi::Runtime& rt, unsigned int tag, jsi::Function styleSheetFn);
     StyleSheet& addFromObject(jsi::Runtime& rt, unsigned int tag, jsi::Object rawStyleSheet);
     jsi::Object unwrapStyleSheet(jsi::Runtime& rt, const StyleSheet& styleSheet);
+    jsi::Object getCurrentTheme(jsi::Runtime& rt);
+    jsi::Object getMiniRuntime(jsi::Runtime& rt);
 };
 
 }

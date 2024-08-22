@@ -8,6 +8,7 @@
 #include <NitroModules/HybridContext.hpp>
 #include "Unistyles-Swift-Cxx-Umbrella.hpp"
 #include "Helpers.h"
+#include "Constants.h"
 #include "Breakpoints.h"
 #include "StyleSheetRegistry.h"
 
@@ -50,6 +51,6 @@ private:
     Unistyles::HybridNativePlatformSpecCxx nativePlatform;
     std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime;
     std::shared_ptr<HybridMiniRuntime> miniRuntime;
-    core::StyleSheetRegistry styleSheetRegistry{};
+    core::StyleSheetRegistry styleSheetRegistry{miniRuntime};
 };
 
