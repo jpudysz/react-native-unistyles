@@ -12,7 +12,7 @@ namespace margelo::nitro::unistyles::core {
 using namespace facebook;
 
 struct StyleSheetRegistry {
-    StyleSheetRegistry(std::shared_ptr<HybridMiniRuntime> miniRuntime): miniRuntime{miniRuntime} {}
+    StyleSheetRegistry() = default;
 
     StyleSheetRegistry(const StyleSheetRegistry&) = delete;
     StyleSheetRegistry(StyleSheetRegistry&&) = delete;
@@ -22,10 +22,13 @@ struct StyleSheetRegistry {
     StyleSheet& add(jsi::Runtime& rt, jsi::Object rawStyleSheet);
     jsi::Object parse(jsi::Runtime &rt, const StyleSheet& styleSheet);
     void remove(unsigned int tag);
+    void cacheCurrentTheme(jsi::WeakObject&&);
+    void cacheMiniRuntime(jsi::Object&&);
 
 private:
+    std::optional<jsi::Object> cachedMiniRuntime = std::nullopt;
+    std::optional<jsi::WeakObject> cachedTheme = std::nullopt;
     folly::fbvector<StyleSheet> styleSheets{};
-    std::shared_ptr<HybridMiniRuntime> miniRuntime;
 
     StyleSheet& addFromFunction(jsi::Runtime& rt, unsigned int tag, jsi::Function styleSheetFn);
     StyleSheet& addFromObject(jsi::Runtime& rt, unsigned int tag, jsi::Object rawStyleSheet);

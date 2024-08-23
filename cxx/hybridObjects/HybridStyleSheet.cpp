@@ -56,6 +56,8 @@ jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisV
     });
 
     verifyAndSelectTheme(rt);
+    loadJSTheme(rt);
+    loadMiniRuntime(rt);
 
     return jsi::Value::undefined();
 }
@@ -121,7 +123,7 @@ void HybridStyleSheet::verifyAndSelectTheme(jsi::Runtime &rt) {
     bool hasSingleTheme = this->unistylesRuntime->registeredThemeNames.size();
 
     // user didn't select initial theme nor can have adaptive themes, and registered more than 1 theme
-    //  do nothing user must select initial theme during runtime
+    // do nothing user must select initial theme during runtime
     if (!hasInitialTheme && !hasAdaptiveThemes && !hasSingleTheme) {
         return;
     }
@@ -173,4 +175,35 @@ void HybridStyleSheet::setThemeFromColorScheme() {
         default:
             throw std::runtime_error("[Unistyles]: Unable to set adaptive theme as your device doesn't support it.");
     }
+}
+
+void HybridStyleSheet::loadJSTheme(jsi::Runtime &rt) {
+    auto themeName = this->unistylesRuntime->currentThemeName;
+    auto hasSingleTheme = this->unistylesRuntime->registeredThemeNames.size() == 1;
+    
+    // at this point, if we don't have a theme, then we should return a default (empty object)
+    if (!themeName.has_value() && hasSingleTheme) {
+        this->styleSheetRegistry.cacheCurrentTheme(jsi::WeakObject(rt, jsi::Object(rt)));
+        
+        return;
+    }
+    
+    // this will fail later, user didn't select any theme
+    if (!themeName.has_value()) {
+        return;
+    }
+    
+    auto globalKey = jsi::PropNameID::forUtf8(rt, std::string(helpers::GLOBAL_THEME_PREFIX + themeName.value()));
+    
+    if (!rt.global().hasProperty(rt, globalKey)) {
+        throw std::runtime_error("Theme '" + themeName.value() + "' is not accessible from C++.");
+    }
+    
+    auto theme = rt.global().getProperty(rt, globalKey).asObject(rt);
+    
+    this->styleSheetRegistry.cacheCurrentTheme(jsi::WeakObject(rt, std::move(theme)));
+}
+
+void HybridStyleSheet::loadMiniRuntime(jsi::Runtime& rt) {
+    this->styleSheetRegistry.cacheMiniRuntime(this->miniRuntime.get()->toObject(rt).asObject(rt));
 }

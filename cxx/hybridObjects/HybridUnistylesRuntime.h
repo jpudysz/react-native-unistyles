@@ -40,7 +40,7 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     std::optional<std::string> currentBreakpointName = std::nullopt;
     std::vector<std::pair<std::string, double>> sortedBreakpointPairs{};
     std::vector<std::string> registeredThemeNames{};
-
+    
 private:
     Unistyles::HybridNativePlatformSpecCxx nativePlatform;
 };

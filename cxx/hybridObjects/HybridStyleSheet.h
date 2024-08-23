@@ -47,10 +47,12 @@ private:
     void parseThemes(jsi::Runtime& rt, jsi::Object themes);
     void verifyAndSelectTheme(jsi::Runtime &rt);
     void setThemeFromColorScheme();
+    void loadJSTheme(jsi::Runtime &rt);
+    void loadMiniRuntime(jsi::Runtime& rt);
 
     Unistyles::HybridNativePlatformSpecCxx nativePlatform;
     std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime;
     std::shared_ptr<HybridMiniRuntime> miniRuntime;
-    core::StyleSheetRegistry styleSheetRegistry{miniRuntime};
+    core::StyleSheetRegistry styleSheetRegistry{};
 };
 

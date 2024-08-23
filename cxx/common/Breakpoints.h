@@ -8,6 +8,7 @@ namespace margelo::nitro::unistyles::helpers {
 
 using Breakpoints = std::vector<std::pair<std::string, double>>;
 
+// convert user's breakpoints to sorted C++ representation
 inline Breakpoints jsiBreakpointsToVecPairs(jsi::Runtime& rt, jsi::Value&& breakpoints) {
     Breakpoints sortedVecPairs;
     
@@ -24,6 +25,7 @@ inline Breakpoints jsiBreakpointsToVecPairs(jsi::Runtime& rt, jsi::Value&& break
     return sortedVecPairs;
 }
 
+// C++ function to select current breakpoint based on screen width
 inline std::string getBreakpointFromScreenWidth(int screenWidth, const Breakpoints& sortedVecPairs) {
     auto it = std::upper_bound(sortedVecPairs.cbegin(), sortedVecPairs.cend(), screenWidth, [](int width, const auto& pair) {
         return width < pair.second;
