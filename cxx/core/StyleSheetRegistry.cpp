@@ -77,7 +77,6 @@ jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, const StyleSh
     }
 
     // StyleSheet is a function
-    
     auto theme = this->getCurrentTheme(rt);
 
     if (styleSheet.type == StyleSheetType::Themable) {
@@ -87,6 +86,7 @@ jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, const StyleSh
             .asObject(rt);
     }
 
+    // stylesheet also has a mini runtime
     auto miniRuntime = this->getMiniRuntime(rt);
 
     return styleSheet.rawValue
@@ -96,22 +96,25 @@ jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, const StyleSh
 }
 
 jsi::Object StyleSheetRegistry::getCurrentTheme(jsi::Runtime& rt) {
-    auto currentThemeName = this->miniRuntime.get()->getThemeName();
+    helpers::assertThat(rt, this->cachedTheme.has_value(), "failed to load the theme. Did you forget to select initial one?");
     
-    if (!currentThemeName.has_value()) {
-        // at this point, if we don't have a theme, then we should return a default (empty object)
-        return jsi::Object(rt);
-    }
+    auto& theme = this->cachedTheme.value();
     
-    auto globalKey = jsi::PropNameID::forUtf8(rt, std::string(helpers::GLOBAL_THEME_PREFIX + currentThemeName.value()));
+    helpers::assertThat(rt, theme.lock(rt).isObject(), "not able to retrieve a theme. Please report issue with steps to reproduce.");
     
-    if (!rt.global().hasProperty(rt, globalKey)) {
-        throw std::runtime_error("Theme '" + currentThemeName.value() + "' is not accessible from C++.");
-    }
-    
-    return rt.global().getProperty(rt, globalKey).asObject(rt);
+    return theme.lock(rt).asObject(rt);
 }
 
 jsi::Object StyleSheetRegistry::getMiniRuntime(jsi::Runtime& rt) {
-    return this->miniRuntime.get()->toObject(rt).asObject(rt);
+    helpers::assertThat(rt, this->cachedMiniRuntime.has_value(), "failed to load mini runtime. Please report issue with steps to reproduce.");
+    
+    return std::move(this->cachedMiniRuntime.value());
+}
+
+void StyleSheetRegistry::cacheCurrentTheme(jsi::WeakObject&& theme) {
+    this->cachedTheme = jsi::WeakObject(std::move(theme));
+}
+
+void StyleSheetRegistry::cacheMiniRuntime(jsi::Object&& miniRuntime) {
+    this->cachedMiniRuntime = std::move(miniRuntime);
 }

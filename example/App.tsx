@@ -169,7 +169,7 @@ console.log('Native parsing styles:')
 console.log('time: ', end1 - start1, 'ms')
 
 const start2 = performance.now()
-const styles = StyleSheet.create(theme => ({
+const styles = StyleSheet.create((theme, rt) => ({
     container: {
         flex: 1,
         justifyContent: 'center',
