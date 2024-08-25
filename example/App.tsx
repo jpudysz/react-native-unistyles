@@ -1,7 +1,6 @@
 import React from 'react'
 import { View, Text, TextInput, Button, StyleSheet as NativeStyleSheet } from 'react-native'
 import { UnistylesRuntime, StatusBarStyle, StyleSheet } from 'react-native-unistyles'
-import { breakpoints, darkTheme, lightTheme, premiumTheme } from './unistyles'
 
 export const App = () => {
     const {
@@ -131,19 +130,6 @@ export const App = () => {
         </View>
     )
 }
-
-StyleSheet.configure({
-    settings: {
-        adaptiveThemes: true,
-        // initialTheme: 'dark'
-    },
-    breakpoints,
-    themes: {
-        light: lightTheme,
-        dark: darkTheme,
-        premium: premiumTheme
-    }
-})
 
 const start1 = performance.now()
 NativeStyleSheet.create({

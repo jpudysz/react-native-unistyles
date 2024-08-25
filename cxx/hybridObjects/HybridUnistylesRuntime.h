@@ -43,7 +43,7 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     void setImmersiveMode(bool isEnabled) override;
     void setRootViewBackgroundColor(const std::optional<std::string> &hex, std::optional<double> alpha) override;
 
-    // todo create own MiniRuntime as HO, drop it
+    // internal
     Dimensions getStatusBarDimensions();
     Dimensions getNavigationBarDimensions();
     

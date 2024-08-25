@@ -8,10 +8,10 @@ double HybridStyleSheet::getHairlineWidth() {
 }
 
 jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
-    helpers::assertThat(rt, count == 1, "StyleSheet.create must be called with one argument.");
-    helpers::assertThat(rt, arguments[0].isObject(), "StyleSheet.create must be called with object or function.");
+    helpers::assertThat(rt, count == 1, "expected to be called with one argument.");
+    helpers::assertThat(rt, arguments[0].isObject(), "expected to be called with object or function.");
 
-    auto styleSheetId = thisVal.asObject(rt).getProperty(rt, "__id");
+    auto styleSheetId = thisVal.asObject(rt).getProperty(rt, helpers::STYLESHEET_ID.c_str());
 
     // this might happen only when hot reloading
     if (!styleSheetId.isUndefined()) {
@@ -23,42 +23,44 @@ jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal,
     auto parsedStyleSheet = styleSheetRegistry.parse(rt, registeredStyleSheet);
 
     // todo
+    // attach unistyles methods
+    // parse
+    // return HO
 
     return parsedStyleSheet;
 }
 
 jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
-    helpers::assertThat(rt, count == 1, "StyleSheet.configure must be called with one argument.");
-    helpers::assertThat(rt, arguments[0].isObject(), "StyleSheet.configure must be called with object.");
+    helpers::assertThat(rt, count == 1, "expected to be called with one argument.");
+    helpers::assertThat(rt, arguments[0].isObject(), "expected to be called with object.");
 
     // create new state
+    auto config = arguments[0].asObject(rt);
     auto& registry = core::UnistylesRegistry::get();
     auto miniRuntime = this->miniRuntime->toObject(rt).asObject(rt);
     
     registry.createState(rt, miniRuntime);
 
-    auto config = arguments[0].asObject(rt);
-
     helpers::enumerateJSIObject(rt, config, [&](const std::string& propertyName, jsi::Value& propertyValue){
         if (propertyName == "settings") {
-            helpers::assertThat(rt, propertyValue.isObject(), "settings passed to StyleSheet.configure must be an object.");
+            helpers::assertThat(rt, propertyValue.isObject(), "settings must be an object.");
 
             return this->parseSettings(rt, propertyValue.asObject(rt));
         }
 
         if (propertyName == "breakpoints") {
-            helpers::assertThat(rt, propertyValue.isObject(), "breakpoints passed to StyleSheet.configure must be an object.");
+            helpers::assertThat(rt, propertyValue.isObject(), "breakpoints must be an object.");
 
             return this->parseBreakpoints(rt, propertyValue.asObject(rt));
         }
 
         if (propertyName == "themes") {
-            helpers::assertThat(rt, propertyValue.isObject(), "themes passed to StyleSheet.configure must be an object.");
+            helpers::assertThat(rt, propertyValue.isObject(), "themes must be an object.");
 
             return this->parseThemes(rt, propertyValue.asObject(rt));
         }
 
-        helpers::assertThat(rt, false, "StyleSheet.configure received unexpected key: '" + std::string(propertyName) + "'.");
+        helpers::assertThat(rt, false, "received unexpected key: '" + std::string(propertyName) + "'.");
     });
 
     verifyAndSelectTheme(rt);
@@ -86,7 +88,7 @@ void HybridStyleSheet::parseSettings(jsi::Runtime &rt, jsi::Object settings) {
             return;
         }
 
-        helpers::assertThat(rt, false, "StyleSheet.configure object has unexpected key for settings: '" + std::string(propertyName) + "'");
+        helpers::assertThat(rt, false, "settings received unexpected key: '" + std::string(propertyName) + "'");
     });
 }
 
@@ -107,7 +109,7 @@ void HybridStyleSheet::parseThemes(jsi::Runtime &rt, jsi::Object themes) {
     auto& registry = core::UnistylesRegistry::get();
     
     helpers::enumerateJSIObject(rt, themes, [&](const std::string& propertyName, jsi::Value& propertyValue){
-        helpers::assertThat(rt, propertyValue.isObject(), "registered theme must be an object.");
+        helpers::assertThat(rt, propertyValue.isObject(), "registered theme '" + propertyName + "' must be an object.");
         
         registry.registerTheme(rt, propertyName, propertyValue.asObject(rt));
     });
@@ -117,11 +119,18 @@ void HybridStyleSheet::verifyAndSelectTheme(jsi::Runtime &rt) {
     auto& state = core::UnistylesRegistry::get().getState(rt);
     
     bool hasInitialTheme = state.hasInitialTheme();
+    bool prefersAdaptiveThemes = state.getPrefersAdaptiveThemes();
     bool hasAdaptiveThemes = state.hasAdaptiveThemes();
-    bool hasSingleTheme = state.getThemesCount() == 1;
+    std::vector<std::string> registeredThemeNames = state.getRegisteredThemeNames();
+    bool hasSingleTheme = registeredThemeNames.size() == 1;
+    
+    // user tries to enable adaptive themes, but didn't register both 'light' and 'dark' themes
+    if (prefersAdaptiveThemes && !hasAdaptiveThemes) {
+        helpers::assertThat(rt, false, "you're trying to enable adaptiveThemes, but you didn't register both 'light' and 'dark' themes.");
+    }
 
     // user didn't select initial theme nor can have adaptive themes, and registered more than 1 theme
-    // do nothing user must select initial theme during runtime
+    // do nothing - user must select initial theme during runtime
     if (!hasInitialTheme && !hasAdaptiveThemes && !hasSingleTheme) {
         return;
     }
@@ -129,7 +138,7 @@ void HybridStyleSheet::verifyAndSelectTheme(jsi::Runtime &rt) {
     // user didn't select initial theme nor can have adaptive themes, but registered exactly 1 theme
     // preselect it!
     if (!hasInitialTheme && !hasAdaptiveThemes && hasSingleTheme) {
-        return state.setTheme(state.getFirstThemeName());
+        return state.setTheme(registeredThemeNames.at(0));
     }
 
     // user didn't select initial theme, but has adaptive themes
@@ -148,14 +157,14 @@ void HybridStyleSheet::verifyAndSelectTheme(jsi::Runtime &rt) {
     // validate if following theme exist
     std::string selectedTheme = state.getInitialTheme().value();
 
-    helpers::assertThat(rt, state.hasTheme(selectedTheme), "initial theme '" + selectedTheme + "' has not been registered.");
+    helpers::assertThat(rt, state.hasTheme(selectedTheme), "you're trying to select theme '" + selectedTheme + "' but it wasn't registered.");
 
-    return state.setTheme(selectedTheme);
+    state.setTheme(selectedTheme);
 }
 
 void HybridStyleSheet::setThemeFromColorScheme(jsi::Runtime& rt) {
-    ColorScheme colorScheme = static_cast<ColorScheme>(this->nativePlatform.getColorScheme());
     auto& state = core::UnistylesRegistry::get().getState(rt);
+    ColorScheme colorScheme = static_cast<ColorScheme>(this->nativePlatform.getColorScheme());
 
     switch (colorScheme) {
         case ColorScheme::LIGHT:
@@ -167,6 +176,6 @@ void HybridStyleSheet::setThemeFromColorScheme(jsi::Runtime& rt) {
 
             return;
         default:
-            throw std::runtime_error("[Unistyles]: Unable to set adaptive theme as your device doesn't support it.");
+            throw std::runtime_error("unable to set adaptive theme as your device doesn't support it.");
     }
 }
