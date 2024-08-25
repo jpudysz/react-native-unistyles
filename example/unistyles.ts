@@ -1,3 +1,5 @@
+import { StyleSheet } from 'react-native-unistyles'
+
 const sharedColors = {
     barbie: '#ff9ff3',
     oak: '#1dd1a1',
@@ -13,7 +15,8 @@ const lightTheme = {
         backgroundColor: '#ffffff',
         typography: '#000000',
         accent: sharedColors.blood
-    }
+    },
+    gap: (v: number) => v * 8
 }
 
 const darkTheme = {
@@ -22,7 +25,8 @@ const darkTheme = {
         backgroundColor: '#000000',
         typography: '#ffffff',
         accent: sharedColors.barbie
-    }
+    },
+    gap: (v: number) => v * 8
 }
 
 const premiumTheme = {
@@ -31,7 +35,8 @@ const premiumTheme = {
         backgroundColor: sharedColors.barbie,
         typography: '#76278f',
         accent: '#000000'
-    }
+    },
+    gap: (v: number) => v * 8
 }
 
 const breakpoints = {
@@ -55,9 +60,14 @@ declare module 'react-native-unistyles' {
     export interface UnistylesBreakpoints extends AppBreakpoints {}
 }
 
-export {
-    lightTheme,
-    darkTheme,
-    premiumTheme,
-    breakpoints
-}
+StyleSheet.configure({
+    settings: {
+        adaptiveThemes: true
+    },
+    breakpoints,
+    themes: {
+        light: lightTheme,
+        dark: darkTheme,
+        premium: premiumTheme
+    }
+})

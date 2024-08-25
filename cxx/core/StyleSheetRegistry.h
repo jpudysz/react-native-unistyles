@@ -17,8 +17,6 @@ struct StyleSheetRegistry {
 
     StyleSheetRegistry(const StyleSheetRegistry&) = delete;
     StyleSheetRegistry(StyleSheetRegistry&&) = delete;
-    StyleSheetRegistry& operator=(const StyleSheetRegistry&) = delete;
-    StyleSheetRegistry& operator=(StyleSheetRegistry&&) = default;
 
     StyleSheet& add(jsi::Runtime& rt, jsi::Object rawStyleSheet);
     jsi::Object parse(jsi::Runtime &rt, const StyleSheet& styleSheet);

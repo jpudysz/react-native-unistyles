@@ -32,7 +32,7 @@ void core::UnistylesRegistry::setInitialThemeName(jsi::Runtime& rt, std::string 
 core::UnistylesState& core::UnistylesRegistry::getState(jsi::Runtime& rt) {
     auto it = this->states.find(&rt);
     
-    helpers::assertThat(rt, it != this->states.end(), "there is no state attached for the current runtime. Did you forget to call StyleSheet.configure?");
+    helpers::assertThat(rt, it != this->states.end(), "Unistyles was loaded, but it's not configured. Did you forget to call StyleSheet.configure? If you don't want to use any themes or breakpoints, simply call it with an empty object {}.");
     
     return it->second;
 }
@@ -40,8 +40,10 @@ core::UnistylesState& core::UnistylesRegistry::getState(jsi::Runtime& rt) {
 void core::UnistylesRegistry::createState(jsi::Runtime& rt, jsi::Object& miniRuntime) {
     auto it = this->states.find(&rt);
     
+    // remove old state, so we can swap it with new config
+    // during live reload
     if (it != this->states.end()) {
-        return;
+        this->states.extract(&rt);
     }
     
     this->states.emplace(

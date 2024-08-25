@@ -21,13 +21,13 @@ StyleSheet& StyleSheetRegistry::addFromObject(jsi::Runtime &rt, unsigned int tag
 StyleSheet& StyleSheetRegistry::addFromFunction(jsi::Runtime &rt, unsigned int tag, jsi::Function styleSheetFn) {
     auto numberOfArgs = styleSheetFn.getProperty(rt, "length").getNumber();
 
-    helpers::assertThat(rt, numberOfArgs <= 2, "function passed to StyleSheet.create can't have more than 2 arguments.");
+    helpers::assertThat(rt, numberOfArgs <= 2, "expected up to 2 arguments.");
 
     // stylesheet is still static, remove the function wrapper
     if (numberOfArgs == 0) {
         auto staticStyleSheet = styleSheetFn.call(rt).asObject(rt);
 
-        this->styleSheets.emplace_back(tag, core::StyleSheetType::Static, std::move(styleSheetFn));
+        this->styleSheets.emplace_back(tag, core::StyleSheetType::Static, std::move(staticStyleSheet));
     }
 
     // stylesheet depends only on theme
@@ -53,7 +53,7 @@ void StyleSheetRegistry::remove(unsigned int tag) {
     );
 
     if (it == this->styleSheets.cend()) {
-        throw std::runtime_error("StyleSheet with tag: " + std::to_string(tag) + " cannot be found.");
+        throw std::runtime_error("stylesheet with tag: " + std::to_string(tag) + " cannot be found.");
     }
 
     this->styleSheets.erase(it);
@@ -75,7 +75,7 @@ jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, const StyleSh
     if (styleSheet.type == StyleSheetType::Static) {
         return jsi::Value(rt, styleSheet.rawValue).asObject(rt);
     }
-    
+
     // StyleSheet is a function
     auto& state = core::UnistylesRegistry::get().getState(rt);
     auto theme = state.getJSTheme();

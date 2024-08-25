@@ -31,7 +31,7 @@ jsi::Object core::UnistylesState::getJSTheme() {
         return jsi::Object(*rt);
     }
     
-    helpers::assertThat(*rt, currentThemeName.has_value(), "your stylesheet is trying to get the theme, but no theme was selected yet. Did you forget to select initial theme?");
+    helpers::assertThat(*rt, currentThemeName.has_value(), "one of your stylesheets is trying to get the theme, but no theme has been selected yet. Did you forget to select an initial theme?");
     
     auto& state = core::UnistylesRegistry::get().getState(*rt);
     auto it = state.jsThemes.find(currentThemeName.value());
@@ -64,12 +64,8 @@ bool core::UnistylesState::hasInitialTheme() {
     return this->initialThemeName.has_value();
 }
 
-int core::UnistylesState::getThemesCount() {
-    return this->registeredThemeNames.size();
-}
-
-std::string core::UnistylesState::getFirstThemeName() {
-    return this->registeredThemeNames.at(0);
+std::vector<std::string> core::UnistylesState::getRegisteredThemeNames() {
+    return std::vector<std::string>(this->registeredThemeNames);
 }
 
 std::optional<std::string> core::UnistylesState::getInitialTheme() {
@@ -78,4 +74,8 @@ std::optional<std::string> core::UnistylesState::getInitialTheme() {
 
 std::optional<std::string> core::UnistylesState::getCurrentBreakpointName() {
     return this->currentBreakpointName;
+}
+
+bool core::UnistylesState::getPrefersAdaptiveThemes() {
+    return this->prefersAdaptiveThemes.has_value() && this->prefersAdaptiveThemes.value();
 }
