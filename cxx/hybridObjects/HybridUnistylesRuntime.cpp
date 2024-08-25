@@ -1,6 +1,13 @@
 #include "HybridUnistylesRuntime.h"
+#include "UnistylesState.h"
 
 using namespace margelo::nitro::unistyles;
+
+jsi::Value HybridUnistylesRuntime::onLoad(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    this->rt = &rt;
+    
+    return jsi::Value::undefined();
+}
 
 ColorScheme HybridUnistylesRuntime::getColorScheme() {
     int colorScheme = this->nativePlatform.getColorScheme();
@@ -9,11 +16,9 @@ ColorScheme HybridUnistylesRuntime::getColorScheme() {
 }
 
 bool HybridUnistylesRuntime::getHasAdaptiveThemes() {
-    if (!this->prefersAdaptiveThemes.has_value()) {
-        return false;
-    }
-
-    return this->prefersAdaptiveThemes.value() && this->canHaveAdaptiveThemes;
+    auto& state = core::UnistylesRegistry::get().getState(*rt);
+    
+    return state.hasAdaptiveThemes();
 };
 
 Dimensions HybridUnistylesRuntime::getScreen() {
@@ -21,7 +26,9 @@ Dimensions HybridUnistylesRuntime::getScreen() {
 };
 
 std::optional<std::string> HybridUnistylesRuntime::getThemeName() {
-    return this->currentThemeName;
+    auto& state = core::UnistylesRegistry::get().getState(*rt);
+    
+    return state.getCurrentThemeName();
 };
 
 std::string HybridUnistylesRuntime::getContentSizeCategory() {
@@ -29,7 +36,9 @@ std::string HybridUnistylesRuntime::getContentSizeCategory() {
 };
 
 std::optional<std::string> HybridUnistylesRuntime::getBreakpoint() {
-    return this->currentBreakpointName;
+    auto& state = core::UnistylesRegistry::get().getState(*rt);
+    
+    return state.getCurrentBreakpointName();
 };
 
 bool HybridUnistylesRuntime::getRtl() {
@@ -59,19 +68,17 @@ double HybridUnistylesRuntime::getFontScale() {
 };
 
 void HybridUnistylesRuntime::setTheme(const std::string &themeName) {
-    if (this->getHasAdaptiveThemes()) {
-        throw std::runtime_error("[Unistyles]: You're trying to set theme to: '" + std::string(themeName) + "', but adaptiveThemes are enabled.");
-    }
-
-    if (!helpers::vecContainsKeys(this->registeredThemeNames, {themeName})) {
-        throw std::runtime_error("[Unistyles]: You're trying to set theme to: '" + std::string(themeName) + "', but it wasn't registered.");
-    }
-
-    this->currentThemeName = themeName;
+    helpers::assertThat(*rt, !this->getHasAdaptiveThemes(), "You're trying to set theme to: '" + themeName + "', but adaptiveThemes are enabled.");
+    
+    auto& state = core::UnistylesRegistry::get().getState(*rt);
+    
+    state.setTheme(themeName);
 };
 
 void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
-    this->prefersAdaptiveThemes = isEnabled;
+    auto& registry = core::UnistylesRegistry::get();
+    
+    registry.setPrefersAdaptiveThemes(*rt, isEnabled);
 };
 
 void HybridUnistylesRuntime::setImmersiveMode(bool isEnabled) {};

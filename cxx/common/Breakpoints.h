@@ -1,6 +1,7 @@
 #pragma once
 
 #include <jsi/jsi.h>
+#include "Helpers.h"
 
 using namespace facebook;
 
@@ -13,7 +14,7 @@ inline Breakpoints jsiBreakpointsToVecPairs(jsi::Runtime& rt, jsi::Value&& break
     Breakpoints sortedVecPairs;
     
     enumerateJSIObject(rt, breakpoints.asObject(rt), [&](const std::string& propertyName, jsi::Value& propertyValue){
-        assertThat(rt, propertyValue.isNumber(), "Value for breakpoint " + std::string(propertyName) + " is not a number.");
+        assertThat(rt, propertyValue.isNumber(), "value for breakpoint " + std::string(propertyName) + " is not a number.");
         
         sortedVecPairs.emplace_back(propertyName, propertyValue.asNumber());
     });

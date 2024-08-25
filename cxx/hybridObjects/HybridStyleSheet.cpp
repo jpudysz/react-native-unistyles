@@ -31,6 +31,12 @@ jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisV
     helpers::assertThat(rt, count == 1, "StyleSheet.configure must be called with one argument.");
     helpers::assertThat(rt, arguments[0].isObject(), "StyleSheet.configure must be called with object.");
 
+    // create new state
+    auto& registry = core::UnistylesRegistry::get();
+    auto miniRuntime = this->miniRuntime->toObject(rt).asObject(rt);
+    
+    registry.createState(rt, miniRuntime);
+
     auto config = arguments[0].asObject(rt);
 
     helpers::enumerateJSIObject(rt, config, [&](const std::string& propertyName, jsi::Value& propertyValue){
@@ -56,21 +62,18 @@ jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisV
     });
 
     verifyAndSelectTheme(rt);
-    loadJSTheme(rt);
-    loadMiniRuntime(rt);
 
     return jsi::Value::undefined();
 }
 
 void HybridStyleSheet::parseSettings(jsi::Runtime &rt, jsi::Object settings) {
+    auto& registry = core::UnistylesRegistry::get();
+    
     helpers::enumerateJSIObject(rt, settings, [&](const std::string& propertyName, jsi::Value& propertyValue){
         if (propertyName == "adaptiveThemes") {
             helpers::assertThat(rt, propertyValue.isBool(), "adaptiveThemes configuration must be of boolean type.");
 
-            // set adaptive theme only once, this function might be triggered during hot reload
-            if (this->unistylesRuntime->prefersAdaptiveThemes == std::nullopt) {
-                this->unistylesRuntime->prefersAdaptiveThemes = propertyValue.asBool();
-            }
+            registry.setPrefersAdaptiveThemes(rt, propertyValue.asBool());
 
             return;
         }
@@ -78,7 +81,7 @@ void HybridStyleSheet::parseSettings(jsi::Runtime &rt, jsi::Object settings) {
         if (propertyName == "initialTheme") {
             helpers::assertThat(rt, propertyValue.isString(), "initialTheme configuration must be of string type.");
 
-            this->unistylesRuntime->initialThemeName = propertyValue.asString(rt).utf8(rt);
+            registry.setInitialThemeName(rt, propertyValue.asString(rt).utf8(rt));
 
             return;
         }
@@ -92,35 +95,30 @@ void HybridStyleSheet::parseBreakpoints(jsi::Runtime &rt, jsi::Object breakpoint
 
     helpers::assertThat(rt, sortedBreakpoints.size() > 0, "registered breakpoints can't be empty.");
     helpers::assertThat(rt, sortedBreakpoints.front().second == 0, "first breakpoint must start from 0.");
-
-    this->unistylesRuntime->sortedBreakpointPairs = std::move(sortedBreakpoints);
-    this->unistylesRuntime->currentBreakpointName = helpers::getBreakpointFromScreenWidth(
-        this->nativePlatform.getScreenDimensions().width,
-        this->unistylesRuntime->sortedBreakpointPairs
-    );
+    
+    auto& registry = core::UnistylesRegistry::get();
+    auto& state = registry.getState(rt);
+    
+    registry.registerBreakpoints(rt, sortedBreakpoints);
+    state.computeCurrentBreakpoint(nativePlatform.getScreenDimensions().width);
 }
 
 void HybridStyleSheet::parseThemes(jsi::Runtime &rt, jsi::Object themes) {
-    // this function can be triggered second time during hot reloading
-    // simply destroy previously referenced themes
-    this->unistylesRuntime->registeredThemeNames.clear();
-
+    auto& registry = core::UnistylesRegistry::get();
+    
     helpers::enumerateJSIObject(rt, themes, [&](const std::string& propertyName, jsi::Value& propertyValue){
         helpers::assertThat(rt, propertyValue.isObject(), "registered theme must be an object.");
-        helpers::defineHiddenProperty(rt, rt.global(), ::helpers::GLOBAL_THEME_PREFIX + propertyName, propertyValue.asObject(rt));
-
-        this->unistylesRuntime->registeredThemeNames.emplace_back(propertyName);
+        
+        registry.registerTheme(rt, propertyName, propertyValue.asObject(rt));
     });
 }
 
 void HybridStyleSheet::verifyAndSelectTheme(jsi::Runtime &rt) {
-    // Set metadata about adaptive themes
-    bool canHaveAdaptiveThemes = helpers::vecContainsKeys(this->unistylesRuntime->registeredThemeNames, {"light", "dark"});
-    this->unistylesRuntime->canHaveAdaptiveThemes = canHaveAdaptiveThemes;
-
-    bool hasInitialTheme = this->unistylesRuntime->initialThemeName.has_value();
-    bool hasAdaptiveThemes = this->unistylesRuntime->getHasAdaptiveThemes();
-    bool hasSingleTheme = this->unistylesRuntime->registeredThemeNames.size();
+    auto& state = core::UnistylesRegistry::get().getState(rt);
+    
+    bool hasInitialTheme = state.hasInitialTheme();
+    bool hasAdaptiveThemes = state.hasAdaptiveThemes();
+    bool hasSingleTheme = state.getThemesCount() == 1;
 
     // user didn't select initial theme nor can have adaptive themes, and registered more than 1 theme
     // do nothing user must select initial theme during runtime
@@ -131,79 +129,44 @@ void HybridStyleSheet::verifyAndSelectTheme(jsi::Runtime &rt) {
     // user didn't select initial theme nor can have adaptive themes, but registered exactly 1 theme
     // preselect it!
     if (!hasInitialTheme && !hasAdaptiveThemes && hasSingleTheme) {
-        this->unistylesRuntime->currentThemeName = this->unistylesRuntime->registeredThemeNames.at(0);
-
-        return;
+        return state.setTheme(state.getFirstThemeName());
     }
 
     // user didn't select initial theme, but has adaptive themes
     // simply select theme based on color scheme
     if (!hasInitialTheme && hasAdaptiveThemes) {
-        return this->setThemeFromColorScheme();
+        return this->setThemeFromColorScheme(rt);
     }
 
     // user selected both initial theme and adaptive themes
     // we should throw an error as these options are mutually exclusive
     if (hasInitialTheme && hasAdaptiveThemes) {
-        this->unistylesRuntime->initialThemeName = std::nullopt;
-
         helpers::assertThat(rt, false, "you're trying to set initial theme and enable adaptiveThemes, but these options are mutually exclusive.");
     }
 
     // user only selected initial theme
     // validate if following theme exist
-    std::string selectedTheme = this->unistylesRuntime->initialThemeName.value();
-    bool hasRegisteredTheme = helpers::vecContainsKeys(this->unistylesRuntime->registeredThemeNames, {selectedTheme});
+    std::string selectedTheme = state.getInitialTheme().value();
 
-    helpers::assertThat(rt, hasRegisteredTheme, "initial theme '" + selectedTheme + "' has not been registered.");
+    helpers::assertThat(rt, state.hasTheme(selectedTheme), "initial theme '" + selectedTheme + "' has not been registered.");
 
-    this->unistylesRuntime->currentThemeName = selectedTheme;
+    return state.setTheme(selectedTheme);
 }
 
-void HybridStyleSheet::setThemeFromColorScheme() {
+void HybridStyleSheet::setThemeFromColorScheme(jsi::Runtime& rt) {
     ColorScheme colorScheme = static_cast<ColorScheme>(this->nativePlatform.getColorScheme());
+    auto& state = core::UnistylesRegistry::get().getState(rt);
 
     switch (colorScheme) {
         case ColorScheme::LIGHT:
-            this->unistylesRuntime->currentThemeName = "light";
+            state.setTheme("light");
 
             return;
         case ColorScheme::DARK:
-            this->unistylesRuntime->currentThemeName = "dark";
+            state.setTheme("dark");
 
             return;
         default:
             throw std::runtime_error("[Unistyles]: Unable to set adaptive theme as your device doesn't support it.");
     }
-}
-
-void HybridStyleSheet::loadJSTheme(jsi::Runtime &rt) {
-    auto themeName = this->unistylesRuntime->currentThemeName;
-    auto hasSingleTheme = this->unistylesRuntime->registeredThemeNames.size() == 1;
-    
-    // at this point, if we don't have a theme, then we should return a default (empty object)
-    if (!themeName.has_value() && hasSingleTheme) {
-        this->styleSheetRegistry.cacheCurrentTheme(jsi::WeakObject(rt, jsi::Object(rt)));
-        
-        return;
-    }
-    
-    // this will fail later, user didn't select any theme
-    if (!themeName.has_value()) {
-        return;
-    }
-    
-    auto globalKey = jsi::PropNameID::forUtf8(rt, std::string(helpers::GLOBAL_THEME_PREFIX + themeName.value()));
-    
-    if (!rt.global().hasProperty(rt, globalKey)) {
-        throw std::runtime_error("Theme '" + themeName.value() + "' is not accessible from C++.");
-    }
-    
-    auto theme = rt.global().getProperty(rt, globalKey).asObject(rt);
-    
-    this->styleSheetRegistry.cacheCurrentTheme(jsi::WeakObject(rt, std::move(theme)));
-}
-
-void HybridStyleSheet::loadMiniRuntime(jsi::Runtime& rt) {
-    this->styleSheetRegistry.cacheMiniRuntime(this->miniRuntime.get()->toObject(rt).asObject(rt));
 }
