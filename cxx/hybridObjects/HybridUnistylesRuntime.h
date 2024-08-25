@@ -6,12 +6,26 @@
 #include <NitroModules/HybridContext.hpp>
 #include "Unistyles-Swift-Cxx-Umbrella.hpp"
 #include "Helpers.h"
+#include "UnistylesRegistry.h"
 
 using namespace margelo::nitro::unistyles;
 
 struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
-    HybridUnistylesRuntime(Unistyles::HybridNativePlatformSpecCxx _nativePlatform): nativePlatform{_nativePlatform} {}
+    HybridUnistylesRuntime(Unistyles::HybridNativePlatformSpecCxx nativePlatform): nativePlatform{nativePlatform} {}
 
+    jsi::Value onLoad(jsi::Runtime& rt,
+                      const jsi::Value& thisValue,
+                      const jsi::Value* args,
+                      size_t count);
+    
+    void loadHybridMethods() override {
+        HybridUnistylesRuntimeSpec::loadHybridMethods();
+
+        registerHybrids(this, [](Prototype& prototype) {
+            prototype.registerHybridMethod("init", &HybridUnistylesRuntime::onLoad);
+        });
+    };
+    
     ColorScheme getColorScheme() override;
     bool getHasAdaptiveThemes() override;
     bool getRtl() override;
@@ -29,18 +43,11 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     void setImmersiveMode(bool isEnabled) override;
     void setRootViewBackgroundColor(const std::optional<std::string> &hex, std::optional<double> alpha) override;
 
-    // internals
+    // todo create own MiniRuntime as HO, drop it
     Dimensions getStatusBarDimensions();
     Dimensions getNavigationBarDimensions();
-
-    std::optional<bool> prefersAdaptiveThemes;
-    bool canHaveAdaptiveThemes = false;
-    std::optional<std::string> initialThemeName = std::nullopt;
-    std::optional<std::string> currentThemeName = std::nullopt;
-    std::optional<std::string> currentBreakpointName = std::nullopt;
-    std::vector<std::pair<std::string, double>> sortedBreakpointPairs{};
-    std::vector<std::string> registeredThemeNames{};
     
+    jsi::Runtime* rt;
 private:
     Unistyles::HybridNativePlatformSpecCxx nativePlatform;
 };

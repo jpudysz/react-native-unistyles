@@ -1,4 +1,5 @@
 #include "HybridMiniRuntime.h"
+#include "UnistylesState.h"
 
 ColorScheme HybridMiniRuntime::getColorScheme() {
     return this->unistylesRuntime->getColorScheme();

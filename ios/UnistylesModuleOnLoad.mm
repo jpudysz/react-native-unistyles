@@ -4,6 +4,7 @@
 #import "HybridStatusBar.h"
 #import "HybridNavigationBar.h"
 #import "HybridStyleSheet.h"
+#import "UnistylesState.h"
 
 using namespace margelo::nitro;
 
@@ -15,8 +16,7 @@ using namespace margelo::nitro;
 + (void)load  {
     auto nativePlatform = Unistyles::NativePlatform::create();
     auto unistylesRuntime = std::make_shared<HybridUnistylesRuntime>(nativePlatform);
-    auto miniRuntime = std::make_shared<HybridMiniRuntime>(unistylesRuntime);
-
+ 
     HybridObjectRegistry::registerHybridObjectConstructor("UnistylesRuntime", [unistylesRuntime]() -> std::shared_ptr<HybridObject>{
         return unistylesRuntime;
     });
@@ -26,8 +26,8 @@ using namespace margelo::nitro;
     HybridObjectRegistry::registerHybridObjectConstructor("NavigationBar", [nativePlatform]() -> std::shared_ptr<HybridObject>{
         return std::make_shared<HybridNavigationBar>(nativePlatform);
     });
-    HybridObjectRegistry::registerHybridObjectConstructor("StyleSheet", [nativePlatform, unistylesRuntime, miniRuntime]() -> std::shared_ptr<HybridObject>{
-        return std::make_shared<HybridStyleSheet>(nativePlatform, unistylesRuntime, miniRuntime);
+    HybridObjectRegistry::registerHybridObjectConstructor("StyleSheet", [nativePlatform, unistylesRuntime]() -> std::shared_ptr<HybridObject>{
+        return std::make_shared<HybridStyleSheet>(nativePlatform, unistylesRuntime);
     });
 }
 

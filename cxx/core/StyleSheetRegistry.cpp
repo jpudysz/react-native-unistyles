@@ -21,7 +21,7 @@ StyleSheet& StyleSheetRegistry::addFromObject(jsi::Runtime &rt, unsigned int tag
 StyleSheet& StyleSheetRegistry::addFromFunction(jsi::Runtime &rt, unsigned int tag, jsi::Function styleSheetFn) {
     auto numberOfArgs = styleSheetFn.getProperty(rt, "length").getNumber();
 
-    helpers::assertThat(rt, numberOfArgs <= 2, "Function passed to StyleSheet.create can't have more than 2 arguments.");
+    helpers::assertThat(rt, numberOfArgs <= 2, "function passed to StyleSheet.create can't have more than 2 arguments.");
 
     // stylesheet is still static, remove the function wrapper
     if (numberOfArgs == 0) {
@@ -75,9 +75,10 @@ jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, const StyleSh
     if (styleSheet.type == StyleSheetType::Static) {
         return jsi::Value(rt, styleSheet.rawValue).asObject(rt);
     }
-
+    
     // StyleSheet is a function
-    auto theme = this->getCurrentTheme(rt);
+    auto& state = core::UnistylesRegistry::get().getState(rt);
+    auto theme = state.getJSTheme();
 
     if (styleSheet.type == StyleSheetType::Themable) {
         return styleSheet.rawValue
@@ -86,35 +87,12 @@ jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, const StyleSh
             .asObject(rt);
     }
 
-    // stylesheet also has a mini runtime
-    auto miniRuntime = this->getMiniRuntime(rt);
+    // stylesheet also has a mini runtime dependency
+    // StyleSheetType::ThemableWithMiniRuntime
+    auto& miniRuntime = state.getMiniRuntime();
 
     return styleSheet.rawValue
         .asFunction(rt)
-        .call(rt, std::move(theme), std::move(miniRuntime))
+        .call(rt, std::move(theme), miniRuntime)
         .asObject(rt);
-}
-
-jsi::Object StyleSheetRegistry::getCurrentTheme(jsi::Runtime& rt) {
-    helpers::assertThat(rt, this->cachedTheme.has_value(), "failed to load the theme. Did you forget to select initial one?");
-    
-    auto& theme = this->cachedTheme.value();
-    
-    helpers::assertThat(rt, theme.lock(rt).isObject(), "not able to retrieve a theme. Please report issue with steps to reproduce.");
-    
-    return theme.lock(rt).asObject(rt);
-}
-
-jsi::Object StyleSheetRegistry::getMiniRuntime(jsi::Runtime& rt) {
-    helpers::assertThat(rt, this->cachedMiniRuntime.has_value(), "failed to load mini runtime. Please report issue with steps to reproduce.");
-    
-    return std::move(this->cachedMiniRuntime.value());
-}
-
-void StyleSheetRegistry::cacheCurrentTheme(jsi::WeakObject&& theme) {
-    this->cachedTheme = jsi::WeakObject(std::move(theme));
-}
-
-void StyleSheetRegistry::cacheMiniRuntime(jsi::Object&& miniRuntime) {
-    this->cachedMiniRuntime = std::move(miniRuntime);
 }
