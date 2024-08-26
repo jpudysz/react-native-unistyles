@@ -5,7 +5,7 @@ import type { UnistylesBreakpoints, UnistylesThemes } from '../../global'
 
 type UnistylesSettings = {
     adaptiveThemes?: boolean,
-    initialTheme?: keyof UnistylesThemes
+    initialTheme?: (() => keyof UnistylesThemes) | keyof UnistylesThemes
 }
 
 type UnistylesConfig = {

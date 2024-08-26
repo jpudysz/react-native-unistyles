@@ -26,6 +26,7 @@ struct UnistylesState {
     std::optional<std::string>& getCurrentThemeName();
     std::vector<std::string> getRegisteredThemeNames();
     std::optional<std::string> getInitialTheme();
+    std::optional<jsi::Function> getInitialThemeNameFn;
     std::optional<std::string> getCurrentBreakpointName();
 
     jsi::Object getJSTheme();

@@ -81,7 +81,13 @@ void HybridStyleSheet::parseSettings(jsi::Runtime &rt, jsi::Object settings) {
         }
 
         if (propertyName == "initialTheme") {
-            helpers::assertThat(rt, propertyValue.isString(), "initialTheme configuration must be of string type.");
+            if (propertyValue.isObject()) {
+                helpers::assertThat(rt, propertyValue.asObject(rt).isFunction(rt), "initialTheme configuration must be either a string or a function.");
+                
+                return registry.setInitialThemeNameCallback(rt, propertyValue.asObject(rt).asFunction(rt));
+            }
+            
+            helpers::assertThat(rt, propertyValue.isString(), "initialTheme configuration must be either a string or a function.");
 
             registry.setInitialThemeName(rt, propertyValue.asString(rt).utf8(rt));
 
