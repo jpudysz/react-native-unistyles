@@ -1,23 +1,14 @@
 import React from 'react'
-import { Button, Text, View } from 'react-native'
-import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
+import { Text, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import './unistyles'
 
 export const App = () => {
-
     return (
         <View style={styles.container}>
             <Text style={styles.text}>
-                {UnistylesRuntime.hasAdaptiveThemes ? 'true' : 'false'}
+                Hello from Unistyles 3.0!
             </Text>
-            <Button
-                title="Change theme"
-                onPress={() => {
-                    // setCounter(prevState => prevState + 1)
-
-                    UnistylesRuntime.setTheme('dark')
-                }}
-            />
         </View>
     )
 }

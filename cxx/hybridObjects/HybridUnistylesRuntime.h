@@ -17,12 +17,17 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
                       const jsi::Value& thisValue,
                       const jsi::Value* args,
                       size_t count);
+    jsi::Value updateTheme(jsi::Runtime& rt,
+                      const jsi::Value& thisValue,
+                      const jsi::Value* args,
+                      size_t count);
     
     void loadHybridMethods() override {
         HybridUnistylesRuntimeSpec::loadHybridMethods();
 
         registerHybrids(this, [](Prototype& prototype) {
             prototype.registerHybridMethod("init", &HybridUnistylesRuntime::onLoad);
+            prototype.registerHybridMethod("updateTheme", &HybridUnistylesRuntime::updateTheme);
         });
     };
     

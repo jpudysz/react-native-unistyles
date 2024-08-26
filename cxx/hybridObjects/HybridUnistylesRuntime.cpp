@@ -99,11 +99,26 @@ void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
     }
 };
 
+jsi::Value HybridUnistylesRuntime::updateTheme(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    helpers::assertThat(rt, count == 2, "expected to be called with two arguments.");
+    helpers::assertThat(rt, args[0].isString(), "first argument expected to be a string.");
+    helpers::assertThat(rt, args[1].isObject(), "second argument expected to be a function.");
+    
+    auto& registry = core::UnistylesRegistry::get();
+    auto themeName = args[0].asString(rt).utf8(rt);
+    
+    helpers::assertThat(rt, args[1].asObject(rt).isFunction(rt), "second argument expected to be a function.");
+
+    registry.updateTheme(rt, themeName, args[1].asObject(rt).asFunction(rt));
+    
+    return jsi::Value::undefined();
+}
+
 void HybridUnistylesRuntime::setImmersiveMode(bool isEnabled) {};
 
 void HybridUnistylesRuntime::setRootViewBackgroundColor(const std::optional<std::string> &hex, std::optional<double> alpha) {
     this->nativePlatform.setRootViewBackgroundColor(hex, alpha);
-};
+}
 
 Dimensions HybridUnistylesRuntime::getStatusBarDimensions() {
     return this->nativePlatform.getStatusBarDimensions();
