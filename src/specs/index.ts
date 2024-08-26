@@ -39,8 +39,11 @@ HybridStyleSheet.absoluteFill = NativeStyleSheet.absoluteFill
 HybridStyleSheet.flatten = NativeStyleSheet.flatten
 HybridStyleSheet.compose = NativeStyleSheet.compose
 
-// @ts-ignore
-HybridUnistylesRuntime.init();
+type ConfigurableUnistylesRuntime = typeof HybridUnistylesRuntime & {
+    init(): void
+}
+
+(HybridUnistylesRuntime as ConfigurableUnistylesRuntime).init()
 
 export {
     HybridStyleSheet as StyleSheet,
