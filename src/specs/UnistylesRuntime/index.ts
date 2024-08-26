@@ -18,7 +18,7 @@ export interface UnistylesRuntime extends UnistylesRuntimeSpec {
 
     setTheme(themeName: AppThemeName): void
     updateTheme(themeName: AppThemeName, updater: (currentTheme: AppTheme) => AppTheme): void,
-    setRootViewBackgroundColor(hex?: `#${string}`, alpha?: number): void
+    setRootViewBackgroundColor(hex: `#${string}`, alpha?: number): void
 }
 
 export interface MiniRuntime extends MiniRuntimeSpec {
