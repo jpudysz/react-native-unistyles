@@ -46,7 +46,7 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     void setTheme(const std::string &themeName) override;
     void setAdaptiveThemes(bool isEnabled) override;
     void setImmersiveMode(bool isEnabled) override;
-    void setRootViewBackgroundColor(const std::optional<std::string> &hex, std::optional<double> alpha) override;
+    void setRootViewBackgroundColor(const std::string &hex, std::optional<double> alpha) override;
 
     // internal
     Dimensions getStatusBarDimensions();

@@ -65,7 +65,7 @@ abstract class HybridNativePlatformSpec: HybridObject() {
   
   @DoNotStrip
   @Keep
-  abstract fun setRootViewBackgroundColor(hex: String?, alpha: Double?): Unit
+  abstract fun setRootViewBackgroundColor(hex: String, alpha: Double?): Unit
   
   @DoNotStrip
   @Keep

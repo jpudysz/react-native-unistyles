@@ -116,7 +116,12 @@ jsi::Value HybridUnistylesRuntime::updateTheme(jsi::Runtime &rt, const jsi::Valu
 
 void HybridUnistylesRuntime::setImmersiveMode(bool isEnabled) {};
 
-void HybridUnistylesRuntime::setRootViewBackgroundColor(const std::optional<std::string> &hex, std::optional<double> alpha) {
+void HybridUnistylesRuntime::setRootViewBackgroundColor(const std::string &hex, std::optional<double> alpha) {
+    bool isValidHex = hex.starts_with("#") && (hex.length() == 7 || hex.length() == 9);
+    
+    helpers::assertThat(*rt, isValidHex, "invalid hex color.");
+    helpers::assertThat(*rt, !alpha.has_value() || (alpha.value() >= 0 && alpha.value() <= 1), "invalid alpha value. Should be between 0 and 1.");
+    
     this->nativePlatform.setRootViewBackgroundColor(hex, alpha);
 }
 

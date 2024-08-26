@@ -46,7 +46,7 @@ namespace margelo::nitro::unistyles {
     Dimensions getStatusBarDimensions() override;
     Dimensions getNavigationBarDimensions() override;
     bool getPrefersRtlDirection() override;
-    void setRootViewBackgroundColor(const std::optional<std::string>& hex, std::optional<double> alpha) override;
+    void setRootViewBackgroundColor(const std::string& hex, std::optional<double> alpha) override;
     void setNavigationBarBackgroundColor(const std::optional<std::string>& hex, std::optional<double> alpha) override;
     void setNavigationBarHidden(bool isHidden) override;
     void setStatusBarBackgroundColor(const std::optional<std::string>& hex, std::optional<double> alpha) override;

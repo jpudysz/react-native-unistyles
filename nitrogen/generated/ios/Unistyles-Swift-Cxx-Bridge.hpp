@@ -22,19 +22,19 @@
 namespace margelo::nitro::unistyles::bridge::swift {
 
   /**
-   * Specialized version of `std::optional<std::string>`.
-   */
-  using std__optional_std__string_ = std::optional<std::string>;
-  inline std::optional<std::string> create_std__optional_std__string_(const std::string& value) {
-    return std::optional<std::string>(value);
-  }
-  
-  /**
    * Specialized version of `std::optional<double>`.
    */
   using std__optional_double_ = std::optional<double>;
   inline std::optional<double> create_std__optional_double_(const double& value) {
     return std::optional<double>(value);
+  }
+  
+  /**
+   * Specialized version of `std::optional<std::string>`.
+   */
+  using std__optional_std__string_ = std::optional<std::string>;
+  inline std::optional<std::string> create_std__optional_std__string_(const std::string& value) {
+    return std::optional<std::string>(value);
   }
 
 } // namespace margelo::nitro::unistyles::bridge::swift
