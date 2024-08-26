@@ -1,25 +1,22 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Button, Text, View } from 'react-native'
 import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
 import './unistyles'
 
 export const App = () => {
-    const [, setCounter] = useState(0)
 
     return (
         <View style={styles.container}>
             <Text style={styles.text}>
-                Selected theme: {UnistylesRuntime.themeName ?? '-'}
-            </Text>
-            <Text style={styles.text}>
-                Has adaptive themes: {UnistylesRuntime.hasAdaptiveThemes ? 'true' : 'false'}
-            </Text>
-            <Text style={styles.text}>
-                Current breakpoint: {UnistylesRuntime.breakpoint ?? '-'}
+                {UnistylesRuntime.hasAdaptiveThemes ? 'true' : 'false'}
             </Text>
             <Button
-                title="Re-render"
-                onPress={() => setCounter(prevState => prevState + 1)}
+                title="Change theme"
+                onPress={() => {
+                    // setCounter(prevState => prevState + 1)
+
+                    UnistylesRuntime.setTheme('dark')
+                }}
             />
         </View>
     )
