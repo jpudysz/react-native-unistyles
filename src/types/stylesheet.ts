@@ -2,6 +2,7 @@ import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
 import type { ShadowOffset, TransformStyles, UnistylesTheme } from './core'
 import type { UnistylesBreakpoints } from '../global'
 import type { MiniRuntime } from '../specs'
+import type { ReactNativeStyleSheet } from './breakpoints'
 
 // these props are treated differently to nest breakpoints and media queries
 type NestedKeys = 'shadowOffset' | 'transform' | 'textShadowOffset'
@@ -47,4 +48,10 @@ export type StyleSheet = {
     [styleName: string]: UnistylesValues | ((...args: any) => UnistylesValues)
 }
 
-export type StyleSheetWithSuperPowers = ((theme: UnistylesTheme, miniRuntime: MiniRuntime) => StyleSheet) | StyleSheet
+export type StyleSheetWithSuperPowers<S extends StyleSheet> =
+    | ((theme: UnistylesTheme, miniRuntime: MiniRuntime) => S)
+    | S
+
+const create = <S extends StyleSheet>(stylesheet: StyleSheetWithSuperPowers<S>): ReactNativeStyleSheet<S> => stylesheet as ReactNativeStyleSheet<S>
+
+export type CreateUnistylesStyleSheet = typeof create
