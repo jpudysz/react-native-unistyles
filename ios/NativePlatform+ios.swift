@@ -160,10 +160,10 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         }
     }
 
-    func setRootViewBackgroundColor(hex: String?, alpha: Double?) throws {
+    func setRootViewBackgroundColor(hex: String, alpha: Double?) throws {
         DispatchQueue.main.async {
             guard let presentedViewController = RCTPresentedViewController(),
-                  let backgroundColor = colorFromHexString(hex ?? "", alpha: alpha ?? 1) else {
+                  let backgroundColor = colorFromHexString(hex, alpha: alpha ?? 1) else {
                 print("🦄 Unistyles: Couldn't set rootView backgroundColor")
 
                 return

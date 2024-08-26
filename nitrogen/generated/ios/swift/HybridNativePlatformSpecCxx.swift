@@ -163,15 +163,9 @@ public final class HybridNativePlatformSpecCxx {
   }
   
   @inline(__always)
-  public func setRootViewBackgroundColor(hex: bridge.std__optional_std__string_, alpha: bridge.std__optional_double_) -> Void {
+  public func setRootViewBackgroundColor(hex: std.string, alpha: bridge.std__optional_double_) -> Void {
     do {
-      try self.implementation.setRootViewBackgroundColor(hex: { () -> String? in
-        if let actualValue = hex.value {
-          return String(actualValue)
-        } else {
-          return nil
-        }
-      }(), alpha: { () -> Double? in
+      try self.implementation.setRootViewBackgroundColor(hex: String(hex), alpha: { () -> Double? in
         if let actualValue = alpha.value {
           return actualValue
         } else {

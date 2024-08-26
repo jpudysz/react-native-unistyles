@@ -71,8 +71,8 @@ namespace margelo::nitro::unistyles {
     static const auto method = _javaPart->getClass()->getMethod<bool()>("getPrefersRtlDirection");
     throw std::runtime_error("getPrefersRtlDirection(...) is not yet implemented!");
   }
-  void JHybridNativePlatformSpec::setRootViewBackgroundColor(const std::optional<std::string>& hex, std::optional<double> alpha) {
-    static const auto method = _javaPart->getClass()->getMethod<void(std::optional<std::string>, std::optional<double>)>("setRootViewBackgroundColor");
+  void JHybridNativePlatformSpec::setRootViewBackgroundColor(const std::string& hex, std::optional<double> alpha) {
+    static const auto method = _javaPart->getClass()->getMethod<void(std::string, std::optional<double>)>("setRootViewBackgroundColor");
     throw std::runtime_error("setRootViewBackgroundColor(...) is not yet implemented!");
   }
   void JHybridNativePlatformSpec::setNavigationBarBackgroundColor(const std::optional<std::string>& hex, std::optional<double> alpha) {

@@ -20,5 +20,5 @@ export interface UnistylesRuntime extends HybridObject<{ ios: 'c++', android: 'c
     setTheme(themeName: string): void,
     setAdaptiveThemes(isEnabled: boolean): void,
     setImmersiveMode(isEnabled: boolean): void,
-    setRootViewBackgroundColor(hex?: string, alpha?: number): void
+    setRootViewBackgroundColor(hex: string, alpha?: number): void
 }

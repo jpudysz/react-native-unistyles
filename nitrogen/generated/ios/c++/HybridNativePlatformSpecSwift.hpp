@@ -103,7 +103,7 @@ namespace margelo::nitro::unistyles {
       auto value = _swiftPart.getPrefersRtlDirection();
       return value;
     }
-    inline void setRootViewBackgroundColor(const std::optional<std::string>& hex, std::optional<double> alpha) override {
+    inline void setRootViewBackgroundColor(const std::string& hex, std::optional<double> alpha) override {
       _swiftPart.setRootViewBackgroundColor(hex, alpha);
     }
     inline void setNavigationBarBackgroundColor(const std::optional<std::string>& hex, std::optional<double> alpha) override {
