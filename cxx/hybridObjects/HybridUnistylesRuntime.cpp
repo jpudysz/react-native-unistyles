@@ -79,6 +79,24 @@ void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
     auto& registry = core::UnistylesRegistry::get();
     
     registry.setPrefersAdaptiveThemes(*rt, isEnabled);
+    
+    // if user disabled it, or can't have adaptive themes, do nothing
+    if (!this->getHasAdaptiveThemes()) {
+        return;
+    }
+    
+    // if user enabled adaptive themes, then we need to make sure
+    // we selected theme based on color scheme
+    auto& state = core::UnistylesRegistry::get().getState(*rt);
+    auto colorScheme = this->getColorScheme();
+    auto currentThemeName = this->getThemeName();
+    auto nextTheme = colorScheme == ColorScheme::LIGHT
+        ? "light"
+        : "dark";
+
+    if (!currentThemeName.has_value() || nextTheme != currentThemeName.value()) {
+        state.setTheme(nextTheme);
+    }
 };
 
 void HybridUnistylesRuntime::setImmersiveMode(bool isEnabled) {};
