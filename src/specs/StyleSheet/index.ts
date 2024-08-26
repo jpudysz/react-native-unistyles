@@ -1,7 +1,7 @@
 import type { StyleSheet as NativeStyleSheet } from 'react-native'
 import type { StyleSheet as StyleSheetSpec } from './StyleSheet.nitro'
-import type { StyleSheetWithSuperPowers } from '../../types'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../../global'
+import type { CreateUnistylesStyleSheet } from '../../types'
 
 type UnistylesSettings = {
     adaptiveThemes?: boolean,
@@ -14,8 +14,6 @@ type UnistylesConfig = {
     breakpoints?: UnistylesBreakpoints
 }
 
-const create = <S extends StyleSheetWithSuperPowers>(stylesheet: S): S => stylesheet
-
 export interface StyleSheet extends StyleSheetSpec {
     absoluteFillObject: typeof NativeStyleSheet.absoluteFillObject,
     absoluteFill: typeof NativeStyleSheet.absoluteFill,
@@ -23,6 +21,6 @@ export interface StyleSheet extends StyleSheetSpec {
     flatten: typeof NativeStyleSheet.flatten,
 
     // overridden methods
-    create: typeof create,
+    create: CreateUnistylesStyleSheet,
     configure(config: UnistylesConfig): void
 }

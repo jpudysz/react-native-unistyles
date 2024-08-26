@@ -8,7 +8,7 @@ export type {
     RNStyle
 } from './core'
 export type {
-    StyleSheetWithSuperPowers,
+    CreateUnistylesStyleSheet,
     StyleSheet,
     AllAvailableKeys,
     UnistylesValues,
