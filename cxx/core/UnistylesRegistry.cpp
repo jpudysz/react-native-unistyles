@@ -58,3 +58,20 @@ void core::UnistylesRegistry::createState(jsi::Runtime& rt, jsi::Object& miniRun
         std::forward_as_tuple(rt, std::move(miniRuntime))
     );
 }
+
+void core::UnistylesRegistry::updateTheme(jsi::Runtime& rt, std::string& themeName, jsi::Function&& callback) {
+    auto& state = this->getState(rt);
+    auto it = state.jsThemes.find(themeName);
+    
+    helpers::assertThat(rt, it != state.jsThemes.end(), "you're trying to update theme '" + themeName + "' but it wasn't registered.");
+    
+    auto currentThemeValue = it->second.lock(rt);
+    
+    helpers::assertThat(rt, currentThemeValue.isObject(), "unable to update your theme from C++. It was already garbage collected.");
+    
+    auto result = callback.call(rt, currentThemeValue.asObject(rt));
+    
+    helpers::assertThat(rt, result.isObject(), "returned theme is not an object. Please check your updateTheme function.");
+
+    it->second = jsi::WeakObject(rt, result.asObject(rt));
+}

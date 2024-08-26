@@ -22,6 +22,7 @@ struct UnistylesRegistry {
     void setPrefersAdaptiveThemes(jsi::Runtime& rt, bool prefersAdaptiveThemes);
     void setInitialThemeName(jsi::Runtime& rt, std::string themeName);
     void setInitialThemeNameCallback(jsi::Runtime& rt, jsi::Function&& getInitialThemeNameFn);
+    void updateTheme(jsi::Runtime& rt, std::string& themeName, jsi::Function&& callback);
     
     UnistylesState& getState(jsi::Runtime& rt);
     void createState(jsi::Runtime& rt, jsi::Object& miniRuntime);
