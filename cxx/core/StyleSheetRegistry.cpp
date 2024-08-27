@@ -59,15 +59,16 @@ void StyleSheetRegistry::remove(unsigned int tag) {
     this->styleSheets.erase(it);
 }
 
-jsi::Object StyleSheetRegistry::parse(jsi::Runtime &rt, const StyleSheet &styleSheet) {
+jsi::Object StyleSheetRegistry::parse(jsi::Runtime &rt, StyleSheet &styleSheet) {
     jsi::Object unwrappedStyleSheet = this->unwrapStyleSheet(rt, styleSheet);
+    std::unordered_map<std::string, Unistyle>& unistyles = this->parseToUnistyles(rt, styleSheet, unwrappedStyleSheet);
 
     // todo parse it
 
     return unwrappedStyleSheet;
 }
 
-jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, const StyleSheet &styleSheet) {
+jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, StyleSheet &styleSheet) {
     // firstly we need to get object representation of user's StyleSheet
     // StyleSheet can be a function or an object
 
@@ -95,4 +96,9 @@ jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, const StyleSh
         .asFunction(rt)
         .call(rt, std::move(theme), miniRuntime)
         .asObject(rt);
+}
+
+std::unordered_map<std::string, Unistyle>& StyleSheetRegistry::parseToUnistyles(jsi::Runtime& rt, StyleSheet& styleSheet, jsi::Object& unwrappedStyleSheet) {
+    // todo
+    return styleSheet.unistyles;
 }

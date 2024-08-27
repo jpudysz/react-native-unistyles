@@ -7,6 +7,7 @@
 #include "Helpers.h"
 #include "UnistylesRegistry.h"
 #include "UnistylesState.h"
+#include "Unistyle.h"
 
 namespace margelo::nitro::unistyles::core {
 
@@ -19,7 +20,7 @@ struct StyleSheetRegistry {
     StyleSheetRegistry(StyleSheetRegistry&&) = delete;
 
     StyleSheet& add(jsi::Runtime& rt, jsi::Object rawStyleSheet);
-    jsi::Object parse(jsi::Runtime &rt, const StyleSheet& styleSheet);
+    jsi::Object parse(jsi::Runtime &rt, StyleSheet& styleSheet);
     void remove(unsigned int tag);
 
 private:
@@ -27,7 +28,8 @@ private:
 
     StyleSheet& addFromFunction(jsi::Runtime& rt, unsigned int tag, jsi::Function styleSheetFn);
     StyleSheet& addFromObject(jsi::Runtime& rt, unsigned int tag, jsi::Object rawStyleSheet);
-    jsi::Object unwrapStyleSheet(jsi::Runtime& rt, const StyleSheet& styleSheet);
+    jsi::Object unwrapStyleSheet(jsi::Runtime& rt, StyleSheet& styleSheet);
+    std::unordered_map<std::string, Unistyle>& parseToUnistyles(jsi::Runtime& rt, StyleSheet& styleSheet, jsi::Object& unwrappedStyleSheet);
 };
 
 }

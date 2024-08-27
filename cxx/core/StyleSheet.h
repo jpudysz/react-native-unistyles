@@ -1,6 +1,7 @@
 #pragma once
 
 #include <jsi/jsi.h>
+#include "Unistyle.h"
 
 namespace margelo::nitro::unistyles::core {
 
@@ -33,6 +34,7 @@ struct StyleSheet {
     unsigned int tag;
     StyleSheetType type;
     jsi::Object rawValue;
+    std::unordered_map<std::string, Unistyle> unistyles{};
 };
 
 }
