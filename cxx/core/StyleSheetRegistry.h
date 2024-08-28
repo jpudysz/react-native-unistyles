@@ -8,6 +8,7 @@
 #include "UnistylesRegistry.h"
 #include "UnistylesState.h"
 #include "Unistyle.h"
+#include "Parser.h"
 
 namespace margelo::nitro::unistyles::core {
 

@@ -59,12 +59,12 @@ void StyleSheetRegistry::remove(unsigned int tag) {
     this->styleSheets.erase(it);
 }
 
+// todo return type to reference
 jsi::Object StyleSheetRegistry::parse(jsi::Runtime &rt, StyleSheet &styleSheet) {
     jsi::Object unwrappedStyleSheet = this->unwrapStyleSheet(rt, styleSheet);
-    std::unordered_map<std::string, Unistyle>& unistyles = this->parseToUnistyles(rt, styleSheet, unwrappedStyleSheet);
-
-    // todo parse it
-
+    auto& unistyles = this->parseToUnistyles(rt, styleSheet, unwrappedStyleSheet);
+    auto parsedStyles = parser::Parser::get().parseUnistyles(rt, unistyles);
+    
     return unwrappedStyleSheet;
 }
 
@@ -99,6 +99,28 @@ jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, StyleSheet &s
 }
 
 std::unordered_map<std::string, Unistyle>& StyleSheetRegistry::parseToUnistyles(jsi::Runtime& rt, StyleSheet& styleSheet, jsi::Object& unwrappedStyleSheet) {
-    // todo
+    helpers::enumerateJSIObject(rt, unwrappedStyleSheet, [&](const std::string& styleKey, jsi::Value& propertyValue){
+        helpers::assertThat(rt, propertyValue.isObject(), "style with name '" + styleKey + "' is not a function or object.");
+        
+        auto styleValue = propertyValue.asObject(rt);
+        
+        if (styleValue.isFunction(rt)) {
+            // todo
+            styleSheet.unistyles.emplace(
+                std::piecewise_construct,
+                std::forward_as_tuple(styleKey),
+                std::forward_as_tuple(styleKey, UnistyleType::DynamicFunction, styleValue)
+            );
+            
+            return;
+        }
+        
+        styleSheet.unistyles.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(styleKey),
+            std::forward_as_tuple(styleKey, UnistyleType::Object, styleValue)
+        );
+    });
+    
     return styleSheet.unistyles;
 }
