@@ -4,9 +4,11 @@ import { StyleSheet } from 'react-native-unistyles'
 import './unistyles'
 
 export const App = () => {
+    console.log(styles)
+
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>
+            <Text style={styles.text(2)}>
                 Hello from Unistyles 3.0!
             </Text>
         </View>
@@ -19,8 +21,8 @@ const styles = StyleSheet.create(theme => ({
         justifyContent: 'center',
         alignItems: 'center'
     },
-    text: {
+    text: (a: number) => ({
         color: theme.colors.typography,
-        marginTop: theme.gap(1)
-    }
+        marginTop: theme.gap(1) * a
+    })
 }))

@@ -24,7 +24,6 @@ jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal,
 
     // todo
     // attach unistyles methods
-    // parse
     // return HO
 
     return parsedStyleSheet;

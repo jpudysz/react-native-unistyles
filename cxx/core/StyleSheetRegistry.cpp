@@ -59,13 +59,11 @@ void StyleSheetRegistry::remove(unsigned int tag) {
     this->styleSheets.erase(it);
 }
 
-// todo return type to reference
 jsi::Object StyleSheetRegistry::parse(jsi::Runtime &rt, StyleSheet &styleSheet) {
     jsi::Object unwrappedStyleSheet = this->unwrapStyleSheet(rt, styleSheet);
     auto& unistyles = this->parseToUnistyles(rt, styleSheet, unwrappedStyleSheet);
-    auto parsedStyles = parser::Parser::get().parseUnistyles(rt, unistyles);
-    
-    return unwrappedStyleSheet;
+
+    return parser::Parser::get().parseUnistyles(rt, unistyles);
 }
 
 jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, StyleSheet &styleSheet) {
@@ -98,28 +96,19 @@ jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, StyleSheet &s
         .asObject(rt);
 }
 
-std::unordered_map<std::string, Unistyle>& StyleSheetRegistry::parseToUnistyles(jsi::Runtime& rt, StyleSheet& styleSheet, jsi::Object& unwrappedStyleSheet) {
+std::vector<core::Unistyle>& StyleSheetRegistry::parseToUnistyles(jsi::Runtime& rt, StyleSheet& styleSheet, jsi::Object& unwrappedStyleSheet) {
     helpers::enumerateJSIObject(rt, unwrappedStyleSheet, [&](const std::string& styleKey, jsi::Value& propertyValue){
         helpers::assertThat(rt, propertyValue.isObject(), "style with name '" + styleKey + "' is not a function or object.");
         
-        auto styleValue = propertyValue.asObject(rt);
+        jsi::Object styleValue = propertyValue.asObject(rt);
         
         if (styleValue.isFunction(rt)) {
-            // todo
-            styleSheet.unistyles.emplace(
-                std::piecewise_construct,
-                std::forward_as_tuple(styleKey),
-                std::forward_as_tuple(styleKey, UnistyleType::DynamicFunction, styleValue)
-            );
+            styleSheet.unistyles.emplace_back(UnistyleType::DynamicFunction, styleKey, styleValue);
             
             return;
         }
-        
-        styleSheet.unistyles.emplace(
-            std::piecewise_construct,
-            std::forward_as_tuple(styleKey),
-            std::forward_as_tuple(styleKey, UnistyleType::Object, styleValue)
-        );
+
+        styleSheet.unistyles.emplace_back(UnistyleType::Object, styleKey, styleValue);
     });
     
     return styleSheet.unistyles;

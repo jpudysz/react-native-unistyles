@@ -30,7 +30,7 @@ private:
     StyleSheet& addFromFunction(jsi::Runtime& rt, unsigned int tag, jsi::Function styleSheetFn);
     StyleSheet& addFromObject(jsi::Runtime& rt, unsigned int tag, jsi::Object rawStyleSheet);
     jsi::Object unwrapStyleSheet(jsi::Runtime& rt, StyleSheet& styleSheet);
-    std::unordered_map<std::string, Unistyle>& parseToUnistyles(jsi::Runtime& rt, StyleSheet& styleSheet, jsi::Object& unwrappedStyleSheet);
+    std::vector<core::Unistyle>& parseToUnistyles(jsi::Runtime& rt, StyleSheet& styleSheet, jsi::Object& unwrappedStyleSheet);
 };
 
 }

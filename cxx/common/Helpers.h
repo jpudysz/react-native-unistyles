@@ -40,7 +40,7 @@ inline bool vecContainsKeys(std::vector<std::string>& vec, std::vector<std::stri
 }
 
 template<typename PropertyType>
-inline void defineHiddenProperty(jsi::Runtime& rt, jsi::Object&& object, const std::string& propName, PropertyType&& property) {
+inline void defineHiddenProperty(jsi::Runtime& rt, jsi::Object& object, const std::string& propName, PropertyType&& property) {
     auto global = rt.global();
     auto objectConstructor = global.getPropertyAsObject(rt, "Object");
     auto defineProperty = objectConstructor.getPropertyAsFunction(rt, "defineProperty");
