@@ -60,5 +60,24 @@ inline void defineHiddenProperty(jsi::Runtime& rt, jsi::Object& object, const st
     defineProperty.call(rt, object, facebook::jsi::String::createFromAscii(rt, propName.c_str()), descriptor);
 }
 
+inline bool isPlatformColor(jsi::Runtime& rt, jsi::Object& maybePlatformColor) {
+    auto isIOSPlatformColor = maybePlatformColor.hasProperty(rt, "semantic") && maybePlatformColor.getProperty(rt, "semantic").isObject();
+
+    if (isIOSPlatformColor) {
+        return true;
+    }
+
+    // Android
+    return maybePlatformColor.hasProperty(rt, "resource_paths") && maybePlatformColor.getProperty(rt, "resource_paths").isObject();
+}
+
+inline jsi::Object& mergeJSIObjects(jsi::Runtime&rt, jsi::Object& obj1, jsi::Object& obj2) {
+    helpers::enumerateJSIObject(rt, obj2, [&](const std::string& propertyName, jsi::Value& propertyValue){
+        obj1.setProperty(rt, propertyName.c_str(), propertyValue);
+    });
+
+    return obj1;
+}
+
 }
 

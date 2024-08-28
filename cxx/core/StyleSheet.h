@@ -35,6 +35,7 @@ struct StyleSheet {
     StyleSheetType type;
     jsi::Object rawValue;
     std::vector<core::Unistyle> unistyles{};
+    std::vector<std::pair<std::string, std::string>> variants{};
 };
 
 }
