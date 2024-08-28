@@ -234,11 +234,11 @@ jsi::Value UnistylesRuntime::getNavigationBar(jsi::Runtime& rt, std::string fnNa
 }
 
 jsi::Value UnistylesRuntime::getPixelRatio(jsi::Runtime& rt, std::string fnName) {
-    return jsi::Value(roundf(this->pixelRatio * 100)/ 100);
+    return jsi::Value(static_cast<double>(roundf(this->pixelRatio * 100)/ 100));
 }
 
 jsi::Value UnistylesRuntime::getFontScale(jsi::Runtime& rt, std::string fnName) {
-    return jsi::Value(roundf(this->fontScale * 100) / 100);
+    return jsi::Value(static_cast<double>(roundf(this->fontScale * 100) / 100));
 }
 
 std::optional<jsi::Value> UnistylesRuntime::setThemes(jsi::Runtime& rt, const jsi::Value& value) {
