@@ -34,7 +34,7 @@ struct StyleSheet {
     unsigned int tag;
     StyleSheetType type;
     jsi::Object rawValue;
-    std::unordered_map<std::string, Unistyle> unistyles{};
+    std::vector<core::Unistyle> unistyles{};
 };
 
 }
