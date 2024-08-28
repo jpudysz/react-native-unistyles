@@ -2,11 +2,13 @@ import type { TypeStyle } from 'typestyle'
 import type { ReactNativeStyleSheet } from '../src/types'
 import type { StyleSheetWithSuperPowers, StyleSheet } from '../src/types/stylesheet'
 import { UnistylesRegistry } from './registry'
-import { reduceObject, toReactNative } from './utils'
+import { reduceObject, toReactNativeClassName } from './utils'
+import { UnistylesRuntime } from './runtime'
 
 export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
     if (typeof stylesheet === 'function') {
-        return {}
+        // TODO: pass mini runtime
+        stylesheet = stylesheet(UnistylesRuntime.theme, {} as any)
     }
 
     return reduceObject(stylesheet, (value, key) => {
@@ -16,20 +18,20 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
 
             return (...args: Array<any>) => {
                 if (stylesheet) {
-                    className = UnistylesRegistry.updateStyles(stylesheet, value(...args), key)
+                    UnistylesRegistry.updateStyles(stylesheet, value(...args), className)
 
-                    return toReactNative(className)
+                    return toReactNativeClassName(className)
                 }
 
-                const entry = UnistylesRegistry.create(value(...args), key)
+                const entry = UnistylesRegistry.createStyles(value(...args), key)
 
                 className = entry.className
                 stylesheet = entry.unistyles
 
-                return toReactNative(className)
+                return toReactNativeClassName(className)
             }
         }
 
-        return toReactNative(UnistylesRegistry.create(value, key).className)
+        return toReactNativeClassName(UnistylesRegistry.createStyles(value, key).className)
     }) as ReactNativeStyleSheet<StyleSheet>
 }

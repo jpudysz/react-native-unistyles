@@ -8,8 +8,8 @@ export default function App() {
 
     return (
         <View>
-            <Text style={stylesheet.text}>Static red</Text>
-            <Text style={stylesheet.dynamicText(state)}>Dynamic red / blue</Text>
+            <Text style={stylesheet.text}>Static aloes</Text>
+            <Text style={stylesheet.dynamicText(state)}>Dynamic barbie / oak</Text>
             <Button
                 title={`Clicked ${state} times`}
                 onPress={() => setState(state + 1)}
@@ -18,11 +18,11 @@ export default function App() {
     )
 }
 
-const stylesheet = StyleSheet.create({
+const stylesheet = StyleSheet.create((theme) => ({
     text: {
-        color: 'red'
+        color: theme.colors.aloes
     },
     dynamicText: (test: number) => ({
-        color: test % 2 === 0 ? 'red' : 'blue'
+        color: test % 2 === 0 ? theme.colors.barbie : theme.colors.oak
     })
-})
+}))

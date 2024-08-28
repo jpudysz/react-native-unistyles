@@ -9,7 +9,7 @@ export const reduceObject = <TObj extends Record<string, any>, TReducer>(
 // TODO: create implementation
 export const convertToTypeStyle = (value: UnistylesValues) => value as unknown as NestedCSSProperties
 
-export const toReactNative = (className: string) => ({
+export const toReactNativeClassName = (className: string) => ({
     $$css: true,
     'unistyles-class': className
 })
