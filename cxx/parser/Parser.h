@@ -24,7 +24,7 @@ private:
     Parser() = default;
     
     jsi::Object parseFirstLevel(jsi::Runtime &rt, core::Unistyle& unistyle, Variants& variants);
-    jsi::Object parseSecondLevel(jsi::Runtime &rt, jsi::Value& nestedObject);
+    jsi::Value parseSecondLevel(jsi::Runtime &rt, jsi::Value& nestedObject);
     jsi::Function createDynamicFunctionProxy(jsi::Runtime &rt, core::Unistyle& unistyle, Variants& variants);
     std::vector<folly::dynamic> parseDynamicFunctionArguments(jsi::Runtime& rt, size_t count, const jsi::Value* arguments);
     std::vector<core::UnistyleDependency> parseDependencies(jsi::Runtime& rt, jsi::Object&& dependencies);
