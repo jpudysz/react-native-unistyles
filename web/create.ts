@@ -7,8 +7,7 @@ import { UnistylesRuntime } from './runtime'
 
 export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
     if (typeof stylesheet === 'function') {
-        // TODO: pass mini runtime
-        stylesheet = stylesheet(UnistylesRuntime.theme, {} as any)
+        stylesheet = stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
     }
 
     return reduceObject(stylesheet, (value, key) => {

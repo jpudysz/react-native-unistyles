@@ -1,28 +1,51 @@
 import { Button, Text, View } from 'react-native'
 import './unistyles'
-import { StyleSheet } from 'react-native-unistyles'
+import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
 import { useState } from 'react'
 
 export default function App() {
     const [state, setState] = useState(0)
 
     return (
-        <View>
-            <Text style={stylesheet.text}>Static aloes</Text>
-            <Text style={stylesheet.dynamicText(state)}>Dynamic barbie / oak</Text>
+        <View style={styles.box}>
+            <Text style={styles.text}>Static style</Text>
+            <Text style={styles.dynamicText(state)}>Dynamic function style</Text>
             <Button
                 title={`Clicked ${state} times`}
                 onPress={() => setState(state + 1)}
+            />
+            <Button
+                title='Set dark theme'
+                onPress={() => UnistylesRuntime.setTheme('dark')}
+            />
+            <Button
+                title='Set light theme'
+                onPress={() => UnistylesRuntime.setTheme('light')}
+            />
+            <Button
+                title='Set premium theme'
+                onPress={() => UnistylesRuntime.setTheme('premium')}
             />
         </View>
     )
 }
 
-const stylesheet = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
+    box: {
+        backgroundColor: theme.colors.backgroundColor
+    },
     text: {
-        color: theme.colors.aloes
+        color: theme.colors.typography
     },
     dynamicText: (test: number) => ({
-        color: test % 2 === 0 ? theme.colors.barbie : theme.colors.oak
+        color: test % 2 === 0 ? {
+            xs: 'red',
+            md: 'green',
+            lg: 'blue'
+        } : {
+            xs: 'orange',
+            md: 'yellow',
+            lg: 'purple'
+        }
     })
 }))
