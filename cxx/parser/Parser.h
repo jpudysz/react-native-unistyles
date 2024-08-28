@@ -31,7 +31,9 @@ private:
     jsi::Value parseTransforms(jsi::Runtime& rt, jsi::Object& obj);
     jsi::Value getValueFromBreakpoints(jsi::Runtime& rt, jsi::Object& obj);
     jsi::Object parseVariants(jsi::Runtime& rt, Variants& variants, jsi::Object& obj);
+    jsi::Value getStylesForVariant(jsi::Runtime& rt, jsi::Object& groupValue, std::optional<std::string> selectedVariant);
     jsi::Object parseCompoundVariants(jsi::Runtime& rt, Variants& variants, jsi::Object& obj);
+    bool shouldApplyCompoundVariants(jsi::Runtime& rt, Variants& variants, jsi::Object& compoundVariant);
 };
 
 Parser& Parser::get() {
