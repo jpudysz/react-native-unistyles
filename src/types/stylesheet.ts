@@ -52,6 +52,4 @@ export type StyleSheetWithSuperPowers<S extends StyleSheet> =
     | ((theme: UnistylesTheme, miniRuntime: MiniRuntime) => S)
     | S
 
-const create = <S extends StyleSheet>(stylesheet: StyleSheetWithSuperPowers<S>): ReactNativeStyleSheet<S> => stylesheet as ReactNativeStyleSheet<S>
-
-export type CreateUnistylesStyleSheet = typeof create
+export type CreateUnistylesStyleSheet = <S extends StyleSheet>(stylesheet: StyleSheetWithSuperPowers<S>) => ReactNativeStyleSheet<S>

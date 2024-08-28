@@ -84,10 +84,14 @@
     "@react-native/normalize-colors": "*",
     "react": "*",
     "react-native": "*",
-    "react-native-web": "*"
+    "react-native-web": "*",
+    "typestyle": ">=2.4.0"
   },
   "peerDependenciesMeta": {
     "react-native-web": {
+      "optional": true
+    },
+    "typestyle": {
       "optional": true
     }
   },

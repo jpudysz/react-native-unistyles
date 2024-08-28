@@ -12610,8 +12610,11 @@ __metadata:
     react: "*"
     react-native: "*"
     react-native-web: "*"
+    typestyle: ">=2.4.0"
   peerDependenciesMeta:
     react-native-web:
+      optional: true
+    typestyle:
       optional: true
   languageName: unknown
   linkType: soft

@@ -8,7 +8,7 @@ type UnistylesSettings = {
     initialTheme?: (() => keyof UnistylesThemes) | keyof UnistylesThemes
 }
 
-type UnistylesConfig = {
+export type UnistylesConfig = {
     settings?: UnistylesSettings,
     themes?: UnistylesThemes,
     breakpoints?: UnistylesBreakpoints
