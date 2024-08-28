@@ -166,7 +166,7 @@ jsi::Object parser::Parser::parseVariants(jsi::Runtime& rt, Variants& variants, 
             continue;
         }
         
-        auto parsedNestedStyles = this->parseSecondLevel(rt, styles);
+        auto parsedNestedStyles = this->parseSecondLevel(rt, styles).asObject(rt);
 
         helpers::mergeJSIObjects(rt, parsedVariant, parsedNestedStyles);
     }
@@ -206,7 +206,7 @@ jsi::Object parser::Parser::parseCompoundVariants(jsi::Runtime& rt, Variants& va
 
         if (this->shouldApplyCompoundVariants(rt, variants, valueObject)) {
             auto styles = valueObject.getProperty(rt, "styles");
-            auto parsedNestedStyles = this->parseSecondLevel(rt, styles);
+            auto parsedNestedStyles = this->parseSecondLevel(rt, styles).asObject(rt);
             
             unistyles::helpers::mergeJSIObjects(rt, parsedCompoundVariants, parsedNestedStyles);
         }
@@ -342,7 +342,64 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime &rt, core::Unistyle& un
     return parsedStyle;
 }
 
-jsi::Object parser::Parser::parseSecondLevel(jsi::Runtime &rt, jsi::Value& nestedObject) {
-    // todo
-    return jsi::Object(rt);
+jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, jsi::Value& nestedStyle) {
+    // primitives
+    if (nestedStyle.isString() || nestedStyle.isNumber() || nestedStyle.isUndefined() || nestedStyle.isNull()) {
+        return jsi::Value(rt, nestedStyle);
+    }
+
+    // ignore any non objects at this level
+    if (!nestedStyle.isObject()) {
+        return jsi::Value::undefined();
+    }
+
+    auto nestedObjectStyle = nestedStyle.asObject(rt);
+
+    // too deep to accept any functions or arrays
+    if (nestedObjectStyle.isArray(rt) || nestedObjectStyle.isFunction(rt)) {
+        return jsi::Value::undefined();
+    }
+    
+    jsi::Object parsedStyle = jsi::Object(rt);
+    
+    helpers::enumerateJSIObject(rt, nestedObjectStyle, [&](const std::string& propertyName, jsi::Value& propertyValue){
+        // primitives
+        if (propertyValue.isString() || propertyValue.isNumber() || propertyValue.isUndefined() || propertyValue.isNull()) {
+            parsedStyle.setProperty(rt, propertyName.c_str(), propertyValue);
+
+            return;
+        }
+
+        // ignore any non objects at this level
+        if (!propertyValue.isObject()) {
+            parsedStyle.setProperty(rt, propertyName.c_str(), jsi::Value::undefined());
+
+            return;
+        }
+
+        auto nestedObjectStyle = propertyValue.asObject(rt);
+
+        if (nestedObjectStyle.isFunction(rt)) {
+            parsedStyle.setProperty(rt, propertyName.c_str(), jsi::Value::undefined());
+
+            return;
+        }
+        
+        // possible with variants and compoundVariants
+        if (nestedObjectStyle.isArray(rt) && propertyName == "transform") {
+            parsedStyle.setProperty(rt, propertyName.c_str(), parseTransforms(rt, nestedObjectStyle));
+            
+            return;
+        }
+        
+        if (nestedObjectStyle.isArray(rt) && propertyName == "fontVariant") {
+            parsedStyle.setProperty(rt, propertyName.c_str(), propertyValue);
+            
+            return;
+        }
+
+        parsedStyle.setProperty(rt, propertyName.c_str(), this->getValueFromBreakpoints(rt, nestedObjectStyle));
+    });
+
+    return parsedStyle;
 }
