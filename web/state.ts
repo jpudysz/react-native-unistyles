@@ -1,7 +1,7 @@
 import type { UnistylesConfig } from '../src/specs/StyleSheet'
 import { createTypeStyle } from 'typestyle'
 import { camelToKebab, reduceObject } from './utils'
-import type { AppThemeName } from '../src/specs/types'
+import type { AppBreakpoint, AppThemeName } from '../src/specs/types'
 import type { UnistylesTheme } from '../src/types'
 import type { UnistylesBreakpoints } from '../src/global'
 
@@ -11,7 +11,10 @@ class UnistylesStateBuilder {
     private themesStyleSheet = createTypeStyle(this.themeStyleTag)
     themeName?: AppThemeName
 
+    breakpoint?: AppBreakpoint
     breakpoints?: UnistylesBreakpoints
+
+    hasAdaptiveThemes = false
 
     init = (config: UnistylesConfig) => {
         document.head.appendChild(this.themeStyleTag)
@@ -33,8 +36,27 @@ class UnistylesStateBuilder {
 
         this.breakpoints = config.breakpoints
         this.themeName = config.settings?.initialTheme ?? this.themes.keys().next().value
-        const root = document.querySelector(':root')
-        root?.classList.add(this.themeName ?? '')
+        document.querySelector(':root')?.classList.add(this.themeName ?? '')
+
+        Object.entries(config.breakpoints ?? {})
+            .sort(([, a], [, b]) => a - b)
+            .forEach(([breakpoint, value]) => {
+                const mediaQuery = window.matchMedia(`(min-width: ${value}px)`)
+
+                if (mediaQuery.matches) {
+                    this.breakpoint = breakpoint as AppBreakpoint
+                }
+
+                mediaQuery.addEventListener('change', (event) => {
+                    if (!event.matches) {
+                        return
+                    }
+
+                    this.breakpoint = breakpoint as AppBreakpoint
+                })
+            })
+
+        this.hasAdaptiveThemes = config.settings?.adaptiveThemes ?? false
     }
 }
 
