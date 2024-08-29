@@ -32,7 +32,14 @@ export default function App() {
 
 const styles = StyleSheet.create((theme) => ({
     box: {
-        backgroundColor: theme.colors.backgroundColor
+        backgroundColor: theme.colors.backgroundColor,
+        _hover: {
+            backgroundColor: {
+                xs: 'red',
+                md: 'green',
+                lg: 'blue'
+            },
+        }
     },
     text: {
         color: theme.colors.typography
