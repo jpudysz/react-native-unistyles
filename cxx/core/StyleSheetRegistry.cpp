@@ -65,14 +65,14 @@ jsi::Object StyleSheetRegistry::parse(jsi::Runtime &rt, StyleSheet &styleSheet) 
 
     // configure and run parser
     auto& state = core::UnistylesRegistry::get().getState(rt);
-    parser::ParserSettings settings {
+    auto settings = std::make_unique<parser::ParserSettings>(
         styleSheet.variants,
         state.getCurrentBreakpointName(),
         state.getSortedBreakpointPairs(),
         miniRuntime->getScreen()
-    };
+    );
     
-    return parser::Parser::get().parseUnistyles(rt, unistyles, settings);
+    return parser::Parser::configure(std::move(settings)).parseUnistyles(rt, unistyles);
 }
 
 jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, StyleSheet &styleSheet) {
