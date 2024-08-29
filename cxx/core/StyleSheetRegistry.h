@@ -15,7 +15,7 @@ namespace margelo::nitro::unistyles::core {
 using namespace facebook;
 
 struct StyleSheetRegistry {
-    StyleSheetRegistry() = default;
+    StyleSheetRegistry(std::shared_ptr<HybridMiniRuntime> miniRuntime): miniRuntime{miniRuntime} {}
 
     StyleSheetRegistry(const StyleSheetRegistry&) = delete;
     StyleSheetRegistry(StyleSheetRegistry&&) = delete;
@@ -31,6 +31,7 @@ private:
     StyleSheet& addFromObject(jsi::Runtime& rt, unsigned int tag, jsi::Object rawStyleSheet);
     jsi::Object unwrapStyleSheet(jsi::Runtime& rt, StyleSheet& styleSheet);
     std::vector<core::Unistyle>& parseToUnistyles(jsi::Runtime& rt, StyleSheet& styleSheet, jsi::Object& unwrappedStyleSheet);
+    std::shared_ptr<HybridMiniRuntime> miniRuntime;
 };
 
 }

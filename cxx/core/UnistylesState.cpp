@@ -78,6 +78,10 @@ std::vector<std::string> core::UnistylesState::getRegisteredThemeNames() {
     return std::vector<std::string>(this->registeredThemeNames);
 }
 
+std::vector<std::pair<std::string, double>> core::UnistylesState::getSortedBreakpointPairs() {
+    return std::vector<std::pair<std::string, double>>(this->sortedBreakpointPairs);
+}
+
 std::optional<std::string> core::UnistylesState::getInitialTheme() {
     return this->initialThemeName;
 }
