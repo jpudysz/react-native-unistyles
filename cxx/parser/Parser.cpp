@@ -134,7 +134,7 @@ jsi::Value parser::Parser::parseTransforms(jsi::Runtime& rt, jsi::Object& obj, P
         helpers::enumerateJSIObject(rt, parsedResult.asObject(rt), [&](const std::string& propertyName, jsi::Value& propertyValue){
             // we shouldn't allow undefined in transforms, simply remove entire object from array
             if (!propertyValue.isUndefined()) {
-                parsedTransforms.emplace_back(&parsedResult);
+                parsedTransforms.emplace_back(std::move(parsedResult));
             }
         });
     }
@@ -420,6 +420,10 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, jsi::Value& nested
     // too deep to accept any functions or arrays
     if (nestedObjectStyle.isArray(rt) || nestedObjectStyle.isFunction(rt)) {
         return jsi::Value::undefined();
+    }
+    
+    if (helpers::isPlatformColor(rt, nestedObjectStyle)) {
+        return jsi::Value(rt, nestedStyle);
     }
     
     jsi::Object parsedStyle = jsi::Object(rt);
