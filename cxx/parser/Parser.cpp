@@ -115,23 +115,37 @@ jsi::Value parser::Parser::parseTransforms(jsi::Runtime& rt, jsi::Object& obj, P
     if (!obj.isArray(rt)) {
         return jsi::Value::undefined();
     }
-
+    
+    std::vector<jsi::Value> parsedTransforms{};
     jsi::Array transforms = obj.asArray(rt);
-    jsi::Array parsedTransforms = jsi::Array(rt, transforms.length(rt));
     size_t length = transforms.length(rt);
 
     for (size_t i = 0; i < length; i++) {
         jsi::Value value = transforms.getValueAtIndex(rt, i);
 
         if (!value.isObject()) {
-            parsedTransforms.setValueAtIndex(rt, i, jsi::Value::undefined());
+            parsedTransforms.push_back(jsi::Value::undefined());
+            
             continue;
         }
+        
+        auto parsedResult = this->parseSecondLevel(rt, value, settings);
 
-        parsedTransforms.setValueAtIndex(rt, i, this->parseSecondLevel(rt, value, settings));
+        helpers::enumerateJSIObject(rt, parsedResult.asObject(rt), [&](const std::string& propertyName, jsi::Value& propertyValue){
+            // we shouldn't allow undefined in transforms, simply remove entire object from array
+            if (!propertyValue.isUndefined()) {
+                parsedTransforms.emplace_back(&parsedResult);
+            }
+        });
+    }
+    
+    jsi::Array result = jsi::Array(rt, parsedTransforms.size());
+    
+    for (size_t i = 0; i < parsedTransforms.size(); i++) {
+        result.setValueAtIndex(rt, i, parsedTransforms[i]);
     }
 
-    return parsedTransforms;
+    return result;
 }
 
 jsi::Value parser::Parser::getValueFromBreakpoints(jsi::Runtime& rt, jsi::Object& obj, ParserSettings& settings) {
@@ -161,7 +175,7 @@ jsi::Value parser::Parser::getValueFromBreakpoints(jsi::Runtime& rt, jsi::Object
         return obj.getProperty(rt, currentOrientation);
     }
 
-    if (currentBreakpoint == "") {
+    if (!currentBreakpoint.has_value()) {
         return jsi::Value::undefined();
     }
 
@@ -171,7 +185,7 @@ jsi::Value parser::Parser::getValueFromBreakpoints(jsi::Runtime& rt, jsi::Object
         settings.sortedBreakpointPairs.rbegin(),
         settings.sortedBreakpointPairs.rend(),
         [&currentBreakpoint](const std::pair<std::string, double>& breakpoint){
-            return breakpoint.first == currentBreakpoint;
+            return breakpoint.first == currentBreakpoint.value();
         }
     );
 
