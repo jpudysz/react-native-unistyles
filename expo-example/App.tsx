@@ -1,4 +1,4 @@
-import { Button, Text, View } from 'react-native'
+import { Button, Text, TouchableOpacity, View } from 'react-native'
 import './unistyles'
 import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
 import { useState } from 'react'
@@ -7,52 +7,97 @@ export default function App() {
     const [state, setState] = useState(0)
 
     return (
-        <View style={styles.box}>
-            <Text style={styles.text}>Static style</Text>
-            <Text style={styles.dynamicText(state)}>Dynamic function style</Text>
-            <Button
-                title={`Clicked ${state} times`}
+        <View style={styles.container}>
+            <View style={styles.static}>
+                <Text style={styles.staticText}>Static style</Text>
+            </View>
+            <View style={styles.theme}>
+                <Text style={styles.themeText}>Theme based style</Text>
+                <View style={styles.themeButtonsContainer}>
+                    <Button
+                        title='Set dark theme'
+                        onPress={() => UnistylesRuntime.setTheme('dark')}
+                        />
+                    <Button
+                        title='Set light theme'
+                        onPress={() => UnistylesRuntime.setTheme('light')}
+                        />
+                    <Button
+                        title='Set premium theme'
+                        onPress={() => UnistylesRuntime.setTheme('premium')}
+                    />
+                </View>
+            </View>
+            <TouchableOpacity
+                style={styles.dynamic(state)}
                 onPress={() => setState(state + 1)}
-            />
-            <Button
-                title='Set dark theme'
-                onPress={() => UnistylesRuntime.setTheme('dark')}
-            />
-            <Button
-                title='Set light theme'
-                onPress={() => UnistylesRuntime.setTheme('light')}
-            />
-            <Button
-                title='Set premium theme'
-                onPress={() => UnistylesRuntime.setTheme('premium')}
-            />
+            >
+                <Text style={styles.whiteText}>
+                    {`Dynamic style based on the state: ${state}\n(Press to change the state)`}
+                </Text>
+            </TouchableOpacity>
+            <View style={styles.hover}>
+                <Text style={styles.whiteText}>Hover effect style</Text>
+            </View>
+            <View style={styles.breakpoint}>
+                <Text style={styles.whiteText}>Breakpoint based style</Text>
+            </View>
         </View>
     )
 }
 
-const styles = StyleSheet.create((theme) => ({
-    box: {
-        backgroundColor: theme.colors.backgroundColor,
-        _hover: {
-            backgroundColor: {
-                xs: 'red',
-                md: 'green',
-                lg: 'blue'
-            },
-        }
+const common = {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+} as const
+
+const styles = StyleSheet.create(theme => ({
+    container: {
+        flex: 1,
+        display: 'flex'
     },
-    text: {
+    static: {
+        backgroundColor: 'pink',
+        ...common
+    },
+    staticText: {
+        color: 'red'
+    },
+    theme: {
+        backgroundColor: theme.colors.backgroundColor,
+        ...common
+    },
+    themeText: {
         color: theme.colors.typography
     },
-    dynamicText: (test: number) => ({
-        color: test % 2 === 0 ? {
-            xs: 'red',
-            md: 'green',
-            lg: 'blue'
-        } : {
-            xs: 'orange',
-            md: 'yellow',
-            lg: 'purple'
+    themeButtonsContainer: {
+        marginTop: 20,
+        flexDirection: 'row',
+        gap: 10
+    },
+    dynamic: (state: number) => ({
+        backgroundColor: state % 2 === 0 ? theme.colors.fog : theme.colors.oak,
+        ...common
+    }),
+    whiteText: {
+        color: 'white',
+        textAlign: 'center'
+    },
+    hover: {
+        ...common,
+        backgroundColor: theme.colors.blood,
+        cursor: 'pointer',
+        _hover: {
+            backgroundColor: theme.colors.sky
         }
-    })
+    },
+    breakpoint: {
+        ...common,
+        backgroundColor: {
+            xs: theme.colors.blood,
+            md: theme.colors.sky,
+            xl: theme.colors.aloes,
+        }
+    }
 }))
