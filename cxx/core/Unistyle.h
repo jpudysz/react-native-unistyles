@@ -20,6 +20,12 @@ enum class UnistyleDependency {
     // todo extend
 };
 
+struct DynamicFunctionMetadata {
+    size_t count;
+    std::vector<folly::dynamic> arguments;
+    jsi::Object returnedValue;
+};
+
 struct Unistyle {
     Unistyle(UnistyleType type, std::string styleKey, jsi::Object& rawObject)
         : styleKey{styleKey}, type{type}, rawValue{std::move(rawObject)} {}
@@ -42,7 +48,7 @@ struct Unistyle {
     std::optional<jsi::Object> parsedStyle;
     std::vector<int> nativeTags{};
     std::vector<UnistyleDependency> dependencies{};
-    std::optional<std::pair<size_t, std::vector<folly::dynamic>>> dynamicFunctionMetadata = std::nullopt;
+    std::optional<DynamicFunctionMetadata> dynamicFunctionMetadata = std::nullopt;
 };
 
 }
