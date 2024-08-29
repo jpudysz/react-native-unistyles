@@ -3,18 +3,18 @@
 using namespace margelo::nitro::unistyles;
 using namespace facebook;
 
-jsi::Object parser::Parser::parseUnistyles(jsi::Runtime &rt, std::vector<core::Unistyle>& unistyles, Variants& variants) {
+jsi::Object parser::Parser::parseUnistyles(jsi::Runtime &rt, std::vector<core::Unistyle>& unistyles, ParserSettings& settings) {
     jsi::Object reactNativeStyles = jsi::Object(rt);
 
     for (core::Unistyle& unistyle : unistyles) {
         if (unistyle.type == core::UnistyleType::Object) {
-            auto result = this->parseFirstLevel(rt, unistyle, variants);
+            auto result = this->parseFirstLevel(rt, unistyle, settings);
 
             reactNativeStyles.setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle.styleKey), std::move(result));
         }
 
         if (unistyle.type == core::UnistyleType::DynamicFunction) {
-            auto hostFn = this->createDynamicFunctionProxy(rt, unistyle, variants);
+            auto hostFn = this->createDynamicFunctionProxy(rt, unistyle, settings);
 
             helpers::defineHiddenProperty(rt, reactNativeStyles, helpers::PROXY_FN_PREFIX + unistyle.styleKey, unistyle.rawValue.asFunction(rt));
             reactNativeStyles.setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle.styleKey), std::move(hostFn));
@@ -24,7 +24,7 @@ jsi::Object parser::Parser::parseUnistyles(jsi::Runtime &rt, std::vector<core::U
     return reactNativeStyles;
 }
 
-jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime &rt, core::Unistyle& unistyle, Variants& variants) {
+jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime &rt, core::Unistyle& unistyle, ParserSettings& settings) {
     return jsi::Function::createFromHostFunction(
         rt,
         jsi::PropNameID::forUtf8(rt, unistyle.styleKey),
@@ -43,7 +43,7 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime &rt, core:
                 unistyle.dynamicFunctionMetadata = std::make_pair(count, this->parseDynamicFunctionArguments(rt, count, args));
             }
 
-            return this->parseFirstLevel(rt, unistyle, variants);
+            return this->parseFirstLevel(rt, unistyle, settings);
     });
 }
 
@@ -111,7 +111,7 @@ std::vector<core::UnistyleDependency> parser::Parser::parseDependencies(jsi::Run
     return parsedDependencies;
 }
 
-jsi::Value parser::Parser::parseTransforms(jsi::Runtime& rt, jsi::Object& obj) {
+jsi::Value parser::Parser::parseTransforms(jsi::Runtime& rt, jsi::Object& obj, ParserSettings& settings) {
     if (!obj.isArray(rt)) {
         return jsi::Value::undefined();
     }
@@ -128,18 +128,66 @@ jsi::Value parser::Parser::parseTransforms(jsi::Runtime& rt, jsi::Object& obj) {
             continue;
         }
 
-        parsedTransforms.setValueAtIndex(rt, i, this->parseSecondLevel(rt, value));
+        parsedTransforms.setValueAtIndex(rt, i, this->parseSecondLevel(rt, value, settings));
     }
 
     return parsedTransforms;
 }
 
-jsi::Value parser::Parser::getValueFromBreakpoints(jsi::Runtime& rt, jsi::Object& obj) {
-    // todo
+jsi::Value parser::Parser::getValueFromBreakpoints(jsi::Runtime& rt, jsi::Object& obj, ParserSettings& settings) {
+    auto hasBreakpoints = !settings.sortedBreakpointPairs.empty();
+    auto currentBreakpoint = settings.currentBreakpointName;
+    auto currentOrientation = settings.screenDimensions.width > settings.screenDimensions.height
+        ? "landscape"
+        : "portrait";
+
+    jsi::Array propertyNames = obj.getPropertyNames(rt);
+    size_t length = propertyNames.size(rt);
+    
+    // mq has the biggest priority, so check if first
+    for (size_t i = 0; i < length; i++) {
+        auto propertyName = propertyNames.getValueAtIndex(rt, i).asString(rt).utf8(rt);
+        auto propertyValue = obj.getProperty(rt, propertyName.c_str());
+        auto mq = core::UnistylesMQ{propertyName};
+        
+        if (mq.isWithinTheWidthAndHeight(settings.screenDimensions)) {
+            // todo handle transforms etc.
+            return propertyValue;
+        }
+    }
+
+    // handle orientation breakpoints
+    if (!hasBreakpoints && obj.hasProperty(rt, currentOrientation)) {
+        return obj.getProperty(rt, currentOrientation);
+    }
+
+    if (currentBreakpoint == "") {
+        return jsi::Value::undefined();
+    }
+
+    // if you're still here it means that there is no
+    // matching mq nor default breakpoint, let's find the user defined breakpoint
+    auto currentBreakpointIt = std::find_if(
+        settings.sortedBreakpointPairs.rbegin(),
+        settings.sortedBreakpointPairs.rend(),
+        [&currentBreakpoint](const std::pair<std::string, double>& breakpoint){
+            return breakpoint.first == currentBreakpoint;
+        }
+    );
+
+    // look for any hit in reversed vector
+    for (auto it = currentBreakpointIt; it != settings.sortedBreakpointPairs.rend(); ++it) {
+        auto breakpoint = it->first.c_str();
+
+        if (obj.hasProperty(rt, breakpoint)) {
+            return obj.getProperty(rt, breakpoint);
+        }
+    }
+
     return jsi::Value::undefined();
 }
 
-jsi::Object parser::Parser::parseVariants(jsi::Runtime& rt, Variants& variants, jsi::Object& obj) {
+jsi::Object parser::Parser::parseVariants(jsi::Runtime& rt, jsi::Object& obj, ParserSettings& settings) {
     jsi::Object parsedVariant = jsi::Object(rt);
     jsi::Array propertyNames = obj.getPropertyNames(rt);
     size_t length = propertyNames.size(rt);
@@ -149,14 +197,14 @@ jsi::Object parser::Parser::parseVariants(jsi::Runtime& rt, Variants& variants, 
         auto groupValue = obj.getProperty(rt, groupName.c_str()).asObject(rt);
 
         auto it = std::find_if(
-            variants.cbegin(),
-            variants.cend(),
+            settings.variants.cbegin(),
+            settings.variants.cend(),
             [&groupName](auto& variant){
                 return variant.first == groupName;
             }
         );
 
-        auto selectedVariant = it != variants.end()
+        auto selectedVariant = it != settings.variants.end()
             ? std::make_optional(it->second)
             : std::nullopt;
 
@@ -166,7 +214,7 @@ jsi::Object parser::Parser::parseVariants(jsi::Runtime& rt, Variants& variants, 
             continue;
         }
         
-        auto parsedNestedStyles = this->parseSecondLevel(rt, styles).asObject(rt);
+        auto parsedNestedStyles = this->parseSecondLevel(rt, styles, settings).asObject(rt);
 
         helpers::mergeJSIObjects(rt, parsedVariant, parsedNestedStyles);
     }
@@ -186,7 +234,7 @@ jsi::Value parser::Parser::getStylesForVariant(jsi::Runtime& rt, jsi::Object& gr
     return jsi::Value::undefined();
 }
 
-jsi::Object parser::Parser::parseCompoundVariants(jsi::Runtime& rt, Variants& variants, jsi::Object& obj) {
+jsi::Object parser::Parser::parseCompoundVariants(jsi::Runtime& rt, jsi::Object& obj, ParserSettings& settings) {
     if (!obj.isArray(rt)) {
         return jsi::Object(rt);
     }
@@ -204,9 +252,9 @@ jsi::Object parser::Parser::parseCompoundVariants(jsi::Runtime& rt, Variants& va
 
         auto valueObject = value.asObject(rt);
 
-        if (this->shouldApplyCompoundVariants(rt, variants, valueObject)) {
+        if (this->shouldApplyCompoundVariants(rt, settings.variants, valueObject)) {
             auto styles = valueObject.getProperty(rt, "styles");
-            auto parsedNestedStyles = this->parseSecondLevel(rt, styles).asObject(rt);
+            auto parsedNestedStyles = this->parseSecondLevel(rt, styles, settings).asObject(rt);
             
             unistyles::helpers::mergeJSIObjects(rt, parsedCompoundVariants, parsedNestedStyles);
         }
@@ -215,7 +263,7 @@ jsi::Object parser::Parser::parseCompoundVariants(jsi::Runtime& rt, Variants& va
     return parsedCompoundVariants;
 }
 
-bool parser::Parser::shouldApplyCompoundVariants(jsi::Runtime& rt, Variants& variants, jsi::Object& compoundVariant) {
+bool parser::Parser::shouldApplyCompoundVariants(jsi::Runtime& rt, const Variants& variants, jsi::Object& compoundVariant) {
     if (variants.empty()) {
         return false;
     }
@@ -251,7 +299,7 @@ bool parser::Parser::shouldApplyCompoundVariants(jsi::Runtime& rt, Variants& var
     return true;
 }
 
-jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime &rt, core::Unistyle& unistyle, Variants& variants) {
+jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime &rt, core::Unistyle& unistyle, ParserSettings& settings) {
     auto& style = unistyle.rawValue;
     auto parsedStyle = jsi::Object(rt);
 
@@ -296,7 +344,7 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime &rt, core::Unistyle& un
         }
 
         if (propertyName == "transform" && propertyValueObject.isArray(rt)) {
-            parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), parseTransforms(rt, propertyValueObject));
+            parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), parseTransforms(rt, propertyValueObject, settings));
 
             return;
         }
@@ -308,7 +356,7 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime &rt, core::Unistyle& un
         }
 
         if (propertyName == "shadowOffset" || propertyName == "textShadowOffset") {
-            parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), this->parseSecondLevel(rt, propertyValue));
+            parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), this->parseSecondLevel(rt, propertyValue, settings));
 
             return;
         }
@@ -320,20 +368,20 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime &rt, core::Unistyle& un
         }
         
         // 'mq' or 'breakpoints'
-        auto valueFromBreakpoint = getValueFromBreakpoints(rt, propertyValueObject);
+        auto valueFromBreakpoint = getValueFromBreakpoints(rt, propertyValueObject, settings);
 
-        parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), this->parseSecondLevel(rt, valueFromBreakpoint));
+        parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), this->parseSecondLevel(rt, valueFromBreakpoint, settings));
     });
 
-    if (shouldParseVariants && !variants.empty()) {
+    if (shouldParseVariants && !settings.variants.empty()) {
         auto propertyValueObject = style.getProperty(rt, "variants").asObject(rt);
-        auto parsedVariant = this->parseVariants(rt, variants, propertyValueObject);
+        auto parsedVariant = this->parseVariants(rt, propertyValueObject, settings);
         
         helpers::mergeJSIObjects(rt, parsedStyle, parsedVariant);
 
         if (shouldParseCompoundVariants) {
             auto compoundVariants = style.getProperty(rt, "compoundVariants").asObject(rt);
-            auto parsedCompoundVariants = this->parseCompoundVariants(rt, variants, compoundVariants);
+            auto parsedCompoundVariants = this->parseCompoundVariants(rt, compoundVariants, settings);
 
             helpers::mergeJSIObjects(rt, parsedStyle, parsedCompoundVariants);
         }
@@ -342,7 +390,7 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime &rt, core::Unistyle& un
     return parsedStyle;
 }
 
-jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, jsi::Value& nestedStyle) {
+jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, jsi::Value& nestedStyle, ParserSettings& settings) {
     // primitives
     if (nestedStyle.isString() || nestedStyle.isNumber() || nestedStyle.isUndefined() || nestedStyle.isNull()) {
         return jsi::Value(rt, nestedStyle);
@@ -387,7 +435,7 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, jsi::Value& nested
         
         // possible with variants and compoundVariants
         if (nestedObjectStyle.isArray(rt) && propertyName == "transform") {
-            parsedStyle.setProperty(rt, propertyName.c_str(), parseTransforms(rt, nestedObjectStyle));
+            parsedStyle.setProperty(rt, propertyName.c_str(), parseTransforms(rt, nestedObjectStyle, settings));
             
             return;
         }
@@ -398,7 +446,7 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, jsi::Value& nested
             return;
         }
 
-        parsedStyle.setProperty(rt, propertyName.c_str(), this->getValueFromBreakpoints(rt, nestedObjectStyle));
+        parsedStyle.setProperty(rt, propertyName.c_str(), this->getValueFromBreakpoints(rt, nestedObjectStyle, settings));
     });
 
     return parsedStyle;

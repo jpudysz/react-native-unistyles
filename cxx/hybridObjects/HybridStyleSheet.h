@@ -49,6 +49,6 @@ private:
 
     Unistyles::HybridNativePlatformSpecCxx nativePlatform;
     std::shared_ptr<HybridMiniRuntime> miniRuntime;
-    core::StyleSheetRegistry styleSheetRegistry{};
+    core::StyleSheetRegistry styleSheetRegistry{miniRuntime};
 };
 

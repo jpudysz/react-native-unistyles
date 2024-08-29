@@ -28,6 +28,7 @@ struct UnistylesState {
     std::optional<std::string> getInitialTheme();
     std::optional<jsi::Function> getInitialThemeNameFn;
     std::optional<std::string> getCurrentBreakpointName();
+    std::vector<std::pair<std::string, double>> getSortedBreakpointPairs();
 
     jsi::Object getJSTheme();
     jsi::Object& getMiniRuntime();

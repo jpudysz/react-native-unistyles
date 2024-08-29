@@ -63,7 +63,16 @@ jsi::Object StyleSheetRegistry::parse(jsi::Runtime &rt, StyleSheet &styleSheet) 
     jsi::Object unwrappedStyleSheet = this->unwrapStyleSheet(rt, styleSheet);
     auto& unistyles = this->parseToUnistyles(rt, styleSheet, unwrappedStyleSheet);
 
-    return parser::Parser::get().parseUnistyles(rt, unistyles, styleSheet.variants);
+    // configure and run parser
+    auto& state = core::UnistylesRegistry::get().getState(rt);
+    parser::ParserSettings settings {
+        styleSheet.variants,
+        state.getCurrentBreakpointName(),
+        state.getSortedBreakpointPairs(),
+        miniRuntime->getScreen()
+    };
+    
+    return parser::Parser::get().parseUnistyles(rt, unistyles, settings);
 }
 
 jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, StyleSheet &styleSheet) {
