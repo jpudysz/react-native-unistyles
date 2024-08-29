@@ -3,6 +3,7 @@ import type { ShadowOffset, TransformStyles, UnistylesTheme } from './core'
 import type { UnistylesBreakpoints } from '../global'
 import type { MiniRuntime } from '../specs'
 import type { ReactNativeStyleSheet } from './breakpoints'
+import type { Pseudo } from '../../web/pseudo'
 
 // these props are treated differently to nest breakpoints and media queries
 type NestedKeys = 'shadowOffset' | 'transform' | 'textShadowOffset'
@@ -36,12 +37,16 @@ type AllAvailableStyles = UnistyleView & UnistyleText & UnistyleImage & Unistyle
 export type AllAvailableKeys = keyof (UnistyleView & UnistyleText & UnistyleImage)
 export type BreakpointsOrMediaQueries = keyof UnistylesBreakpoints | symbol
 
-export type UnistylesValues = {
+type FlatUnistylesValues = {
     [propName in AllAvailableKeys]?: AllAvailableStyles[propName] | {
         [key in BreakpointsOrMediaQueries]?: AllAvailableStyles[propName]
     }
-} & Variants & {
+}
+
+export type UnistylesValues = FlatUnistylesValues & Variants & {
     [propName in NestedKeys]?: UnistyleNestedStyles[propName]
+} & {
+    [propName in Pseudo]?: FlatUnistylesValues
 }
 
 export type StyleSheet = {
