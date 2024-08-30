@@ -35,7 +35,16 @@ export const parseStyle = <T extends RNStyle>(
 
         // transforms
         if (key === 'transform' && Array.isArray(value)) {
-            acc[key] = value.map(value => parseStyle(value, variant))
+            acc[key] = value
+                .map(value => parseStyle(value, variant))
+                .filter(value => {
+                    // remove undefined values
+                    if (typeof value === 'object') {
+                        return Object.values(value).at(0) !== undefined
+                    }
+
+                    return true
+                })
 
             return acc
         }
