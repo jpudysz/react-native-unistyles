@@ -23,7 +23,6 @@ enum class UnistyleDependency {
 struct DynamicFunctionMetadata {
     size_t count;
     std::vector<folly::dynamic> arguments;
-    jsi::Object returnedValue;
 };
 
 struct Unistyle {
