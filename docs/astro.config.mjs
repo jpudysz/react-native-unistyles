@@ -73,8 +73,7 @@ export default defineConfig({
                         },
                         {
                             label: 'Edge to edge layout',
-                            link: '/reference/edge-to-edge/',
-                            badge: 'Updated'
+                            link: '/reference/edge-to-edge/'
                         },
                         {
                             label: 'useInitialTheme',
@@ -102,12 +101,12 @@ export default defineConfig({
                         },
                         {
                             label: 'Unistyles Registry',
-                            link: '/reference/unistyles-registry/'
+                            link: '/reference/unistyles-registry/',
+                            badge: 'Updated'
                         },
                         {
                             label: 'Unistyles Runtime',
-                            link: '/reference/unistyles-runtime/',
-                            badge: 'New'
+                            link: '/reference/unistyles-runtime/'
                         },
                         {
                             label: 'Content size category',
@@ -148,8 +147,7 @@ export default defineConfig({
                     items: [
                         {
                             label: 'All examples',
-                            link: '/examples/all',
-                            badge: 'Updated'
+                            link: '/examples/all'
                         }
                     ]
                 },
