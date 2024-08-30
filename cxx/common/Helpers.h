@@ -25,6 +25,16 @@ inline void enumerateJSIObject(jsi::Runtime& rt, const jsi::Object& obj, std::fu
     }
 }
 
+inline void iterateJSIArray(jsi::Runtime& rt, const jsi::Array& array, std::function<void(size_t, jsi::Value&)> callback) {
+    size_t length = array.size(rt);
+
+    for (size_t i = 0; i < length; i++) {
+        auto value = array.getValueAtIndex(rt, i);
+
+        callback(i, value);
+    }
+}
+
 inline bool vecContainsKeys(std::vector<std::string>& vec, std::vector<std::string>&& keys) {
     std::unordered_set<std::string> availableKeys(keys.begin(), keys.end());
 
@@ -46,13 +56,13 @@ inline void defineHiddenProperty(jsi::Runtime& rt, jsi::Object& object, const st
     auto defineProperty = objectConstructor.getPropertyAsFunction(rt, "defineProperty");
 
     facebook::jsi::Object descriptor(rt);
-    
+
     if constexpr (std::is_same_v<std::decay_t<PropertyType>, jsi::Function>) {
         descriptor.setProperty(rt, facebook::jsi::PropNameID::forUtf8(rt, "value"), std::forward<PropertyType>(property));
     } else {
         descriptor.setProperty(rt, facebook::jsi::PropNameID::forUtf8(rt, "value"), property);
     }
-    
+
     descriptor.setProperty(rt, facebook::jsi::PropNameID::forUtf8(rt, "enumerable"), facebook::jsi::Value(false));
     descriptor.setProperty(rt, facebook::jsi::PropNameID::forUtf8(rt, "writable"), facebook::jsi::Value(true));
     descriptor.setProperty(rt, facebook::jsi::PropNameID::forUtf8(rt, "configurable"), facebook::jsi::Value(true));

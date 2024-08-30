@@ -9,6 +9,9 @@ jsi::Object parser::Parser::parseUnistyles(jsi::Runtime &rt, std::vector<core::U
     for (core::Unistyle& unistyle : unistyles) {
         if (unistyle.type == core::UnistyleType::Object) {
             auto result = this->parseFirstLevel(rt, unistyle);
+            
+            unistyle.isDirty = false;
+            unistyle.parsedStyle = jsi::Value(rt, result).asObject(rt);
 
             reactNativeStyles.setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle.styleKey), std::move(result));
         }
@@ -38,14 +41,14 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime &rt, core:
                 .asFunction(rt)
                 .call(rt, args, count);
 
-            // save function metadata if not present
-            if (!unistyle.dynamicFunctionMetadata.has_value()) {
-                unistyle.dynamicFunctionMetadata = core::DynamicFunctionMetadata{
-                    count,
-                    this->parseDynamicFunctionArguments(rt, count, args),
-                    result.asObject(rt)
-                };
-            }
+            // save function metadata to call it later
+            unistyle.dynamicFunctionMetadata = core::DynamicFunctionMetadata{
+                count,
+                this->parseDynamicFunctionArguments(rt, count, args)
+            };
+            
+            unistyle.isDirty = false;
+            unistyle.parsedStyle = jsi::Value(rt, result).asObject(rt);
 
             return this->parseFirstLevel(rt, unistyle);
     });
@@ -86,8 +89,15 @@ std::vector<folly::dynamic> parser::Parser::parseDynamicFunctionArguments(jsi::R
 
             continue;
         }
+        
+        if (!arg.isObject()) {
+            continue;;
+        }
 
-        if (arg.isObject()) {
+        auto argObj = arg.asObject(rt);
+        
+        // allow arrays and objects too
+        if (!argObj.isFunction(rt) && !argObj.isArrayBuffer(rt)) {
             parsedArgument.push_back(jsi::dynamicFromValue(rt, arg));
 
             continue;
@@ -101,36 +111,28 @@ std::vector<core::UnistyleDependency> parser::Parser::parseDependencies(jsi::Run
     helpers::assertThat(rt, dependencies.isArray(rt), "babel transform is invalid. Unexpected type for dependencies. Please report new Github issue.");
     
     std::vector<core::UnistyleDependency> parsedDependencies;
-
-    auto deps = dependencies.asArray(rt);
-    size_t length = deps.size(rt);
-
-    for (size_t i = 0; i < length; i++) {
-        jsi::Value element = deps.getValueAtIndex(rt, i);
-        auto dependency = static_cast<core::UnistyleDependency>(element.asNumber());
+    
+    helpers::iterateJSIArray(rt, dependencies.asArray(rt), [&](size_t i, jsi::Value& value){
+        auto dependency = static_cast<core::UnistyleDependency>(value.asNumber());
 
         parsedDependencies.push_back(dependency);
-    }
+    });
 
     return parsedDependencies;
 }
 
 jsi::Value parser::Parser::parseTransforms(jsi::Runtime& rt, jsi::Object& obj) {
+    // eg. [{ scale: 2 }, { translateX: 100 }]
+    
     if (!obj.isArray(rt)) {
         return jsi::Value::undefined();
     }
 
     std::vector<jsi::Value> parsedTransforms{};
-    jsi::Array transforms = obj.asArray(rt);
-    size_t length = transforms.length(rt);
 
-    for (size_t i = 0; i < length; i++) {
-        jsi::Value value = transforms.getValueAtIndex(rt, i);
-
+    helpers::iterateJSIArray(rt, obj.asArray(rt), [&](size_t i, jsi::Value& value){
         if (!value.isObject()) {
-            parsedTransforms.push_back(jsi::Value::undefined());
-            
-            continue;
+            return;
         }
         
         auto parsedResult = this->parseSecondLevel(rt, value);
@@ -141,8 +143,9 @@ jsi::Value parser::Parser::parseTransforms(jsi::Runtime& rt, jsi::Object& obj) {
                 parsedTransforms.emplace_back(std::move(parsedResult));
             }
         });
-    }
+    });
     
+    // create jsi::Array result with correct transforms
     jsi::Array result = jsi::Array(rt, parsedTransforms.size());
     
     for (size_t i = 0; i < parsedTransforms.size(); i++) {
@@ -159,7 +162,7 @@ jsi::Value parser::Parser::getValueFromBreakpoints(jsi::Runtime& rt, jsi::Object
     auto currentOrientation = settings->screenDimensions.width > settings->screenDimensions.height
         ? "landscape"
         : "portrait";
-
+    
     jsi::Array propertyNames = obj.getPropertyNames(rt);
     size_t length = propertyNames.size(rt);
     
@@ -170,12 +173,12 @@ jsi::Value parser::Parser::getValueFromBreakpoints(jsi::Runtime& rt, jsi::Object
         auto mq = core::UnistylesMQ{propertyName};
         
         if (mq.isWithinTheWidthAndHeight(settings->screenDimensions)) {
-            // todo handle transforms etc.
+            // we have direct hit
             return propertyValue;
         }
     }
 
-    // handle orientation breakpoints
+    // check orientation breakpoints if user didn't register own breakpoint
     if (!hasBreakpoints && obj.hasProperty(rt, currentOrientation)) {
         return obj.getProperty(rt, currentOrientation);
     }
@@ -211,11 +214,9 @@ jsi::Object parser::Parser::parseVariants(jsi::Runtime& rt, jsi::Object& obj) {
     jsi::Object parsedVariant = jsi::Object(rt);
     jsi::Array propertyNames = obj.getPropertyNames(rt);
     size_t length = propertyNames.size(rt);
-
-    for (size_t i = 0; i < length; i++) {
-        auto groupName = propertyNames.getValueAtIndex(rt, i).asString(rt).utf8(rt);
-        auto groupValue = obj.getProperty(rt, groupName.c_str()).asObject(rt);
-
+    
+    helpers::enumerateJSIObject(rt, obj, [&](const std::string& groupName, jsi::Value& groupValue) {
+        // try to match groupName to selected variants
         auto it = std::find_if(
             settings->variants.cbegin(),
             settings->variants.cend(),
@@ -223,26 +224,29 @@ jsi::Object parser::Parser::parseVariants(jsi::Runtime& rt, jsi::Object& obj) {
                 return variant.first == groupName;
             }
         );
-
+        
         auto selectedVariant = it != settings->variants.end()
             ? std::make_optional(it->second)
             : std::nullopt;
 
-        auto styles = this->getStylesForVariant(rt, groupValue, selectedVariant);
+        // we've got a match, but we need to check some condition
+        auto styles = this->getStylesForVariant(rt, groupValue.asObject(rt), selectedVariant);
         
+        // oops, invalid variant
         if (styles.isUndefined() || !styles.isObject()) {
-            continue;
+            return;
         }
         
         auto parsedNestedStyles = this->parseSecondLevel(rt, styles).asObject(rt);
 
         helpers::mergeJSIObjects(rt, parsedVariant, parsedNestedStyles);
-    }
+    });
 
     return parsedVariant;
 }
 
-jsi::Value parser::Parser::getStylesForVariant(jsi::Runtime& rt, jsi::Object& groupValue, std::optional<std::string> selectedVariant) {
+jsi::Value parser::Parser::getStylesForVariant(jsi::Runtime& rt, jsi::Object&& groupValue, std::optional<std::string> selectedVariant) {
+    // if there is no value, let's try 'default'
     auto selectedVariantKey = selectedVariant.has_value()
         ? selectedVariant.value().c_str()
         : "default";
@@ -260,26 +264,23 @@ jsi::Object parser::Parser::parseCompoundVariants(jsi::Runtime& rt, jsi::Object&
     }
 
     auto settings = this->settings.get();
-    auto array = obj.asArray(rt);
     jsi::Object parsedCompoundVariants = jsi::Object(rt);
-    size_t length = array.length(rt);
-
-    for (size_t i = 0; i < length; i++) {
-        jsi::Value value = array.getValueAtIndex(rt, i);
-
+    
+    helpers::iterateJSIArray(rt, obj.asArray(rt), [&](size_t i, jsi::Value& value){
         if (!value.isObject()) {
-            continue;
+            return;
         }
 
         auto valueObject = value.asObject(rt);
 
+        // check if every condition for given compound variant is met
         if (this->shouldApplyCompoundVariants(rt, settings->variants, valueObject)) {
             auto styles = valueObject.getProperty(rt, "styles");
             auto parsedNestedStyles = this->parseSecondLevel(rt, styles).asObject(rt);
             
             unistyles::helpers::mergeJSIObjects(rt, parsedCompoundVariants, parsedNestedStyles);
         }
-    }
+    });
 
     return parsedCompoundVariants;
 }
@@ -322,9 +323,11 @@ bool parser::Parser::shouldApplyCompoundVariants(jsi::Runtime& rt, const Variant
 
 jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime &rt, core::Unistyle& unistyle) {
     auto settings = this->settings.get();
+    // for objects - we simply operate on them
+    // for functions we need to work on the saved result (object)
     auto& style = unistyle.type == core::UnistyleType::Object
         ? unistyle.rawValue
-        : unistyle.dynamicFunctionMetadata.value().returnedValue;
+        : unistyle.parsedStyle.value();
     auto parsedStyle = jsi::Object(rt);
 
     // we need to be sure that compoundVariants are parsed after variants and after every other style
@@ -357,7 +360,7 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime &rt, core::Unistyle& un
         
         auto propertyValueObject = propertyValue.asObject(rt);
         
-        // ignore any functions at this level
+        // also, ignore any functions at this level
         if (propertyValueObject.isFunction(rt)) {
             return;
         }
