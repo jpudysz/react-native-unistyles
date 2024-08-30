@@ -32,7 +32,8 @@ export type UnistylesConfig = {
     initialTheme?: keyof UnistylesThemes,
     plugins?: Array<UnistylesPlugin>,
     experimentalCSSMediaQueries?: boolean,
-    windowResizeDebounceTimeMs?: number
+    windowResizeDebounceTimeMs?: number,
+    disableAnimatedInsets?: boolean
 }
 
 export type UnistylesBridge = {
@@ -66,6 +67,9 @@ export type UnistylesBridge = {
 
     // web only
     setWindowResizeDebounceTimeMs(timeMs: number): void
+
+    // android only
+    disableAnimatedInsets(): void
 }
 
 export type UnistylesThemeEvent = {

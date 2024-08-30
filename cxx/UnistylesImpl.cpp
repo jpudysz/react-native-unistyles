@@ -298,3 +298,13 @@ jsi::Value UnistylesRuntime::setRootBackgroundColor(jsi::Runtime& rt, std::strin
 jsi::Value UnistylesRuntime::getIsRtl(jsi::Runtime& rt, std::string fnName) {
     return jsi::Value(this->rtl);
 }
+
+jsi::Value UnistylesRuntime::disableAnimatedInsets(jsi::Runtime& rt, std::string fnName) {
+    return HOST_FN(fnName, 1, {
+        if (this->disableAnimatedInsetsAndroid.has_value()) {
+            this->disableAnimatedInsetsAndroid.value()();
+        }
+
+        return jsi::Value::undefined();
+    });
+}

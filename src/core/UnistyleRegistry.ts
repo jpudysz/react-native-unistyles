@@ -1,6 +1,6 @@
 import type { UnistylesBridge, UnistylesConfig, UnistylesPlugin } from '../types'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
-import { isDev, isWeb, UnistylesError } from '../common'
+import { isAndroid, isDev, isWeb, UnistylesError } from '../common'
 import { cssMediaQueriesPlugin, normalizeWebStylesPlugin } from '../plugins'
 
 export class UnistyleRegistry {
@@ -62,6 +62,10 @@ export class UnistyleRegistry {
 
         if (isWeb && config.windowResizeDebounceTimeMs !== undefined) {
             this.unistylesBridge.setWindowResizeDebounceTimeMs(config.windowResizeDebounceTimeMs)
+        }
+
+        if (isAndroid && config.disableAnimatedInsets) {
+            this.unistylesBridge.disableAnimatedInsets()
         }
 
         return {
