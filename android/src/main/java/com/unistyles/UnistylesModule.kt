@@ -154,7 +154,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                     insets
                 }
 
-                if (Build.VERSION.SDK_INT >= 30) {
+                if (platform.hasAnimatedInsets && Build.VERSION.SDK_INT >= 30) {
                     ViewCompat.setWindowInsetsAnimationCallback(
                         mainView,
                         object : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP) {

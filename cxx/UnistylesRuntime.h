@@ -35,7 +35,8 @@ struct JSI_EXPORT UnistylesRuntime : public jsi::HostObject, UnistylesModel {
             {"fontScale", BIND_FN(getFontScale)},
             {"setRootViewBackgroundColor", BIND_FN(setRootBackgroundColor)},
             {"setImmersiveMode", BIND_FN(setImmersiveModeEnabled)},
-            {"rtl", BIND_FN(getIsRtl)}
+            {"rtl", BIND_FN(getIsRtl)},
+            {"disableAnimatedInsets", BIND_FN(disableAnimatedInsets)}
         };
 
         this->setters = {
@@ -66,6 +67,7 @@ struct JSI_EXPORT UnistylesRuntime : public jsi::HostObject, UnistylesModel {
     jsi::Value setRootBackgroundColor(jsi::Runtime&, std::string);
     jsi::Value setImmersiveModeEnabled(jsi::Runtime&, std::string);
     jsi::Value getIsRtl(jsi::Runtime&, std::string);
+    jsi::Value disableAnimatedInsets(jsi::Runtime&, std::string);
 
     std::optional<jsi::Value> setThemes(jsi::Runtime&, const jsi::Value&);
 

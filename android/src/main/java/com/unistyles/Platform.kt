@@ -20,11 +20,16 @@ import java.util.Locale
 import kotlin.math.roundToInt
 
 class Platform(private val reactApplicationContext: ReactApplicationContext) {
+    var hasAnimatedInsets = true
     private var insets: Insets = Insets(0, 0, 0, 0)
     private var defaultNavigationBarColor: Int = -1
     private var defaultStatusBarColor: Int = -1
 
     var orientation: Int = reactApplicationContext.resources.configuration.orientation
+
+    fun disableAnimatedInsets() {
+        this.hasAnimatedInsets = false
+    }
 
     @Suppress("DEPRECATION")
     fun getScreenDimensions(): Screen {
@@ -140,10 +145,16 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
         }
 
         val insets = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
-        val imeInsets = insetsCompat.getInsets(WindowInsetsCompat.Type.ime())
+
+        if (!hasAnimatedInsets) {
+            this.insets = Insets(statusBarTopInset, insets.bottom, insets.left, insets.right)
+
+            return
+        }
 
         // Android 10 and below - set bottom insets to 0 while keyboard is visible and use default bottom insets otherwise
         // Android 11 and above - animate bottom insets while keyboard is appearing and disappearing
+        val imeInsets = insetsCompat.getInsets(WindowInsetsCompat.Type.ime())
         val insetBottom = when(imeInsets.bottom > 0) {
             true -> {
                 if (Build.VERSION.SDK_INT >= 30 && animatedBottomInsets != null) {

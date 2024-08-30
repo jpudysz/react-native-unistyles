@@ -66,6 +66,7 @@ struct UnistylesModel {
     std::optional<std::function<void(bool)>> setStatusBarHidden;
     std::optional<std::function<void(bool)>> setImmersiveMode;
     std::optional<std::function<void(std::string, float alpha)>> setRootViewBackgroundColor;
+    std::optional<std::function<void()>> disableAnimatedInsetsAndroid;
 
     void setScreenDimensionsCallback(std::function<Screen()> callback) {
         this->getScreenDimensions = callback;
@@ -102,6 +103,9 @@ struct UnistylesModel {
     }
     void setRootViewBackgroundColorCallback(std::function<void(std::string color, float alpha)> callback) {
         this->setRootViewBackgroundColor = callback;
+    }
+    void setDisableAnimatedInsetsAndroidCallback(std::function<void()> callback) {
+        this->disableAnimatedInsetsAndroid = callback;
     }
 
     Dimensions screen = {0, 0};
