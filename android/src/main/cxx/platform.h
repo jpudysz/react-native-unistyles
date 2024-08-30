@@ -17,3 +17,4 @@ bool getIsRTL(JNIEnv *env, jobject unistylesModule);
 std::string getContentSizeCategory(JNIEnv *env, jobject unistylesModule);
 void setNavigationBarColor(JNIEnv *env, jobject unistylesModule, std::string color, float alpha);
 void setStatusBarColor(JNIEnv *env, jobject unistylesModule, std::string color, float alpha);
+void disableAnimatedInsets(JNIEnv *env, jobject unistylesModule);

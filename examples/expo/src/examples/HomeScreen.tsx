@@ -501,7 +501,8 @@ export const HomeScreen = () => {
                                 })
                                 .addBreakpoints(breakpoints)
                                 .addConfig({
-                                    initialTheme: 'light'
+                                    initialTheme: 'light',
+                                    disableAnimatedInsets: true
                                 })
 
                             navigation.navigate(DemoNames.Keyboard)
