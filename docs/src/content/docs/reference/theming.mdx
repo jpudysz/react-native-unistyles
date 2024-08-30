@@ -84,6 +84,10 @@ Where `name` is the unique name of your theme.
 
 :::tip
 Your themes may have different shapes, but it's generally not recommended.
+
+For example, at runtime, if you reference a property from `lightTheme` that doesn’t exist in `darkTheme` or any other theme, the value will default to `undefined` when the app switches to that theme. This can lead to unpredictable behavior in your app.
+
+TypeScript will warn you if you attempt to use a property that isn’t defined across all your themes.
 :::
 
 ### Select theme
