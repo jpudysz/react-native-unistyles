@@ -37,6 +37,7 @@ struct Parser {
     Parser(const Parser&) = delete;
     Parser(const Parser&&) = delete;
     
+    void parseUnistyle(jsi::Runtime& rt, core::Unistyle& unistyle, jsi::Object& target);
     jsi::Object parseUnistyles(jsi::Runtime& rt, std::vector<core::Unistyle>& unistyles);
     
 private:

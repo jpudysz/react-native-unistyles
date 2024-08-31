@@ -7,24 +7,28 @@ jsi::Object parser::Parser::parseUnistyles(jsi::Runtime &rt, std::vector<core::U
     jsi::Object reactNativeStyles = jsi::Object(rt);
 
     for (core::Unistyle& unistyle : unistyles) {
-        if (unistyle.type == core::UnistyleType::Object) {
-            auto result = this->parseFirstLevel(rt, unistyle);
-            
-            unistyle.isDirty = false;
-            unistyle.parsedStyle = jsi::Value(rt, result).asObject(rt);
-
-            reactNativeStyles.setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle.styleKey), std::move(result));
-        }
-
-        if (unistyle.type == core::UnistyleType::DynamicFunction) {
-            auto hostFn = this->createDynamicFunctionProxy(rt, unistyle);
-
-            helpers::defineHiddenProperty(rt, reactNativeStyles, helpers::PROXY_FN_PREFIX + unistyle.styleKey, unistyle.rawValue.asFunction(rt));
-            reactNativeStyles.setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle.styleKey), std::move(hostFn));
-        }
+        this->parseUnistyle(rt, unistyle, reactNativeStyles);
     }
 
     return reactNativeStyles;
+}
+
+void parser::Parser::parseUnistyle(jsi::Runtime& rt, core::Unistyle& unistyle, jsi::Object& target) {
+    if (unistyle.type == core::UnistyleType::Object) {
+        auto result = this->parseFirstLevel(rt, unistyle);
+        
+        unistyle.isDirty = false;
+        unistyle.parsedStyle = jsi::Value(rt, result).asObject(rt);
+
+        target.setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle.styleKey), std::move(result));
+    }
+
+    if (unistyle.type == core::UnistyleType::DynamicFunction) {
+        auto hostFn = this->createDynamicFunctionProxy(rt, unistyle);
+
+        helpers::defineHiddenProperty(rt, target, helpers::PROXY_FN_PREFIX + unistyle.styleKey, unistyle.rawValue.asFunction(rt));
+        target.setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle.styleKey), std::move(hostFn));
+    }
 }
 
 jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime &rt, core::Unistyle& unistyle) {
@@ -213,7 +217,6 @@ jsi::Object parser::Parser::parseVariants(jsi::Runtime& rt, jsi::Object& obj) {
     auto settings = this->settings.get();
     jsi::Object parsedVariant = jsi::Object(rt);
     jsi::Array propertyNames = obj.getPropertyNames(rt);
-    size_t length = propertyNames.size(rt);
     
     helpers::enumerateJSIObject(rt, obj, [&](const std::string& groupName, jsi::Value& groupValue) {
         // try to match groupName to selected variants

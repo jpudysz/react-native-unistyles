@@ -35,8 +35,9 @@ inline void iterateJSIArray(jsi::Runtime& rt, const jsi::Array& array, std::func
     }
 }
 
-inline bool vecContainsKeys(std::vector<std::string>& vec, std::vector<std::string>&& keys) {
-    std::unordered_set<std::string> availableKeys(keys.begin(), keys.end());
+template<typename PropertyType>
+inline bool vecContainsKeys(std::vector<PropertyType>& vec, std::vector<PropertyType>&& keys) {
+    std::unordered_set<PropertyType> availableKeys(keys.begin(), keys.end());
 
     for (const auto& key : vec) {
         availableKeys.erase(key);

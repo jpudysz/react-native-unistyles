@@ -11,6 +11,7 @@
 #include "Constants.h"
 #include "Breakpoints.h"
 #include "StyleSheetRegistry.h"
+#include "HostStyle.h"
 
 using namespace margelo::nitro::unistyles;
 
