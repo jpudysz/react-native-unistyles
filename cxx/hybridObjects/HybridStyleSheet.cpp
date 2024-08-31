@@ -12,7 +12,8 @@ jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal,
     helpers::assertThat(rt, count == 1, "expected to be called with one argument.");
     helpers::assertThat(rt, arguments[0].isObject(), "expected to be called with object or function.");
 
-    auto styleSheetId = thisVal.asObject(rt).getProperty(rt, helpers::STYLESHEET_ID.c_str());
+    auto thisStyleSheet = thisVal.asObject(rt);
+    auto styleSheetId = thisStyleSheet.getProperty(rt, helpers::STYLESHEET_ID.c_str());
 
     // this might happen only when hot reloading
     if (!styleSheetId.isUndefined()) {
@@ -24,9 +25,11 @@ jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal,
     auto parsedStyleSheet = styleSheetRegistry.parse(rt, registeredStyleSheet);
 
     this->attachMetaFunctions(rt, registeredStyleSheet, parsedStyleSheet);
+    
+    // attach unique ID
+    helpers::defineHiddenProperty(rt, thisStyleSheet, helpers::STYLESHEET_ID, jsi::Value(registeredStyleSheet.tag));
 
     // todo
-    // attach ID
     // return HO
 
     return parsedStyleSheet;
@@ -202,24 +205,56 @@ void HybridStyleSheet::attachMetaFunctions(jsi::Runtime &rt, core::StyleSheet& s
     });
 
     // attach addVariants to stylesheet
-    helpers::defineHiddenProperty(rt, std::move(parsedStyleSheet), helpers::ADD_VARIANTS_FN, std::move(addVariantsHostFn));
+    helpers::defineHiddenProperty(rt, parsedStyleSheet, helpers::ADD_VARIANTS_FN, std::move(addVariantsHostFn));
 
     // attach addNode and removeNode to each style
     helpers::enumerateJSIObject(rt, parsedStyleSheet, [&](const std::string& propertyName, jsi::Value& propertyValue){
         auto addNodeHostFn = jsi::Function::createFromHostFunction(rt, addNodeFnName, 1,
-            [](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
-            // todo
+            [&, propertyName](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+            helpers::assertThat(rt, count == 1, "expected to be called with one argument,");
+            helpers::assertThat(rt, args[0].isNumber(), "expected to be called with number.");
+            
+            auto nativeTag = args[0].asNumber();
+            auto it = std::find_if(
+                styleSheet.unistyles.begin(),
+                styleSheet.unistyles.end(),
+                [&propertyName](const core::Unistyle& style) {
+                    return style.styleKey == propertyName;
+                }
+            );
+
+            if (it != styleSheet.unistyles.end()) {
+                it->nativeTags.push_back(nativeTag);
+            }
 
             return jsi::Value::undefined();
         });
         auto removeNodeHostFn = jsi::Function::createFromHostFunction(rt, removeNodeFnName, 1,
-            [](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
-            // todo
+            [&, propertyName](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+            helpers::assertThat(rt, count == 1, "expected to be called with one argument,");
+            helpers::assertThat(rt, args[0].isNumber(), "expected to be called with number.");
+            
+            auto nativeTag = args[0].asNumber();
+            auto it = std::find_if(
+                styleSheet.unistyles.begin(),
+                styleSheet.unistyles.end(),
+                [&propertyName](const core::Unistyle& style) {
+                    return style.styleKey == propertyName;
+                }
+            );
+            
+            auto tagIt = std::find(it->nativeTags.begin(), it->nativeTags.end(), nativeTag);
+
+            if (tagIt != it->nativeTags.end()) {
+                it->nativeTags.erase(tagIt);
+            }
 
             return jsi::Value::undefined();
         });
+        
+        auto style = jsi::Value(rt, propertyValue).asObject(rt);
 
-        helpers::defineHiddenProperty(rt, propertyValue.asObject(rt), helpers::ADD_NODE_FN, std::move(addNodeHostFn));
-        helpers::defineHiddenProperty(rt, propertyValue.asObject(rt), helpers::REMOVE_NODE_FN, std::move(removeNodeHostFn));
+        helpers::defineHiddenProperty(rt, style, helpers::ADD_NODE_FN, std::move(addNodeHostFn));
+        helpers::defineHiddenProperty(rt, style, helpers::REMOVE_NODE_FN, std::move(removeNodeHostFn));
     });
 }

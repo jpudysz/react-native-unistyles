@@ -15,7 +15,7 @@ enum class StyleSheetType {
 };
 
 struct StyleSheet {
-    StyleSheet(unsigned int tag, StyleSheetType type, jsi::Object rawValue): tag{tag}, type{type}, rawValue{std::move(rawValue)} {};
+    StyleSheet(int tag, StyleSheetType type, jsi::Object rawValue): tag{tag}, type{type}, rawValue{std::move(rawValue)} {};
     
     StyleSheet(const StyleSheet&) = delete;
     StyleSheet(StyleSheet&& other) noexcept : tag{other.tag}, type{other.type}, rawValue{std::move(other.rawValue)} {
@@ -32,7 +32,7 @@ struct StyleSheet {
         return *this;
     }
     
-    unsigned int tag;
+    int tag;
     StyleSheetType type;
     jsi::Object rawValue;
     std::vector<core::Unistyle> unistyles{};
