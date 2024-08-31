@@ -100,6 +100,7 @@ void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
 };
 
 jsi::Value HybridUnistylesRuntime::updateTheme(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    // todo remove me with nitro 0.6
     helpers::assertThat(rt, count == 2, "expected to be called with two arguments.");
     helpers::assertThat(rt, args[0].isString(), "first argument expected to be a string.");
     helpers::assertThat(rt, args[1].isObject(), "second argument expected to be a function.");

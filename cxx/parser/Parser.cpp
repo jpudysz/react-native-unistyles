@@ -19,7 +19,7 @@ jsi::Object parser::Parser::parseUnistyles(jsi::Runtime &rt, std::vector<core::U
         if (unistyle.type == core::UnistyleType::DynamicFunction) {
             auto hostFn = this->createDynamicFunctionProxy(rt, unistyle);
 
-            helpers::defineHiddenProperty(rt, reactNativeStyles, helpers::PROXY_FN_PREFIX + unistyle.styleKey, unistyle.rawValue.asFunction(rt));
+            helpers::defineHiddenProperty(rt, std::move(reactNativeStyles), helpers::PROXY_FN_PREFIX + unistyle.styleKey, unistyle.rawValue.asFunction(rt));
             reactNativeStyles.setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle.styleKey), std::move(hostFn));
         }
     }
