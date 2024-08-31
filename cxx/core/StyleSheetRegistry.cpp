@@ -60,6 +60,8 @@ void StyleSheetRegistry::remove(unsigned int tag) {
 }
 
 jsi::Object StyleSheetRegistry::parse(jsi::Runtime &rt, StyleSheet &styleSheet) {
+    std::future<Dimensions> screenDimensions = std::async(std::launch::async, &HybridMiniRuntime::getScreen, miniRuntime);
+    
     jsi::Object unwrappedStyleSheet = this->unwrapStyleSheet(rt, styleSheet);
     auto& unistyles = this->parseToUnistyles(rt, styleSheet, unwrappedStyleSheet);
 
@@ -69,7 +71,7 @@ jsi::Object StyleSheetRegistry::parse(jsi::Runtime &rt, StyleSheet &styleSheet) 
         styleSheet.variants,
         state.getCurrentBreakpointName(),
         state.getSortedBreakpointPairs(),
-        miniRuntime->getScreen()
+        screenDimensions.get()
     );
     
     return parser::Parser::configure(std::move(settings)).parseUnistyles(rt, unistyles);
