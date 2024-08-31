@@ -25,7 +25,7 @@ jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal,
     auto parsedStyleSheet = styleSheetRegistry.parse(rt, registeredStyleSheet);
 
     this->attachMetaFunctions(rt, registeredStyleSheet, parsedStyleSheet);
-    
+
     // attach unique ID
     helpers::defineHiddenProperty(rt, thisStyleSheet, helpers::STYLESHEET_ID, jsi::Value(registeredStyleSheet.tag));
 
@@ -200,7 +200,7 @@ void HybridStyleSheet::attachMetaFunctions(jsi::Runtime &rt, core::StyleSheet& s
         [&](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         helpers::assertThat(rt, count == 1, "expected to be called with one argument.");
         styleSheet.addVariants(rt, jsi::Value(rt, args[0]));
-        
+
         jsi::Object stylesWithVariants = jsi::Object(rt);
         auto& state = core::UnistylesRegistry::get().getState(rt);
         auto settings = std::make_unique<parser::ParserSettings>(
@@ -210,7 +210,7 @@ void HybridStyleSheet::attachMetaFunctions(jsi::Runtime &rt, core::StyleSheet& s
             miniRuntime->getScreen()
         );
         auto& parser = parser::Parser::configure(std::move(settings));
-        
+
 
         for (auto& style: styleSheet.unistyles) {
             if (helpers::vecContainsKeys(style.dependencies, {core::UnistyleDependency::Variants})) {
@@ -230,7 +230,7 @@ void HybridStyleSheet::attachMetaFunctions(jsi::Runtime &rt, core::StyleSheet& s
             [&, propertyName](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
             helpers::assertThat(rt, count == 1, "expected to be called with one argument,");
             helpers::assertThat(rt, args[0].isNumber(), "expected to be called with number.");
-            
+
             auto nativeTag = args[0].asNumber();
             auto it = std::find_if(
                 styleSheet.unistyles.begin(),
@@ -250,7 +250,7 @@ void HybridStyleSheet::attachMetaFunctions(jsi::Runtime &rt, core::StyleSheet& s
             [&, propertyName](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
             helpers::assertThat(rt, count == 1, "expected to be called with one argument,");
             helpers::assertThat(rt, args[0].isNumber(), "expected to be called with number.");
-            
+
             auto nativeTag = args[0].asNumber();
             auto it = std::find_if(
                 styleSheet.unistyles.begin(),
@@ -259,7 +259,7 @@ void HybridStyleSheet::attachMetaFunctions(jsi::Runtime &rt, core::StyleSheet& s
                     return style.styleKey == propertyName;
                 }
             );
-            
+
             auto tagIt = std::find(it->nativeTags.begin(), it->nativeTags.end(), nativeTag);
 
             if (tagIt != it->nativeTags.end()) {
@@ -268,7 +268,7 @@ void HybridStyleSheet::attachMetaFunctions(jsi::Runtime &rt, core::StyleSheet& s
 
             return jsi::Value::undefined();
         });
-        
+
         auto style = jsi::Value(rt, propertyValue).asObject(rt);
 
         helpers::defineHiddenProperty(rt, style, helpers::ADD_NODE_FN, std::move(addNodeHostFn));
