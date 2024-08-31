@@ -2,6 +2,7 @@
 
 #include <jsi/jsi.h>
 #include "Unistyle.h"
+#include "Helpers.h"
 
 namespace margelo::nitro::unistyles::core {
 
@@ -36,6 +37,9 @@ struct StyleSheet {
     jsi::Object rawValue;
     std::vector<core::Unistyle> unistyles{};
     std::vector<std::pair<std::string, std::string>> variants{};
+    
+    void addVariants(jsi::Runtime& rt, jsi::Value&& variants);
+    void addOrUpdateVariant(std::string variantName, std::string variantValue);
 };
 
 }
