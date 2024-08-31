@@ -29,10 +29,10 @@ jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal,
     // attach unique ID
     helpers::defineHiddenProperty(rt, thisStyleSheet, helpers::STYLESHEET_ID, jsi::Value(registeredStyleSheet.tag));
 
-    // todo
-    // return HO
+    auto style = std::make_shared<core::HostStyle>(parsedStyleSheet);
+    auto styleHostObject = jsi::Object::createFromHostObject(rt, style);
 
-    return parsedStyleSheet;
+    return styleHostObject;
 }
 
 jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
@@ -200,8 +200,25 @@ void HybridStyleSheet::attachMetaFunctions(jsi::Runtime &rt, core::StyleSheet& s
         [&](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         helpers::assertThat(rt, count == 1, "expected to be called with one argument.");
         styleSheet.addVariants(rt, jsi::Value(rt, args[0]));
+        
+        jsi::Object stylesWithVariants = jsi::Object(rt);
+        auto& state = core::UnistylesRegistry::get().getState(rt);
+        auto settings = std::make_unique<parser::ParserSettings>(
+            styleSheet.variants,
+            state.getCurrentBreakpointName(),
+            state.getSortedBreakpointPairs(),
+            miniRuntime->getScreen()
+        );
+        auto& parser = parser::Parser::configure(std::move(settings));
+        
 
-        return jsi::Value::undefined();
+        for (auto& style: styleSheet.unistyles) {
+            if (helpers::vecContainsKeys(style.dependencies, {core::UnistyleDependency::Variants})) {
+                parser.parseUnistyle(rt, style, stylesWithVariants);
+            }
+        }
+
+        return stylesWithVariants;
     });
 
     // attach addVariants to stylesheet
