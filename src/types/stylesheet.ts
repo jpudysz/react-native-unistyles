@@ -18,12 +18,19 @@ type UnistyleNestedStyles = {
     transform?: Array<ToDeepUnistyles<TransformStyles>>
 }
 
-type Variants = {
-    variants?: {
-        [variantName: string]: {
-            [variant: string]: Omit<UnistylesValues, 'variants'>
-        }
+type VariantsObject = {
+    [variantName: string]: {
+        [variant: string]: Omit<UnistylesValues, 'variants' | 'compoundVariants'>
     }
+}
+
+type CompoundVariant = {
+    styles: Omit<UnistylesValues, 'variants' | 'compoundVariants'>
+}
+
+type VariantsAndCompoundVariants = {
+    variants?: VariantsObject,
+    compoundVariants?: Array<CompoundVariant>
 }
 
 export type ToDeepUnistyles<T> = {
@@ -41,7 +48,7 @@ export type UnistylesValues = {
     [propName in AllAvailableKeys]?: AllAvailableStyles[propName] | {
         [key in BreakpointsOrMediaQueries]?: AllAvailableStyles[propName]
     }
-} & Variants & {
+} & VariantsAndCompoundVariants & {
     [propName in NestedKeys]?: UnistyleNestedStyles[propName]
 }
 
