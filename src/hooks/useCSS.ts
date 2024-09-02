@@ -16,7 +16,7 @@ export const useCSS = <T>(stylesheet: ReactNativeStyleSheet<T>) => {
             .forEach(([_key, value]) => {
                 Object.entries(value!)
                     .forEach(([prop, val]) => {
-                        if (!val.toString().includes('@media')) {
+                        if (!val?.toString().includes('@media')) {
                             return
                         }
 
