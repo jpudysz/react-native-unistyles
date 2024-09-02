@@ -59,15 +59,25 @@ void StyleSheetRegistry::remove(unsigned int tag) {
     this->styleSheets.erase(it);
 }
 
-jsi::Object StyleSheetRegistry::parse(jsi::Runtime &rt, const StyleSheet &styleSheet) {
+jsi::Object StyleSheetRegistry::parse(jsi::Runtime &rt, StyleSheet &styleSheet) {
+    std::future<Dimensions> screenDimensions = std::async(std::launch::async, &HybridMiniRuntime::getScreen, miniRuntime);
+    
     jsi::Object unwrappedStyleSheet = this->unwrapStyleSheet(rt, styleSheet);
+    auto& unistyles = this->parseToUnistyles(rt, styleSheet, unwrappedStyleSheet);
 
-    // todo parse it
-
-    return unwrappedStyleSheet;
+    // configure and run parser
+    auto& state = core::UnistylesRegistry::get().getState(rt);
+    auto settings = std::make_unique<parser::ParserSettings>(
+        styleSheet.variants,
+        state.getCurrentBreakpointName(),
+        state.getSortedBreakpointPairs(),
+        screenDimensions.get()
+    );
+    
+    return parser::Parser::configure(std::move(settings)).parseUnistyles(rt, unistyles);
 }
 
-jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, const StyleSheet &styleSheet) {
+jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, StyleSheet &styleSheet) {
     // firstly we need to get object representation of user's StyleSheet
     // StyleSheet can be a function or an object
 
@@ -95,4 +105,22 @@ jsi::Object StyleSheetRegistry::unwrapStyleSheet(jsi::Runtime &rt, const StyleSh
         .asFunction(rt)
         .call(rt, std::move(theme), miniRuntime)
         .asObject(rt);
+}
+
+std::vector<core::Unistyle>& StyleSheetRegistry::parseToUnistyles(jsi::Runtime& rt, StyleSheet& styleSheet, jsi::Object& unwrappedStyleSheet) {
+    helpers::enumerateJSIObject(rt, unwrappedStyleSheet, [&](const std::string& styleKey, jsi::Value& propertyValue){
+        helpers::assertThat(rt, propertyValue.isObject(), "style with name '" + styleKey + "' is not a function or object.");
+        
+        jsi::Object styleValue = propertyValue.asObject(rt);
+        
+        if (styleValue.isFunction(rt)) {
+            styleSheet.unistyles.emplace_back(UnistyleType::DynamicFunction, styleKey, styleValue);
+            
+            return;
+        }
+
+        styleSheet.unistyles.emplace_back(UnistyleType::Object, styleKey, styleValue);
+    });
+    
+    return styleSheet.unistyles;
 }

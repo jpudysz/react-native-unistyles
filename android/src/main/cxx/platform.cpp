@@ -49,6 +49,10 @@ void makeShared(JNIEnv *env, jobject unistylesModule, std::shared_ptr<UnistylesR
         setRootViewBackgroundColor(env, unistylesModule, color, alpha);
     });
 
+    unistylesRuntime->setDisableAnimatedInsetsAndroidCallback([=]() {
+        disableAnimatedInsets(env, unistylesModule);
+    });
+
     Screen screen = getScreenDimensions(env, unistylesModule);
 
     unistylesRuntime->screen = Dimensions{screen.width, screen.height};
@@ -60,6 +64,20 @@ void makeShared(JNIEnv *env, jobject unistylesModule, std::shared_ptr<UnistylesR
     unistylesRuntime->fontScale = screen.fontScale;
     unistylesRuntime->pixelRatio = screen.pixelRatio;
     unistylesRuntime->rtl = getIsRTL(env, unistylesModule);
+}
+
+void disableAnimatedInsets(JNIEnv *env, jobject unistylesModule) {
+    jclass cls = env->GetObjectClass(unistylesModule);
+    jfieldID platformFieldId = env->GetFieldID(cls, "platform", "Lcom/unistyles/Platform;");
+    jobject platformInstance = env->GetObjectField(unistylesModule, platformFieldId);
+    jclass platformClass = env->GetObjectClass(platformInstance);
+    jmethodID methodId = env->GetMethodID(platformClass, "disableAnimatedInsets", "()V");
+
+    env->CallVoidMethod(platformInstance, methodId);
+
+    env->DeleteLocalRef(cls);
+    env->DeleteLocalRef(platformInstance);
+    env->DeleteLocalRef(platformClass);
 }
 
 Screen getScreenDimensions(JNIEnv *env, jobject unistylesModule) {

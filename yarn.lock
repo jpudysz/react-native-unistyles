@@ -7033,7 +7033,7 @@ __metadata:
     babel-plugin-module-resolver: 5.0.2
     react: 18.3.1
     react-native: 0.75.1
-    react-native-nitro-modules: 0.5.0
+    react-native-nitro-modules: 0.6.0
     typescript: 5.5.4
   languageName: unknown
   linkType: soft
@@ -11404,18 +11404,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nitro-codegen@npm:0.5.0":
-  version: 0.5.0
-  resolution: "nitro-codegen@npm:0.5.0"
+"nitro-codegen@npm:0.6.0":
+  version: 0.6.0
+  resolution: "nitro-codegen@npm:0.6.0"
   dependencies:
     chalk: ^5.3.0
-    react-native-nitro-modules: ^0.5.0
+    react-native-nitro-modules: ^0.6.0
     ts-morph: ^23.0.0
     yargs: ^17.7.2
     zod: ^3.23.8
   bin:
     nitro-codegen: lib/index.js
-  checksum: 1eeec973638300bb509cf529b2a5ecf16fbe86f59f965fa649024c5a46ad3de95f293879c787b16331aa24581ddfdba2dc1469a5a7a024adad76dc3f084ba960
+  checksum: 931411e732800a93ec4ba983d7ec9f081c4a6f817ad5e191aff26e74c5463c0f1d5e45b91652df41d362e780cf53713d06ed684f945f05b67fc7bf22bc14ca62
   languageName: node
   linkType: hard
 
@@ -12565,13 +12565,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-nitro-modules@npm:0.5.0, react-native-nitro-modules@npm:^0.5.0":
-  version: 0.5.0
-  resolution: "react-native-nitro-modules@npm:0.5.0"
+"react-native-nitro-modules@npm:0.6.0, react-native-nitro-modules@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "react-native-nitro-modules@npm:0.6.0"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 17b100320c14f6d2fcf4e2b36299b5e0d8af42719b3baca4236fc971b416b43f9c0001e019035080e1448eb09e763099b28009f2be4c8af254cd6cfa6339aa2c
+  checksum: 178692d9c0b1337fbfbad63f702c21a97bb4f691d75abccb9a63c2acf9dc879fc623d1669a41bff7d82c75bf8d31ea2da3db835782e0daf757cc39a2af4f9e15
   languageName: node
   linkType: hard
 
@@ -12610,11 +12610,11 @@ __metadata:
     husky: 9.1.5
     jest: 29.7.0
     metro-react-native-babel-preset: 0.77.0
-    nitro-codegen: 0.5.0
+    nitro-codegen: 0.6.0
     react: 18.3.1
     react-native: 0.75.2
     react-native-builder-bob: 0.30.0
-    react-native-nitro-modules: 0.5.0
+    react-native-nitro-modules: 0.6.0
     react-native-web: 0.19.12
     react-test-renderer: 18.3.1
     release-it: 17.6.0

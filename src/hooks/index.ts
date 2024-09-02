@@ -1,1 +1,0 @@
-export { useVariants } from './useVariants'

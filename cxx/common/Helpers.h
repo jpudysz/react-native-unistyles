@@ -25,8 +25,19 @@ inline void enumerateJSIObject(jsi::Runtime& rt, const jsi::Object& obj, std::fu
     }
 }
 
-inline bool vecContainsKeys(std::vector<std::string>& vec, std::vector<std::string>&& keys) {
-    std::unordered_set<std::string> availableKeys(keys.begin(), keys.end());
+inline void iterateJSIArray(jsi::Runtime& rt, const jsi::Array& array, std::function<void(size_t, jsi::Value&)> callback) {
+    size_t length = array.size(rt);
+
+    for (size_t i = 0; i < length; i++) {
+        auto value = array.getValueAtIndex(rt, i);
+
+        callback(i, value);
+    }
+}
+
+template<typename PropertyType>
+inline bool vecContainsKeys(std::vector<PropertyType>& vec, std::vector<PropertyType>&& keys) {
+    std::unordered_set<PropertyType> availableKeys(keys.begin(), keys.end());
 
     for (const auto& key : vec) {
         availableKeys.erase(key);
@@ -40,24 +51,43 @@ inline bool vecContainsKeys(std::vector<std::string>& vec, std::vector<std::stri
 }
 
 template<typename PropertyType>
-inline void defineHiddenProperty(jsi::Runtime& rt, jsi::Object&& object, const std::string& propName, PropertyType&& property) {
+inline void defineHiddenProperty(jsi::Runtime& rt, jsi::Object& object, const std::string& propName, PropertyType&& property) {
     auto global = rt.global();
     auto objectConstructor = global.getPropertyAsObject(rt, "Object");
     auto defineProperty = objectConstructor.getPropertyAsFunction(rt, "defineProperty");
 
     facebook::jsi::Object descriptor(rt);
-    
+
     if constexpr (std::is_same_v<std::decay_t<PropertyType>, jsi::Function>) {
         descriptor.setProperty(rt, facebook::jsi::PropNameID::forUtf8(rt, "value"), std::forward<PropertyType>(property));
     } else {
         descriptor.setProperty(rt, facebook::jsi::PropNameID::forUtf8(rt, "value"), property);
     }
-    
+
     descriptor.setProperty(rt, facebook::jsi::PropNameID::forUtf8(rt, "enumerable"), facebook::jsi::Value(false));
     descriptor.setProperty(rt, facebook::jsi::PropNameID::forUtf8(rt, "writable"), facebook::jsi::Value(true));
     descriptor.setProperty(rt, facebook::jsi::PropNameID::forUtf8(rt, "configurable"), facebook::jsi::Value(true));
 
     defineProperty.call(rt, object, facebook::jsi::String::createFromAscii(rt, propName.c_str()), descriptor);
+}
+
+inline bool isPlatformColor(jsi::Runtime& rt, jsi::Object& maybePlatformColor) {
+    auto isIOSPlatformColor = maybePlatformColor.hasProperty(rt, "semantic") && maybePlatformColor.getProperty(rt, "semantic").isObject();
+
+    if (isIOSPlatformColor) {
+        return true;
+    }
+
+    // Android
+    return maybePlatformColor.hasProperty(rt, "resource_paths") && maybePlatformColor.getProperty(rt, "resource_paths").isObject();
+}
+
+inline jsi::Object& mergeJSIObjects(jsi::Runtime&rt, jsi::Object& obj1, jsi::Object& obj2) {
+    helpers::enumerateJSIObject(rt, obj2, [&](const std::string& propertyName, jsi::Value& propertyValue){
+        obj1.setProperty(rt, propertyName.c_str(), propertyValue);
+    });
+
+    return obj1;
 }
 
 }

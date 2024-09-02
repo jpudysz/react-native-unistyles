@@ -8,10 +8,10 @@ double HybridStyleSheet::getHairlineWidth() {
 }
 
 jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
-    helpers::assertThat(rt, count == 1, "expected to be called with one argument.");
     helpers::assertThat(rt, arguments[0].isObject(), "expected to be called with object or function.");
 
-    auto styleSheetId = thisVal.asObject(rt).getProperty(rt, helpers::STYLESHEET_ID.c_str());
+    auto thisStyleSheet = thisVal.asObject(rt);
+    auto styleSheetId = thisStyleSheet.getProperty(rt, helpers::STYLESHEET_ID.c_str());
 
     // this might happen only when hot reloading
     if (!styleSheetId.isUndefined()) {
@@ -22,23 +22,25 @@ jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal,
     core::StyleSheet& registeredStyleSheet = styleSheetRegistry.add(rt, std::move(rawStyleSheet));
     auto parsedStyleSheet = styleSheetRegistry.parse(rt, registeredStyleSheet);
 
-    // todo
-    // attach unistyles methods
-    // parse
-    // return HO
+    this->attachMetaFunctions(rt, registeredStyleSheet, parsedStyleSheet);
 
-    return parsedStyleSheet;
+    // attach unique ID
+    helpers::defineHiddenProperty(rt, thisStyleSheet, helpers::STYLESHEET_ID, jsi::Value(registeredStyleSheet.tag));
+
+    auto style = std::make_shared<core::HostStyle>(parsedStyleSheet);
+    auto styleHostObject = jsi::Object::createFromHostObject(rt, style);
+
+    return styleHostObject;
 }
 
 jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
-    helpers::assertThat(rt, count == 1, "expected to be called with one argument.");
     helpers::assertThat(rt, arguments[0].isObject(), "expected to be called with object.");
 
     // create new state
     auto config = arguments[0].asObject(rt);
     auto& registry = core::UnistylesRegistry::get();
     auto miniRuntime = this->miniRuntime->toObject(rt).asObject(rt);
-    
+
     registry.createState(rt, miniRuntime);
 
     helpers::enumerateJSIObject(rt, config, [&](const std::string& propertyName, jsi::Value& propertyValue){
@@ -70,7 +72,7 @@ jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisV
 
 void HybridStyleSheet::parseSettings(jsi::Runtime &rt, jsi::Object settings) {
     auto& registry = core::UnistylesRegistry::get();
-    
+
     helpers::enumerateJSIObject(rt, settings, [&](const std::string& propertyName, jsi::Value& propertyValue){
         if (propertyName == "adaptiveThemes") {
             helpers::assertThat(rt, propertyValue.isBool(), "adaptiveThemes configuration must be of boolean type.");
@@ -83,10 +85,10 @@ void HybridStyleSheet::parseSettings(jsi::Runtime &rt, jsi::Object settings) {
         if (propertyName == "initialTheme") {
             if (propertyValue.isObject()) {
                 helpers::assertThat(rt, propertyValue.asObject(rt).isFunction(rt), "initialTheme configuration must be either a string or a function.");
-                
+
                 return registry.setInitialThemeNameCallback(rt, propertyValue.asObject(rt).asFunction(rt));
             }
-            
+
             helpers::assertThat(rt, propertyValue.isString(), "initialTheme configuration must be either a string or a function.");
 
             registry.setInitialThemeName(rt, propertyValue.asString(rt).utf8(rt));
@@ -103,33 +105,33 @@ void HybridStyleSheet::parseBreakpoints(jsi::Runtime &rt, jsi::Object breakpoint
 
     helpers::assertThat(rt, sortedBreakpoints.size() > 0, "registered breakpoints can't be empty.");
     helpers::assertThat(rt, sortedBreakpoints.front().second == 0, "first breakpoint must start from 0.");
-    
+
     auto& registry = core::UnistylesRegistry::get();
     auto& state = registry.getState(rt);
-    
+
     registry.registerBreakpoints(rt, sortedBreakpoints);
     state.computeCurrentBreakpoint(nativePlatform.getScreenDimensions().width);
 }
 
 void HybridStyleSheet::parseThemes(jsi::Runtime &rt, jsi::Object themes) {
     auto& registry = core::UnistylesRegistry::get();
-    
+
     helpers::enumerateJSIObject(rt, themes, [&](const std::string& propertyName, jsi::Value& propertyValue){
         helpers::assertThat(rt, propertyValue.isObject(), "registered theme '" + propertyName + "' must be an object.");
-        
+
         registry.registerTheme(rt, propertyName, propertyValue.asObject(rt));
     });
 }
 
 void HybridStyleSheet::verifyAndSelectTheme(jsi::Runtime &rt) {
     auto& state = core::UnistylesRegistry::get().getState(rt);
-    
+
     bool hasInitialTheme = state.hasInitialTheme();
     bool prefersAdaptiveThemes = state.getPrefersAdaptiveThemes();
     bool hasAdaptiveThemes = state.hasAdaptiveThemes();
     std::vector<std::string> registeredThemeNames = state.getRegisteredThemeNames();
     bool hasSingleTheme = registeredThemeNames.size() == 1;
-    
+
     // user tries to enable adaptive themes, but didn't register both 'light' and 'dark' themes
     if (prefersAdaptiveThemes && !hasAdaptiveThemes) {
         helpers::assertThat(rt, false, "you're trying to enable adaptiveThemes, but you didn't register both 'light' and 'dark' themes.");
@@ -184,4 +186,88 @@ void HybridStyleSheet::setThemeFromColorScheme(jsi::Runtime& rt) {
         default:
             throw std::runtime_error("unable to set adaptive theme as your device doesn't support it.");
     }
+}
+
+void HybridStyleSheet::attachMetaFunctions(jsi::Runtime &rt, core::StyleSheet& styleSheet, jsi::Object &parsedStyleSheet) {
+    auto addNodeFnName = jsi::PropNameID::forUtf8(rt, helpers::ADD_NODE_FN);
+    auto removeNodeFnName = jsi::PropNameID::forUtf8(rt, helpers::REMOVE_NODE_FN);
+    auto addVariantsFnName = jsi::PropNameID::forUtf8(rt, helpers::ADD_VARIANTS_FN);
+    auto addVariantsHostFn = jsi::Function::createFromHostFunction(rt, addVariantsFnName, 1,
+        [&](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        helpers::assertThat(rt, count == 1, "expected to be called with one argument.");
+        styleSheet.addVariants(rt, jsi::Value(rt, args[0]));
+
+        jsi::Object stylesWithVariants = jsi::Object(rt);
+        auto& state = core::UnistylesRegistry::get().getState(rt);
+        auto settings = std::make_unique<parser::ParserSettings>(
+            styleSheet.variants,
+            state.getCurrentBreakpointName(),
+            state.getSortedBreakpointPairs(),
+            miniRuntime->getScreen()
+        );
+        auto& parser = parser::Parser::configure(std::move(settings));
+
+
+        for (auto& style: styleSheet.unistyles) {
+            if (helpers::vecContainsKeys(style.dependencies, {core::UnistyleDependency::Variants})) {
+                parser.parseUnistyle(rt, style, stylesWithVariants);
+            }
+        }
+
+        return stylesWithVariants;
+    });
+
+    // attach addVariants to stylesheet
+    helpers::defineHiddenProperty(rt, parsedStyleSheet, helpers::ADD_VARIANTS_FN, std::move(addVariantsHostFn));
+
+    // attach addNode and removeNode to each style
+    helpers::enumerateJSIObject(rt, parsedStyleSheet, [&](const std::string& propertyName, jsi::Value& propertyValue){
+        auto addNodeHostFn = jsi::Function::createFromHostFunction(rt, addNodeFnName, 1,
+            [&, propertyName](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+            helpers::assertThat(rt, count == 1, "expected to be called with one argument,");
+            helpers::assertThat(rt, args[0].isNumber(), "expected to be called with number.");
+
+            auto nativeTag = args[0].asNumber();
+            auto it = std::find_if(
+                styleSheet.unistyles.begin(),
+                styleSheet.unistyles.end(),
+                [&propertyName](const core::Unistyle& style) {
+                    return style.styleKey == propertyName;
+                }
+            );
+
+            if (it != styleSheet.unistyles.end()) {
+                it->nativeTags.push_back(nativeTag);
+            }
+
+            return jsi::Value::undefined();
+        });
+        auto removeNodeHostFn = jsi::Function::createFromHostFunction(rt, removeNodeFnName, 1,
+            [&, propertyName](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+            helpers::assertThat(rt, count == 1, "expected to be called with one argument,");
+            helpers::assertThat(rt, args[0].isNumber(), "expected to be called with number.");
+
+            auto nativeTag = args[0].asNumber();
+            auto it = std::find_if(
+                styleSheet.unistyles.begin(),
+                styleSheet.unistyles.end(),
+                [&propertyName](const core::Unistyle& style) {
+                    return style.styleKey == propertyName;
+                }
+            );
+
+            auto tagIt = std::find(it->nativeTags.begin(), it->nativeTags.end(), nativeTag);
+
+            if (tagIt != it->nativeTags.end()) {
+                it->nativeTags.erase(tagIt);
+            }
+
+            return jsi::Value::undefined();
+        });
+
+        auto style = jsi::Value(rt, propertyValue).asObject(rt);
+
+        helpers::defineHiddenProperty(rt, style, helpers::ADD_NODE_FN, std::move(addNodeHostFn));
+        helpers::defineHiddenProperty(rt, style, helpers::REMOVE_NODE_FN, std::move(removeNodeHostFn));
+    });
 }
