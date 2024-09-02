@@ -17,7 +17,6 @@ void parser::Parser::parseUnistyle(jsi::Runtime& rt, core::Unistyle& unistyle, j
     if (unistyle.type == core::UnistyleType::Object) {
         auto result = this->parseFirstLevel(rt, unistyle);
         
-        unistyle.isDirty = false;
         unistyle.parsedStyle = jsi::Value(rt, result).asObject(rt);
 
         target.setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle.styleKey), std::move(result));
@@ -51,7 +50,6 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime &rt, core:
                 this->parseDynamicFunctionArguments(rt, count, args)
             };
             
-            unistyle.isDirty = false;
             unistyle.parsedStyle = jsi::Value(rt, result).asObject(rt);
 
             return this->parseFirstLevel(rt, unistyle);

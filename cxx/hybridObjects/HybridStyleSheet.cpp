@@ -1,5 +1,7 @@
 #include "HybridStyleSheet.h"
 
+using namespace facebook::react;
+
 double HybridStyleSheet::getHairlineWidth() {
     auto pixelRatio = this->nativePlatform.getPixelRatio();
     auto nearestPixel = static_cast<int>(std::trunc(pixelRatio * 0.4));
@@ -273,8 +275,67 @@ void HybridStyleSheet::attachMetaFunctions(jsi::Runtime &rt, core::StyleSheet& s
 }
 
 void HybridStyleSheet::onPlatformEvent(PlatformEvent event) {
+    // todo compare values, call methods only when value changed
     auto dependencies = helpers::getUnistyleDependenciesFromPlatformEvent(event);
-    auto styleSheets = this->styleSheetRegistry.getUnistylesWithDependencies(dependencies);
 
-    // todo split it between shadowTree and native update
+
+    this->updateUnistylesWithDependencies(dependencies);
+}
+
+void HybridStyleSheet::updateUnistylesWithDependencies(std::vector<core::UnistyleDependency>& dependencies) {
+    auto unistyles = this->styleSheetRegistry.getUnistylesWithDependencies(dependencies);
+
+    auto rt = this->unistylesRuntime->rt;
+    auto uiManager = UIManagerBinding::getBinding(*rt);
+    const auto &shadowTreeRegistry = uiManager->getUIManager().getShadowTreeRegistry();
+
+    auto& state = core::UnistylesRegistry::get().getState(*rt);
+    std::vector<std::pair<std::string, std::string>> variants{};
+    Dimensions dimensions{400, 800};
+    auto settings = std::make_unique<parser::ParserSettings>(
+        variants,
+        state.getCurrentBreakpointName(),
+        state.getSortedBreakpointPairs(),
+        // todo
+        dimensions
+    );
+
+    auto& parser = parser::Parser::configure(std::move(settings));
+
+    std::for_each(unistyles.begin(), unistyles.end(), [&](const core::Unistyle* unistyle){
+        jsi::Object stylesProps = jsi::Object(*rt);
+        auto nonConstUnistyles = const_cast<core::Unistyle*>(unistyle);
+
+        nonConstUnistyles->isDirty = true;
+        parser.parseUnistyle(*rt, *nonConstUnistyles, stylesProps);
+        nonConstUnistyles->parsedStyle = std::move(stylesProps);
+
+        auto rawProps = RawProps(*rt, jsi::Value(*rt, unistyle->parsedStyle.value()));
+
+        // todo split it between shadowTree and native update
+        // todo optimise it
+        shadowTreeRegistry.enumerate([&](const ShadowTree& shadowTree, bool& stop){
+            std::for_each(unistyle->nativeTags.begin(), unistyle->nativeTags.end(), [&](int nativeTag){
+                auto transaction = [&](const RootShadowNode& oldRootShadowNode) {
+                    auto traverser = shadow::ShadowTreeTraverser{oldRootShadowNode};
+                    auto targetNode = traverser.findShadowNode(nativeTag);
+
+                    if (!targetNode) {
+                        return std::static_pointer_cast<facebook::react::RootShadowNode>(traverser.getShadowTree());
+                    }
+
+                    auto newShadowNode = traverser.cloneShadowNodeWithNewProps(targetNode, rawProps);
+
+                    traverser.replaceShadowNode(newShadowNode);
+
+                    return traverser.getShadowTree();
+                };
+
+                shadowTree.commit(transaction, {false, true});
+                stop = true;
+            });
+        });
+
+        nonConstUnistyles->isDirty = false;
+    });
 }
