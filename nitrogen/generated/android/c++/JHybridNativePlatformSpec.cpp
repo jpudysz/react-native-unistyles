@@ -14,6 +14,8 @@ namespace margelo::nitro::unistyles { struct Insets; }
 namespace margelo::nitro::unistyles { enum class ColorScheme; }
 // Forward declaration of `Dimensions` to properly resolve imports.
 namespace margelo::nitro::unistyles { struct Dimensions; }
+// Forward declaration of `PlatformEvent` to properly resolve imports.
+namespace margelo::nitro::unistyles { enum class PlatformEvent; }
 
 #include "Insets.hpp"
 #include "JInsets.hpp"
@@ -23,6 +25,10 @@ namespace margelo::nitro::unistyles { struct Dimensions; }
 #include "Dimensions.hpp"
 #include "JDimensions.hpp"
 #include <optional>
+#include <functional>
+#include "PlatformEvent.hpp"
+#include "JFunc_void_PlatformEvent.hpp"
+#include "JPlatformEvent.hpp"
 
 namespace margelo::nitro::unistyles {
 
@@ -109,6 +115,10 @@ namespace margelo::nitro::unistyles {
   void JHybridNativePlatformSpec::setImmersiveMode(bool isEnabled) {
     static const auto method = _javaPart->getClass()->getMethod<void(bool /* isEnabled */)>("setImmersiveMode");
     method(_javaPart, isEnabled);
+  }
+  void JHybridNativePlatformSpec::registerPlatformListener(const std::function<void(PlatformEvent /* event */)>& callback) {
+    static const auto method = _javaPart->getClass()->getMethod<void(jni::alias_ref<JFunc_void_PlatformEvent::javaobject> /* callback */)>("registerPlatformListener");
+    method(_javaPart, JFunc_void_PlatformEvent::fromCpp(callback));
   }
 
 } // namespace margelo::nitro::unistyles

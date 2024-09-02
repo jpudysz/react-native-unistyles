@@ -271,3 +271,10 @@ void HybridStyleSheet::attachMetaFunctions(jsi::Runtime &rt, core::StyleSheet& s
         helpers::defineHiddenProperty(rt, style, helpers::REMOVE_NODE_FN, std::move(removeNodeHostFn));
     });
 }
+
+void HybridStyleSheet::onPlatformEvent(PlatformEvent event) {
+    auto dependencies = helpers::getUnistyleDependenciesFromPlatformEvent(event);
+    auto styleSheets = this->styleSheetRegistry.getUnistylesWithDependencies(dependencies);
+
+    // todo split it between shadowTree and native update
+}

@@ -124,3 +124,25 @@ std::vector<core::Unistyle>& StyleSheetRegistry::parseToUnistyles(jsi::Runtime& 
     
     return styleSheet.unistyles;
 }
+
+std::vector<const core::Unistyle*> StyleSheetRegistry::getUnistylesWithDependencies(std::vector<core::UnistyleDependency>& dependencies) {
+    std::vector<const core::Unistyle*> stylesToUpdate;
+    
+    for (const auto& styleSheet : this->styleSheets) {
+        for (const Unistyle& unistyle : styleSheet.unistyles) {
+            bool hasAnyOfDependencies = std::any_of(
+                unistyle.dependencies.begin(),
+                unistyle.dependencies.end(),
+                [&dependencies](core::UnistyleDependency dep) {
+                    return std::find(dependencies.begin(), dependencies.end(), dep) != dependencies.end();
+                }
+            );
+
+            if (hasAnyOfDependencies) {
+                stylesToUpdate.push_back(&unistyle);
+            }
+        }
+    }
+
+    return stylesToUpdate;
+}

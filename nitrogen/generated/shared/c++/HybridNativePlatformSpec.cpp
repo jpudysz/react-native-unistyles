@@ -29,6 +29,7 @@ namespace margelo::nitro::unistyles {
       prototype.registerHybridMethod("setNavigationBarHidden", &HybridNativePlatformSpec::setNavigationBarHidden);
       prototype.registerHybridMethod("setStatusBarBackgroundColor", &HybridNativePlatformSpec::setStatusBarBackgroundColor);
       prototype.registerHybridMethod("setImmersiveMode", &HybridNativePlatformSpec::setImmersiveMode);
+      prototype.registerHybridMethod("registerPlatformListener", &HybridNativePlatformSpec::registerPlatformListener);
     });
   }
 

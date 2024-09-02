@@ -2,6 +2,10 @@ import type { HybridObject } from 'react-native-nitro-modules'
 import type { Dimensions, Insets } from './types'
 
 type ColorScheme = 'dark' | 'light' | 'unspecified'
+type PlatformEvent =
+    | 'onOrientationChange'
+    | 'onContentSizeCategoryChange'
+    | 'onScreenSizeChange'
 
 export interface NativePlatform extends HybridObject<{ ios: 'swift', android: 'kotlin' }> {
     getInsets(): Insets,
@@ -19,4 +23,6 @@ export interface NativePlatform extends HybridObject<{ ios: 'swift', android: 'k
     setNavigationBarHidden?(isHidden: boolean): void,
     setStatusBarBackgroundColor?(hex?: string, alpha?: number): void,
     setImmersiveMode(isEnabled: boolean): void,
+
+    registerPlatformListener(callback: (event: PlatformEvent) => void): void
 }
