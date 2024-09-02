@@ -125,8 +125,60 @@ std::vector<core::Unistyle>& StyleSheetRegistry::parseToUnistyles(jsi::Runtime& 
     return styleSheet.unistyles;
 }
 
-std::vector<const core::Unistyle*> StyleSheetRegistry::getUnistylesWithDependencies(std::vector<core::UnistyleDependency>& dependencies) {
+std::vector<const core::Unistyle*> StyleSheetRegistry::recompute(
+    jsi::Runtime &rt,
+    const StyleSheet* styleSheet,
+    std::vector<core::UnistyleDependency>& dependencies
+) {
+    auto mutatedStyleSheet = const_cast<StyleSheet*>(styleSheet);
+    jsi::Object unwrappedStyleSheet = this->unwrapStyleSheet(rt, *mutatedStyleSheet);
+    auto unistyles = this->getUnistylesWithDependencies(*mutatedStyleSheet, dependencies);
+    
+    helpers::enumerateJSIObject(rt, unwrappedStyleSheet, [&](const std::string& styleKey, jsi::Value& propertyValue){
+        auto it = std::find_if(unistyles.begin(), unistyles.end(), [&styleKey](const core::Unistyle* unistyle){
+            return styleKey == unistyle->styleKey;
+        });
+        
+        if (it == unistyles.end()) {
+            return;
+        }
+      
+        auto unistyle = const_cast<core::Unistyle*>(*it);
+        auto newRawStyle = propertyValue.asObject(rt);
+
+        unistyle->isDirty = true;
+        unistyle->rawValue = std::move(newRawStyle);
+        unistyle->parsedStyle = std::nullopt;
+    });
+    
+    return unistyles;
+}
+
+std::vector<const core::Unistyle*> StyleSheetRegistry::getUnistylesWithDependencies(
+    StyleSheet& styleSheet,
+    std::vector<core::UnistyleDependency>& dependencies
+) {
     std::vector<const core::Unistyle*> stylesToUpdate;
+    
+    for (const Unistyle& unistyle : styleSheet.unistyles) {
+        bool hasAnyOfDependencies = std::any_of(
+            unistyle.dependencies.begin(),
+            unistyle.dependencies.end(),
+            [&dependencies](core::UnistyleDependency dep) {
+                return std::find(dependencies.begin(), dependencies.end(), dep) != dependencies.end();
+            }
+        );
+
+        if (hasAnyOfDependencies) {
+            stylesToUpdate.push_back(&unistyle);
+        }
+    }
+
+    return stylesToUpdate;
+}
+
+std::vector<const core::StyleSheet*> StyleSheetRegistry::getStyleSheetsWithDependencies(std::vector<core::UnistyleDependency>& dependencies) {
+    std::vector<const core::StyleSheet*> styleSheetsToUpdate;
     
     for (const auto& styleSheet : this->styleSheets) {
         for (const Unistyle& unistyle : styleSheet.unistyles) {
@@ -139,10 +191,10 @@ std::vector<const core::Unistyle*> StyleSheetRegistry::getUnistylesWithDependenc
             );
 
             if (hasAnyOfDependencies) {
-                stylesToUpdate.push_back(&unistyle);
+                styleSheetsToUpdate.push_back(&styleSheet);
             }
         }
     }
 
-    return stylesToUpdate;
+    return styleSheetsToUpdate;
 }

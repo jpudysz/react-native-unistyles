@@ -23,7 +23,9 @@ struct StyleSheetRegistry {
     StyleSheet& add(jsi::Runtime& rt, jsi::Object rawStyleSheet);
     jsi::Object parse(jsi::Runtime &rt, StyleSheet& styleSheet);
     void remove(unsigned int tag);
-    std::vector<const core::Unistyle*> getUnistylesWithDependencies(std::vector<core::UnistyleDependency>& dependencies);
+    std::vector<const core::Unistyle*> getUnistylesWithDependencies(StyleSheet& styleSheet, std::vector<core::UnistyleDependency>& dependencies);
+    std::vector<const core::StyleSheet*> getStyleSheetsWithDependencies(std::vector<core::UnistyleDependency>& dependencies);
+    std::vector<const core::Unistyle*> recompute(jsi::Runtime &rt, const StyleSheet* styleSheet, std::vector<core::UnistyleDependency>& dependencies);
 
 private:
     folly::fbvector<StyleSheet> styleSheets{};
