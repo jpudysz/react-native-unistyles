@@ -11,11 +11,11 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     var memorySize: Int {
         return getSizeOf(self)
     }
-    
+
     init() {
         setupPlatformListeners()
     }
-    
+
     deinit {
         removePlatformListeners()
     }
@@ -72,17 +72,26 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     }
 
     func getScreenDimensions() throws -> Dimensions {
-        DispatchQueue.main.sync {
+        // todo: fix this
+        func getDimensions() -> Dimensions {
             guard let presentedViewController = RCTPresentedViewController(),
                   let windowFrame = presentedViewController.view.window?.frame else {
                 // this should never happen, but it's better to return zeros
                 return Dimensions(width: 0, height: 0)
             }
-            
+
             let width = windowFrame.size.width
             let height = windowFrame.size.height
 
             return Dimensions(width: width, height: height)
+        }
+
+        if Thread.isMainThread {
+            return getDimensions()
+        }
+
+        return DispatchQueue.main.sync {
+            return getDimensions()
         }
     }
 

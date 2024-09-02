@@ -9,7 +9,7 @@ func colorFromHexString(_ hexString: String, alpha: CGFloat) -> UIColor? {
     let hexSanitized = String(hexString.dropFirst())
     let scanner = Scanner(string: hexSanitized)
     let hasAlpha = hexSanitized.count == 8
-    
+
     if (hasAlpha && !scanner.scanHexInt64(&alphaValue)) || !scanner.scanHexInt64(&rgbValue) {
         return nil
     }
