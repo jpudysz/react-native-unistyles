@@ -65,9 +65,6 @@ npx expo prebuild
 <a href="https://github.com/mobily">
      <img src="https://avatars.githubusercontent.com/u/1467712?v=4" height="70px" width="70px" alt="mobily" />
 </a>
-<a href="https://github.com/abanobboles">
-     <img src="https://avatars.githubusercontent.com/u/9078953?v=4" height="70px" width="70px" alt="abanobboles" />
-</a>
 <a href="https://github.com/mwarger">
      <img src="https://avatars.githubusercontent.com/u/686823?v=4" height="70px" width="70px" alt="mwarger" />
 </a>
@@ -88,6 +85,9 @@ npx expo prebuild
 </a>
 <a href="https://github.com">
      <img src="https://avatars.githubusercontent.com/u/113348625?v=4" height="70px" width="70px" alt="anonymous" />
+</a>
+<a href="https://github.com/abanobboles">
+     <img src="https://avatars.githubusercontent.com/u/9078953?v=4" height="70px" width="70px" alt="abanobboles" />
 </a>
 
 ## Sponsor my work

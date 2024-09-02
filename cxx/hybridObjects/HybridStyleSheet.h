@@ -4,13 +4,12 @@
 #include "HybridStyleSheetSpec.hpp"
 #include "HybridUnistylesRuntime.h"
 #include "HybridMiniRuntime.h"
-// todo remove me
-#include <NitroModules/HybridContext.hpp>
 #include "Unistyles-Swift-Cxx-Umbrella.hpp"
 #include "Helpers.h"
 #include "Constants.h"
 #include "Breakpoints.h"
 #include "StyleSheetRegistry.h"
+#include "HostStyle.h"
 
 using namespace margelo::nitro::unistyles;
 
@@ -18,7 +17,7 @@ struct HybridStyleSheet: public HybridStyleSheetSpec {
     HybridStyleSheet(
         Unistyles::HybridNativePlatformSpecCxx nativePlatform,
         std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime
-    ) : nativePlatform{nativePlatform}, miniRuntime{std::make_shared<HybridMiniRuntime>(unistylesRuntime)} {}
+    ) : HybridObject(TAG), nativePlatform{nativePlatform}, miniRuntime{std::make_shared<HybridMiniRuntime>(unistylesRuntime)} {}
 
     jsi::Value create(jsi::Runtime& rt,
                       const jsi::Value& thisValue,
@@ -33,8 +32,8 @@ struct HybridStyleSheet: public HybridStyleSheetSpec {
         HybridStyleSheetSpec::loadHybridMethods();
 
         registerHybrids(this, [](Prototype& prototype) {
-            prototype.registerHybridMethod("create", &HybridStyleSheet::create);
-            prototype.registerHybridMethod("configure", &HybridStyleSheet::configure);
+            prototype.registerRawHybridMethod("create", 1, &HybridStyleSheet::create);
+            prototype.registerRawHybridMethod("configure", 1, &HybridStyleSheet::configure);
         });
     };
 
@@ -46,9 +45,10 @@ private:
     void parseThemes(jsi::Runtime& rt, jsi::Object themes);
     void verifyAndSelectTheme(jsi::Runtime &rt);
     void setThemeFromColorScheme(jsi::Runtime& rt);
+    void attachMetaFunctions(jsi::Runtime& rt, core::StyleSheet& styleSheet, jsi::Object& parsedStyleSheet);
 
     Unistyles::HybridNativePlatformSpecCxx nativePlatform;
     std::shared_ptr<HybridMiniRuntime> miniRuntime;
-    core::StyleSheetRegistry styleSheetRegistry{};
+    core::StyleSheetRegistry styleSheetRegistry{miniRuntime};
 };
 
