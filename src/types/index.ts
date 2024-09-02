@@ -18,4 +18,4 @@ export type {
 } from './stylesheet'
 export type { ReactNativeStyleSheet } from './breakpoints'
 export type { ExtractVariantNames } from './variants'
-export { AndroidContentSizeCategory, IOSContentSizeCategory} from './accessibility'
+export { AndroidContentSizeCategory, IOSContentSizeCategory, WebContentSizeCategory } from './accessibility'

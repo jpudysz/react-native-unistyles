@@ -1,7 +1,7 @@
-import { Button, Text, TouchableOpacity, View } from 'react-native'
-import './unistyles'
-import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
 import { useState } from 'react'
+import { Button, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
+import './unistyles'
 
 export default function App() {
     const [state, setState] = useState(0)

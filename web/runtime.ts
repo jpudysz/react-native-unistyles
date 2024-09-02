@@ -1,5 +1,5 @@
 import { ColorScheme, Orientation, type AppThemeName } from '../src/specs/types'
-import { IOSContentSizeCategory } from '../src/types'
+import { WebContentSizeCategory } from '../src/types'
 import { UnistylesState } from './state'
 
 class UnistylesRuntimeBuilder {
@@ -22,7 +22,7 @@ class UnistylesRuntimeBuilder {
     }
 
     get contentSizeCategory() {
-        return IOSContentSizeCategory.Unspecified
+        return WebContentSizeCategory.Unspecified
     }
 
     get breakpoint() {
@@ -80,7 +80,7 @@ class UnistylesRuntimeBuilder {
     }
 
     get rtl() {
-        return false
+        return document.documentElement.dir === 'rtl'
     }
 
     get hasAdaptiveThemes() {
