@@ -78,16 +78,21 @@
     "react-native-web": "0.19.12",
     "react-test-renderer": "18.3.1",
     "release-it": "17.6.0",
-    "typescript": "5.5.4"
+    "typescript": "5.5.4",
+    "typestyle": "2.4.0"
   },
   "peerDependencies": {
     "@react-native/normalize-colors": "*",
     "react": "*",
     "react-native": "*",
-    "react-native-web": "*"
+    "react-native-web": "*",
+    "typestyle": ">=2.4.0"
   },
   "peerDependenciesMeta": {
     "react-native-web": {
+      "optional": true
+    },
+    "typestyle": {
       "optional": true
     }
   },

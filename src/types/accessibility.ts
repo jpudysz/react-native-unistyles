@@ -23,3 +23,7 @@ export enum AndroidContentSizeCategory {
     ExtraHuge = 'ExtraHuge',
     ExtraExtraHuge = 'ExtraExtraHuge'
 }
+
+export enum WebContentSizeCategory {
+    Unspecified = 'web-unspecified',
+}
