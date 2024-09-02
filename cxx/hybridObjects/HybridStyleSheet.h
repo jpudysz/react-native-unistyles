@@ -1,6 +1,9 @@
 #pragma once
 
 #include <cmath>
+#include <jsi/jsi.h>
+#include <react/renderer/uimanager/UIManagerBinding.h>
+#include <react/renderer/uimanager/UIManager.h>
 #include "HybridStyleSheetSpec.hpp"
 #include "HybridUnistylesRuntime.h"
 #include "HybridMiniRuntime.h"
@@ -10,6 +13,7 @@
 #include "Breakpoints.h"
 #include "StyleSheetRegistry.h"
 #include "HostStyle.h"
+#include "ShadowTreeTraverser.h"
 
 using namespace margelo::nitro::unistyles;
 
@@ -17,7 +21,10 @@ struct HybridStyleSheet: public HybridStyleSheetSpec {
     HybridStyleSheet(
         Unistyles::HybridNativePlatformSpecCxx nativePlatform,
         std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime
-    ) : HybridObject(TAG), nativePlatform{nativePlatform}, miniRuntime{std::make_shared<HybridMiniRuntime>(unistylesRuntime)} {
+    ) : HybridObject(TAG),
+        unistylesRuntime{unistylesRuntime},
+        nativePlatform{nativePlatform},
+        miniRuntime{std::make_shared<HybridMiniRuntime>(unistylesRuntime)} {
         this->nativePlatform.registerPlatformListener(std::bind(&HybridStyleSheet::onPlatformEvent, this, std::placeholders::_1));
     }
 
@@ -49,9 +56,11 @@ private:
     void setThemeFromColorScheme(jsi::Runtime& rt);
     void attachMetaFunctions(jsi::Runtime& rt, core::StyleSheet& styleSheet, jsi::Object& parsedStyleSheet);
     void onPlatformEvent(PlatformEvent event);
+    void updateUnistylesWithDependencies(std::vector<core::UnistyleDependency>& depdendencies);
 
     Unistyles::HybridNativePlatformSpecCxx nativePlatform;
     std::shared_ptr<HybridMiniRuntime> miniRuntime;
+    std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime;
     core::StyleSheetRegistry styleSheetRegistry{miniRuntime};
 };
 

@@ -1,18 +1,34 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { Text, View } from 'react-native'
 import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
 import './unistyles'
 
 export const App = () => {
-    styles.addVariants({
-        color: 'blue',
-        size: 'small'
-    })
+    const renderCount = useRef(0)
+    // fix bug with attaching methods to styles
+    // styles.addVariants({
+    //     color: 'blue',
+    //     size: 'small'
+    // })
 
     return (
-        <View style={styles.container}>
-            <Text>
-                Current breakpoint: {UnistylesRuntime.breakpoint}
+        <View
+            style={styles.container}
+            ref={ref => {
+                if (ref) {
+                    styles.container.uni__addNode(ref.__nativeTag)
+                }
+
+                return () => {
+                    styles.container.uni__removeNode(ref.__nativeTag)
+                }
+            }}
+        >
+            <Text style={styles.text}>
+                Screen: {UnistylesRuntime.screen.width}x{UnistylesRuntime.screen.height}
+            </Text>
+            <Text style={styles.text}>
+                Render count: {++renderCount.current}
             </Text>
         </View>
     )
@@ -23,46 +39,13 @@ const styles = StyleSheet.create((theme, rt) => ({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: rt.screen.width > 500
-            ? theme.colors.backgroundColor
-            : 'red',
-        variants: {
-            size: {
-                small: {
-                    width: 100,
-                    height: 100
-                },
-                medium: {
-                    width: 200,
-                    height: 200
-                },
-                large: {
-                    width: 300,
-                    height: 300
-                }
-            },
-            color: {
-                red: {
-                    backgroundColor: 'red'
-                },
-                green: {
-                    backgroundColor: 'green'
-                },
-                blue: {
-                    backgroundColor: '#a4a4e5'
-                }
-            }
-        },
-        compoundVariants: [
-            {
-                color: 'blue',
-                size: 'small',
-                styles: {
-                    width: '100%',
-                    height: '100%'
-                }
-            }
-        ],
+        backgroundColor: theme.colors.accent,
+        width: rt.screen.width / 2,
+        height: rt.screen.height / 2,
         uni__dependencies: [2, 6]
+    },
+    text: {
+        color: theme.colors.backgroundColor,
+        backgroundColor: theme.colors.typography
     }
 }))
