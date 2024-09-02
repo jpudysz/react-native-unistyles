@@ -8,8 +8,6 @@ double HybridStyleSheet::getHairlineWidth() {
 }
 
 jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
-    // todo remove me with nitro 0.6
-    helpers::assertThat(rt, count == 1, "expected to be called with one argument.");
     helpers::assertThat(rt, arguments[0].isObject(), "expected to be called with object or function.");
 
     auto thisStyleSheet = thisVal.asObject(rt);
@@ -36,8 +34,6 @@ jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal,
 }
 
 jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
-    // todo remove me with nitro 0.6
-    helpers::assertThat(rt, count == 1, "expected to be called with one argument.");
     helpers::assertThat(rt, arguments[0].isObject(), "expected to be called with object.");
 
     // create new state
