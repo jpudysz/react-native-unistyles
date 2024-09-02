@@ -8,9 +8,16 @@ typealias CxxListener = (PlatformEvent) -> Void
 class NativeIOSPlatform: HybridNativePlatformSpec {
     var listeners: Array<CxxListener> = []
     var hybridContext = margelo.nitro.HybridContext()
-
     var memorySize: Int {
         return getSizeOf(self)
+    }
+    
+    init() {
+        setupPlatformListeners()
+    }
+    
+    deinit {
+        removePlatformListeners()
     }
 
     func getColorScheme() throws -> ColorScheme {
