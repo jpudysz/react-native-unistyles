@@ -3,7 +3,10 @@
 import Foundation
 import NitroModules
 
+typealias CxxListener = (PlatformEvent) -> Void
+
 class NativeIOSPlatform: HybridNativePlatformSpec {
+    var listeners: Array<CxxListener> = []
     var hybridContext = margelo.nitro.HybridContext()
 
     var memorySize: Int {
@@ -68,7 +71,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
                 // this should never happen, but it's better to return zeros
                 return Dimensions(width: 0, height: 0)
             }
-
+            
             let width = windowFrame.size.width
             let height = windowFrame.size.height
 
@@ -172,7 +175,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
             presentedViewController.view.backgroundColor = backgroundColor
         }
     }
-    
+
     func getNavigationBarDimensions() throws -> Dimensions {
         return Dimensions(width: 0, height: 0);
     }

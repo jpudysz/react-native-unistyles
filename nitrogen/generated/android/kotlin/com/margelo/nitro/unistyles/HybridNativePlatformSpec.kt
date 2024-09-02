@@ -92,6 +92,17 @@ abstract class HybridNativePlatformSpec: HybridObject() {
   @DoNotStrip
   @Keep
   abstract fun setImmersiveMode(isEnabled: Boolean): Unit
+  
+  @DoNotStrip
+  @Keep
+  abstract fun registerPlatformListener(callback: (event: PlatformEvent) -> Unit): Unit
+  
+  @DoNotStrip
+  @Keep
+  private fun registerPlatformListener(callback: Func_void_PlatformEvent): Unit {
+    val result = registerPlatformListener(callback.toLambda())
+    return result
+  }
 
   private external fun initHybrid(): HybridData
 

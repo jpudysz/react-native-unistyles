@@ -23,6 +23,7 @@ struct StyleSheetRegistry {
     StyleSheet& add(jsi::Runtime& rt, jsi::Object rawStyleSheet);
     jsi::Object parse(jsi::Runtime &rt, StyleSheet& styleSheet);
     void remove(unsigned int tag);
+    std::vector<const core::Unistyle*> getUnistylesWithDependencies(std::vector<core::UnistyleDependency>& dependencies);
 
 private:
     folly::fbvector<StyleSheet> styleSheets{};
@@ -31,6 +32,7 @@ private:
     StyleSheet& addFromObject(jsi::Runtime& rt, unsigned int tag, jsi::Object rawStyleSheet);
     jsi::Object unwrapStyleSheet(jsi::Runtime& rt, StyleSheet& styleSheet);
     std::vector<core::Unistyle>& parseToUnistyles(jsi::Runtime& rt, StyleSheet& styleSheet, jsi::Object& unwrappedStyleSheet);
+    
     std::shared_ptr<HybridMiniRuntime> miniRuntime;
 };
 

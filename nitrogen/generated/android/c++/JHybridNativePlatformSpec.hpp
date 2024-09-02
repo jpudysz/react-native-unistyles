@@ -57,6 +57,7 @@ namespace margelo::nitro::unistyles {
     void setNavigationBarHidden(bool isHidden) override;
     void setStatusBarBackgroundColor(const std::optional<std::string>& hex, std::optional<double> alpha) override;
     void setImmersiveMode(bool isEnabled) override;
+    void registerPlatformListener(const std::function<void(PlatformEvent /* event */)>& callback) override;
 
   private:
     friend HybridBase;

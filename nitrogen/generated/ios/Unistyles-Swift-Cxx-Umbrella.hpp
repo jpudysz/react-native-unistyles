@@ -17,12 +17,16 @@ namespace margelo::nitro::unistyles { struct Dimensions; }
 namespace margelo::nitro::unistyles { struct Insets; }
 // Forward declaration of `Orientation` to properly resolve imports.
 namespace margelo::nitro::unistyles { enum class Orientation; }
+// Forward declaration of `PlatformEvent` to properly resolve imports.
+namespace margelo::nitro::unistyles { enum class PlatformEvent; }
 
 // Include C++ defined types
 #include "ColorScheme.hpp"
 #include "Dimensions.hpp"
 #include "Insets.hpp"
 #include "Orientation.hpp"
+#include "PlatformEvent.hpp"
+#include <functional>
 #include <optional>
 #include <string>
 

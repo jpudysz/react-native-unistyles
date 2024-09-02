@@ -20,12 +20,16 @@ namespace margelo::nitro::unistyles { struct Insets; }
 namespace margelo::nitro::unistyles { enum class ColorScheme; }
 // Forward declaration of `Dimensions` to properly resolve imports.
 namespace margelo::nitro::unistyles { struct Dimensions; }
+// Forward declaration of `PlatformEvent` to properly resolve imports.
+namespace margelo::nitro::unistyles { enum class PlatformEvent; }
 
 #include "Insets.hpp"
 #include "ColorScheme.hpp"
 #include <string>
 #include "Dimensions.hpp"
 #include <optional>
+#include <functional>
+#include "PlatformEvent.hpp"
 
 namespace margelo::nitro::unistyles {
 
@@ -69,6 +73,7 @@ namespace margelo::nitro::unistyles {
       virtual void setNavigationBarHidden(bool isHidden) = 0;
       virtual void setStatusBarBackgroundColor(const std::optional<std::string>& hex, std::optional<double> alpha) = 0;
       virtual void setImmersiveMode(bool isEnabled) = 0;
+      virtual void registerPlatformListener(const std::function<void(PlatformEvent /* event */)>& callback) = 0;
 
     protected:
       // Hybrid Setup

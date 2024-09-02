@@ -2,6 +2,8 @@
 
 #include <jsi/jsi.h>
 #include <unordered_set>
+#include "Unistyle.h"
+#include "PlatformEvent.hpp"
 
 using namespace facebook;
 
@@ -88,6 +90,17 @@ inline jsi::Object& mergeJSIObjects(jsi::Runtime&rt, jsi::Object& obj1, jsi::Obj
     });
 
     return obj1;
+}
+
+inline std::vector<core::UnistyleDependency> getUnistyleDependenciesFromPlatformEvent(PlatformEvent& event) {
+    switch (event) {
+        case PlatformEvent::ONSCREENSIZECHANGE:
+            return {core::UnistyleDependency::Dimensions};
+        case PlatformEvent::ONORIENTATIONCHANGE:
+            return {core::UnistyleDependency::Orientation, core::UnistyleDependency::Dimensions};
+        case PlatformEvent::ONCONTENTSIZECATEGORYCHANGE:
+            return{core::UnistyleDependency::ContentSizeCategory};
+    }
 }
 
 }

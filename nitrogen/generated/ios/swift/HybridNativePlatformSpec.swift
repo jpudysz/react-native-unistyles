@@ -47,6 +47,7 @@ public protocol HybridNativePlatformSpec: HybridObjectSpec {
   func setNavigationBarHidden(isHidden: Bool) throws -> Void
   func setStatusBarBackgroundColor(hex: String?, alpha: Double?) throws -> Void
   func setImmersiveMode(isEnabled: Bool) throws -> Void
+  func registerPlatformListener(callback: @escaping ((_ event: PlatformEvent) -> Void)) throws -> Void
 }
 
 public extension HybridNativePlatformSpec {

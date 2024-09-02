@@ -19,12 +19,16 @@ namespace margelo::nitro::unistyles { struct Insets; }
 namespace margelo::nitro::unistyles { enum class ColorScheme; }
 // Forward declaration of `Dimensions` to properly resolve imports.
 namespace margelo::nitro::unistyles { struct Dimensions; }
+// Forward declaration of `PlatformEvent` to properly resolve imports.
+namespace margelo::nitro::unistyles { enum class PlatformEvent; }
 
 #include "Insets.hpp"
 #include "ColorScheme.hpp"
 #include <string>
 #include "Dimensions.hpp"
 #include <optional>
+#include <functional>
+#include "PlatformEvent.hpp"
 
 #if __has_include(<NitroModules/HybridContext.hpp>)
 #include <NitroModules/HybridContext.hpp>
@@ -119,6 +123,9 @@ namespace margelo::nitro::unistyles {
     }
     inline void setImmersiveMode(bool isEnabled) override {
       _swiftPart.setImmersiveMode(std::forward<decltype(isEnabled)>(isEnabled));
+    }
+    inline void registerPlatformListener(const std::function<void(PlatformEvent /* event */)>& callback) override {
+      _swiftPart.registerPlatformListener(callback);
     }
 
   private:

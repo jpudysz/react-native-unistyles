@@ -18,12 +18,14 @@ export const App = () => {
     )
 }
 
-const styles = StyleSheet.create(theme => ({
+const styles = StyleSheet.create((theme, rt) => ({
     container: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: theme.colors.backgroundColor,
+        backgroundColor: rt.screen.width > 500
+            ? theme.colors.backgroundColor
+            : 'red',
         variants: {
             size: {
                 small: {
@@ -61,6 +63,6 @@ const styles = StyleSheet.create(theme => ({
                 }
             }
         ],
-        uni__dependencies: [2]
+        uni__dependencies: [2, 6]
     }
 }))

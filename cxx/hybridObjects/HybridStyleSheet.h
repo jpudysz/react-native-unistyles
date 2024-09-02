@@ -17,7 +17,9 @@ struct HybridStyleSheet: public HybridStyleSheetSpec {
     HybridStyleSheet(
         Unistyles::HybridNativePlatformSpecCxx nativePlatform,
         std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime
-    ) : HybridObject(TAG), nativePlatform{nativePlatform}, miniRuntime{std::make_shared<HybridMiniRuntime>(unistylesRuntime)} {}
+    ) : HybridObject(TAG), nativePlatform{nativePlatform}, miniRuntime{std::make_shared<HybridMiniRuntime>(unistylesRuntime)} {
+        this->nativePlatform.registerPlatformListener(std::bind(&HybridStyleSheet::onPlatformEvent, this, std::placeholders::_1));
+    }
 
     jsi::Value create(jsi::Runtime& rt,
                       const jsi::Value& thisValue,
@@ -46,6 +48,7 @@ private:
     void verifyAndSelectTheme(jsi::Runtime &rt);
     void setThemeFromColorScheme(jsi::Runtime& rt);
     void attachMetaFunctions(jsi::Runtime& rt, core::StyleSheet& styleSheet, jsi::Object& parsedStyleSheet);
+    void onPlatformEvent(PlatformEvent event);
 
     Unistyles::HybridNativePlatformSpecCxx nativePlatform;
     std::shared_ptr<HybridMiniRuntime> miniRuntime;
