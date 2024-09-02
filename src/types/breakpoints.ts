@@ -20,15 +20,19 @@ type ExtractBreakpoints<T> = T extends object
 type ParseNestedObject<T> = T extends (...args: infer A) => infer R
     ? (...args: A) => ParseNestedObject<R>
     : T extends object
-        ? T extends { variants: infer R }
-            ? ParseVariants<FlattenVariants<R>> & ParseNestedObject<Omit<T, 'variants'>>
-            : {
-                [K in keyof T]: T[K] extends object
-                    ? T[K] extends OpaqueColorValue
-                        ? ColorValue
-                        : ExtractBreakpoints<T[K]>
-                    : T[K]
-            }
+        ? T extends { variants: infer R, compoundVariants: infer C }
+            ? ParseVariants<FlattenVariants<R>> & FlattenCompoundVariants<C> & ParseNestedObject<Omit<T, 'variants' | 'compoundVariants'>>
+            : T extends { variants: infer R }
+                ? ParseVariants<FlattenVariants<R>> & ParseNestedObject<Omit<T, 'variants'>>
+                : T extends { compoundVariants: object }
+                    ? ParseNestedObject<Omit<T, 'compoundVariants'>>
+                    : {
+                        [K in keyof T]: T[K] extends object
+                            ? T[K] extends OpaqueColorValue
+                                ? ColorValue
+                                : ExtractBreakpoints<T[K]>
+                            : T[K]
+                    }
         : T
 
 type FlattenVariants<T> = T extends object
@@ -42,6 +46,12 @@ type FlattenVariants<T> = T extends object
             : never
     }
     : never
+
+type FlattenCompoundVariants<T> = T extends Array<infer _>
+    ? FlattenCompoundVariants<T[number]>
+    : T extends { styles: infer S }
+        ? ParseNestedObject<S>
+        : never
 
 type ParseVariants<T> = T extends object
     ? T[keyof T] extends object
