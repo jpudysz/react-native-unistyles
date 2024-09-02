@@ -2,8 +2,6 @@
 
 #include "HybridUnistylesRuntimeSpec.hpp"
 #include "HybridNativePlatformSpec.hpp"
-// todo remove me
-#include <NitroModules/HybridContext.hpp>
 #include "Unistyles-Swift-Cxx-Umbrella.hpp"
 #include "Helpers.h"
 #include "UnistylesRegistry.h"
@@ -11,7 +9,7 @@
 using namespace margelo::nitro::unistyles;
 
 struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
-    HybridUnistylesRuntime(Unistyles::HybridNativePlatformSpecCxx nativePlatform): nativePlatform{nativePlatform} {}
+    HybridUnistylesRuntime(Unistyles::HybridNativePlatformSpecCxx nativePlatform): HybridObject(TAG), nativePlatform{nativePlatform} {}
 
     jsi::Value onLoad(jsi::Runtime& rt,
                       const jsi::Value& thisValue,
@@ -26,8 +24,8 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
         HybridUnistylesRuntimeSpec::loadHybridMethods();
 
         registerHybrids(this, [](Prototype& prototype) {
-            prototype.registerHybridMethod("init", &HybridUnistylesRuntime::onLoad);
-            prototype.registerHybridMethod("updateTheme", &HybridUnistylesRuntime::updateTheme);
+            prototype.registerRawHybridMethod("init", 1, &HybridUnistylesRuntime::onLoad);
+            prototype.registerRawHybridMethod("updateTheme", 1, &HybridUnistylesRuntime::updateTheme);
         });
     };
     

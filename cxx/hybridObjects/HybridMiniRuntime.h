@@ -6,7 +6,7 @@
 using namespace margelo::nitro::unistyles;
 
 struct HybridMiniRuntime: public HybridMiniRuntimeSpec {
-    HybridMiniRuntime(std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime): unistylesRuntime{unistylesRuntime} {}
+    HybridMiniRuntime(std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime): HybridObject(TAG), unistylesRuntime{unistylesRuntime} {}
     
     ColorScheme getColorScheme() override;
     bool getHasAdaptiveThemes() override;
