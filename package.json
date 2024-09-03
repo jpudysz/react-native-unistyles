@@ -153,5 +153,10 @@
         }
       ]
     ]
+  },
+  "codegenConfig": {
+    "name": "TurboUnistyles",
+    "type": "modules",
+    "jsSrcsDir": "./src/specs/HybridUnistyles"
   }
 }

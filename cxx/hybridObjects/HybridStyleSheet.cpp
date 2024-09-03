@@ -298,10 +298,10 @@ void HybridStyleSheet::updateUnistylesWithDependencies(std::vector<core::Unistyl
     );
 
     auto& parser = parser::Parser::configure(std::move(settings));
-    
+
     std::for_each(styleSheets.begin(), styleSheets.end(), [&](const core::StyleSheet* styleSheet){
         auto unistyles = this->styleSheetRegistry.recompute(*rt, styleSheet, dependencies);
-        
+
         std::for_each(unistyles.begin(), unistyles.end(), [&](const core::Unistyle* unistyle){
             jsi::Object stylesProps = jsi::Object(*rt);
             auto mutatedUnistyle = const_cast<core::Unistyle*>(unistyle);
