@@ -1,10 +1,15 @@
 import { create } from './create'
-import { UnistylesRuntime } from './runtime'
 import { UnistylesState } from './state'
+import { StyleSheet as NativeStyleSheet } from 'react-native'
 
 export const StyleSheet = {
     configure: UnistylesState.init,
-    create
+    create,
+    absoluteFill: NativeStyleSheet.absoluteFill,
+    compose: NativeStyleSheet.compose,
+    flatten: NativeStyleSheet.flatten,
+    hairlineWidth: NativeStyleSheet.hairlineWidth
 }
 
-export { UnistylesRuntime }
+export { UnistylesRuntime } from './runtime'
+export * from './mock'
