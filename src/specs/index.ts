@@ -1,5 +1,6 @@
 import { NitroModules } from 'react-native-nitro-modules'
 import { StatusBar as NativeStatusBar, StyleSheet as NativeStyleSheet } from 'react-native'
+import './NativeUnistyles'
 import type { NavigationBar } from './NavigtionBar'
 import type { StatusBar, StatusBarHiddenAnimation } from './StatusBar'
 import type { UnistylesRuntime, MiniRuntime } from './UnistylesRuntime'
