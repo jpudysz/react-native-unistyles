@@ -1,6 +1,8 @@
-import { ColorScheme, Orientation, type AppThemeName } from '../src/specs/types'
+import { ColorScheme, Orientation, type AppTheme, type AppThemeName } from '../src/specs/types'
 import { WebContentSizeCategory } from '../src/types'
+import { NavigationBar, StatusBar } from './mock'
 import { UnistylesState } from './state'
+import { hexToRGBA, schemeToTheme } from './utils'
 
 class UnistylesRuntimeBuilder {
     private readonly lightMedia = window.matchMedia('(prefers-color-scheme: light)')
@@ -73,10 +75,7 @@ class UnistylesRuntimeBuilder {
     }
 
     get statusBar() {
-        return {
-            width: 0,
-            height: 0
-        }
+        return StatusBar
     }
 
     get rtl() {
@@ -88,10 +87,7 @@ class UnistylesRuntimeBuilder {
     }
 
     get navigationBar() {
-        return {
-            width: 0,
-            height: 0,
-        }
+        return NavigationBar
     }
 
     get miniRuntime() {
@@ -105,16 +101,49 @@ class UnistylesRuntimeBuilder {
             screen: this.screen,
             fontScale: this.fontScale,
             insets: this.insets,
-            statusBar: this.statusBar,
+            statusBar: {
+                width: this.statusBar.width,
+                height: this.statusBar.height
+            },
+            navigationBar: {
+                width: this.navigationBar.width,
+                height: this.navigationBar.height,
+            },
             rtl: this.rtl,
             hasAdaptiveThemes: this.hasAdaptiveThemes,
-            navigationBar: this.navigationBar
         }
     }
 
     setTheme = (themeName: AppThemeName) => {
         document.querySelector(':root')?.classList.replace(UnistylesRuntime.themeName ?? '', themeName)
         UnistylesState.themeName = themeName
+    }
+
+    setAdaptiveThemes = (isEnabled: boolean) => {
+        UnistylesState.hasAdaptiveThemes = isEnabled
+
+        if (!isEnabled) {
+            return
+        }
+
+        this.setTheme(schemeToTheme(UnistylesRuntime.colorScheme))
+    }
+
+    setRootViewBackgroundColor = (hex: string, alpha?: number) => {
+        document.documentElement.style.backgroundColor = alpha ? hexToRGBA(hex, alpha) : hex
+    }
+
+    setImmersiveMode = () => {}
+
+    updateTheme = (themeName: AppThemeName, updater: (currentTheme: AppTheme) => AppTheme) => {
+        const oldTheme = UnistylesState.rawThemes ? UnistylesState.rawThemes[themeName] : undefined
+
+        if (!oldTheme || !UnistylesState.rawThemes) {
+            throw new Error(`🦄 Theme "${themeName}" is not registered!`)
+        }
+
+        UnistylesState.rawThemes[themeName] = updater(oldTheme)
+        UnistylesState.updateThemes()
     }
 }
 
