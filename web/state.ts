@@ -53,22 +53,26 @@ class UnistylesStateBuilder {
         this.hasAdaptiveThemes = settings?.adaptiveThemes ?? false
         const themeNames = Object.keys(this.rawThemes ?? {}) as Array<AppThemeName>
 
+        // Single theme + no settings
         if (!settings?.adaptiveThemes && !settings?.initialTheme && themeNames.length === 1) {
             this.themeName = themeNames[0]
 
             return
         }
 
+        // No settings
         if (!settings?.adaptiveThemes && !settings?.initialTheme) {
             throw new Error('🦄 You need to specify either "initialTheme" or "adaptiveThemes" in your config')
         }
 
+        // Adaptive themes
         if (settings.adaptiveThemes) {
             this.themeName = schemeToTheme(UnistylesRuntime.colorScheme)
 
             return
         }
 
+        // Initial theme
         this.themeName = typeof settings.initialTheme === 'function' ? settings.initialTheme() : settings.initialTheme
     }
 
