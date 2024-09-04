@@ -3,8 +3,9 @@ import type { ShadowOffset, TransformStyles, UnistylesTheme } from './core'
 import type { UnistylesBreakpoints } from '../global'
 import type { MiniRuntime } from '../specs'
 import type { ReactNativeStyleSheet } from './breakpoints'
-import type { Pseudo } from '../../web/pseudo'
 import type { ExtractVariantNames } from './variants'
+import type { CSSProperties } from 'react'
+import type { Pseudo } from '../../web/pseudo'
 
 // these props are treated differently to nest breakpoints and media queries
 type NestedKeys = 'shadowOffset' | 'transform' | 'textShadowOffset'
@@ -23,6 +24,10 @@ type VariantsObject = {
     [variantName: string]: {
         [variant: string]: Omit<UnistylesValues, 'variants' | 'compoundVariants'>
     }
+}
+
+type CustomClassName = {
+    _css?: string | Array<string>
 }
 
 type CompoundVariant = {
@@ -55,7 +60,9 @@ export type UnistylesValues = FlatUnistylesValues & {
 } & VariantsAndCompoundVariants & {
     [propName in NestedKeys]?: UnistyleNestedStyles[propName]
 } & {
-    [propName in Pseudo]?: FlatUnistylesValues
+    _web?: CSSProperties & CustomClassName & {
+        [propName in Pseudo]?: CSSProperties
+    }
 }
 
 export type StyleSheet = {
@@ -73,4 +80,3 @@ type AddVariantsFn<T> = {
 const create = <S extends StyleSheet>(stylesheet: StyleSheetWithSuperPowers<S>): (ReactNativeStyleSheet<S> & AddVariantsFn<typeof stylesheet>) => stylesheet as (ReactNativeStyleSheet<S> & AddVariantsFn<typeof stylesheet>)
 
 export type CreateUnistylesStyleSheet = typeof create
-
