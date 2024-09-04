@@ -12,7 +12,14 @@ export const convertBreakpoint = (breakpoint: string) => {
 }
 
 export const convertToTypeStyle = (value: UnistylesValues): Array<NestedCSSProperties> => {
-    return Object.entries(value).flatMap(([unistylesKey, unistylesValue]) => {
+    return Object.entries({
+        ...value,
+        ...value._web
+    }).flatMap(([unistylesKey, unistylesValue]) => {
+        if (['_css', '_web'].includes(unistylesKey)) {
+            return []
+        }
+
         if (isPseudo(unistylesKey)) {
             const typestyleValues = convertToTypeStyle(unistylesValue as UnistylesValues)
 
