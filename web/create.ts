@@ -16,21 +16,23 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
             let stylesheet: TypeStyle | undefined
 
             return (...args: Array<any>) => {
-                if (stylesheet) {
-                    UnistylesRegistry.updateStyles(stylesheet, value(...args), className)
+                const result = value(...args)
 
-                    return toReactNativeClassName(className)
+                if (stylesheet) {
+                    UnistylesRegistry.updateStyles(stylesheet, result, className)
+
+                    return toReactNativeClassName(className, result)
                 }
 
-                const entry = UnistylesRegistry.createStyles(value(...args), key)
+                const entry = UnistylesRegistry.createStyles(result, key)
 
                 className = entry.className
                 stylesheet = entry.unistyles
 
-                return toReactNativeClassName(className)
+                return toReactNativeClassName(className, result)
             }
         }
 
-        return toReactNativeClassName(UnistylesRegistry.createStyles(value, key).className)
+        return toReactNativeClassName(UnistylesRegistry.createStyles(value, key).className, value)
     }) as ReactNativeStyleSheet<StyleSheet>
 }

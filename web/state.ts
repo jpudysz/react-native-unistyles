@@ -27,7 +27,7 @@ class UnistylesStateBuilder {
         this.initSettings(config.settings)
 
         document.head.appendChild(this.themeStyleTag)
-        document.querySelector(':root')?.classList.add(this.themeName ?? '')
+        document.documentElement.classList.add(this.themeName ?? '')
     }
 
     updateThemes = () => {
@@ -95,7 +95,6 @@ class UnistylesStateBuilder {
                     this.breakpoint = breakpoint as AppBreakpoint
                 })
             })
-
     }
 }
 

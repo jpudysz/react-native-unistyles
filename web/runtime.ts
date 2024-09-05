@@ -55,8 +55,8 @@ class UnistylesRuntimeBuilder {
 
     get screen() {
         return {
-            width: screen.width,
-            height: screen.height
+            width: window.innerWidth,
+            height: window.innerHeight
         }
     }
 
@@ -115,7 +115,7 @@ class UnistylesRuntimeBuilder {
     }
 
     setTheme = (themeName: AppThemeName) => {
-        document.querySelector(':root')?.classList.replace(UnistylesRuntime.themeName ?? '', themeName)
+        document.documentElement.classList.replace(UnistylesRuntime.themeName ?? '', themeName)
         UnistylesState.themeName = themeName
     }
 
