@@ -115,7 +115,7 @@ class UnistylesRuntimeBuilder {
     }
 
     setTheme = (themeName: AppThemeName) => {
-        document.querySelector(':root')?.classList.replace(UnistylesRuntime.themeName ?? '', themeName)
+        document.documentElement.classList.replace(UnistylesRuntime.themeName ?? '', themeName)
         UnistylesState.themeName = themeName
     }
 

@@ -15,9 +15,24 @@ export const toReactNativeClassName = (className: string, values: UnistylesValue
     Object.defineProperties(returnValue, reduceObject(values, value => ({
         value,
         enumerable: false,
+        configurable: true
     })))
 
-    return returnValue
+    return new Proxy(returnValue, {
+        get: (target, prop) => {
+            if (!keyInObject(target, prop)) {
+                return undefined
+            }
+
+            const value = target[prop]
+
+            if (typeof value === 'string' && value.startsWith('var(--')) {
+                return window.getComputedStyle(document.documentElement).getPropertyValue(value.slice(4, -1))
+            }
+
+            return value
+        }
+    })
 }
 
 export const keyInObject = <T extends Record<string, any>>(obj: T, key: PropertyKey): key is keyof T => key in obj
