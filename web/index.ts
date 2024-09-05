@@ -1,4 +1,5 @@
 import { create } from './create'
+import { UnistylesRuntime } from './runtime'
 import { UnistylesState } from './state'
 import { StyleSheet as NativeStyleSheet } from 'react-native'
 
@@ -13,3 +14,5 @@ export const StyleSheet = {
 
 export { UnistylesRuntime } from './runtime'
 export * from './mock'
+
+export const getSsrUnistyles = () => UnistylesRuntime.getSsrUnistyles()
