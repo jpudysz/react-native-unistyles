@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react'
 import { NitroModules } from 'react-native-nitro-modules'
 import { StatusBar as NativeStatusBar, StyleSheet as NativeStyleSheet } from 'react-native'
 import './NativeUnistyles'
@@ -60,3 +61,5 @@ export {
 export type {
     MiniRuntime
 }
+
+export const getSsrUnistyles = () => [] as Array<ReactElement>
