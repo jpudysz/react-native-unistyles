@@ -55,8 +55,8 @@ class UnistylesRuntimeBuilder {
 
     get screen() {
         return {
-            width: screen.width,
-            height: screen.height
+            width: window.innerWidth,
+            height: window.innerHeight
         }
     }
 
