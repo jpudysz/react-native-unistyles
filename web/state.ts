@@ -1,15 +1,19 @@
-import type { UnistylesConfig } from '../src/specs/StyleSheet'
 import { createTypeStyle } from 'typestyle'
-import { camelToKebab, reduceObject, schemeToTheme } from './utils'
-import type { AppBreakpoint, AppThemeName } from '../src/specs/types'
+import { type ReactElement, createElement, createRef } from 'react'
 import type { UnistylesTheme } from '../src/types'
+import type { UnistylesConfig } from '../src/specs/StyleSheet'
+import type { AppBreakpoint, AppThemeName } from '../src/specs/types'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../src/global'
 import { UnistylesRuntime } from './runtime'
+import { camelToKebab, reduceObject, schemeToTheme } from './utils'
 
 class UnistylesStateBuilder {
+    private readonly isSSR = typeof window === 'undefined'
+    readonly tags = [] as Array<ReactElement>
+
     rawThemes?: UnistylesThemes
     themes = new Map<string, UnistylesTheme>()
-    private themeStyleTag = document.createElement('style')
+    private themeStyleTag = this.createTag()
     private themesStyleSheet = createTypeStyle(this.themeStyleTag)
     themeName?: AppThemeName
 
@@ -20,13 +24,15 @@ class UnistylesStateBuilder {
 
     init = (config: UnistylesConfig) => {
         this.rawThemes = config.themes
+
         this.updateThemes()
-
         this.initBreakpoints(config.breakpoints)
-
         this.initSettings(config.settings)
 
-        document.head.appendChild(this.themeStyleTag)
+        if (this.isSSR) {
+            return
+        }
+
         document.documentElement.classList.add(this.themeName ?? '')
     }
 
@@ -95,6 +101,48 @@ class UnistylesStateBuilder {
                     this.breakpoint = breakpoint as AppBreakpoint
                 })
             })
+    }
+
+    createTag() {
+        if (!this.isSSR) {
+            const tag = document.createElement('style')
+
+            document.head.appendChild(tag)
+
+            return tag
+        }
+
+        const tagRef = new Proxy(createRef<HTMLStyleElement>(), {
+            set: (target, prop, value) => {
+                // When ref is assigned
+                if ('textContent' in value) {
+                    value.textContent = tag.textContent
+                }
+
+                return Reflect.set(target, prop, value)
+            }
+        })
+        const tagElement = createElement('style', { ref: tagRef, key: this.tags.length }, '')
+        const tag = new Proxy({ textContent: '' }, {
+            set: (target, prop, value) => {
+                if (prop !== 'textContent') {
+                    return false
+                }
+
+                // When css is updated
+                target.textContent = value
+
+                if (tagRef.current) {
+                    tagRef.current.textContent = value
+                }
+
+                return true
+            }
+        })
+
+        this.tags.push(tagElement)
+
+        return tag
     }
 }
 
