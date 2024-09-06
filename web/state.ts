@@ -83,18 +83,28 @@ class UnistylesStateBuilder {
     }
 
     private initBreakpoints = (breakpoints = {} as UnistylesBreakpoints) => {
+        const breakpointsMap = new Map<string, MediaQueryList>()
+
         this.breakpoints = breakpoints
+
         Object.entries(breakpoints)
             .sort(([, a], [, b]) => a - b)
             .forEach(([breakpoint, value]) => {
                 const mediaQuery = window.matchMedia(`(min-width: ${value}px)`)
+                breakpointsMap.set(breakpoint, mediaQuery)
 
                 if (mediaQuery.matches) {
                     this.breakpoint = breakpoint as AppBreakpoint
                 }
 
-                mediaQuery.addEventListener('change', (event) => {
+                mediaQuery.addEventListener('change', event => {
                     if (!event.matches) {
+                        const [currentBreakpoint] = Array.from(breakpointsMap).find(([,mq]) => mq.matches) ?? []
+
+                        if (currentBreakpoint) {
+                            this.breakpoint = currentBreakpoint as AppBreakpoint
+                        }
+
                         return
                     }
 
