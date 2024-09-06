@@ -1,11 +1,16 @@
-import type { NestedCSSProperties } from 'typestyle/lib/types'
+import type { MediaQuery, NestedCSSProperties } from 'typestyle/lib/types'
 import type { UnistylesValues } from '../src/types'
 import { media } from 'typestyle'
 import { UnistylesState } from './state'
 import { keyInObject } from './utils'
 import { isPseudo } from './pseudo'
+import { isUnistylesMq, parseMq } from './mq'
 
-export const convertBreakpoint = (breakpoint: string) => {
+export const convertBreakpoint = (breakpoint: string): MediaQuery => {
+    if (isUnistylesMq(breakpoint)) {
+        return parseMq(breakpoint)
+    }
+
     return {
         minWidth: UnistylesState.breakpoints && keyInObject(UnistylesState.breakpoints, breakpoint) ? UnistylesState.breakpoints[breakpoint] : undefined,
     }
