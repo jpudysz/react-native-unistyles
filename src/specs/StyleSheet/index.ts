@@ -6,7 +6,6 @@ import type { CreateUnistylesStyleSheet } from '../../types'
 type UnistylesSettings = {
     adaptiveThemes?: boolean,
     initialTheme?: (() => keyof UnistylesThemes) | keyof UnistylesThemes
-    ssr?: boolean
 }
 
 export type UnistylesConfig = {

@@ -15,4 +15,4 @@ export const StyleSheet = {
 export { UnistylesRuntime } from './runtime'
 export * from './mock'
 
-export const getSsrUnistyles = () => UnistylesRuntime.getSsrUnistyles()
+export const getSSRUnistyles = () => UnistylesRuntime.getSSRUnistyles()
