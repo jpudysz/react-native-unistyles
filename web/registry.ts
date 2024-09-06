@@ -1,17 +1,16 @@
 import { createTypeStyle, TypeStyle } from 'typestyle'
 import type { UnistylesValues } from '../src/types'
 import { convertToTypeStyle } from './convert'
+import { UnistylesState } from './state'
 
 class UnistylesRegistryBuilder {
     createStyles = (stylesheet: UnistylesValues, key: string | number) => {
-        const stylesTag = document.createElement('style')
+        const stylesTag = UnistylesState.createTag()
         const unistyles = createTypeStyle(stylesTag)
         const typestyleStylesheets = convertToTypeStyle(stylesheet)
         const className = unistyles.style({
             $debugName: String(key),
         }, ...typestyleStylesheets)
-
-        document.head.appendChild(stylesTag)
 
         if (stylesheet._web?._css) {
             const customClassName = Array.isArray(stylesheet._web._css)
