@@ -62,4 +62,4 @@ export type {
     MiniRuntime
 }
 
-export const getSsrUnistyles = () => [] as Array<ReactElement>
+export const getSSRUnistyles = () => [] as Array<ReactElement>
