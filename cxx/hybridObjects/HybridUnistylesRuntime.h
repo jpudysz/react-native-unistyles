@@ -9,26 +9,21 @@
 using namespace margelo::nitro::unistyles;
 
 struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
-    HybridUnistylesRuntime(Unistyles::HybridNativePlatformSpecCxx nativePlatform): HybridObject(TAG), nativePlatform{nativePlatform} {}
+    HybridUnistylesRuntime(Unistyles::HybridNativePlatformSpecCxx nativePlatform, jsi::Runtime& rt): HybridObject(TAG), nativePlatform{nativePlatform}, rt{&rt} {}
 
-    jsi::Value onLoad(jsi::Runtime& rt,
-                      const jsi::Value& thisValue,
-                      const jsi::Value* args,
-                      size_t count);
     jsi::Value updateTheme(jsi::Runtime& rt,
                       const jsi::Value& thisValue,
                       const jsi::Value* args,
                       size_t count);
-    
+
     void loadHybridMethods() override {
         HybridUnistylesRuntimeSpec::loadHybridMethods();
 
         registerHybrids(this, [](Prototype& prototype) {
-            prototype.registerRawHybridMethod("init", 1, &HybridUnistylesRuntime::onLoad);
             prototype.registerRawHybridMethod("updateTheme", 1, &HybridUnistylesRuntime::updateTheme);
         });
     };
-    
+
     ColorScheme getColorScheme() override;
     bool getHasAdaptiveThemes() override;
     bool getRtl() override;
@@ -49,7 +44,7 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     // internal
     Dimensions getStatusBarDimensions();
     Dimensions getNavigationBarDimensions();
-    
+
     jsi::Runtime* rt;
 private:
     Unistyles::HybridNativePlatformSpecCxx nativePlatform;

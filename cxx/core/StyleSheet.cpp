@@ -8,7 +8,7 @@ void core::StyleSheet::addVariants(jsi::Runtime &rt, jsi::Value&& variants) {
         return;
     }
 
-    helpers::assertThat(rt, variants.isObject(), "expected to be called with object.");
+    helpers::assertThat(rt, variants.isObject(), "add variants expected to be called with object.");
 
     auto selectedVariants = variants.asObject(rt);
 
