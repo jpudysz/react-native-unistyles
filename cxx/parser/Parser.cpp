@@ -39,18 +39,18 @@ void parser::Parser::parseUnistyle(jsi::Runtime& rt, core::Unistyle& unistyle) {
         helpers::assertThat(rt, unistyle.dynamicFunctionMetadata.has_value(), "function has not metadata. Unistyles is not able to call it from C++.");
 
         auto metadata = unistyle.dynamicFunctionMetadata.value();
-        
+
         // create vector of arguments
         std::vector<jsi::Value> args{};
 
         for (int i = 0; i < metadata.count; i++) {
             folly::dynamic& arg = metadata.arguments.at(i);
-            
+
             args.emplace_back(jsi::valueFromDynamic(rt, arg));
         }
-        
+
         const jsi::Value *argStart = args.data();
-        
+
         auto rawResult = unistyle.rawValue.asFunction(rt).callAsConstructor(rt, argStart, metadata.count).asObject(rt);
 
         unistyle.parsedStyle = std::move(rawResult);
@@ -59,6 +59,35 @@ void parser::Parser::parseUnistyle(jsi::Runtime& rt, core::Unistyle& unistyle) {
 
         unistyle.parsedStyle = std::move(result);
     }
+}
+
+parser::ViewUpdates parser::Parser::unistylesToViewUpdates(jsi::Runtime& rt, std::vector<core::Unistyle*>& unistyles) {
+    parser::ViewUpdates updates{};
+
+    std::for_each(unistyles.begin(), unistyles.end(), [&](const core::Unistyle* unistyle){
+        jsi::Object layoutProps = jsi::Object(rt);
+        jsi::Object uiProps = jsi::Object(rt);
+
+        helpers::enumerateJSIObject(rt, unistyle->parsedStyle.value(), [&](const std::string propertyName, jsi::Value& propertyValue){
+            bool isLayoutProp = parser::isLayoutProp(propertyName);
+
+            isLayoutProp
+                ? layoutProps.setProperty(rt, propertyName.c_str(), propertyValue)
+                : uiProps.setProperty(rt, propertyName.c_str(), propertyValue);
+        });
+
+        std::for_each(unistyle->nativeTags.begin(), unistyle->nativeTags.end(), [&](int nativeTag){
+            jsi::Array layoutNames = layoutProps.getPropertyNames(rt);
+            jsi::Array uiNames = uiProps.getPropertyNames(rt);
+
+            auto& ref = updates.emplace_back(nativeTag, jsi::Value(rt, layoutProps), jsi::Value(rt, uiProps));
+
+            ref.hasLayoutProps = layoutNames.size(rt) > 0;
+            ref.hasUIProps = uiNames.size(rt) > 0;
+        });
+    });
+
+    return updates;
 }
 
 void parser::Parser::parseUnistyleToJSIObject(jsi::Runtime& rt, core::Unistyle& unistyle, jsi::Object& target) {

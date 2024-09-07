@@ -8,6 +8,7 @@
 #include "Constants.h"
 #include "Helpers.h"
 #include "MediaQueries.h"
+#include "ViewUpdate.h"
 
 namespace margelo::nitro::unistyles::parser {
 
@@ -40,6 +41,7 @@ struct Parser {
     void parseUnistyle(jsi::Runtime& rt, core::Unistyle& unistyle);
     void parseUnistyleToJSIObject(jsi::Runtime& rt, core::Unistyle& unistyle, jsi::Object& target);
     jsi::Object parseUnistyles(jsi::Runtime& rt, std::vector<core::Unistyle>& unistyles);
+    ViewUpdates unistylesToViewUpdates(jsi::Runtime& rt, std::vector<core::Unistyle*>&);
 
 private:
     Parser() = default;
