@@ -25,7 +25,17 @@ jsi::Value HostStyle::get(jsi::Runtime& rt, const jsi::PropNameID& propNameId) {
             
             helpers::enumerateJSIObject(rt, stylesWithVariants, [&](const std::string propertyName, jsi::Value& propertyValue){
                 // override property
-                this->parsedStyleSheet.setProperty(rt, propertyName.c_str(), propertyValue.asObject(rt));
+                auto originalProp = this->parsedStyleSheet.getProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName)).asObject(rt);
+
+                // move meta functions
+                auto addNodeFn = originalProp.getProperty(rt, jsi::PropNameID::forUtf8(rt, helpers::ADD_NODE_FN));
+                auto removeNodeFn = originalProp.getProperty(rt, jsi::PropNameID::forUtf8(rt, helpers::REMOVE_NODE_FN));
+                auto propertyValueObject = propertyValue.asObject(rt);
+                
+                propertyValueObject.setProperty(rt, helpers::ADD_NODE_FN.c_str(), std::move(addNodeFn));
+                propertyValueObject.setProperty(rt, helpers::REMOVE_NODE_FN.c_str(), std::move(removeNodeFn));
+                
+                this->parsedStyleSheet.setProperty(rt, propertyName.c_str(), std::move(propertyValue));
             });
             
             return jsi::Value::undefined();

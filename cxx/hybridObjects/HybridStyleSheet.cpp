@@ -209,10 +209,9 @@ void HybridStyleSheet::attachMetaFunctions(jsi::Runtime &rt, core::StyleSheet& s
         );
         auto& parser = parser::Parser::configure(std::move(settings));
 
-
         for (auto& style: styleSheet.unistyles) {
             if (helpers::vecContainsKeys(style.dependencies, {core::UnistyleDependency::Variants})) {
-                parser.parseUnistyle(rt, style, stylesWithVariants);
+                parser.parseUnistyleToJSIObject(rt, style, stylesWithVariants);
             }
         }
 
@@ -303,18 +302,16 @@ void HybridStyleSheet::updateUnistylesWithDependencies(std::vector<core::Unistyl
         auto unistyles = this->styleSheetRegistry.recompute(*rt, styleSheet, dependencies);
 
         std::for_each(unistyles.begin(), unistyles.end(), [&](const core::Unistyle* unistyle){
-            jsi::Object stylesProps = jsi::Object(*rt);
             auto mutatedUnistyle = const_cast<core::Unistyle*>(unistyle);
 
-            parser.parseUnistyle(*rt, *mutatedUnistyle, stylesProps);
-            mutatedUnistyle->parsedStyle = std::move(stylesProps);
-
-            auto rawProps = RawProps(*rt, jsi::Value(*rt, unistyle->parsedStyle.value()));
+            parser.parseUnistyle(*rt, *mutatedUnistyle);
 
             // todo split it between shadowTree and native update
-            // todo optimise it
-            shadowTreeRegistry.enumerate([&](const ShadowTree& shadowTree, bool& stop){
+            // todo optimise it, there is a bug here
+            shadowTreeRegistry.enumerate([&unistyle, &rt](const ShadowTree& shadowTree, bool& stop){
                 std::for_each(unistyle->nativeTags.begin(), unistyle->nativeTags.end(), [&](int nativeTag){
+                    auto rawProps = RawProps(*rt, jsi::Value(*rt, unistyle->parsedStyle.value()));
+ 
                     auto transaction = [&](const RootShadowNode& oldRootShadowNode) {
                         auto traverser = shadow::ShadowTreeTraverser{oldRootShadowNode};
                         auto targetNode = traverser.findShadowNode(nativeTag);
