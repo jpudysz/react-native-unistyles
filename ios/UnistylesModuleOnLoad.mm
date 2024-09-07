@@ -41,6 +41,13 @@ RCT_EXPORT_MODULE(Unistyles)
 - (void)createHybrids:(jsi::Runtime&)rt {
     auto nativePlatform = Unistyles::NativePlatform::create();
     auto unistylesRuntime = std::make_shared<HybridUnistylesRuntime>(nativePlatform, rt);
+    auto updateLayoutProps = [weakSelf = self, &rt](parser::ViewUpdates& updates){
+        std::for_each(updates.begin(), updates.end(), [weakSelf, &rt](parser::Update& update){
+            if (update.hasUIProps) {
+                [weakSelf updateLayoutPropsWithViewTag:@(update.nativeTag) props:convertJSIValueToDictionary(rt, update.uiProps)];
+            }
+        });
+    };
 
     HybridObjectRegistry::registerHybridObjectConstructor("UnistylesRuntime", [unistylesRuntime]() -> std::shared_ptr<HybridObject>{
         return unistylesRuntime;
@@ -51,8 +58,8 @@ RCT_EXPORT_MODULE(Unistyles)
     HybridObjectRegistry::registerHybridObjectConstructor("NavigationBar", [nativePlatform]() -> std::shared_ptr<HybridObject>{
         return std::make_shared<HybridNavigationBar>(nativePlatform);
     });
-    HybridObjectRegistry::registerHybridObjectConstructor("StyleSheet", [nativePlatform, unistylesRuntime]() -> std::shared_ptr<HybridObject>{
-        return std::make_shared<HybridStyleSheet>(nativePlatform, unistylesRuntime);
+    HybridObjectRegistry::registerHybridObjectConstructor("StyleSheet", [nativePlatform, unistylesRuntime, updateLayoutProps]() -> std::shared_ptr<HybridObject>{
+        return std::make_shared<HybridStyleSheet>(nativePlatform, unistylesRuntime, updateLayoutProps);
     });
 }
 

@@ -6,13 +6,12 @@ import './unistyles'
 export const App = () => {
     const renderCount = useRef(0)
     styles.addVariants({
-        color: 'primary',
-        size: 'small'
+        color: 'primary'
     })
 
     return (
         <View
-            style={styles.container(2)}
+            style={styles.container(1)}
             ref={ref => {
                 if (ref) {
                     styles.container.uni__addNode(ref.__nativeTag)
@@ -53,20 +52,6 @@ const styles = StyleSheet.create((theme, rt) => ({
                 },
                 secondary: {
                     backgroundColor: theme.colors.barbie
-                }
-            },
-            size: {
-                small: {
-                    width: 100,
-                    height: 100
-                },
-                medium: {
-                    width: 200,
-                    height: 200
-                },
-                large: {
-                    width: 300,
-                    height: 300
                 }
             }
         },

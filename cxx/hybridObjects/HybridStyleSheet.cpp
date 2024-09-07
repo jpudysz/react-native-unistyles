@@ -283,8 +283,6 @@ void HybridStyleSheet::onPlatformEvent(PlatformEvent event) {
 void HybridStyleSheet::updateUnistylesWithDependencies(std::vector<core::UnistyleDependency>& dependencies) {
     auto styleSheets = this->styleSheetRegistry.getStyleSheetsWithDependencies(dependencies);
     auto rt = this->unistylesRuntime->rt;
-    auto uiManager = UIManagerBinding::getBinding(*rt);
-    const auto &shadowTreeRegistry = uiManager->getUIManager().getShadowTreeRegistry();
     auto& state = core::UnistylesRegistry::get().getState(*rt);
     std::vector<std::pair<std::string, std::string>> variants{};
     Dimensions dimensions{400, 800};
@@ -297,42 +295,23 @@ void HybridStyleSheet::updateUnistylesWithDependencies(std::vector<core::Unistyl
     );
 
     auto& parser = parser::Parser::configure(std::move(settings));
-
+    std::vector<core::Unistyle*> unistylesToUpdate{};
+    
     std::for_each(styleSheets.begin(), styleSheets.end(), [&](const core::StyleSheet* styleSheet){
         auto unistyles = this->styleSheetRegistry.recompute(*rt, styleSheet, dependencies);
 
         std::for_each(unistyles.begin(), unistyles.end(), [&](const core::Unistyle* unistyle){
             auto mutatedUnistyle = const_cast<core::Unistyle*>(unistyle);
-
-            parser.parseUnistyle(*rt, *mutatedUnistyle);
-
-            // todo split it between shadowTree and native update
-            // todo optimise it, there is a bug here
-            shadowTreeRegistry.enumerate([&unistyle, &rt](const ShadowTree& shadowTree, bool& stop){
-                std::for_each(unistyle->nativeTags.begin(), unistyle->nativeTags.end(), [&](int nativeTag){
-                    auto rawProps = RawProps(*rt, jsi::Value(*rt, unistyle->parsedStyle.value()));
  
-                    auto transaction = [&](const RootShadowNode& oldRootShadowNode) {
-                        auto traverser = shadow::ShadowTreeTraverser{oldRootShadowNode};
-                        auto targetNode = traverser.findShadowNode(nativeTag);
-
-                        if (!targetNode) {
-                            return std::static_pointer_cast<facebook::react::RootShadowNode>(traverser.getShadowTree());
-                        }
-
-                        auto newShadowNode = traverser.cloneShadowNodeWithNewProps(targetNode, rawProps);
-
-                        traverser.replaceShadowNode(newShadowNode);
-
-                        return traverser.getShadowTree();
-                    };
-
-                    shadowTree.commit(transaction, {false, true});
-                    stop = true;
-                });
-            });
-
+            parser.parseUnistyle(*rt, *mutatedUnistyle);
+            unistylesToUpdate.push_back(mutatedUnistyle);
+            
             mutatedUnistyle->isDirty = false;
         });
     });
+    
+    auto viewUpdates = parser.unistylesToViewUpdates(*rt, unistylesToUpdate);
+    
+    this->updateUIProps(viewUpdates);
+    shadow::ShadowTreeManager::updateShadowTree(*rt, viewUpdates);
 }
