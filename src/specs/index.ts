@@ -41,12 +41,6 @@ HybridStyleSheet.absoluteFill = NativeStyleSheet.absoluteFill
 HybridStyleSheet.flatten = NativeStyleSheet.flatten
 HybridStyleSheet.compose = NativeStyleSheet.compose
 
-type ConfigurableUnistylesRuntime = typeof HybridUnistylesRuntime & {
-    init(): void
-}
-
-(HybridUnistylesRuntime as ConfigurableUnistylesRuntime).init()
-
 export {
     HybridStyleSheet as StyleSheet,
     HybridUnistylesRuntime as UnistylesRuntime

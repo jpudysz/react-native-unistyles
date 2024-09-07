@@ -8,6 +8,7 @@
 #include "Constants.h"
 #include "Helpers.h"
 #include "MediaQueries.h"
+#include "ViewUpdate.h"
 
 namespace margelo::nitro::unistyles::parser {
 
@@ -19,7 +20,7 @@ struct ParserSettings {
     const std::optional<std::string> currentBreakpointName;
     const std::vector<std::pair<std::string, double>> sortedBreakpointPairs;
     const Dimensions screenDimensions;
-    
+
     ParserSettings(
         Variants& variants,
         std::optional<std::string> currentBreakpointName,
@@ -33,13 +34,15 @@ struct ParserSettings {
 
 struct Parser {
     static Parser& configure(std::unique_ptr<ParserSettings>);
-    
+
     Parser(const Parser&) = delete;
     Parser(const Parser&&) = delete;
-    
-    void parseUnistyle(jsi::Runtime& rt, core::Unistyle& unistyle, jsi::Object& target);
+
+    void parseUnistyle(jsi::Runtime& rt, core::Unistyle& unistyle);
+    void parseUnistyleToJSIObject(jsi::Runtime& rt, core::Unistyle& unistyle, jsi::Object& target);
     jsi::Object parseUnistyles(jsi::Runtime& rt, std::vector<core::Unistyle>& unistyles);
-    
+    ViewUpdates unistylesToViewUpdates(jsi::Runtime& rt, std::vector<core::Unistyle*>&);
+
 private:
     Parser() = default;
     std::unique_ptr<ParserSettings> settings;
@@ -59,7 +62,7 @@ private:
 
 Parser& Parser::configure(std::unique_ptr<ParserSettings> settings) {
     static Parser parser;
-    
+
     parser.settings = std::move(settings);
 
     return parser;
