@@ -15,12 +15,18 @@ using namespace margelo::nitro;
 
 RCT_EXPORT_MODULE(Unistyles)
 
+@synthesize bridge = _bridge;
+
 + (BOOL)requiresMainQueueSetup {
     return YES;
 }
 
 - (void)setSurfacePresenter:(id<RCTSurfacePresenterStub>)surfacePresenter {
     _surfacePresenter = surfacePresenter;
+}
+
+- (void)setBridge:(RCTBridge *)bridge {
+    _bridge = bridge;
 }
 
 - (void)installJSIBindingsWithRuntime:(jsi::Runtime&)rt {
@@ -68,8 +74,30 @@ RCT_EXPORT_MODULE(Unistyles)
 }
 
 - (void)updateLayoutPropsWithViewTag:(NSNumber *)viewTag props:(NSDictionary *)uiProps {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self->_surfacePresenter synchronouslyUpdateViewOnUIThread:viewTag props:uiProps];
+    // dispatch_async(dispatch_get_main_queue(), ^{
+    
+    RCTExecuteOnMainQueue(^{
+        RCTSurfacePresenter* surfacePresenter = self->_surfacePresenter;
+        RCTComponentViewRegistry *componentViewRegistry = surfacePresenter.mountingManager.componentViewRegistry;
+        ReactTag tag = [viewTag integerValue];
+        
+        auto* componentView = [componentViewRegistry findComponentViewWithTag:tag];
+        
+        [surfacePresenter synchronouslyUpdateViewOnUIThread:viewTag props:uiProps];
+        [componentView finalizeUpdates:RNComponentViewUpdateMask{}];
+    });
+}
+
+- (void)updateUIProps {
+    RCTExecuteOnMainQueue(^{
+        RCTSurfacePresenter* surfacePresenter = self->_surfacePresenter;
+
+        NSMutableDictionary *dictionary = [NSMutableDictionary new];
+        
+        dictionary[@"backgroundColor"] = @"#ffaa11";
+        dictionary[@"opacity"] = @(0.2);
+        
+        [surfacePresenter synchronouslyUpdateViewOnUIThread:@(18) props:dictionary];
     });
 }
 
