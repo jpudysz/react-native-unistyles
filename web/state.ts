@@ -5,10 +5,10 @@ import type { UnistylesConfig } from '../src/specs/StyleSheet'
 import type { AppBreakpoint, AppThemeName } from '../src/specs/types'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../src/global'
 import { UnistylesRuntime } from './runtime'
-import { camelToKebab, reduceObject, schemeToTheme } from './utils'
+import { camelToKebab, isServer, reduceObject, schemeToTheme } from './utils'
 
 class UnistylesStateBuilder {
-    private readonly isSSR = typeof window === 'undefined'
+    private readonly isSSR = isServer()
     readonly tags = [] as Array<ReactElement>
 
     rawThemes?: UnistylesThemes
@@ -90,6 +90,10 @@ class UnistylesStateBuilder {
         Object.entries(breakpoints)
             .sort(([, a], [, b]) => a - b)
             .forEach(([breakpoint, value]) => {
+                if (isServer()) {
+                    return
+                }
+
                 const mediaQuery = window.matchMedia(`(min-width: ${value}px)`)
                 breakpointsMap.set(breakpoint, mediaQuery)
 

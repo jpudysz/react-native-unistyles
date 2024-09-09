@@ -26,7 +26,7 @@ export const toReactNativeClassName = (className: string, values: UnistylesValue
 
             const value = target[prop]
 
-            if (typeof value === 'string' && value.startsWith('var(--')) {
+            if (!isServer() && typeof value === 'string' && value.startsWith('var(--')) {
                 return window.getComputedStyle(document.documentElement).getPropertyValue(value.slice(4, -1))
             }
 
@@ -56,3 +56,5 @@ export const hexToRGBA = (hex: string, opacity: number) => hex
     .filter(num => !isNaN(num))
     .reduce((acc, color) => `${acc}${color},`, 'rgba(')
     .concat(`${opacity})`)
+
+export const isServer = () => typeof window === 'undefined'
