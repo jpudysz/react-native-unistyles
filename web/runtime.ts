@@ -1,18 +1,43 @@
 import { ColorScheme, Orientation, type AppTheme, type AppThemeName } from '../src/specs/types'
+import type { MiniRuntime } from '../src/specs/UnistylesRuntime'
 import { WebContentSizeCategory } from '../src/types'
 import { NavigationBar, StatusBar } from './mock'
 import { UnistylesState } from './state'
-import { hexToRGBA, schemeToTheme } from './utils'
+import { hexToRGBA, isServer, schemeToTheme } from './utils'
 
 class UnistylesRuntimeBuilder {
-    private readonly lightMedia = window.matchMedia('(prefers-color-scheme: light)')
-    private readonly darkMedia = window.matchMedia('(prefers-color-scheme: dark)')
+    private lightMedia = this.getLightMedia()
+    private darkMedia = this.getDarkMedia()
+
+    private getLightMedia(): MediaQueryList | null {
+        if (isServer()) {
+            return null
+        }
+
+        if (!this.lightMedia) {
+            this.lightMedia = window.matchMedia('(prefers-color-scheme: light)')
+        }
+
+        return this.lightMedia
+    }
+
+    private getDarkMedia(): MediaQueryList | null {
+        if (isServer()) {
+            return null
+        }
+
+        if (!this.darkMedia) {
+            this.darkMedia = window.matchMedia('(prefers-color-scheme: dark)')
+        }
+
+        return this.darkMedia
+    }
 
     get colorScheme() {
         switch (true) {
-            case this.lightMedia.matches:
+            case this.getLightMedia()?.matches:
                 return ColorScheme.Light
-            case this.darkMedia.matches:
+            case this.getDarkMedia()?.matches:
                 return ColorScheme.Dark
             default:
                 return ColorScheme.Unspecified
@@ -32,6 +57,10 @@ class UnistylesRuntimeBuilder {
     }
 
     get orientation() {
+        if (isServer()) {
+            return Orientation.Portrait
+        }
+
         return screen.orientation.type.includes('portrait') ? Orientation.Portrait : Orientation.Landscape
     }
 
@@ -50,10 +79,17 @@ class UnistylesRuntimeBuilder {
     }
 
     get pixelRatio() {
-        return window.devicePixelRatio
+        return isServer() ? 1 : window.devicePixelRatio
     }
 
     get screen() {
+        if (isServer()) {
+            return {
+                width: 0,
+                height: 0
+            }
+        }
+
         return {
             width: window.innerWidth,
             height: window.innerHeight
@@ -79,7 +115,7 @@ class UnistylesRuntimeBuilder {
     }
 
     get rtl() {
-        return document.documentElement.dir === 'rtl'
+        return isServer() ? true : document.documentElement.dir === 'rtl'
     }
 
     get hasAdaptiveThemes() {
@@ -90,7 +126,7 @@ class UnistylesRuntimeBuilder {
         return NavigationBar
     }
 
-    get miniRuntime() {
+    get miniRuntime(): MiniRuntime {
         return {
             colorScheme: this.colorScheme,
             themeName: this.themeName,
@@ -111,12 +147,21 @@ class UnistylesRuntimeBuilder {
             },
             rtl: this.rtl,
             hasAdaptiveThemes: this.hasAdaptiveThemes,
+            name: 'MiniRuntime',
+            toString: () => 'MiniRuntime',
+            __type: 'web',
+            equals: () => true,
         }
     }
 
     setTheme = (themeName: AppThemeName) => {
-        document.documentElement.classList.replace(UnistylesRuntime.themeName ?? '', themeName)
         UnistylesState.themeName = themeName
+
+        if (isServer()) {
+            return
+        }
+
+        document.documentElement.classList.replace(UnistylesRuntime.themeName ?? '', themeName)
     }
 
     setAdaptiveThemes = (isEnabled: boolean) => {
@@ -130,6 +175,10 @@ class UnistylesRuntimeBuilder {
     }
 
     setRootViewBackgroundColor = (hex: string, alpha?: number) => {
+        if (isServer()) {
+            return
+        }
+
         document.documentElement.style.backgroundColor = alpha ? hexToRGBA(hex, alpha) : hex
     }
 
