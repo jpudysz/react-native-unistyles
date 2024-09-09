@@ -16,20 +16,17 @@ void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime &rt, par
         // but it can cause performance issues for hundreds of nodes
         // so let's mutate Shadow Tree in single transaction
         auto transaction = [&](const RootShadowNode& oldRootShadowNode) {
-            std::unordered_map<const ShadowNodeFamily*, RawProps> nodes;
+            std::unordered_map<const ShadowNodeFamily*, std::vector<RawProps>> nodes;
 
-            std::for_each(updates.begin(), updates.end(), [&](parser::Update& update){
-                // filter non layout updates
-                if (update.hasLayoutProps) {
-                    auto shadowNode = shadow::ShadowTreeManager::findShadowNode(oldRootShadowNode, update.nativeTag);
-                    
-                    // if there is no shadowNode, then most likely node was unmounted
-                    // simply skip it, StyleSheet will get own notification soon
-                    if (shadowNode) {
-                        auto family = &shadowNode->getFamily();
+            std::for_each(updates.begin(), updates.end(), [&](auto& update){
+                auto shadowNode = shadow::ShadowTreeManager::findShadowNode(oldRootShadowNode, update.first);
+                
+                // if there is no shadowNode, then most likely node was unmounted
+                // simply skip it, StyleSheet will get own notification soon
+                if (shadowNode) {
+                    auto family = &shadowNode->getFamily();
 
-                        nodes[family] = RawProps(rt, std::move(update.layoutProps));;
-                    }
+                    nodes[family].emplace_back(std::move(update.second));
                 }
             });
 
@@ -86,8 +83,8 @@ AffectedNodes shadow::ShadowTreeManager::findAffectedNodes(const RootShadowNode&
 
         for (const auto& [parentNode, index] : std::ranges::reverse_view(familyAncestors)) {
             const auto parentFamily = &parentNode.get().getFamily();
-            auto& affectedNode = affectedNodes[parentFamily];
-
+            std::unordered_set<int>& affectedNode = affectedNodes[parentFamily];
+    
             affectedNode.insert(index);
         }
     });
@@ -120,10 +117,14 @@ ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode
             shadowNode.getSurfaceId(),
             *shadowNode.getContextContainer()
         };
-
-        updatedProps = shadowNode
-            .getComponentDescriptor()
-            .cloneProps(propsParserContext, shadowNode.getProps(), RawProps(rawPropsIt->second));
+        
+        updatedProps = shadowNode.getProps();
+        
+        for (const auto& props: rawPropsIt->second) {
+            updatedProps = shadowNode
+                .getComponentDescriptor()
+                .cloneProps(propsParserContext, updatedProps, RawProps(props));
+        }
     }
 
     return shadowNode.clone({

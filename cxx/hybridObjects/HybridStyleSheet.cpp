@@ -312,6 +312,7 @@ void HybridStyleSheet::updateUnistylesWithDependencies(std::vector<core::Unistyl
     
     auto viewUpdates = parser.unistylesToViewUpdates(*rt, unistylesToUpdate);
     
-    this->updateUIProps(viewUpdates);
-    shadow::ShadowTreeManager::updateShadowTree(*rt, viewUpdates);
+    if (viewUpdates.size() > 0) {
+        shadow::ShadowTreeManager::updateShadowTree(*rt, viewUpdates);
+    }
 }

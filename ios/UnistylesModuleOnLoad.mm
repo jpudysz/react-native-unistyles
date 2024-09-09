@@ -9,24 +9,12 @@
 
 using namespace margelo::nitro;
 
-@implementation UnistylesModule {
-    __weak id<RCTSurfacePresenterStub> _surfacePresenter;
-}
+@implementation UnistylesModule
 
 RCT_EXPORT_MODULE(Unistyles)
 
-@synthesize bridge = _bridge;
-
 + (BOOL)requiresMainQueueSetup {
     return YES;
-}
-
-- (void)setSurfacePresenter:(id<RCTSurfacePresenterStub>)surfacePresenter {
-    _surfacePresenter = surfacePresenter;
-}
-
-- (void)setBridge:(RCTBridge *)bridge {
-    _bridge = bridge;
 }
 
 - (void)installJSIBindingsWithRuntime:(jsi::Runtime&)rt {
@@ -47,13 +35,6 @@ RCT_EXPORT_MODULE(Unistyles)
 - (void)createHybrids:(jsi::Runtime&)rt {
     auto nativePlatform = Unistyles::NativePlatform::create();
     auto unistylesRuntime = std::make_shared<HybridUnistylesRuntime>(nativePlatform, rt);
-    auto updateLayoutProps = [weakSelf = self, &rt](parser::ViewUpdates& updates){
-        std::for_each(updates.begin(), updates.end(), [weakSelf, &rt](parser::Update& update){
-            if (update.hasUIProps) {
-                [weakSelf updateLayoutPropsWithViewTag:@(update.nativeTag) props:convertJSIValueToDictionary(rt, update.uiProps)];
-            }
-        });
-    };
 
     HybridObjectRegistry::registerHybridObjectConstructor("UnistylesRuntime", [unistylesRuntime]() -> std::shared_ptr<HybridObject>{
         return unistylesRuntime;
@@ -64,41 +45,13 @@ RCT_EXPORT_MODULE(Unistyles)
     HybridObjectRegistry::registerHybridObjectConstructor("NavigationBar", [nativePlatform]() -> std::shared_ptr<HybridObject>{
         return std::make_shared<HybridNavigationBar>(nativePlatform);
     });
-    HybridObjectRegistry::registerHybridObjectConstructor("StyleSheet", [nativePlatform, unistylesRuntime, updateLayoutProps]() -> std::shared_ptr<HybridObject>{
-        return std::make_shared<HybridStyleSheet>(nativePlatform, unistylesRuntime, updateLayoutProps);
+    HybridObjectRegistry::registerHybridObjectConstructor("StyleSheet", [nativePlatform, unistylesRuntime]() -> std::shared_ptr<HybridObject>{
+        return std::make_shared<HybridStyleSheet>(nativePlatform, unistylesRuntime);
     });
 }
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:(const facebook::react::ObjCTurboModule::InitParams &)params {
     return std::make_shared<facebook::react::NativeTurboUnistylesSpecJSI>(params);
-}
-
-- (void)updateLayoutPropsWithViewTag:(NSNumber *)viewTag props:(NSDictionary *)uiProps {
-    // dispatch_async(dispatch_get_main_queue(), ^{
-    
-    RCTExecuteOnMainQueue(^{
-        RCTSurfacePresenter* surfacePresenter = self->_surfacePresenter;
-        RCTComponentViewRegistry *componentViewRegistry = surfacePresenter.mountingManager.componentViewRegistry;
-        ReactTag tag = [viewTag integerValue];
-        
-        auto* componentView = [componentViewRegistry findComponentViewWithTag:tag];
-        
-        [surfacePresenter synchronouslyUpdateViewOnUIThread:viewTag props:uiProps];
-        [componentView finalizeUpdates:RNComponentViewUpdateMask{}];
-    });
-}
-
-- (void)updateUIProps {
-    RCTExecuteOnMainQueue(^{
-        RCTSurfacePresenter* surfacePresenter = self->_surfacePresenter;
-
-        NSMutableDictionary *dictionary = [NSMutableDictionary new];
-        
-        dictionary[@"backgroundColor"] = @"#ffaa11";
-        dictionary[@"opacity"] = @(0.2);
-        
-        [surfacePresenter synchronouslyUpdateViewOnUIThread:@(18) props:dictionary];
-    });
 }
 
 @end
