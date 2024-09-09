@@ -147,8 +147,8 @@ class UnistylesRuntimeBuilder {
             },
             rtl: this.rtl,
             hasAdaptiveThemes: this.hasAdaptiveThemes,
-            name: 'miniRuntime',
-            toString: () => 'miniRuntime',
+            name: 'MiniRuntime',
+            toString: () => 'MiniRuntime',
             __type: 'web',
             equals: () => true,
         }
