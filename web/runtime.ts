@@ -1,4 +1,5 @@
 import { ColorScheme, Orientation, type AppTheme, type AppThemeName } from '../src/specs/types'
+import type { MiniRuntime } from '../src/specs/UnistylesRuntime'
 import { WebContentSizeCategory } from '../src/types'
 import { NavigationBar, StatusBar } from './mock'
 import { UnistylesState } from './state'
@@ -125,7 +126,7 @@ class UnistylesRuntimeBuilder {
         return NavigationBar
     }
 
-    get miniRuntime() {
+    get miniRuntime(): MiniRuntime {
         return {
             colorScheme: this.colorScheme,
             themeName: this.themeName,
@@ -146,6 +147,10 @@ class UnistylesRuntimeBuilder {
             },
             rtl: this.rtl,
             hasAdaptiveThemes: this.hasAdaptiveThemes,
+            name: 'miniRuntime',
+            toString: () => 'miniRuntime',
+            __type: 'web',
+            equals: () => true,
         }
     }
 
