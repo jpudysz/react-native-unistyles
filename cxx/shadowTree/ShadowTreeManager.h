@@ -11,7 +11,7 @@ namespace margelo::nitro::unistyles::shadow {
 using namespace facebook::react;
 using namespace facebook;
 
-using NodesToBeChanged = std::unordered_map<const ShadowNodeFamily*, RawProps>;
+using NodesToBeChanged = std::unordered_map<const ShadowNodeFamily*, std::vector<RawProps>>;
 using AffectedNodes = std::unordered_map<const ShadowNodeFamily *, std::unordered_set<int>>;
 
 struct ShadowTreeManager {
