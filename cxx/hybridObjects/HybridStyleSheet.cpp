@@ -296,22 +296,22 @@ void HybridStyleSheet::updateUnistylesWithDependencies(std::vector<core::Unistyl
 
     auto& parser = parser::Parser::configure(std::move(settings));
     std::vector<core::Unistyle*> unistylesToUpdate{};
-    
+
     std::for_each(styleSheets.begin(), styleSheets.end(), [&](const core::StyleSheet* styleSheet){
         auto unistyles = this->styleSheetRegistry.recompute(*rt, styleSheet, dependencies);
 
         std::for_each(unistyles.begin(), unistyles.end(), [&](const core::Unistyle* unistyle){
             auto mutatedUnistyle = const_cast<core::Unistyle*>(unistyle);
- 
+
             parser.parseUnistyle(*rt, *mutatedUnistyle);
             unistylesToUpdate.push_back(mutatedUnistyle);
-            
+
             mutatedUnistyle->isDirty = false;
         });
     });
-    
+
     auto viewUpdates = parser.unistylesToViewUpdates(*rt, unistylesToUpdate);
-    
+
     if (viewUpdates.size() > 0) {
         shadow::ShadowTreeManager::updateShadowTree(*rt, viewUpdates);
     }

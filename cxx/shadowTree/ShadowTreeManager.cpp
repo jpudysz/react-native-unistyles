@@ -8,8 +8,8 @@ using NodesToBeChanged = std::unordered_map<const ShadowNodeFamily*, RawProps>;
 using AffectedNodes = std::unordered_map<const ShadowNodeFamily*, std::unordered_set<int>>;
 
 void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime &rt, parser::ViewUpdates& updates) {
-    auto uiManager = UIManagerBinding::getBinding(rt);
-    const auto &shadowTreeRegistry = uiManager->getUIManager().getShadowTreeRegistry();
+    auto& uiManager = UIManagerBinding::getBinding(rt)->getUIManager();
+    const auto &shadowTreeRegistry = uiManager.getShadowTreeRegistry();
 
     shadowTreeRegistry.enumerate([&updates, &rt](const ShadowTree& shadowTree, bool& stop){
         // we could iterate via updates and create multiple commits
@@ -20,13 +20,13 @@ void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime &rt, par
 
             std::for_each(updates.begin(), updates.end(), [&](auto& update){
                 auto shadowNode = shadow::ShadowTreeManager::findShadowNode(oldRootShadowNode, update.first);
-                
+
                 // if there is no shadowNode, then most likely node was unmounted
                 // simply skip it, StyleSheet will get own notification soon
                 if (shadowNode) {
                     auto family = &shadowNode->getFamily();
 
-                    nodes[family].emplace_back(std::move(update.second));
+                    nodes[family].emplace_back(RawProps(rt, std::move(update.second)));
                 }
             });
 
@@ -84,7 +84,7 @@ AffectedNodes shadow::ShadowTreeManager::findAffectedNodes(const RootShadowNode&
         for (const auto& [parentNode, index] : std::ranges::reverse_view(familyAncestors)) {
             const auto parentFamily = &parentNode.get().getFamily();
             std::unordered_set<int>& affectedNode = affectedNodes[parentFamily];
-    
+
             affectedNode.insert(index);
         }
     });
@@ -117,9 +117,9 @@ ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode
             shadowNode.getSurfaceId(),
             *shadowNode.getContextContainer()
         };
-        
+
         updatedProps = shadowNode.getProps();
-        
+
         for (const auto& props: rawPropsIt->second) {
             updatedProps = shadowNode
                 .getComponentDescriptor()
