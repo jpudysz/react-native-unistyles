@@ -65,25 +65,8 @@ parser::ViewUpdates parser::Parser::unistylesToViewUpdates(jsi::Runtime& rt, std
     parser::ViewUpdates updates{};
 
     std::for_each(unistyles.begin(), unistyles.end(), [&](const core::Unistyle* unistyle){
-        jsi::Object layoutProps = jsi::Object(rt);
-        jsi::Object uiProps = jsi::Object(rt);
-
-        helpers::enumerateJSIObject(rt, unistyle->parsedStyle.value(), [&](const std::string propertyName, jsi::Value& propertyValue){
-            bool isLayoutProp = parser::isLayoutProp(propertyName);
-
-            isLayoutProp
-                ? layoutProps.setProperty(rt, propertyName.c_str(), propertyValue)
-                : uiProps.setProperty(rt, propertyName.c_str(), propertyValue);
-        });
-
         std::for_each(unistyle->nativeTags.begin(), unistyle->nativeTags.end(), [&](int nativeTag){
-            jsi::Array layoutNames = layoutProps.getPropertyNames(rt);
-            jsi::Array uiNames = uiProps.getPropertyNames(rt);
-
-            auto& ref = updates.emplace_back(nativeTag, jsi::Value(rt, layoutProps), jsi::Value(rt, uiProps));
-
-            ref.hasLayoutProps = layoutNames.size(rt) > 0;
-            ref.hasUIProps = uiNames.size(rt) > 0;
+            updates[nativeTag] = jsi::Value(rt, unistyle->parsedStyle.value());
         });
     });
 

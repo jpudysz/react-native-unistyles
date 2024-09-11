@@ -19,12 +19,10 @@ using namespace margelo::nitro::unistyles;
 struct HybridStyleSheet: public HybridStyleSheetSpec {
     HybridStyleSheet(
         Unistyles::HybridNativePlatformSpecCxx nativePlatform,
-        std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime,
-        std::function<void(parser::ViewUpdates&)> updateUIProps
+        std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime
     ) : HybridObject(TAG),
         unistylesRuntime{unistylesRuntime},
         nativePlatform{nativePlatform},
-        updateUIProps(updateUIProps),
         miniRuntime{std::make_shared<HybridMiniRuntime>(unistylesRuntime)} {
         this->nativePlatform.registerPlatformListener(std::bind(&HybridStyleSheet::onPlatformEvent, this, std::placeholders::_1));
     }
@@ -63,6 +61,5 @@ private:
     std::shared_ptr<HybridMiniRuntime> miniRuntime;
     std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime;
     core::StyleSheetRegistry styleSheetRegistry{miniRuntime};
-    std::function<void(parser::ViewUpdates&)> updateUIProps;
 };
 
