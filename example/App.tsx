@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { Button, Text, View } from 'react-native'
-import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
+import { StyleSheet, UnistylesRuntime, ShadowRegistry } from 'react-native-unistyles'
 import './unistyles'
 
 export const App = () => {
@@ -15,15 +15,27 @@ export const App = () => {
             style={styles.container}
             ref={ref => {
                 if (ref) {
-                    styles.container.uni__addNode(ref.__nativeTag)
+                    //tag
+                    ShadowRegistry.add(styles.container, ref)
                 }
 
                 return () => {
-                    styles.container.uni__removeNode(ref.__nativeTag)
+                    ShadowRegistry.remove(styles.container, ref)
                 }
             }}
         >
-            <Text style={styles.text}>
+            <Text
+                style={styles.text}
+                ref={ref => {
+                    if (ref) {
+                        ShadowRegistry.add(styles.text, ref)
+                    }
+
+                    return () => {
+                        ShadowRegistry.remove(styles.text, ref)
+                    }
+                }}
+            >
                 Screen: {UnistylesRuntime.screen.width}x{UnistylesRuntime.screen.height}
             </Text>
             <Text style={styles.text}>

@@ -1,6 +1,7 @@
 #import "UnistylesModuleOnLoad.h"
 #import <NitroModules/HybridObjectRegistry.hpp>
 #import "HybridUnistylesRuntime.h"
+#import "HybridShadowRegistry.h"
 #import "HybridMiniRuntime.h"
 #import "HybridStatusBar.h"
 #import "HybridNavigationBar.h"
@@ -27,6 +28,7 @@ RCT_EXPORT_MODULE(Unistyles)
         HybridObjectRegistry::unregisterHybridObjectConstructor("StatusBar");
         HybridObjectRegistry::unregisterHybridObjectConstructor("NavigationBar");
         HybridObjectRegistry::unregisterHybridObjectConstructor("StyleSheet");
+        HybridObjectRegistry::unregisterHybridObjectConstructor("ShadowRegistry");
     }
 
     [self createHybrids:rt];
@@ -35,6 +37,7 @@ RCT_EXPORT_MODULE(Unistyles)
 - (void)createHybrids:(jsi::Runtime&)rt {
     auto nativePlatform = Unistyles::NativePlatform::create();
     auto unistylesRuntime = std::make_shared<HybridUnistylesRuntime>(nativePlatform, rt);
+    auto shadowRegistry = std::make_shared<HybridShadowRegistry>();
 
     HybridObjectRegistry::registerHybridObjectConstructor("UnistylesRuntime", [unistylesRuntime]() -> std::shared_ptr<HybridObject>{
         return unistylesRuntime;
@@ -47,6 +50,9 @@ RCT_EXPORT_MODULE(Unistyles)
     });
     HybridObjectRegistry::registerHybridObjectConstructor("StyleSheet", [nativePlatform, unistylesRuntime]() -> std::shared_ptr<HybridObject>{
         return std::make_shared<HybridStyleSheet>(nativePlatform, unistylesRuntime);
+    });
+    HybridObjectRegistry::registerHybridObjectConstructor("ShadowRegistry", [shadowRegistry]() -> std::shared_ptr<HybridObject>{
+        return shadowRegistry;
     });
 }
 
