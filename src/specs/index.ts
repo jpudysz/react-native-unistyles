@@ -6,6 +6,7 @@ import type { NavigationBar } from './NavigtionBar'
 import type { StatusBar, StatusBarHiddenAnimation } from './StatusBar'
 import type { UnistylesRuntime, MiniRuntime } from './UnistylesRuntime'
 import type { StyleSheet } from './StyleSheet'
+import { ShadowRegistry } from './ShadowRegistry'
 import { StatusBarStyle, ColorScheme, Orientation } from './types'
 import { isIOS } from '../common'
 
@@ -43,7 +44,8 @@ HybridStyleSheet.compose = NativeStyleSheet.compose
 
 export {
     HybridStyleSheet as StyleSheet,
-    HybridUnistylesRuntime as UnistylesRuntime
+    HybridUnistylesRuntime as UnistylesRuntime,
+    ShadowRegistry
 }
 
 export {

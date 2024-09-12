@@ -36,6 +36,8 @@ struct DynamicFunctionMetadata {
 };
 
 struct Unistyle {
+    using Shared = std::shared_ptr<const Unistyle>;
+    
     Unistyle(UnistyleType type, std::string styleKey, jsi::Object& rawObject)
         : styleKey{styleKey}, type{type}, rawValue{std::move(rawObject)} {}
 
@@ -49,7 +51,7 @@ struct Unistyle {
           nativeTags(std::move(other.nativeTags)),
           dependencies(std::move(other.dependencies)),
           dynamicFunctionMetadata(std::move(other.dynamicFunctionMetadata)) {}
-
+   
     std::string styleKey;
     UnistyleType type;
     bool isDirty = false;
