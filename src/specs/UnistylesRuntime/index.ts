@@ -1,11 +1,12 @@
+import { NitroModules } from 'react-native-nitro-modules'
 import type { UnistylesRuntime as UnistylesRuntimeSpec } from './UnistylesRuntime.nitro'
-import type { MiniRuntime as MiniRuntimeSpec } from './MiniRuntime.nitro'
 import type { AppBreakpoint, AppTheme, AppThemeName, ColorScheme, Orientation } from '../types'
-import type { AndroidContentSizeCategory, IOSContentSizeCategory, WebContentSizeCategory } from '../../types'
-import type { StatusBar } from '../StatusBar'
-import type { NavigationBar } from '../NavigtionBar'
+import type { AndroidContentSizeCategory, IOSContentSizeCategory } from '../../types'
+import type { UnistylesStatusBar } from '../StatusBar'
+import type { UnistylesNavigationBar } from '../NavigtionBar'
+import { isIOS } from '../../common'
 
-export interface UnistylesRuntime extends UnistylesRuntimeSpec {
+export interface UnistylesRuntimePrivate extends Omit<UnistylesRuntimeSpec, 'setRootViewBackgroundColor'> {
     readonly colorScheme: ColorScheme,
     readonly themeName?: AppThemeName,
     readonly contentSizeCategory: IOSContentSizeCategory | AndroidContentSizeCategory,
@@ -13,18 +14,28 @@ export interface UnistylesRuntime extends UnistylesRuntimeSpec {
     readonly orientation: Orientation,
 
     // other HybridObjects
-    statusBar: StatusBar,
-    navigationBar: NavigationBar,
+    statusBar: UnistylesStatusBar,
+    navigationBar: UnistylesNavigationBar,
 
     setTheme(themeName: AppThemeName): void
     updateTheme(themeName: AppThemeName, updater: (currentTheme: AppTheme) => AppTheme): void,
-    setRootViewBackgroundColor(hex: `#${string}`, alpha?: number): void
+    setRootViewBackgroundColor(color?: string): void
+
+    // constructors
+    createHybridStatusBar(): UnistylesStatusBar,
+    createHybridNavigationBar(): UnistylesNavigationBar
 }
 
-export interface MiniRuntime extends MiniRuntimeSpec {
-    readonly colorScheme: ColorScheme,
-    readonly themeName?: AppThemeName,
-    readonly contentSizeCategory: IOSContentSizeCategory | AndroidContentSizeCategory | WebContentSizeCategory,
-    readonly breakpoint?: AppBreakpoint,
-    readonly orientation: Orientation,
+type UnistylesRuntime = Omit<UnistylesRuntimePrivate, 'createHybridStatusBar' | 'createHybridNavigationBar' | 'dispose'>
+
+const HybridUnistylesRuntime = NitroModules
+    .createHybridObject<UnistylesRuntimePrivate>('UnistylesRuntime')
+
+HybridUnistylesRuntime.statusBar = HybridUnistylesRuntime.createHybridStatusBar()
+HybridUnistylesRuntime.navigationBar = HybridUnistylesRuntime.createHybridNavigationBar()
+
+if (isIOS) {
+    HybridUnistylesRuntime.setImmersiveMode = HybridUnistylesRuntime.statusBar.setHidden
 }
+
+export const Runtime = HybridUnistylesRuntime as UnistylesRuntime

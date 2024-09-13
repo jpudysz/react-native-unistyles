@@ -3,7 +3,7 @@
 import Foundation
 import NitroModules
 
-typealias CxxListener = (PlatformEvent) -> Void
+typealias CxxListener = (Array<UnistyleDependency>) -> Void
 
 class NativeIOSPlatform: HybridNativePlatformSpec {
     var listeners: Array<CxxListener> = []
@@ -18,6 +18,10 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
 
     deinit {
         removePlatformListeners()
+    }
+    
+    func buildMiniRuntime() throws -> UnistylesMiniRuntime {
+        // todo
     }
 
     func getColorScheme() throws -> ColorScheme {
@@ -179,16 +183,15 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         }
     }
 
-    func setRootViewBackgroundColor(hex: String, alpha: Double?) throws {
+    func setRootViewBackgroundColor(color: Double) throws {
         DispatchQueue.main.async {
-            guard let presentedViewController = RCTPresentedViewController(),
-                  let backgroundColor = colorFromHexString(hex, alpha: alpha ?? 1) else {
+            guard let presentedViewController = RCTPresentedViewController() else {
                 print("🦄 Unistyles: Couldn't set rootView backgroundColor")
 
                 return
             }
-
-            presentedViewController.view.backgroundColor = backgroundColor
+            // todo convert int to UIColor
+            // presentedViewController.view.backgroundColor = color
         }
     }
 
@@ -197,9 +200,11 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     }
 
     // not implemented for iOS as there are no such APIs
-    func setNavigationBarBackgroundColor(hex: String?, alpha: Double?) throws {}
+    func setNavigationBarBackgroundColor(color: Double?) throws {}
     func setNavigationBarHidden(isHidden: Bool) throws {}
-    func setStatusBarBackgroundColor(hex: String?, alpha: Double?) throws {}
+    func setStatusBarBackgroundColor(color: Double?) throws {}
+    
+    // implemented from JS
     func setImmersiveMode(isEnabled: Bool) throws {}
 }
 
