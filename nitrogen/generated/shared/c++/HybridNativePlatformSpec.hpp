@@ -20,8 +20,8 @@ namespace margelo::nitro::unistyles { struct Insets; }
 namespace margelo::nitro::unistyles { enum class ColorScheme; }
 // Forward declaration of `Dimensions` to properly resolve imports.
 namespace margelo::nitro::unistyles { struct Dimensions; }
-// Forward declaration of `UnistylesMiniRuntime` to properly resolve imports.
-namespace margelo::nitro::unistyles { struct UnistylesMiniRuntime; }
+// Forward declaration of `UnistylesNativeMiniRuntime` to properly resolve imports.
+namespace margelo::nitro::unistyles { struct UnistylesNativeMiniRuntime; }
 // Forward declaration of `UnistyleDependency` to properly resolve imports.
 namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 
@@ -30,7 +30,7 @@ namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 #include <string>
 #include "Dimensions.hpp"
 #include <optional>
-#include "UnistylesMiniRuntime.hpp"
+#include "UnistylesNativeMiniRuntime.hpp"
 #include <functional>
 #include <vector>
 #include "UnistyleDependency.hpp"
@@ -77,7 +77,7 @@ namespace margelo::nitro::unistyles {
       virtual void setNavigationBarHidden(bool isHidden) = 0;
       virtual void setStatusBarBackgroundColor(std::optional<double> color) = 0;
       virtual void setImmersiveMode(bool isEnabled) = 0;
-      virtual UnistylesMiniRuntime buildMiniRuntime() = 0;
+      virtual UnistylesNativeMiniRuntime buildMiniRuntime() = 0;
       virtual void registerPlatformListener(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>& callback) = 0;
 
     protected:

@@ -1,9 +1,9 @@
 import { NitroModules } from 'react-native-nitro-modules'
-import type { UnistylesRuntime as UnistylesRuntimeSpec } from './UnistylesRuntime.nitro'
+import type { UnistylesRuntime as UnistylesRuntimeSpec, UnistylesMiniRuntime } from './UnistylesRuntime.nitro'
 import type { AppBreakpoint, AppTheme, AppThemeName, ColorScheme, Orientation } from '../types'
-import type { AndroidContentSizeCategory, IOSContentSizeCategory } from '../../types'
 import type { UnistylesStatusBar } from '../StatusBar'
 import type { UnistylesNavigationBar } from '../NavigtionBar'
+import type { AndroidContentSizeCategory, IOSContentSizeCategory } from '../../types'
 import { isIOS } from '../../common'
 
 export interface UnistylesRuntimePrivate extends Omit<UnistylesRuntimeSpec, 'setRootViewBackgroundColor'> {
@@ -26,7 +26,7 @@ export interface UnistylesRuntimePrivate extends Omit<UnistylesRuntimeSpec, 'set
     createHybridNavigationBar(): UnistylesNavigationBar
 }
 
-type UnistylesRuntime = Omit<UnistylesRuntimePrivate, 'createHybridStatusBar' | 'createHybridNavigationBar' | 'dispose'>
+type UnistylesRuntime = Omit<UnistylesRuntimePrivate, 'createHybridStatusBar' | 'createHybridNavigationBar' | 'dispose' | 'miniRuntime'>
 
 const HybridUnistylesRuntime = NitroModules
     .createHybridObject<UnistylesRuntimePrivate>('UnistylesRuntime')
@@ -39,3 +39,7 @@ if (isIOS) {
 }
 
 export const Runtime = HybridUnistylesRuntime as UnistylesRuntime
+
+export type {
+    UnistylesMiniRuntime
+}

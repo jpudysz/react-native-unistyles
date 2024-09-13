@@ -19,8 +19,10 @@ namespace margelo::nitro::unistyles { struct Insets; }
 namespace margelo::nitro::unistyles { enum class Orientation; }
 // Forward declaration of `UnistyleDependency` to properly resolve imports.
 namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
-// Forward declaration of `UnistylesMiniRuntime` to properly resolve imports.
-namespace margelo::nitro::unistyles { struct UnistylesMiniRuntime; }
+// Forward declaration of `UnistylesCxxMiniRuntime` to properly resolve imports.
+namespace margelo::nitro::unistyles { struct UnistylesCxxMiniRuntime; }
+// Forward declaration of `UnistylesNativeMiniRuntime` to properly resolve imports.
+namespace margelo::nitro::unistyles { struct UnistylesNativeMiniRuntime; }
 
 // Include C++ defined types
 #include "ColorScheme.hpp"
@@ -28,7 +30,8 @@ namespace margelo::nitro::unistyles { struct UnistylesMiniRuntime; }
 #include "Insets.hpp"
 #include "Orientation.hpp"
 #include "UnistyleDependency.hpp"
-#include "UnistylesMiniRuntime.hpp"
+#include "UnistylesCxxMiniRuntime.hpp"
+#include "UnistylesNativeMiniRuntime.hpp"
 #include <functional>
 #include <optional>
 #include <string>

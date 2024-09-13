@@ -7,6 +7,7 @@ typealias CxxListener = (Array<UnistyleDependency>) -> Void
 
 class NativeIOSPlatform: HybridNativePlatformSpec {
     var listeners: Array<CxxListener> = []
+    var miniRuntime: UnistylesNativeMiniRuntime?
     var hybridContext = margelo.nitro.HybridContext()
     var memorySize: Int {
         return getSizeOf(self)
@@ -14,14 +15,26 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
 
     init() {
         setupPlatformListeners()
+
+        self.miniRuntime = UnistylesNativeMiniRuntime(
+            colorScheme: try! self.getColorScheme(),
+            screen: try! self.getScreenDimensions(),
+            contentSizeCategory: try! self.getContentSizeCategory(),
+            insets: try! self.getInsets(),
+            pixelRatio: try! self.getPixelRatio(),
+            fontScale: try! self.getFontScale(),
+            rtl: try! self.getPrefersRtlDirection(),
+            statusBar: try! self.getStatusBarDimensions(),
+            navigationBar: try! self.getNavigationBarDimensions()
+        )
     }
 
     deinit {
         removePlatformListeners()
     }
-    
-    func buildMiniRuntime() throws -> UnistylesMiniRuntime {
-        // todo
+
+    func buildMiniRuntime() throws -> UnistylesNativeMiniRuntime {
+        return self.miniRuntime!
     }
 
     func getColorScheme() throws -> ColorScheme {
@@ -183,7 +196,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         }
     }
 
-    func setRootViewBackgroundColor(color: Double) throws {
+    func setRootViewBackgroundColor(color: Double?) throws {
         DispatchQueue.main.async {
             guard let presentedViewController = RCTPresentedViewController() else {
                 print("🦄 Unistyles: Couldn't set rootView backgroundColor")
@@ -203,7 +216,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     func setNavigationBarBackgroundColor(color: Double?) throws {}
     func setNavigationBarHidden(isHidden: Bool) throws {}
     func setStatusBarBackgroundColor(color: Double?) throws {}
-    
+
     // implemented from JS
     func setImmersiveMode(isEnabled: Bool) throws {}
 }

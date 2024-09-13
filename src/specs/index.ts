@@ -2,7 +2,7 @@ import './NativeUnistyles'
 
 import { Runtime } from './UnistylesRuntime'
 import { HybridUnistylesStyleSheet } from './StyleSheet'
-import type { MiniRuntime } from './NativePlatform'
+import type { MiniRuntime } from './UnistylesRuntime'
 import { StatusBarStyle, ColorScheme, Orientation } from './types'
 
 export {
