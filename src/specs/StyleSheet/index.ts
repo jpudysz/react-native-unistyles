@@ -1,5 +1,7 @@
-import type { StyleSheet as NativeStyleSheet } from 'react-native'
-import type { StyleSheet as StyleSheetSpec } from './StyleSheet.nitro'
+import { NitroModules } from 'react-native-nitro-modules'
+import { StyleSheet as NativeStyleSheet } from 'react-native'
+import type { StyleSheet as NativeStyleSheetType } from 'react-native'
+import type { UnistylesStyleSheet as UnistylesStyleSheetSpec } from './UnistylesStyleSheet.nitro'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../../global'
 import type { CreateUnistylesStyleSheet } from '../../types'
 
@@ -14,13 +16,25 @@ export type UnistylesConfig = {
     breakpoints?: UnistylesBreakpoints
 }
 
-export interface StyleSheet extends StyleSheetSpec {
-    absoluteFillObject: typeof NativeStyleSheet.absoluteFillObject,
-    absoluteFill: typeof NativeStyleSheet.absoluteFill,
-    compose: typeof NativeStyleSheet.compose,
-    flatten: typeof NativeStyleSheet.flatten,
+export interface UnistylesStyleSheet extends UnistylesStyleSheetSpec {
+    absoluteFillObject: typeof NativeStyleSheetType.absoluteFillObject,
+    absoluteFill: typeof NativeStyleSheetType.absoluteFill,
+    compose: typeof NativeStyleSheetType.compose,
+    flatten: typeof NativeStyleSheetType.flatten,
 
     // overridden methods
     create: CreateUnistylesStyleSheet,
     configure(config: UnistylesConfig): void
+}
+
+const HybridUnistylesStyleSheet = NitroModules
+    .createHybridObject<UnistylesStyleSheet>('UnistylesStyleSheet')
+
+HybridUnistylesStyleSheet.absoluteFillObject = NativeStyleSheet.absoluteFillObject
+HybridUnistylesStyleSheet.absoluteFill = NativeStyleSheet.absoluteFill
+HybridUnistylesStyleSheet.flatten = NativeStyleSheet.flatten
+HybridUnistylesStyleSheet.compose = NativeStyleSheet.compose
+
+export {
+    HybridUnistylesStyleSheet
 }

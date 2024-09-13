@@ -32,12 +32,13 @@ extension NativeIOSPlatform {
         listeners.append(callback)
     }
     
-    func emitCxxEvent(event: PlatformEvent) {
-        self.listeners.forEach { $0(event) }
+    func emitCxxEvent(dependencies: Array<UnistyleDependency>) {
+        self.listeners.forEach { $0(dependencies) }
     }
     
     @objc func onWindowChange(_ notification: Notification) {
-        self.emitCxxEvent(event: PlatformEvent.onscreensizechange)
+        // todo compute dependencies from MiniRuntime
+        // self.emitCxxEvent(event: PlatformEvent.onscreensizechange)
     }
 
     @objc func onAppearanceChange(_ notification: Notification) {

@@ -1,5 +1,5 @@
-import type { NavigationBar as NavigationBarSpec } from './NavigationBar.nitro'
+import type { UnistylesNavigationBar as UnistylesNavigationBarSpec } from './UnistylesNavigationBar.nitro'
 
-export interface NavigationBar extends NavigationBarSpec {
-    setBackgroundColor(hex?: `#${string}`, alpha?: number): void
+export interface UnistylesNavigationBar extends Omit<UnistylesNavigationBarSpec, 'setBackgroundColor' | 'dispose'> {
+    setBackgroundColor(color?: string): void
 }
