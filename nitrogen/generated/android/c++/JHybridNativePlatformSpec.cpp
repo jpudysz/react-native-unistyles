@@ -14,10 +14,8 @@ namespace margelo::nitro::unistyles { struct Insets; }
 namespace margelo::nitro::unistyles { enum class ColorScheme; }
 // Forward declaration of `Dimensions` to properly resolve imports.
 namespace margelo::nitro::unistyles { struct Dimensions; }
-// Forward declaration of `UnistylesMiniRuntime` to properly resolve imports.
-namespace margelo::nitro::unistyles { struct UnistylesMiniRuntime; }
-// Forward declaration of `Orientation` to properly resolve imports.
-namespace margelo::nitro::unistyles { enum class Orientation; }
+// Forward declaration of `UnistylesNativeMiniRuntime` to properly resolve imports.
+namespace margelo::nitro::unistyles { struct UnistylesNativeMiniRuntime; }
 // Forward declaration of `UnistyleDependency` to properly resolve imports.
 namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 
@@ -28,11 +26,9 @@ namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 #include <string>
 #include "Dimensions.hpp"
 #include "JDimensions.hpp"
-#include "UnistylesMiniRuntime.hpp"
-#include "JUnistylesMiniRuntime.hpp"
+#include "UnistylesNativeMiniRuntime.hpp"
+#include "JUnistylesNativeMiniRuntime.hpp"
 #include <optional>
-#include "Orientation.hpp"
-#include "JOrientation.hpp"
 #include <functional>
 #include <vector>
 #include "UnistyleDependency.hpp"
@@ -125,8 +121,8 @@ namespace margelo::nitro::unistyles {
     static const auto method = _javaPart->getClass()->getMethod<void(bool /* isEnabled */)>("setImmersiveMode");
     method(_javaPart, isEnabled);
   }
-  UnistylesMiniRuntime JHybridNativePlatformSpec::buildMiniRuntime() {
-    static const auto method = _javaPart->getClass()->getMethod<jni::alias_ref<JUnistylesMiniRuntime>()>("buildMiniRuntime");
+  UnistylesNativeMiniRuntime JHybridNativePlatformSpec::buildMiniRuntime() {
+    static const auto method = _javaPart->getClass()->getMethod<jni::alias_ref<JUnistylesNativeMiniRuntime>()>("buildMiniRuntime");
     auto result = method(_javaPart);
     return result->toCpp();
   }

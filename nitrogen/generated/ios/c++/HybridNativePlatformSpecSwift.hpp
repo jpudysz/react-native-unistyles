@@ -19,10 +19,8 @@ namespace margelo::nitro::unistyles { struct Insets; }
 namespace margelo::nitro::unistyles { enum class ColorScheme; }
 // Forward declaration of `Dimensions` to properly resolve imports.
 namespace margelo::nitro::unistyles { struct Dimensions; }
-// Forward declaration of `UnistylesMiniRuntime` to properly resolve imports.
-namespace margelo::nitro::unistyles { struct UnistylesMiniRuntime; }
-// Forward declaration of `Orientation` to properly resolve imports.
-namespace margelo::nitro::unistyles { enum class Orientation; }
+// Forward declaration of `UnistylesNativeMiniRuntime` to properly resolve imports.
+namespace margelo::nitro::unistyles { struct UnistylesNativeMiniRuntime; }
 // Forward declaration of `UnistyleDependency` to properly resolve imports.
 namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 
@@ -31,8 +29,7 @@ namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 #include <string>
 #include "Dimensions.hpp"
 #include <optional>
-#include "UnistylesMiniRuntime.hpp"
-#include "Orientation.hpp"
+#include "UnistylesNativeMiniRuntime.hpp"
 #include <functional>
 #include <vector>
 #include "UnistyleDependency.hpp"
@@ -81,40 +78,40 @@ namespace margelo::nitro::unistyles {
   public:
     // Methods
     inline Insets getInsets() override {
-      auto value = _swiftPart.getInsets();
-      return value;
+      auto __result = _swiftPart.getInsets();
+      return __result;
     }
     inline ColorScheme getColorScheme() override {
-      auto value = _swiftPart.getColorScheme();
-      return static_cast<ColorScheme>(value);
+      auto __result = _swiftPart.getColorScheme();
+      return static_cast<ColorScheme>(__result);
     }
     inline double getFontScale() override {
-      auto value = _swiftPart.getFontScale();
-      return value;
+      auto __result = _swiftPart.getFontScale();
+      return __result;
     }
     inline double getPixelRatio() override {
-      auto value = _swiftPart.getPixelRatio();
-      return value;
+      auto __result = _swiftPart.getPixelRatio();
+      return __result;
     }
     inline std::string getContentSizeCategory() override {
-      auto value = _swiftPart.getContentSizeCategory();
-      return value;
+      auto __result = _swiftPart.getContentSizeCategory();
+      return __result;
     }
     inline Dimensions getScreenDimensions() override {
-      auto value = _swiftPart.getScreenDimensions();
-      return value;
+      auto __result = _swiftPart.getScreenDimensions();
+      return __result;
     }
     inline Dimensions getStatusBarDimensions() override {
-      auto value = _swiftPart.getStatusBarDimensions();
-      return value;
+      auto __result = _swiftPart.getStatusBarDimensions();
+      return __result;
     }
     inline Dimensions getNavigationBarDimensions() override {
-      auto value = _swiftPart.getNavigationBarDimensions();
-      return value;
+      auto __result = _swiftPart.getNavigationBarDimensions();
+      return __result;
     }
     inline bool getPrefersRtlDirection() override {
-      auto value = _swiftPart.getPrefersRtlDirection();
-      return value;
+      auto __result = _swiftPart.getPrefersRtlDirection();
+      return __result;
     }
     inline void setRootViewBackgroundColor(std::optional<double> color) override {
       _swiftPart.setRootViewBackgroundColor(color);
@@ -131,9 +128,9 @@ namespace margelo::nitro::unistyles {
     inline void setImmersiveMode(bool isEnabled) override {
       _swiftPart.setImmersiveMode(std::forward<decltype(isEnabled)>(isEnabled));
     }
-    inline UnistylesMiniRuntime buildMiniRuntime() override {
-      auto value = _swiftPart.buildMiniRuntime();
-      return value;
+    inline UnistylesNativeMiniRuntime buildMiniRuntime() override {
+      auto __result = _swiftPart.buildMiniRuntime();
+      return __result;
     }
     inline void registerPlatformListener(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>& callback) override {
       _swiftPart.registerPlatformListener(callback);

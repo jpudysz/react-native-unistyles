@@ -47,7 +47,7 @@ public protocol HybridNativePlatformSpec: HybridObjectSpec {
   func setNavigationBarHidden(isHidden: Bool) throws -> Void
   func setStatusBarBackgroundColor(color: Double?) throws -> Void
   func setImmersiveMode(isEnabled: Bool) throws -> Void
-  func buildMiniRuntime() throws -> UnistylesMiniRuntime
+  func buildMiniRuntime() throws -> UnistylesNativeMiniRuntime
   func registerPlatformListener(callback: @escaping ((_ dependencies: [UnistyleDependency]) -> Void)) throws -> Void
 }
 

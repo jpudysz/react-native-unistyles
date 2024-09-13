@@ -57,7 +57,7 @@ namespace margelo::nitro::unistyles {
     void setNavigationBarHidden(bool isHidden) override;
     void setStatusBarBackgroundColor(std::optional<double> color) override;
     void setImmersiveMode(bool isEnabled) override;
-    UnistylesMiniRuntime buildMiniRuntime() override;
+    UnistylesNativeMiniRuntime buildMiniRuntime() override;
     void registerPlatformListener(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>& callback) override;
 
   private:

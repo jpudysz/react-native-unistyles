@@ -26,6 +26,7 @@ namespace margelo::nitro::unistyles {
       prototype.registerHybridGetter("pixelRatio", &HybridUnistylesRuntimeSpec::getPixelRatio);
       prototype.registerHybridGetter("fontScale", &HybridUnistylesRuntimeSpec::getFontScale);
       prototype.registerHybridGetter("rtl", &HybridUnistylesRuntimeSpec::getRtl);
+      prototype.registerHybridGetter("miniRuntime", &HybridUnistylesRuntimeSpec::getMiniRuntime);
       prototype.registerHybridMethod("setTheme", &HybridUnistylesRuntimeSpec::setTheme);
       prototype.registerHybridMethod("setAdaptiveThemes", &HybridUnistylesRuntimeSpec::setAdaptiveThemes);
       prototype.registerHybridMethod("setImmersiveMode", &HybridUnistylesRuntimeSpec::setImmersiveMode);

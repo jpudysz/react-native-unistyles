@@ -13,12 +13,24 @@
 namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 
 // Include C++ defined types
-#include "UnistyleDependency.hpp"
-#include <functional>
-#include <memory>
-#include <optional>
-#include <string>
-#include <vector>
+#if __has_include("UnistyleDependency.hpp")
+ #include "UnistyleDependency.hpp"
+#endif
+#if __has_include(<functional>)
+ #include <functional>
+#endif
+#if __has_include(<memory>)
+ #include <memory>
+#endif
+#if __has_include(<optional>)
+ #include <optional>
+#endif
+#if __has_include(<string>)
+ #include <string>
+#endif
+#if __has_include(<vector>)
+ #include <vector>
+#endif
 
 /**
  * Contains specialized versions of C++ templated types so they can be accessed from Swift,
@@ -35,14 +47,6 @@ namespace margelo::nitro::unistyles::bridge::swift {
   }
   
   /**
-   * Specialized version of `std::optional<std::string>`.
-   */
-  using std__optional_std__string_ = std::optional<std::string>;
-  inline std::optional<std::string> create_std__optional_std__string_(const std::string& value) {
-    return std::optional<std::string>(value);
-  }
-  
-  /**
    * Specialized version of `std::vector<UnistyleDependency>`.
    */
   using std__vector_UnistyleDependency_ = std::vector<UnistyleDependency>;
@@ -53,17 +57,39 @@ namespace margelo::nitro::unistyles::bridge::swift {
   }
   
   /**
-   * Specialized version of `std::function<void(const std::vector<UnistyleDependency>& / * dependencies * /)>`.
+   * Specialized version of `std::function<void(const std::vector<UnistyleDependency>&)>`.
    */
   using Func_void_std__vector_UnistyleDependency_ = std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>;
+  /**
+   * Wrapper class for a `std::function<void(const std::vector<UnistyleDependency>& / * dependencies * /)>`, this can be used from Swift.
+   */
+  class Func_void_std__vector_UnistyleDependency__Wrapper {
+  public:
+    explicit Func_void_std__vector_UnistyleDependency__Wrapper(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>& func): function(func) {}
+    explicit Func_void_std__vector_UnistyleDependency__Wrapper(std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>&& func): function(std::move(func)) {}
+  
+    void call(std::vector<UnistyleDependency> dependencies) const {
+      function(dependencies);
+    }
+  
+    std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)> function;
+  };
   inline Func_void_std__vector_UnistyleDependency_ create_Func_void_std__vector_UnistyleDependency_(void* closureHolder, void(*call)(void* /* closureHolder */, std::vector<UnistyleDependency>), void(*destroy)(void*)) {
     std::shared_ptr<void> sharedClosureHolder(closureHolder, destroy);
-    return [sharedClosureHolder, call](const std::vector<UnistyleDependency>& dependencies) -> void {
+    return Func_void_std__vector_UnistyleDependency_([sharedClosureHolder, call](const std::vector<UnistyleDependency>& dependencies) -> void {
       call(sharedClosureHolder.get(), dependencies);
-    };
+    });
   }
-  inline std::shared_ptr<Func_void_std__vector_UnistyleDependency_> share_Func_void_std__vector_UnistyleDependency_(const Func_void_std__vector_UnistyleDependency_& value) {
-    return std::make_shared<Func_void_std__vector_UnistyleDependency_>(value);
+  inline std::shared_ptr<Func_void_std__vector_UnistyleDependency__Wrapper> share_Func_void_std__vector_UnistyleDependency_(const Func_void_std__vector_UnistyleDependency_& value) {
+    return std::make_shared<Func_void_std__vector_UnistyleDependency__Wrapper>(value);
+  }
+  
+  /**
+   * Specialized version of `std::optional<std::string>`.
+   */
+  using std__optional_std__string_ = std::optional<std::string>;
+  inline std::optional<std::string> create_std__optional_std__string_(const std::string& value) {
+    return std::optional<std::string>(value);
   }
 
 } // namespace margelo::nitro::unistyles::bridge::swift

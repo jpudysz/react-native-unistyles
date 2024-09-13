@@ -22,6 +22,8 @@ namespace margelo::nitro::unistyles { struct Dimensions; }
 namespace margelo::nitro::unistyles { struct Insets; }
 // Forward declaration of `Orientation` to properly resolve imports.
 namespace margelo::nitro::unistyles { enum class Orientation; }
+// Forward declaration of `UnistylesCxxMiniRuntime` to properly resolve imports.
+namespace margelo::nitro::unistyles { struct UnistylesCxxMiniRuntime; }
 
 #include "ColorScheme.hpp"
 #include "Dimensions.hpp"
@@ -29,6 +31,7 @@ namespace margelo::nitro::unistyles { enum class Orientation; }
 #include <string>
 #include "Insets.hpp"
 #include "Orientation.hpp"
+#include "UnistylesCxxMiniRuntime.hpp"
 
 namespace margelo::nitro::unistyles {
 
@@ -65,6 +68,7 @@ namespace margelo::nitro::unistyles {
       virtual double getPixelRatio() = 0;
       virtual double getFontScale() = 0;
       virtual bool getRtl() = 0;
+      virtual UnistylesCxxMiniRuntime getMiniRuntime() = 0;
 
     public:
       // Methods

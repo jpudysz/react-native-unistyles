@@ -95,7 +95,7 @@ abstract class HybridNativePlatformSpec: HybridObject() {
   
   @DoNotStrip
   @Keep
-  abstract fun buildMiniRuntime(): UnistylesMiniRuntime
+  abstract fun buildMiniRuntime(): UnistylesNativeMiniRuntime
   
   @DoNotStrip
   @Keep

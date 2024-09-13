@@ -2,7 +2,6 @@ import type { HybridObject } from 'react-native-nitro-modules'
 import type { Dimensions, Insets } from '../types'
 
 type ColorScheme = 'dark' | 'light' | 'unspecified'
-type Orientation = 'portrait' | 'landscape'
 
 enum UnistyleDependency {
     Theme = 0,
@@ -20,15 +19,11 @@ enum UnistyleDependency {
     FontScale = 12
 }
 
-export interface UnistylesMiniRuntime {
+export interface UnistylesNativeMiniRuntime {
     readonly colorScheme: ColorScheme,
-    readonly hasAdaptiveThemes: boolean,
     readonly screen: Dimensions,
-    readonly themeName?: string,
     readonly contentSizeCategory: string,
-    readonly breakpoint?: string,
     readonly insets: Insets,
-    readonly orientation: Orientation,
     readonly pixelRatio: number,
     readonly fontScale: number,
     readonly rtl: boolean
@@ -56,6 +51,6 @@ export interface NativePlatform extends HybridObject<{ ios: 'swift', android: 'k
     setImmersiveMode(isEnabled: boolean): void,
 
     // private
-    buildMiniRuntime(): UnistylesMiniRuntime,
+    buildMiniRuntime(): UnistylesNativeMiniRuntime,
     registerPlatformListener(callback: (dependencies: Array<UnistyleDependency>) => void): void
 }

@@ -236,7 +236,7 @@ public final class HybridNativePlatformSpecCxx {
   }
   
   @inline(__always)
-  public func buildMiniRuntime() -> UnistylesMiniRuntime {
+  public func buildMiniRuntime() -> UnistylesNativeMiniRuntime {
     do {
       let result = try self.implementation.buildMiniRuntime()
       return result
@@ -252,7 +252,7 @@ public final class HybridNativePlatformSpecCxx {
       try self.implementation.registerPlatformListener(callback: { () -> (([UnistyleDependency]) -> Void) in
         let shared = bridge.share_Func_void_std__vector_UnistyleDependency_(callback)
         return { (dependencies: [UnistyleDependency]) -> Void in
-          shared.pointee({ () -> bridge.std__vector_UnistyleDependency_ in
+          shared.pointee.call({ () -> bridge.std__vector_UnistyleDependency_ in
           var vector = bridge.create_std__vector_UnistyleDependency_(dependencies.count)
           for item in dependencies {
             vector.push_back(item.rawValue)
