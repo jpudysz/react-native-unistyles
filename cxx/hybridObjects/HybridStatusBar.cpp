@@ -1,0 +1,13 @@
+#include "HybridStatusBar.h"
+
+void HybridStatusBar::setBackgroundColor(std::optional<double> color) {
+    this->_nativePlatform.setStatusBarBackgroundColor(color);
+}
+
+double HybridStatusBar::getWidth() {
+    return this->_nativePlatform.getStatusBarDimensions().width;
+}
+
+double HybridStatusBar::getHeight() {
+    return this->_nativePlatform.getStatusBarDimensions().height;
+}

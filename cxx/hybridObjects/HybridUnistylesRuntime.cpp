@@ -3,43 +3,37 @@
 using namespace margelo::nitro::unistyles;
 
 ColorScheme HybridUnistylesRuntime::getColorScheme() {
-    int colorScheme = this->nativePlatform.getColorScheme();
+    int colorScheme = this->_nativePlatform.getColorScheme();
 
     return static_cast<ColorScheme>(colorScheme);
 }
 
 bool HybridUnistylesRuntime::getHasAdaptiveThemes() {
-    auto& state = core::UnistylesRegistry::get().getState(*rt);
-
-    return state.hasAdaptiveThemes();
+    return this->_state->hasAdaptiveThemes;
 };
 
 Dimensions HybridUnistylesRuntime::getScreen() {
-    return this->nativePlatform.getScreenDimensions();
+    return this->_nativePlatform.getScreenDimensions();
 };
 
 std::optional<std::string> HybridUnistylesRuntime::getThemeName() {
-    auto& state = core::UnistylesRegistry::get().getState(*rt);
-
-    return state.getCurrentThemeName();
+    return this->_state->currentThemeName;
 };
 
 std::string HybridUnistylesRuntime::getContentSizeCategory() {
-    return this->nativePlatform.getContentSizeCategory();
+    return this->_nativePlatform.getContentSizeCategory();
 };
 
 std::optional<std::string> HybridUnistylesRuntime::getBreakpoint() {
-    auto& state = core::UnistylesRegistry::get().getState(*rt);
-
-    return state.getCurrentBreakpointName();
+    return this->_state->currentBreakpointName;
 };
 
 bool HybridUnistylesRuntime::getRtl() {
-    return this->nativePlatform.getPrefersRtlDirection();
+    return this->_nativePlatform.getPrefersRtlDirection();
 }
 
 Insets HybridUnistylesRuntime::getInsets() {
-    return this->nativePlatform.getInsets();
+    return this->_nativePlatform.getInsets();
 };
 
 Orientation HybridUnistylesRuntime::getOrientation() {
@@ -53,25 +47,21 @@ Orientation HybridUnistylesRuntime::getOrientation() {
 };
 
 double HybridUnistylesRuntime::getPixelRatio() {
-    return this->nativePlatform.getPixelRatio();
+    return this->_nativePlatform.getPixelRatio();
 };
 
 double HybridUnistylesRuntime::getFontScale() {
-    return this->nativePlatform.getFontScale();
+    return this->_nativePlatform.getFontScale();
 };
 
 void HybridUnistylesRuntime::setTheme(const std::string &themeName) {
-    helpers::assertThat(*rt, !this->getHasAdaptiveThemes(), "You're trying to set theme to: '" + themeName + "', but adaptiveThemes are enabled.");
+    helpers::assertThat(*_rt, !this->getHasAdaptiveThemes(), "You're trying to set theme to: '" + themeName + "', but adaptiveThemes are enabled.");
 
-    auto& state = core::UnistylesRegistry::get().getState(*rt);
-
-    state.setTheme(themeName);
+    this->_state->currentThemeName = themeName;
 };
 
 void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
-    auto& registry = core::UnistylesRegistry::get();
-
-    registry.setPrefersAdaptiveThemes(*rt, isEnabled);
+    this->_state->prefersAdaptiveThemes = isEnabled;
 
     // if user disabled it, or can't have adaptive themes, do nothing
     if (!this->getHasAdaptiveThemes()) {
@@ -80,7 +70,6 @@ void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
 
     // if user enabled adaptive themes, then we need to make sure
     // we selected theme based on color scheme
-    auto& state = core::UnistylesRegistry::get().getState(*rt);
     auto colorScheme = this->getColorScheme();
     auto currentThemeName = this->getThemeName();
     auto nextTheme = colorScheme == ColorScheme::LIGHT
@@ -88,7 +77,7 @@ void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
         : "dark";
 
     if (!currentThemeName.has_value() || nextTheme != currentThemeName.value()) {
-        state.setTheme(nextTheme);
+        this->_state->currentThemeName = nextTheme;
     }
 };
 
@@ -96,28 +85,35 @@ jsi::Value HybridUnistylesRuntime::updateTheme(jsi::Runtime &rt, const jsi::Valu
     helpers::assertThat(rt, args[0].isString(), "first argument expected to be a string.");
     helpers::assertThat(rt, args[1].isObject(), "second argument expected to be a function.");
 
-    auto& registry = core::UnistylesRegistry::get();
     auto themeName = args[0].asString(rt).utf8(rt);
 
     helpers::assertThat(rt, args[1].asObject(rt).isFunction(rt), "second argument expected to be a function.");
 
-    registry.updateTheme(rt, themeName, args[1].asObject(rt).asFunction(rt));
+    this->_state->updateTheme(rt, themeName, args[1].asObject(rt).asFunction(rt));
 
     return jsi::Value::undefined();
 }
 
 void HybridUnistylesRuntime::setImmersiveMode(bool isEnabled) {
-    // todo implement for Android
+    this->_nativePlatform.setImmersiveMode(isEnabled);
 };
 
 void HybridUnistylesRuntime::setRootViewBackgroundColor(std::optional<double> color) {
-    this->nativePlatform.setRootViewBackgroundColor(color);
+    this->_nativePlatform.setRootViewBackgroundColor(color);
 }
 
-Dimensions HybridUnistylesRuntime::getStatusBarDimensions() {
-    return this->nativePlatform.getStatusBarDimensions();
+jsi::Value HybridUnistylesRuntime::createHybridStatusBar(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    if (this->_statusBar == nullptr) {
+        this->_statusBar = std::make_shared<HybridStatusBar>(_nativePlatform);
+    }
+    
+    return this->_statusBar->toObject(rt);
 }
 
-Dimensions HybridUnistylesRuntime::getNavigationBarDimensions() {
-    return this->nativePlatform.getNavigationBarDimensions();
+jsi::Value HybridUnistylesRuntime::createHybridNavigationBar(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    if (this->_navigationBar == nullptr) {
+        this->_navigationBar = std::make_shared<HybridNavigationBar>(_nativePlatform);
+    }
+    
+    return this->_navigationBar->toObject(rt);
 }

@@ -4,6 +4,10 @@
 #include "HybridNativePlatformSpec.hpp"
 #include "Unistyles-Swift-Cxx-Umbrella.hpp"
 #include "UnistylesState.h"
+#include "HybridUnistylesStatusBarSpec.hpp"
+#include "HybridNavigationBar.h"
+#include "HybridStatusBar.h"
+#include "Helpers.h"
 
 namespace margelo::nitro::unistyles {
 
@@ -53,6 +57,8 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
 
 private:
     jsi::Runtime* _rt;
+    std::shared_ptr<HybridNavigationBar> _navigationBar;
+    std::shared_ptr<HybridStatusBar> _statusBar;
     std::unique_ptr<core::UnistylesState> _state;
     Unistyles::HybridNativePlatformSpecCxx _nativePlatform;
 };
