@@ -6,17 +6,8 @@ import NitroModules
 typealias CxxListener = (Array<UnistyleDependency>) -> Void
 
 class NativeIOSPlatform: HybridNativePlatformSpec {
-    var listeners: Array<CxxListener> = []
-    var miniRuntime: UnistylesNativeMiniRuntime?
-    var hybridContext = margelo.nitro.HybridContext()
-    var memorySize: Int {
-        return getSizeOf(self)
-    }
-
-    init() {
-        setupPlatformListeners()
-
-        self.miniRuntime = UnistylesNativeMiniRuntime(
+    lazy var miniRuntime: UnistylesNativeMiniRuntime = {
+        return UnistylesNativeMiniRuntime(
             colorScheme: try! self.getColorScheme(),
             screen: try! self.getScreenDimensions(),
             contentSizeCategory: try! self.getContentSizeCategory(),
@@ -27,6 +18,16 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
             statusBar: try! self.getStatusBarDimensions(),
             navigationBar: try! self.getNavigationBarDimensions()
         )
+    }()
+    
+    var listeners: Array<CxxListener> = []
+    var hybridContext = margelo.nitro.HybridContext()
+    var memorySize: Int {
+        return getSizeOf(self)
+    }
+
+    init() {
+        setupPlatformListeners()
     }
 
     deinit {
@@ -34,7 +35,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     }
 
     func buildMiniRuntime() throws -> UnistylesNativeMiniRuntime {
-        return self.miniRuntime!
+        return self.miniRuntime
     }
 
     func getColorScheme() throws -> ColorScheme {
@@ -89,8 +90,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     }
 
     func getScreenDimensions() throws -> Dimensions {
-        // todo: fix this
-        func getDimensions() -> Dimensions {
+        DispatchQueue.main.sync {
             guard let presentedViewController = RCTPresentedViewController(),
                   let windowFrame = presentedViewController.view.window?.frame else {
                 // this should never happen, but it's better to return zeros
@@ -101,14 +101,6 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
             let height = windowFrame.size.height
 
             return Dimensions(width: width, height: height)
-        }
-
-        if Thread.isMainThread {
-            return getDimensions()
-        }
-
-        return DispatchQueue.main.sync {
-            return getDimensions()
         }
     }
 

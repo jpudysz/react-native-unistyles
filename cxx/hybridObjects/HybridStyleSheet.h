@@ -2,19 +2,15 @@
 
 #include <cmath>
 #include <jsi/jsi.h>
-#include "HybridStyleSheetSpec.hpp"
+#include "HybridUnistylesStyleSheetSpec.hpp"
 #include "HybridUnistylesRuntime.h"
 #include "Unistyles-Swift-Cxx-Umbrella.hpp"
 
 using namespace margelo::nitro::unistyles;
 
-struct HybridStyleSheet: public HybridStyleSheetSpec {
+struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
     HybridStyleSheet(std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime)
-      : HybridObject(TAG),
-        unistylesRuntime{unistylesRuntime},
-        miniRuntime{std::make_shared<HybridMiniRuntime>(unistylesRuntime)} {
-        this->nativePlatform.registerPlatformListener(std::bind(&HybridStyleSheet::onPlatformEvent, this, std::placeholders::_1));
-    }
+      : HybridObject(TAG), _unistylesRuntime{unistylesRuntime} {}
 
     jsi::Value create(jsi::Runtime& rt,
                       const jsi::Value& thisValue,
@@ -26,7 +22,7 @@ struct HybridStyleSheet: public HybridStyleSheetSpec {
                       size_t count);
 
     void loadHybridMethods() override {
-        HybridStyleSheetSpec::loadHybridMethods();
+        HybridUnistylesStyleSheetSpec::loadHybridMethods();
 
         registerHybrids(this, [](Prototype& prototype) {
             prototype.registerRawHybridMethod("create", 1, &HybridStyleSheet::create);
@@ -42,9 +38,6 @@ private:
     void parseThemes(jsi::Runtime& rt, jsi::Object themes);
     void verifyAndSelectTheme(jsi::Runtime &rt);
     void setThemeFromColorScheme(jsi::Runtime& rt);
-    void attachMetaFunctions(jsi::Runtime& rt, core::StyleSheet& styleSheet, jsi::Object& parsedStyleSheet);
-    void onPlatformEvent(PlatformEvent event);
-    void updateUnistylesWithDependencies(std::vector<core::UnistyleDependency>& depdendencies);
 
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
 };
