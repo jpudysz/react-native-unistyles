@@ -61,7 +61,7 @@ export type UnistylesValues = FlatUnistylesValues & {
     [propName in NestedKeys]?: UnistyleNestedStyles[propName]
 } & {
     _web?: CSSProperties & CustomClassName & {
-        [propName in Pseudo]?: CSSProperties
+        [propName in Pseudo]?: ToDeepUnistyles<CSSProperties>
     }
 }
 

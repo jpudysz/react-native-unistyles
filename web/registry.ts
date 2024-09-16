@@ -7,10 +7,11 @@ class UnistylesRegistryBuilder {
     createStyles = (stylesheet: UnistylesValues, key: string | number) => {
         const stylesTag = UnistylesState.createTag()
         const unistyles = createTypeStyle(stylesTag)
-        const typestyleStylesheets = convertToTypeStyle(stylesheet)
+        const typestyleStylesheet = convertToTypeStyle(stylesheet)
+
         const className = unistyles.style({
             $debugName: String(key),
-        }, ...typestyleStylesheets)
+        }, typestyleStylesheet)
 
         if (stylesheet._web?._css) {
             const customClassName = Array.isArray(stylesheet._web._css)
@@ -30,10 +31,10 @@ class UnistylesRegistryBuilder {
     }
 
     updateStyles = (unistyles: TypeStyle, stylesheet: UnistylesValues, className: string) => {
-        const typestyleStylesheets = convertToTypeStyle(stylesheet)
+        const typestyleStylesheet = convertToTypeStyle(stylesheet)
 
         unistyles.reinit()
-        unistyles.cssRule(`.${className}`, ...typestyleStylesheets)
+        unistyles.cssRule(`.${className}`, typestyleStylesheet)
     }
 }
 
