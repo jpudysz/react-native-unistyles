@@ -155,13 +155,11 @@ class UnistylesRuntimeBuilder {
     }
 
     setTheme = (themeName: AppThemeName) => {
-        UnistylesState.themeName = themeName
-
-        if (isServer()) {
-            return
+        if (!isServer()) {
+            document.documentElement.classList.replace(UnistylesRuntime.themeName ?? '', themeName)
         }
 
-        document.documentElement.classList.replace(UnistylesRuntime.themeName ?? '', themeName)
+        UnistylesState.themeName = themeName
     }
 
     setAdaptiveThemes = (isEnabled: boolean) => {
