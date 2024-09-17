@@ -86,3 +86,5 @@ export const deepMergeObjects = <T extends Record<PropertyKey, any>>(...sources:
 }
 
 export const isDefined = <T>(value: T | undefined | null): value is NonNullable<T> => value !== undefined && value !== null
+
+export const warn = (message: string) => console.warn(`🦄 [react-native-unistyles] ${message}`)
