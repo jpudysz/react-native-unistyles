@@ -1,6 +1,7 @@
 #pragma once
 
 #include "HybridUnistylesStatusBarSpec.hpp"
+#include "Unistyles-Swift-Cxx-Umbrella.hpp"
 #include <optional>
 
 using namespace margelo::nitro::unistyles;

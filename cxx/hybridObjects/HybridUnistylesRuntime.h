@@ -12,9 +12,12 @@
 namespace margelo::nitro::unistyles {
 
 struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
-    HybridUnistylesRuntime(Unistyles::HybridNativePlatformSpecCxx nativePlatform, jsi::Runtime& rt)
-        : HybridObject(TAG), _nativePlatform{nativePlatform}, _rt{&rt}, _state(std::make_unique<core::UnistylesState>(&rt)) {}
-    
+    HybridUnistylesRuntime(
+        Unistyles::HybridNativePlatformSpecCxx nativePlatform,
+        std::shared_ptr<core::UnistylesState> state,
+        jsi::Runtime& rt
+    ) : HybridObject(TAG), _nativePlatform{nativePlatform}, _rt{&rt}, _state{state} {}
+
     jsi::Value updateTheme(jsi::Runtime& rt,
                             const jsi::Value& thisValue,
                             const jsi::Value* args,
@@ -27,17 +30,17 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
                             const jsi::Value& thisValue,
                             const jsi::Value* args,
                             size_t count);
-    
+
     void loadHybridMethods() override {
         HybridUnistylesRuntimeSpec::loadHybridMethods();
-        
+
         registerHybrids(this, [](Prototype& prototype) {
             prototype.registerRawHybridMethod("updateTheme", 1, &HybridUnistylesRuntime::updateTheme);
             prototype.registerRawHybridMethod("createHybridStatusBar", 0, &HybridUnistylesRuntime::createHybridStatusBar);
             prototype.registerRawHybridMethod("createHybridNavigationBar", 0, &HybridUnistylesRuntime::createHybridNavigationBar);
         });
     };
-    
+
     ColorScheme getColorScheme() override;
     bool getHasAdaptiveThemes() override;
     bool getRtl() override;
@@ -49,17 +52,19 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     Orientation getOrientation() override;
     double getPixelRatio() override;
     double getFontScale() override;
-    
+
     void setTheme(const std::string &themeName) override;
     void setAdaptiveThemes(bool isEnabled) override;
     void setImmersiveMode(bool isEnabled) override;
     void setRootViewBackgroundColor(std::optional<double> color) override;
+    UnistylesCxxMiniRuntime getMiniRuntime() override;
 
+    std::shared_ptr<core::UnistylesState> _state;
+    
 private:
     jsi::Runtime* _rt;
     std::shared_ptr<HybridNavigationBar> _navigationBar;
     std::shared_ptr<HybridStatusBar> _statusBar;
-    std::unique_ptr<core::UnistylesState> _state;
     Unistyles::HybridNativePlatformSpecCxx _nativePlatform;
 };
 

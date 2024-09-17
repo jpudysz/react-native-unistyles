@@ -1,8 +1,8 @@
-import './NativeUnistyles'
+import './TurboUnistyles'
 
 import { Runtime } from './UnistylesRuntime'
 import { HybridUnistylesStyleSheet } from './StyleSheet'
-import type { MiniRuntime } from './UnistylesRuntime'
+import type { UnistylesMiniRuntime } from './UnistylesRuntime'
 import { StatusBarStyle, ColorScheme, Orientation } from './types'
 
 export {
@@ -17,5 +17,5 @@ export {
 }
 
 export type {
-    MiniRuntime
+    UnistylesMiniRuntime
 }

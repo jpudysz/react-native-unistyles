@@ -2,9 +2,10 @@
 
 #include <cmath>
 #include <jsi/jsi.h>
-#include "HybridUnistylesStyleSheetSpec.hpp"
 #include "HybridUnistylesRuntime.h"
-#include "Unistyles-Swift-Cxx-Umbrella.hpp"
+#include "HybridUnistylesStyleSheetSpec.hpp"
+#include "Helpers.h"
+#include "Breakpoints.h"
 
 using namespace margelo::nitro::unistyles;
 
