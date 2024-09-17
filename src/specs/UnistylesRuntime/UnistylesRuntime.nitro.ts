@@ -24,7 +24,6 @@ export interface UnistylesMiniRuntime extends UnistylesCxxMiniRuntime {
     readonly breakpoint?: AppBreakpoint
 }
 
-
 export interface UnistylesRuntime extends HybridObject<{ ios: 'c++', android: 'c++' }> {
     readonly colorScheme: ColorScheme,
     readonly hasAdaptiveThemes: boolean,

@@ -1,7 +1,7 @@
 import { NitroModules } from 'react-native-nitro-modules'
 import type { UnistylesRuntime as UnistylesRuntimeSpec, UnistylesMiniRuntime } from './UnistylesRuntime.nitro'
 import type { AppBreakpoint, AppTheme, AppThemeName, ColorScheme, Orientation } from '../types'
-import type { UnistylesStatusBar } from '../StatusBar'
+import { attachStatusBarJSMethods, type UnistylesStatusBar } from '../StatusBar'
 import type { UnistylesNavigationBar } from '../NavigtionBar'
 import type { AndroidContentSizeCategory, IOSContentSizeCategory } from '../../types'
 import { isIOS } from '../../common'
@@ -37,6 +37,8 @@ HybridUnistylesRuntime.navigationBar = HybridUnistylesRuntime.createHybridNaviga
 if (isIOS) {
     HybridUnistylesRuntime.setImmersiveMode = HybridUnistylesRuntime.statusBar.setHidden
 }
+
+attachStatusBarJSMethods(HybridUnistylesRuntime.statusBar)
 
 export const Runtime = HybridUnistylesRuntime as UnistylesRuntime
 

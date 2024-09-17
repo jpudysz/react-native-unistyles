@@ -7,16 +7,13 @@
 #include "HybridUnistylesStatusBarSpec.hpp"
 #include "HybridNavigationBar.h"
 #include "HybridStatusBar.h"
+#include "UnistylesRegistry.h"
 #include "Helpers.h"
 
 namespace margelo::nitro::unistyles {
 
 struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
-    HybridUnistylesRuntime(
-        Unistyles::HybridNativePlatformSpecCxx nativePlatform,
-        std::shared_ptr<core::UnistylesState> state,
-        jsi::Runtime& rt
-    ) : HybridObject(TAG), _nativePlatform{nativePlatform}, _rt{&rt}, _state{state} {}
+    HybridUnistylesRuntime(Unistyles::HybridNativePlatformSpecCxx nativePlatform, jsi::Runtime& rt) : HybridObject(TAG), _nativePlatform{nativePlatform}, _rt{&rt} {}
 
     jsi::Value updateTheme(jsi::Runtime& rt,
                             const jsi::Value& thisValue,
@@ -59,8 +56,6 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     void setRootViewBackgroundColor(std::optional<double> color) override;
     UnistylesCxxMiniRuntime getMiniRuntime() override;
 
-    std::shared_ptr<core::UnistylesState> _state;
-    
 private:
     jsi::Runtime* _rt;
     std::shared_ptr<HybridNavigationBar> _navigationBar;

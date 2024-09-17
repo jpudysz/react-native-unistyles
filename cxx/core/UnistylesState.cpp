@@ -1,7 +1,7 @@
 #include "UnistylesState.h"
+#include "UnistylesRegistry.h"
 
 using namespace margelo::nitro::unistyles;
-using namespace facebook;
 
 bool core::UnistylesState::hasAdaptiveThemes() {
     if (!this->prefersAdaptiveThemes.has_value() || !this->prefersAdaptiveThemes.value()) {
@@ -87,41 +87,4 @@ std::optional<std::string> core::UnistylesState::getCurrentBreakpointName() {
 
 bool core::UnistylesState::getPrefersAdaptiveThemes() {
     return this->prefersAdaptiveThemes.has_value() && this->prefersAdaptiveThemes.value();
-}
-
-void core::UnistylesState::registerTheme(jsi::Runtime& rt, std::string name, jsi::Object&& theme) {
-    this->_jsThemes.emplace(name, jsi::WeakObject(rt, std::move(theme)));
-    this->registeredThemeNames.push_back(name);
-}
-
-void core::UnistylesState::registerBreakpoints(std::vector<std::pair<std::string, double>>& sortedBreakpoints) {
-    this->sortedBreakpointPairs = std::move(sortedBreakpoints);
-}
-
-void core::UnistylesState::setPrefersAdaptiveThemes(bool prefersAdaptiveThemes) {
-    this->prefersAdaptiveThemes = prefersAdaptiveThemes;
-}
-
-void core::UnistylesState::setInitialThemeName(std::string themeName) {
-    this->initialThemeName = themeName;
-}
-
-void core::UnistylesState::setInitialThemeNameCallback(jsi::Function&& getInitialThemeNameFn) {
-    this->getInitialThemeNameFn = std::move(getInitialThemeNameFn);
-}
-
-void core::UnistylesState::updateTheme(jsi::Runtime& rt, std::string& themeName, jsi::Function&& callback) {
-    auto it = this->_jsThemes.find(themeName);
-    
-    helpers::assertThat(rt, it != this->_jsThemes.end(), "you're trying to update theme '" + themeName + "' but it wasn't registered.");
-    
-    auto currentThemeValue = it->second.lock(rt);
-    
-    helpers::assertThat(rt, currentThemeValue.isObject(), "unable to update your theme from C++. It was already garbage collected.");
-    
-    auto result = callback.call(rt, currentThemeValue.asObject(rt));
-    
-    helpers::assertThat(rt, result.isObject(), "returned theme is not an object. Please check your updateTheme function.");
-
-    it->second = jsi::WeakObject(rt, result.asObject(rt));
 }
