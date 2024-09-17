@@ -18,6 +18,6 @@ type ExtractSubVariantKeys<T> = T extends object
         : keyof Omit<T, 'default'> | undefined
     : never
 
-type ExtractVariant<T> = SafeReturnType<T> extends { variants: infer V }
+type ExtractVariant<T> = T extends { variants: infer V }
     ? { [key in keyof V]?: ExtractSubVariantKeys<V[key]> }
     : never
