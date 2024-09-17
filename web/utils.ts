@@ -84,3 +84,5 @@ export const deepMergeObjects = <T extends Record<PropertyKey, any>>(...sources:
 
     return target
 }
+
+export const warn = (message: string) => console.warn(`🦄 [react-native-unistyles] ${message}`)
