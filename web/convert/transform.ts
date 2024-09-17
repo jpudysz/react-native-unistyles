@@ -2,6 +2,7 @@ import type { NestedCSSProperties } from 'typestyle/lib/types'
 import { deepMergeObjects, isDefined, keyInObject } from '../utils'
 import { media } from 'typestyle'
 import { convertBreakpoint } from './breakpoint'
+import { normalizeNumericValue } from './utils'
 
 type Transforms = Array<Record<string, any>>
 
@@ -11,7 +12,7 @@ const normalizeTransform = (key: string, value: any) => {
     }
 
     if (typeof value === 'number') {
-        return value ? `${value}px` : value
+        return normalizeNumericValue(value)
     }
 
     return value
