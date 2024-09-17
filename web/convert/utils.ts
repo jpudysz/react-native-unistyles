@@ -1,11 +1,13 @@
 // based on react-native-web normalizer
 // https://github.com/necolas/react-native-web
 import normalizeColors from '@react-native/normalize-colors'
-import { TEXT_SHADOW_STYLES } from './textShadow'
+import { BOX_SHADOW_STYLES, TEXT_SHADOW_STYLES, type AllShadow, type AllShadowKeys } from './types'
 
 export const isTransform = (key: string, value: any): value is Array<Record<string, any>> => key === 'transform' && Array.isArray(value)
 
 export const isTextShadow = (key: string) => TEXT_SHADOW_STYLES.includes(key as typeof TEXT_SHADOW_STYLES[number])
+
+export const isBoxShadow = (key: string) => BOX_SHADOW_STYLES.includes(key as typeof BOX_SHADOW_STYLES[number])
 
 export const normalizeNumericValue = (value: number) => value ? `${value}px` : value
 
@@ -34,4 +36,19 @@ export const normalizeColor = (color: string, opacity: number = 1) => {
     }
 
     return color
+}
+
+export const extractShadowValue = <TKey extends AllShadowKeys>(key: TKey, breakpoint: string, styles: any): AllShadow[TKey] => {
+    const value = styles[key]
+
+    if (key === 'textShadowOffset' || key === 'shadowOffset') {
+        const { width, height } = value
+
+        return {
+            width: typeof width === 'object' ? width[breakpoint] : width,
+            height: typeof height === 'object' ? height[breakpoint] : height
+        } as AllShadow[TKey]
+    }
+
+    return typeof value === 'object' ? value[breakpoint] : value
 }
