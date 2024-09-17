@@ -17,11 +17,11 @@ export default function App() {
                     <Button
                         title='Set dark theme'
                         onPress={() => UnistylesRuntime.setTheme('dark')}
-                        />
+                    />
                     <Button
                         title='Set light theme'
                         onPress={() => UnistylesRuntime.setTheme('light')}
-                        />
+                    />
                     <Button
                         title='Set premium theme'
                         onPress={() => UnistylesRuntime.setTheme('premium')}
@@ -62,7 +62,7 @@ const styles = StyleSheet.create(theme => ({
         ...common
     },
     staticText: {
-        color: 'red'
+        color: 'red',
     },
     theme: {
         backgroundColor: theme.colors.backgroundColor,
@@ -82,15 +82,17 @@ const styles = StyleSheet.create(theme => ({
     }),
     whiteText: {
         color: 'white',
-        textAlign: 'center'
+        textAlign: 'center',
     },
     hover: {
         ...common,
         backgroundColor: theme.colors.blood,
         cursor: 'pointer',
-        _hover: {
-            backgroundColor: theme.colors.sky
-        }
+        _web: {
+            _hover: {
+                backgroundColor: theme.colors.sky
+            }
+        },
     },
     breakpoint: {
         ...common,
