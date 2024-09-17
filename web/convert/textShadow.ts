@@ -1,10 +1,10 @@
-import { deepMergeObjects, warn } from '../utils'
-import { extractShadowValue, normalizeColor, normalizeNumericValue } from './utils'
-import type { NestedCSSProperties } from 'typestyle/lib/types'
 import { media } from 'typestyle'
-import { convertBreakpoint } from './breakpoint'
+import type { NestedCSSProperties } from 'typestyle/lib/types'
+import { deepMergeObjects, warn } from '../utils'
 import { validateShadow } from './shadow'
+import { convertBreakpoint } from './breakpoint'
 import { TEXT_SHADOW_STYLES, type TextShadow } from './types'
+import { extractShadowValue, normalizeColor, normalizeNumericValue } from './utils'
 
 const createTextShadowValue = (style: TextShadow) => {
     const { textShadowColor, textShadowOffset, textShadowRadius } = style

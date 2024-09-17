@@ -1,5 +1,5 @@
-import type { TextStyle, ViewStyle } from 'react-native';
-import type { ToDeepUnistyles } from '../../src/types/stylesheet';
+import type { TextStyle, ViewStyle } from 'react-native'
+import type { ToDeepUnistyles } from '../../src/types/stylesheet'
 
 export type ShadowOffset = ToDeepUnistyles<{ width: number, height: number }>
 
