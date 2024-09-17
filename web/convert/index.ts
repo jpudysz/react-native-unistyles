@@ -6,12 +6,15 @@ import { convertBreakpoint } from './breakpoint'
 import { getStyle } from './style'
 import { deepMergeObjects } from '../utils'
 import { getTransformStyle } from './transform'
-import { isTextShadow, isTransform } from './utils'
+import { isBoxShadow, isTextShadow, isTransform } from './utils'
 import { getTextShadowStyle } from './textShadow'
+import { getBoxShadowStyle } from './boxShadow'
 
 export const convertToTypeStyle = (value: UnistylesValues) => {
     // Flag to mark if textShadow is already created
     let hasTextShadow = false
+    // Flag to mark if boxShadow is already created
+    let hasBoxShadow = false
 
     const stylesArray = Object.entries({
         ...value,
@@ -42,6 +45,17 @@ export const convertToTypeStyle = (value: UnistylesValues) => {
             hasTextShadow = true
 
             return getTextShadowStyle(value)
+        }
+
+        // Box shadow
+        if (isBoxShadow(unistylesKey)) {
+            if (hasBoxShadow) {
+                return []
+            }
+
+            hasBoxShadow = true
+
+            return getBoxShadowStyle(value)
         }
 
         // Transforms
