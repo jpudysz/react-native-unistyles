@@ -1,10 +1,10 @@
-import { deepMergeObjects, warn } from '../utils'
-import { extractShadowValue, normalizeColor, normalizeNumericValue } from './utils'
-import type { NestedCSSProperties } from 'typestyle/lib/types'
 import { media } from 'typestyle'
-import { convertBreakpoint } from './breakpoint'
+import type { NestedCSSProperties } from 'typestyle/lib/types'
+import { deepMergeObjects, warn } from '../utils'
 import { validateShadow } from './shadow'
+import { convertBreakpoint } from './breakpoint'
 import { BOX_SHADOW_STYLES, type BoxShadow } from './types'
+import { extractShadowValue, normalizeColor, normalizeNumericValue } from './utils'
 
 const createBoxShadowValue = (style: BoxShadow) => {
     // at this point every prop is present

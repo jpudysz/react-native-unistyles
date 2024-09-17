@@ -1,8 +1,8 @@
-import type { NestedCSSProperties } from 'typestyle/lib/types'
-import { deepMergeObjects, isDefined, keyInObject } from '../utils'
 import { media } from 'typestyle'
-import { convertBreakpoint } from './breakpoint'
+import type { NestedCSSProperties } from 'typestyle/lib/types'
+import { deepMergeObjects, keyInObject } from '../utils'
 import { normalizeNumericValue } from './utils'
+import { convertBreakpoint } from './breakpoint'
 
 type Transforms = Array<Record<string, any>>
 
@@ -62,21 +62,21 @@ export const getTransformStyle = (transforms: Transforms): NestedCSSProperties =
     })
 
     const breakpointTransforms = Array.from(breakpoints).flatMap(breakpoint => {
-        const transformsPerBreakpoint = transforms.map(transform => {
+        const transformsPerBreakpoint = transforms.flatMap(transform => {
             const [property] = Object.keys(transform)
 
             if (!property) {
-                return null
+                return []
             }
 
             const value = transform[property]
 
             if (typeof value === 'object' && !Array.isArray(value)) {
-                return keyInObject(value, breakpoint) ? { [property]: value[breakpoint] } : null
+                return keyInObject(value, breakpoint) ? [{ [property]: value[breakpoint] }] : []
             }
 
-            return null
-        }).filter(isDefined)
+            return []
+        })
 
         return media(convertBreakpoint(breakpoint), {
             transform: createTransformValue(transformsPerBreakpoint)
