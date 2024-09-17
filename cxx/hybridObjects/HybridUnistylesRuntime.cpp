@@ -1,4 +1,5 @@
 #include "HybridUnistylesRuntime.h"
+#include "UnistylesState.h"
 
 using namespace margelo::nitro::unistyles;
 
@@ -9,7 +10,7 @@ ColorScheme HybridUnistylesRuntime::getColorScheme() {
 }
 
 bool HybridUnistylesRuntime::getHasAdaptiveThemes() {
-    return this->_state->hasAdaptiveThemes;
+    return this->_state->hasAdaptiveThemes();
 };
 
 Dimensions HybridUnistylesRuntime::getScreen() {
@@ -17,7 +18,7 @@ Dimensions HybridUnistylesRuntime::getScreen() {
 };
 
 std::optional<std::string> HybridUnistylesRuntime::getThemeName() {
-    return this->_state->currentThemeName;
+    return this->_state->getCurrentThemeName();
 };
 
 std::string HybridUnistylesRuntime::getContentSizeCategory() {
@@ -25,7 +26,7 @@ std::string HybridUnistylesRuntime::getContentSizeCategory() {
 };
 
 std::optional<std::string> HybridUnistylesRuntime::getBreakpoint() {
-    return this->_state->currentBreakpointName;
+    return this->_state->getCurrentBreakpointName();
 };
 
 bool HybridUnistylesRuntime::getRtl() {
@@ -57,7 +58,7 @@ double HybridUnistylesRuntime::getFontScale() {
 void HybridUnistylesRuntime::setTheme(const std::string &themeName) {
     helpers::assertThat(*_rt, !this->getHasAdaptiveThemes(), "You're trying to set theme to: '" + themeName + "', but adaptiveThemes are enabled.");
 
-    this->_state->currentThemeName = themeName;
+    this->_state->setTheme(themeName);
 };
 
 void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
@@ -77,7 +78,7 @@ void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
         : "dark";
 
     if (!currentThemeName.has_value() || nextTheme != currentThemeName.value()) {
-        this->_state->currentThemeName = nextTheme;
+        this->_state->setTheme(nextTheme);
     }
 };
 
@@ -106,7 +107,7 @@ jsi::Value HybridUnistylesRuntime::createHybridStatusBar(jsi::Runtime &rt, const
     if (this->_statusBar == nullptr) {
         this->_statusBar = std::make_shared<HybridStatusBar>(_nativePlatform);
     }
-    
+
     return this->_statusBar->toObject(rt);
 }
 
@@ -114,6 +115,27 @@ jsi::Value HybridUnistylesRuntime::createHybridNavigationBar(jsi::Runtime &rt, c
     if (this->_navigationBar == nullptr) {
         this->_navigationBar = std::make_shared<HybridNavigationBar>(_nativePlatform);
     }
-    
+
     return this->_navigationBar->toObject(rt);
+}
+
+UnistylesCxxMiniRuntime HybridUnistylesRuntime::getMiniRuntime() {
+    UnistylesNativeMiniRuntime nativeMiniRuntime =  this->_nativePlatform.buildMiniRuntime();
+    UnistylesCxxMiniRuntime cxxMiniRuntime{
+        this->getThemeName(),
+        this->getBreakpoint(),
+        this->getOrientation(),
+        this->getHasAdaptiveThemes(),
+        nativeMiniRuntime.colorScheme,
+        nativeMiniRuntime.screen,
+        nativeMiniRuntime.contentSizeCategory,
+        nativeMiniRuntime.insets,
+        nativeMiniRuntime.pixelRatio,
+        nativeMiniRuntime.fontScale,
+        nativeMiniRuntime.rtl,
+        nativeMiniRuntime.statusBar,
+        nativeMiniRuntime.navigationBar
+    };
+    
+    return cxxMiniRuntime;
 }

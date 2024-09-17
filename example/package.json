@@ -11,7 +11,7 @@
   "dependencies": {
     "react": "18.3.1",
     "react-native": "0.75.1",
-    "react-native-nitro-modules": "0.8.0",
+    "react-native-nitro-modules": "0.9.2",
     "react-native-unistyles": "workspace:*"
   },
   "devDependencies": {

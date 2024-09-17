@@ -28,7 +28,8 @@ RCT_EXPORT_MODULE(Unistyles)
 
 - (void)createHybrids:(jsi::Runtime&)rt {
     auto nativePlatform = Unistyles::NativePlatform::create();
-    auto unistylesRuntime = std::make_shared<HybridUnistylesRuntime>(nativePlatform, rt);
+    auto unistylesState = std::make_shared<core::UnistylesState>(rt);
+    auto unistylesRuntime = std::make_shared<HybridUnistylesRuntime>(nativePlatform, unistylesState, rt);
     auto styleSheet = std::make_shared<HybridStyleSheet>(unistylesRuntime);
 
     HybridObjectRegistry::registerHybridObjectConstructor("UnistylesRuntime", [unistylesRuntime]() -> std::shared_ptr<HybridObject>{
