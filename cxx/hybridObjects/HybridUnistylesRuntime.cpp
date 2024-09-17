@@ -10,7 +10,9 @@ ColorScheme HybridUnistylesRuntime::getColorScheme() {
 }
 
 bool HybridUnistylesRuntime::getHasAdaptiveThemes() {
-    return this->_state->hasAdaptiveThemes();
+    auto& state = core::UnistylesRegistry::get().getState(*_rt);
+
+    return state.hasAdaptiveThemes();
 };
 
 Dimensions HybridUnistylesRuntime::getScreen() {
@@ -18,7 +20,9 @@ Dimensions HybridUnistylesRuntime::getScreen() {
 };
 
 std::optional<std::string> HybridUnistylesRuntime::getThemeName() {
-    return this->_state->getCurrentThemeName();
+    auto& state = core::UnistylesRegistry::get().getState(*_rt);
+
+    return state.getCurrentThemeName();
 };
 
 std::string HybridUnistylesRuntime::getContentSizeCategory() {
@@ -26,8 +30,11 @@ std::string HybridUnistylesRuntime::getContentSizeCategory() {
 };
 
 std::optional<std::string> HybridUnistylesRuntime::getBreakpoint() {
-    return this->_state->getCurrentBreakpointName();
+    auto& state = core::UnistylesRegistry::get().getState(*_rt);
+
+    return state.getCurrentBreakpointName();
 };
+
 
 bool HybridUnistylesRuntime::getRtl() {
     return this->_nativePlatform.getPrefersRtlDirection();
@@ -58,11 +65,16 @@ double HybridUnistylesRuntime::getFontScale() {
 void HybridUnistylesRuntime::setTheme(const std::string &themeName) {
     helpers::assertThat(*_rt, !this->getHasAdaptiveThemes(), "You're trying to set theme to: '" + themeName + "', but adaptiveThemes are enabled.");
 
-    this->_state->setTheme(themeName);
+    auto& state = core::UnistylesRegistry::get().getState(*_rt);
+
+    state.setTheme(themeName);
 };
 
+
 void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
-    this->_state->prefersAdaptiveThemes = isEnabled;
+    auto& registry = core::UnistylesRegistry::get();
+
+    registry.setPrefersAdaptiveThemes(*_rt, isEnabled);
 
     // if user disabled it, or can't have adaptive themes, do nothing
     if (!this->getHasAdaptiveThemes()) {
@@ -71,6 +83,7 @@ void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
 
     // if user enabled adaptive themes, then we need to make sure
     // we selected theme based on color scheme
+    auto& state = core::UnistylesRegistry::get().getState(*_rt);
     auto colorScheme = this->getColorScheme();
     auto currentThemeName = this->getThemeName();
     auto nextTheme = colorScheme == ColorScheme::LIGHT
@@ -78,7 +91,7 @@ void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
         : "dark";
 
     if (!currentThemeName.has_value() || nextTheme != currentThemeName.value()) {
-        this->_state->setTheme(nextTheme);
+        state.setTheme(nextTheme);
     }
 };
 
@@ -86,11 +99,12 @@ jsi::Value HybridUnistylesRuntime::updateTheme(jsi::Runtime &rt, const jsi::Valu
     helpers::assertThat(rt, args[0].isString(), "first argument expected to be a string.");
     helpers::assertThat(rt, args[1].isObject(), "second argument expected to be a function.");
 
+    auto& registry = core::UnistylesRegistry::get();
     auto themeName = args[0].asString(rt).utf8(rt);
 
     helpers::assertThat(rt, args[1].asObject(rt).isFunction(rt), "second argument expected to be a function.");
 
-    this->_state->updateTheme(rt, themeName, args[1].asObject(rt).asFunction(rt));
+    registry.updateTheme(rt, themeName, args[1].asObject(rt).asFunction(rt));
 
     return jsi::Value::undefined();
 }

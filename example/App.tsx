@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { Button, Text, View } from 'react-native'
-import { StyleSheet } from 'react-native-unistyles'
+import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
 import './unistyles'
 
 export const App = () => {
@@ -11,6 +11,9 @@ export const App = () => {
         <View style={styles.container}>
             <Text style={styles.text}>
                 Render count: {++renderCount.current}
+            </Text>
+            <Text>
+                {UnistylesRuntime.statusBar.width}x{UnistylesRuntime.statusBar.height}
             </Text>
             <Button title="Re-render" onPress={() => setCount(count => count + 1)} />
         </View>
