@@ -9,7 +9,7 @@ export const validateShadow = (shadowProperties: ReadonlyArray<string>, styles: 
             return
         }
 
-        if (key === 'shadowOffset') {
+        if (key === 'shadowOffset' || key === 'textShadowOffset') {
             const { width, height } = value as ShadowOffset
 
             // If shadowOffset.width has breakpoints
@@ -37,7 +37,7 @@ export const validateShadow = (shadowProperties: ReadonlyArray<string>, styles: 
             return
         }
 
-        if (key === 'shadowOffset') {
+        if (key === 'shadowOffset' || key === 'textShadowOffset') {
             const { width, height } = value as ShadowOffset
 
             if (typeof width === 'object') {
