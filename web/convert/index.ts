@@ -5,6 +5,9 @@ import { isPseudo } from '../pseudo'
 import { convertBreakpoint } from './breakpoint'
 import { getStyle } from './style'
 import { deepMergeObjects } from '../utils'
+import { getTransformStyle } from './transform'
+
+const isTransform = (key: string, value: any): value is Array<Record<string, any>> => key === 'transform' && Array.isArray(value)
 
 export const convertToTypeStyle = (value: UnistylesValues) => {
     const stylesArray = Object.entries({
@@ -23,6 +26,10 @@ export const convertToTypeStyle = (value: UnistylesValues) => {
                     [unistylesKey.replace('_', '&:')]: typestyleValues
                 }
             }
+        }
+
+        if (isTransform(unistylesKey, unistylesValue)) {
+            return getTransformStyle(unistylesValue)
         }
 
         if (typeof unistylesValue === 'object' && unistylesValue !== null) {
