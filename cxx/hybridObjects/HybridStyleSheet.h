@@ -41,5 +41,8 @@ private:
     void setThemeFromColorScheme(jsi::Runtime& rt);
 
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
+    
+    // required for parser to work, should be updated on every screen change
+    int _lastScreenWidth = _unistylesRuntime->getScreen().width;
 };
 

@@ -95,7 +95,7 @@ void HybridStyleSheet::parseBreakpoints(jsi::Runtime &rt, jsi::Object breakpoint
     auto& state = registry.getState(rt);
 
     registry.registerBreakpoints(rt, sortedBreakpoints);
-    state.computeCurrentBreakpoint(this->_unistylesRuntime->getScreen().width);
+    state.computeCurrentBreakpoint(this->_lastScreenWidth);
 }
 
 void HybridStyleSheet::parseThemes(jsi::Runtime &rt, jsi::Object themes) {

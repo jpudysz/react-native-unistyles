@@ -39,7 +39,7 @@ jsi::Object core::UnistylesState::getJSTheme() {
 
     auto maybeTheme = it->second.lock(*_rt);
 
-    helpers::assertThat(*_rt, maybeTheme.isObject(), "unable to get your theme from C++. It was already garbage collected.");
+    helpers::assertThat(*_rt, maybeTheme.isObject(), "unable to retrieve your theme from C++ as it has already been garbage collected, likely due to multiple hot reloads. Please live reload the app.");
 
     return maybeTheme.asObject(*_rt);
 }
