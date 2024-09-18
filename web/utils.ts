@@ -86,3 +86,26 @@ export const deepMergeObjects = <T extends Record<PropertyKey, any>>(...sources:
 }
 
 export const warn = (message: string) => console.warn(`🦄 [react-native-unistyles] ${message}`)
+
+export const equal = <T>(a: T, b: T) => {
+    if (Object.is(a, b)) {
+        return true
+    }
+
+    if (
+        typeof a !== 'object'
+        || a === null
+        || typeof b !== 'object'
+        || b === null
+    ) {
+        return false
+    }
+
+    const keysA = Object.keys(a) as Array<keyof T>
+
+    if (keysA.length !== Object.keys(b).length) {
+        return false
+    }
+
+    return keysA.every(key => Object.is(a[key], b[key]) && Object.prototype.hasOwnProperty.call(b, key))
+}
