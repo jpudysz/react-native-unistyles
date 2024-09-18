@@ -4,19 +4,20 @@ import type { Dimensions, Insets } from '../types'
 type ColorScheme = 'dark' | 'light' | 'unspecified'
 
 enum UnistyleDependency {
-    Theme = 0,
+    Theme = 0, // todo do I need it, dynamic function is always recomputed
     Breakpoints = 1,
     Variants = 2,
-    CompoundVariants = 3,
+    CompoundVariants = 3, // todo do I need it
     ColorScheme = 4,
-    Rtl = 5,
+    Rtl = 5, // todo do I need it, it's not dynamic
     Dimensions = 6,
     Orientation = 7,
     ThemeName = 8,
     ContentSizeCategory = 9,
     Insets = 10,
     PixelRatio = 11,
-    FontScale = 12
+    FontScale = 12,
+    StatusBar = 13
 }
 
 export interface UnistylesNativeMiniRuntime {

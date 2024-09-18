@@ -53,6 +53,7 @@ namespace margelo::nitro::unistyles {
       static const auto fieldINSETS = clazz->getStaticField<JUnistyleDependency>("INSETS");
       static const auto fieldPIXELRATIO = clazz->getStaticField<JUnistyleDependency>("PIXELRATIO");
       static const auto fieldFONTSCALE = clazz->getStaticField<JUnistyleDependency>("FONTSCALE");
+      static const auto fieldSTATUSBAR = clazz->getStaticField<JUnistyleDependency>("STATUSBAR");
       
       switch (value) {
         case UnistyleDependency::THEME:
@@ -81,6 +82,8 @@ namespace margelo::nitro::unistyles {
           return clazz->getStaticFieldValue(fieldPIXELRATIO);
         case UnistyleDependency::FONTSCALE:
           return clazz->getStaticFieldValue(fieldFONTSCALE);
+        case UnistyleDependency::STATUSBAR:
+          return clazz->getStaticFieldValue(fieldSTATUSBAR);
         default:
           std::string stringValue = std::to_string(static_cast<int>(value));
           throw std::runtime_error("Invalid enum value (" + stringValue + "!");

@@ -43,6 +43,8 @@ public extension UnistyleDependency {
         self = .pixelratio
       case "FontScale":
         self = .fontscale
+      case "StatusBar":
+        self = .statusbar
       default:
         return nil
     }
@@ -79,6 +81,8 @@ public extension UnistyleDependency {
         return "PixelRatio"
       case .fontscale:
         return "FontScale"
+      case .statusbar:
+        return "StatusBar"
     }
   }
 }
