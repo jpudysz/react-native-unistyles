@@ -21,7 +21,6 @@ struct UnistylesRegistry {
     void registerBreakpoints(jsi::Runtime& rt, std::vector<std::pair<std::string, double>>& sortedBreakpoints);
     void setPrefersAdaptiveThemes(jsi::Runtime& rt, bool prefersAdaptiveThemes);
     void setInitialThemeName(jsi::Runtime& rt, std::string themeName);
-    void setInitialThemeNameCallback(jsi::Runtime& rt, jsi::Function&& getInitialThemeNameFn);
     void updateTheme(jsi::Runtime& rt, std::string& themeName, jsi::Function&& callback);
     
     UnistylesState& getState(jsi::Runtime& rt);

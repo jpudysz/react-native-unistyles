@@ -4,48 +4,38 @@
 using namespace margelo::nitro::unistyles;
 
 bool core::UnistylesState::hasAdaptiveThemes() {
-    if (!this->prefersAdaptiveThemes.has_value() || !this->prefersAdaptiveThemes.value()) {
+    if (!this->_prefersAdaptiveThemes.has_value() || !this->_prefersAdaptiveThemes.value()) {
         return false;
     }
 
-    return helpers::vecContainsKeys(this->registeredThemeNames, {"light", "dark"});
+    return helpers::vecContainsKeys(this->_registeredThemeNames, {"light", "dark"});
 }
 
 void core::UnistylesState::setTheme(std::string themeName) {
-    helpers::assertThat(*_rt, helpers::vecContainsKeys(this->registeredThemeNames, {themeName}), "You're trying to set theme to: '" + std::string(themeName) + "', but it wasn't registered.");
+    helpers::assertThat(*_rt, helpers::vecContainsKeys(this->_registeredThemeNames, {themeName}), "You're trying to set theme to: '" + std::string(themeName) + "', but it wasn't registered.");
 
-    if (themeName != this->currentThemeName) {
-        this->currentThemeName = themeName;
+    if (themeName != this->_currentThemeName) {
+        this->_currentThemeName = themeName;
     }
 }
 
 std::optional<std::string>& core::UnistylesState::getCurrentThemeName() {
-    return this->currentThemeName;
+    return this->_currentThemeName;
 }
 
 jsi::Object core::UnistylesState::getJSTheme() {
-    auto hasSomeThemes = registeredThemeNames.size() > 0;
+    auto hasSomeThemes = _registeredThemeNames.size() > 0;
 
     // return empty object, if user didn't register any themes
     if (!hasSomeThemes) {
         return jsi::Object(*_rt);
     }
 
-    // check if user provided a callback to get initial theme name
-    if (this->getInitialThemeNameFn.has_value()) {
-        auto result = this->getInitialThemeNameFn.value().call(*_rt);
+    helpers::assertThat(*_rt, _currentThemeName.has_value(), "one of your stylesheets is trying to get the theme, but no theme has been selected yet. Did you forget to select an initial theme?");
 
-        helpers::assertThat(*_rt, result.isString(), "initialTheme resolved from function is not a string. Please check your initialTheme function.");
+    auto it = this->_jsThemes.find(_currentThemeName.value());
 
-        this->currentThemeName = result.asString(*_rt).utf8(*_rt);
-        this->getInitialThemeNameFn = std::nullopt;
-    }
-
-    helpers::assertThat(*_rt, currentThemeName.has_value(), "one of your stylesheets is trying to get the theme, but no theme has been selected yet. Did you forget to select an initial theme?");
-
-    auto it = this->_jsThemes.find(currentThemeName.value());
-
-    helpers::assertThat(*_rt, it != this->_jsThemes.end(), "you're trying to get theme '" + currentThemeName.value() + "', but it was not registered. Did you forget to register it with StyleSheet.configure?");
+    helpers::assertThat(*_rt, it != this->_jsThemes.end(), "you're trying to get theme '" + _currentThemeName.value() + "', but it was not registered. Did you forget to register it with StyleSheet.configure?");
 
     auto maybeTheme = it->second.lock(*_rt);
 
@@ -55,36 +45,36 @@ jsi::Object core::UnistylesState::getJSTheme() {
 }
 
 void core::UnistylesState::computeCurrentBreakpoint(int screenWidth) {
-    this->currentBreakpointName = helpers::getBreakpointFromScreenWidth(
+    this->_currentBreakpointName = helpers::getBreakpointFromScreenWidth(
         screenWidth,
-        this->sortedBreakpointPairs
+        this->_sortedBreakpointPairs
     );
 }
 
 bool core::UnistylesState::hasTheme(std::string themeName) {
-    return helpers::vecContainsKeys(this->registeredThemeNames, {themeName});
+    return helpers::vecContainsKeys(this->_registeredThemeNames, {themeName});
 }
 
 bool core::UnistylesState::hasInitialTheme() {
-    return this->initialThemeName.has_value();
+    return this->_initialThemeName.has_value();
 }
 
 std::vector<std::string> core::UnistylesState::getRegisteredThemeNames() {
-    return std::vector<std::string>(this->registeredThemeNames);
+    return std::vector<std::string>(this->_registeredThemeNames);
 }
 
 std::vector<std::pair<std::string, double>> core::UnistylesState::getSortedBreakpointPairs() {
-    return std::vector<std::pair<std::string, double>>(this->sortedBreakpointPairs);
+    return std::vector<std::pair<std::string, double>>(this->_sortedBreakpointPairs);
 }
 
 std::optional<std::string> core::UnistylesState::getInitialTheme() {
-    return this->initialThemeName;
+    return this->_initialThemeName;
 }
 
 std::optional<std::string> core::UnistylesState::getCurrentBreakpointName() {
-    return this->currentBreakpointName;
+    return this->_currentBreakpointName;
 }
 
 bool core::UnistylesState::getPrefersAdaptiveThemes() {
-    return this->prefersAdaptiveThemes.has_value() && this->prefersAdaptiveThemes.value();
+    return this->_prefersAdaptiveThemes.has_value() && this->_prefersAdaptiveThemes.value();
 }
