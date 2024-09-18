@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { TypeStyle } from 'typestyle'
 import type { ReactNativeStyleSheet, StyleSheet } from '../src/types'
 import { deepMergeObjects, equal, reduceObject } from './utils'
@@ -17,9 +17,9 @@ const hasClassName = <T extends object | undefined>(value: T): value is T & { 'u
 
 export const createUseVariants = (styles: ReactNativeStyleSheet<StyleSheet>) => {
     const useVariants = (selectedVariants: Record<string, any>) => {
-        const unistylesRef = useRef<TypeStyle>()
-        const classNameRef = useRef<string>()
-        const selectedVariantStylesRef = useRef<Record<string, any>>()
+        const [unistylesMap] = useState(() => new Map<string, TypeStyle>())
+        const [classNameMap] = useState(() => new Map<string, string>())
+        const [selectedVariantStylesMap] = useState(() => new Map<string, Record<string, any>>())
         const lastSelectedVariantsRef = useRef<Record<string, any>>()
         // Variable that determines if variants have changed and we need to recalculate styles
         const variantsChanged = !equal(lastSelectedVariantsRef.current, selectedVariants)
@@ -56,38 +56,41 @@ export const createUseVariants = (styles: ReactNativeStyleSheet<StyleSheet>) => 
 
                     const mergedVariantStyles = deepMergeObjects(...variantStyles, ...compoundVariantStyles)
 
-                    selectedVariantStylesRef.current = mergedVariantStyles
+                    selectedVariantStylesMap.set(key, mergedVariantStyles)
 
                     return [key, mergedVariantStyles] as const
                 })
         }, [lastSelectedVariantsRef.current])
 
-        if (!unistylesRef.current) {
+        if (unistylesMap.size === 0 && combinedVariantStyles.length > 0) {
             combinedVariantStyles.forEach(([key, value]) => {
                 const { className, unistyles } = UnistylesRegistry.createStyles(value, `variant-${key}`)
 
-                unistylesRef.current = unistyles
-                classNameRef.current = className
+                unistylesMap.set(key, unistyles)
+                classNameMap.set(key, className)
             })
         }
 
         combinedVariantStyles.forEach(([key, value]) => {
             const styleEntry = styles[key]
+            const unistyles = unistylesMap.get(key)
+            const className = classNameMap.get(key)
+            const selectedVariantStyles = selectedVariantStylesMap.get(key)
 
-            if (!hasClassName(styleEntry)) {
+            if (!hasClassName(styleEntry) || !unistyles || !className) {
                 return
             }
 
             if (variantsChanged) {
-                UnistylesRegistry.updateStyles(unistylesRef.current!, value, classNameRef.current!)
+                UnistylesRegistry.updateStyles(unistyles, value, className)
             }
 
-            Object.defineProperties(styleEntry, reduceObject(selectedVariantStylesRef.current ?? {}, value => ({
+            Object.defineProperties(styleEntry, reduceObject(selectedVariantStyles ?? {}, value => ({
                 value,
                 enumerable: false,
                 configurable: true
             })))
-            styleEntry['unistyles-class'] = `${styleEntry['unistyles-class'].replace(/variant-[^\s]+/g, '').trim()} ${classNameRef.current}`
+            styleEntry['unistyles-class'] = `${styleEntry['unistyles-class'].replace(/variant-[^\s]+/g, '').trim()} ${className}`
         })
     }
 
