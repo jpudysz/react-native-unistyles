@@ -4,13 +4,14 @@ import type { StyleSheetWithSuperPowers, StyleSheet } from '../src/types/stylesh
 import { UnistylesRegistry } from './registry'
 import { reduceObject, toReactNativeClassName } from './utils'
 import { UnistylesRuntime } from './runtime'
+import { createUseVariants } from './useVariants'
 
 export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
     if (typeof stylesheet === 'function') {
         stylesheet = stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
     }
 
-    return reduceObject(stylesheet, (value, key) => {
+    const styles = reduceObject(stylesheet, (value, key) => {
         if (typeof value === 'function') {
             let className = ''
             let stylesheet: TypeStyle | undefined
@@ -35,4 +36,8 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
 
         return toReactNativeClassName(UnistylesRegistry.createStyles(value, key).className, value)
     }) as ReactNativeStyleSheet<StyleSheet>
+
+    createUseVariants(styles)
+
+    return styles
 }
