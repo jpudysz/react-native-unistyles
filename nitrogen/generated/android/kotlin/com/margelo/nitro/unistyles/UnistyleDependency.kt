@@ -28,5 +28,6 @@ enum class UnistyleDependency {
   CONTENTSIZECATEGORY,
   INSETS,
   PIXELRATIO,
-  FONTSCALE
+  FONTSCALE,
+  STATUSBAR
 }

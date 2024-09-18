@@ -38,6 +38,7 @@ namespace margelo::nitro::unistyles {
     INSETS      SWIFT_NAME(insets) = 10,
     PIXELRATIO      SWIFT_NAME(pixelratio) = 11,
     FONTSCALE      SWIFT_NAME(fontscale) = 12,
+    STATUSBAR      SWIFT_NAME(statusbar) = 13,
   } CLOSED_ENUM;
 
 } // namespace margelo::nitro::unistyles
@@ -68,7 +69,7 @@ namespace margelo::nitro {
         return false;
       }
       // Check if we are within the bounds of the enum.
-      return integer >= 0 && integer <= 12;
+      return integer >= 0 && integer <= 13;
     }
   };
 
