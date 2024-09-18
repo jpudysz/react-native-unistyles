@@ -73,10 +73,10 @@ export type StyleSheetWithSuperPowers<S extends StyleSheet> =
     | ((theme: UnistylesTheme, miniRuntime: MiniRuntime) => S)
     | S
 
-type AddVariantsFn<T> = {
-    addVariants: (variants: ExtractVariantNames<T>) => void
+type UseVariantsFn<T> = {
+    useVariants: (variants: ExtractVariantNames<T>) => void
 }
 
-const create = <S extends StyleSheet>(stylesheet: StyleSheetWithSuperPowers<S>): (ReactNativeStyleSheet<S> & AddVariantsFn<typeof stylesheet>) => stylesheet as (ReactNativeStyleSheet<S> & AddVariantsFn<typeof stylesheet>)
+const create = <S extends StyleSheet>(stylesheet: StyleSheetWithSuperPowers<S>): (ReactNativeStyleSheet<S> & UseVariantsFn<typeof stylesheet>) => stylesheet as (ReactNativeStyleSheet<S> & UseVariantsFn<typeof stylesheet>)
 
 export type CreateUnistylesStyleSheet = typeof create
