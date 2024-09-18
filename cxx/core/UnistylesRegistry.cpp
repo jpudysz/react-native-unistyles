@@ -8,31 +8,25 @@ void core::UnistylesRegistry::registerTheme(jsi::Runtime& rt, std::string name, 
     auto& state = this->getState(rt);
 
     state._jsThemes.emplace(name, jsi::WeakObject(rt, std::move(theme)));
-    state.registeredThemeNames.push_back(name);
+    state._registeredThemeNames.push_back(name);
 }
 
 void core::UnistylesRegistry::registerBreakpoints(jsi::Runtime& rt, std::vector<std::pair<std::string, double>>& sortedBreakpoints) {
     auto& state = this->getState(rt);
 
-    state.sortedBreakpointPairs = std::move(sortedBreakpoints);
+    state._sortedBreakpointPairs = std::move(sortedBreakpoints);
 }
 
 void core::UnistylesRegistry::setPrefersAdaptiveThemes(jsi::Runtime& rt, bool prefersAdaptiveThemes) {
     auto& state = this->getState(rt);
 
-    state.prefersAdaptiveThemes = prefersAdaptiveThemes;
+    state._prefersAdaptiveThemes = prefersAdaptiveThemes;
 }
 
 void core::UnistylesRegistry::setInitialThemeName(jsi::Runtime& rt, std::string themeName) {
     auto& state = this->getState(rt);
 
-    state.initialThemeName = themeName;
-}
-
-void core::UnistylesRegistry::setInitialThemeNameCallback(jsi::Runtime& rt, jsi::Function&& getInitialThemeNameFn) {
-    auto& state = this->getState(rt);
-
-    state.getInitialThemeNameFn = std::move(getInitialThemeNameFn);
+    state._initialThemeName = themeName;
 }
 
 core::UnistylesState& core::UnistylesRegistry::getState(jsi::Runtime& rt) {

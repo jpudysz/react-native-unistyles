@@ -35,7 +35,7 @@ HybridUnistylesRuntime.statusBar = HybridUnistylesRuntime.createHybridStatusBar(
 HybridUnistylesRuntime.navigationBar = HybridUnistylesRuntime.createHybridNavigationBar()
 
 if (isIOS) {
-    HybridUnistylesRuntime.setImmersiveMode = HybridUnistylesRuntime.statusBar.setHidden
+    HybridUnistylesRuntime.setImmersiveMode = (isEnabled: boolean) => HybridUnistylesRuntime.statusBar.setHidden(isEnabled, 'fade')
 }
 
 attachStatusBarJSMethods(HybridUnistylesRuntime.statusBar)

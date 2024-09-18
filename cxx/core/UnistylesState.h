@@ -25,7 +25,6 @@ struct UnistylesState {
     std::optional<std::string>& getCurrentThemeName();
     std::vector<std::string> getRegisteredThemeNames();
     std::optional<std::string> getInitialTheme();
-    std::optional<jsi::Function> getInitialThemeNameFn;
     std::optional<std::string> getCurrentBreakpointName();
     std::vector<std::pair<std::string, double>> getSortedBreakpointPairs();
 
@@ -35,12 +34,12 @@ struct UnistylesState {
 private:
     jsi::Runtime* _rt;
     std::unordered_map<std::string, jsi::WeakObject> _jsThemes{};
-    std::optional<bool> prefersAdaptiveThemes = std::nullopt;
-    std::optional<std::string> initialThemeName = std::nullopt;
-    std::optional<std::string> currentBreakpointName = std::nullopt;
-    std::vector<std::pair<std::string, double>> sortedBreakpointPairs{};
-    std::vector<std::string> registeredThemeNames{};
-    std::optional<std::string> currentThemeName = std::nullopt;
+    std::optional<bool> _prefersAdaptiveThemes = std::nullopt;
+    std::optional<std::string> _initialThemeName = std::nullopt;
+    std::optional<std::string> _currentBreakpointName = std::nullopt;
+    std::vector<std::pair<std::string, double>> _sortedBreakpointPairs{};
+    std::vector<std::string> _registeredThemeNames{};
+    std::optional<std::string> _currentThemeName = std::nullopt;
 
     friend class UnistylesRegistry;
 };
