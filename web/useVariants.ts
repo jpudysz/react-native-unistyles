@@ -4,7 +4,14 @@ import type { ReactNativeStyleSheet, StyleSheet } from '../src/types'
 import { deepMergeObjects, equal, reduceObject } from './utils'
 import { UnistylesRegistry } from './registry'
 
-const hasVariants = <T extends object>(value: [string, T]): value is [string, T & { variants: Record<string, any> }] => 'variants' in value[1]
+type StylesWithVariants = {
+    variants: Record<string, any>,
+    compoundVariants?: Array<Record<string, any> & {
+        styles: Record<string, any>
+    }>
+}
+
+const hasVariants = <T extends object>(value: [string, T]): value is [string, T & StylesWithVariants] => 'variants' in value[1]
 
 const hasClassName = <T extends object | undefined>(value: T): value is T & { 'unistyles-class': string } => value && 'unistyles-class' in value
 
@@ -25,7 +32,7 @@ export const createUseVariants = (styles: ReactNativeStyleSheet<StyleSheet>) => 
             return Object.entries(styles)
                 .filter(hasVariants)
                 .filter(([_key, { variants }]) => Object.keys(variants).some(variant => variant in variants))
-                .map(([key, { variants }]) => {
+                .map(([key, { variants, compoundVariants = [] }]) => {
                     const variantStyles = Object.entries(variants).flatMap(([variant, styles]) => {
                         const selectedVariant = selectedVariants[variant]
                         const selectedVariantStyles = styles[selectedVariant] ?? styles['default']
@@ -37,7 +44,17 @@ export const createUseVariants = (styles: ReactNativeStyleSheet<StyleSheet>) => 
                         return selectedVariantStyles
                     })
 
-                    const mergedVariantStyles = deepMergeObjects(...variantStyles)
+                    const compoundVariantStyles = compoundVariants.flatMap(compoundVariant => {
+                        const { styles, ...conditions } = compoundVariant
+
+                        if (Object.entries(conditions).some(([variant, value]) => String(selectedVariants[variant]) !== String(value))) {
+                            return []
+                        }
+
+                        return styles
+                    })
+
+                    const mergedVariantStyles = deepMergeObjects(...variantStyles, ...compoundVariantStyles)
 
                     selectedVariantStylesRef.current = mergedVariantStyles
 
