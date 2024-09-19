@@ -6,20 +6,8 @@ import NitroModules
 typealias CxxListener = (Array<UnistyleDependency>) -> Void
 
 class NativeIOSPlatform: HybridNativePlatformSpec {
-    lazy var miniRuntime: UnistylesNativeMiniRuntime = {
-        return UnistylesNativeMiniRuntime(
-            colorScheme: try! self.getColorScheme(),
-            screen: try! self.getScreenDimensions(),
-            contentSizeCategory: try! self.getContentSizeCategory(),
-            insets: try! self.getInsets(),
-            pixelRatio: try! self.getPixelRatio(),
-            fontScale: try! self.getFontScale(),
-            rtl: try! self.getPrefersRtlDirection(),
-            statusBar: try! self.getStatusBarDimensions(),
-            navigationBar: try! self.getNavigationBarDimensions()
-        )
-    }()
-    
+    var miniRuntime: UnistylesNativeMiniRuntime?
+
     var listeners: Array<CxxListener> = []
     var hybridContext = margelo.nitro.HybridContext()
     var memorySize: Int {
@@ -27,18 +15,35 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     }
 
     init() {
+        self.miniRuntime = self.buildMiniRuntime()
+
         setupPlatformListeners()
     }
 
     deinit {
         removePlatformListeners()
     }
-
-    func buildMiniRuntime() throws -> UnistylesNativeMiniRuntime {
-        return self.miniRuntime
+    
+    func getMiniRuntime() -> UnistylesNativeMiniRuntime {
+        return self.miniRuntime!
     }
 
-    func getColorScheme() throws -> ColorScheme {
+    func buildMiniRuntime() -> UnistylesNativeMiniRuntime {
+        return UnistylesNativeMiniRuntime(
+            colorScheme: self.getColorScheme(),
+            screen: self.getScreenDimensions(),
+            contentSizeCategory: self.getContentSizeCategory(),
+            insets: self.getInsets(),
+            pixelRatio: self.getPixelRatio(),
+            fontScale: self.getFontScale(),
+            rtl: self.getPrefersRtlDirection(),
+            statusBar: self.getStatusBarDimensions(),
+            navigationBar: self.getNavigationBarDimensions(),
+            orientation: self.getOrientation()
+        )
+    }
+
+    func getColorScheme() -> ColorScheme {
         let interfaceStyle = UIScreen.main.traitCollection.userInterfaceStyle
 
         switch (interfaceStyle) {
@@ -53,7 +58,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         }
     }
 
-    func getFontScale() throws -> Double {
+    func getFontScale() -> Double {
         func getFontScaleFn() -> Double {
             let contentSizeCategory = UIApplication.shared.preferredContentSizeCategory
             let defaultMultiplier: CGFloat = 17.0
@@ -87,7 +92,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
                 return 1.0
             }
         }
-        
+
         if Thread.isMainThread {
             return getFontScaleFn()
         }
@@ -97,7 +102,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         }
     }
 
-    func getScreenDimensions() throws -> Dimensions {
+    func getScreenDimensions() -> Dimensions {
         func getScreenDimensionsFn() -> Dimensions {
             guard let presentedViewController = RCTPresentedViewController(),
                   let windowFrame = presentedViewController.view.window?.frame else {
@@ -119,8 +124,18 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
             return getScreenDimensionsFn()
         }
     }
+    
+    func getOrientation() -> Orientation {
+        let screenDimensions = getScreenDimensions()
+        
+        if (screenDimensions.width > screenDimensions.height) {
+            return Orientation.landscape;
+        }
 
-    func getContentSizeCategory() throws -> String {
+        return Orientation.portrait;
+    }
+
+    func getContentSizeCategory() -> String {
         func getContentSizeCategoryFn() -> String {
             let contentSizeCategory = UIApplication.shared.preferredContentSizeCategory
 
@@ -153,7 +168,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
                 return "unspecified"
             }
         }
-        
+
         if Thread.isMainThread {
             return getContentSizeCategoryFn()
         }
@@ -164,7 +179,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     }
 
     // todo handle IME animation
-    func getInsets() throws -> Insets {
+    func getInsets() -> Insets {
         func getInsetsFn() -> Insets {
             guard let window = UIApplication.shared.windows.first else {
                 // this should never happen, but it's better to return zeros
@@ -175,7 +190,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
 
             return Insets(top: safeArea.top, bottom: safeArea.bottom, left: safeArea.left, right: safeArea.right, ime: 0)
         }
-        
+
         if Thread.isMainThread {
             return getInsetsFn()
         }
@@ -185,14 +200,14 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         }
     }
 
-    func getPrefersRtlDirection() throws -> Bool {
+    func getPrefersRtlDirection() -> Bool {
         func getPrefersRtlDirectionFn() -> Bool {
             let hasForcedRtl = UserDefaults.standard.bool(forKey: "RCTI18nUtil_forceRTL")
             let isRtl = UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
 
             return hasForcedRtl || isRtl
         }
-        
+
         if Thread.isMainThread {
             return getPrefersRtlDirectionFn()
         }
@@ -202,7 +217,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         }
     }
 
-    func getStatusBarDimensions() throws -> Dimensions {
+    func getStatusBarDimensions() -> Dimensions {
         func getStatusBarDimensionsFn() -> Dimensions {
             guard let window = UIApplication.shared.windows.first,
                   let statusBarManager = window.windowScene?.statusBarManager else {
@@ -214,7 +229,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
 
             return Dimensions(width: statusBarSize.width, height: statusBarSize.height)
         }
-        
+
         if Thread.isMainThread {
             return getStatusBarDimensionsFn()
         }
@@ -224,7 +239,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         }
     }
 
-    func getPixelRatio() throws -> Double {
+    func getPixelRatio() -> Double {
         func getPixelRatioFn() -> Double {
             guard let presentedViewController = RCTPresentedViewController(),
                   let window = presentedViewController.view.window else {
@@ -234,7 +249,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
 
             return window.screen.scale
         }
-        
+
         if Thread.isMainThread {
             return getPixelRatioFn()
         }
@@ -256,7 +271,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         }
     }
 
-    func getNavigationBarDimensions() throws -> Dimensions {
+    func getNavigationBarDimensions() -> Dimensions {
         return Dimensions(width: 0, height: 0);
     }
 

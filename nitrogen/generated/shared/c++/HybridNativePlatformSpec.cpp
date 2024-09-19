@@ -18,6 +18,7 @@ namespace margelo::nitro::unistyles {
       prototype.registerHybridMethod("getColorScheme", &HybridNativePlatformSpec::getColorScheme);
       prototype.registerHybridMethod("getFontScale", &HybridNativePlatformSpec::getFontScale);
       prototype.registerHybridMethod("getPixelRatio", &HybridNativePlatformSpec::getPixelRatio);
+      prototype.registerHybridMethod("getOrientation", &HybridNativePlatformSpec::getOrientation);
       prototype.registerHybridMethod("getContentSizeCategory", &HybridNativePlatformSpec::getContentSizeCategory);
       prototype.registerHybridMethod("getScreenDimensions", &HybridNativePlatformSpec::getScreenDimensions);
       prototype.registerHybridMethod("getStatusBarDimensions", &HybridNativePlatformSpec::getStatusBarDimensions);
@@ -28,7 +29,7 @@ namespace margelo::nitro::unistyles {
       prototype.registerHybridMethod("setNavigationBarHidden", &HybridNativePlatformSpec::setNavigationBarHidden);
       prototype.registerHybridMethod("setStatusBarBackgroundColor", &HybridNativePlatformSpec::setStatusBarBackgroundColor);
       prototype.registerHybridMethod("setImmersiveMode", &HybridNativePlatformSpec::setImmersiveMode);
-      prototype.registerHybridMethod("buildMiniRuntime", &HybridNativePlatformSpec::buildMiniRuntime);
+      prototype.registerHybridMethod("getMiniRuntime", &HybridNativePlatformSpec::getMiniRuntime);
       prototype.registerHybridMethod("registerPlatformListener", &HybridNativePlatformSpec::registerPlatformListener);
     });
   }

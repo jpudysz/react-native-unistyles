@@ -11,6 +11,8 @@
 namespace margelo::nitro::unistyles { struct Insets; }
 // Forward declaration of `ColorScheme` to properly resolve imports.
 namespace margelo::nitro::unistyles { enum class ColorScheme; }
+// Forward declaration of `Orientation` to properly resolve imports.
+namespace margelo::nitro::unistyles { enum class Orientation; }
 // Forward declaration of `Dimensions` to properly resolve imports.
 namespace margelo::nitro::unistyles { struct Dimensions; }
 // Forward declaration of `UnistylesNativeMiniRuntime` to properly resolve imports.
@@ -22,6 +24,8 @@ namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 #include "JInsets.hpp"
 #include "ColorScheme.hpp"
 #include "JColorScheme.hpp"
+#include "Orientation.hpp"
+#include "JOrientation.hpp"
 #include <string>
 #include "Dimensions.hpp"
 #include "JDimensions.hpp"
@@ -75,6 +79,11 @@ namespace margelo::nitro::unistyles {
     auto result = method(_javaPart);
     return result;
   }
+  Orientation JHybridNativePlatformSpec::getOrientation() {
+    static const auto method = _javaPart->getClass()->getMethod<jni::local_ref<JOrientation>()>("getOrientation");
+    auto result = method(_javaPart);
+    return result->toCpp();
+  }
   std::string JHybridNativePlatformSpec::getContentSizeCategory() {
     static const auto method = _javaPart->getClass()->getMethod<jni::local_ref<jni::JString>()>("getContentSizeCategory");
     auto result = method(_javaPart);
@@ -120,8 +129,8 @@ namespace margelo::nitro::unistyles {
     static const auto method = _javaPart->getClass()->getMethod<void(jboolean /* isEnabled */)>("setImmersiveMode");
     method(_javaPart, isEnabled);
   }
-  UnistylesNativeMiniRuntime JHybridNativePlatformSpec::buildMiniRuntime() {
-    static const auto method = _javaPart->getClass()->getMethod<jni::local_ref<JUnistylesNativeMiniRuntime>()>("buildMiniRuntime");
+  UnistylesNativeMiniRuntime JHybridNativePlatformSpec::getMiniRuntime() {
+    static const auto method = _javaPart->getClass()->getMethod<jni::local_ref<JUnistylesNativeMiniRuntime>()>("getMiniRuntime");
     auto result = method(_javaPart);
     return result->toCpp();
   }

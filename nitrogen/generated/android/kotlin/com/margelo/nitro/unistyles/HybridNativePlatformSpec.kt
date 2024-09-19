@@ -54,6 +54,10 @@ abstract class HybridNativePlatformSpec: HybridObject() {
   
   @DoNotStrip
   @Keep
+  abstract fun getOrientation(): Orientation
+  
+  @DoNotStrip
+  @Keep
   abstract fun getContentSizeCategory(): String
   
   @DoNotStrip
@@ -94,7 +98,7 @@ abstract class HybridNativePlatformSpec: HybridObject() {
   
   @DoNotStrip
   @Keep
-  abstract fun buildMiniRuntime(): UnistylesNativeMiniRuntime
+  abstract fun getMiniRuntime(): UnistylesNativeMiniRuntime
   
   @DoNotStrip
   @Keep

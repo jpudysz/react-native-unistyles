@@ -107,6 +107,17 @@ public final class HybridNativePlatformSpecCxx {
   }
   
   @inline(__always)
+  public func getOrientation() -> Int32 {
+    do {
+      let result = try self.implementation.getOrientation()
+      return result.rawValue
+    } catch {
+      let message = "\(error.localizedDescription)"
+      fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
+    }
+  }
+  
+  @inline(__always)
   public func getContentSizeCategory() -> std.string {
     do {
       let result = try self.implementation.getContentSizeCategory()
@@ -217,9 +228,9 @@ public final class HybridNativePlatformSpecCxx {
   }
   
   @inline(__always)
-  public func buildMiniRuntime() -> UnistylesNativeMiniRuntime {
+  public func getMiniRuntime() -> UnistylesNativeMiniRuntime {
     do {
-      let result = try self.implementation.buildMiniRuntime()
+      let result = try self.implementation.getMiniRuntime()
       return result
     } catch {
       let message = "\(error.localizedDescription)"

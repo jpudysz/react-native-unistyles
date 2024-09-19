@@ -1,7 +1,8 @@
 import type { HybridObject } from 'react-native-nitro-modules'
-import type { Dimensions, Insets } from '../types'
+import { type Dimensions, type Insets } from '../types'
 
 type ColorScheme = 'dark' | 'light' | 'unspecified'
+type Orientation = 'portrait' | 'landscape'
 
 enum UnistyleDependency {
     Theme = 0, // todo do I need it, dynamic function is always recomputed
@@ -30,6 +31,7 @@ export interface UnistylesNativeMiniRuntime {
     readonly rtl: boolean
     readonly statusBar: Dimensions,
     readonly navigationBar: Dimensions
+    readonly orientation: Orientation
 }
 
 // represents any native API that can communicate with Unistyles
@@ -39,6 +41,7 @@ export interface NativePlatform extends HybridObject<{ ios: 'swift', android: 'k
     getColorScheme(): ColorScheme,
     getFontScale(): number,
     getPixelRatio(): number,
+    getOrientation(): Orientation,
     getContentSizeCategory(): string,
     getScreenDimensions(): Dimensions,
     getStatusBarDimensions(): Dimensions,
@@ -52,6 +55,6 @@ export interface NativePlatform extends HybridObject<{ ios: 'swift', android: 'k
     setImmersiveMode(isEnabled: boolean): void,
 
     // private
-    buildMiniRuntime(): UnistylesNativeMiniRuntime,
+    getMiniRuntime(): UnistylesNativeMiniRuntime,
     registerPlatformListener(callback: (dependencies: Array<UnistyleDependency>) => void): void
 }
