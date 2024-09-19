@@ -24,5 +24,6 @@ data class UnistylesNativeMiniRuntime(
   val fontScale: Double,
   val rtl: Boolean,
   val statusBar: Dimensions,
-  val navigationBar: Dimensions
+  val navigationBar: Dimensions,
+  val orientation: Orientation
 )

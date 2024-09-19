@@ -16,6 +16,8 @@ namespace Unistyles { class HybridNativePlatformSpecCxx; }
 namespace margelo::nitro::unistyles { struct Insets; }
 // Forward declaration of `ColorScheme` to properly resolve imports.
 namespace margelo::nitro::unistyles { enum class ColorScheme; }
+// Forward declaration of `Orientation` to properly resolve imports.
+namespace margelo::nitro::unistyles { enum class Orientation; }
 // Forward declaration of `Dimensions` to properly resolve imports.
 namespace margelo::nitro::unistyles { struct Dimensions; }
 // Forward declaration of `UnistylesNativeMiniRuntime` to properly resolve imports.
@@ -25,6 +27,7 @@ namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 
 #include "Insets.hpp"
 #include "ColorScheme.hpp"
+#include "Orientation.hpp"
 #include <string>
 #include "Dimensions.hpp"
 #include <optional>
@@ -92,6 +95,10 @@ namespace margelo::nitro::unistyles {
       auto __result = _swiftPart.getPixelRatio();
       return __result;
     }
+    inline Orientation getOrientation() override {
+      auto __result = _swiftPart.getOrientation();
+      return static_cast<Orientation>(__result);
+    }
     inline std::string getContentSizeCategory() override {
       auto __result = _swiftPart.getContentSizeCategory();
       return __result;
@@ -127,8 +134,8 @@ namespace margelo::nitro::unistyles {
     inline void setImmersiveMode(bool isEnabled) override {
       _swiftPart.setImmersiveMode(std::forward<decltype(isEnabled)>(isEnabled));
     }
-    inline UnistylesNativeMiniRuntime buildMiniRuntime() override {
-      auto __result = _swiftPart.buildMiniRuntime();
+    inline UnistylesNativeMiniRuntime getMiniRuntime() override {
+      auto __result = _swiftPart.getMiniRuntime();
       return __result;
     }
     inline void registerPlatformListener(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>& callback) override {

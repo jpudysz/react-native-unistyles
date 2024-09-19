@@ -35,7 +35,6 @@ std::optional<std::string> HybridUnistylesRuntime::getBreakpoint() {
     return state.getCurrentBreakpointName();
 };
 
-
 bool HybridUnistylesRuntime::getRtl() {
     return this->_nativePlatform.getPrefersRtlDirection();
 }
@@ -45,13 +44,9 @@ Insets HybridUnistylesRuntime::getInsets() {
 };
 
 Orientation HybridUnistylesRuntime::getOrientation() {
-    auto screenDimensions = this->getScreen();
-
-    if (screenDimensions.width > screenDimensions.height) {
-        return Orientation::LANDSCAPE;
-    }
-
-    return Orientation::PORTRAIT;
+    int orientation = this->_nativePlatform.getOrientation();
+    
+    return static_cast<Orientation>(orientation);
 };
 
 double HybridUnistylesRuntime::getPixelRatio() {
@@ -134,11 +129,11 @@ jsi::Value HybridUnistylesRuntime::createHybridNavigationBar(jsi::Runtime &rt, c
 }
 
 UnistylesCxxMiniRuntime HybridUnistylesRuntime::getMiniRuntime() {
-    UnistylesNativeMiniRuntime nativeMiniRuntime =  this->_nativePlatform.buildMiniRuntime();
+    UnistylesNativeMiniRuntime nativeMiniRuntime =  this->_nativePlatform.getMiniRuntime();
     UnistylesCxxMiniRuntime cxxMiniRuntime{
         this->getThemeName(),
         this->getBreakpoint(),
-        this->getOrientation(),
+        nativeMiniRuntime.orientation,
         this->getHasAdaptiveThemes(),
         nativeMiniRuntime.colorScheme,
         nativeMiniRuntime.screen,

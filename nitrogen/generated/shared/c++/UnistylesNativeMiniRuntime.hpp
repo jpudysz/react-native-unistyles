@@ -24,11 +24,14 @@ namespace margelo::nitro::unistyles { enum class ColorScheme; }
 namespace margelo::nitro::unistyles { struct Dimensions; }
 // Forward declaration of `Insets` to properly resolve imports.
 namespace margelo::nitro::unistyles { struct Insets; }
+// Forward declaration of `Orientation` to properly resolve imports.
+namespace margelo::nitro::unistyles { enum class Orientation; }
 
 #include "ColorScheme.hpp"
 #include "Dimensions.hpp"
 #include <string>
 #include "Insets.hpp"
+#include "Orientation.hpp"
 
 namespace margelo::nitro::unistyles {
 
@@ -46,9 +49,10 @@ namespace margelo::nitro::unistyles {
     bool rtl     SWIFT_PRIVATE;
     Dimensions statusBar     SWIFT_PRIVATE;
     Dimensions navigationBar     SWIFT_PRIVATE;
+    Orientation orientation     SWIFT_PRIVATE;
 
   public:
-    explicit UnistylesNativeMiniRuntime(ColorScheme colorScheme, Dimensions screen, std::string contentSizeCategory, Insets insets, double pixelRatio, double fontScale, bool rtl, Dimensions statusBar, Dimensions navigationBar): colorScheme(colorScheme), screen(screen), contentSizeCategory(contentSizeCategory), insets(insets), pixelRatio(pixelRatio), fontScale(fontScale), rtl(rtl), statusBar(statusBar), navigationBar(navigationBar) {}
+    explicit UnistylesNativeMiniRuntime(ColorScheme colorScheme, Dimensions screen, std::string contentSizeCategory, Insets insets, double pixelRatio, double fontScale, bool rtl, Dimensions statusBar, Dimensions navigationBar, Orientation orientation): colorScheme(colorScheme), screen(screen), contentSizeCategory(contentSizeCategory), insets(insets), pixelRatio(pixelRatio), fontScale(fontScale), rtl(rtl), statusBar(statusBar), navigationBar(navigationBar), orientation(orientation) {}
   };
 
 } // namespace margelo::nitro::unistyles
@@ -71,7 +75,8 @@ namespace margelo::nitro {
         JSIConverter<double>::fromJSI(runtime, obj.getProperty(runtime, "fontScale")),
         JSIConverter<bool>::fromJSI(runtime, obj.getProperty(runtime, "rtl")),
         JSIConverter<Dimensions>::fromJSI(runtime, obj.getProperty(runtime, "statusBar")),
-        JSIConverter<Dimensions>::fromJSI(runtime, obj.getProperty(runtime, "navigationBar"))
+        JSIConverter<Dimensions>::fromJSI(runtime, obj.getProperty(runtime, "navigationBar")),
+        JSIConverter<Orientation>::fromJSI(runtime, obj.getProperty(runtime, "orientation"))
       );
     }
     static inline jsi::Value toJSI(jsi::Runtime& runtime, const UnistylesNativeMiniRuntime& arg) {
@@ -85,6 +90,7 @@ namespace margelo::nitro {
       obj.setProperty(runtime, "rtl", JSIConverter<bool>::toJSI(runtime, arg.rtl));
       obj.setProperty(runtime, "statusBar", JSIConverter<Dimensions>::toJSI(runtime, arg.statusBar));
       obj.setProperty(runtime, "navigationBar", JSIConverter<Dimensions>::toJSI(runtime, arg.navigationBar));
+      obj.setProperty(runtime, "orientation", JSIConverter<Orientation>::toJSI(runtime, arg.orientation));
       return obj;
     }
     static inline bool canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
@@ -101,6 +107,7 @@ namespace margelo::nitro {
       if (!JSIConverter<bool>::canConvert(runtime, obj.getProperty(runtime, "rtl"))) return false;
       if (!JSIConverter<Dimensions>::canConvert(runtime, obj.getProperty(runtime, "statusBar"))) return false;
       if (!JSIConverter<Dimensions>::canConvert(runtime, obj.getProperty(runtime, "navigationBar"))) return false;
+      if (!JSIConverter<Orientation>::canConvert(runtime, obj.getProperty(runtime, "orientation"))) return false;
       return true;
     }
   };

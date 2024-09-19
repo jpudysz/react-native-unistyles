@@ -36,6 +36,7 @@ public protocol HybridNativePlatformSpec: HybridObjectSpec {
   func getColorScheme() throws -> ColorScheme
   func getFontScale() throws -> Double
   func getPixelRatio() throws -> Double
+  func getOrientation() throws -> Orientation
   func getContentSizeCategory() throws -> String
   func getScreenDimensions() throws -> Dimensions
   func getStatusBarDimensions() throws -> Dimensions
@@ -46,7 +47,7 @@ public protocol HybridNativePlatformSpec: HybridObjectSpec {
   func setNavigationBarHidden(isHidden: Bool) throws -> Void
   func setStatusBarBackgroundColor(color: Double?) throws -> Void
   func setImmersiveMode(isEnabled: Bool) throws -> Void
-  func buildMiniRuntime() throws -> UnistylesNativeMiniRuntime
+  func getMiniRuntime() throws -> UnistylesNativeMiniRuntime
   func registerPlatformListener(callback: @escaping ((_ dependencies: [UnistyleDependency]) -> Void)) throws -> Void
 }
 

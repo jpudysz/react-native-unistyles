@@ -16,6 +16,8 @@
 #include "JColorScheme.hpp"
 #include "JDimensions.hpp"
 #include "JInsets.hpp"
+#include "JOrientation.hpp"
+#include "Orientation.hpp"
 #include <string>
 
 namespace margelo::nitro::unistyles {
@@ -54,6 +56,8 @@ namespace margelo::nitro::unistyles {
       jni::local_ref<JDimensions> statusBar = this->getFieldValue(fieldStatusBar);
       static const auto fieldNavigationBar = clazz->getField<JDimensions>("navigationBar");
       jni::local_ref<JDimensions> navigationBar = this->getFieldValue(fieldNavigationBar);
+      static const auto fieldOrientation = clazz->getField<JOrientation>("orientation");
+      jni::local_ref<JOrientation> orientation = this->getFieldValue(fieldOrientation);
       return UnistylesNativeMiniRuntime(
         colorScheme->toCpp(),
         screen->toCpp(),
@@ -63,7 +67,8 @@ namespace margelo::nitro::unistyles {
         fontScale,
         rtl,
         statusBar->toCpp(),
-        navigationBar->toCpp()
+        navigationBar->toCpp(),
+        orientation->toCpp()
       );
     }
 
@@ -82,7 +87,8 @@ namespace margelo::nitro::unistyles {
         value.fontScale,
         value.rtl,
         JDimensions::fromCpp(value.statusBar),
-        JDimensions::fromCpp(value.navigationBar)
+        JDimensions::fromCpp(value.navigationBar),
+        JOrientation::fromCpp(value.orientation)
       );
     }
   };

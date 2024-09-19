@@ -17,6 +17,8 @@
 namespace margelo::nitro::unistyles { struct Insets; }
 // Forward declaration of `ColorScheme` to properly resolve imports.
 namespace margelo::nitro::unistyles { enum class ColorScheme; }
+// Forward declaration of `Orientation` to properly resolve imports.
+namespace margelo::nitro::unistyles { enum class Orientation; }
 // Forward declaration of `Dimensions` to properly resolve imports.
 namespace margelo::nitro::unistyles { struct Dimensions; }
 // Forward declaration of `UnistylesNativeMiniRuntime` to properly resolve imports.
@@ -26,6 +28,7 @@ namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 
 #include "Insets.hpp"
 #include "ColorScheme.hpp"
+#include "Orientation.hpp"
 #include <string>
 #include "Dimensions.hpp"
 #include <optional>
@@ -66,6 +69,7 @@ namespace margelo::nitro::unistyles {
       virtual ColorScheme getColorScheme() = 0;
       virtual double getFontScale() = 0;
       virtual double getPixelRatio() = 0;
+      virtual Orientation getOrientation() = 0;
       virtual std::string getContentSizeCategory() = 0;
       virtual Dimensions getScreenDimensions() = 0;
       virtual Dimensions getStatusBarDimensions() = 0;
@@ -76,7 +80,7 @@ namespace margelo::nitro::unistyles {
       virtual void setNavigationBarHidden(bool isHidden) = 0;
       virtual void setStatusBarBackgroundColor(std::optional<double> color) = 0;
       virtual void setImmersiveMode(bool isEnabled) = 0;
-      virtual UnistylesNativeMiniRuntime buildMiniRuntime() = 0;
+      virtual UnistylesNativeMiniRuntime getMiniRuntime() = 0;
       virtual void registerPlatformListener(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>& callback) = 0;
 
     protected:

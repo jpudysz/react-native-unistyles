@@ -36,8 +36,9 @@ extension UnistylesNativeMiniRuntime {
             dependencies.append(UnistyleDependency.breakpoints)
         }
 
-        // todo move orientation to native
-        // orientation
+        if (lhs.orientation != rhs.orientation) {
+            dependencies.append(UnistyleDependency.orientation)
+        }
 
         if (lhs.contentSizeCategory != rhs.contentSizeCategory) {
             dependencies.append(UnistyleDependency.contentsizecategory)
@@ -45,10 +46,6 @@ extension UnistylesNativeMiniRuntime {
 
         if (lhs.insets != rhs.insets) {
             dependencies.append(UnistyleDependency.insets)
-        }
-
-        if (lhs.pixelRatio != rhs.pixelRatio) {
-            dependencies.append(UnistyleDependency.pixelratio)
         }
 
         if (lhs.fontScale != rhs.fontScale) {
@@ -59,7 +56,7 @@ extension UnistylesNativeMiniRuntime {
             dependencies.append(UnistyleDependency.statusbar)
         }
 
-        // rtl is not dynamic, so ignore it
+        // rtl and pixel ratio are not dynamic
         // navigation bar is not supported for iOS
 
         return dependencies
