@@ -29,7 +29,9 @@ struct UnistylesState {
     std::vector<std::pair<std::string, double>> getSortedBreakpointPairs();
 
     jsi::Object getJSTheme();
+    int parseColor(std::optional<std::string> color);
     void computeCurrentBreakpoint(int screenWidth);
+    void registerProcessColorFunction(jsi::Function&& fn);
 
 private:
     jsi::Runtime* _rt;
@@ -40,6 +42,7 @@ private:
     std::vector<std::pair<std::string, double>> _sortedBreakpointPairs{};
     std::vector<std::string> _registeredThemeNames{};
     std::optional<std::string> _currentThemeName = std::nullopt;
+    std::shared_ptr<jsi::Function> _processColorFn;
 
     friend class UnistylesRegistry;
 };

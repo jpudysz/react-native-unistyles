@@ -129,7 +129,7 @@ jsi::Value HybridUnistylesRuntime::createHybridNavigationBar(jsi::Runtime &rt, c
 }
 
 UnistylesCxxMiniRuntime HybridUnistylesRuntime::getMiniRuntime() {
-    UnistylesNativeMiniRuntime nativeMiniRuntime =  this->_nativePlatform.getMiniRuntime();
+    UnistylesNativeMiniRuntime nativeMiniRuntime = this->_nativePlatform.getMiniRuntime();
     UnistylesCxxMiniRuntime cxxMiniRuntime{
         this->getThemeName(),
         this->getBreakpoint(),

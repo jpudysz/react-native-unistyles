@@ -1,7 +1,7 @@
 import './TurboUnistyles'
 
 import { Runtime } from './UnistylesRuntime'
-import { HybridUnistylesStyleSheet } from './StyleSheet'
+import { StyleSheet } from './StyleSheet'
 import type { UnistylesMiniRuntime } from './UnistylesRuntime'
 import { StatusBarStyle, ColorScheme, Orientation } from './types'
 
@@ -13,7 +13,7 @@ export {
 
 export {
     Runtime as UnistylesRuntime,
-    HybridUnistylesStyleSheet as StyleSheet,
+    StyleSheet,
 }
 
 export type {

@@ -20,7 +20,7 @@
 + (void) load {
   using namespace margelo::nitro;
 
-  
+
 }
 
 @end
