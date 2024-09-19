@@ -26,7 +26,13 @@ export interface UnistylesRuntimePrivate extends Omit<UnistylesRuntimeSpec, 'set
     createHybridNavigationBar(): UnistylesNavigationBar
 }
 
-type UnistylesRuntime = Omit<UnistylesRuntimePrivate, 'createHybridStatusBar' | 'createHybridNavigationBar' | 'dispose' | 'miniRuntime'>
+type PrivateMethods =
+    |'createHybridStatusBar'
+    | 'createHybridNavigationBar'
+    | 'dispose'
+    | 'miniRuntime'
+
+type UnistylesRuntime = Omit<UnistylesRuntimePrivate, PrivateMethods>
 
 const HybridUnistylesRuntime = NitroModules
     .createHybridObject<UnistylesRuntimePrivate>('UnistylesRuntime')

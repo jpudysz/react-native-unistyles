@@ -47,6 +47,7 @@ jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisV
     });
 
     verifyAndSelectTheme(rt);
+    loadExternalMethods(thisVal, rt);
 
     return jsi::Value::undefined();
 }
@@ -174,3 +175,18 @@ void HybridStyleSheet::setThemeFromColorScheme(jsi::Runtime& rt) {
     }
 }
 
+void HybridStyleSheet::loadExternalMethods(const jsi::Value& thisValue, jsi::Runtime& rt) {
+    auto jsMethods = thisValue.getObject(rt).getProperty(rt, "jsMethods");
+    
+    helpers::assertThat(rt, jsMethods.isObject(), "can't find jsMethods.");
+    
+    auto maybeProcessColorFn = jsMethods.asObject(rt).getProperty(rt, "processColor");
+    
+    helpers::assertThat(rt, maybeProcessColorFn.isObject(), "can't load processColor function from JS.");
+
+    auto processColorFn = maybeProcessColorFn.asObject(rt).asFunction(rt);
+    auto& registry = core::UnistylesRegistry::get();
+    auto& state = registry.getState(rt);
+    
+    state.registerProcessColorFunction(std::move(processColorFn));
+}

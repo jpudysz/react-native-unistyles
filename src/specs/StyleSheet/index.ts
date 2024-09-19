@@ -1,5 +1,5 @@
 import { NitroModules } from 'react-native-nitro-modules'
-import { StyleSheet as NativeStyleSheet } from 'react-native'
+import { processColor, StyleSheet as NativeStyleSheet } from 'react-native'
 import type { StyleSheet as NativeStyleSheetType } from 'react-native'
 import type { UnistylesStyleSheet as UnistylesStyleSheetSpec } from './UnistylesStyleSheet.nitro'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../../global'
@@ -24,7 +24,10 @@ export interface UnistylesStyleSheet extends UnistylesStyleSheetSpec {
 
     // overridden methods
     create: CreateUnistylesStyleSheet,
-    configure(config: UnistylesConfig): void
+    configure(config: UnistylesConfig): void,
+    jsMethods: {
+        processColor: typeof processColor
+    }
 }
 
 const HybridUnistylesStyleSheet = NitroModules
@@ -34,7 +37,8 @@ HybridUnistylesStyleSheet.absoluteFillObject = NativeStyleSheet.absoluteFillObje
 HybridUnistylesStyleSheet.absoluteFill = NativeStyleSheet.absoluteFill
 HybridUnistylesStyleSheet.flatten = NativeStyleSheet.flatten
 HybridUnistylesStyleSheet.compose = NativeStyleSheet.compose
-
-export {
-    HybridUnistylesStyleSheet
+HybridUnistylesStyleSheet.jsMethods = {
+    processColor
 }
+
+export const StyleSheet = HybridUnistylesStyleSheet as Omit<UnistylesStyleSheet, 'jsMethods'>
