@@ -23,7 +23,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     deinit {
         removePlatformListeners()
     }
-    
+
     func getMiniRuntime() -> UnistylesNativeMiniRuntime {
         return self.miniRuntime!
     }
@@ -124,10 +124,10 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
             return getScreenDimensionsFn()
         }
     }
-    
+
     func getOrientation() -> Orientation {
         let screenDimensions = getScreenDimensions()
-        
+
         if (screenDimensions.width > screenDimensions.height) {
             return Orientation.landscape;
         }
@@ -266,8 +266,14 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
 
                 return
             }
-            // todo convert int to UIColor
-            // presentedViewController.view.backgroundColor = color
+            
+            guard let parsedColor = color else {
+                presentedViewController.view.backgroundColor = UIColor.fromInt(0)
+                
+                return
+            }
+
+            presentedViewController.view.backgroundColor = UIColor.fromInt(Int(parsedColor))
         }
     }
 

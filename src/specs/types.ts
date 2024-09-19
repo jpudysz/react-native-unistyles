@@ -1,3 +1,4 @@
+import type { ColorValue } from 'react-native'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
 
 export enum ColorScheme {
@@ -33,3 +34,5 @@ export enum StatusBarStyle {
 export type AppThemeName = keyof UnistylesThemes
 export type AppBreakpoint = keyof UnistylesBreakpoints
 export type AppTheme = UnistylesThemes[AppThemeName]
+
+export type Color = ColorValue | number

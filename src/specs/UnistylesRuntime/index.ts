@@ -1,8 +1,9 @@
+import { processColor } from 'react-native'
 import { NitroModules } from 'react-native-nitro-modules'
 import type { UnistylesRuntime as UnistylesRuntimeSpec, UnistylesMiniRuntime } from './UnistylesRuntime.nitro'
-import type { AppBreakpoint, AppTheme, AppThemeName, ColorScheme, Orientation } from '../types'
+import type { AppBreakpoint, AppTheme, AppThemeName, Color, ColorScheme, Orientation } from '../types'
 import { attachStatusBarJSMethods, type UnistylesStatusBar } from '../StatusBar'
-import type { UnistylesNavigationBar } from '../NavigtionBar'
+import { attachNavigationBarJSMethods, type UnistylesNavigationBar } from '../NavigtionBar'
 import type { AndroidContentSizeCategory, IOSContentSizeCategory } from '../../types'
 import { isIOS } from '../../common'
 
@@ -19,7 +20,8 @@ export interface UnistylesRuntimePrivate extends Omit<UnistylesRuntimeSpec, 'set
 
     setTheme(themeName: AppThemeName): void
     updateTheme(themeName: AppThemeName, updater: (currentTheme: AppTheme) => AppTheme): void,
-    setRootViewBackgroundColor(color?: string): void
+    setRootViewBackgroundColor(color?: string): void,
+    _setRootViewBackgroundColor(color?: Color): void
 
     // constructors
     createHybridStatusBar(): UnistylesStatusBar,
@@ -31,6 +33,7 @@ type PrivateMethods =
     | 'createHybridNavigationBar'
     | 'dispose'
     | 'miniRuntime'
+    | '_setRootViewBackgroundColor'
 
 type UnistylesRuntime = Omit<UnistylesRuntimePrivate, PrivateMethods>
 
@@ -39,12 +42,20 @@ const HybridUnistylesRuntime = NitroModules
 
 HybridUnistylesRuntime.statusBar = HybridUnistylesRuntime.createHybridStatusBar()
 HybridUnistylesRuntime.navigationBar = HybridUnistylesRuntime.createHybridNavigationBar()
+HybridUnistylesRuntime._setRootViewBackgroundColor = HybridUnistylesRuntime.setRootViewBackgroundColor
+
+HybridUnistylesRuntime.setRootViewBackgroundColor = (color?: string) => {
+    const parsedColor = processColor(color)
+
+    HybridUnistylesRuntime._setRootViewBackgroundColor(parsedColor as number)
+}
 
 if (isIOS) {
     HybridUnistylesRuntime.setImmersiveMode = (isEnabled: boolean) => HybridUnistylesRuntime.statusBar.setHidden(isEnabled, 'fade')
 }
 
 attachStatusBarJSMethods(HybridUnistylesRuntime.statusBar)
+attachNavigationBarJSMethods(HybridUnistylesRuntime.navigationBar)
 
 export const Runtime = HybridUnistylesRuntime as UnistylesRuntime
 
