@@ -1,13 +1,14 @@
 import { ColorScheme, Orientation, type AppTheme, type AppThemeName } from '../src/specs/types'
 import type { MiniRuntime } from '../src/specs/UnistylesRuntime'
 import { WebContentSizeCategory } from '../src/types'
+import { UnistyleDependency, UnistylesListener } from './listener'
 import { NavigationBar, StatusBar } from './mock'
 import { UnistylesState } from './state'
 import { hexToRGBA, isServer, schemeToTheme } from './utils'
 
 class UnistylesRuntimeBuilder {
-    private lightMedia = this.getLightMedia()
-    private darkMedia = this.getDarkMedia()
+    lightMedia = this.getLightMedia()
+    darkMedia = this.getDarkMedia()
 
     private getLightMedia(): MediaQueryList | null {
         if (isServer()) {
@@ -149,17 +150,20 @@ class UnistylesRuntimeBuilder {
             hasAdaptiveThemes: this.hasAdaptiveThemes,
             name: 'MiniRuntime',
             toString: () => 'MiniRuntime',
+            dispose: () => {},
             __type: 'web',
             equals: () => true,
         }
     }
 
     setTheme = (themeName: AppThemeName) => {
-        if (!isServer()) {
-            document.documentElement.classList.replace(UnistylesRuntime.themeName ?? '', themeName)
+        if (themeName === UnistylesRuntime.themeName) {
+            return
         }
 
         UnistylesState.themeName = themeName
+        UnistylesListener.emitChange(UnistyleDependency.Theme)
+        UnistylesListener.emitChange(UnistyleDependency.ThemeName)
     }
 
     setAdaptiveThemes = (isEnabled: boolean) => {
@@ -183,14 +187,13 @@ class UnistylesRuntimeBuilder {
     setImmersiveMode = () => {}
 
     updateTheme = (themeName: AppThemeName, updater: (currentTheme: AppTheme) => AppTheme) => {
-        const oldTheme = UnistylesState.rawThemes ? UnistylesState.rawThemes[themeName] : undefined
+        const oldTheme = UnistylesState.themes.get(themeName)
 
-        if (!oldTheme || !UnistylesState.rawThemes) {
+        if (!oldTheme) {
             throw new Error(`🦄 Theme "${themeName}" is not registered!`)
         }
 
-        UnistylesState.rawThemes[themeName] = updater(oldTheme)
-        UnistylesState.updateThemes()
+        UnistylesState.themes.set(themeName, updater(oldTheme))
     }
 
     getSSRUnistyles = () => UnistylesState.tags
