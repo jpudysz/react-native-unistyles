@@ -85,8 +85,6 @@ void core::UnistylesState::registerProcessColorFunction(jsi::Function&& fn) {
 
 int core::UnistylesState::parseColor(std::optional<std::string> color) {
     if (!color.has_value()) {
-        // todo do I need to call it?
-        // check color int for null/undefined
         return 0;
     }
 

@@ -42,9 +42,5 @@ private:
     void loadExternalMethods(const jsi::Value& thisValue, jsi::Runtime& rt);
 
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
-    
-    // todo required for parser to work, should be updated on every screen change
-    // todo move it to runtime
-    int _lastScreenWidth = _unistylesRuntime->getScreen().width;
 };
 

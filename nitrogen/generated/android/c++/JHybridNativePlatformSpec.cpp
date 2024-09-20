@@ -31,7 +31,6 @@ namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 #include "JDimensions.hpp"
 #include "UnistylesNativeMiniRuntime.hpp"
 #include "JUnistylesNativeMiniRuntime.hpp"
-#include <optional>
 #include <functional>
 #include <vector>
 #include "UnistyleDependency.hpp"
@@ -109,21 +108,21 @@ namespace margelo::nitro::unistyles {
     auto result = method(_javaPart);
     return result;
   }
-  void JHybridNativePlatformSpec::setRootViewBackgroundColor(std::optional<double> color) {
-    static const auto method = _javaPart->getClass()->getMethod<void(jni::alias_ref<jni::JDouble> /* color */)>("setRootViewBackgroundColor");
-    method(_javaPart, color.has_value() ? jni::JDouble::valueOf(color.value()) : nullptr);
+  void JHybridNativePlatformSpec::setRootViewBackgroundColor(double color) {
+    static const auto method = _javaPart->getClass()->getMethod<void(double /* color */)>("setRootViewBackgroundColor");
+    method(_javaPart, color);
   }
-  void JHybridNativePlatformSpec::setNavigationBarBackgroundColor(std::optional<double> color) {
-    static const auto method = _javaPart->getClass()->getMethod<void(jni::alias_ref<jni::JDouble> /* color */)>("setNavigationBarBackgroundColor");
-    method(_javaPart, color.has_value() ? jni::JDouble::valueOf(color.value()) : nullptr);
+  void JHybridNativePlatformSpec::setNavigationBarBackgroundColor(double color) {
+    static const auto method = _javaPart->getClass()->getMethod<void(double /* color */)>("setNavigationBarBackgroundColor");
+    method(_javaPart, color);
   }
   void JHybridNativePlatformSpec::setNavigationBarHidden(bool isHidden) {
     static const auto method = _javaPart->getClass()->getMethod<void(jboolean /* isHidden */)>("setNavigationBarHidden");
     method(_javaPart, isHidden);
   }
-  void JHybridNativePlatformSpec::setStatusBarBackgroundColor(std::optional<double> color) {
-    static const auto method = _javaPart->getClass()->getMethod<void(jni::alias_ref<jni::JDouble> /* color */)>("setStatusBarBackgroundColor");
-    method(_javaPart, color.has_value() ? jni::JDouble::valueOf(color.value()) : nullptr);
+  void JHybridNativePlatformSpec::setStatusBarBackgroundColor(double color) {
+    static const auto method = _javaPart->getClass()->getMethod<void(double /* color */)>("setStatusBarBackgroundColor");
+    method(_javaPart, color);
   }
   void JHybridNativePlatformSpec::setImmersiveMode(bool isEnabled) {
     static const auto method = _javaPart->getClass()->getMethod<void(jboolean /* isEnabled */)>("setImmersiveMode");

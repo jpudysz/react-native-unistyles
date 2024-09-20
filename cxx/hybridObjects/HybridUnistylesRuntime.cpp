@@ -90,6 +90,16 @@ void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
     }
 };
 
+int HybridUnistylesRuntime::getCachedScreenWidth() {
+    if (this->_lastKnownScreenWidth) {
+        return this->_lastKnownScreenWidth;
+    }
+    
+    this->_lastKnownScreenWidth = this->getScreen().width;
+    
+    return this->_lastKnownScreenWidth;
+}
+
 jsi::Value HybridUnistylesRuntime::updateTheme(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, args[0].isString(), "first argument expected to be a string.");
     helpers::assertThat(rt, args[1].isObject(), "second argument expected to be a function.");
@@ -108,7 +118,7 @@ void HybridUnistylesRuntime::setImmersiveMode(bool isEnabled) {
     this->_nativePlatform.setImmersiveMode(isEnabled);
 };
 
-void HybridUnistylesRuntime::setRootViewBackgroundColor(std::optional<double> color) {
+void HybridUnistylesRuntime::setRootViewBackgroundColor(double color) {
     this->_nativePlatform.setRootViewBackgroundColor(color);
 }
 

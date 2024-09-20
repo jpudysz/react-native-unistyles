@@ -59,7 +59,7 @@ public final class HybridNativePlatformSpecCxx {
   }
 
   // Properties
-  
+
 
   // Methods
   @inline(__always)
@@ -72,7 +72,7 @@ public final class HybridNativePlatformSpecCxx {
       fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
     }
   }
-  
+
   @inline(__always)
   public func getColorScheme() -> Int32 {
     do {
@@ -83,7 +83,7 @@ public final class HybridNativePlatformSpecCxx {
       fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
     }
   }
-  
+
   @inline(__always)
   public func getFontScale() -> Double {
     do {
@@ -94,7 +94,7 @@ public final class HybridNativePlatformSpecCxx {
       fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
     }
   }
-  
+
   @inline(__always)
   public func getPixelRatio() -> Double {
     do {
@@ -105,7 +105,7 @@ public final class HybridNativePlatformSpecCxx {
       fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
     }
   }
-  
+
   @inline(__always)
   public func getOrientation() -> Int32 {
     do {
@@ -116,7 +116,7 @@ public final class HybridNativePlatformSpecCxx {
       fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
     }
   }
-  
+
   @inline(__always)
   public func getContentSizeCategory() -> std.string {
     do {
@@ -127,7 +127,7 @@ public final class HybridNativePlatformSpecCxx {
       fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
     }
   }
-  
+
   @inline(__always)
   public func getScreenDimensions() -> Dimensions {
     do {
@@ -138,7 +138,7 @@ public final class HybridNativePlatformSpecCxx {
       fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
     }
   }
-  
+
   @inline(__always)
   public func getStatusBarDimensions() -> Dimensions {
     do {
@@ -149,7 +149,7 @@ public final class HybridNativePlatformSpecCxx {
       fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
     }
   }
-  
+
   @inline(__always)
   public func getNavigationBarDimensions() -> Dimensions {
     do {
@@ -160,7 +160,7 @@ public final class HybridNativePlatformSpecCxx {
       fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
     }
   }
-  
+
   @inline(__always)
   public func getPrefersRtlDirection() -> Bool {
     do {
@@ -171,62 +171,62 @@ public final class HybridNativePlatformSpecCxx {
       fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
     }
   }
-  
+
   @inline(__always)
-  public func setRootViewBackgroundColor(color: bridge.std__optional_double_) -> Void {
+  public func setRootViewBackgroundColor(color: Double) -> Void {
     do {
-      try self.implementation.setRootViewBackgroundColor(color: color.value)
-      return 
+      try self.implementation.setRootViewBackgroundColor(color: color)
+      return
     } catch {
       let message = "\(error.localizedDescription)"
       fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
     }
   }
-  
+
   @inline(__always)
-  public func setNavigationBarBackgroundColor(color: bridge.std__optional_double_) -> Void {
+  public func setNavigationBarBackgroundColor(color: Double) -> Void {
     do {
-      try self.implementation.setNavigationBarBackgroundColor(color: color.value)
-      return 
+      try self.implementation.setNavigationBarBackgroundColor(color: color)
+      return
     } catch {
       let message = "\(error.localizedDescription)"
       fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
     }
   }
-  
+
   @inline(__always)
   public func setNavigationBarHidden(isHidden: Bool) -> Void {
     do {
       try self.implementation.setNavigationBarHidden(isHidden: isHidden)
-      return 
+      return
     } catch {
       let message = "\(error.localizedDescription)"
       fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
     }
   }
-  
+
   @inline(__always)
-  public func setStatusBarBackgroundColor(color: bridge.std__optional_double_) -> Void {
+  public func setStatusBarBackgroundColor(color: Double) -> Void {
     do {
-      try self.implementation.setStatusBarBackgroundColor(color: color.value)
-      return 
+      try self.implementation.setStatusBarBackgroundColor(color: color)
+      return
     } catch {
       let message = "\(error.localizedDescription)"
       fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
     }
   }
-  
+
   @inline(__always)
   public func setImmersiveMode(isEnabled: Bool) -> Void {
     do {
       try self.implementation.setImmersiveMode(isEnabled: isEnabled)
-      return 
+      return
     } catch {
       let message = "\(error.localizedDescription)"
       fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
     }
   }
-  
+
   @inline(__always)
   public func getMiniRuntime() -> UnistylesNativeMiniRuntime {
     do {
@@ -237,7 +237,7 @@ public final class HybridNativePlatformSpecCxx {
       fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
     }
   }
-  
+
   @inline(__always)
   public func registerPlatformListener(callback: bridge.Func_void_std__vector_UnistyleDependency_) -> Void {
     do {
@@ -253,7 +253,7 @@ public final class HybridNativePlatformSpecCxx {
         }())
         }
       }())
-      return 
+      return
     } catch {
       let message = "\(error.localizedDescription)"
       fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
