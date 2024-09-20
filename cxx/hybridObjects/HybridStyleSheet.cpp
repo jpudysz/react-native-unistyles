@@ -9,7 +9,7 @@ double HybridStyleSheet::getHairlineWidth() {
 
 jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
     helpers::assertThat(rt, arguments[0].isObject(), "expected to be called with object or function.");
-    
+
     // todo
 
     return arguments[0].asObject(rt);
@@ -67,11 +67,11 @@ void HybridStyleSheet::parseSettings(jsi::Runtime &rt, jsi::Object settings) {
         if (propertyName == "initialTheme") {
             if (propertyValue.isObject()) {
                 helpers::assertThat(rt, propertyValue.asObject(rt).isFunction(rt), "initialTheme configuration must be either a string or a function.");
-                
+
                 auto result = propertyValue.asObject(rt).asFunction(rt).call(rt);
-                
+
                 helpers::assertThat(rt, result.isString(), "initialTheme resolved from function is not a string. Please check your initialTheme function.");
-                
+
                 return registry.setInitialThemeName(rt, result.asString(rt).utf8(rt));
             }
 
@@ -177,16 +177,16 @@ void HybridStyleSheet::setThemeFromColorScheme(jsi::Runtime& rt) {
 
 void HybridStyleSheet::loadExternalMethods(const jsi::Value& thisValue, jsi::Runtime& rt) {
     auto jsMethods = thisValue.getObject(rt).getProperty(rt, "jsMethods");
-    
+
     helpers::assertThat(rt, jsMethods.isObject(), "can't find jsMethods.");
-    
+
     auto maybeProcessColorFn = jsMethods.asObject(rt).getProperty(rt, "processColor");
-    
+
     helpers::assertThat(rt, maybeProcessColorFn.isObject(), "can't load processColor function from JS.");
 
     auto processColorFn = maybeProcessColorFn.asObject(rt).asFunction(rt);
     auto& registry = core::UnistylesRegistry::get();
     auto& state = registry.getState(rt);
-    
+
     state.registerProcessColorFunction(std::move(processColorFn));
 }
