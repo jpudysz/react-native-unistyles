@@ -1,15 +1,19 @@
 #pragma once
 
 #include <jsi/jsi.h>
+#include <react/renderer/uimanager/UIManager.h>
 #include <unordered_map>
 #include <unordered_set>
 #include "Breakpoints.h"
+#include "StyleSheet.h"
+#include "Unistyle.h"
 
 namespace margelo::nitro::unistyles::core {
 
 struct UnistylesState;
 
 using namespace facebook;
+using namespace facebook::react;
 
 struct UnistylesRegistry {
     static UnistylesRegistry& get();
@@ -30,6 +34,8 @@ private:
     UnistylesRegistry() = default;
 
     std::unordered_map<jsi::Runtime*, UnistylesState> _states{};
+    std::vector<core::StyleSheet> _styleSheetRegistry{};
+    std::unordered_map<const ShadowNodeFamily*, std::vector<const core::Unistyle*>> _shadowRegistry{};
 };
 
 UnistylesRegistry& UnistylesRegistry::get() {
