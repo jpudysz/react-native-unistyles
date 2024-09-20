@@ -259,21 +259,15 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         }
     }
 
-    func setRootViewBackgroundColor(color: Double?) throws {
+    func setRootViewBackgroundColor(color: Double) throws {
         DispatchQueue.main.async {
             guard let presentedViewController = RCTPresentedViewController() else {
                 print("🦄 Unistyles: Couldn't set rootView backgroundColor")
 
                 return
             }
-            
-            guard let parsedColor = color else {
-                presentedViewController.view.backgroundColor = UIColor.fromInt(0)
-                
-                return
-            }
 
-            presentedViewController.view.backgroundColor = UIColor.fromInt(Int(parsedColor))
+            presentedViewController.view.backgroundColor = UIColor.fromInt(Int(color))
         }
     }
 
@@ -282,9 +276,9 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     }
 
     // not implemented for iOS as there are no such APIs
-    func setNavigationBarBackgroundColor(color: Double?) throws {}
+    func setNavigationBarBackgroundColor(color: Double) throws {}
     func setNavigationBarHidden(isHidden: Bool) throws {}
-    func setStatusBarBackgroundColor(color: Double?) throws {}
+    func setStatusBarBackgroundColor(color: Double) throws {}
 
     // implemented from JS
     func setImmersiveMode(isEnabled: Bool) throws {}

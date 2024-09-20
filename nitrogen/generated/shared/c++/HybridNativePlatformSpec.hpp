@@ -31,7 +31,6 @@ namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 #include "Orientation.hpp"
 #include <string>
 #include "Dimensions.hpp"
-#include <optional>
 #include "UnistylesNativeMiniRuntime.hpp"
 #include <functional>
 #include <vector>
@@ -75,10 +74,10 @@ namespace margelo::nitro::unistyles {
       virtual Dimensions getStatusBarDimensions() = 0;
       virtual Dimensions getNavigationBarDimensions() = 0;
       virtual bool getPrefersRtlDirection() = 0;
-      virtual void setRootViewBackgroundColor(std::optional<double> color) = 0;
-      virtual void setNavigationBarBackgroundColor(std::optional<double> color) = 0;
+      virtual void setRootViewBackgroundColor(double color) = 0;
+      virtual void setNavigationBarBackgroundColor(double color) = 0;
       virtual void setNavigationBarHidden(bool isHidden) = 0;
-      virtual void setStatusBarBackgroundColor(std::optional<double> color) = 0;
+      virtual void setStatusBarBackgroundColor(double color) = 0;
       virtual void setImmersiveMode(bool isEnabled) = 0;
       virtual UnistylesNativeMiniRuntime getMiniRuntime() = 0;
       virtual void registerPlatformListener(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>& callback) = 0;

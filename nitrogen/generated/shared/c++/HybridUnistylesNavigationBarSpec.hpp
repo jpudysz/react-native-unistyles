@@ -15,7 +15,7 @@
 
 
 
-#include <optional>
+
 
 namespace margelo::nitro::unistyles {
 
@@ -46,7 +46,7 @@ namespace margelo::nitro::unistyles {
 
     public:
       // Methods
-      virtual void setBackgroundColor(std::optional<double> color) = 0;
+      virtual void setBackgroundColor(double color) = 0;
       virtual void setHidden(bool isHidden) = 0;
 
     protected:

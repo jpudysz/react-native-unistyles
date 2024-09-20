@@ -1,6 +1,6 @@
 #include "HybridStatusBar.h"
 
-void HybridStatusBar::setBackgroundColor(std::optional<double> color) {
+void HybridStatusBar::setBackgroundColor(double color) {
     this->_nativePlatform.setStatusBarBackgroundColor(color);
 }
 

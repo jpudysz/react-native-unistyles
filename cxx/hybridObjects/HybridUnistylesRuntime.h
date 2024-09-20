@@ -49,15 +49,17 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     Orientation getOrientation() override;
     double getPixelRatio() override;
     double getFontScale() override;
+    int getCachedScreenWidth();
 
     void setTheme(const std::string &themeName) override;
     void setAdaptiveThemes(bool isEnabled) override;
     void setImmersiveMode(bool isEnabled) override;
-    void setRootViewBackgroundColor(std::optional<double> color) override;
+    void setRootViewBackgroundColor(double color) override;
     UnistylesCxxMiniRuntime getMiniRuntime() override;
 
 private:
     jsi::Runtime* _rt;
+    int _lastKnownScreenWidth = 0;
     std::shared_ptr<HybridNavigationBar> _navigationBar;
     std::shared_ptr<HybridStatusBar> _statusBar;
     Unistyles::HybridNativePlatformSpecCxx _nativePlatform;

@@ -1,6 +1,6 @@
 #include "HybridNavigationBar.h"
 
-void HybridNavigationBar::setBackgroundColor(std::optional<double> color) {
+void HybridNavigationBar::setBackgroundColor(double color) {
     this->_nativePlatform.setNavigationBarBackgroundColor(color);
 };
 

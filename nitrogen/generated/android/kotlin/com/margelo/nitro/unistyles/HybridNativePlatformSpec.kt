@@ -78,11 +78,11 @@ abstract class HybridNativePlatformSpec: HybridObject() {
   
   @DoNotStrip
   @Keep
-  abstract fun setRootViewBackgroundColor(color: Double?): Unit
+  abstract fun setRootViewBackgroundColor(color: Double): Unit
   
   @DoNotStrip
   @Keep
-  abstract fun setNavigationBarBackgroundColor(color: Double?): Unit
+  abstract fun setNavigationBarBackgroundColor(color: Double): Unit
   
   @DoNotStrip
   @Keep
@@ -90,7 +90,7 @@ abstract class HybridNativePlatformSpec: HybridObject() {
   
   @DoNotStrip
   @Keep
-  abstract fun setStatusBarBackgroundColor(color: Double?): Unit
+  abstract fun setStatusBarBackgroundColor(color: Double): Unit
   
   @DoNotStrip
   @Keep

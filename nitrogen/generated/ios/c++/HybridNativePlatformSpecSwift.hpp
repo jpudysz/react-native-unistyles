@@ -30,7 +30,6 @@ namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 #include "Orientation.hpp"
 #include <string>
 #include "Dimensions.hpp"
-#include <optional>
 #include "UnistylesNativeMiniRuntime.hpp"
 #include <functional>
 #include <vector>
@@ -119,17 +118,17 @@ namespace margelo::nitro::unistyles {
       auto __result = _swiftPart.getPrefersRtlDirection();
       return __result;
     }
-    inline void setRootViewBackgroundColor(std::optional<double> color) override {
-      _swiftPart.setRootViewBackgroundColor(color);
+    inline void setRootViewBackgroundColor(double color) override {
+      _swiftPart.setRootViewBackgroundColor(std::forward<decltype(color)>(color));
     }
-    inline void setNavigationBarBackgroundColor(std::optional<double> color) override {
-      _swiftPart.setNavigationBarBackgroundColor(color);
+    inline void setNavigationBarBackgroundColor(double color) override {
+      _swiftPart.setNavigationBarBackgroundColor(std::forward<decltype(color)>(color));
     }
     inline void setNavigationBarHidden(bool isHidden) override {
       _swiftPart.setNavigationBarHidden(std::forward<decltype(isHidden)>(isHidden));
     }
-    inline void setStatusBarBackgroundColor(std::optional<double> color) override {
-      _swiftPart.setStatusBarBackgroundColor(color);
+    inline void setStatusBarBackgroundColor(double color) override {
+      _swiftPart.setStatusBarBackgroundColor(std::forward<decltype(color)>(color));
     }
     inline void setImmersiveMode(bool isEnabled) override {
       _swiftPart.setImmersiveMode(std::forward<decltype(isEnabled)>(isEnabled));

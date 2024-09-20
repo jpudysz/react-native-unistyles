@@ -1,8 +1,7 @@
 import Foundation
 
 extension UIColor {
-    public static func fromInt(_ value: Int?) -> UIColor {
-        let color = value ?? 0
+    public static func fromInt(_ color: Int) -> UIColor {
         let red = CGFloat((color >> 16) & 0xFF) / 255.0
         let green = CGFloat((color >> 8) & 0xFF) / 255.0
         let blue = CGFloat(color & 0xFF) / 255.0

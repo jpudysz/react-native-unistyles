@@ -38,14 +38,6 @@ namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 namespace margelo::nitro::unistyles::bridge::swift {
 
   /**
-   * Specialized version of `std::optional<double>`.
-   */
-  using std__optional_double_ = std::optional<double>;
-  inline std::optional<double> create_std__optional_double_(const double& value) {
-    return std::optional<double>(value);
-  }
-  
-  /**
    * Specialized version of `std::vector<UnistyleDependency>`.
    */
   using std__vector_UnistyleDependency_ = std::vector<UnistyleDependency>;
