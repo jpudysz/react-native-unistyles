@@ -83,10 +83,10 @@ void core::UnistylesState::registerProcessColorFunction(jsi::Function&& fn) {
     this->_processColorFn = std::make_shared<jsi::Function>(std::move(fn));
 }
 
-int core::UnistylesState::parseColor(std::optional<std::string> color) {
-    if (!color.has_value()) {
+int core::UnistylesState::parseColor(jsi::Value& maybeColor) {
+    if (!maybeColor.isString()) {
         return 0;
     }
 
-    return this->_processColorFn.get()->call(*_rt, color.value()).asNumber();
+    return this->_processColorFn.get()->call(*_rt, maybeColor.asString(*_rt)).asNumber();
 }
