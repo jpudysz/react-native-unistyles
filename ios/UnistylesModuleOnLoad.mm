@@ -1,6 +1,7 @@
 #import "UnistylesModuleOnLoad.h"
 #import <NitroModules/HybridObjectRegistry.hpp>
 #import "HybridUnistylesRuntime.h"
+#import "HybridShadowRegistry.h"
 #import "HybridMiniRuntime.h"
 #import "HybridStatusBar.h"
 #import "HybridNavigationBar.h"
@@ -9,30 +10,34 @@
 
 using namespace margelo::nitro;
 
-@implementation UnistylesModule {
-    __weak id<RCTSurfacePresenterStub> _surfacePresenter;
-}
+@implementation UnistylesModule
 
-// manually register TurboModule as Nitro also requires +load method
-RCT_EXTERN void RCTRegisterModule(Class);
-
-@synthesize bridge = _bridge;
+RCT_EXPORT_MODULE(Unistyles)
 
 + (BOOL)requiresMainQueueSetup {
     return YES;
 }
 
-+ (NSString *)moduleName {
-    return @"Unistyles";
+- (void)installJSIBindingsWithRuntime:(jsi::Runtime&)rt {
+    // function is called on: first init and every live reload
+    // check if this is live reload, if so let's replace UnistylesRuntime with new runtime
+    auto hasUnistylesRuntime = HybridObjectRegistry::hasHybridObject("UnistylesRuntime");
+
+    if (hasUnistylesRuntime) {
+        HybridObjectRegistry::unregisterHybridObjectConstructor("UnistylesRuntime");
+        HybridObjectRegistry::unregisterHybridObjectConstructor("StatusBar");
+        HybridObjectRegistry::unregisterHybridObjectConstructor("NavigationBar");
+        HybridObjectRegistry::unregisterHybridObjectConstructor("StyleSheet");
+        HybridObjectRegistry::unregisterHybridObjectConstructor("ShadowRegistry");
+    }
+
+    [self createHybrids:rt];
 }
 
-+ (void)load  {
-    // init React Native Turbo Module
-    RCTRegisterModule(self);
-    
-    // init all Nitro Hybrids
+- (void)createHybrids:(jsi::Runtime&)rt {
     auto nativePlatform = Unistyles::NativePlatform::create();
-    auto unistylesRuntime = std::make_shared<HybridUnistylesRuntime>(nativePlatform);
+    auto unistylesRuntime = std::make_shared<HybridUnistylesRuntime>(nativePlatform, rt);
+    auto shadowRegistry = std::make_shared<HybridShadowRegistry>();
 
     HybridObjectRegistry::registerHybridObjectConstructor("UnistylesRuntime", [unistylesRuntime]() -> std::shared_ptr<HybridObject>{
         return unistylesRuntime;
@@ -46,28 +51,13 @@ RCT_EXTERN void RCTRegisterModule(Class);
     HybridObjectRegistry::registerHybridObjectConstructor("StyleSheet", [nativePlatform, unistylesRuntime]() -> std::shared_ptr<HybridObject>{
         return std::make_shared<HybridStyleSheet>(nativePlatform, unistylesRuntime);
     });
-}
-
-- (void)setSurfacePresenter:(id<RCTSurfacePresenterStub>)surfacePresenter {
-    _surfacePresenter = surfacePresenter;
-}
-
-- (void)setBridge:(RCTBridge *)bridge {
-    _bridge = bridge;
-
-    // todo
-    // grab runtime at any time
-    // jsi::Runtime* runtime = reinterpret_cast<jsi::Runtime*>(_bridge.runtime);
+    HybridObjectRegistry::registerHybridObjectConstructor("ShadowRegistry", [shadowRegistry]() -> std::shared_ptr<HybridObject>{
+        return shadowRegistry;
+    });
 }
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:(const facebook::react::ObjCTurboModule::InitParams &)params {
     return std::make_shared<facebook::react::NativeTurboUnistylesSpecJSI>(params);
-}
-
-- (void)updateLayoutPropsWithViewTag:(NSNumber *)viewTag props:(NSDictionary *)uiProps {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self->_surfacePresenter synchronouslyUpdateViewOnUIThread:viewTag props:uiProps];
-    });
 }
 
 @end

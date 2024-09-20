@@ -157,6 +157,6 @@
   "codegenConfig": {
     "name": "TurboUnistyles",
     "type": "modules",
-    "jsSrcsDir": "./src/specs/HybridUnistyles"
+    "jsSrcsDir": "./src/specs/NativeUnistyles"
   }
 }

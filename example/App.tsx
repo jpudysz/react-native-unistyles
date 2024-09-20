@@ -1,14 +1,13 @@
-import React, { useRef } from 'react'
-import { Text, View } from 'react-native'
-import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
+import React, { useRef, useState } from 'react'
+import { Button, Text, View } from 'react-native'
+import { StyleSheet, UnistylesRuntime, ShadowRegistry } from 'react-native-unistyles'
 import './unistyles'
 
 export const App = () => {
+    const [, setCount] = useState(0)
     const renderCount = useRef(0)
-    // fix bug with attaching methods to styles
     // styles.addVariants({
-    //     color: 'blue',
-    //     size: 'small'
+    //     color: 'primary'
     // })
 
     return (
@@ -16,20 +15,33 @@ export const App = () => {
             style={styles.container}
             ref={ref => {
                 if (ref) {
-                    styles.container.uni__addNode(ref.__nativeTag)
+                    //tag
+                    ShadowRegistry.add(styles.container, ref)
                 }
 
                 return () => {
-                    styles.container.uni__removeNode(ref.__nativeTag)
+                    ShadowRegistry.remove(styles.container, ref)
                 }
             }}
         >
-            <Text style={styles.text}>
+            <Text
+                style={styles.text}
+                ref={ref => {
+                    if (ref) {
+                        ShadowRegistry.add(styles.text, ref)
+                    }
+
+                    return () => {
+                        ShadowRegistry.remove(styles.text, ref)
+                    }
+                }}
+            >
                 Screen: {UnistylesRuntime.screen.width}x{UnistylesRuntime.screen.height}
             </Text>
             <Text style={styles.text}>
                 Render count: {++renderCount.current}
             </Text>
+            <Button title="Re-render" onPress={() => setCount(count => count + 1)} />
         </View>
     )
 }
@@ -37,9 +49,19 @@ export const App = () => {
 const styles = StyleSheet.create((theme, rt) => ({
     container: {
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: rt.orientation == 'portrait'
+            ? 'center'
+            : 'flex-end',
         alignItems: 'center',
-        backgroundColor: theme.colors.accent,
+        opacity: rt.orientation == 'portrait'
+            ? 1
+            : 0.5,
+        backgroundColor: rt.orientation == 'portrait'
+            ? theme.colors.barbie
+            : theme.colors.fog,
+        borderRadius: rt.orientation == 'portrait'
+            ? 0
+            : 10,
         width: rt.screen.width / 2,
         height: rt.screen.height / 2,
         uni__dependencies: [2, 6]

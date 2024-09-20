@@ -2,8 +2,6 @@
 
 #include <cmath>
 #include <jsi/jsi.h>
-#include <react/renderer/uimanager/UIManagerBinding.h>
-#include <react/renderer/uimanager/UIManager.h>
 #include "HybridStyleSheetSpec.hpp"
 #include "HybridUnistylesRuntime.h"
 #include "HybridMiniRuntime.h"
@@ -13,7 +11,8 @@
 #include "Breakpoints.h"
 #include "StyleSheetRegistry.h"
 #include "HostStyle.h"
-#include "ShadowTreeTraverser.h"
+#include "ShadowTreeManager.h"
+#include "ViewUpdate.h"
 
 using namespace margelo::nitro::unistyles;
 
