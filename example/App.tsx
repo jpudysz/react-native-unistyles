@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { Button, Text, View } from 'react-native'
-import { StyleSheet } from 'react-native-unistyles'
+import { StyleSheet, UnistylesShadowRegistry } from 'react-native-unistyles'
 import './unistyles'
 
 export const App = () => {
@@ -8,7 +8,16 @@ export const App = () => {
     const renderCount = useRef(0)
 
     return (
-        <View style={styles.container}>
+        <View
+            style={styles.container}
+            ref={ref => {
+                UnistylesShadowRegistry.add(ref, styles.container)
+
+                return () => {
+                    UnistylesShadowRegistry.remove(ref, styles.container)
+                }
+            }}
+        >
             <Text style={styles.text}>
                 Render count: {++renderCount.current}
             </Text>

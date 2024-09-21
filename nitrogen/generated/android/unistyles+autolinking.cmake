@@ -29,6 +29,7 @@ target_sources(
   # Shared Nitrogen C++ sources
   ../nitrogen/generated/shared/c++/HybridNativePlatformSpec.cpp
   ../nitrogen/generated/shared/c++/HybridUnistylesNavigationBarSpec.cpp
+  ../nitrogen/generated/shared/c++/HybridUnistylesShadowRegistrySpec.cpp
   ../nitrogen/generated/shared/c++/HybridUnistylesStatusBarSpec.cpp
   ../nitrogen/generated/shared/c++/HybridUnistylesStyleSheetSpec.cpp
   ../nitrogen/generated/shared/c++/HybridUnistylesRuntimeSpec.cpp
