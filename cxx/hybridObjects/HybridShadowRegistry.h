@@ -1,6 +1,10 @@
 #pragma once
 
 #include "HybridUnistylesShadowRegistrySpec.hpp"
+#include <react/renderer/uimanager/primitives.h>
+#include "UnistyleWrapper.h"
+#include "UnistylesState.h"
+#include "UnistylesRegistry.h"
 
 namespace margelo::nitro::unistyles {
 

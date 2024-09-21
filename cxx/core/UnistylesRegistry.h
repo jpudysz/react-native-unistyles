@@ -29,13 +29,15 @@ struct UnistylesRegistry {
     
     UnistylesState& getState(jsi::Runtime& rt);
     void createState(jsi::Runtime& rt);
+    void linkShadowNodeWithUnistyle(const ShadowNodeFamily*, const core::Unistyle::Shared);
+    void unlinkShadowNodeWithUnistyle(const ShadowNodeFamily*, const core::Unistyle::Shared);
     
 private:
     UnistylesRegistry() = default;
 
     std::unordered_map<jsi::Runtime*, UnistylesState> _states{};
     std::vector<core::StyleSheet> _styleSheetRegistry{};
-    std::unordered_map<const ShadowNodeFamily*, std::vector<const core::Unistyle*>> _shadowRegistry{};
+    std::unordered_map<const ShadowNodeFamily*, std::vector<core::Unistyle::Shared>> _shadowRegistry{};
 };
 
 UnistylesRegistry& UnistylesRegistry::get() {

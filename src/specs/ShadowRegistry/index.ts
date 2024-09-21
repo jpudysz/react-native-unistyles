@@ -27,7 +27,7 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
 }
 
 HybridShadowRegistry.add = (handle, style) => {
-    if (!handle || !style?.__uid) {
+    if (!handle || !style?.__unid) {
         return
     }
 
@@ -35,7 +35,7 @@ HybridShadowRegistry.add = (handle, style) => {
 }
 
 HybridShadowRegistry.remove = (handle, style) => {
-    if (!handle || !style?.__uid) {
+    if (!handle || !style?.__unid) {
         return
     }
 
