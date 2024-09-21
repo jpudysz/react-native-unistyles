@@ -18,6 +18,8 @@ namespace margelo::nitro::unistyles { class HybridNativePlatformSpec; }
 namespace margelo::nitro::unistyles { class HybridUnistylesNavigationBarSpec; }
 // Forward declaration of `HybridUnistylesRuntimeSpec` to properly resolve imports.
 namespace margelo::nitro::unistyles { class HybridUnistylesRuntimeSpec; }
+// Forward declaration of `HybridUnistylesShadowRegistrySpec` to properly resolve imports.
+namespace margelo::nitro::unistyles { class HybridUnistylesShadowRegistrySpec; }
 // Forward declaration of `HybridUnistylesStatusBarSpec` to properly resolve imports.
 namespace margelo::nitro::unistyles { class HybridUnistylesStatusBarSpec; }
 // Forward declaration of `HybridUnistylesStyleSheetSpec` to properly resolve imports.
@@ -39,6 +41,7 @@ namespace margelo::nitro::unistyles { struct UnistylesNativeMiniRuntime; }
 #include "HybridNativePlatformSpec.hpp"
 #include "HybridUnistylesNavigationBarSpec.hpp"
 #include "HybridUnistylesRuntimeSpec.hpp"
+#include "HybridUnistylesShadowRegistrySpec.hpp"
 #include "HybridUnistylesStatusBarSpec.hpp"
 #include "HybridUnistylesStyleSheetSpec.hpp"
 #include "Insets.hpp"
@@ -68,6 +71,8 @@ namespace Unistyles { class HybridNativePlatformSpecCxx; }
 namespace Unistyles { class HybridUnistylesNavigationBarSpecCxx; }
 // Forward declaration of `HybridUnistylesRuntimeSpecCxx` to properly resolve imports.
 namespace Unistyles { class HybridUnistylesRuntimeSpecCxx; }
+// Forward declaration of `HybridUnistylesShadowRegistrySpecCxx` to properly resolve imports.
+namespace Unistyles { class HybridUnistylesShadowRegistrySpecCxx; }
 // Forward declaration of `HybridUnistylesStatusBarSpecCxx` to properly resolve imports.
 namespace Unistyles { class HybridUnistylesStatusBarSpecCxx; }
 // Forward declaration of `HybridUnistylesStyleSheetSpecCxx` to properly resolve imports.

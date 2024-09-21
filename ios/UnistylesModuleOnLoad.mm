@@ -2,6 +2,7 @@
 #import <NitroModules/HybridObjectRegistry.hpp>
 #import "HybridUnistylesRuntime.h"
 #import "HybridStyleSheet.h"
+#import "HybridShadowRegistry.h"
 
 using namespace margelo::nitro;
 
@@ -36,6 +37,9 @@ RCT_EXPORT_MODULE(Unistyles)
     });
     HybridObjectRegistry::registerHybridObjectConstructor("UnistylesStyleSheet", [styleSheet]() -> std::shared_ptr<HybridObject>{
         return styleSheet;
+    });
+    HybridObjectRegistry::registerHybridObjectConstructor("UnistylesShadowRegistry", []() -> std::shared_ptr<HybridObject>{
+        return std::make_shared<HybridShadowRegistry>();
     });
 }
 
