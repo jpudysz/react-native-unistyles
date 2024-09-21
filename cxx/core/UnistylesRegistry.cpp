@@ -69,3 +69,20 @@ void core::UnistylesRegistry::updateTheme(jsi::Runtime& rt, std::string& themeNa
 
     it->second = jsi::WeakObject(rt, result.asObject(rt));
 }
+
+void core::UnistylesRegistry::linkShadowNodeWithUnistyle(const ShadowNodeFamily* shadowNodeFamily, const core::Unistyle::Shared unistyle) {
+    if (!this->_shadowRegistry.contains(shadowNodeFamily)) {
+        this->_shadowRegistry[shadowNodeFamily] = {};
+    }
+    
+    this->_shadowRegistry[shadowNodeFamily].emplace_back(unistyle);
+}
+
+void core::UnistylesRegistry::unlinkShadowNodeWithUnistyle(const ShadowNodeFamily* shadowNodeFamily, const core::Unistyle::Shared unistyle) {
+    auto& unistylesVec = this->_shadowRegistry[shadowNodeFamily];
+    auto it = std::find(unistylesVec.begin(), unistylesVec.end(), unistyle);
+    
+    if (it != unistylesVec.end()) {
+        this->_shadowRegistry[shadowNodeFamily].erase(it);
+    }
+}

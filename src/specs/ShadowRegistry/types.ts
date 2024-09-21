@@ -25,5 +25,5 @@ export type ViewHandle = {
 }
 
 export type Unistyle = {
-    __uid?: number
+    __unid?: number
 }
