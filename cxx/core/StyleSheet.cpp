@@ -45,7 +45,3 @@ void core::StyleSheet::addOrUpdateVariant(std::string variantName, std::string v
     // update
     it->second = variantValue;
 }
-
-void core::StyleSheet::rebuildUnistyles(jsi::Runtime& rt) {
-    // todo
-}

@@ -69,4 +69,25 @@ inline jsi::Object& mergeJSIObjects(jsi::Runtime&rt, jsi::Object& obj1, jsi::Obj
     return obj1;
 }
 
+inline void iterateJSIArray(jsi::Runtime& rt, const jsi::Array& array, std::function<void(size_t, jsi::Value&)> callback) {
+    size_t length = array.size(rt);
+
+    for (size_t i = 0; i < length; i++) {
+        auto value = array.getValueAtIndex(rt, i);
+
+        callback(i, value);
+    }
+}
+
+inline bool isPlatformColor(jsi::Runtime& rt, jsi::Object& maybePlatformColor) {
+    auto isIOSPlatformColor = maybePlatformColor.hasProperty(rt, "semantic") && maybePlatformColor.getProperty(rt, "semantic").isObject();
+
+    if (isIOSPlatformColor) {
+        return true;
+    }
+
+    // Android
+    return maybePlatformColor.hasProperty(rt, "resource_paths") && maybePlatformColor.getProperty(rt, "resource_paths").isObject();
+}
+
 }

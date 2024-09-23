@@ -41,7 +41,6 @@ struct StyleSheet {
     std::vector<std::pair<std::string, std::string>> variants{};
     
     void addVariants(jsi::Runtime& rt, jsi::Value&& variants);
-    void rebuildUnistyles(jsi::Runtime& rt);
     
 private:
     void addOrUpdateVariant(std::string variantName, std::string variantValue);
