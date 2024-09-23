@@ -18,26 +18,10 @@ export const toReactNativeClassName = (className: string, values: UnistylesValue
         configurable: true
     })))
 
-    return new Proxy(returnValue, {
-        get: (target, prop) => {
-            if (!keyInObject(target, prop)) {
-                return undefined
-            }
-
-            const value = target[prop]
-
-            if (!isServer() && typeof value === 'string' && value.startsWith('var(--')) {
-                return window.getComputedStyle(document.documentElement).getPropertyValue(value.slice(4, -1))
-            }
-
-            return value
-        }
-    })
+    return returnValue
 }
 
 export const keyInObject = <T extends Record<string, any>>(obj: T, key: PropertyKey): key is keyof T => key in obj
-
-export const camelToKebab = (str: string) => str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase()
 
 export const schemeToTheme = (scheme: ColorScheme): AppThemeName => {
     switch (scheme) {

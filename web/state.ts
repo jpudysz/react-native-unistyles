@@ -1,20 +1,17 @@
-import { createTypeStyle } from 'typestyle'
 import { type ReactElement, createElement, createRef } from 'react'
 import type { UnistylesTheme } from '../src/types'
 import type { UnistylesConfig } from '../src/specs/StyleSheet'
 import type { AppBreakpoint, AppThemeName } from '../src/specs/types'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../src/global'
 import { UnistylesRuntime } from './runtime'
-import { camelToKebab, isServer, reduceObject, schemeToTheme } from './utils'
+import { isServer, schemeToTheme } from './utils'
+import { UnistyleDependency, UnistylesListener } from './listener'
 
 class UnistylesStateBuilder {
     private readonly isSSR = isServer()
     readonly tags = [] as Array<ReactElement>
 
-    rawThemes?: UnistylesThemes
     themes = new Map<string, UnistylesTheme>()
-    private themeStyleTag = this.createTag()
-    private themesStyleSheet = createTypeStyle(this.themeStyleTag)
     themeName?: AppThemeName
 
     breakpoint?: AppBreakpoint
@@ -23,9 +20,7 @@ class UnistylesStateBuilder {
     hasAdaptiveThemes = false
 
     init = (config: UnistylesConfig) => {
-        this.rawThemes = config.themes
-
-        this.updateThemes()
+        this.initThemes(config.themes)
         this.initBreakpoints(config.breakpoints)
         this.initSettings(config.settings)
 
@@ -33,31 +28,19 @@ class UnistylesStateBuilder {
             return
         }
 
+        UnistylesListener.initListeners()
         document.documentElement.classList.add(this.themeName ?? '')
     }
 
-    updateThemes = () => {
-        this.themesStyleSheet.reinit()
-        Object.entries(this.rawThemes ?? {}).forEach(([themeName, theme]) => {
-            const parsedTheme = reduceObject(theme, (themePropertyValue, themeProperty) => {
-                if (themeProperty === 'colors') {
-                    const parsedColors = Object.fromEntries(Object.entries(themePropertyValue).map(([colorName, colorValue]) => [`--${String(colorName)}`, colorValue]))
-
-                    this.themesStyleSheet.cssRule(`:root.${themeName}`, parsedColors)
-
-                    return reduceObject(themePropertyValue, (_colorValue, colorName) => `var(--${camelToKebab(String(colorName))})`)
-                }
-
-                return themePropertyValue
-            })
-
-            this.themes.set(themeName, parsedTheme as UnistylesTheme)
+    private initThemes = (themes = {} as UnistylesThemes) => {
+        Object.entries(themes).forEach(([themeName, theme]) => {
+            this.themes.set(themeName, theme)
         })
     }
 
     private initSettings = (settings: UnistylesConfig['settings']) => {
         this.hasAdaptiveThemes = settings?.adaptiveThemes ?? false
-        const themeNames = Object.keys(this.rawThemes ?? {}) as Array<AppThemeName>
+        const themeNames = Array.from(this.themes.keys()) as Array<AppThemeName>
 
         // Single theme + no settings
         if (!settings?.adaptiveThemes && !settings?.initialTheme && themeNames.length === 1) {
@@ -107,12 +90,14 @@ class UnistylesStateBuilder {
 
                         if (currentBreakpoint) {
                             this.breakpoint = currentBreakpoint as AppBreakpoint
+                            UnistylesListener.emitChange(UnistyleDependency.Breakpoints)
                         }
 
                         return
                     }
 
                     this.breakpoint = breakpoint as AppBreakpoint
+                    UnistylesListener.emitChange(UnistyleDependency.Breakpoints)
                 })
             })
     }

@@ -52,7 +52,7 @@ const common = {
     alignItems: 'center'
 } as const
 
-const styles = StyleSheet.create(theme => ({
+const styles = StyleSheet.create((theme, rt) => ({
     container: {
         flex: 1,
         display: 'flex'
@@ -66,10 +66,12 @@ const styles = StyleSheet.create(theme => ({
     },
     theme: {
         backgroundColor: theme.colors.backgroundColor,
+        uni__dependencies: [0],
         ...common
     },
     themeText: {
-        color: theme.colors.typography
+        color: theme.colors.typography,
+        uni__dependencies: [0],
     },
     themeButtonsContainer: {
         marginTop: 20,
@@ -78,11 +80,13 @@ const styles = StyleSheet.create(theme => ({
     },
     dynamic: (state: number) => ({
         backgroundColor: state % 2 === 0 ? theme.colors.fog : theme.colors.oak,
+        uni__dependencies: [0],
         ...common
     }),
     whiteText: {
         color: 'white',
         textAlign: 'center',
+        uni__dependencies: [0],
     },
     hover: {
         ...common,
@@ -93,6 +97,7 @@ const styles = StyleSheet.create(theme => ({
                 backgroundColor: theme.colors.sky
             }
         },
+        uni__dependencies: [0],
     },
     breakpoint: {
         ...common,
@@ -100,6 +105,19 @@ const styles = StyleSheet.create(theme => ({
             xs: theme.colors.blood,
             md: theme.colors.sky,
             xl: theme.colors.aloes,
-        }
+        },
+        position: 'relative',
+        _web: {
+            _after: {
+                fontWeight: 'bold',
+                content: `"Current breakpoint: ${rt.breakpoint}"`,
+                color: 'white',
+                position: 'absolute',
+                top: '60%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+            }
+        },
+        uni__dependencies: [0, 1],
     }
 }))
