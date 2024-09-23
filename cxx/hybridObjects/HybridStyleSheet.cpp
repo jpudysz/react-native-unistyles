@@ -10,9 +10,22 @@ double HybridStyleSheet::getHairlineWidth() {
 jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
     helpers::assertThat(rt, arguments[0].isObject(), "expected to be called with object or function.");
 
-    // todo
+    auto thisStyleSheet = thisVal.asObject(rt);
+    auto styleSheetId = thisStyleSheet.getProperty(rt, helpers::UNISTYLES_ID.c_str());
+    auto& registry = core::UnistylesRegistry::get();
 
-    return arguments[0].asObject(rt);
+    // this might happen only when hot reloading
+    if (!styleSheetId.isUndefined()) {
+        registry.removeStyleSheet(styleSheetId.asNumber());
+    }
+    
+    jsi::Object rawStyleSheet = arguments[0].asObject(rt);
+    core::StyleSheet& registeredStyleSheet = registry.addStyleSheetFromValue(rt, std::move(rawStyleSheet));
+    
+    // attach unique ID
+    helpers::defineHiddenProperty(rt, thisStyleSheet, helpers::UNISTYLES_ID.c_str(), jsi::Value(registeredStyleSheet.tag));
+
+    return std::move(registeredStyleSheet.rawValue);
 }
 
 jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
