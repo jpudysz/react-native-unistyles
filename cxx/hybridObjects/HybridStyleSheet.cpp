@@ -20,12 +20,14 @@ jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal,
     }
     
     jsi::Object rawStyleSheet = arguments[0].asObject(rt);
-    core::StyleSheet& registeredStyleSheet = registry.addStyleSheetFromValue(rt, std::move(rawStyleSheet));
+    auto registeredStyleSheet = registry.addStyleSheetFromValue(rt, std::move(rawStyleSheet));
     
-    // attach unique ID
-    helpers::defineHiddenProperty(rt, thisStyleSheet, helpers::UNISTYLES_ID.c_str(), jsi::Value(registeredStyleSheet.tag));
+    registeredStyleSheet->rebuildUnistyles(rt);
+    
+    auto style = std::make_shared<core::HostStyle>(registeredStyleSheet);
+    auto styleHostObject = jsi::Object::createFromHostObject(rt, style);
 
-    return std::move(registeredStyleSheet.rawValue);
+    return styleHostObject;
 }
 
 jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {

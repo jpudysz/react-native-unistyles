@@ -4,7 +4,7 @@
 using namespace margelo::nitro::unistyles::core;
 using namespace facebook;
 
-StyleSheet& StyleSheetRegistry::addStyleSheetFromValue(jsi::Runtime& rt, jsi::Object rawStyleSheet) {
+std::shared_ptr<StyleSheet> StyleSheetRegistry::addStyleSheetFromValue(jsi::Runtime& rt, jsi::Object rawStyleSheet) {
     static unsigned int tag = 0;
 
     if (rawStyleSheet.isFunction(rt)) {
@@ -14,7 +14,7 @@ StyleSheet& StyleSheetRegistry::addStyleSheetFromValue(jsi::Runtime& rt, jsi::Ob
     return this->addFromObject(rt, ++tag, std::move(rawStyleSheet));
 }
 
-StyleSheet& StyleSheetRegistry::addFromFunction(jsi::Runtime& rt, unsigned int tag, jsi::Function styleSheetFn) {
+std::shared_ptr<StyleSheet> StyleSheetRegistry::addFromFunction(jsi::Runtime& rt, unsigned int tag, jsi::Function styleSheetFn) {
     auto numberOfArgs = styleSheetFn.getProperty(rt, "length").getNumber();
 
     helpers::assertThat(rt, numberOfArgs <= 2, "expected up to 2 arguments.");
@@ -37,7 +37,7 @@ StyleSheet& StyleSheetRegistry::addFromFunction(jsi::Runtime& rt, unsigned int t
     return registry.addStyleSheet(tag, core::StyleSheetType::ThemableWithMiniRuntime, std::move(styleSheetFn));
 }
 
-StyleSheet& StyleSheetRegistry::addFromObject(jsi::Runtime& rt, unsigned int tag, jsi::Object rawStyleSheet) {
+std::shared_ptr<StyleSheet> StyleSheetRegistry::addFromObject(jsi::Runtime& rt, unsigned int tag, jsi::Object rawStyleSheet) {
     auto& registry = UnistylesRegistry::get();
     
     return registry.addStyleSheet(tag, core::StyleSheetType::Static, std::move(rawStyleSheet));
