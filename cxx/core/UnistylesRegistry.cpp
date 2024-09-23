@@ -87,18 +87,18 @@ void core::UnistylesRegistry::unlinkShadowNodeWithUnistyle(const ShadowNodeFamil
     }
 }
 
-core::StyleSheet& core::UnistylesRegistry::addStyleSheet(int tag, core::StyleSheetType type, jsi::Object&& rawValue) {
-    this->_styleSheetRegistry.emplace_back(tag, type, std::move(rawValue));
+std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(int tag, core::StyleSheetType type, jsi::Object&& rawValue) {
+    this->_styleSheetRegistry.emplace_back(std::make_shared<core::StyleSheet>(tag, type, std::move(rawValue)));
 
     return this->_styleSheetRegistry.back();
 }
 
 void core::UnistylesRegistry::removeStyleSheet(int tag) {
     auto it = std::find_if(
-        this->_styleSheetRegistry.cbegin(),
-        this->_styleSheetRegistry.cend(),
-        [tag](const StyleSheet& styleSheet){
-            return styleSheet.tag == tag;
+        this->_styleSheetRegistry.begin(),
+        this->_styleSheetRegistry.end(),
+        [tag](std::shared_ptr<StyleSheet> styleSheet){
+            return styleSheet->tag == tag;
         }
     );
 

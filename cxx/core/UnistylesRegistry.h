@@ -32,14 +32,14 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     void createState(jsi::Runtime& rt);
     void linkShadowNodeWithUnistyle(const ShadowNodeFamily*, const core::Unistyle::Shared);
     void unlinkShadowNodeWithUnistyle(const ShadowNodeFamily*, const core::Unistyle::Shared);
-    core::StyleSheet& addStyleSheet(int tag, core::StyleSheetType type, jsi::Object&& rawValue);
+    std::shared_ptr<core::StyleSheet> addStyleSheet(int tag, core::StyleSheetType type, jsi::Object&& rawValue);
     void removeStyleSheet(int tag);
     
 private:
     UnistylesRegistry() = default;
 
     std::unordered_map<jsi::Runtime*, UnistylesState> _states{};
-    std::vector<core::StyleSheet> _styleSheetRegistry{};
+    std::vector<std::shared_ptr<core::StyleSheet>> _styleSheetRegistry{};
     std::unordered_map<const ShadowNodeFamily*, std::vector<core::Unistyle::Shared>> _shadowRegistry{};
 };
 
