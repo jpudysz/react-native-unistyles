@@ -63,19 +63,6 @@ const styles = StyleSheet.create((theme, rt) => ({
     },
     staticText: {
         color: 'red',
-        position: 'relative',
-        uni__dependencies: [0, 6],
-        _web: {
-            _after: {
-                content: `"${rt.screen.width}px"`,
-                color: 'red',
-                width: 100,
-                height: 100,
-                position: 'absolute',
-                top: 20,
-                left: 0,
-            }
-        }
     },
     theme: {
         backgroundColor: theme.colors.backgroundColor,
@@ -119,6 +106,18 @@ const styles = StyleSheet.create((theme, rt) => ({
             md: theme.colors.sky,
             xl: theme.colors.aloes,
         },
-        uni__dependencies: [0],
+        position: 'relative',
+        _web: {
+            _after: {
+                fontWeight: 'bold',
+                content: `"Current breakpoint: ${rt.breakpoint}"`,
+                color: 'white',
+                position: 'absolute',
+                top: '60%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+            }
+        },
+        uni__dependencies: [0, 1],
     }
 }))
