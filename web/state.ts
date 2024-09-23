@@ -29,7 +29,6 @@ class UnistylesStateBuilder {
         }
 
         UnistylesListener.initListeners()
-        document.documentElement.classList.add(this.themeName ?? '')
     }
 
     private initThemes = (themes = {} as UnistylesThemes) => {
