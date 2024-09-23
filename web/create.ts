@@ -16,7 +16,7 @@ type ListenToDependenciesProps = {
 }
 
 export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
-    const computedStylesheet = typeof stylesheet === 'function' 
+    const computedStylesheet = typeof stylesheet === 'function'
         ? stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
         : stylesheet
 
@@ -27,7 +27,7 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
             return
         }
 
-        UnistylesListener.addListeners(dependencies, () => {
+        return UnistylesListener.addListeners(dependencies, () => {
             const newComputedStylesheet = typeof stylesheet === 'function'
                 ? stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
                 : stylesheet
@@ -48,13 +48,22 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
     const styles = reduceObject(computedStylesheet, (value, key) => {
         if (typeof value === 'function') {
             let className = ''
-            let stylesheet: TypeStyle | undefined
+            let unistyles: TypeStyle | undefined
+            let dispose: VoidFunction | undefined
 
             return (...args: Array<any>) => {
                 const result = value(...args)
 
-                if (stylesheet) {
-                    UnistylesRegistry.updateStyles(stylesheet, result, className)
+                if (unistyles) {
+                    dispose?.()
+                    UnistylesRegistry.updateStyles(unistyles, result, className)
+                    dispose = listenToDependencies({
+                        key,
+                        value,
+                        unistyles,
+                        className,
+                        args
+                    })
 
                     return toReactNativeClassName(className, result)
                 }
@@ -62,11 +71,11 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
                 const entry = UnistylesRegistry.createStyles(result, key)
 
                 className = entry.className
-                stylesheet = entry.unistyles
-                listenToDependencies({ 
+                unistyles = entry.unistyles
+                dispose = listenToDependencies({
                     key,
                     value,
-                    unistyles: stylesheet,
+                    unistyles,
                     className,
                     args
                 })
