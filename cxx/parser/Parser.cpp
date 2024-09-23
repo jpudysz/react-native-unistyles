@@ -3,6 +3,8 @@
 using namespace margelo::nitro::unistyles;
 using namespace facebook;
 
+using Variants = std::vector<std::pair<std::string, std::string>>;
+
 void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet) {
     jsi::Object unwrappedStyleSheet = this->unwrapStyleSheet(rt, styleSheet);
     
@@ -53,6 +55,27 @@ jsi::Object parser::Parser::unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<S
 
 void parser::Parser::parseUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet) {
     for (Unistyle::Shared unistyle : styleSheet->unistyles) {
+        if (unistyle->type == core::UnistyleType::Object) {
+            auto result = this->parseFirstLevel(rt, unistyle, styleSheet->variants);
+
+            unistyle->parsedStyle = std::move(result);
+        }
+
+        if (unistyle->type == core::UnistyleType::DynamicFunction) {
+            auto hostFn = this->createDynamicFunctionProxy(rt, unistyle, styleSheet->variants);
+
+            helpers::defineHiddenProperty(rt, *unistyle->parsedStyle, helpers::PROXY_FN_PREFIX + unistyle->styleKey, unistyle->rawValue.asFunction(rt));
+            unistyle->parsedStyle->setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle->styleKey), std::move(hostFn));
+        }
+    }
+}
+
+void parser::Parser::rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet) {
+    for (Unistyle::Shared unistyle : styleSheet->unistyles) {
+        if (!unistyle->dependsOn(UnistyleDependency::VARIANTS)) {
+            continue;
+        }
+        
         if (unistyle->type == core::UnistyleType::Object) {
             auto result = this->parseFirstLevel(rt, unistyle, styleSheet->variants);
 
@@ -525,4 +548,26 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, jsi::Value& nested
     });
 
     return parsedStyle;
+}
+
+Variants parser::Parser::variantsToPairs(jsi::Runtime& rt, jsi::Object&& variants) {
+    Variants pairs{};
+    
+    helpers::enumerateJSIObject(rt, variants, [&](const std::string& variantName, jsi::Value& variantValue){
+        if (variantValue.isUndefined() || variantValue.isNull()) {
+            return;
+        }
+
+        if (variantValue.isBool()) {
+            pairs.emplace_back(std::make_pair(variantName, variantValue.asBool() ? "true" : "false"));
+
+            return;
+        }
+
+        if (variantValue.isString()) {
+            pairs.emplace_back(std::make_pair(variantName, variantValue.asString(rt).utf8(rt)));
+        }
+    });
+    
+    return pairs;
 }

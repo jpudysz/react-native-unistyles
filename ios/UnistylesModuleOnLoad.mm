@@ -22,6 +22,7 @@ RCT_EXPORT_MODULE(Unistyles)
     if (hasUnistylesRuntime) {
         HybridObjectRegistry::unregisterHybridObjectConstructor("UnistylesRuntime");
         HybridObjectRegistry::unregisterHybridObjectConstructor("UnistylesStyleSheet");
+        HybridObjectRegistry::unregisterHybridObjectConstructor("UnistylesShadowRegistry");
     }
 
     [self createHybrids:rt];

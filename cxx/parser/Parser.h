@@ -1,7 +1,6 @@
 #pragma once
 
 #include <jsi/jsi.h>
-#include <jsi/JSIDynamic.h>
 #include <folly/dynamic.h>
 #include "Unistyle.h"
 #include "Dimensions.hpp"
@@ -23,6 +22,9 @@ struct Parser {
     
     void buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
     void parseUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
+    Variants variantsToPairs(jsi::Runtime& rt, jsi::Object&& variants);
+    void rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
+    
 private:
     jsi::Object unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
     jsi::Object parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared unistyle, Variants& variants);
