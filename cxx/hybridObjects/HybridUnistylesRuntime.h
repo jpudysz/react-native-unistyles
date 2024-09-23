@@ -50,6 +50,7 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     double getPixelRatio() override;
     double getFontScale() override;
     Dimensions getCachedScreenDimensions();
+    void registerPlatformListener(const std::function<void(std::vector<UnistyleDependency>)>& listener);
 
     void setTheme(const std::string &themeName) override;
     void setAdaptiveThemes(bool isEnabled) override;

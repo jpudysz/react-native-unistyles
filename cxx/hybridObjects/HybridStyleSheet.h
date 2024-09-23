@@ -14,7 +14,11 @@ using namespace margelo::nitro::unistyles;
 
 struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
     HybridStyleSheet(std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime)
-      : HybridObject(TAG), _unistylesRuntime{unistylesRuntime} {}
+      : HybridObject(TAG), _unistylesRuntime{unistylesRuntime} {
+          this->_unistylesRuntime->registerPlatformListener(
+              std::bind(&HybridStyleSheet::onPlatformDependenciesChange, this, std::placeholders::_1)
+          );
+      }
 
     jsi::Value create(jsi::Runtime& rt,
                       const jsi::Value& thisValue,
@@ -35,7 +39,7 @@ struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
     };
 
     double getHairlineWidth() override;
-
+    
 private:
     void parseSettings(jsi::Runtime& rt, jsi::Object settings);
     void parseBreakpoints(jsi::Runtime& rt, jsi::Object breakpoints);
@@ -43,6 +47,7 @@ private:
     void verifyAndSelectTheme(jsi::Runtime &rt);
     void setThemeFromColorScheme(jsi::Runtime& rt);
     void loadExternalMethods(const jsi::Value& thisValue, jsi::Runtime& rt);
+    void onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies);
 
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
 };

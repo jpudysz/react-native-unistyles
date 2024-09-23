@@ -18,15 +18,15 @@ jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal,
     if (!styleSheetId.isUndefined()) {
         registry.removeStyleSheet(styleSheetId.asNumber());
     }
-    
+
     jsi::Object rawStyleSheet = arguments[0].asObject(rt);
     auto registeredStyleSheet = registry.addStyleSheetFromValue(rt, std::move(rawStyleSheet));
-    
+
     auto parser = parser::Parser(this->_unistylesRuntime);
-    
+
     parser.buildUnistyles(rt, registeredStyleSheet);
     parser.parseUnistyles(rt, registeredStyleSheet);
-    
+
     auto style = std::make_shared<core::HostStyle>(registeredStyleSheet, this->_unistylesRuntime);
     auto styleHostObject = jsi::Object::createFromHostObject(rt, style);
 
@@ -207,4 +207,11 @@ void HybridStyleSheet::loadExternalMethods(const jsi::Value& thisValue, jsi::Run
     auto& state = registry.getState(rt);
 
     state.registerProcessColorFunction(std::move(processColorFn));
+}
+
+void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies) {
+    auto& registry = core::UnistylesRegistry::get();
+    auto parser = parser::Parser(this->_unistylesRuntime);
+
+    // todo
 }
