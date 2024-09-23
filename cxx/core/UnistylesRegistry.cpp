@@ -86,3 +86,26 @@ void core::UnistylesRegistry::unlinkShadowNodeWithUnistyle(const ShadowNodeFamil
         this->_shadowRegistry[shadowNodeFamily].erase(it);
     }
 }
+
+core::StyleSheet& core::UnistylesRegistry::addStyleSheet(int tag, core::StyleSheetType type, jsi::Object&& rawValue) {
+    this->_styleSheetRegistry.emplace_back(tag, type, std::move(rawValue));
+
+    return this->_styleSheetRegistry.back();
+}
+
+void core::UnistylesRegistry::removeStyleSheet(int tag) {
+    auto it = std::find_if(
+        this->_styleSheetRegistry.cbegin(),
+        this->_styleSheetRegistry.cend(),
+        [tag](const StyleSheet& styleSheet){
+            return styleSheet.tag == tag;
+        }
+    );
+
+    if (it == this->_styleSheetRegistry.cend()) {
+        throw std::runtime_error("stylesheet with tag: " + std::to_string(tag) + " cannot be found.");
+    }
+
+    this->_styleSheetRegistry.erase(it);
+}
+    

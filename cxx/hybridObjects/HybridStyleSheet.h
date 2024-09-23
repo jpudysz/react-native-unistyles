@@ -5,6 +5,7 @@
 #include "HybridUnistylesRuntime.h"
 #include "HybridUnistylesStyleSheetSpec.hpp"
 #include "Helpers.h"
+#include "Constants.h"
 #include "Breakpoints.h"
 
 using namespace margelo::nitro::unistyles;

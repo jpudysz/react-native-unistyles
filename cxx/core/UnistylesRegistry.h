@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include "Breakpoints.h"
+#include "StyleSheetRegistry.h"
 #include "StyleSheet.h"
 #include "Unistyle.h"
 
@@ -15,7 +16,7 @@ struct UnistylesState;
 using namespace facebook;
 using namespace facebook::react;
 
-struct UnistylesRegistry {
+struct UnistylesRegistry: public StyleSheetRegistry {
     static UnistylesRegistry& get();
     
     UnistylesRegistry(const UnistylesRegistry&) = delete;
@@ -31,6 +32,8 @@ struct UnistylesRegistry {
     void createState(jsi::Runtime& rt);
     void linkShadowNodeWithUnistyle(const ShadowNodeFamily*, const core::Unistyle::Shared);
     void unlinkShadowNodeWithUnistyle(const ShadowNodeFamily*, const core::Unistyle::Shared);
+    core::StyleSheet& addStyleSheet(int tag, core::StyleSheetType type, jsi::Object&& rawValue);
+    void removeStyleSheet(int tag);
     
 private:
     UnistylesRegistry() = default;
