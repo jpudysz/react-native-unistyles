@@ -179,3 +179,7 @@ jsi::Value HybridUnistylesRuntime::getMiniRuntimeAsValue(jsi::Runtime& rt) {
 
     return obj;
 }
+
+void HybridUnistylesRuntime::registerPlatformListener(const std::function<void(std::vector<UnistyleDependency>)>& listener) {
+    this->_nativePlatform.registerPlatformListener(listener);
+}
