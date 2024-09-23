@@ -22,7 +22,10 @@ jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal,
     jsi::Object rawStyleSheet = arguments[0].asObject(rt);
     auto registeredStyleSheet = registry.addStyleSheetFromValue(rt, std::move(rawStyleSheet));
     
-    registeredStyleSheet->rebuildUnistyles(rt);
+    auto parser = parser::Parser(this->_unistylesRuntime);
+    
+    parser.buildUnistyles(rt, registeredStyleSheet);
+    parser.parseUnistyles(rt, registeredStyleSheet);
     
     auto style = std::make_shared<core::HostStyle>(registeredStyleSheet);
     auto styleHostObject = jsi::Object::createFromHostObject(rt, style);
@@ -111,7 +114,7 @@ void HybridStyleSheet::parseBreakpoints(jsi::Runtime &rt, jsi::Object breakpoint
     auto& state = registry.getState(rt);
 
     registry.registerBreakpoints(rt, sortedBreakpoints);
-    state.computeCurrentBreakpoint(this->_unistylesRuntime->getCachedScreenWidth());
+    state.computeCurrentBreakpoint(this->_unistylesRuntime->getCachedScreenDimensions().width);
 }
 
 void HybridStyleSheet::parseThemes(jsi::Runtime &rt, jsi::Object themes) {

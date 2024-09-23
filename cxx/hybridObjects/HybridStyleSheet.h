@@ -8,6 +8,7 @@
 #include "Helpers.h"
 #include "Constants.h"
 #include "Breakpoints.h"
+#include "Parser.h"
 
 using namespace margelo::nitro::unistyles;
 
