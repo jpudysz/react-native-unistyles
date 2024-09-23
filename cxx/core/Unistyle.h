@@ -40,6 +40,10 @@ struct Unistyle {
     std::optional<jsi::Object> parsedStyle;
     std::vector<UnistyleDependency> dependencies{};
     std::optional<DynamicFunctionMetadata> dynamicFunctionMetadata = std::nullopt;
+    
+    bool dependsOn(UnistyleDependency dependency) {
+        return std::find(this->dependencies.begin(), this->dependencies.end(), dependency) != this->dependencies.end();
+    }
 };
 
 }

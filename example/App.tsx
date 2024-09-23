@@ -7,6 +7,10 @@ export const App = () => {
     const [, setCount] = useState(0)
     const renderCount = useRef(0)
 
+    styles.addVariants({
+        size: 'medium'
+    })
+
     return (
         <View
             style={styles.container}
@@ -26,13 +30,27 @@ export const App = () => {
     )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme, rt) => ({
     container: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center'
     },
     text: {
-        color: 'red'
+        color: theme.colors.blood,
+        variants: {
+            size: {
+                small: {
+                    fontSize: rt.fontScale * 10
+                },
+                medium: {
+                    fontSize: rt.fontScale * 30
+                },
+                large: {
+                    fontSize: rt.fontScale * 50
+                }
+            }
+        },
+        uni__dependencies: [2]
     }
-})
+}))

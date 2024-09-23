@@ -65,7 +65,6 @@ void HybridUnistylesRuntime::setTheme(const std::string &themeName) {
     state.setTheme(themeName);
 };
 
-
 void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
     auto& registry = core::UnistylesRegistry::get();
 

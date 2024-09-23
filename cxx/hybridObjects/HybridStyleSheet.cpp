@@ -27,7 +27,7 @@ jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal,
     parser.buildUnistyles(rt, registeredStyleSheet);
     parser.parseUnistyles(rt, registeredStyleSheet);
     
-    auto style = std::make_shared<core::HostStyle>(registeredStyleSheet);
+    auto style = std::make_shared<core::HostStyle>(registeredStyleSheet, this->_unistylesRuntime);
     auto styleHostObject = jsi::Object::createFromHostObject(rt, style);
 
     return styleHostObject;

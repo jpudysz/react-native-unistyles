@@ -39,11 +39,6 @@ struct StyleSheet {
     jsi::Object rawValue;
     std::vector<Unistyle::Shared> unistyles{};
     std::vector<std::pair<std::string, std::string>> variants{};
-    
-    void addVariants(jsi::Runtime& rt, jsi::Value&& variants);
-    
-private:
-    void addOrUpdateVariant(std::string variantName, std::string variantValue);
 };
 
 }

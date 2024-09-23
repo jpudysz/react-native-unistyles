@@ -25,7 +25,7 @@ inline static Unistyle::Shared unistyleFromValue(jsi::Runtime& rt, const jsi::Va
 }
 
 inline static jsi::Value valueFromUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle) {
-    auto wrappedUnistyle = std::make_shared<UnistyleWrapper>(std::move(unistyle));
+    auto wrappedUnistyle = std::make_shared<UnistyleWrapper>(unistyle);
 
     jsi::Object obj = jsi::Object(rt);
 
