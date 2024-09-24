@@ -9,6 +9,7 @@
 #include "Constants.h"
 #include "Breakpoints.h"
 #include "Parser.h"
+#include "ShadowTreeManager.h"
 
 using namespace margelo::nitro::unistyles;
 

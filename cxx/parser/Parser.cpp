@@ -76,19 +76,56 @@ void parser::Parser::rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_
             continue;
         }
         
-        if (unistyle->type == core::UnistyleType::Object) {
-            auto result = this->parseFirstLevel(rt, unistyle, styleSheet->variants);
+        this->rebuildUnistyle(rt, styleSheet, unistyle);
+    }
+}
 
-            unistyle->parsedStyle = std::move(result);
-        }
+void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, DependencyMap& dependencyMap) {
+    for (const auto& [styleSheet, pair] : dependencyMap) {
+        jsi::Object unwrappedStyleSheet = this->unwrapStyleSheet(rt, styleSheet);
 
-        if (unistyle->type == core::UnistyleType::DynamicFunction) {
-            auto hostFn = this->createDynamicFunctionProxy(rt, unistyle, styleSheet->variants);
-
-            helpers::defineHiddenProperty(rt, *unistyle->parsedStyle, helpers::PROXY_FN_PREFIX + unistyle->styleKey, unistyle->rawValue.asFunction(rt));
-            unistyle->parsedStyle->setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle->styleKey), std::move(hostFn));
+        for (const auto& unistyle : pair.second) {
+            if (unwrappedStyleSheet.hasProperty(rt, unistyle->styleKey.c_str())) {
+                unistyle->rawValue = unwrappedStyleSheet.getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
+                this->rebuildUnistyle(rt, styleSheet, unistyle);
+            }
         }
     }
+}
+
+void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, Unistyle::Shared unistyle) {
+    if (unistyle->type == core::UnistyleType::Object) {
+        auto result = this->parseFirstLevel(rt, unistyle, styleSheet->variants);
+
+        unistyle->parsedStyle = std::move(result);
+    }
+
+    if (unistyle->type == core::UnistyleType::DynamicFunction) {
+        auto hostFn = this->createDynamicFunctionProxy(rt, unistyle, styleSheet->variants);
+
+        helpers::defineHiddenProperty(rt, *unistyle->parsedStyle, helpers::PROXY_FN_PREFIX + unistyle->styleKey, unistyle->rawValue.asFunction(rt));
+        unistyle->parsedStyle->setProperty(rt, jsi::PropNameID::forUtf8(rt, unistyle->styleKey), std::move(hostFn));
+    }
+}
+
+shadow::ShadowLeafUpdates parser::Parser::dependencyMapToShadowLeafUpdates(jsi::Runtime& rt, DependencyMap& dependencyMap) {
+    shadow::ShadowLeafUpdates updates;
+    
+    for (const auto& [styleSheet, pair] : dependencyMap) {
+        for (const auto& unistyle : pair.second) {
+            auto rawProps = RawProps(rt, jsi::Value(rt, unistyle->parsedStyle.value()));
+            
+            if (updates.contains(pair.first)) {
+                updates[pair.first].emplace_back(std::move(rawProps));
+                
+                continue;
+            }
+            
+            updates.emplace(pair.first, std::vector<RawProps>{std::move(rawProps)});
+        }
+    }
+    
+    return updates;
 }
 
 std::vector<folly::dynamic> parser::Parser::parseDynamicFunctionArguments(jsi::Runtime& rt, size_t count, const jsi::Value* arguments) {

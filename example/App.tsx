@@ -33,8 +33,10 @@ export const App = () => {
 const styles = StyleSheet.create((theme, rt) => ({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
+        justifyContent: rt.colorScheme === 'dark' ? 'center' : 'flex-end',
+        alignItems: 'center',
+        backgroundColor: rt.colorScheme === 'dark' ? theme.colors.barbie : theme.colors.backgroundColor,
+        uni__dependencies: [4]
     },
     text: {
         color: theme.colors.blood,

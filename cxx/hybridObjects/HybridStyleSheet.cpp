@@ -212,6 +212,16 @@ void HybridStyleSheet::loadExternalMethods(const jsi::Value& thisValue, jsi::Run
 void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies) {
     auto& registry = core::UnistylesRegistry::get();
     auto parser = parser::Parser(this->_unistylesRuntime);
+    auto dependencyMap = registry.buildDependencyMap(dependencies);
+    auto& rt = this->_unistylesRuntime->getRuntime();
+    
+    if (dependencyMap.size() == 0) {
+        return;
+    }
 
-    // todo
+    parser.rebuildUnistylesInDependencyMap(rt, dependencyMap);
+    
+    auto shadowLeafUpdates = parser.dependencyMapToShadowLeafUpdates(rt, dependencyMap);
+    
+    shadow::ShadowTreeManager::updateShadowTree(rt, shadowLeafUpdates);
 }

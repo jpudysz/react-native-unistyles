@@ -58,6 +58,7 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     void setRootViewBackgroundColor(double color) override;
     UnistylesCxxMiniRuntime getMiniRuntime() override;
     jsi::Value getMiniRuntimeAsValue(jsi::Runtime& rt);
+    jsi::Runtime& getRuntime();
 
 private:
     jsi::Runtime* _rt;

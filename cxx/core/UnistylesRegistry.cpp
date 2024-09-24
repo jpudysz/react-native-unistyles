@@ -3,6 +3,9 @@
 
 using namespace margelo::nitro::unistyles;
 using namespace facebook;
+using namespace facebook::react;
+
+using DependencyMap = std::unordered_map<std::shared_ptr<core::StyleSheet>, std::pair<const ShadowNodeFamily*, std::vector<core::Unistyle::Shared>>>;
 
 void core::UnistylesRegistry::registerTheme(jsi::Runtime& rt, std::string name, jsi::Object&& theme) {
     auto& state = this->getState(rt);
@@ -109,3 +112,47 @@ void core::UnistylesRegistry::removeStyleSheet(int tag) {
     this->_styleSheetRegistry.erase(it);
 }
     
+DependencyMap core::UnistylesRegistry::buildDependencyMap(std::vector<UnistyleDependency>& deps) {
+    DependencyMap dependencyMap;
+ 
+    for (const auto& styleSheet : this->_styleSheetRegistry) {
+        for (const auto& unistyle : styleSheet->unistyles) {
+            // check if in the given stylesheet we have unistyle
+            // that depends on something affected
+            bool hasAnyOfDependencies = std::any_of(
+                unistyle->dependencies.begin(),
+                unistyle->dependencies.end(),
+                [&deps](UnistyleDependency dep) {
+                    return std::find(deps.begin(), deps.end(), dep) != deps.end();
+                }
+            );
+            
+            if (!hasAnyOfDependencies) {
+                continue;
+            }
+            
+            // if so, we need to find shadow family too
+            for (const auto& pair : this->_shadowRegistry) {
+                const auto& [family, unistyles] = pair;
+                
+                for (const auto& shadowUnistyle : unistyles) {
+                    if (unistyle != shadowUnistyle) {
+                        continue;
+                    }
+                    
+                    // case for update
+                    if (dependencyMap.contains(styleSheet)) {
+                        dependencyMap[styleSheet].second.emplace_back(shadowUnistyle);
+                        
+                        continue;
+                    }
+                    
+                    // case for new entry
+                    dependencyMap.emplace(styleSheet, std::make_pair(family, std::vector<core::Unistyle::Shared>{shadowUnistyle}));
+                }
+            }
+        }
+    }
+
+    return dependencyMap;
+}
