@@ -16,7 +16,7 @@ std::vector<jsi::PropNameID> HostStyle::getPropertyNames(jsi::Runtime& rt) {
 
 jsi::Value HostStyle::get(jsi::Runtime& rt, const jsi::PropNameID& propNameId) {
     auto propertyName = propNameId.utf8(rt);
-    
+
     if (propertyName == helpers::UNISTYLES_ID) {
         return jsi::Value(this->_styleSheet->tag);
     }
@@ -50,7 +50,7 @@ jsi::Value HostStyle::get(jsi::Runtime& rt, const jsi::PropNameID& propNameId) {
     if (it == this->_styleSheet->unistyles.end()) {
         return jsi::Value::undefined();
     }
-
+    
     return valueFromUnistyle(rt, *it);
 }
 

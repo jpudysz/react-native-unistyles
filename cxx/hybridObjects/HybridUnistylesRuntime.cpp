@@ -184,6 +184,10 @@ jsi::Runtime& HybridUnistylesRuntime::getRuntime() {
     return *this->_rt;
 }
 
+void HybridUnistylesRuntime::updateLastKnownDimensions() {
+    this->_lastKnownScreenDimensions = this->_nativePlatform.getScreenDimensions();
+}
+
 void HybridUnistylesRuntime::registerPlatformListener(const std::function<void(std::vector<UnistyleDependency>)>& listener) {
     this->_nativePlatform.registerPlatformListener(listener);
 }

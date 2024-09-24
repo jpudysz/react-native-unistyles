@@ -215,6 +215,10 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
     auto dependencyMap = registry.buildDependencyMap(dependencies);
     auto& rt = this->_unistylesRuntime->getRuntime();
     
+    if (std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::DIMENSIONS) != dependencies.end()) {
+        this->_unistylesRuntime->updateLastKnownDimensions();
+    }
+    
     if (dependencyMap.size() == 0) {
         return;
     }

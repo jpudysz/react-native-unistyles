@@ -26,14 +26,24 @@ inline static Unistyle::Shared unistyleFromValue(jsi::Runtime& rt, const jsi::Va
 
 inline static jsi::Value valueFromUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle) {
     auto wrappedUnistyle = std::make_shared<UnistyleWrapper>(unistyle);
+    
+    if (unistyle->type == UnistyleType::Object) {
+        jsi::Object obj = jsi::Object(rt);
+        
+        obj.setNativeState(rt, std::move(wrappedUnistyle));
+        helpers::defineHiddenProperty(rt, obj, helpers::UNISTYLES_ID.c_str(), unistyle->styleKey);
+        
+        helpers::mergeJSIObjects(rt, obj, unistyle->parsedStyle.value());
+        
+        return obj;
+    }
+    
+    auto hostFn = jsi::Value(rt, unistyle->proxiedFunction.value()).asObject(rt).asFunction(rt);
 
-    jsi::Object obj = jsi::Object(rt);
-
-    obj.setNativeState(rt, std::move(wrappedUnistyle));
-    helpers::defineHiddenProperty(rt, obj, helpers::UNISTYLES_ID.c_str(), unistyle->styleKey);
-    helpers::mergeJSIObjects(rt, obj, unistyle->parsedStyle.value());
-
-    return obj;
+    hostFn.setNativeState(rt, std::move(wrappedUnistyle));
+    hostFn.setProperty(rt, helpers::UNISTYLES_ID.c_str(), unistyle->styleKey);
+    
+    return std::move(hostFn);
 }
 
 }

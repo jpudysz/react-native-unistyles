@@ -22,7 +22,16 @@ export const App = () => {
                 }
             }}
         >
-            <Text style={styles.text}>
+            <Text
+                style={styles.text('italic')}
+                ref={ref => {
+                    UnistylesShadowRegistry.add(ref, styles.text)
+
+                    return () => {
+                        UnistylesShadowRegistry.remove(ref, styles.text)
+                    }
+                }}
+            >
                 Render count: {++renderCount.current}
             </Text>
             <Button title="Re-render" onPress={() => setCount(count => count + 1)} />
@@ -38,7 +47,8 @@ const styles = StyleSheet.create((theme, rt) => ({
         backgroundColor: rt.colorScheme === 'dark' ? theme.colors.barbie : theme.colors.backgroundColor,
         uni__dependencies: [4]
     },
-    text: {
+    text: (fontStyle: 'italic' | 'normal') => ({
+        fontStyle,
         color: theme.colors.blood,
         variants: {
             size: {
@@ -53,6 +63,6 @@ const styles = StyleSheet.create((theme, rt) => ({
                 }
             }
         },
-        uni__dependencies: [2]
-    }
+        uni__dependencies: [2, 4]
+    })
 }))
