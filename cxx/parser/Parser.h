@@ -9,6 +9,7 @@
 #include "MediaQueries.h"
 #include "HybridUnistylesRuntime.h"
 #include "StyleSheet.h"
+#include "ShadowLeafUpdate.h"
 
 namespace margelo::nitro::unistyles::parser {
 
@@ -16,6 +17,7 @@ using namespace facebook;
 using namespace margelo::nitro::unistyles::core;
     
 using Variants = std::vector<std::pair<std::string, std::string>>;
+using DependencyMap = std::unordered_map<std::shared_ptr<core::StyleSheet>, std::pair<const ShadowNodeFamily*, std::vector<core::Unistyle::Shared>>>;
  
 struct Parser {
     Parser(std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime): _unistylesRuntime{unistylesRuntime} {}
@@ -24,8 +26,11 @@ struct Parser {
     void parseUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
     Variants variantsToPairs(jsi::Runtime& rt, jsi::Object&& variants);
     void rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
+    void rebuildUnistylesInDependencyMap(jsi::Runtime& rt, DependencyMap& dependencyMap);
+    shadow::ShadowLeafUpdates dependencyMapToShadowLeafUpdates(jsi::Runtime& rt, DependencyMap& dependencyMap);
     
 private:
+    void rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, Unistyle::Shared unistyle);
     jsi::Object unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
     jsi::Object parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared unistyle, Variants& variants);
     jsi::Value parseSecondLevel(jsi::Runtime& rt, jsi::Value& nestedObject);
