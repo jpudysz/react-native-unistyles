@@ -15,20 +15,20 @@ namespace margelo::nitro::unistyles::parser {
 
 using namespace facebook;
 using namespace margelo::nitro::unistyles::core;
-    
+
 using Variants = std::vector<std::pair<std::string, std::string>>;
 using DependencyMap = std::unordered_map<std::shared_ptr<core::StyleSheet>, std::pair<const ShadowNodeFamily*, std::vector<core::Unistyle::Shared>>>;
- 
+
 struct Parser {
     Parser(std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime): _unistylesRuntime{unistylesRuntime} {}
-    
+
     void buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
     void parseUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
     Variants variantsToPairs(jsi::Runtime& rt, jsi::Object&& variants);
     void rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
     void rebuildUnistylesInDependencyMap(jsi::Runtime& rt, DependencyMap& dependencyMap);
     shadow::ShadowLeafUpdates dependencyMapToShadowLeafUpdates(jsi::Runtime& rt, DependencyMap& dependencyMap);
-    
+
 private:
     void rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, Unistyle::Shared unistyle);
     jsi::Object unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
@@ -43,7 +43,7 @@ private:
     jsi::Value getStylesForVariant(jsi::Runtime& rt, jsi::Object&& groupValue, std::optional<std::string> selectedVariant);
     jsi::Object parseCompoundVariants(jsi::Runtime& rt, jsi::Object& obj, Variants& variants);
     bool shouldApplyCompoundVariants(jsi::Runtime& rt, const Variants& variants, jsi::Object& compoundVariant);
-    
+
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
 };
 

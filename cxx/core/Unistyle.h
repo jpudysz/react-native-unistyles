@@ -21,7 +21,7 @@ struct DynamicFunctionMetadata {
 
 struct Unistyle {
     using Shared = std::shared_ptr<Unistyle>;
-    
+
     Unistyle(UnistyleType type, std::string styleKey, jsi::Object& rawObject)
         : styleKey{styleKey}, type{type}, rawValue{std::move(rawObject)} {}
 
@@ -33,14 +33,17 @@ struct Unistyle {
           parsedStyle(std::move(other.parsedStyle)),
           dependencies(std::move(other.dependencies)),
           dynamicFunctionMetadata(std::move(other.dynamicFunctionMetadata)) {}
-   
+
     UnistyleType type;
     std::string styleKey;
     jsi::Object rawValue;
     std::optional<jsi::Object> parsedStyle;
     std::vector<UnistyleDependency> dependencies{};
+
+    // available for dynamic functions only
+    std::optional<jsi::Function> proxiedFunction = std::nullopt;
     std::optional<DynamicFunctionMetadata> dynamicFunctionMetadata = std::nullopt;
-    
+
     bool dependsOn(UnistyleDependency dependency) {
         return std::find(this->dependencies.begin(), this->dependencies.end(), dependency) != this->dependencies.end();
     }
