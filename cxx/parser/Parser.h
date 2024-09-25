@@ -43,6 +43,8 @@ private:
     jsi::Value getStylesForVariant(jsi::Runtime& rt, jsi::Object&& groupValue, std::optional<std::string> selectedVariant);
     jsi::Object parseCompoundVariants(jsi::Runtime& rt, jsi::Object& obj, Variants& variants);
     bool shouldApplyCompoundVariants(jsi::Runtime& rt, const Variants& variants, jsi::Object& compoundVariant);
+    RawProps parseStylesToShadowTreeStyles(jsi::Runtime& rt, jsi::Object& parsedStyles);
+    bool isColor(const std::string& propertyName);
 
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
 };

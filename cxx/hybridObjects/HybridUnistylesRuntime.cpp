@@ -89,16 +89,6 @@ void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
     }
 };
 
-Dimensions HybridUnistylesRuntime::getCachedScreenDimensions() {
-    if (this->_lastKnownScreenDimensions.has_value()) {
-        return this->_lastKnownScreenDimensions.value();
-    }
-    
-    this->_lastKnownScreenDimensions = this->getScreen();
-    
-    return this->_lastKnownScreenDimensions.value();
-}
-
 jsi::Value HybridUnistylesRuntime::updateTheme(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, args[0].isString(), "first argument expected to be a string.");
     helpers::assertThat(rt, args[1].isObject(), "second argument expected to be a function.");
@@ -182,10 +172,6 @@ jsi::Value HybridUnistylesRuntime::getMiniRuntimeAsValue(jsi::Runtime& rt) {
 
 jsi::Runtime& HybridUnistylesRuntime::getRuntime() {
     return *this->_rt;
-}
-
-void HybridUnistylesRuntime::updateLastKnownDimensions() {
-    this->_lastKnownScreenDimensions = this->_nativePlatform.getScreenDimensions();
 }
 
 void HybridUnistylesRuntime::registerPlatformListener(const std::function<void(std::vector<UnistyleDependency>)>& listener) {

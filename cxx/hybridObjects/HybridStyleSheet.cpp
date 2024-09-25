@@ -114,7 +114,7 @@ void HybridStyleSheet::parseBreakpoints(jsi::Runtime &rt, jsi::Object breakpoint
     auto& state = registry.getState(rt);
 
     registry.registerBreakpoints(rt, sortedBreakpoints);
-    state.computeCurrentBreakpoint(this->_unistylesRuntime->getCachedScreenDimensions().width);
+    state.computeCurrentBreakpoint(this->_unistylesRuntime->getScreen().width);
 }
 
 void HybridStyleSheet::parseThemes(jsi::Runtime &rt, jsi::Object themes) {
@@ -214,11 +214,7 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
     auto parser = parser::Parser(this->_unistylesRuntime);
     auto dependencyMap = registry.buildDependencyMap(dependencies);
     auto& rt = this->_unistylesRuntime->getRuntime();
-    
-    if (std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::DIMENSIONS) != dependencies.end()) {
-        this->_unistylesRuntime->updateLastKnownDimensions();
-    }
-    
+ 
     if (dependencyMap.size() == 0) {
         return;
     }
