@@ -50,7 +50,7 @@ const styles = StyleSheet.create((theme, rt) => ({
     text: (fontWeight: 'bold' | 'normal', fontStyle: 'italic' | 'normal') => ({
         fontWeight,
         fontStyle,
-        color: theme.colors.blood,
+        color: 'red',
         variants: {
             size: {
                 small: {

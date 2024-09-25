@@ -49,7 +49,6 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     Orientation getOrientation() override;
     double getPixelRatio() override;
     double getFontScale() override;
-    Dimensions getCachedScreenDimensions();
     void registerPlatformListener(const std::function<void(std::vector<UnistyleDependency>)>& listener);
 
     void setTheme(const std::string &themeName) override;
@@ -58,12 +57,10 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     void setRootViewBackgroundColor(double color) override;
     UnistylesCxxMiniRuntime getMiniRuntime() override;
     jsi::Value getMiniRuntimeAsValue(jsi::Runtime& rt);
-    void updateLastKnownDimensions();
     jsi::Runtime& getRuntime();
 
 private:
     jsi::Runtime* _rt;
-    std::optional<Dimensions> _lastKnownScreenDimensions = std::nullopt;
     std::shared_ptr<HybridNavigationBar> _navigationBar;
     std::shared_ptr<HybridStatusBar> _statusBar;
     Unistyles::HybridNativePlatformSpecCxx _nativePlatform;
