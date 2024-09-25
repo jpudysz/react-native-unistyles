@@ -14,12 +14,12 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
         jsi::Object styleValue = propertyValue.asObject(rt);
 
         if (styleValue.isFunction(rt)) {
-            styleSheet->unistyles.emplace_back(std::make_shared<Unistyle>(UnistyleType::DynamicFunction, styleKey, styleValue));
+            styleSheet->unistyles[styleKey] = std::make_shared<Unistyle>(UnistyleType::DynamicFunction, styleKey, styleValue);
 
             return;
         }
 
-        styleSheet->unistyles.emplace_back(std::make_shared<Unistyle>(UnistyleType::Object, styleKey, styleValue));
+        styleSheet->unistyles[styleKey] = std::make_shared<Unistyle>(UnistyleType::Object, styleKey, styleValue);
     });
 }
 
@@ -54,7 +54,7 @@ jsi::Object parser::Parser::unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<S
 }
 
 void parser::Parser::parseUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet) {
-    for (Unistyle::Shared unistyle : styleSheet->unistyles) {
+    for (const auto& [_, unistyle] : styleSheet->unistyles) {
         if (unistyle->type == core::UnistyleType::Object) {
             auto result = this->parseFirstLevel(rt, unistyle, styleSheet->variants);
 
@@ -70,7 +70,7 @@ void parser::Parser::parseUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
 }
 
 void parser::Parser::rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet) {
-    for (Unistyle::Shared unistyle : styleSheet->unistyles) {
+    for (const auto& [_, unistyle] : styleSheet->unistyles) {
         if (!unistyle->dependsOn(UnistyleDependency::VARIANTS)) {
             continue;
         }
@@ -102,7 +102,11 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleShee
     }
 
     if (unistyle->type == core::UnistyleType::DynamicFunction) {
-        // todo to function
+        auto maybeMetadata = unistyle->dynamicFunctionMetadata;
+        
+        helpers::assertThat(rt, maybeMetadata.has_value(), "Your dynamic function '" + unistyle->styleKey + "' has no metadata and can't be processed.");
+
+        // convert arguments to jsi::Value
         auto metadata = unistyle->dynamicFunctionMetadata.value();
         std::vector<jsi::Value> args{};
 
@@ -114,7 +118,7 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleShee
 
         const jsi::Value *argStart = args.data();
         auto functionResult = unistyle->proxiedFunction.value().callAsConstructor(rt, argStart, metadata.count).asObject(rt);
-        
+
         // todo this is weird syntax
         unistyle->parsedStyle = std::move(functionResult);
         unistyle->parsedStyle = this->parseFirstLevel(rt, unistyle, styleSheet->variants);
@@ -295,7 +299,7 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared u
 
 jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unistyle::Shared unistyle, Variants& variants) {
     auto unistylesRuntime = this->_unistylesRuntime;
-    
+
     return jsi::Function::createFromHostFunction(
         rt,
         jsi::PropNameID::forUtf8(rt, unistyle->styleKey),
@@ -303,7 +307,7 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
         [this, unistylesRuntime, unistyle, &variants](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
             auto thisObject = thisVal.asObject(rt);
             auto parser = parser::Parser(unistylesRuntime);
-            
+
             // call original function
             auto result = unistyle->rawValue.asFunction(rt).call(rt, args, count);
 

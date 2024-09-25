@@ -37,7 +37,7 @@ struct StyleSheet {
     int tag;
     StyleSheetType type;
     jsi::Object rawValue;
-    std::vector<Unistyle::Shared> unistyles{};
+    std::unordered_map<std::string, Unistyle::Shared> unistyles{};
     std::vector<std::pair<std::string, std::string>> variants{};
 };
 

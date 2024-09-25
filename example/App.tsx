@@ -23,7 +23,7 @@ export const App = () => {
             }}
         >
             <Text
-                style={styles.text('italic')}
+                style={styles.text('normal', 'italic')}
                 ref={ref => {
                     UnistylesShadowRegistry.add(ref, styles.text)
 
@@ -47,7 +47,8 @@ const styles = StyleSheet.create((theme, rt) => ({
         backgroundColor: rt.colorScheme === 'dark' ? theme.colors.barbie : theme.colors.backgroundColor,
         uni__dependencies: [4]
     },
-    text: (fontStyle: 'italic' | 'normal') => ({
+    text: (fontWeight: 'bold' | 'normal', fontStyle: 'italic' | 'normal') => ({
+        fontWeight,
         fontStyle,
         color: theme.colors.blood,
         variants: {
