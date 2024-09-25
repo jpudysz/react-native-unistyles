@@ -116,7 +116,7 @@ DependencyMap core::UnistylesRegistry::buildDependencyMap(std::vector<UnistyleDe
     DependencyMap dependencyMap;
  
     for (const auto& styleSheet : this->_styleSheetRegistry) {
-        for (const auto& unistyle : styleSheet->unistyles) {
+        for (const auto& [_, unistyle] : styleSheet->unistyles) {
             // check if in the given stylesheet we have unistyle
             // that depends on something affected
             bool hasAnyOfDependencies = std::any_of(

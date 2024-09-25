@@ -6,10 +6,10 @@ using namespace facebook;
 
 std::vector<jsi::PropNameID> HostStyle::getPropertyNames(jsi::Runtime& rt) {
     auto propertyNames = std::vector<jsi::PropNameID> {};
-    
-    std::for_each(this->_styleSheet->unistyles.begin(), this->_styleSheet->unistyles.end(), [&](Unistyle::Shared unistyle){
-        propertyNames.emplace_back(jsi::PropNameID::forUtf8(rt, unistyle->styleKey));
-    });
+
+    for (const auto& pair : this->_styleSheet->unistyles) {
+        propertyNames.emplace_back(jsi::PropNameID::forUtf8(rt, pair.first));
+    }
     
     return propertyNames;
 }
@@ -43,15 +43,11 @@ jsi::Value HostStyle::get(jsi::Runtime& rt, const jsi::PropNameID& propNameId) {
         });
     }
 
-    auto it = std::find_if(this->_styleSheet->unistyles.begin(), this->_styleSheet->unistyles.end(), [&](Unistyle::Shared unistyle){
-        return unistyle->styleKey == propertyName;
-    });
-    
-    if (it == this->_styleSheet->unistyles.end()) {
-        return jsi::Value::undefined();
+    if (this->_styleSheet->unistyles.contains(propertyName)) {
+        return valueFromUnistyle(rt, this->_styleSheet->unistyles[propertyName]);
     }
     
-    return valueFromUnistyle(rt, *it);
+    return jsi::Value::undefined();
 }
 
 void HostStyle::set(jsi::Runtime& rt, const jsi::PropNameID& propNameId, const jsi::Value& value) {}
