@@ -24,17 +24,21 @@ export const App = () => {
         >
             <Text
                 style={styles.text('normal', 'italic')}
-                ref={ref => {
-                    UnistylesShadowRegistry.add(ref, styles.text)
-
-                    return () => {
-                        UnistylesShadowRegistry.remove(ref, styles.text)
-                    }
-                }}
+                // ref={ref => {
+                //     UnistylesShadowRegistry.add(ref, styles.text)
+                //
+                //     return () => {
+                //         UnistylesShadowRegistry.remove(ref, styles.text)
+                //     }
+                // }}
             >
                 Render count: {++renderCount.current}
             </Text>
-            <Button title="Re-render" onPress={() => setCount(count => count + 1)} />
+            <Button
+                title="Re-render"
+                onPress={() => setCount(count => count + 1)}
+            />
+            <View style={{ height: 50}} />
         </View>
     )
 }
