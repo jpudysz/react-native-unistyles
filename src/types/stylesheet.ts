@@ -1,7 +1,7 @@
 import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
 import type { ShadowOffset, TransformStyles, UnistylesTheme } from './core'
 import type { UnistylesBreakpoints } from '../global'
-import type { MiniRuntime } from '../specs'
+import type { UnistylesMiniRuntime } from '../specs'
 import type { ReactNativeStyleSheet } from './breakpoints'
 import type { ExtractVariantNames } from './variants'
 import type { CSSProperties } from 'react'
@@ -70,7 +70,7 @@ export type StyleSheet = {
 }
 
 export type StyleSheetWithSuperPowers<S extends StyleSheet> =
-    | ((theme: UnistylesTheme, miniRuntime: MiniRuntime) => S)
+    | ((theme: UnistylesTheme, miniRuntime: UnistylesMiniRuntime) => S)
     | S
 
 type UseVariantsFn<T> = {

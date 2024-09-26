@@ -2,8 +2,6 @@
 
 #include <jsi/jsi.h>
 #include <unordered_set>
-#include "Unistyle.h"
-#include "PlatformEvent.hpp"
 
 using namespace facebook;
 
@@ -18,37 +16,27 @@ inline void assertThat(jsi::Runtime& rt, bool condition, const std::string& mess
 inline void enumerateJSIObject(jsi::Runtime& rt, const jsi::Object& obj, std::function<void(const std::string& propertyName, jsi::Value& propertyValue)> callback) {
     jsi::Array propertyNames = obj.getPropertyNames(rt);
     size_t length = propertyNames.size(rt);
-
+    
     for (size_t i = 0; i < length; i++) {
         auto propertyName = propertyNames.getValueAtIndex(rt, i).asString(rt).utf8(rt);
         auto propertyValue = obj.getProperty(rt, propertyName.c_str());
-
+        
         callback(propertyName, propertyValue);
-    }
-}
-
-inline void iterateJSIArray(jsi::Runtime& rt, const jsi::Array& array, std::function<void(size_t, jsi::Value&)> callback) {
-    size_t length = array.size(rt);
-
-    for (size_t i = 0; i < length; i++) {
-        auto value = array.getValueAtIndex(rt, i);
-
-        callback(i, value);
     }
 }
 
 template<typename PropertyType>
 inline bool vecContainsKeys(std::vector<PropertyType>& vec, std::vector<PropertyType>&& keys) {
     std::unordered_set<PropertyType> availableKeys(keys.begin(), keys.end());
-
+    
     for (const auto& key : vec) {
         availableKeys.erase(key);
-
+        
         if (availableKeys.empty()) {
             return true;
         }
     }
-
+    
     return false;
 }
 
@@ -73,6 +61,24 @@ inline void defineHiddenProperty(jsi::Runtime& rt, jsi::Object& object, const st
     defineProperty.call(rt, object, facebook::jsi::String::createFromAscii(rt, propName.c_str()), descriptor);
 }
 
+inline jsi::Object& mergeJSIObjects(jsi::Runtime&rt, jsi::Object& obj1, jsi::Object& obj2) {
+    helpers::enumerateJSIObject(rt, obj2, [&](const std::string& propertyName, jsi::Value& propertyValue){
+        obj1.setProperty(rt, propertyName.c_str(), propertyValue);
+    });
+
+    return obj1;
+}
+
+inline void iterateJSIArray(jsi::Runtime& rt, const jsi::Array& array, std::function<void(size_t, jsi::Value&)> callback) {
+    size_t length = array.size(rt);
+
+    for (size_t i = 0; i < length; i++) {
+        auto value = array.getValueAtIndex(rt, i);
+
+        callback(i, value);
+    }
+}
+
 inline bool isPlatformColor(jsi::Runtime& rt, jsi::Object& maybePlatformColor) {
     auto isIOSPlatformColor = maybePlatformColor.hasProperty(rt, "semantic") && maybePlatformColor.getProperty(rt, "semantic").isObject();
 
@@ -84,24 +90,4 @@ inline bool isPlatformColor(jsi::Runtime& rt, jsi::Object& maybePlatformColor) {
     return maybePlatformColor.hasProperty(rt, "resource_paths") && maybePlatformColor.getProperty(rt, "resource_paths").isObject();
 }
 
-inline jsi::Object& mergeJSIObjects(jsi::Runtime&rt, jsi::Object& obj1, jsi::Object& obj2) {
-    helpers::enumerateJSIObject(rt, obj2, [&](const std::string& propertyName, jsi::Value& propertyValue){
-        obj1.setProperty(rt, propertyName.c_str(), propertyValue);
-    });
-
-    return obj1;
 }
-
-inline std::vector<core::UnistyleDependency> getUnistyleDependenciesFromPlatformEvent(PlatformEvent& event) {
-    switch (event) {
-        case PlatformEvent::ONSCREENSIZECHANGE:
-            return {core::UnistyleDependency::Dimensions};
-        case PlatformEvent::ONORIENTATIONCHANGE:
-            return {core::UnistyleDependency::Orientation, core::UnistyleDependency::Dimensions};
-        case PlatformEvent::ONCONTENTSIZECATEGORYCHANGE:
-            return{core::UnistyleDependency::ContentSizeCategory};
-    }
-}
-
-}
-

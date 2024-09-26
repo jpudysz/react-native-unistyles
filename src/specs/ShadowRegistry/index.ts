@@ -1,18 +1,18 @@
 import { NitroModules } from 'react-native-nitro-modules'
-import type { ShadowRegistry as ShadowRegistrySpec } from './ShadowRegistry.nitro'
-import type { ViewHandle } from './types'
+import type { UnistylesShadowRegistry as UnistylesShadowRegistrySpec } from './ShadowRegistry.nitro'
+import type { ShadowNode, Unistyle, ViewHandle } from './types'
 
-interface ShadowRegistry extends ShadowRegistrySpec {
+interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     // Babel API
-    add(style: object, handle: ViewHandle): void,
-    remove(style: object, handle: ViewHandle): void,
-
+    add(handle?: ViewHandle, style?: Unistyle): void,
+    remove(handle?: ViewHandle, style?: Unistyle): void,
     // JSI
-    link(style: object, node: object): void,
-    unlink(style: object, node: object): void
+    link(node: ShadowNode, style: Unistyle): void,
+    unlink(node: ShadowNode, style: Unistyle): void
 }
 
-const HybridShadowRegistry = NitroModules.createHybridObject<ShadowRegistry>('ShadowRegistry')
+const HybridShadowRegistry = NitroModules.createHybridObject<ShadowRegistry>('UnistylesShadowRegistry')
+
 const findShadowNodeForHandle = (handle: ViewHandle) => {
     const node = handle?.__internalInstanceHandle?.stateNode?.node
         ?? handle?.getScrollResponder?.()?.getNativeScrollRef?.()?.__internalInstanceHandle?.stateNode?.node
@@ -26,12 +26,21 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
     return node
 }
 
-HybridShadowRegistry.add = (style, handle) =>
-    HybridShadowRegistry.link(style, findShadowNodeForHandle(handle))
+HybridShadowRegistry.add = (handle, style) => {
+    if (!handle || !style?.__unid) {
+        return
+    }
 
-HybridShadowRegistry.remove = (style, handle) =>
-    HybridShadowRegistry.unlink(style, findShadowNodeForHandle(handle))
-
-export {
-    HybridShadowRegistry as ShadowRegistry
+    HybridShadowRegistry.link(findShadowNodeForHandle(handle), style)
 }
+
+HybridShadowRegistry.remove = (handle, style) => {
+    if (!handle || !style?.__unid) {
+        return
+    }
+
+    HybridShadowRegistry.unlink(findShadowNodeForHandle(handle), style)
+}
+
+// todo hide API
+export const UnistylesShadowRegistry = HybridShadowRegistry as ShadowRegistry

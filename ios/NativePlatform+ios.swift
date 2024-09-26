@@ -3,9 +3,11 @@
 import Foundation
 import NitroModules
 
-typealias CxxListener = (PlatformEvent) -> Void
+typealias CxxListener = (Array<UnistyleDependency>) -> Void
 
 class NativeIOSPlatform: HybridNativePlatformSpec {
+    var miniRuntime: UnistylesNativeMiniRuntime?
+
     var listeners: Array<CxxListener> = []
     var hybridContext = margelo.nitro.HybridContext()
     var memorySize: Int {
@@ -13,6 +15,8 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     }
 
     init() {
+        self.miniRuntime = self.buildMiniRuntime()
+
         setupPlatformListeners()
     }
 
@@ -20,7 +24,26 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         removePlatformListeners()
     }
 
-    func getColorScheme() throws -> ColorScheme {
+    func getMiniRuntime() -> UnistylesNativeMiniRuntime {
+        return self.miniRuntime!
+    }
+
+    func buildMiniRuntime() -> UnistylesNativeMiniRuntime {
+        return UnistylesNativeMiniRuntime(
+            colorScheme: self.getColorScheme(),
+            screen: self.getScreenDimensions(),
+            contentSizeCategory: self.getContentSizeCategory(),
+            insets: self.getInsets(),
+            pixelRatio: self.getPixelRatio(),
+            fontScale: self.getFontScale(),
+            rtl: self.getPrefersRtlDirection(),
+            statusBar: self.getStatusBarDimensions(),
+            navigationBar: self.getNavigationBarDimensions(),
+            orientation: self.getOrientation()
+        )
+    }
+
+    func getColorScheme() -> ColorScheme {
         let interfaceStyle = UIScreen.main.traitCollection.userInterfaceStyle
 
         switch (interfaceStyle) {
@@ -35,8 +58,8 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         }
     }
 
-    func getFontScale() throws -> Double {
-        DispatchQueue.main.sync {
+    func getFontScale() -> Double {
+        func getFontScaleFn() -> Double {
             let contentSizeCategory = UIApplication.shared.preferredContentSizeCategory
             let defaultMultiplier: CGFloat = 17.0
 
@@ -69,11 +92,18 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
                 return 1.0
             }
         }
+
+        if Thread.isMainThread {
+            return getFontScaleFn()
+        }
+
+        return DispatchQueue.main.sync {
+            return getFontScaleFn()
+        }
     }
 
-    func getScreenDimensions() throws -> Dimensions {
-        // todo: fix this
-        func getDimensions() -> Dimensions {
+    func getScreenDimensions() -> Dimensions {
+        func getScreenDimensionsFn() -> Dimensions {
             guard let presentedViewController = RCTPresentedViewController(),
                   let windowFrame = presentedViewController.view.window?.frame else {
                 // this should never happen, but it's better to return zeros
@@ -87,16 +117,26 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         }
 
         if Thread.isMainThread {
-            return getDimensions()
+            return getScreenDimensionsFn()
         }
 
         return DispatchQueue.main.sync {
-            return getDimensions()
+            return getScreenDimensionsFn()
         }
     }
 
-    func getContentSizeCategory() throws -> String {
-        DispatchQueue.main.sync {
+    func getOrientation() -> Orientation {
+        let screenDimensions = getScreenDimensions()
+
+        if (screenDimensions.width > screenDimensions.height) {
+            return Orientation.landscape;
+        }
+
+        return Orientation.portrait;
+    }
+
+    func getContentSizeCategory() -> String {
+        func getContentSizeCategoryFn() -> String {
             let contentSizeCategory = UIApplication.shared.preferredContentSizeCategory
 
             switch contentSizeCategory {
@@ -128,11 +168,19 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
                 return "unspecified"
             }
         }
+
+        if Thread.isMainThread {
+            return getContentSizeCategoryFn()
+        }
+
+        return DispatchQueue.main.sync {
+            return getContentSizeCategoryFn()
+        }
     }
 
     // todo handle IME animation
-    func getInsets() throws -> Insets {
-        DispatchQueue.main.sync {
+    func getInsets() -> Insets {
+        func getInsetsFn() -> Insets {
             guard let window = UIApplication.shared.windows.first else {
                 // this should never happen, but it's better to return zeros
                 return Insets(top: 0, bottom: 0, left: 0, right: 0, ime: 0)
@@ -142,19 +190,35 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
 
             return Insets(top: safeArea.top, bottom: safeArea.bottom, left: safeArea.left, right: safeArea.right, ime: 0)
         }
+
+        if Thread.isMainThread {
+            return getInsetsFn()
+        }
+
+        return DispatchQueue.main.sync {
+            return getInsetsFn()
+        }
     }
 
-    func getPrefersRtlDirection() throws -> Bool {
-        DispatchQueue.main.sync {
+    func getPrefersRtlDirection() -> Bool {
+        func getPrefersRtlDirectionFn() -> Bool {
             let hasForcedRtl = UserDefaults.standard.bool(forKey: "RCTI18nUtil_forceRTL")
             let isRtl = UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
 
             return hasForcedRtl || isRtl
         }
+
+        if Thread.isMainThread {
+            return getPrefersRtlDirectionFn()
+        }
+
+        return DispatchQueue.main.sync {
+            return getPrefersRtlDirectionFn()
+        }
     }
 
-    func getStatusBarDimensions() throws -> Dimensions {
-        DispatchQueue.main.sync {
+    func getStatusBarDimensions() -> Dimensions {
+        func getStatusBarDimensionsFn() -> Dimensions {
             guard let window = UIApplication.shared.windows.first,
                   let statusBarManager = window.windowScene?.statusBarManager else {
                 // this should never happen, but it's better to return defaults
@@ -165,10 +229,18 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
 
             return Dimensions(width: statusBarSize.width, height: statusBarSize.height)
         }
+
+        if Thread.isMainThread {
+            return getStatusBarDimensionsFn()
+        }
+
+        return DispatchQueue.main.sync {
+            return getStatusBarDimensionsFn()
+        }
     }
 
-    func getPixelRatio() throws -> Double {
-        DispatchQueue.main.sync {
+    func getPixelRatio() -> Double {
+        func getPixelRatioFn() -> Double {
             guard let presentedViewController = RCTPresentedViewController(),
                   let window = presentedViewController.view.window else {
                 // this should never happen, but it's better to return default
@@ -177,29 +249,38 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
 
             return window.screen.scale
         }
+
+        if Thread.isMainThread {
+            return getPixelRatioFn()
+        }
+
+        return DispatchQueue.main.sync {
+            return getPixelRatioFn()
+        }
     }
 
-    func setRootViewBackgroundColor(hex: String, alpha: Double?) throws {
+    func setRootViewBackgroundColor(color: Double) throws {
         DispatchQueue.main.async {
-            guard let presentedViewController = RCTPresentedViewController(),
-                  let backgroundColor = colorFromHexString(hex, alpha: alpha ?? 1) else {
+            guard let presentedViewController = RCTPresentedViewController() else {
                 print("🦄 Unistyles: Couldn't set rootView backgroundColor")
 
                 return
             }
 
-            presentedViewController.view.backgroundColor = backgroundColor
+            presentedViewController.view.backgroundColor = UIColor.fromInt(Int(color))
         }
     }
 
-    func getNavigationBarDimensions() throws -> Dimensions {
+    func getNavigationBarDimensions() -> Dimensions {
         return Dimensions(width: 0, height: 0);
     }
 
     // not implemented for iOS as there are no such APIs
-    func setNavigationBarBackgroundColor(hex: String?, alpha: Double?) throws {}
+    func setNavigationBarBackgroundColor(color: Double) throws {}
     func setNavigationBarHidden(isHidden: Bool) throws {}
-    func setStatusBarBackgroundColor(hex: String?, alpha: Double?) throws {}
+    func setStatusBarBackgroundColor(color: Double) throws {}
+
+    // implemented from JS
     func setImmersiveMode(isEnabled: Bool) throws {}
 }
 

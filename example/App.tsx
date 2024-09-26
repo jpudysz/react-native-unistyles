@@ -1,47 +1,44 @@
 import React, { useRef, useState } from 'react'
 import { Button, Text, View } from 'react-native'
-import { StyleSheet, UnistylesRuntime, ShadowRegistry } from 'react-native-unistyles'
+import { StyleSheet, UnistylesShadowRegistry } from 'react-native-unistyles'
 import './unistyles'
 
 export const App = () => {
     const [, setCount] = useState(0)
     const renderCount = useRef(0)
-    // styles.addVariants({
-    //     color: 'primary'
-    // })
+
+    styles.addVariants({
+        size: 'medium'
+    })
 
     return (
         <View
             style={styles.container}
             ref={ref => {
-                if (ref) {
-                    //tag
-                    ShadowRegistry.add(styles.container, ref)
-                }
+                UnistylesShadowRegistry.add(ref, styles.container)
 
                 return () => {
-                    ShadowRegistry.remove(styles.container, ref)
+                    UnistylesShadowRegistry.remove(ref, styles.container)
                 }
             }}
         >
             <Text
-                style={styles.text}
+                style={styles.text('normal', 'italic')}
                 ref={ref => {
-                    if (ref) {
-                        ShadowRegistry.add(styles.text, ref)
-                    }
+                    UnistylesShadowRegistry.add(ref, styles.text)
 
                     return () => {
-                        ShadowRegistry.remove(styles.text, ref)
+                        UnistylesShadowRegistry.remove(ref, styles.text)
                     }
                 }}
             >
-                Screen: {UnistylesRuntime.screen.width}x{UnistylesRuntime.screen.height}
-            </Text>
-            <Text style={styles.text}>
                 Render count: {++renderCount.current}
             </Text>
-            <Button title="Re-render" onPress={() => setCount(count => count + 1)} />
+            <Button
+                title="Re-render"
+                onPress={() => setCount(count => count + 1)}
+            />
+            <View style={{ height: 50}} />
         </View>
     )
 }
@@ -49,25 +46,32 @@ export const App = () => {
 const styles = StyleSheet.create((theme, rt) => ({
     container: {
         flex: 1,
-        justifyContent: rt.orientation == 'portrait'
+        justifyContent: rt.colorScheme === 'dark'
             ? 'center'
             : 'flex-end',
         alignItems: 'center',
-        opacity: rt.orientation == 'portrait'
-            ? 1
-            : 0.5,
-        backgroundColor: rt.orientation == 'portrait'
+        backgroundColor: rt.colorScheme === 'dark'
             ? theme.colors.barbie
-            : theme.colors.fog,
-        borderRadius: rt.orientation == 'portrait'
-            ? 0
-            : 10,
-        width: rt.screen.width / 2,
-        height: rt.screen.height / 2,
-        uni__dependencies: [2, 6]
+            : theme.colors.oak,
+        uni__dependencies: [4]
     },
-    text: {
-        color: theme.colors.backgroundColor,
-        backgroundColor: theme.colors.typography
-    }
+    text: (fontWeight: 'bold' | 'normal', fontStyle: 'italic' | 'normal') => ({
+        fontWeight,
+        fontStyle,
+        color: theme.colors.typography,
+        variants: {
+            size: {
+                small: {
+                    fontSize: rt.fontScale * 10
+                },
+                medium: {
+                    fontSize: rt.fontScale * 30
+                },
+                large: {
+                    fontSize: rt.fontScale * 50
+                }
+            }
+        },
+        uni__dependencies: [2, 4]
+    })
 }))

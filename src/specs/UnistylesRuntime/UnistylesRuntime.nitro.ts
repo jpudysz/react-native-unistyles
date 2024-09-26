@@ -1,8 +1,28 @@
 import type { HybridObject } from 'react-native-nitro-modules'
-import type { Dimensions, Insets } from '../types'
+import type { AppBreakpoint, AppThemeName, Dimensions, Insets } from '../types'
+import type { AndroidContentSizeCategory, IOSContentSizeCategory, WebContentSizeCategory } from '../../types'
+import type { UnistylesNativeMiniRuntime } from '../NativePlatform'
 
 type ColorScheme = 'light' | 'dark' | 'unspecified'
 type Orientation = 'portrait' | 'landscape'
+
+// used for Nitro. It's Native + Cxx types
+export interface UnistylesCxxMiniRuntime extends UnistylesNativeMiniRuntime {
+    readonly themeName?: string,
+    readonly breakpoint?: string,
+    readonly orientation: Orientation,
+    readonly hasAdaptiveThemes: boolean,
+}
+
+// used for TS types
+export interface UnistylesMiniRuntime extends UnistylesCxxMiniRuntime {
+    readonly colorScheme: ColorScheme,
+    readonly contentSizeCategory: IOSContentSizeCategory | AndroidContentSizeCategory | WebContentSizeCategory,
+
+    // additional metadata
+    readonly themeName?: AppThemeName,
+    readonly breakpoint?: AppBreakpoint
+}
 
 export interface UnistylesRuntime extends HybridObject<{ ios: 'c++', android: 'c++' }> {
     readonly colorScheme: ColorScheme,
@@ -20,5 +40,8 @@ export interface UnistylesRuntime extends HybridObject<{ ios: 'c++', android: 'c
     setTheme(themeName: string): void,
     setAdaptiveThemes(isEnabled: boolean): void,
     setImmersiveMode(isEnabled: boolean): void,
-    setRootViewBackgroundColor(hex: string, alpha?: number): void
+    setRootViewBackgroundColor(color: number): void
+
+    // private
+    readonly miniRuntime: UnistylesCxxMiniRuntime
 }

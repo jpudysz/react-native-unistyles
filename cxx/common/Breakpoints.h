@@ -41,4 +41,3 @@ inline std::string getBreakpointFromScreenWidth(int screenWidth, const Breakpoin
 }
 
 }
-

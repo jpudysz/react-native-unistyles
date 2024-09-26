@@ -3,24 +3,38 @@
 #include "HybridUnistylesRuntimeSpec.hpp"
 #include "HybridNativePlatformSpec.hpp"
 #include "Unistyles-Swift-Cxx-Umbrella.hpp"
-#include "Helpers.h"
+#include "UnistylesState.h"
+#include "HybridUnistylesStatusBarSpec.hpp"
+#include "HybridNavigationBar.h"
+#include "HybridStatusBar.h"
 #include "UnistylesRegistry.h"
+#include "Helpers.h"
 
-using namespace margelo::nitro::unistyles;
+namespace margelo::nitro::unistyles {
 
 struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
-    HybridUnistylesRuntime(Unistyles::HybridNativePlatformSpecCxx nativePlatform, jsi::Runtime& rt): HybridObject(TAG), nativePlatform{nativePlatform}, rt{&rt} {}
+    HybridUnistylesRuntime(Unistyles::HybridNativePlatformSpecCxx nativePlatform, jsi::Runtime& rt) : HybridObject(TAG), _nativePlatform{nativePlatform}, _rt{&rt} {}
 
     jsi::Value updateTheme(jsi::Runtime& rt,
-                      const jsi::Value& thisValue,
-                      const jsi::Value* args,
-                      size_t count);
+                            const jsi::Value& thisValue,
+                            const jsi::Value* args,
+                            size_t count);
+    jsi::Value createHybridStatusBar(jsi::Runtime& rt,
+                            const jsi::Value& thisValue,
+                            const jsi::Value* args,
+                            size_t count);
+    jsi::Value createHybridNavigationBar(jsi::Runtime& rt,
+                            const jsi::Value& thisValue,
+                            const jsi::Value* args,
+                            size_t count);
 
     void loadHybridMethods() override {
         HybridUnistylesRuntimeSpec::loadHybridMethods();
 
         registerHybrids(this, [](Prototype& prototype) {
             prototype.registerRawHybridMethod("updateTheme", 1, &HybridUnistylesRuntime::updateTheme);
+            prototype.registerRawHybridMethod("createHybridStatusBar", 0, &HybridUnistylesRuntime::createHybridStatusBar);
+            prototype.registerRawHybridMethod("createHybridNavigationBar", 0, &HybridUnistylesRuntime::createHybridNavigationBar);
         });
     };
 
@@ -35,17 +49,21 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     Orientation getOrientation() override;
     double getPixelRatio() override;
     double getFontScale() override;
+    void registerPlatformListener(const std::function<void(std::vector<UnistyleDependency>)>& listener);
 
     void setTheme(const std::string &themeName) override;
     void setAdaptiveThemes(bool isEnabled) override;
     void setImmersiveMode(bool isEnabled) override;
-    void setRootViewBackgroundColor(const std::string &hex, std::optional<double> alpha) override;
+    void setRootViewBackgroundColor(double color) override;
+    UnistylesCxxMiniRuntime getMiniRuntime() override;
+    jsi::Value getMiniRuntimeAsValue(jsi::Runtime& rt);
+    jsi::Runtime& getRuntime();
 
-    // internal
-    Dimensions getStatusBarDimensions();
-    Dimensions getNavigationBarDimensions();
-
-    jsi::Runtime* rt;
 private:
-    Unistyles::HybridNativePlatformSpecCxx nativePlatform;
+    jsi::Runtime* _rt;
+    std::shared_ptr<HybridNavigationBar> _navigationBar;
+    std::shared_ptr<HybridStatusBar> _statusBar;
+    Unistyles::HybridNativePlatformSpecCxx _nativePlatform;
 };
+
+}
