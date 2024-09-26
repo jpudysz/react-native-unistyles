@@ -46,15 +46,19 @@ export const App = () => {
 const styles = StyleSheet.create((theme, rt) => ({
     container: {
         flex: 1,
-        justifyContent: rt.colorScheme === 'dark' ? 'center' : 'flex-end',
+        justifyContent: rt.colorScheme === 'dark'
+            ? 'center'
+            : 'flex-end',
         alignItems: 'center',
-        backgroundColor: rt.colorScheme === 'dark' ? theme.colors.barbie : theme.colors.backgroundColor,
+        backgroundColor: rt.colorScheme === 'dark'
+            ? theme.colors.barbie
+            : theme.colors.oak,
         uni__dependencies: [4]
     },
     text: (fontWeight: 'bold' | 'normal', fontStyle: 'italic' | 'normal') => ({
         fontWeight,
         fontStyle,
-        color: 'red',
+        color: theme.colors.typography,
         variants: {
             size: {
                 small: {

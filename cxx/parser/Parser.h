@@ -30,7 +30,7 @@ struct Parser {
     Variants variantsToPairs(jsi::Runtime& rt, jsi::Object&& variants);
     void rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
     void rebuildUnistylesInDependencyMap(jsi::Runtime& rt, DependencyMap& dependencyMap);
-    shadow::ShadowLeafUpdates dependencyMapToShadowLeafUpdates(jsi::Runtime& rt, DependencyMap& dependencyMap);
+    shadow::ShadowLeafUpdates dependencyMapToShadowLeafUpdates(DependencyMap& dependencyMap);
 
 private:
     void rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, Unistyle::Shared unistyle);

@@ -138,8 +138,9 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleShee
 }
 
 // convert dependency map to shadow tree updates
-shadow::ShadowLeafUpdates parser::Parser::dependencyMapToShadowLeafUpdates(jsi::Runtime& rt, DependencyMap& dependencyMap) {
+shadow::ShadowLeafUpdates parser::Parser::dependencyMapToShadowLeafUpdates(DependencyMap& dependencyMap) {
     shadow::ShadowLeafUpdates updates;
+    auto& rt = this->_unistylesRuntime->getRuntime();
 
     for (const auto& [styleSheet, map] : dependencyMap) {
         for (const auto& [shadowNode, unistyles] : map) {

@@ -16,13 +16,19 @@ void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime& rt, sha
         // so let's mutate Shadow Tree in single transaction
         auto transaction = [&](const RootShadowNode& oldRootShadowNode) {
             auto affectedNodes = shadow::ShadowTreeManager::findAffectedNodes(oldRootShadowNode, updates);
-
-            return std::static_pointer_cast<RootShadowNode>(shadow::ShadowTreeManager::cloneShadowTree(
+            auto newRootNode = std::static_pointer_cast<RootShadowNode>(shadow::ShadowTreeManager::cloneShadowTree(
                 rt,
                 oldRootShadowNode,
                 updates,
                 affectedNodes
             ));
+            
+            // set unistyles commit trait
+            auto unistylesRootNode = std::reinterpret_pointer_cast<core::UnistylesCommitShadowNode>(newRootNode);
+            
+            unistylesRootNode->addUnistylesCommitTrait();
+
+            return newRootNode;
         };
 
         // commit once!
@@ -30,6 +36,7 @@ void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime& rt, sha
         // enableStateReconciliation: https://reactnative.dev/architecture/render-pipeline#react-native-renderer-state-updates
         // mountSynchronously: must be true as this is update from C++ not React
         shadowTree.commit(transaction, {false, true});
+        
 
         // for now we're assuming single surface, can be improved in the future
         // stop = true means stop enumerating next shadow tree
