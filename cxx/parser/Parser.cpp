@@ -670,7 +670,6 @@ RawProps parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, jsi::Ob
 // check is styleKey contains color
 bool parser::Parser::isColor(const std::string& propertyName) {
     std::string str = propertyName;
-
     std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 
     return str.find("color") != std::string::npos;
