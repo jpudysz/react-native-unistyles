@@ -151,3 +151,25 @@ DependencyMap core::UnistylesRegistry::buildDependencyMap(std::vector<UnistyleDe
 
     return dependencyMap;
 }
+
+DependencyMap core::UnistylesRegistry::buildDependencyMap() {
+    DependencyMap dependencyMap;
+ 
+    for (const auto& styleSheet : this->_styleSheetRegistry) {
+        for (const auto& [_, unistyle] : styleSheet->unistyles) {
+            for (const auto& pair : this->_shadowRegistry) {
+                const auto& [family, unistyles] = pair;
+                
+                for (const auto& shadowUnistyle : unistyles) {
+                    if (unistyle != shadowUnistyle) {
+                        continue;
+                    }
+
+                    dependencyMap[styleSheet][family].push_back(shadowUnistyle);
+                }
+            }
+        }
+    }
+
+    return dependencyMap;
+}

@@ -40,6 +40,7 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     std::shared_ptr<core::StyleSheet> addStyleSheet(int tag, core::StyleSheetType type, jsi::Object&& rawValue);
     void removeStyleSheet(int tag);
     DependencyMap buildDependencyMap(std::vector<UnistyleDependency>& deps);
+    DependencyMap buildDependencyMap();
     
 private:
     UnistylesRegistry() = default;

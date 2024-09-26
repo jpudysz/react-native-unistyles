@@ -5,6 +5,7 @@
 #include <react/renderer/uimanager/UIManager.h>
 #include <ranges>
 #include "ShadowLeafUpdate.h"
+#include "UnistylesCommitShadowNode.h"
 
 namespace margelo::nitro::unistyles::shadow {
 

@@ -1,5 +1,7 @@
 #include "HybridStyleSheet.h"
 
+using namespace facebook::react;
+
 double HybridStyleSheet::getHairlineWidth() {
     auto pixelRatio = this->_unistylesRuntime->getPixelRatio();
     auto nearestPixel = static_cast<int>(std::trunc(pixelRatio * 0.4));
@@ -41,6 +43,7 @@ jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisV
     auto& registry = core::UnistylesRegistry::get();
 
     registry.createState(rt);
+    this->registerCommitHook(rt);
 
     helpers::enumerateJSIObject(rt, config, [&](const std::string& propertyName, jsi::Value& propertyValue){
         if (propertyName == "settings") {
@@ -214,14 +217,21 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
     auto parser = parser::Parser(this->_unistylesRuntime);
     auto dependencyMap = registry.buildDependencyMap(dependencies);
     auto& rt = this->_unistylesRuntime->getRuntime();
- 
+
     if (dependencyMap.size() == 0) {
         return;
     }
 
     parser.rebuildUnistylesInDependencyMap(rt, dependencyMap);
-    
-    auto shadowLeafUpdates = parser.dependencyMapToShadowLeafUpdates(rt, dependencyMap);
-    
+
+    auto shadowLeafUpdates = parser.dependencyMapToShadowLeafUpdates(dependencyMap);
+
     shadow::ShadowTreeManager::updateShadowTree(rt, shadowLeafUpdates);
+}
+
+void HybridStyleSheet::registerCommitHook(jsi::Runtime &rt) {
+    auto& uiManager = UIManagerBinding::getBinding(rt)->getUIManager();
+
+    this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(this->_unistylesRuntime);
+    uiManager.registerCommitHook(*this->_unistylesCommitHook);
 }

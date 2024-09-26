@@ -10,8 +10,10 @@
 #include "Breakpoints.h"
 #include "Parser.h"
 #include "ShadowTreeManager.h"
+#include "UnistylesCommitHook.h"
 
 using namespace margelo::nitro::unistyles;
+using namespace facebook::react;
 
 struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
     HybridStyleSheet(std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime)
@@ -20,6 +22,12 @@ struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
               std::bind(&HybridStyleSheet::onPlatformDependenciesChange, this, std::placeholders::_1)
           );
       }
+    
+    ~HybridStyleSheet() {
+        auto& uiManager = UIManagerBinding::getBinding(this->_unistylesRuntime->getRuntime())->getUIManager();
+        
+        uiManager.unregisterCommitHook(*this->_unistylesCommitHook);
+    }
 
     jsi::Value create(jsi::Runtime& rt,
                       const jsi::Value& thisValue,
@@ -49,7 +57,9 @@ private:
     void setThemeFromColorScheme(jsi::Runtime& rt);
     void loadExternalMethods(const jsi::Value& thisValue, jsi::Runtime& rt);
     void onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies);
+    void registerCommitHook(jsi::Runtime& rt);
 
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
+    std::shared_ptr<core::UnistylesCommitHook> _unistylesCommitHook;
 };
 
