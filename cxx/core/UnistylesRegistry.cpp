@@ -5,7 +5,10 @@ using namespace margelo::nitro::unistyles;
 using namespace facebook;
 using namespace facebook::react;
 
-using DependencyMap = std::unordered_map<std::shared_ptr<core::StyleSheet>, std::pair<const ShadowNodeFamily*, std::vector<core::Unistyle::Shared>>>;
+using DependencyMap = std::unordered_map<
+    std::shared_ptr<core::StyleSheet>,
+    std::unordered_map<const ShadowNodeFamily*, std::vector<core::Unistyle::Shared>>
+>;
 
 void core::UnistylesRegistry::registerTheme(jsi::Runtime& rt, std::string name, jsi::Object&& theme) {
     auto& state = this->getState(rt);
@@ -139,16 +142,8 @@ DependencyMap core::UnistylesRegistry::buildDependencyMap(std::vector<UnistyleDe
                     if (unistyle != shadowUnistyle) {
                         continue;
                     }
-                    
-                    // case for update
-                    if (dependencyMap.contains(styleSheet)) {
-                        dependencyMap[styleSheet].second.emplace_back(shadowUnistyle);
-                        
-                        continue;
-                    }
-                    
-                    // case for new entry
-                    dependencyMap.emplace(styleSheet, std::make_pair(family, std::vector<core::Unistyle::Shared>{shadowUnistyle}));
+
+                    dependencyMap[styleSheet][family].push_back(shadowUnistyle);
                 }
             }
         }

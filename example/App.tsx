@@ -24,13 +24,13 @@ export const App = () => {
         >
             <Text
                 style={styles.text('normal', 'italic')}
-                // ref={ref => {
-                //     UnistylesShadowRegistry.add(ref, styles.text)
-                //
-                //     return () => {
-                //         UnistylesShadowRegistry.remove(ref, styles.text)
-                //     }
-                // }}
+                ref={ref => {
+                    UnistylesShadowRegistry.add(ref, styles.text)
+
+                    return () => {
+                        UnistylesShadowRegistry.remove(ref, styles.text)
+                    }
+                }}
             >
                 Render count: {++renderCount.current}
             </Text>
