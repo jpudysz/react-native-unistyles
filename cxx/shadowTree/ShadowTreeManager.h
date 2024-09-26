@@ -4,22 +4,20 @@
 #include <react/renderer/uimanager/UIManagerBinding.h>
 #include <react/renderer/uimanager/UIManager.h>
 #include <ranges>
-#include "ViewUpdate.h"
+#include "ShadowLeafUpdate.h"
+#include "UnistylesCommitShadowNode.h"
 
 namespace margelo::nitro::unistyles::shadow {
 
 using namespace facebook::react;
 using namespace facebook;
 
-using NodesToBeChanged = std::unordered_map<const ShadowNodeFamily*, std::vector<RawProps>>;
 using AffectedNodes = std::unordered_map<const ShadowNodeFamily *, std::unordered_set<int>>;
 
 struct ShadowTreeManager {
-    static void updateShadowTree(jsi::Runtime& rt, parser::ViewUpdates& updates);
-    static std::shared_ptr<const ShadowNode> findShadowNode(const RootShadowNode& rootNode, const int nativeTag);
-    static std::shared_ptr<const ShadowNode> findShadowNodeByTag(const std::shared_ptr<const ShadowNode>& shadowNode, int nativeTag);
-    static AffectedNodes findAffectedNodes(const RootShadowNode& rootNode, NodesToBeChanged& nodes);
-    static ShadowNode::Unshared cloneShadowTree(const ShadowNode &shadowNode, NodesToBeChanged& nodes, AffectedNodes& affectedNodes);
+    static void updateShadowTree(jsi::Runtime& rt, shadow::ShadowLeafUpdates& updates);
+    static AffectedNodes findAffectedNodes(const RootShadowNode& rootNode, ShadowLeafUpdates& updates);
+    static ShadowNode::Unshared cloneShadowTree(jsi::Runtime& rt, const ShadowNode &shadowNode, ShadowLeafUpdates& updates, AffectedNodes& affectedNodes);
 };
 
 }

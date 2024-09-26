@@ -2,29 +2,31 @@
 
 #include <cmath>
 #include <jsi/jsi.h>
-#include "HybridStyleSheetSpec.hpp"
 #include "HybridUnistylesRuntime.h"
-#include "HybridMiniRuntime.h"
-#include "Unistyles-Swift-Cxx-Umbrella.hpp"
+#include "HybridUnistylesStyleSheetSpec.hpp"
+#include "HostStyle.h"
 #include "Helpers.h"
 #include "Constants.h"
 #include "Breakpoints.h"
-#include "StyleSheetRegistry.h"
-#include "HostStyle.h"
+#include "Parser.h"
 #include "ShadowTreeManager.h"
-#include "ViewUpdate.h"
+#include "UnistylesCommitHook.h"
 
 using namespace margelo::nitro::unistyles;
+using namespace facebook::react;
 
-struct HybridStyleSheet: public HybridStyleSheetSpec {
-    HybridStyleSheet(
-        Unistyles::HybridNativePlatformSpecCxx nativePlatform,
-        std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime
-    ) : HybridObject(TAG),
-        unistylesRuntime{unistylesRuntime},
-        nativePlatform{nativePlatform},
-        miniRuntime{std::make_shared<HybridMiniRuntime>(unistylesRuntime)} {
-        this->nativePlatform.registerPlatformListener(std::bind(&HybridStyleSheet::onPlatformEvent, this, std::placeholders::_1));
+struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
+    HybridStyleSheet(std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime)
+      : HybridObject(TAG), _unistylesRuntime{unistylesRuntime} {
+          this->_unistylesRuntime->registerPlatformListener(
+              std::bind(&HybridStyleSheet::onPlatformDependenciesChange, this, std::placeholders::_1)
+          );
+      }
+    
+    ~HybridStyleSheet() {
+        auto& uiManager = UIManagerBinding::getBinding(this->_unistylesRuntime->getRuntime())->getUIManager();
+        
+        uiManager.unregisterCommitHook(*this->_unistylesCommitHook);
     }
 
     jsi::Value create(jsi::Runtime& rt,
@@ -37,7 +39,7 @@ struct HybridStyleSheet: public HybridStyleSheetSpec {
                       size_t count);
 
     void loadHybridMethods() override {
-        HybridStyleSheetSpec::loadHybridMethods();
+        HybridUnistylesStyleSheetSpec::loadHybridMethods();
 
         registerHybrids(this, [](Prototype& prototype) {
             prototype.registerRawHybridMethod("create", 1, &HybridStyleSheet::create);
@@ -46,20 +48,18 @@ struct HybridStyleSheet: public HybridStyleSheetSpec {
     };
 
     double getHairlineWidth() override;
-
+    
 private:
     void parseSettings(jsi::Runtime& rt, jsi::Object settings);
     void parseBreakpoints(jsi::Runtime& rt, jsi::Object breakpoints);
     void parseThemes(jsi::Runtime& rt, jsi::Object themes);
     void verifyAndSelectTheme(jsi::Runtime &rt);
     void setThemeFromColorScheme(jsi::Runtime& rt);
-    void attachMetaFunctions(jsi::Runtime& rt, core::StyleSheet& styleSheet, jsi::Object& parsedStyleSheet);
-    void onPlatformEvent(PlatformEvent event);
-    void updateUnistylesWithDependencies(std::vector<core::UnistyleDependency>& depdendencies);
+    void loadExternalMethods(const jsi::Value& thisValue, jsi::Runtime& rt);
+    void onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies);
+    void registerCommitHook(jsi::Runtime& rt);
 
-    Unistyles::HybridNativePlatformSpecCxx nativePlatform;
-    std::shared_ptr<HybridMiniRuntime> miniRuntime;
-    std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime;
-    core::StyleSheetRegistry styleSheetRegistry{miniRuntime};
+    std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
+    std::shared_ptr<core::UnistylesCommitHook> _unistylesCommitHook;
 };
 

@@ -5,7 +5,6 @@
 #include <jsi/jsi.h>
 #include <vector>
 #include "Helpers.h"
-#include "Constants.h"
 
 namespace margelo::nitro::unistyles::core {
 
@@ -14,7 +13,7 @@ struct UnistylesRegistry;
 using namespace facebook;
 
 struct UnistylesState {
-    UnistylesState(jsi::Runtime& rt, jsi::Object&& miniRuntime): rt{&rt}, miniRuntime{std::move(miniRuntime)} {}
+    UnistylesState(jsi::Runtime& rt): _rt{&rt} {}
     UnistylesState(const UnistylesState&) = delete;
     UnistylesState(const UnistylesState&&) = delete;
 
@@ -26,25 +25,24 @@ struct UnistylesState {
     std::optional<std::string>& getCurrentThemeName();
     std::vector<std::string> getRegisteredThemeNames();
     std::optional<std::string> getInitialTheme();
-    std::optional<jsi::Function> getInitialThemeNameFn;
     std::optional<std::string> getCurrentBreakpointName();
     std::vector<std::pair<std::string, double>> getSortedBreakpointPairs();
 
     jsi::Object getJSTheme();
-    jsi::Object& getMiniRuntime();
+    int parseColor(jsi::Value& color);
     void computeCurrentBreakpoint(int screenWidth);
+    void registerProcessColorFunction(jsi::Function&& fn);
 
 private:
-    jsi::Runtime* rt;
-    jsi::Object miniRuntime;
-    std::unordered_map<std::string, jsi::WeakObject> jsThemes{};
-
-    std::optional<bool> prefersAdaptiveThemes;
-    std::optional<std::string> initialThemeName = std::nullopt;
-    std::optional<std::string> currentBreakpointName = std::nullopt;
-    std::vector<std::pair<std::string, double>> sortedBreakpointPairs{};
-    std::vector<std::string> registeredThemeNames{};
-    std::optional<std::string> currentThemeName = std::nullopt;
+    jsi::Runtime* _rt;
+    std::unordered_map<std::string, jsi::WeakObject> _jsThemes{};
+    std::optional<bool> _prefersAdaptiveThemes = std::nullopt;
+    std::optional<std::string> _initialThemeName = std::nullopt;
+    std::optional<std::string> _currentBreakpointName = std::nullopt;
+    std::vector<std::pair<std::string, double>> _sortedBreakpointPairs{};
+    std::vector<std::string> _registeredThemeNames{};
+    std::optional<std::string> _currentThemeName = std::nullopt;
+    std::shared_ptr<jsi::Function> _processColorFn;
 
     friend class UnistylesRegistry;
 };

@@ -6,5 +6,6 @@
   "android": {
     "androidNamespace": ["unistyles"],
     "androidCxxLibName": "unistyles"
-  }
+  },
+  "autolinking": {}
 }

@@ -4,10 +4,9 @@ using namespace margelo::nitro::unistyles;
 using namespace facebook::react;
 using namespace facebook;
 
-using NodesToBeChanged = std::unordered_map<const ShadowNodeFamily*, RawProps>;
 using AffectedNodes = std::unordered_map<const ShadowNodeFamily*, std::unordered_set<int>>;
 
-void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime &rt, parser::ViewUpdates& updates) {
+void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime& rt, shadow::ShadowLeafUpdates& updates) {
     auto& uiManager = UIManagerBinding::getBinding(rt)->getUIManager();
     const auto &shadowTreeRegistry = uiManager.getShadowTreeRegistry();
 
@@ -16,23 +15,20 @@ void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime &rt, par
         // but it can cause performance issues for hundreds of nodes
         // so let's mutate Shadow Tree in single transaction
         auto transaction = [&](const RootShadowNode& oldRootShadowNode) {
-            std::unordered_map<const ShadowNodeFamily*, std::vector<RawProps>> nodes;
+            auto affectedNodes = shadow::ShadowTreeManager::findAffectedNodes(oldRootShadowNode, updates);
+            auto newRootNode = std::static_pointer_cast<RootShadowNode>(shadow::ShadowTreeManager::cloneShadowTree(
+                rt,
+                oldRootShadowNode,
+                updates,
+                affectedNodes
+            ));
+            
+            // set unistyles commit trait
+            auto unistylesRootNode = std::reinterpret_pointer_cast<core::UnistylesCommitShadowNode>(newRootNode);
+            
+            unistylesRootNode->addUnistylesCommitTrait();
 
-            std::for_each(updates.begin(), updates.end(), [&](auto& update){
-                auto shadowNode = shadow::ShadowTreeManager::findShadowNode(oldRootShadowNode, update.first);
-
-                // if there is no shadowNode, then most likely node was unmounted
-                // simply skip it, StyleSheet will get own notification soon
-                if (shadowNode) {
-                    auto family = &shadowNode->getFamily();
-
-                    nodes[family].emplace_back(RawProps(rt, std::move(update.second)));
-                }
-            });
-
-            auto affectedNodes = shadow::ShadowTreeManager::findAffectedNodes(oldRootShadowNode, nodes);
-
-            return std::static_pointer_cast<RootShadowNode>(shadow::ShadowTreeManager::cloneShadowTree(oldRootShadowNode, nodes, affectedNodes));
+            return newRootNode;
         };
 
         // commit once!
@@ -40,6 +36,7 @@ void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime &rt, par
         // enableStateReconciliation: https://reactnative.dev/architecture/render-pipeline#react-native-renderer-state-updates
         // mountSynchronously: must be true as this is update from C++ not React
         shadowTree.commit(transaction, {false, true});
+        
 
         // for now we're assuming single surface, can be improved in the future
         // stop = true means stop enumerating next shadow tree
@@ -48,36 +45,28 @@ void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime &rt, par
     });
 }
 
-std::shared_ptr<const ShadowNode> shadow::ShadowTreeManager::findShadowNode(const RootShadowNode& rootNode, const int nativeTag) {
-    auto shadowNode = rootNode.ShadowNode::getChildren().at(0);
-
-    return shadow::ShadowTreeManager::findShadowNodeByTag(shadowNode, nativeTag);
-}
-
-std::shared_ptr<const ShadowNode> shadow::ShadowTreeManager::findShadowNodeByTag(const std::shared_ptr<const ShadowNode>& shadowNode, int nativeTag) {
-    if (shadowNode->getTag() == nativeTag) {
-        return shadowNode;
-    }
-
-    auto& children = shadowNode->getChildren();
-
-    for (const auto& child : children) {
-        auto result = findShadowNodeByTag(child, nativeTag);
-
-        if (result != nullptr) {
-            return result;
-        }
-    }
-
-    return nullptr;
-}
-
 // based on Reanimated algorithm
-AffectedNodes shadow::ShadowTreeManager::findAffectedNodes(const RootShadowNode& rootNode, NodesToBeChanged& nodes) {
+// For each affected family we're gathering affected nodes (their indexes)
+// Example:
+//      A
+//    /   \
+//   B     C
+//  / \
+// D   E*
+//    / \
+//   F   G
+//
+// For ShadowFamily E* we will get:
+//[
+//  0 - because B is a first children of A,
+//  1 - because E is a second children of B
+//]
+// A, B and E are affected now
+AffectedNodes shadow::ShadowTreeManager::findAffectedNodes(const RootShadowNode& rootNode, ShadowLeafUpdates& updates) {
     AffectedNodes affectedNodes;
 
     // compute affected nodes (sub tree)
-    std::for_each(nodes.begin(), nodes.end(), [&](const auto& pair) {
+    std::for_each(updates.begin(), updates.end(), [&](const auto& pair) {
         const auto& [family, _] = pair;
         const auto familyAncestors = family->getAncestors(rootNode);
 
@@ -93,11 +82,10 @@ AffectedNodes shadow::ShadowTreeManager::findAffectedNodes(const RootShadowNode&
 }
 
 // based on Reanimated algorithm
-ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode &shadowNode, NodesToBeChanged& nodes, AffectedNodes& affectedNodes) {
+// clone affected nodes recursively, inject props and commit tree
+ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(jsi::Runtime& rt, const ShadowNode &shadowNode, ShadowLeafUpdates& updates, AffectedNodes& affectedNodes) {
     const auto family = &shadowNode.getFamily();
-
-    // family's RawProps and indexes of children
-    const auto rawPropsIt = nodes.find(family);
+    const auto rawPropsIt = updates.find(family);
     const auto childrenIt = affectedNodes.find(family);
     auto children = shadowNode.getChildren();
 
@@ -105,14 +93,14 @@ ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode
     if (childrenIt != affectedNodes.end()) {
         // get all indexes of children and clone it recursively
         for (const auto index : childrenIt->second) {
-            children[index] = cloneShadowTree(*children[index], nodes, affectedNodes);
+            children[index] = cloneShadowTree(rt, *children[index], updates, affectedNodes);
         }
     }
 
     Props::Shared updatedProps = nullptr;
 
-    // clone props for out target shadow node and place fresh RawProps
-    if (rawPropsIt != nodes.end()) {
+    // clone props for our target shadow node and place fresh RawProps
+    if (rawPropsIt != updates.end()) {
         PropsParserContext propsParserContext{
             shadowNode.getSurfaceId(),
             *shadowNode.getContextContainer()
@@ -120,6 +108,7 @@ ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode
 
         updatedProps = shadowNode.getProps();
 
+        // we may have multiple Unistyles for single node, so we must apply them all
         for (const auto& props: rawPropsIt->second) {
             updatedProps = shadowNode
                 .getComponentDescriptor()
