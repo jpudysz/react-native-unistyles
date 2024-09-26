@@ -84,17 +84,19 @@ void parser::Parser::rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_
 
 // rebuild all unistyles that are affected by platform event
 void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, DependencyMap& dependencyMap) {
-    for (const auto& [styleSheet, pair] : dependencyMap) {
+    for (const auto& [styleSheet, map] : dependencyMap) {
         jsi::Object unwrappedStyleSheet = this->unwrapStyleSheet(rt, styleSheet);
 
-        for (const auto& unistyle : pair.second) {
-            // StyleSheet might have styles that are not affected
-            if (!unwrappedStyleSheet.hasProperty(rt, unistyle->styleKey.c_str())) {
-                continue;
-            }
+        for (const auto& [shadowNode, unistyles] : map) {
+            for (const auto& unistyle : unistyles) {
+                // StyleSheet might have styles that are not affected
+                if (!unwrappedStyleSheet.hasProperty(rt, unistyle->styleKey.c_str())) {
+                    continue;
+                }
 
-            unistyle->rawValue = unwrappedStyleSheet.getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
-            this->rebuildUnistyle(rt, styleSheet, unistyle);
+                unistyle->rawValue = unwrappedStyleSheet.getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
+                this->rebuildUnistyle(rt, styleSheet, unistyle);
+            }
         }
     }
 }
@@ -139,17 +141,19 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleShee
 shadow::ShadowLeafUpdates parser::Parser::dependencyMapToShadowLeafUpdates(jsi::Runtime& rt, DependencyMap& dependencyMap) {
     shadow::ShadowLeafUpdates updates;
 
-    for (const auto& [styleSheet, pair] : dependencyMap) {
-        for (const auto& unistyle : pair.second) {
-            auto rawProps = this->parseStylesToShadowTreeStyles(rt, unistyle->parsedStyle.value());
+    for (const auto& [styleSheet, map] : dependencyMap) {
+        for (const auto& [shadowNode, unistyles] : map) {
+            for (const auto& unistyle : unistyles) {
+                auto rawProps = this->parseStylesToShadowTreeStyles(rt, unistyle->parsedStyle.value());
 
-            if (updates.contains(pair.first)) {
-                updates[pair.first].emplace_back(std::move(rawProps));
+                if (updates.contains(shadowNode)) {
+                    updates[shadowNode].emplace_back(std::move(rawProps));
 
-                continue;
+                    continue;
+                }
+
+                updates.emplace(shadowNode, std::vector<RawProps>{std::move(rawProps)});
             }
-
-            updates.emplace(pair.first, std::vector<RawProps>{std::move(rawProps)});
         }
     }
 

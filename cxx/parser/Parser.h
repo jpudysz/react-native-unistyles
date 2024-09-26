@@ -17,7 +17,10 @@ using namespace facebook;
 using namespace margelo::nitro::unistyles::core;
 
 using Variants = std::vector<std::pair<std::string, std::string>>;
-using DependencyMap = std::unordered_map<std::shared_ptr<core::StyleSheet>, std::pair<const ShadowNodeFamily*, std::vector<core::Unistyle::Shared>>>;
+using DependencyMap = std::unordered_map<
+    std::shared_ptr<core::StyleSheet>,
+    std::unordered_map<const ShadowNodeFamily*, std::vector<core::Unistyle::Shared>>
+>;
 
 struct Parser {
     Parser(std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime): _unistylesRuntime{unistylesRuntime} {}
