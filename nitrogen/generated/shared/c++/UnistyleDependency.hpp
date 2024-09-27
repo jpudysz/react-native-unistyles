@@ -26,19 +26,19 @@ namespace margelo::nitro::unistyles {
    */
   enum class UnistyleDependency {
     THEME      SWIFT_NAME(theme) = 0,
-    BREAKPOINTS      SWIFT_NAME(breakpoints) = 1,
-    VARIANTS      SWIFT_NAME(variants) = 2,
-    COMPOUNDVARIANTS      SWIFT_NAME(compoundvariants) = 3,
-    COLORSCHEME      SWIFT_NAME(colorscheme) = 4,
-    RTL      SWIFT_NAME(rtl) = 5,
+    THEMENAME      SWIFT_NAME(themename) = 1,
+    ADAPTIVETHEMES      SWIFT_NAME(adaptivethemes) = 2,
+    BREAKPOINTS      SWIFT_NAME(breakpoints) = 3,
+    VARIANTS      SWIFT_NAME(variants) = 4,
+    COLORSCHEME      SWIFT_NAME(colorscheme) = 5,
     DIMENSIONS      SWIFT_NAME(dimensions) = 6,
     ORIENTATION      SWIFT_NAME(orientation) = 7,
-    THEMENAME      SWIFT_NAME(themename) = 8,
-    CONTENTSIZECATEGORY      SWIFT_NAME(contentsizecategory) = 9,
-    INSETS      SWIFT_NAME(insets) = 10,
-    PIXELRATIO      SWIFT_NAME(pixelratio) = 11,
-    FONTSCALE      SWIFT_NAME(fontscale) = 12,
-    STATUSBAR      SWIFT_NAME(statusbar) = 13,
+    CONTENTSIZECATEGORY      SWIFT_NAME(contentsizecategory) = 8,
+    INSETS      SWIFT_NAME(insets) = 9,
+    PIXELRATIO      SWIFT_NAME(pixelratio) = 10,
+    FONTSCALE      SWIFT_NAME(fontscale) = 11,
+    STATUSBAR      SWIFT_NAME(statusbar) = 12,
+    NAVIGATIONBAR      SWIFT_NAME(navigationbar) = 13,
   } CLOSED_ENUM;
 
 } // namespace margelo::nitro::unistyles

@@ -206,6 +206,17 @@ public final class HybridNativePlatformSpecCxx {
   }
 
   @inline(__always)
+  public func setStatusBarHidden(isHidden: Bool) -> Void {
+    do {
+      try self.implementation.setStatusBarHidden(isHidden: isHidden)
+      return
+    } catch {
+      let message = "\(error.localizedDescription)"
+      fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(message))")
+    }
+  }
+
+  @inline(__always)
   public func setStatusBarBackgroundColor(color: Double) -> Void {
     do {
       try self.implementation.setStatusBarBackgroundColor(color: color)

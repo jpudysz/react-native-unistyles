@@ -45,6 +45,7 @@ public protocol HybridNativePlatformSpec: HybridObjectSpec {
   func setRootViewBackgroundColor(color: Double) throws -> Void
   func setNavigationBarBackgroundColor(color: Double) throws -> Void
   func setNavigationBarHidden(isHidden: Bool) throws -> Void
+  func setStatusBarHidden(isHidden: Bool) throws -> Void
   func setStatusBarBackgroundColor(color: Double) throws -> Void
   func setImmersiveMode(isEnabled: Bool) throws -> Void
   func getMiniRuntime() throws -> UnistylesNativeMiniRuntime

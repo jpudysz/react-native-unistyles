@@ -127,6 +127,9 @@ namespace margelo::nitro::unistyles {
     inline void setNavigationBarHidden(bool isHidden) override {
       _swiftPart.setNavigationBarHidden(std::forward<decltype(isHidden)>(isHidden));
     }
+    inline void setStatusBarHidden(bool isHidden) override {
+      _swiftPart.setStatusBarHidden(std::forward<decltype(isHidden)>(isHidden));
+    }
     inline void setStatusBarBackgroundColor(double color) override {
       _swiftPart.setStatusBarBackgroundColor(std::forward<decltype(color)>(color));
     }

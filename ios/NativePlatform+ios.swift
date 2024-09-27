@@ -274,6 +274,10 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     func getNavigationBarDimensions() -> Dimensions {
         return Dimensions(width: 0, height: 0);
     }
+    
+    func setStatusBarHidden(isHidden: Bool) throws {
+        self.onWindowChange(Notification(name: NSNotification.Name("RCTWindowFrameDidChangeNotification")))
+    }
 
     // not implemented for iOS as there are no such APIs
     func setNavigationBarBackgroundColor(color: Double) throws {}

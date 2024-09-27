@@ -77,6 +77,7 @@ namespace margelo::nitro::unistyles {
       virtual void setRootViewBackgroundColor(double color) = 0;
       virtual void setNavigationBarBackgroundColor(double color) = 0;
       virtual void setNavigationBarHidden(bool isHidden) = 0;
+      virtual void setStatusBarHidden(bool isHidden) = 0;
       virtual void setStatusBarBackgroundColor(double color) = 0;
       virtual void setImmersiveMode(bool isEnabled) = 0;
       virtual UnistylesNativeMiniRuntime getMiniRuntime() = 0;

@@ -90,6 +90,10 @@ abstract class HybridNativePlatformSpec: HybridObject() {
   
   @DoNotStrip
   @Keep
+  abstract fun setStatusBarHidden(isHidden: Boolean): Unit
+  
+  @DoNotStrip
+  @Keep
   abstract fun setStatusBarBackgroundColor(color: Double): Unit
   
   @DoNotStrip

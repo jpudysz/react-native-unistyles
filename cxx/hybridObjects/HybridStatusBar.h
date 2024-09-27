@@ -12,6 +12,7 @@ struct HybridStatusBar: public HybridUnistylesStatusBarSpec {
     void setBackgroundColor(double color) override;
     double getWidth() override;
     double getHeight() override;
+    void setHidden(bool isHidden) override;
     
 private:
     Unistyles::HybridNativePlatformSpecCxx _nativePlatform;
