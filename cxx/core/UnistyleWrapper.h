@@ -38,10 +38,11 @@ inline static jsi::Value valueFromUnistyle(jsi::Runtime& rt, Unistyle::Shared un
         return obj;
     }
     
-    auto hostFn = jsi::Value(rt, unistyle->proxiedFunction.value()).asObject(rt).asFunction(rt);
+    auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyle);
+    auto hostFn = jsi::Value(rt, unistyleFn->proxiedFunction.value()).asObject(rt).asFunction(rt);
 
     hostFn.setNativeState(rt, std::move(wrappedUnistyle));
-    hostFn.setProperty(rt, helpers::UNISTYLES_ID.c_str(), unistyle->styleKey);
+    hostFn.setProperty(rt, helpers::UNISTYLES_ID.c_str(), unistyleFn->styleKey);
     
     return std::move(hostFn);
 }

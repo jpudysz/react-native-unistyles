@@ -3,6 +3,11 @@
 using namespace margelo::nitro::unistyles;
 using namespace facebook::react;
 
+core::UnistylesCommitHook::UnistylesCommitHook(UIManager& uiManager, std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime)
+    : _unistylesRuntime{unistylesRuntime} {
+        uiManager.registerCommitHook(*this);
+    };
+
 core::UnistylesCommitHook::~UnistylesCommitHook() noexcept {}
 
 void core::UnistylesCommitHook::commitHookWasRegistered(const UIManager &uiManager) noexcept {}
