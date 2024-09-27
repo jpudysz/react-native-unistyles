@@ -229,6 +229,7 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
     shadow::ShadowTreeManager::updateShadowTree(rt, shadowLeafUpdates);
 }
 
+// todo unregister me
 void HybridStyleSheet::registerCommitHook(jsi::Runtime &rt) {
     auto& uiManager = UIManagerBinding::getBinding(rt)->getUIManager();
 

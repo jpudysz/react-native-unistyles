@@ -63,6 +63,7 @@ void HybridUnistylesRuntime::setTheme(const std::string &themeName) {
     auto& state = core::UnistylesRegistry::get().getState(*_rt);
 
     state.setTheme(themeName);
+    this->_onDependenciesChange({UnistyleDependency::THEME, UnistyleDependency::THEMENAME});
 };
 
 void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
@@ -176,4 +177,5 @@ jsi::Runtime& HybridUnistylesRuntime::getRuntime() {
 
 void HybridUnistylesRuntime::registerPlatformListener(const std::function<void(std::vector<UnistyleDependency>)>& listener) {
     this->_nativePlatform.registerPlatformListener(listener);
+    this->_onDependenciesChange = listener;
 }
