@@ -15,8 +15,19 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
 
         jsi::Object styleValue = propertyValue.asObject(rt);
 
+
+        if (styleValue.isFunction(rt)) {
+            styleSheet->unistyles[styleKey] = std::make_shared<UnistyleDynamicFunction>(
+                UnistyleType::DynamicFunction,
+                styleKey,
+                styleValue
+            );
+
+            return;
+        }
+
         styleSheet->unistyles[styleKey] = std::make_shared<Unistyle>(
-            styleValue.isFunction(rt) ? UnistyleType::DynamicFunction : UnistyleType::Object,
+            UnistyleType::Object,
             styleKey,
             styleValue
         );
@@ -64,9 +75,10 @@ void parser::Parser::parseUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
 
         if (unistyle->type == core::UnistyleType::DynamicFunction) {
             auto hostFn = this->createDynamicFunctionProxy(rt, unistyle, styleSheet->variants);
+            auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyle);
 
             // defer parsing dynamic functions
-            unistyle->proxiedFunction = std::move(hostFn);
+            unistyleFn->proxiedFunction = std::move(hostFn);
         }
     }
 }
@@ -112,12 +124,13 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleShee
     // for functions we need to call memoized function
     // with last know arguments and parse it with new theme and mini runtime
     if (unistyle->type == core::UnistyleType::DynamicFunction) {
-        auto maybeMetadata = unistyle->dynamicFunctionMetadata;
+        auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyle);
+        auto maybeMetadata = unistyleFn->dynamicFunctionMetadata;
 
-        helpers::assertThat(rt, maybeMetadata.has_value(), "Your dynamic function '" + unistyle->styleKey + "' has no metadata and can't be processed.");
+        helpers::assertThat(rt, maybeMetadata.has_value(), "Your dynamic function '" + unistyleFn->styleKey + "' has no metadata and can't be processed.");
 
         // convert arguments to jsi::Value
-        auto metadata = unistyle->dynamicFunctionMetadata.value();
+        auto metadata = unistyleFn->dynamicFunctionMetadata.value();
         std::vector<jsi::Value> args{};
 
         for (int i = 0; i < metadata.count; i++) {
@@ -129,11 +142,10 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleShee
         const jsi::Value *argStart = args.data();
 
         // call cached function with memoized arguments
-        auto functionResult = unistyle->proxiedFunction.value().callAsConstructor(rt, argStart, metadata.count).asObject(rt);
+        auto functionResult = unistyleFn->proxiedFunction.value().callAsConstructor(rt, argStart, metadata.count).asObject(rt);
 
-        // todo this is weird syntax, should I introduce another property for mid conversion?
-        unistyle->parsedStyle = std::move(functionResult);
-        unistyle->parsedStyle = this->parseFirstLevel(rt, unistyle, styleSheet->variants);
+        unistyleFn->unprocessedValue = std::move(functionResult);
+        unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, styleSheet->variants);
     }
 }
 
@@ -219,10 +231,10 @@ std::vector<folly::dynamic> parser::Parser::parseDynamicFunctionArguments(jsi::R
 // eg. variants, compoundVariants, mq, breakpoints etc.
 jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared unistyle, Variants& variants) {
     // for objects - we simply operate on them
-    // for functions we need to work on the mid-saved result (object)
+    // for functions we need to work on the unprocessed result (object)
     auto& style = unistyle->type == core::UnistyleType::Object
         ? unistyle->rawValue
-        : unistyle->parsedStyle.value();
+        : std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyle)->unprocessedValue.value();
     auto parsedStyle = jsi::Object(rt);
 
     // we need to be sure that compoundVariants are parsed after variants and after every other style
@@ -333,14 +345,17 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
             auto result = unistyle->rawValue.asFunction(rt).call(rt, args, count);
 
             // memoize metadata to call it later
-            unistyle->dynamicFunctionMetadata = core::DynamicFunctionMetadata{
+            auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyle);
+
+            unistyleFn->dynamicFunctionMetadata = core::DynamicFunctionMetadata{
                 count,
                 this->parseDynamicFunctionArguments(rt, count, args)
             };
 
-            unistyle->parsedStyle = jsi::Value(rt, result).asObject(rt);
+            unistyleFn->unprocessedValue = jsi::Value(rt, result).asObject(rt);
+            unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
 
-            return this->parseFirstLevel(rt, unistyle, variants);
+            return jsi::Value(rt, unistyleFn->parsedStyle.value());
     });
 }
 

@@ -165,6 +165,7 @@ DependencyMap core::UnistylesRegistry::buildDependencyMap() {
                         continue;
                     }
 
+                    // make sure to use base Unistyle class
                     dependencyMap[styleSheet][family].push_back(shadowUnistyle);
                 }
             }

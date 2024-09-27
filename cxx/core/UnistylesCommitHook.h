@@ -11,7 +11,7 @@ namespace margelo::nitro::unistyles::core {
 using namespace facebook::react;
 
 struct UnistylesCommitHook : public UIManagerCommitHook {
-    UnistylesCommitHook(std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime): _unistylesRuntime{unistylesRuntime} {};
+    UnistylesCommitHook(UIManager& uiManager, std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime);
     ~UnistylesCommitHook() noexcept override;
 
     void commitHookWasRegistered(const UIManager &uiManager) noexcept override;

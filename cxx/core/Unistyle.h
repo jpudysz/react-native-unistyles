@@ -24,15 +24,10 @@ struct Unistyle {
 
     Unistyle(UnistyleType type, std::string styleKey, jsi::Object& rawObject)
         : styleKey{styleKey}, type{type}, rawValue{std::move(rawObject)} {}
+    virtual ~Unistyle() = default;
 
     Unistyle(const Unistyle&) = delete;
-    Unistyle(Unistyle&& other) noexcept
-        : styleKey(std::move(other.styleKey)),
-          type(other.type),
-          rawValue(std::move(other.rawValue)),
-          parsedStyle(std::move(other.parsedStyle)),
-          dependencies(std::move(other.dependencies)),
-          dynamicFunctionMetadata(std::move(other.dynamicFunctionMetadata)) {}
+    Unistyle(Unistyle&& other) = delete;
 
     UnistyleType type;
     std::string styleKey;
@@ -40,13 +35,27 @@ struct Unistyle {
     std::optional<jsi::Object> parsedStyle;
     std::vector<UnistyleDependency> dependencies{};
 
-    // available for dynamic functions only
-    std::optional<jsi::Function> proxiedFunction = std::nullopt;
-    std::optional<DynamicFunctionMetadata> dynamicFunctionMetadata = std::nullopt;
-
     inline bool dependsOn(UnistyleDependency dependency) {
         return std::find(this->dependencies.begin(), this->dependencies.end(), dependency) != this->dependencies.end();
     }
+};
+
+struct UnistyleDynamicFunction: public Unistyle {
+    // dynamic function must have 4 different value types
+    // rawValue <- original user function
+    // proxiedFunction <- host function that is a wrapper for user's original function
+    // unprocessedValue <- object generated after calling proxy and user's original function
+    // parsedStyle <- parsed with Unistyle's parser
+
+    UnistyleDynamicFunction(UnistyleType type, std::string styleKey, jsi::Object& rawObject)
+        : Unistyle(type, styleKey, rawObject) {}
+
+    UnistyleDynamicFunction(const UnistyleDynamicFunction&) = delete;
+    UnistyleDynamicFunction(UnistyleDynamicFunction&& other) = delete;
+
+    std::optional<jsi::Object> unprocessedValue;
+    std::optional<jsi::Function> proxiedFunction = std::nullopt;
+    std::optional<DynamicFunctionMetadata> dynamicFunctionMetadata = std::nullopt;
 };
 
 }

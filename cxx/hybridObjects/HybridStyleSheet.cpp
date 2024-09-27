@@ -43,7 +43,6 @@ jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisV
     auto& registry = core::UnistylesRegistry::get();
 
     registry.createState(rt);
-    this->registerCommitHook(rt);
 
     helpers::enumerateJSIObject(rt, config, [&](const std::string& propertyName, jsi::Value& propertyValue){
         if (propertyName == "settings") {
@@ -69,6 +68,7 @@ jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisV
 
     verifyAndSelectTheme(rt);
     loadExternalMethods(thisVal, rt);
+    registerCommitHook(rt);
 
     return jsi::Value::undefined();
 }
@@ -229,10 +229,8 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
     shadow::ShadowTreeManager::updateShadowTree(rt, shadowLeafUpdates);
 }
 
-// todo unregister me
 void HybridStyleSheet::registerCommitHook(jsi::Runtime &rt) {
-    auto& uiManager = UIManagerBinding::getBinding(rt)->getUIManager();
+    UIManager& uiManager = const_cast<UIManager&>(UIManagerBinding::getBinding(rt)->getUIManager());
 
-    this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(this->_unistylesRuntime);
-    uiManager.registerCommitHook(*this->_unistylesCommitHook);
+    this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(uiManager, this->_unistylesRuntime);
 }
