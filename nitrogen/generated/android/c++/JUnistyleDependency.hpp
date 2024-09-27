@@ -41,39 +41,37 @@ namespace margelo::nitro::unistyles {
     static jni::alias_ref<JUnistyleDependency> fromCpp(UnistyleDependency value) {
       static const auto clazz = javaClassStatic();
       static const auto fieldTHEME = clazz->getStaticField<JUnistyleDependency>("THEME");
+      static const auto fieldTHEMENAME = clazz->getStaticField<JUnistyleDependency>("THEMENAME");
+      static const auto fieldADAPTIVETHEMES = clazz->getStaticField<JUnistyleDependency>("ADAPTIVETHEMES");
       static const auto fieldBREAKPOINTS = clazz->getStaticField<JUnistyleDependency>("BREAKPOINTS");
       static const auto fieldVARIANTS = clazz->getStaticField<JUnistyleDependency>("VARIANTS");
-      static const auto fieldCOMPOUNDVARIANTS = clazz->getStaticField<JUnistyleDependency>("COMPOUNDVARIANTS");
       static const auto fieldCOLORSCHEME = clazz->getStaticField<JUnistyleDependency>("COLORSCHEME");
-      static const auto fieldRTL = clazz->getStaticField<JUnistyleDependency>("RTL");
       static const auto fieldDIMENSIONS = clazz->getStaticField<JUnistyleDependency>("DIMENSIONS");
       static const auto fieldORIENTATION = clazz->getStaticField<JUnistyleDependency>("ORIENTATION");
-      static const auto fieldTHEMENAME = clazz->getStaticField<JUnistyleDependency>("THEMENAME");
       static const auto fieldCONTENTSIZECATEGORY = clazz->getStaticField<JUnistyleDependency>("CONTENTSIZECATEGORY");
       static const auto fieldINSETS = clazz->getStaticField<JUnistyleDependency>("INSETS");
       static const auto fieldPIXELRATIO = clazz->getStaticField<JUnistyleDependency>("PIXELRATIO");
       static const auto fieldFONTSCALE = clazz->getStaticField<JUnistyleDependency>("FONTSCALE");
       static const auto fieldSTATUSBAR = clazz->getStaticField<JUnistyleDependency>("STATUSBAR");
+      static const auto fieldNAVIGATIONBAR = clazz->getStaticField<JUnistyleDependency>("NAVIGATIONBAR");
       
       switch (value) {
         case UnistyleDependency::THEME:
           return clazz->getStaticFieldValue(fieldTHEME);
+        case UnistyleDependency::THEMENAME:
+          return clazz->getStaticFieldValue(fieldTHEMENAME);
+        case UnistyleDependency::ADAPTIVETHEMES:
+          return clazz->getStaticFieldValue(fieldADAPTIVETHEMES);
         case UnistyleDependency::BREAKPOINTS:
           return clazz->getStaticFieldValue(fieldBREAKPOINTS);
         case UnistyleDependency::VARIANTS:
           return clazz->getStaticFieldValue(fieldVARIANTS);
-        case UnistyleDependency::COMPOUNDVARIANTS:
-          return clazz->getStaticFieldValue(fieldCOMPOUNDVARIANTS);
         case UnistyleDependency::COLORSCHEME:
           return clazz->getStaticFieldValue(fieldCOLORSCHEME);
-        case UnistyleDependency::RTL:
-          return clazz->getStaticFieldValue(fieldRTL);
         case UnistyleDependency::DIMENSIONS:
           return clazz->getStaticFieldValue(fieldDIMENSIONS);
         case UnistyleDependency::ORIENTATION:
           return clazz->getStaticFieldValue(fieldORIENTATION);
-        case UnistyleDependency::THEMENAME:
-          return clazz->getStaticFieldValue(fieldTHEMENAME);
         case UnistyleDependency::CONTENTSIZECATEGORY:
           return clazz->getStaticFieldValue(fieldCONTENTSIZECATEGORY);
         case UnistyleDependency::INSETS:
@@ -84,6 +82,8 @@ namespace margelo::nitro::unistyles {
           return clazz->getStaticFieldValue(fieldFONTSCALE);
         case UnistyleDependency::STATUSBAR:
           return clazz->getStaticFieldValue(fieldSTATUSBAR);
+        case UnistyleDependency::NAVIGATIONBAR:
+          return clazz->getStaticFieldValue(fieldNAVIGATIONBAR);
         default:
           std::string stringValue = std::to_string(static_cast<int>(value));
           throw std::runtime_error("Invalid enum value (" + stringValue + "!");

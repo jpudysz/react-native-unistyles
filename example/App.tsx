@@ -53,7 +53,7 @@ const styles = StyleSheet.create((theme, rt) => ({
         backgroundColor: rt.colorScheme === 'dark'
             ? theme.colors.barbie
             : theme.colors.oak,
-        uni__dependencies: [4]
+        uni__dependencies: [5]
     },
     text: (fontWeight: 'bold' | 'normal', fontStyle: 'italic' | 'normal') => ({
         fontWeight,
@@ -72,6 +72,6 @@ const styles = StyleSheet.create((theme, rt) => ({
                 }
             }
         },
-        uni__dependencies: [2, 4]
+        uni__dependencies: [4]
     })
 }))

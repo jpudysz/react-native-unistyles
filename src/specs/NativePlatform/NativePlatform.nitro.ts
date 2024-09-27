@@ -5,20 +5,20 @@ type ColorScheme = 'dark' | 'light' | 'unspecified'
 type Orientation = 'portrait' | 'landscape'
 
 enum UnistyleDependency {
-    Theme = 0, // todo do I need it, dynamic function is always recomputed
-    Breakpoints = 1,
-    Variants = 2,
-    CompoundVariants = 3, // todo do I need it
-    ColorScheme = 4,
-    Rtl = 5, // todo do I need it, it's not dynamic
+    Theme = 0,
+    ThemeName = 1,
+    AdaptiveThemes = 2,
+    Breakpoints = 3,
+    Variants = 4,
+    ColorScheme = 5,
     Dimensions = 6,
     Orientation = 7,
-    ThemeName = 8,
-    ContentSizeCategory = 9,
-    Insets = 10,
-    PixelRatio = 11,
-    FontScale = 12,
-    StatusBar = 13
+    ContentSizeCategory = 8,
+    Insets = 9,
+    PixelRatio = 10,
+    FontScale = 11,
+    StatusBar = 12,
+    NavigationBar = 13
 }
 
 export interface UnistylesNativeMiniRuntime {
@@ -51,6 +51,7 @@ export interface NativePlatform extends HybridObject<{ ios: 'swift', android: 'k
     setRootViewBackgroundColor(color: number): void,
     setNavigationBarBackgroundColor?(color: number): void,
     setNavigationBarHidden?(isHidden: boolean): void,
+    setStatusBarHidden(isHidden: boolean): void,
     setStatusBarBackgroundColor?(color: number): void,
     setImmersiveMode(isEnabled: boolean): void,
 

@@ -47,6 +47,7 @@ namespace margelo::nitro::unistyles {
     public:
       // Methods
       virtual void setBackgroundColor(double color) = 0;
+      virtual void setHidden(bool isHidden) = 0;
 
     protected:
       // Hybrid Setup

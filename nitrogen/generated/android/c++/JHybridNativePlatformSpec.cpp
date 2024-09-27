@@ -120,6 +120,10 @@ namespace margelo::nitro::unistyles {
     static const auto method = _javaPart->getClass()->getMethod<void(jboolean /* isHidden */)>("setNavigationBarHidden");
     method(_javaPart, isHidden);
   }
+  void JHybridNativePlatformSpec::setStatusBarHidden(bool isHidden) {
+    static const auto method = _javaPart->getClass()->getMethod<void(jboolean /* isHidden */)>("setStatusBarHidden");
+    method(_javaPart, isHidden);
+  }
   void JHybridNativePlatformSpec::setStatusBarBackgroundColor(double color) {
     static const auto method = _javaPart->getClass()->getMethod<void(double /* color */)>("setStatusBarBackgroundColor");
     method(_javaPart, color);

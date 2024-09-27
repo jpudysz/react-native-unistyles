@@ -19,22 +19,20 @@ public extension UnistyleDependency {
     switch string {
       case "Theme":
         self = .theme
+      case "ThemeName":
+        self = .themename
+      case "AdaptiveThemes":
+        self = .adaptivethemes
       case "Breakpoints":
         self = .breakpoints
       case "Variants":
         self = .variants
-      case "CompoundVariants":
-        self = .compoundvariants
       case "ColorScheme":
         self = .colorscheme
-      case "Rtl":
-        self = .rtl
       case "Dimensions":
         self = .dimensions
       case "Orientation":
         self = .orientation
-      case "ThemeName":
-        self = .themename
       case "ContentSizeCategory":
         self = .contentsizecategory
       case "Insets":
@@ -45,6 +43,8 @@ public extension UnistyleDependency {
         self = .fontscale
       case "StatusBar":
         self = .statusbar
+      case "NavigationBar":
+        self = .navigationbar
       default:
         return nil
     }
@@ -57,22 +57,20 @@ public extension UnistyleDependency {
     switch self {
       case .theme:
         return "Theme"
+      case .themename:
+        return "ThemeName"
+      case .adaptivethemes:
+        return "AdaptiveThemes"
       case .breakpoints:
         return "Breakpoints"
       case .variants:
         return "Variants"
-      case .compoundvariants:
-        return "CompoundVariants"
       case .colorscheme:
         return "ColorScheme"
-      case .rtl:
-        return "Rtl"
       case .dimensions:
         return "Dimensions"
       case .orientation:
         return "Orientation"
-      case .themename:
-        return "ThemeName"
       case .contentsizecategory:
         return "ContentSizeCategory"
       case .insets:
@@ -83,6 +81,8 @@ public extension UnistyleDependency {
         return "FontScale"
       case .statusbar:
         return "StatusBar"
+      case .navigationbar:
+        return "NavigationBar"
     }
   }
 }
