@@ -64,6 +64,7 @@ private:
     std::shared_ptr<HybridNavigationBar> _navigationBar;
     std::shared_ptr<HybridStatusBar> _statusBar;
     Unistyles::HybridNativePlatformSpecCxx _nativePlatform;
+    std::function<void(std::vector<UnistyleDependency>)> _onDependenciesChange;
 };
 
 }

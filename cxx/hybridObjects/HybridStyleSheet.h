@@ -22,12 +22,6 @@ struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
               std::bind(&HybridStyleSheet::onPlatformDependenciesChange, this, std::placeholders::_1)
           );
       }
-    
-    ~HybridStyleSheet() {
-        auto& uiManager = UIManagerBinding::getBinding(this->_unistylesRuntime->getRuntime())->getUIManager();
-        
-        uiManager.unregisterCommitHook(*this->_unistylesCommitHook);
-    }
 
     jsi::Value create(jsi::Runtime& rt,
                       const jsi::Value& thisValue,

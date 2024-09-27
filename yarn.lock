@@ -7033,7 +7033,7 @@ __metadata:
     babel-plugin-module-resolver: 5.0.2
     react: 18.3.1
     react-native: 0.75.1
-    react-native-nitro-modules: 0.9.2
+    react-native-nitro-modules: 0.10.0
     react-native-unistyles: "workspace:*"
     typescript: 5.5.4
   languageName: unknown
@@ -11405,9 +11405,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nitro-codegen@npm:0.9.2":
-  version: 0.9.2
-  resolution: "nitro-codegen@npm:0.9.2"
+"nitro-codegen@npm:0.10.0":
+  version: 0.10.0
+  resolution: "nitro-codegen@npm:0.10.0"
   dependencies:
     chalk: ^5.3.0
     react-native-nitro-modules: ^0.9.2
@@ -11416,7 +11416,7 @@ __metadata:
     zod: ^3.23.8
   bin:
     nitro-codegen: lib/index.js
-  checksum: 278edc630a20a296cdc78baab4db065962a4f79bbe4f7b47ba53ea702548ebb30132284d301e318127c69de0ea766b858f3341eb43fa6fd9ad8a4c893869948b
+  checksum: fd694b452baa15ea85748fbfb473f87922e955801323ef60ff0f7c05817ab289b79c88e5740ffb167b4d9f4c7a74932bbd00df8243fed48c20681c78e470cffd
   languageName: node
   linkType: hard
 
@@ -12566,7 +12566,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-nitro-modules@npm:0.9.2, react-native-nitro-modules@npm:^0.9.2":
+"react-native-nitro-modules@npm:0.10.0":
+  version: 0.10.0
+  resolution: "react-native-nitro-modules@npm:0.10.0"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 28becb62078eedb9b549567d5cfb61e3dce3024934d37c25c34a0ee31efc241879e5339930c342393c149591d317d5a386b945db208e893865276f69a82d8495
+  languageName: node
+  linkType: hard
+
+"react-native-nitro-modules@npm:^0.9.2":
   version: 0.9.2
   resolution: "react-native-nitro-modules@npm:0.9.2"
   peerDependencies:
@@ -12611,11 +12621,11 @@ __metadata:
     husky: 9.1.5
     jest: 29.7.0
     metro-react-native-babel-preset: 0.77.0
-    nitro-codegen: 0.9.2
+    nitro-codegen: 0.10.0
     react: 18.3.1
     react-native: 0.75.2
     react-native-builder-bob: 0.30.0
-    react-native-nitro-modules: 0.9.2
+    react-native-nitro-modules: 0.10.0
     react-native-web: 0.19.12
     react-test-renderer: 18.3.1
     release-it: 17.6.0

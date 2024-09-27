@@ -7,7 +7,7 @@ export const App = () => {
     const [, setCount] = useState(0)
     const renderCount = useRef(0)
 
-    styles.addVariants({
+    styles.useVariants({
         size: 'medium'
     })
 
