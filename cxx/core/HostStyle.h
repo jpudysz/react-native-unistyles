@@ -15,7 +15,7 @@ struct JSI_EXPORT HostStyle : public jsi::HostObject {
     std::vector<jsi::PropNameID> getPropertyNames(jsi::Runtime& rt);
     jsi::Value get(jsi::Runtime& rt, const jsi::PropNameID& propNameId);
     void set(jsi::Runtime& rt, const jsi::PropNameID& propNameId, const jsi::Value& value);
-    jsi::Function createVariantsProxyFunction(jsi::Runtime& rt);
+    jsi::Function createAddVariantsProxyFunction(jsi::Runtime& rt);
 
 private:
     std::shared_ptr<StyleSheet> _styleSheet;

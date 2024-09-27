@@ -44,7 +44,7 @@ struct Unistyle {
     std::optional<jsi::Function> proxiedFunction = std::nullopt;
     std::optional<DynamicFunctionMetadata> dynamicFunctionMetadata = std::nullopt;
 
-    bool dependsOn(UnistyleDependency dependency) {
+    inline bool dependsOn(UnistyleDependency dependency) {
         return std::find(this->dependencies.begin(), this->dependencies.end(), dependency) != this->dependencies.end();
     }
 };
