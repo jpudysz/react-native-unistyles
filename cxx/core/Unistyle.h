@@ -35,9 +35,29 @@ struct Unistyle {
     std::optional<jsi::Object> parsedStyle;
     std::vector<UnistyleDependency> dependencies{};
 
+    inline void addDependency(UnistyleDependency dependency) {
+        // we can't add dependencies if unistyle is sealed
+        if (this->_isSealed) {
+            return;
+        }
+
+        auto it = std::find(this->dependencies.begin(), this->dependencies.end(), dependency);
+
+        if (it == this->dependencies.end()) {
+            this->dependencies.push_back(dependency);
+        }
+    }
+
     inline bool dependsOn(UnistyleDependency dependency) {
         return std::find(this->dependencies.begin(), this->dependencies.end(), dependency) != this->dependencies.end();
     }
+
+    inline void seal() {
+        this->_isSealed = true;
+    }
+
+private:
+    bool _isSealed = false;
 };
 
 struct UnistyleDynamicFunction: public Unistyle {
