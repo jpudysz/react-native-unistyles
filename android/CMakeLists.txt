@@ -26,10 +26,19 @@ set_target_properties(unistyles PROPERTIES
 find_package(ReactAndroid REQUIRED CONFIG)
 find_package(fbjni REQUIRED CONFIG)
 
+# REACTNATIVE_MERGED_SO doesnt work as of RN 0.76.0-rc.3
+if (ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
+    target_link_libraries(unistyles ReactAndroid::reactnative)
+else()
+    target_link_libraries(unistyles
+        ReactAndroid::turbomodulejsijni
+        ReactAndroid::react_nativemodule_core
+        android
+        fbjni::fbjni
+    )
+endif()
+
 target_link_libraries(unistyles
     ReactAndroid::jsi
-    ReactAndroid::turbomodulejsijni
-    ReactAndroid::react_nativemodule_core
-    android
     fbjni::fbjni
 )
