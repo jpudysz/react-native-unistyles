@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { Button, Text, View } from 'react-native'
-import { StyleSheet, UnistylesShadowRegistry } from 'react-native-unistyles'
+import { StyleSheet } from 'react-native-unistyles'
 import './unistyles'
 
 export const App = () => {
@@ -12,26 +12,8 @@ export const App = () => {
     })
 
     return (
-        <View
-            style={styles.container}
-            ref={ref => {
-                UnistylesShadowRegistry.add(ref, styles.container)
-
-                return () => {
-                    UnistylesShadowRegistry.remove(ref, styles.container)
-                }
-            }}
-        >
-            <Text
-                style={styles.text('normal', 'italic')}
-                ref={ref => {
-                    UnistylesShadowRegistry.add(ref, styles.text)
-
-                    return () => {
-                        UnistylesShadowRegistry.remove(ref, styles.text)
-                    }
-                }}
-            >
+        <View style={styles.container}>
+            <Text style={styles.text('normal', 'italic')}>
                 Render count: {++renderCount.current}
             </Text>
             <Button
@@ -52,8 +34,7 @@ const styles = StyleSheet.create((theme, rt) => ({
         alignItems: 'center',
         backgroundColor: rt.colorScheme === 'dark'
             ? theme.colors.barbie
-            : theme.colors.oak,
-        uni__dependencies: [5]
+            : theme.colors.oak
     },
     text: (fontWeight: 'bold' | 'normal', fontStyle: 'italic' | 'normal') => ({
         fontWeight,
@@ -71,7 +52,6 @@ const styles = StyleSheet.create((theme, rt) => ({
                     fontSize: rt.fontScale * 50
                 }
             }
-        },
-        uni__dependencies: [4]
+        }
     })
 }))

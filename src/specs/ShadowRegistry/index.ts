@@ -42,5 +42,10 @@ HybridShadowRegistry.remove = (handle, style) => {
     HybridShadowRegistry.unlink(findShadowNodeForHandle(handle), style)
 }
 
-// todo hide API
-export const UnistylesShadowRegistry = HybridShadowRegistry as ShadowRegistry
+type PrivateMethods =
+    | 'add'
+    | 'remove'
+    | 'link'
+    | 'unlink'
+
+export const UnistylesShadowRegistry = HybridShadowRegistry as Omit<ShadowRegistry, PrivateMethods>
