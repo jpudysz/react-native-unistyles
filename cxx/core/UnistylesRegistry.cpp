@@ -99,7 +99,7 @@ std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(int tag
     return this->_styleSheetRegistry.back();
 }
 
-void core::UnistylesRegistry::removeStyleSheet(int tag) {
+std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::getStyleSheetById(int tag) {
     auto it = std::find_if(
         this->_styleSheetRegistry.begin(),
         this->_styleSheetRegistry.end(),
@@ -107,12 +107,12 @@ void core::UnistylesRegistry::removeStyleSheet(int tag) {
             return styleSheet->tag == tag;
         }
     );
-
+    
     if (it == this->_styleSheetRegistry.cend()) {
         throw std::runtime_error("stylesheet with tag: " + std::to_string(tag) + " cannot be found.");
     }
-
-    this->_styleSheetRegistry.erase(it);
+    
+    return *it;
 }
     
 DependencyMap core::UnistylesRegistry::buildDependencyMap(std::vector<UnistyleDependency>& deps) {

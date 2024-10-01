@@ -9,20 +9,29 @@ double HybridStyleSheet::getHairlineWidth() {
     return nearestPixel / pixelRatio;
 }
 
+double HybridStyleSheet::get___unid() {
+    return this->__unid;
+}
+
 jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
     helpers::assertThat(rt, arguments[0].isObject(), "expected to be called with object or function.");
 
     auto thisStyleSheet = thisVal.asObject(rt);
-    auto styleSheetId = thisStyleSheet.getProperty(rt, helpers::UNISTYLES_ID.c_str());
     auto& registry = core::UnistylesRegistry::get();
 
     // this might happen only when hot reloading
-    if (!styleSheetId.isUndefined()) {
-        registry.removeStyleSheet(styleSheetId.asNumber());
+    if (this->__unid != -1) {
+        auto registeredStyleSheet = registry.getStyleSheetById(this->__unid);
+        auto style = std::make_shared<core::HostStyle>(registeredStyleSheet, this->_unistylesRuntime);
+        auto styleHostObject = jsi::Object::createFromHostObject(rt, style);
+
+        return styleHostObject;
     }
 
     jsi::Object rawStyleSheet = arguments[0].asObject(rt);
     auto registeredStyleSheet = registry.addStyleSheetFromValue(rt, std::move(rawStyleSheet));
+
+    this->__unid = registeredStyleSheet->tag;
 
     auto parser = parser::Parser(this->_unistylesRuntime);
 

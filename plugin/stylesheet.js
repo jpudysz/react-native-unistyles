@@ -94,8 +94,6 @@ function analyzeDependencies(t, unistyleObj, themeName, rtName) {
 
     // add dependencies to the unistyle object if any found
     if (dependencies.length > 0) {
-        console.log('adding dependencies', dependencies)
-
         unistyleObj.properties.push(
             t.objectProperty(
                 t.identifier('uni__dependencies'),

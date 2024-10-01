@@ -43,8 +43,3 @@ std::shared_ptr<StyleSheet> StyleSheetRegistry::addFromObject(jsi::Runtime& rt, 
     return registry.addStyleSheet(tag, core::StyleSheetType::Static, std::move(rawStyleSheet));
 }
 
-void StyleSheetRegistry::removeStyleSheetByTag(unsigned int tag) {
-    auto& registry = UnistylesRegistry::get();
-    
-    registry.removeStyleSheet(tag);
-}

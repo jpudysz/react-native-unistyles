@@ -42,6 +42,7 @@ namespace margelo::nitro::unistyles {
     public:
       // Properties
       virtual double getHairlineWidth() = 0;
+      virtual double get___unid() = 0;
 
     public:
       // Methods
