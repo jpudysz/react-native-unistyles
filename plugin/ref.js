@@ -1,0 +1,166 @@
+function getRefProp(t, path) {
+    return path.node.openingElement.attributes.find(attr =>
+        t.isJSXAttribute(attr) &&
+        t.isJSXIdentifier(attr.name, { name: 'ref' }) &&
+        t.isJSXExpressionContainer(attr.value)
+    )
+}
+
+function addRef(t, path, styleObj, styleProp) {
+    const newRefFunction = t.arrowFunctionExpression(
+        [t.identifier('ref')],
+        t.blockStatement([
+            t.expressionStatement(
+                t.callExpression(
+                    t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
+                    [t.identifier('ref'), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
+                )
+            ),
+            t.returnStatement(
+                t.arrowFunctionExpression([],
+                    t.callExpression(
+                        t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('remove')),
+                        [t.identifier('ref'), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
+                    )
+                )
+            )
+        ])
+    )
+
+    const newRefProp = t.jsxAttribute(
+        t.jsxIdentifier('ref'),
+        t.jsxExpressionContainer(newRefFunction)
+    )
+
+    path.node.openingElement.attributes.push(newRefProp)
+}
+
+function overrideRef(t, path, refProp, styleObj, styleProp) {
+    const uniqueRefName = path.scope.generateUidIdentifier('ref').name
+    const isIdentifier = t.isIdentifier(refProp.value.expression)
+    const binding = path.scope.getBinding(refProp.value.expression.name)
+
+    // ref={ref}
+    if (isIdentifier && !binding) {
+        const userVariableName = refProp.value.expression.name
+        const newRefFunction = t.arrowFunctionExpression(
+            [t.identifier(uniqueRefName)],
+            t.blockStatement([
+                t.expressionStatement(
+                    t.assignmentExpression('=', t.identifier(userVariableName), t.identifier(uniqueRefName))
+                ),
+                t.expressionStatement(
+                    t.callExpression(
+                        t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
+                        [t.identifier(uniqueRefName), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
+                    )
+                ),
+                t.returnStatement(
+                    t.arrowFunctionExpression([],
+                        t.callExpression(
+                            t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('remove')),
+                            [t.identifier(uniqueRefName), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
+                        )
+                    )
+                )
+            ])
+        )
+
+        refProp.value = t.jsxExpressionContainer(newRefFunction)
+
+        return
+    }
+
+    // ref={ref => { }}
+    if (t.isArrowFunctionExpression(refProp.value.expression)) {
+        const userArrowFunction = refProp.value.expression
+        const userStatements = userArrowFunction.body.body
+        const userReturnStatement = userStatements.find(statement => t.isReturnStatement(statement))
+        const userCleanupFunction = userReturnStatement
+            ? userReturnStatement.argument
+            : null
+
+        const newRefFunction = t.arrowFunctionExpression(
+            [t.identifier(uniqueRefName)],
+            t.blockStatement([
+                ...userStatements.filter(statement => !t.isReturnStatement(statement)),
+                t.expressionStatement(
+                    t.callExpression(
+                        t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
+                        [t.identifier(uniqueRefName), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
+                    )
+                ),
+                // Merged cleanup function
+                t.returnStatement(
+                    t.arrowFunctionExpression([], t.blockStatement([
+                        ...(userCleanupFunction ? [
+                            t.expressionStatement(
+                                t.callExpression(userCleanupFunction, [])
+                            )
+                        ] : []),
+                        t.expressionStatement(
+                            t.callExpression(
+                                t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('remove')),
+                                [t.identifier(uniqueRefName), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
+                            )
+                        )
+                    ]))
+                )
+            ])
+        )
+
+        refProp.value = t.jsxExpressionContainer(newRefFunction)
+
+        return
+    }
+
+    // ref={scopedFunction}
+    const userFunctionName = refProp.value.expression
+    const isArrowFunction = t.isArrowFunctionExpression(binding.path.node.init)
+    const userFunction = isArrowFunction
+        ? binding.path.node.init
+        : binding.path.node
+    const returnStatement = userFunction.body.body.find(statement => t.isReturnStatement(statement))
+    const userCleanupFunction = returnStatement
+        ? returnStatement.argument
+        : null
+
+    const newRefFunction = t.arrowFunctionExpression(
+        [t.identifier(uniqueRefName)],
+        t.blockStatement([
+            t.expressionStatement(
+                t.callExpression(userFunctionName, [t.identifier(uniqueRefName)])
+            ),
+            t.expressionStatement(
+                t.callExpression(
+                    t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
+                    [t.identifier(uniqueRefName), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
+                )
+            ),
+            t.returnStatement(
+                t.arrowFunctionExpression([], t.blockStatement([
+                    ...(userCleanupFunction ? [
+                        t.expressionStatement(
+                            t.callExpression(userCleanupFunction, [])
+                        )
+                    ] : []),
+                    t.expressionStatement(
+                        t.callExpression(
+                            t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('remove')),
+                            [t.identifier(uniqueRefName), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
+                        )
+                    )
+                ]))
+            )
+        ])
+    )
+
+    refProp.value = t.jsxExpressionContainer(newRefFunction)
+    userFunction.body.body = userFunction.body.body.filter(statement => !t.isReturnStatement(statement))
+}
+
+module.exports = {
+    getRefProp,
+    addRef,
+    overrideRef
+}
