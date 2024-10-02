@@ -4,7 +4,7 @@ import { type Dimensions, type Insets } from '../types'
 type ColorScheme = 'dark' | 'light' | 'unspecified'
 type Orientation = 'portrait' | 'landscape'
 
-enum UnistyleDependency {
+export enum UnistyleDependency {
     Theme = 0,
     ThemeName = 1,
     AdaptiveThemes = 2,

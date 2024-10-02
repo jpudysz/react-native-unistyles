@@ -5,7 +5,8 @@ import type { AppBreakpoint, AppThemeName } from '../src/specs/types'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../src/global'
 import { UnistylesRuntime } from './runtime'
 import { isServer, schemeToTheme } from './utils'
-import { UnistyleDependency, UnistylesListener } from './listener'
+import { UnistylesListener } from './listener'
+import { UnistyleDependency } from '../src/specs/NativePlatform'
 
 class UnistylesStateBuilder {
     private readonly isSSR = isServer()
@@ -29,7 +30,6 @@ class UnistylesStateBuilder {
         }
 
         UnistylesListener.initListeners()
-        document.documentElement.classList.add(this.themeName ?? '')
     }
 
     private initThemes = (themes = {} as UnistylesThemes) => {
