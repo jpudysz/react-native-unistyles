@@ -31,6 +31,10 @@ function getIdentifierNameFromExpression(t, memberExpression) {
         return memberExpression.body.properties.map(prop => getIdentifierNameFromExpression(t, prop.value)).flat()
     }
 
+    if (t.isTemplateLiteral(memberExpression)) {
+       return memberExpression.expressions.map(expression => getIdentifierNameFromMemberExpression(t, expression)).flat()
+    }
+
     return []
 }
 
@@ -42,6 +46,10 @@ function getSecondPropertyName(t, memberExpression) {
             getSecondPropertyName(t, memberExpression.alternate),
             getSecondPropertyName(t, memberExpression.consequent),
         ].flat().find(Boolean)
+    }
+
+    if (t.isTemplateLiteral(memberExpression)) {
+       return memberExpression.expressions.map(expression => getSecondPropertyName(t, expression)).flat().find(Boolean)
     }
 
     if (!t.isMemberExpression(memberExpression)) {
