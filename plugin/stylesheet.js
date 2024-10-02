@@ -1,5 +1,22 @@
 const { getIdentifierNameFromExpression, getSecondPropertyName } = require('./common')
 
+const UnistyleDependency = {
+    Theme: 0,
+    ThemeName: 1,
+    AdaptiveThemes: 2,
+    Breakpoints: 3,
+    Variants: 4,
+    ColorScheme: 5,
+    Dimensions: 6,
+    Orientation: 7,
+    ContentSizeCategory: 8,
+    Insets: 9,
+    PixelRatio: 10,
+    FontScale: 11,
+    StatusBar: 12,
+    NavigationBar: 13
+}
+
 function isUnistylesStyleSheet(t, path, state) {
     const callee = path.get('callee')
 
@@ -11,77 +28,89 @@ function isUnistylesStyleSheet(t, path, state) {
     )
 }
 
-function analyzeDependencies(t, unistyleObj, themeName, rtName) {
+function analyzeDependencies(t, state, name, unistyleObj, themeName, rtName) {
+    const debugMessage = deps => {
+        if (state.opts.debug) {
+            const mappedDeps = deps
+                .map(dep => Object.keys(UnistyleDependency).find(key => UnistyleDependency[key] === dep))
+                .join(', ')
+
+            console.log(`[${state.filename}]: "${name}" dependencies: ${mappedDeps}`)
+        }
+    }
     const unistyle = unistyleObj.properties
     const dependencies = []
 
     Object.values(unistyle).forEach(uni => {
-        const isAccessingTheme = getIdentifierNameFromExpression(t, uni.value).some(name => name === themeName)
+        const identifier = getIdentifierNameFromExpression(t, uni.value, uni.key.name)
 
-        if (isAccessingTheme) {
-            dependencies.push(0)
+        if (identifier.includes(themeName)) {
+            dependencies.push(UnistyleDependency.Theme)
 
             return
         }
 
-        const isAccessingMiniRuntime = getIdentifierNameFromExpression(t, uni.value).some(name => name === rtName)
-
-        if (isAccessingMiniRuntime) {
-            const propertyName = getSecondPropertyName(t, uni.value)
+        if (identifier.includes(rtName)) {
+            const propertyName = getSecondPropertyName(t, uni.value, uni.key.name)
 
             switch (propertyName) {
                 case 'themeName': {
-                    dependencies.push(1)
+                    dependencies.push(UnistyleDependency.ThemeName)
 
                     return
                 }
                 case 'adaptiveThemes': {
-                    dependencies.push(2)
+                    dependencies.push(UnistyleDependency.AdaptiveThemes)
+
+                    return
+                }
+                case 'breakpoint': {
+                    dependencies.push(UnistyleDependency.Breakpoints)
 
                     return
                 }
                 case 'colorScheme': {
-                    dependencies.push(5)
+                    dependencies.push(UnistyleDependency.ColorScheme)
 
                     return
                 }
                 case 'screen': {
-                    dependencies.push(6)
+                    dependencies.push(UnistyleDependency.Dimensions)
 
                     return
                 }
                 case 'orientation': {
-                    dependencies.push(7)
+                    dependencies.push(UnistyleDependency.Orientation)
 
                     return
                 }
                 case 'contentSizeCategory': {
-                    dependencies.push(8)
+                    dependencies.push(UnistyleDependency.ContentSizeCategory)
 
                     return
                 }
                 case 'insets': {
-                    dependencies.push(9)
+                    dependencies.push(UnistyleDependency.Insets)
 
                     return
                 }
                 case 'pixelRatio': {
-                    dependencies.push(10)
+                    dependencies.push(UnistyleDependency.PixelRatio)
 
                     return
                 }
                 case 'fontScale': {
-                    dependencies.push(11)
+                    dependencies.push(UnistyleDependency.FontScale)
 
                     return
                 }
                 case 'statusBar': {
-                    dependencies.push(12)
+                    dependencies.push(UnistyleDependency.StatusBar)
 
                     return
                 }
                 case 'navigationBar': {
-                    dependencies.push(13)
+                    dependencies.push(UnistyleDependency.NavigationBar)
 
                     return
                 }
@@ -94,10 +123,14 @@ function analyzeDependencies(t, unistyleObj, themeName, rtName) {
 
     // add dependencies to the unistyle object if any found
     if (dependencies.length > 0) {
+        const uniqueDependencies = Array.from(new Set(dependencies))
+
+        debugMessage(uniqueDependencies)
+
         unistyleObj.properties.push(
             t.objectProperty(
                 t.identifier('uni__dependencies'),
-                t.arrayExpression(Array.from(new Set(dependencies)).map(dep => t.numericLiteral(dep)))
+                t.arrayExpression(uniqueDependencies.map(dep => t.numericLiteral(dep)))
             )
         )
     }

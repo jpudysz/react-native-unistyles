@@ -7,7 +7,9 @@ module.exports = api => {
     return {
         presets: ['module:@react-native/babel-preset'],
         plugins: [
-            path.join(__dirname, '../plugin'),
+            [path.join(__dirname, '../plugin'), {
+                debug: true
+            }],
             [
                 'module-resolver',
                 {
