@@ -1,5 +1,5 @@
+import { UnistyleDependency } from '../../src/specs/NativePlatform'
 import { UnistylesRuntime } from '../runtime'
-import { UnistyleDependency } from './dependencyList'
 
 export class UnistylesListenerBuilder {
     private isInitialized = false

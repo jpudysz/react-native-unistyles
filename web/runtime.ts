@@ -1,7 +1,8 @@
+import { UnistyleDependency } from '../src/specs/NativePlatform'
 import { ColorScheme, Orientation, type AppTheme, type AppThemeName } from '../src/specs/types'
-import type { MiniRuntime } from '../src/specs/UnistylesRuntime'
+import type { UnistylesMiniRuntime } from '../src/specs/UnistylesRuntime'
 import { WebContentSizeCategory } from '../src/types'
-import { UnistyleDependency, UnistylesListener } from './listener'
+import { UnistylesListener } from './listener'
 import { NavigationBar, StatusBar } from './mock'
 import { UnistylesState } from './state'
 import { hexToRGBA, isServer, schemeToTheme } from './utils'
@@ -127,7 +128,7 @@ class UnistylesRuntimeBuilder {
         return NavigationBar
     }
 
-    get miniRuntime(): MiniRuntime {
+    get miniRuntime(): UnistylesMiniRuntime {
         return {
             colorScheme: this.colorScheme,
             themeName: this.themeName,
@@ -147,12 +148,7 @@ class UnistylesRuntimeBuilder {
                 height: this.navigationBar.height,
             },
             rtl: this.rtl,
-            hasAdaptiveThemes: this.hasAdaptiveThemes,
-            name: 'MiniRuntime',
-            toString: () => 'MiniRuntime',
-            dispose: () => {},
-            __type: 'web',
-            equals: () => true,
+            hasAdaptiveThemes: this.hasAdaptiveThemes
         }
     }
 
