@@ -3,6 +3,7 @@
 #include "string"
 #include <jsi/jsi.h>
 #include <folly/dynamic.h>
+#include "Unistyles-Swift-Cxx-Umbrella.hpp"
 
 namespace margelo::nitro::unistyles::core {
 
@@ -13,52 +14,67 @@ enum class UnistyleType {
     DynamicFunction
 };
 
-enum class UnistyleDependency {
-    Theme = 0,
-    Breakpoints = 1,
-    Variants = 2,
-    CompoundVariants = 3,
-    ColorScheme = 4,
-    Rtl = 5,
-    Dimensions = 6,
-    Orientation = 7,
-    ThemeName = 8,
-    ContentSizeCategory = 9,
-    Insets = 10,
-    PixelRatio = 11,
-    FontScale = 12
-    // todo extend
-};
-
 struct DynamicFunctionMetadata {
     size_t count;
     std::vector<folly::dynamic> arguments;
 };
 
 struct Unistyle {
-    using Shared = std::shared_ptr<const Unistyle>;
-    
+    using Shared = std::shared_ptr<Unistyle>;
+
     Unistyle(UnistyleType type, std::string styleKey, jsi::Object& rawObject)
         : styleKey{styleKey}, type{type}, rawValue{std::move(rawObject)} {}
+    virtual ~Unistyle() = default;
 
     Unistyle(const Unistyle&) = delete;
-    Unistyle(Unistyle&& other) noexcept
-        : styleKey(std::move(other.styleKey)),
-          type(other.type),
-          isDirty(other.isDirty),
-          rawValue(std::move(other.rawValue)),
-          parsedStyle(std::move(other.parsedStyle)),
-          nativeTags(std::move(other.nativeTags)),
-          dependencies(std::move(other.dependencies)),
-          dynamicFunctionMetadata(std::move(other.dynamicFunctionMetadata)) {}
-   
-    std::string styleKey;
+    Unistyle(Unistyle&& other) = delete;
+
     UnistyleType type;
-    bool isDirty = false;
+    std::string styleKey;
     jsi::Object rawValue;
     std::optional<jsi::Object> parsedStyle;
-    std::vector<int> nativeTags{};
     std::vector<UnistyleDependency> dependencies{};
+
+    inline void addDependency(UnistyleDependency dependency) {
+        // we can't add dependencies if unistyle is sealed
+        if (this->_isSealed) {
+            return;
+        }
+
+        auto it = std::find(this->dependencies.begin(), this->dependencies.end(), dependency);
+
+        if (it == this->dependencies.end()) {
+            this->dependencies.push_back(dependency);
+        }
+    }
+
+    inline bool dependsOn(UnistyleDependency dependency) {
+        return std::find(this->dependencies.begin(), this->dependencies.end(), dependency) != this->dependencies.end();
+    }
+
+    inline void seal() {
+        this->_isSealed = true;
+    }
+
+private:
+    bool _isSealed = false;
+};
+
+struct UnistyleDynamicFunction: public Unistyle {
+    // dynamic function must have 4 different value types
+    // rawValue <- original user function
+    // proxiedFunction <- host function that is a wrapper for user's original function
+    // unprocessedValue <- object generated after calling proxy and user's original function
+    // parsedStyle <- parsed with Unistyle's parser
+
+    UnistyleDynamicFunction(UnistyleType type, std::string styleKey, jsi::Object& rawObject)
+        : Unistyle(type, styleKey, rawObject) {}
+
+    UnistyleDynamicFunction(const UnistyleDynamicFunction&) = delete;
+    UnistyleDynamicFunction(UnistyleDynamicFunction&& other) = delete;
+
+    std::optional<jsi::Object> unprocessedValue;
+    std::optional<jsi::Function> proxiedFunction = std::nullopt;
     std::optional<DynamicFunctionMetadata> dynamicFunctionMetadata = std::nullopt;
 };
 

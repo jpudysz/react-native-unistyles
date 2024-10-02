@@ -1,17 +1,17 @@
 #include "HybridNavigationBar.h"
 
-void HybridNavigationBar::setBackgroundColor(const std::optional<std::string> &hex, std::optional<double> alpha) {
-    this->nativePlatform.setNavigationBarBackgroundColor(hex, alpha);
+void HybridNavigationBar::setBackgroundColor(double color) {
+    this->_nativePlatform.setNavigationBarBackgroundColor(color);
 };
 
 void HybridNavigationBar::setHidden(bool isHidden) {
-    this->nativePlatform.setNavigationBarHidden(isHidden);
+    this->_nativePlatform.setNavigationBarHidden(isHidden);
 };
 
 double HybridNavigationBar::getWidth() {
-    return this->nativePlatform.getNavigationBarDimensions().width;
+    return this->_nativePlatform.getNavigationBarDimensions().width;
 }
 
 double HybridNavigationBar::getHeight() {
-    return this->nativePlatform.getNavigationBarDimensions().height;
+    return this->_nativePlatform.getNavigationBarDimensions().height;
 }

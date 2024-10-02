@@ -2,6 +2,10 @@
 
 using namespace margelo::nitro::unistyles;
 
+bool core::UnistylesMQ::isMQ() {
+    return this->isValid;
+}
+
 bool core::UnistylesMQ::checkIsMQ(const std::string& maybeMQ) {
     std::regex pattern(R"(:([hw])\[(\d+)(?:,\s*(\d+|Infinity))?\])");
 

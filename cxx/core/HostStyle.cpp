@@ -1,52 +1,57 @@
 #include "HostStyle.h"
 
 using namespace margelo::nitro::unistyles::core;
+using namespace margelo::nitro::unistyles::parser;
 using namespace facebook;
 
 std::vector<jsi::PropNameID> HostStyle::getPropertyNames(jsi::Runtime& rt) {
     auto propertyNames = std::vector<jsi::PropNameID> {};
-    
-    helpers::enumerateJSIObject(rt, parsedStyleSheet, [&](const std::string propertyName, jsi::Value& propertyValue){
-        propertyNames.emplace_back(jsi::PropNameID::forUtf8(rt, propertyName));
-    });
 
+    for (const auto& pair : this->_styleSheet->unistyles) {
+        propertyNames.emplace_back(jsi::PropNameID::forUtf8(rt, pair.first));
+    }
+    
     return propertyNames;
 }
 
 jsi::Value HostStyle::get(jsi::Runtime& rt, const jsi::PropNameID& propNameId) {
     auto propertyName = propNameId.utf8(rt);
-    auto hasProperty = this->parsedStyleSheet.hasProperty(rt, propertyName.c_str());
 
+    if (propertyName == helpers::UNISTYLES_ID) {
+        return jsi::Value(this->_styleSheet->tag);
+    }
+    
     if (propertyName == helpers::ADD_VARIANTS_FN) {
-        return jsi::Function::createFromHostFunction(rt, jsi::PropNameID::forUtf8(rt, helpers::ADD_VARIANTS_FN), 1, [&](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count){
-            // proxy call
-            auto originalFn = this->parsedStyleSheet.getProperty(rt, helpers::ADD_VARIANTS_FN.c_str()).asObject(rt).asFunction(rt);
-            auto stylesWithVariants = originalFn.call(rt, arguments, count).asObject(rt);
-            
-            helpers::enumerateJSIObject(rt, stylesWithVariants, [&](const std::string propertyName, jsi::Value& propertyValue){
-                // override property
-                auto originalProp = this->parsedStyleSheet.getProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName)).asObject(rt);
+        return this->createAddVariantsProxyFunction(rt);
+    }
 
-                // move meta functions
-                auto addNodeFn = originalProp.getProperty(rt, jsi::PropNameID::forUtf8(rt, helpers::ADD_NODE_FN));
-                auto removeNodeFn = originalProp.getProperty(rt, jsi::PropNameID::forUtf8(rt, helpers::REMOVE_NODE_FN));
-                auto propertyValueObject = propertyValue.asObject(rt);
-                
-                propertyValueObject.setProperty(rt, helpers::ADD_NODE_FN.c_str(), std::move(addNodeFn));
-                propertyValueObject.setProperty(rt, helpers::REMOVE_NODE_FN.c_str(), std::move(removeNodeFn));
-                
-                this->parsedStyleSheet.setProperty(rt, propertyName.c_str(), std::move(propertyValue));
-            });
-            
+    if (this->_styleSheet->unistyles.contains(propertyName)) {
+        return valueFromUnistyle(rt, this->_styleSheet->unistyles[propertyName]);
+    }
+    
+    return jsi::Value::undefined();
+}
+
+jsi::Function HostStyle::createAddVariantsProxyFunction(jsi::Runtime& rt) {
+    auto useVariantsFnName = jsi::PropNameID::forUtf8(rt, helpers::ADD_VARIANTS_FN);
+
+    return jsi::Function::createFromHostFunction(rt, useVariantsFnName, 1, [&](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count){
+        helpers::assertThat(rt, count == 1, "useVariants expected to be called with one argument.");
+        helpers::assertThat(rt, arguments[0].isObject(), "useVariants expected to be called with object.");
+
+        auto parser = parser::Parser(this->_unistylesRuntime);
+        auto pairs = parser.variantsToPairs(rt, arguments[0].asObject(rt));
+        
+        if (pairs == this->_styleSheet->variants) {
             return jsi::Value::undefined();
-        });
-    }
-
-    if (hasProperty) {
-        return this->parsedStyleSheet.getProperty(rt, propertyName.c_str());
-    }
-
-    return jsi::Value(rt, parsedStyleSheet);
+        }
+        
+        this->_styleSheet->variants = pairs;
+        
+        parser.rebuildUnistylesWithVariants(rt, this->_styleSheet);
+        
+        return jsi::Value::undefined();
+    });
 }
 
 void HostStyle::set(jsi::Runtime& rt, const jsi::PropNameID& propNameId, const jsi::Value& value) {}
