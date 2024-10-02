@@ -1,5 +1,5 @@
-import type { NavigationBar as NavigationBarSpec } from '../src/specs/NavigtionBar'
-import type { StatusBar as StatusBarSpec } from '../src/specs/StatusBar'
+import type { UnistylesNavigationBar as NavigationBarSpec } from '../src/specs/NavigtionBar'
+import type { UnistylesStatusBar as StatusBarSpec } from '../src/specs/StatusBar'
 
 export const StatusBar: StatusBarSpec = {
     width: 0,
@@ -8,7 +8,6 @@ export const StatusBar: StatusBarSpec = {
     setHidden: () => {},
     setBackgroundColor: () => {},
     equals: () => true,
-    dispose: () => {},
     toString: () => 'StatusBar',
     __type: 'web',
     name: 'StatusBar'
@@ -20,8 +19,17 @@ export const NavigationBar: NavigationBarSpec = {
     setHidden: () => {},
     setBackgroundColor: () => {},
     equals: () => true,
-    dispose: () => {},
     toString: () => 'NavigationBar',
     __type: 'web',
     name: 'NavigationBar'
+}
+
+export const UnistylesShadowRegistry = {
+    name: 'UnistylesShadowRegistry',
+    __type: 'web',
+    equals: () => true,
+    toString: () => 'UnistylesShadowRegistry',
+    dispose: () => {},
+    add: () => {},
+    remove: () => {},
 }
