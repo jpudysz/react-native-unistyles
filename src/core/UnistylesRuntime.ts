@@ -196,6 +196,19 @@ export class UnistylesRuntime {
     }
 
     /**
+     * Get theme by name
+     * @param themeName - The name of the theme to get or current theme if not specified
+     * @returns - The theme
+     */
+    public getTheme(themeName?: keyof UnistylesThemes) {
+        if (!themeName) {
+            return this.unistylesRegistry.getTheme(this.themeName)
+        }
+
+        return this.unistylesRegistry.getTheme(themeName)
+    }
+
+    /**
      * Get the immersive mode (both status bar and navigation bar hidden (Android))
      * @param isEnabled
      */

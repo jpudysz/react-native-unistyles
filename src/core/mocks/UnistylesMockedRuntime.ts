@@ -126,6 +126,14 @@ export class UnistylesMockedRuntime {
         return ScreenOrientation.Portrait
     }
 
+    public getTheme = (themeName?: keyof UnistylesThemes) => {
+        if (!themeName) {
+            return this.unistylesRegistry.getTheme(this.themeName)
+        }
+
+        return this.unistylesRegistry.getTheme(themeName)
+    }
+
     public setTheme = (name: keyof UnistylesThemes) => true
     public updateTheme = (name: keyof UnistylesThemes, theme: UnistylesThemes[keyof UnistylesThemes]) => {}
     public setAdaptiveThemes = (enabled: boolean) => {}
