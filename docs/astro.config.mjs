@@ -101,12 +101,12 @@ export default defineConfig({
                         },
                         {
                             label: 'Unistyles Registry',
-                            link: '/reference/unistyles-registry/',
-                            badge: 'Updated'
+                            link: '/reference/unistyles-registry/'
                         },
                         {
                             label: 'Unistyles Runtime',
-                            link: '/reference/unistyles-runtime/'
+                            link: '/reference/unistyles-runtime/',
+                            badge: 'Updated'
                         },
                         {
                             label: 'Content size category',
