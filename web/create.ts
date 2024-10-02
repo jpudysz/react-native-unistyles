@@ -5,7 +5,8 @@ import { UnistylesRegistry } from './registry'
 import { keyInObject, reduceObject, toReactNativeClassName } from './utils'
 import { UnistylesRuntime } from './runtime'
 import { createUseVariants } from './useVariants'
-import { UnistylesListener, type UnistyleDependency } from './listener'
+import { UnistylesListener } from './listener'
+import type { UnistyleDependency } from '../src/specs/NativePlatform'
 
 type ListenToDependenciesProps = {
     value: StyleSheet[keyof StyleSheet],
