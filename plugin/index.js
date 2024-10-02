@@ -73,7 +73,7 @@ module.exports = function ({ types: t }) {
                 if (t.isObjectExpression(arg)) {
                     arg.properties.forEach(property => {
                         if (t.isObjectProperty(property)) {
-                            analyzeDependencies(t, property.value)
+                            analyzeDependencies(t, state, property.key.name, property.value, property.key.name)
                         }
                     })
                 }
@@ -101,7 +101,7 @@ module.exports = function ({ types: t }) {
                                     ? property.value.body
                                     : property.value
 
-                                analyzeDependencies(t, propertyValue, themeLocalName, miniRuntimeLocalName)
+                                analyzeDependencies(t, state, property.key.name, propertyValue, themeLocalName, miniRuntimeLocalName)
                             }
                         })
                     }

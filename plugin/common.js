@@ -1,4 +1,4 @@
-function getIdentifierNameFromExpression(t, memberExpression) {
+function getIdentifierNameFromExpression(t, memberExpression, rootStyleKey) {
     if (t.isMemberExpression(memberExpression)) {
         const object = memberExpression.object
 
@@ -18,6 +18,13 @@ function getIdentifierNameFromExpression(t, memberExpression) {
         }
     }
 
+    if (t.isBinaryExpression(memberExpression)) {
+        return [
+            getIdentifierNameFromExpression(t, memberExpression.left),
+            getIdentifierNameFromExpression(t, memberExpression.right)
+        ].flat().find(Boolean)
+    }
+
     if (t.isConditionalExpression(memberExpression)) {
         return [
             getIdentifierNameFromExpression(t, memberExpression.test.left),
@@ -32,13 +39,35 @@ function getIdentifierNameFromExpression(t, memberExpression) {
     }
 
     if (t.isTemplateLiteral(memberExpression)) {
-       return memberExpression.expressions.map(expression => getIdentifierNameFromMemberExpression(t, expression)).flat()
+        return memberExpression.expressions.map(expression => getIdentifierNameFromExpression(t, expression)).flat()
+    }
+
+    if (t.isObjectExpression(memberExpression) && rootStyleKey === 'variants') {
+        return memberExpression.properties
+            .filter(t.isObjectProperty)
+            // first level
+            .flatMap(property => property.value.properties)
+            .filter(t.isObjectProperty)
+            // second level
+            .flatMap(property => property.value.properties)
+            .filter(t.isObjectProperty)
+            // last level key-value
+            .flatMap(property => t.isObjectProperty(property.value)
+                ? property.value.object
+                : t.isBinaryExpression(property.value)
+                    ? [property.value.left, property.value.right]
+                    : undefined
+            )
+            .flatMap(expression => t.isIdentifier(expression)
+                ? expression.name
+                : getIdentifierNameFromExpression(t, expression)
+            )
     }
 
     return []
 }
 
-function getSecondPropertyName(t, memberExpression) {
+function getSecondPropertyName(t, memberExpression, rootStyleKey) {
     if (t.isConditionalExpression(memberExpression)) {
         return [
             getSecondPropertyName(t, memberExpression.test.left),
@@ -49,7 +78,28 @@ function getSecondPropertyName(t, memberExpression) {
     }
 
     if (t.isTemplateLiteral(memberExpression)) {
-       return memberExpression.expressions.map(expression => getSecondPropertyName(t, expression)).flat().find(Boolean)
+        return memberExpression.expressions.map(expression => getSecondPropertyName(t, expression)).flat().find(Boolean)
+    }
+
+    if (t.isBinaryExpression(memberExpression)) {
+        return [
+            getSecondPropertyName(t, memberExpression.left),
+            getSecondPropertyName(t, memberExpression.right)
+        ].flat()
+    }
+
+    if (t.isObjectExpression(memberExpression) && rootStyleKey === 'variants') {
+        return memberExpression.properties
+            .filter(t.isObjectProperty)
+            // first level
+            .flatMap(property => property.value.properties)
+            .filter(t.isObjectProperty)
+            // second level
+            .flatMap(property => property.value.properties)
+            .filter(t.isObjectProperty)
+            // last level key-value
+            .flatMap(property => getSecondPropertyName(t, property.value))
+            .find(Boolean)
     }
 
     if (!t.isMemberExpression(memberExpression)) {
