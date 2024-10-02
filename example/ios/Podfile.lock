@@ -7,7 +7,7 @@ PODS:
   - hermes-engine (0.75.1):
     - hermes-engine/Pre-built (= 0.75.1)
   - hermes-engine/Pre-built (0.75.1)
-  - NitroModules (0.6.0):
+  - NitroModules (0.10.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -34,11 +34,6 @@ PODS:
     - fmt (= 9.1.0)
     - glog
     - RCT-Folly/Default (= 2024.01.01.00)
-  - RCT-Folly/Default (2024.01.01.00):
-    - boost
-    - DoubleConversion
-    - fmt (= 9.1.0)
-    - glog
   - RCT-Folly/Fabric (2024.01.01.00):
     - boost
     - DoubleConversion
@@ -1747,14 +1742,14 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  boost: 4cb898d0bf20404aab1850c656dcea009429d6c1
-  DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
+  boost: 1dca942403ed9342f98334bf4c3621f011aa7946
+  DoubleConversion: f16ae600a246532c4020132d54af21d0ddb2a385
   FBLazyVector: a3071c12f1650bfa84f2815e9982426256a0aae1
-  fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
-  glog: 69ef571f3de08433d766d614c73a9838a06bf7eb
+  fmt: 10c6e61f4be25dc963c36bd73fc7b1705fe975be
+  glog: 08b301085f15bcbb6ff8632a8ebaf239aae04e6a
   hermes-engine: e949b1da40409c52aa7bd79ff32cec045f5b4650
-  NitroModules: b404fe4ebf47e0b057c526959b5e200256000f09
-  RCT-Folly: 4464f4d875961fce86008d45f4ecf6cef6de0740
+  NitroModules: c9d57098c1fbad84d4891794ce609eee8d68f54d
+  RCT-Folly: bf5c0376ffe4dd2cf438dcf86db385df9fdce648
   RCTDeprecation: bc01aeeb7acc314fc615a092001050d2e97c353a
   RCTRequired: a511d4665e1f7ac044aad6486aa19d061bd2d365
   RCTTypeSafety: e77969bb08d920251de98b1fc1df223d7039c1ff
@@ -1810,7 +1805,7 @@ SPEC CHECKSUMS:
   ReactCodegen: e9156d86a166f3e10dc8fb6160764048df3528bc
   ReactCommon: 3ae48fa4cfa7052a270c2150ececfc94e541fb8a
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
-  Unistyles: d6219896c5dc8e43eee1cfd9bf454ff61d88fe34
+  Unistyles: 3403881d647a14b1ad1bff3e91d3a6db000c2ac6
   Yoga: 06fc4b2c3664ae0e278964b8fbcb0ee9d21f0a5a
 
 PODFILE CHECKSUM: 3abed4c018ba7175304335b9bf107fae3d4fa3b1

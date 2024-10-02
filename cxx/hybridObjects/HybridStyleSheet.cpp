@@ -3,33 +3,42 @@
 using namespace facebook::react;
 
 double HybridStyleSheet::getHairlineWidth() {
-    auto pixelRatio = this->nativePlatform.getPixelRatio();
+    auto pixelRatio = this->_unistylesRuntime->getPixelRatio();
     auto nearestPixel = static_cast<int>(std::trunc(pixelRatio * 0.4));
 
     return nearestPixel / pixelRatio;
+}
+
+double HybridStyleSheet::get___unid() {
+    return this->__unid;
 }
 
 jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
     helpers::assertThat(rt, arguments[0].isObject(), "expected to be called with object or function.");
 
     auto thisStyleSheet = thisVal.asObject(rt);
-    auto styleSheetId = thisStyleSheet.getProperty(rt, helpers::STYLESHEET_ID.c_str());
+    auto& registry = core::UnistylesRegistry::get();
 
     // this might happen only when hot reloading
-    if (!styleSheetId.isUndefined()) {
-        styleSheetRegistry.remove(styleSheetId.asNumber());
+    if (this->__unid != -1) {
+        auto registeredStyleSheet = registry.getStyleSheetById(this->__unid);
+        auto style = std::make_shared<core::HostStyle>(registeredStyleSheet, this->_unistylesRuntime);
+        auto styleHostObject = jsi::Object::createFromHostObject(rt, style);
+
+        return styleHostObject;
     }
 
     jsi::Object rawStyleSheet = arguments[0].asObject(rt);
-    core::StyleSheet& registeredStyleSheet = styleSheetRegistry.add(rt, std::move(rawStyleSheet));
-    auto parsedStyleSheet = styleSheetRegistry.parse(rt, registeredStyleSheet);
+    auto registeredStyleSheet = registry.addStyleSheetFromValue(rt, std::move(rawStyleSheet));
 
-    this->attachMetaFunctions(rt, registeredStyleSheet, parsedStyleSheet);
+    this->__unid = registeredStyleSheet->tag;
 
-    // attach unique ID
-    helpers::defineHiddenProperty(rt, thisStyleSheet, helpers::STYLESHEET_ID, jsi::Value(registeredStyleSheet.tag));
+    auto parser = parser::Parser(this->_unistylesRuntime);
 
-    auto style = std::make_shared<core::HostStyle>(parsedStyleSheet);
+    parser.buildUnistyles(rt, registeredStyleSheet);
+    parser.parseUnistyles(rt, registeredStyleSheet);
+
+    auto style = std::make_shared<core::HostStyle>(registeredStyleSheet, this->_unistylesRuntime);
     auto styleHostObject = jsi::Object::createFromHostObject(rt, style);
 
     return styleHostObject;
@@ -41,9 +50,8 @@ jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisV
     // create new state
     auto config = arguments[0].asObject(rt);
     auto& registry = core::UnistylesRegistry::get();
-    auto miniRuntime = this->miniRuntime->toObject(rt).asObject(rt);
 
-    registry.createState(rt, miniRuntime);
+    registry.createState(rt);
 
     helpers::enumerateJSIObject(rt, config, [&](const std::string& propertyName, jsi::Value& propertyValue){
         if (propertyName == "settings") {
@@ -68,6 +76,8 @@ jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisV
     });
 
     verifyAndSelectTheme(rt);
+    loadExternalMethods(thisVal, rt);
+    registerCommitHook(rt);
 
     return jsi::Value::undefined();
 }
@@ -88,7 +98,11 @@ void HybridStyleSheet::parseSettings(jsi::Runtime &rt, jsi::Object settings) {
             if (propertyValue.isObject()) {
                 helpers::assertThat(rt, propertyValue.asObject(rt).isFunction(rt), "initialTheme configuration must be either a string or a function.");
 
-                return registry.setInitialThemeNameCallback(rt, propertyValue.asObject(rt).asFunction(rt));
+                auto result = propertyValue.asObject(rt).asFunction(rt).call(rt);
+
+                helpers::assertThat(rt, result.isString(), "initialTheme resolved from function is not a string. Please check your initialTheme function.");
+
+                return registry.setInitialThemeName(rt, result.asString(rt).utf8(rt));
             }
 
             helpers::assertThat(rt, propertyValue.isString(), "initialTheme configuration must be either a string or a function.");
@@ -112,7 +126,7 @@ void HybridStyleSheet::parseBreakpoints(jsi::Runtime &rt, jsi::Object breakpoint
     auto& state = registry.getState(rt);
 
     registry.registerBreakpoints(rt, sortedBreakpoints);
-    state.computeCurrentBreakpoint(nativePlatform.getScreenDimensions().width);
+    state.computeCurrentBreakpoint(this->_unistylesRuntime->getScreen().width);
 }
 
 void HybridStyleSheet::parseThemes(jsi::Runtime &rt, jsi::Object themes) {
@@ -124,6 +138,7 @@ void HybridStyleSheet::parseThemes(jsi::Runtime &rt, jsi::Object themes) {
         registry.registerTheme(rt, propertyName, propertyValue.asObject(rt));
     });
 }
+
 
 void HybridStyleSheet::verifyAndSelectTheme(jsi::Runtime &rt) {
     auto& state = core::UnistylesRegistry::get().getState(rt);
@@ -174,7 +189,7 @@ void HybridStyleSheet::verifyAndSelectTheme(jsi::Runtime &rt) {
 
 void HybridStyleSheet::setThemeFromColorScheme(jsi::Runtime& rt) {
     auto& state = core::UnistylesRegistry::get().getState(rt);
-    ColorScheme colorScheme = static_cast<ColorScheme>(this->nativePlatform.getColorScheme());
+    ColorScheme colorScheme = static_cast<ColorScheme>(this->_unistylesRuntime->getColorScheme());
 
     switch (colorScheme) {
         case ColorScheme::LIGHT:
@@ -190,129 +205,41 @@ void HybridStyleSheet::setThemeFromColorScheme(jsi::Runtime& rt) {
     }
 }
 
-void HybridStyleSheet::attachMetaFunctions(jsi::Runtime &rt, core::StyleSheet& styleSheet, jsi::Object &parsedStyleSheet) {
-    auto addNodeFnName = jsi::PropNameID::forUtf8(rt, helpers::ADD_NODE_FN);
-    auto removeNodeFnName = jsi::PropNameID::forUtf8(rt, helpers::REMOVE_NODE_FN);
-    auto addVariantsFnName = jsi::PropNameID::forUtf8(rt, helpers::ADD_VARIANTS_FN);
-    auto addVariantsHostFn = jsi::Function::createFromHostFunction(rt, addVariantsFnName, 1,
-        [&](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
-        helpers::assertThat(rt, count == 1, "expected to be called with one argument.");
-        styleSheet.addVariants(rt, jsi::Value(rt, args[0]));
+void HybridStyleSheet::loadExternalMethods(const jsi::Value& thisValue, jsi::Runtime& rt) {
+    auto jsMethods = thisValue.getObject(rt).getProperty(rt, "jsMethods");
 
-        jsi::Object stylesWithVariants = jsi::Object(rt);
-        auto& state = core::UnistylesRegistry::get().getState(rt);
-        auto settings = std::make_unique<parser::ParserSettings>(
-            styleSheet.variants,
-            state.getCurrentBreakpointName(),
-            state.getSortedBreakpointPairs(),
-            miniRuntime->getScreen()
-        );
-        auto& parser = parser::Parser::configure(std::move(settings));
+    helpers::assertThat(rt, jsMethods.isObject(), "can't find jsMethods.");
 
-        for (auto& style: styleSheet.unistyles) {
-            if (helpers::vecContainsKeys(style.dependencies, {core::UnistyleDependency::Variants})) {
-                parser.parseUnistyleToJSIObject(rt, style, stylesWithVariants);
-            }
-        }
+    auto maybeProcessColorFn = jsMethods.asObject(rt).getProperty(rt, "processColor");
 
-        return stylesWithVariants;
-    });
+    helpers::assertThat(rt, maybeProcessColorFn.isObject(), "can't load processColor function from JS.");
 
-    // attach addVariants to stylesheet
-    helpers::defineHiddenProperty(rt, parsedStyleSheet, helpers::ADD_VARIANTS_FN, std::move(addVariantsHostFn));
+    auto processColorFn = maybeProcessColorFn.asObject(rt).asFunction(rt);
+    auto& registry = core::UnistylesRegistry::get();
+    auto& state = registry.getState(rt);
 
-    // attach addNode and removeNode to each style
-    helpers::enumerateJSIObject(rt, parsedStyleSheet, [&](const std::string& propertyName, jsi::Value& propertyValue){
-        auto addNodeHostFn = jsi::Function::createFromHostFunction(rt, addNodeFnName, 1,
-            [&, propertyName](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
-            helpers::assertThat(rt, count == 1, "expected to be called with one argument,");
-            helpers::assertThat(rt, args[0].isNumber(), "expected to be called with number.");
-
-            auto nativeTag = args[0].asNumber();
-            auto it = std::find_if(
-                styleSheet.unistyles.begin(),
-                styleSheet.unistyles.end(),
-                [&propertyName](const core::Unistyle& style) {
-                    return style.styleKey == propertyName;
-                }
-            );
-
-            if (it != styleSheet.unistyles.end()) {
-                it->nativeTags.push_back(nativeTag);
-            }
-
-            return jsi::Value::undefined();
-        });
-        auto removeNodeHostFn = jsi::Function::createFromHostFunction(rt, removeNodeFnName, 1,
-            [&, propertyName](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
-            helpers::assertThat(rt, count == 1, "expected to be called with one argument,");
-            helpers::assertThat(rt, args[0].isNumber(), "expected to be called with number.");
-
-            auto nativeTag = args[0].asNumber();
-            auto it = std::find_if(
-                styleSheet.unistyles.begin(),
-                styleSheet.unistyles.end(),
-                [&propertyName](const core::Unistyle& style) {
-                    return style.styleKey == propertyName;
-                }
-            );
-
-            auto tagIt = std::find(it->nativeTags.begin(), it->nativeTags.end(), nativeTag);
-
-            if (tagIt != it->nativeTags.end()) {
-                it->nativeTags.erase(tagIt);
-            }
-
-            return jsi::Value::undefined();
-        });
-
-        auto style = jsi::Value(rt, propertyValue).asObject(rt);
-
-        helpers::defineHiddenProperty(rt, style, helpers::ADD_NODE_FN, std::move(addNodeHostFn));
-        helpers::defineHiddenProperty(rt, style, helpers::REMOVE_NODE_FN, std::move(removeNodeHostFn));
-    });
+    state.registerProcessColorFunction(std::move(processColorFn));
 }
 
-void HybridStyleSheet::onPlatformEvent(PlatformEvent event) {
-    // todo compare values, call methods only when value changed
-    auto dependencies = helpers::getUnistyleDependenciesFromPlatformEvent(event);
+void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies) {
+    auto& registry = core::UnistylesRegistry::get();
+    auto parser = parser::Parser(this->_unistylesRuntime);
+    auto dependencyMap = registry.buildDependencyMap(dependencies);
+    auto& rt = this->_unistylesRuntime->getRuntime();
 
-    this->updateUnistylesWithDependencies(dependencies);
-}
-
-void HybridStyleSheet::updateUnistylesWithDependencies(std::vector<core::UnistyleDependency>& dependencies) {
-    auto styleSheets = this->styleSheetRegistry.getStyleSheetsWithDependencies(dependencies);
-    auto rt = this->unistylesRuntime->rt;
-    auto& state = core::UnistylesRegistry::get().getState(*rt);
-    std::vector<std::pair<std::string, std::string>> variants{};
-    Dimensions dimensions{400, 800};
-    auto settings = std::make_unique<parser::ParserSettings>(
-        variants,
-        state.getCurrentBreakpointName(),
-        state.getSortedBreakpointPairs(),
-        // todo
-        dimensions
-    );
-
-    auto& parser = parser::Parser::configure(std::move(settings));
-    std::vector<core::Unistyle*> unistylesToUpdate{};
-
-    std::for_each(styleSheets.begin(), styleSheets.end(), [&](const core::StyleSheet* styleSheet){
-        auto unistyles = this->styleSheetRegistry.recompute(*rt, styleSheet, dependencies);
-
-        std::for_each(unistyles.begin(), unistyles.end(), [&](const core::Unistyle* unistyle){
-            auto mutatedUnistyle = const_cast<core::Unistyle*>(unistyle);
-
-            parser.parseUnistyle(*rt, *mutatedUnistyle);
-            unistylesToUpdate.push_back(mutatedUnistyle);
-
-            mutatedUnistyle->isDirty = false;
-        });
-    });
-
-    auto viewUpdates = parser.unistylesToViewUpdates(*rt, unistylesToUpdate);
-
-    if (viewUpdates.size() > 0) {
-        shadow::ShadowTreeManager::updateShadowTree(*rt, viewUpdates);
+    if (dependencyMap.size() == 0) {
+        return;
     }
+
+    parser.rebuildUnistylesInDependencyMap(rt, dependencyMap);
+
+    auto shadowLeafUpdates = parser.dependencyMapToShadowLeafUpdates(dependencyMap);
+
+    shadow::ShadowTreeManager::updateShadowTree(rt, shadowLeafUpdates);
+}
+
+void HybridStyleSheet::registerCommitHook(jsi::Runtime &rt) {
+    UIManager& uiManager = const_cast<UIManager&>(UIManagerBinding::getBinding(rt)->getUIManager());
+
+    this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(uiManager, this->_unistylesRuntime);
 }

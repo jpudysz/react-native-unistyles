@@ -1,71 +1,55 @@
 #pragma once
 
 #include <jsi/jsi.h>
-#include <jsi/JSIDynamic.h>
 #include <folly/dynamic.h>
 #include "Unistyle.h"
 #include "Dimensions.hpp"
 #include "Constants.h"
 #include "Helpers.h"
 #include "MediaQueries.h"
-#include "ViewUpdate.h"
+#include "HybridUnistylesRuntime.h"
+#include "StyleSheet.h"
+#include "ShadowLeafUpdate.h"
 
 namespace margelo::nitro::unistyles::parser {
 
 using namespace facebook;
+using namespace margelo::nitro::unistyles::core;
+
 using Variants = std::vector<std::pair<std::string, std::string>>;
-
-struct ParserSettings {
-    const Variants variants;
-    const std::optional<std::string> currentBreakpointName;
-    const std::vector<std::pair<std::string, double>> sortedBreakpointPairs;
-    const Dimensions screenDimensions;
-
-    ParserSettings(
-        Variants& variants,
-        std::optional<std::string> currentBreakpointName,
-        std::vector<std::pair<std::string, double>> sortedBreakpointPairs,
-        Dimensions screenDimensions
-    ): variants{std::move(variants)},
-       currentBreakpointName(std::move(currentBreakpointName)),
-       sortedBreakpointPairs{std::move(sortedBreakpointPairs)},
-       screenDimensions(std::move(screenDimensions)) {}
-};
+using DependencyMap = std::unordered_map<
+    std::shared_ptr<core::StyleSheet>,
+    std::unordered_map<const ShadowNodeFamily*, std::vector<core::Unistyle::Shared>>
+>;
 
 struct Parser {
-    static Parser& configure(std::unique_ptr<ParserSettings>);
+    Parser(std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime): _unistylesRuntime{unistylesRuntime} {}
 
-    Parser(const Parser&) = delete;
-    Parser(const Parser&&) = delete;
-
-    void parseUnistyle(jsi::Runtime& rt, core::Unistyle& unistyle);
-    void parseUnistyleToJSIObject(jsi::Runtime& rt, core::Unistyle& unistyle, jsi::Object& target);
-    jsi::Object parseUnistyles(jsi::Runtime& rt, std::vector<core::Unistyle>& unistyles);
-    ViewUpdates unistylesToViewUpdates(jsi::Runtime& rt, std::vector<core::Unistyle*>&);
+    void buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
+    void parseUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
+    Variants variantsToPairs(jsi::Runtime& rt, jsi::Object&& variants);
+    void rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
+    void rebuildUnistylesInDependencyMap(jsi::Runtime& rt, DependencyMap& dependencyMap);
+    shadow::ShadowLeafUpdates dependencyMapToShadowLeafUpdates(DependencyMap& dependencyMap);
 
 private:
-    Parser() = default;
-    std::unique_ptr<ParserSettings> settings;
-
-    jsi::Object parseFirstLevel(jsi::Runtime &rt, core::Unistyle& unistyle);
-    jsi::Value parseSecondLevel(jsi::Runtime &rt, jsi::Value& nestedObject);
-    jsi::Function createDynamicFunctionProxy(jsi::Runtime &rt, core::Unistyle& unistyle);
+    void rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, Unistyle::Shared unistyle);
+    jsi::Object unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
+    jsi::Object parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared unistyle, Variants& variants);
+    jsi::Value parseSecondLevel(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Value& nestedObject);
+    jsi::Function createDynamicFunctionProxy(jsi::Runtime& rt, Unistyle::Shared unistyle, Variants& variants);
     std::vector<folly::dynamic> parseDynamicFunctionArguments(jsi::Runtime& rt, size_t count, const jsi::Value* arguments);
-    std::vector<core::UnistyleDependency> parseDependencies(jsi::Runtime& rt, jsi::Object&& dependencies);
-    jsi::Value parseTransforms(jsi::Runtime& rt, jsi::Object& obj);
-    jsi::Value getValueFromBreakpoints(jsi::Runtime& rt, jsi::Object& obj);
-    jsi::Object parseVariants(jsi::Runtime& rt, jsi::Object& obj);
+    std::vector<UnistyleDependency> parseDependencies(jsi::Runtime &rt, jsi::Object&& dependencies);
+    jsi::Value parseTransforms(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Object& obj);
+    jsi::Value getValueFromBreakpoints(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Object& obj);
+    jsi::Object parseVariants(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Object& obj, Variants& variants);
     jsi::Value getStylesForVariant(jsi::Runtime& rt, jsi::Object&& groupValue, std::optional<std::string> selectedVariant);
-    jsi::Object parseCompoundVariants(jsi::Runtime& rt, jsi::Object& obj);
+    jsi::Object parseCompoundVariants(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Object& obj, Variants& variants);
     bool shouldApplyCompoundVariants(jsi::Runtime& rt, const Variants& variants, jsi::Object& compoundVariant);
+    RawProps parseStylesToShadowTreeStyles(jsi::Runtime& rt, jsi::Object& parsedStyles);
+    bool isColor(const std::string& propertyName);
+
+    std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
 };
-
-Parser& Parser::configure(std::unique_ptr<ParserSettings> settings) {
-    static Parser parser;
-
-    parser.settings = std::move(settings);
-
-    return parser;
-}
 
 }

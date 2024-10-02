@@ -3,7 +3,7 @@ import type { SafeReturnType } from './common'
 export type ExtractVariantNames<T> = ExtractVariantKeys<SafeReturnType<T>>
 
 type ExtractVariantKeys<T> = T extends object
-    ? ExtractVariant<T[keyof T]>
+    ? ExtractVariant<SafeReturnType<T[keyof T]>>
     : never
 
 type HasBooleanVariants<T> = T extends Record<'true', any>
@@ -20,4 +20,4 @@ type ExtractSubVariantKeys<T> = T extends object
 
 type ExtractVariant<T> = T extends { variants: infer V }
     ? { [key in keyof V]?: ExtractSubVariantKeys<V[key]> }
-    : never
+    : T

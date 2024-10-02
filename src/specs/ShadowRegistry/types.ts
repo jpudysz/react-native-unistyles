@@ -1,7 +1,9 @@
 export type StateNode = {
-    node?: {
-        __hostObjectShadowNodeWrapper: any
-    }
+    node?: ShadowNode
+}
+
+export type ShadowNode = {
+    __hostObjectShadowNodeWrapper: any
 }
 
 export type ViewHandle = {
@@ -19,5 +21,9 @@ export type ViewHandle = {
         __internalInstanceHandle?: {
             stateNode?: StateNode
         }
-    }),
+    })
+}
+
+export type Unistyle = {
+    __unid?: number
 }
