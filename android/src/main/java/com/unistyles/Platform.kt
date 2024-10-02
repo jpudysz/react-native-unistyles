@@ -145,6 +145,12 @@ class Platform(private val reactApplicationContext: ReactApplicationContext) {
         }
 
         val insets = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+        val bottomIME = insetsCompat.getInsets(WindowInsetsCompat.Type.ime()).bottom
+
+        // fix for keyboard controller, that triggers WindowInsetsListener
+        if(!hasAnimatedInsets && bottomIME != 0) {
+            return
+        }
 
         if (!hasAnimatedInsets) {
             this.insets = Insets(statusBarTopInset, insets.bottom, insets.left, insets.right)
