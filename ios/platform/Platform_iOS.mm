@@ -173,17 +173,17 @@
 }
 
 - (void)setRootViewBackgroundColor:(std::string)color alpha:(float)alpha {
-    UIViewController *presentedViewController = RCTPresentedViewController();
-    NSString *colorString = [NSString stringWithUTF8String:color.c_str()];
-    UIColor *backgroundColor = colorFromHexString(colorString, alpha);
-
-    if (backgroundColor == nil) {
-        NSLog(@"🦄 Unistyles: Couldn't set rootView to %@ color", colorString);
-
-        return;
-    }
-
     dispatch_async(dispatch_get_main_queue(), ^{
+        UIViewController *presentedViewController = RCTPresentedViewController();
+        NSString *colorString = [NSString stringWithUTF8String:color.c_str()];
+        UIColor *backgroundColor = colorFromHexString(colorString, alpha);
+
+        if (backgroundColor == nil) {
+            NSLog(@"🦄 Unistyles: Couldn't set rootView to %@ color", colorString);
+
+            return;
+        }
+        
         presentedViewController.view.backgroundColor = backgroundColor;
     });
 }
