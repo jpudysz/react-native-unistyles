@@ -6,6 +6,14 @@ function getRefProp(t, path) {
     )
 }
 
+function hasStringRef(t, path) {
+    return path.node.openingElement.attributes.find(attr =>
+        t.isJSXAttribute(attr) &&
+        t.isJSXIdentifier(attr.name, { name: 'ref' }) &&
+        t.isStringLiteral(attr.value)
+    )
+}
+
 function addRef(t, path, styleObj, styleProp) {
     const newRefFunction = t.arrowFunctionExpression(
         [t.identifier('ref')],
@@ -41,7 +49,7 @@ function overrideRef(t, path, refProp, styleObj, styleProp) {
     const binding = path.scope.getBinding(refProp.value.expression.name)
 
     // ref={ref}
-    if (isIdentifier && !binding) {
+    if (isIdentifier && binding && t.isCallExpression(binding.path.node.init)) {
         const userVariableName = refProp.value.expression.name
         const newRefFunction = t.arrowFunctionExpression(
             [t.identifier(uniqueRefName)],
@@ -81,13 +89,13 @@ function overrideRef(t, path, refProp, styleObj, styleProp) {
             : null
 
         const newRefFunction = t.arrowFunctionExpression(
-            [t.identifier(uniqueRefName)],
+            [t.identifier('ref')],
             t.blockStatement([
                 ...userStatements.filter(statement => !t.isReturnStatement(statement)),
                 t.expressionStatement(
                     t.callExpression(
                         t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
-                        [t.identifier(uniqueRefName), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
+                        [t.identifier('ref'), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
                     )
                 ),
                 // Merged cleanup function
@@ -101,7 +109,7 @@ function overrideRef(t, path, refProp, styleObj, styleProp) {
                         t.expressionStatement(
                             t.callExpression(
                                 t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('remove')),
-                                [t.identifier(uniqueRefName), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
+                                [t.identifier('ref'), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
                             )
                         )
                     ]))
@@ -115,15 +123,19 @@ function overrideRef(t, path, refProp, styleObj, styleProp) {
     }
 
     // ref={scopedFunction}
-    const userFunctionName = refProp.value.expression
     const isArrowFunction = t.isArrowFunctionExpression(binding.path.node.init)
+    const isFunction = t.isFunctionDeclaration(binding.path.node)
+
+    if (!isArrowFunction && !isFunction) {
+        return
+    }
+
+    const userFunctionName = refProp.value.expression
     const userFunction = isArrowFunction
         ? binding.path.node.init
         : binding.path.node
-    const returnStatement = userFunction.body.body.find(statement => t.isReturnStatement(statement))
-    const userCleanupFunction = returnStatement
-        ? returnStatement.argument
-        : null
+    const returnStatement = userFunction.body.body.find(statement => t.isReturnStatement(statement));
+    const userCleanupFunction = returnStatement ? returnStatement.argument : null;
 
     const newRefFunction = t.arrowFunctionExpression(
         [t.identifier(uniqueRefName)],
@@ -162,5 +174,6 @@ function overrideRef(t, path, refProp, styleObj, styleProp) {
 module.exports = {
     getRefProp,
     addRef,
-    overrideRef
+    overrideRef,
+    hasStringRef
 }

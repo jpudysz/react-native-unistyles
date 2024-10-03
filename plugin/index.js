@@ -1,6 +1,6 @@
 const addShadowRegistryImport = require('./import')
 const { getStyleObjectPath, getStyleAttribute } = require('./style')
-const { getRefProp, addRef, overrideRef } = require('./ref')
+const { getRefProp, addRef, overrideRef, hasStringRef } = require('./ref')
 const { isUnistylesStyleSheet, analyzeDependencies } = require('./stylesheet')
 
 module.exports = function ({ types: t }) {
@@ -55,6 +55,11 @@ module.exports = function ({ types: t }) {
                 state.file.hasAnyUnistyle = true
 
                 const refProp = getRefProp(t, path)
+
+                if (!refProp && hasStringRef(t, path)) {
+                    throw new Error("Detected string based ref which is not supported by Unistyles.")
+                }
+
                 const styleObj = stylePath[0]
                 const styleProp = stylePath[1]
 
