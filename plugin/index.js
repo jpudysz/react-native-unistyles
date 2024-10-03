@@ -78,7 +78,11 @@ module.exports = function ({ types: t }) {
                 if (t.isObjectExpression(arg)) {
                     arg.properties.forEach(property => {
                         if (t.isObjectProperty(property)) {
-                            analyzeDependencies(t, state, property.key.name, property.value, property.key.name)
+                            const propertyValue = t.isArrowFunctionExpression(property.value)
+                                ? property.value.body
+                                : property.value
+
+                            analyzeDependencies(t, state, property.key.name, propertyValue)
                         }
                     })
                 }

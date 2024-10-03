@@ -117,7 +117,10 @@ function analyzeDependencies(t, state, name, unistyleObj, themeName, rtName) {
             }
         }
 
-        // variants are detectable from C++
+        if (uni.key && uni.key.name === 'variants') {
+            dependencies.push(UnistyleDependency.Variants)
+        }
+
         // breakpoints are too complex and are handled by C++
     })
 

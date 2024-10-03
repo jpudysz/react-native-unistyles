@@ -14,7 +14,7 @@ pluginTester({
     },
     tests: [
         {
-            title: 'Does nothing if there is no StyleSheet.create from Unistyles',
+            title: 'Does nothing if there is no import from Unistyles',
             code: `
                 import { StyleSheet } from 'react-native'
 
@@ -51,9 +51,9 @@ pluginTester({
             `
         },
         {
-            title: 'Adds ref if there is StyleSheet.create from Unistyles',
+            title: 'Adds ref if there is any import from Unistyles',
             code: `
-                import { StyleSheet } from 'react-native-unistyles'
+                import 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
@@ -71,7 +71,7 @@ pluginTester({
             `,
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
-                import { StyleSheet } from 'react-native-unistyles'
+                import 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
@@ -88,50 +88,6 @@ pluginTester({
                 }
 
                 const styles = StyleSheet.create({
-                    container: {
-                        backgroundColor: 'red'
-                    }
-                })
-            `
-        },
-        {
-            title: 'Adds ref if there is StyleSheet.create from Unistyles under different name',
-            code: `
-                import { StyleSheet as ST } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View style={styles.container}>
-                            <Text>Hello world</Text>
-                        </View>
-                    )
-                }
-
-                const styles = ST.create({
-                    container: {
-                        backgroundColor: 'red'
-                    }
-                })
-            `,
-            output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
-                import { StyleSheet as ST } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View
-                            style={styles.container}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, styles.container)
-                                return () => UnistylesShadowRegistry.remove(ref, styles.container)
-                            }}
-                        >
-                            <Text>Hello world</Text>
-                        </View>
-                    )
-                }
-
-                const styles = ST.create({
                     container: {
                         backgroundColor: 'red'
                     }
@@ -195,11 +151,11 @@ pluginTester({
         {
             title: 'Preserves user\'s ref as function',
             code: `
-                import React from 'react'
+                import { useRef } from 'react'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = React.useRef()
+                    let myRef = useRef()
 
                     return (
                         <View
@@ -222,11 +178,11 @@ pluginTester({
             `,
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
-                import React from 'react'
+                import { useRef } from 'react'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = React.useRef()
+                    let myRef = useRef()
 
                     return (
                         <View
@@ -458,6 +414,512 @@ pluginTester({
                     container: {
                         backgroundColor: 'red'
                     }
+                })
+            `
+        },
+        {
+            title: 'Should not modify ref if user is using inline styles',
+            code: `
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    let myRef = useRef()
+
+                    return (
+                        <View
+                            ref={myRef}
+                            style={{
+                                backgroundColor: 'red'
+                            }}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: {
+                        backgroundColor: 'red'
+                    }
+                })
+            `,
+            output: `
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    let myRef = useRef()
+
+                    return (
+                        <View
+                            ref={myRef}
+                            style={{
+                                backgroundColor: 'red'
+                            }}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: {
+                        backgroundColor: 'red'
+                    }
+                })
+            `
+        },
+        {
+            title: 'Should not modify ref if user is not member accessing styles',
+            code: `
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    let myRef = useRef()
+
+                    return (
+                        <View
+                            ref={myRef}
+                            style={{
+                                ...obj1,
+                                ...obj2
+                            }}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: {
+                        backgroundColor: 'red'
+                    }
+                })
+            `,
+            output: `
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    let myRef = useRef()
+
+                    return (
+                        <View
+                            ref={myRef}
+                            style={{
+                                ...obj1,
+                                ...obj2
+                            }}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: {
+                        backgroundColor: 'red'
+                    }
+                })
+            `
+        },
+        {
+            title: 'Should not modify ref if user is not member accessing styles in array',
+            code: `
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    let myRef = useRef()
+
+                    return (
+                        <View
+                            ref={myRef}
+                            style={[obj1, obj2]}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: {
+                        backgroundColor: 'red'
+                    }
+                })
+            `,
+            output: `
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    let myRef = useRef()
+
+                    return (
+                        <View ref={myRef} style={[obj1, obj2]}>
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: {
+                        backgroundColor: 'red'
+                    }
+                })
+            `
+        },
+        {
+            title: 'Should modify ref if user is using spreads on styles',
+            code: `
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    let myRef = useRef()
+
+                    return (
+                        <View
+                            ref={myRef}
+                            style={{
+                                ...styles.container,
+                                ...{
+                                    backgroundColor: 'red'
+                                }
+                            }}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: {
+                        backgroundColor: 'red'
+                    }
+                })
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    let myRef = useRef()
+
+                    return (
+                        <View
+                            ref={_ref => {
+                                myRef = _ref
+                                UnistylesShadowRegistry.add(_ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(_ref, styles.container)
+                            }}
+                            style={{
+                                ...styles.container,
+                                ...{
+                                    backgroundColor: 'red'
+                                }
+                            }}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: {
+                        backgroundColor: 'red'
+                    }
+                })
+            `
+        },
+        {
+            title: 'Should modify ref if user is using array for styles',
+            code: `
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    let myRef = useRef()
+
+                    return (
+                        <View
+                            ref={myRef}
+                            style={[
+                                styles.container,
+                                {
+                                    backgroundColor: 'red'
+                                }
+                            ]}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: {
+                        backgroundColor: 'red'
+                    }
+                })
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    let myRef = useRef()
+
+                    return (
+                        <View
+                            ref={_ref => {
+                                myRef = _ref
+                                UnistylesShadowRegistry.add(_ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(_ref, styles.container)
+                            }}
+                            style={[
+                                styles.container,
+                                {
+                                    backgroundColor: 'red'
+                                }
+                            ]}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: {
+                        backgroundColor: 'red'
+                    }
+                })
+            `
+        },
+        {
+            title: 'Should modify ref if user is using single style in array',
+            code: `
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    let myRef = useRef()
+
+                    return (
+                        <View
+                            ref={myRef}
+                            style={[styles.container]}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: {
+                        backgroundColor: 'red'
+                    }
+                })
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    let myRef = useRef()
+
+                    return (
+                        <View
+                            ref={_ref => {
+                                myRef = _ref
+                                UnistylesShadowRegistry.add(_ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(_ref, styles.container)
+                            }}
+                            style={[styles.container]}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: {
+                        backgroundColor: 'red'
+                    }
+                })
+            `
+        },
+        {
+            title: 'Should modify ref if user is using dynamic function in array',
+            code: `
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    let myRef = useRef()
+
+                    return (
+                        <View
+                            ref={myRef}
+                            style={[
+                                styles.container(1, 2)
+                            ]}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: () => ({
+                        backgroundColor: 'red'
+                    })
+                })
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    let myRef = useRef()
+
+                    return (
+                        <View
+                            ref={_ref => {
+                                myRef = _ref
+                                UnistylesShadowRegistry.add(_ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(_ref, styles.container)
+                            }}
+                            style={[styles.container(1, 2)]}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: () => ({
+                        backgroundColor: 'red'
+                    })
+                })
+            `
+        },
+        {
+            title: 'Should modify ref if user is using dynamic function in object',
+            code: `
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    let myRef = useRef()
+
+                    return (
+                        <View
+                            ref={myRef}
+                            style={{
+                                backgroundColor: 'red',
+                                ...styles.container(1, 2)
+                            }}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: () => ({
+                        backgroundColor: 'red'
+                    })
+                })
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    let myRef = useRef()
+
+                    return (
+                        <View
+                            ref={_ref => {
+                                myRef = _ref
+                                UnistylesShadowRegistry.add(_ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(_ref, styles.container)
+                            }}
+                            style={{
+                                backgroundColor: 'red',
+                                ...styles.container(1, 2)
+                            }}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: () => ({
+                        backgroundColor: 'red'
+                    })
+                })
+            `
+        },
+        {
+            title: 'Should modify registry names if user changes name of member expression',
+            code: `
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    let myRef = useRef()
+
+                    return (
+                        <View
+                            ref={myRef}
+                            style={uhh.dkk()}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const uhh = StyleSheet.create({
+                    dkk: () => ({
+                        backgroundColor: 'red'
+                    })
+                })
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    let myRef = useRef()
+
+                    return (
+                        <View
+                            ref={_ref => {
+                                myRef = _ref
+                                UnistylesShadowRegistry.add(_ref, uhh.dkk)
+                                return () => UnistylesShadowRegistry.remove(_ref, uhh.dkk)
+                            }}
+                            style={uhh.dkk()}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const uhh = StyleSheet.create({
+                    dkk: () => ({
+                        backgroundColor: 'red'
+                    })
                 })
             `
         },
