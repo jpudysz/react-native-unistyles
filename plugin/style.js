@@ -6,7 +6,7 @@ function getStyleObjectPath(t, node) {
 
     // [styles.container]
     if (t.isArrayExpression(node)) {
-        return node.elements.some(element => getStyleObjectPath(t, element))
+        return node.elements.flatMap(element => getStyleObjectPath(t, element))
     }
 
     // [...styles.container]
@@ -16,7 +16,7 @@ function getStyleObjectPath(t, node) {
 
     // {{ ...styles.container }}
     if (t.isObjectExpression(node)) {
-        return node.properties.some(prop => getStyleObjectPath(t, prop.argument))
+        return node.properties.flatMap(prop => getStyleObjectPath(t, prop.argument))
     }
 
     // {styles.container(arg1, arg2)}
