@@ -7,6 +7,9 @@ module.exports = function (api) {
     return {
         presets: ['babel-preset-expo'],
         plugins: [
+            [path.join(__dirname, '../plugin'), {
+                debug: true
+            }],
             [
                 'module-resolver',
                 {
