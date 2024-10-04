@@ -74,6 +74,9 @@ const convertMap = {
     resizeMode: (value: string) => ({
         backgroundSize: value
     }),
+    lineHeight: (value: number) => ({
+        lineHeight: `${value}px`
+    }),
 } as Record<PropertyKey, (value: any) => NestedCSSProperties>
 
 export const getStyle = (key: string, value: any) => {
