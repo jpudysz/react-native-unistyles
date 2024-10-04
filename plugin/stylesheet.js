@@ -35,7 +35,7 @@ function analyzeDependencies(t, state, name, unistyleObj, themeName, rtName) {
                 .map(dep => Object.keys(UnistyleDependency).find(key => UnistyleDependency[key] === dep))
                 .join(', ')
 
-            console.log(`[${state.filename}]: "${name}" dependencies: ${mappedDeps}`)
+            console.log(`${state.filename.replace(`${state.file.opts.root}/`, '')}: styles.${name}: [${mappedDeps}]`)
         }
     }
     const unistyle = unistyleObj.properties
