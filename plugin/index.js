@@ -12,6 +12,7 @@ module.exports = function ({ types: t }) {
                     state.file.hasAnyUnistyle = false
                     state.file.hasUnistylesImport = false
                     state.file.styleSheetLocalName = ''
+                    state.file.webDynamicFunctions = {}
                 },
                 exit(path, state) {
                     if (state.file.hasAnyUnistyle) {
@@ -44,7 +45,7 @@ module.exports = function ({ types: t }) {
                     return
                 }
 
-                const stylePath = getStyleObjectPath(t, styleAttr.value.expression)
+                const stylePath = getStyleObjectPath(t, styleAttr.value.expression, state)
 
                 // style prop is not using object expression
                 if (stylePath.length !== 2) {
