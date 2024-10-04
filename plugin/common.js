@@ -1,4 +1,4 @@
-function getIdentifierNameFromExpression(t, memberExpression, rootStyleKey) {
+function getIdentifierNameFromExpression(t, memberExpression) {
     if (t.isMemberExpression(memberExpression)) {
         const object = memberExpression.object
 
@@ -22,7 +22,11 @@ function getIdentifierNameFromExpression(t, memberExpression, rootStyleKey) {
         return [
             getIdentifierNameFromExpression(t, memberExpression.left),
             getIdentifierNameFromExpression(t, memberExpression.right)
-        ].flat().find(Boolean)
+        ].flat()
+    }
+
+    if (t.isCallExpression(memberExpression)) {
+        return getIdentifierNameFromExpression(t, memberExpression.callee)
     }
 
     if (t.isConditionalExpression(memberExpression)) {
@@ -42,43 +46,27 @@ function getIdentifierNameFromExpression(t, memberExpression, rootStyleKey) {
         return memberExpression.expressions.map(expression => getIdentifierNameFromExpression(t, expression)).flat()
     }
 
-    if (t.isObjectExpression(memberExpression) && rootStyleKey === 'variants') {
+    if (t.isObjectExpression(memberExpression)) {
         return memberExpression.properties
-            .filter(t.isObjectProperty)
-            // first level
-            .flatMap(property => property.value.properties)
-            .filter(t.isObjectProperty)
-            // second level
-            .flatMap(property => property.value.properties)
-            .filter(t.isObjectProperty)
-            // last level key-value
-            .flatMap(property => t.isObjectProperty(property.value)
-                ? property.value.object
-                : t.isBinaryExpression(property.value)
-                    ? [property.value.left, property.value.right]
-                    : undefined
-            )
-            .flatMap(expression => t.isIdentifier(expression)
-                ? expression.name
-                : getIdentifierNameFromExpression(t, expression)
-            )
+            .filter(property => t.isObjectProperty(property))
+            .flatMap(property => getIdentifierNameFromExpression(t, property.value))
     }
 
     return []
 }
 
-function getSecondPropertyName(t, memberExpression, rootStyleKey) {
+function getSecondPropertyName(t, memberExpression) {
     if (t.isConditionalExpression(memberExpression)) {
         return [
             getSecondPropertyName(t, memberExpression.test.left),
             getSecondPropertyName(t, memberExpression.test.right),
             getSecondPropertyName(t, memberExpression.alternate),
             getSecondPropertyName(t, memberExpression.consequent),
-        ].flat().find(Boolean)
+        ].flat()
     }
 
     if (t.isTemplateLiteral(memberExpression)) {
-        return memberExpression.expressions.map(expression => getSecondPropertyName(t, expression)).flat().find(Boolean)
+        return memberExpression.expressions.map(expression => getSecondPropertyName(t, expression)).flat()
     }
 
     if (t.isBinaryExpression(memberExpression)) {
@@ -88,22 +76,14 @@ function getSecondPropertyName(t, memberExpression, rootStyleKey) {
         ].flat()
     }
 
-    if (t.isObjectExpression(memberExpression) && rootStyleKey === 'variants') {
+    if (t.isObjectExpression(memberExpression)) {
         return memberExpression.properties
-            .filter(t.isObjectProperty)
-            // first level
-            .flatMap(property => property.value.properties)
-            .filter(t.isObjectProperty)
-            // second level
-            .flatMap(property => property.value.properties)
-            .filter(t.isObjectProperty)
-            // last level key-value
+            .filter(property => t.isObjectProperty(property))
             .flatMap(property => getSecondPropertyName(t, property.value))
-            .find(Boolean)
     }
 
     if (!t.isMemberExpression(memberExpression)) {
-        return null
+        return []
     }
 
     let current = memberExpression
@@ -115,14 +95,14 @@ function getSecondPropertyName(t, memberExpression, rootStyleKey) {
     }
 
     if (propertyName && t.isIdentifier(propertyName)) {
-        return propertyName.name
+        return [propertyName.name]
     }
 
     if (propertyName) {
-        return propertyName.value
+        return [propertyName.value]
     }
 
-    return null
+    return []
 }
 
 module.exports = {

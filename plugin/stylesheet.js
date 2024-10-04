@@ -42,79 +42,81 @@ function analyzeDependencies(t, state, name, unistyleObj, themeName, rtName) {
     const dependencies = []
 
     Object.values(unistyle).forEach(uni => {
-        const identifier = getIdentifierNameFromExpression(t, uni.value, uni.key.name)
+        const identifier = getIdentifierNameFromExpression(t, uni.value)
 
         if (identifier.includes(themeName)) {
             dependencies.push(UnistyleDependency.Theme)
-
-            return
         }
 
         if (identifier.includes(rtName)) {
-            const propertyName = getSecondPropertyName(t, uni.value, uni.key.name)
+            const propertyNames = getSecondPropertyName(t, uni.value)
 
-            switch (propertyName) {
-                case 'themeName': {
-                    dependencies.push(UnistyleDependency.ThemeName)
+            propertyNames
+                .filter(Boolean)
+                .forEach(propertyName => {
+                    switch (propertyName) {
+                        case 'themeName': {
+                            dependencies.push(UnistyleDependency.ThemeName)
 
-                    return
-                }
-                case 'adaptiveThemes': {
-                    dependencies.push(UnistyleDependency.AdaptiveThemes)
+                            return
+                        }
+                        case 'adaptiveThemes': {
+                            dependencies.push(UnistyleDependency.AdaptiveThemes)
 
-                    return
-                }
-                case 'breakpoint': {
-                    dependencies.push(UnistyleDependency.Breakpoints)
+                            return
+                        }
+                        case 'breakpoint': {
+                            dependencies.push(UnistyleDependency.Breakpoints)
 
-                    return
-                }
-                case 'colorScheme': {
-                    dependencies.push(UnistyleDependency.ColorScheme)
+                            return
+                        }
+                        case 'colorScheme': {
+                            dependencies.push(UnistyleDependency.ColorScheme)
 
-                    return
-                }
-                case 'screen': {
-                    dependencies.push(UnistyleDependency.Dimensions)
+                            return
+                        }
+                        case 'screen': {
+                            dependencies.push(UnistyleDependency.Dimensions)
 
-                    return
-                }
-                case 'orientation': {
-                    dependencies.push(UnistyleDependency.Orientation)
+                            return
+                        }
+                        case 'orientation': {
+                            dependencies.push(UnistyleDependency.Orientation)
 
-                    return
-                }
-                case 'contentSizeCategory': {
-                    dependencies.push(UnistyleDependency.ContentSizeCategory)
+                            return
+                        }
+                        case 'contentSizeCategory': {
+                            dependencies.push(UnistyleDependency.ContentSizeCategory)
 
-                    return
-                }
-                case 'insets': {
-                    dependencies.push(UnistyleDependency.Insets)
+                            return
+                        }
+                        case 'insets': {
+                            dependencies.push(UnistyleDependency.Insets)
 
-                    return
-                }
-                case 'pixelRatio': {
-                    dependencies.push(UnistyleDependency.PixelRatio)
+                            return
+                        }
+                        case 'pixelRatio': {
+                            dependencies.push(UnistyleDependency.PixelRatio)
 
-                    return
-                }
-                case 'fontScale': {
-                    dependencies.push(UnistyleDependency.FontScale)
+                            return
+                        }
+                        case 'fontScale': {
+                            dependencies.push(UnistyleDependency.FontScale)
 
-                    return
-                }
-                case 'statusBar': {
-                    dependencies.push(UnistyleDependency.StatusBar)
+                            return
+                        }
+                        case 'statusBar': {
+                            dependencies.push(UnistyleDependency.StatusBar)
 
-                    return
-                }
-                case 'navigationBar': {
-                    dependencies.push(UnistyleDependency.NavigationBar)
+                            return
+                        }
+                        case 'navigationBar': {
+                            dependencies.push(UnistyleDependency.NavigationBar)
 
-                    return
-                }
-            }
+                            return
+                        }
+                    }
+                })
         }
 
         if (uni.key && uni.key.name === 'variants') {
