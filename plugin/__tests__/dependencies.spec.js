@@ -180,5 +180,180 @@ pluginTester({
                 }))
             `
         },
+        {
+            title: 'Should detect dependencies in _web',
+            code: `
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View style={styles.container}>
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: {
+                        flex: 1,
+                        display: 'flex'
+                    },
+                    static: {
+                        backgroundColor: 'pink'
+                    },
+                    staticText: {
+                        color: 'red'
+                    },
+                    theme: {
+                        backgroundColor: theme.colors.backgroundColor
+                    },
+                    themeText: {
+                        color: theme.colors.typography
+                    },
+                    themeButtonsContainer: {
+                        marginTop: 20,
+                        flexDirection: 'row',
+                        gap: 10
+                    },
+                    dynamic: state => ({
+                        backgroundColor: state % 2 === 0 ? theme.colors.fog : theme.colors.oak
+                    }),
+                    whiteText: {
+                        color: 'white',
+                        textAlign: 'center'
+                    },
+                    hover: {
+                        backgroundColor: theme.colors.blood,
+                        cursor: 'pointer',
+                        _web: {
+                            _hover: {
+                                backgroundColor: theme.colors.sky,
+                                paddingTop: rt.insets.top
+                            }
+                        }
+                    },
+                    breakpoint: {
+                        backgroundColor: {
+                            xs: theme.colors.blood,
+                            md: theme.colors.sky,
+                            xl: theme.colors.aloes
+                        },
+                        transform: [
+                            {
+                                translateX: {
+                                    xs: rt.fontScale * 10,
+                                    md: rt.pixelRatio * 10
+                                }
+                            }
+                        ],
+                        position: 'relative',
+                        _web: {
+                            _after: {
+                                fontWeight: 'bold',
+                                content: rt.breakpoint,
+                                color: 'white',
+                                position: 'absolute',
+                                top: '60%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                backgroundColor: rt.colorScheme === 'dark' ? 'black' : 'white'
+                            }
+                        }
+                    }
+                }))
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View
+                            style={styles.container}
+                            ref={ref => {
+                                UnistylesShadowRegistry.add(ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                            }}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: {
+                        flex: 1,
+                        display: 'flex'
+                    },
+                    static: {
+                        backgroundColor: 'pink'
+                    },
+                    staticText: {
+                        color: 'red'
+                    },
+                    theme: {
+                        backgroundColor: theme.colors.backgroundColor,
+                        uni__dependencies: [0]
+                    },
+                    themeText: {
+                        color: theme.colors.typography,
+                        uni__dependencies: [0]
+                    },
+                    themeButtonsContainer: {
+                        marginTop: 20,
+                        flexDirection: 'row',
+                        gap: 10
+                    },
+                    dynamic: state => ({
+                        backgroundColor: state % 2 === 0 ? theme.colors.fog : theme.colors.oak,
+                        uni__dependencies: [0]
+                    }),
+                    whiteText: {
+                        color: 'white',
+                        textAlign: 'center'
+                    },
+                    hover: {
+                        backgroundColor: theme.colors.blood,
+                        cursor: 'pointer',
+                        _web: {
+                            _hover: {
+                                backgroundColor: theme.colors.sky,
+                                paddingTop: rt.insets.top
+                            }
+                        },
+                        uni__dependencies: [0, 9]
+                    },
+                    breakpoint: {
+                        backgroundColor: {
+                            xs: theme.colors.blood,
+                            md: theme.colors.sky,
+                            xl: theme.colors.aloes
+                        },
+                        transform: [
+                            {
+                                translateX: {
+                                    xs: rt.fontScale * 10,
+                                    md: rt.pixelRatio * 10
+                                }
+                            }
+                        ],
+                        position: 'relative',
+                        _web: {
+                            _after: {
+                                fontWeight: 'bold',
+                                content: rt.breakpoint,
+                                color: 'white',
+                                position: 'absolute',
+                                top: '60%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                backgroundColor: rt.colorScheme === 'dark' ? 'black' : 'white'
+                            }
+                        },
+                        uni__dependencies: [0, 11, 10, 3, 5]
+                    }
+                }))
+            `
+        },
     ]
 })

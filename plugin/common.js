@@ -38,6 +38,10 @@ function getIdentifierNameFromExpression(t, memberExpression) {
         ].flat()
     }
 
+    if (t.isArrayExpression(memberExpression)) {
+        return memberExpression.elements.map(expression => getIdentifierNameFromExpression(t, expression)).flat()
+    }
+
     if (t.isArrowFunctionExpression(memberExpression)) {
         return memberExpression.body.properties.map(prop => getIdentifierNameFromExpression(t, prop.value)).flat()
     }
@@ -80,6 +84,10 @@ function getSecondPropertyName(t, memberExpression) {
         return memberExpression.properties
             .filter(property => t.isObjectProperty(property))
             .flatMap(property => getSecondPropertyName(t, property.value))
+    }
+
+    if (t.isArrayExpression(memberExpression)) {
+        return memberExpression.elements.map(expression => getSecondPropertyName(t, expression)).flat()
     }
 
     if (!t.isMemberExpression(memberExpression)) {
