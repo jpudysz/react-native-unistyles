@@ -9,7 +9,7 @@ export const reduceObject = <TObj extends Record<string, any>, TReducer>(
 export const toReactNativeClassName = (className: string, values: UnistylesValues) => {
     const returnValue = {
         $$css: true,
-        'unistyles-class': className
+        [className]: className
     }
 
     Object.defineProperties(returnValue, reduceObject(values, value => ({
