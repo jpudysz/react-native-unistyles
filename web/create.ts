@@ -48,40 +48,44 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
 
     const styles = reduceObject(computedStylesheet, (value, key) => {
         if (typeof value === 'function') {
-            let className = ''
-            let unistyles: TypeStyle | undefined
-            let dispose: VoidFunction | undefined
+            const classNameMap = new Map<number, string>()
+            const unistylesMap = new Map<number, TypeStyle>()
+            const disposeMap = new Map<number, VoidFunction | undefined>()
 
             return (...args: Array<any>) => {
-                const result = value(...args)
+                const [id] = args.slice(-1)
+                const result = value(...args.slice(0, -1))
+                const dispose = disposeMap.get(id)
+                const unistyles = unistylesMap.get(id)
+                const className = classNameMap.get(id)
 
-                if (unistyles) {
-                    dispose?.()
+                if (unistyles && className && dispose) {
+                    dispose()
                     UnistylesRegistry.updateStyles(unistyles, result, className)
-                    dispose = listenToDependencies({
+                    disposeMap.set(id, listenToDependencies({
                         key,
                         value,
                         unistyles,
                         className,
                         args
-                    })
+                    }))
 
                     return toReactNativeClassName(className, result)
                 }
 
                 const entry = UnistylesRegistry.createStyles(result, key)
 
-                className = entry.className
-                unistyles = entry.unistyles
-                dispose = listenToDependencies({
+                classNameMap.set(id, entry.className)
+                unistylesMap.set(id, entry.unistyles)
+                disposeMap.set(id, listenToDependencies({
                     key,
                     value,
-                    unistyles,
-                    className,
+                    unistyles: entry.unistyles,
+                    className: entry.className,
                     args
-                })
+                }))
 
-                return toReactNativeClassName(className, result)
+                return toReactNativeClassName(entry.className, result)
             }
         }
 

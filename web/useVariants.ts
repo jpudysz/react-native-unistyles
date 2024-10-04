@@ -13,8 +13,6 @@ type StylesWithVariants = {
 
 const hasVariants = <T extends object>(value: [string, T]): value is [string, T & StylesWithVariants] => 'variants' in value[1]
 
-const hasClassName = <T extends object | undefined>(value: T): value is T & { 'unistyles-class': string } => value && 'unistyles-class' in value
-
 export const createUseVariants = (styles: ReactNativeStyleSheet<StyleSheet>) => {
     const useVariants = (selectedVariants: Record<string, any>) => {
         const [unistylesMap] = useState(() => new Map<string, TypeStyle>())
@@ -77,7 +75,7 @@ export const createUseVariants = (styles: ReactNativeStyleSheet<StyleSheet>) => 
             const className = classNameMap.get(key)
             const selectedVariantStyles = selectedVariantStylesMap.get(key)
 
-            if (!hasClassName(styleEntry) || !unistyles || !className) {
+            if (!unistyles || !className) {
                 return
             }
 
@@ -90,7 +88,8 @@ export const createUseVariants = (styles: ReactNativeStyleSheet<StyleSheet>) => 
                 enumerable: false,
                 configurable: true
             })))
-            styleEntry['unistyles-class'] = `${styleEntry['unistyles-class'].replace(/variant-[^\s]+/g, '').trim()} ${className}`
+            // @ts-expect-error - apply variant className
+            styleEntry[className] = className
         })
     }
 
