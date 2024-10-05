@@ -14,7 +14,8 @@ double HybridStyleSheet::get___unid() {
 }
 
 jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
-    helpers::assertThat(rt, arguments[0].isObject(), "expected to be called with object or function.");
+    helpers::assertThat(rt, count == 1, "StyleSheet.create expected to be called with one argument.");
+    helpers::assertThat(rt, arguments[0].isObject(), "StyleSheet.create expected to be called with object or function.");
 
     auto thisStyleSheet = thisVal.asObject(rt);
     auto& registry = core::UnistylesRegistry::get();
@@ -45,7 +46,8 @@ jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal,
 }
 
 jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
-    helpers::assertThat(rt, arguments[0].isObject(), "expected to be called with object.");
+    helpers::assertThat(rt, count == 1, "StyleSheet.configure expected to be called with one argument.");
+    helpers::assertThat(rt, arguments[0].isObject(), "StyleSheet.configure expected to be called with object.");
 
     // create new state
     auto config = arguments[0].asObject(rt);
