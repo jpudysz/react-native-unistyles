@@ -11,7 +11,7 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
     jsi::Object unwrappedStyleSheet = this->unwrapStyleSheet(rt, styleSheet);
 
     helpers::enumerateJSIObject(rt, unwrappedStyleSheet, [&](const std::string& styleKey, jsi::Value& propertyValue){
-        helpers::assertThat(rt, propertyValue.isObject(), "style with name '" + styleKey + "' is not a function or object.");
+        helpers::assertThat(rt, propertyValue.isObject(), "Unistyles: Style with name '" + styleKey + "' is not a function or object.");
 
         jsi::Object styleValue = propertyValue.asObject(rt);
 
@@ -128,7 +128,7 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleShee
         auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyle);
         auto maybeMetadata = unistyleFn->dynamicFunctionMetadata;
 
-        helpers::assertThat(rt, maybeMetadata.has_value(), "Your dynamic function '" + unistyleFn->styleKey + "' has no metadata and can't be processed.");
+        helpers::assertThat(rt, maybeMetadata.has_value(), "Unistyles: Your dynamic function '" + unistyleFn->styleKey + "' has no metadata and can't be processed.");
 
         // convert arguments to jsi::Value
         auto metadata = unistyleFn->dynamicFunctionMetadata.value();
@@ -371,7 +371,7 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
 
 // function convert babel generated dependencies to C++ dependencies
 std::vector<UnistyleDependency> parser::Parser::parseDependencies(jsi::Runtime &rt, jsi::Object&& dependencies) {
-    helpers::assertThat(rt, dependencies.isArray(rt), "babel transform is invalid. Unexpected type for dependencies. Please report new Github issue.");
+    helpers::assertThat(rt, dependencies.isArray(rt), "Unistyles: Babel transform is invalid - unexpected type for dependencies.");
 
     std::vector<UnistyleDependency> parsedDependencies{};
     

@@ -17,7 +17,7 @@ std::shared_ptr<StyleSheet> StyleSheetRegistry::addStyleSheetFromValue(jsi::Runt
 std::shared_ptr<StyleSheet> StyleSheetRegistry::addFromFunction(jsi::Runtime& rt, unsigned int tag, jsi::Function styleSheetFn) {
     auto numberOfArgs = styleSheetFn.getProperty(rt, "length").getNumber();
 
-    helpers::assertThat(rt, numberOfArgs <= 2, "expected up to 2 arguments.");
+    helpers::assertThat(rt, numberOfArgs <= 2, "StyleSheet.create expected up to 2 arguments.");
     
     auto& registry = UnistylesRegistry::get();
 
@@ -43,3 +43,8 @@ std::shared_ptr<StyleSheet> StyleSheetRegistry::addFromObject(jsi::Runtime& rt, 
     return registry.addStyleSheet(tag, core::StyleSheetType::Static, std::move(rawStyleSheet));
 }
 
+void StyleSheetRegistry::removeStyleSheetByTag(unsigned int tag) {
+    auto& registry = UnistylesRegistry::get();
+    
+    registry.removeStyleSheet(tag);
+}

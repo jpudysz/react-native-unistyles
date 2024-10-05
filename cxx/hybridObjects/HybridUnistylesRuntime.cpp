@@ -58,7 +58,7 @@ double HybridUnistylesRuntime::getFontScale() {
 };
 
 void HybridUnistylesRuntime::setTheme(const std::string &themeName) {
-    helpers::assertThat(*_rt, !this->getHasAdaptiveThemes(), "You're trying to set theme to: '" + themeName + "', but adaptiveThemes are enabled.");
+    helpers::assertThat(*_rt, !this->getHasAdaptiveThemes(), "Unistyles: You're trying to set theme to: '" + themeName + "', but adaptiveThemes are enabled.");
 
     auto& state = core::UnistylesRegistry::get().getState(*_rt);
 
@@ -117,7 +117,7 @@ jsi::Value HybridUnistylesRuntime::updateTheme(jsi::Runtime &rt, const jsi::Valu
     auto& registry = core::UnistylesRegistry::get();
     auto themeName = args[0].asString(rt).utf8(rt);
 
-    helpers::assertThat(rt, args[1].asObject(rt).isFunction(rt), "second argument expected to be a function.");
+    helpers::assertThat(rt, args[1].asObject(rt).isFunction(rt), "UnistylesRuntime.updateTheme expected second argument to be a function.");
 
     registry.updateTheme(rt, themeName, args[1].asObject(rt).asFunction(rt));
 
