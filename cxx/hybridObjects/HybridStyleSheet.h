@@ -16,11 +16,12 @@ using namespace margelo::nitro::unistyles;
 using namespace facebook::react;
 
 struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
-    HybridStyleSheet(std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime)
-      : HybridObject(TAG), _unistylesRuntime{unistylesRuntime} {
-          this->_unistylesRuntime->registerPlatformListener(
-              std::bind(&HybridStyleSheet::onPlatformDependenciesChange, this, std::placeholders::_1)
-          );
+    HybridStyleSheet(std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime, std::shared_ptr<UIManager> uiManager)
+        : HybridObject(TAG), _unistylesRuntime{unistylesRuntime} {
+            this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(uiManager, unistylesRuntime);
+            this->_unistylesRuntime->registerPlatformListener(
+                  std::bind(&HybridStyleSheet::onPlatformDependenciesChange, this, std::placeholders::_1)
+            );
       }
 
     jsi::Value create(jsi::Runtime& rt,
@@ -52,7 +53,6 @@ private:
     void setThemeFromColorScheme(jsi::Runtime& rt);
     void loadExternalMethods(const jsi::Value& thisValue, jsi::Runtime& rt);
     void onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies);
-    void registerCommitHook(jsi::Runtime& rt);
 
     double __unid = -1;
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;

@@ -77,7 +77,6 @@ jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisV
 
     verifyAndSelectTheme(rt);
     loadExternalMethods(thisVal, rt);
-    registerCommitHook(rt);
 
     return jsi::Value::undefined();
 }
@@ -236,10 +235,4 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
     auto shadowLeafUpdates = parser.dependencyMapToShadowLeafUpdates(dependencyMap);
 
     shadow::ShadowTreeManager::updateShadowTree(rt, shadowLeafUpdates);
-}
-
-void HybridStyleSheet::registerCommitHook(jsi::Runtime &rt) {
-    UIManager& uiManager = const_cast<UIManager&>(UIManagerBinding::getBinding(rt)->getUIManager());
-
-    this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(uiManager, this->_unistylesRuntime);
 }

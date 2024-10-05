@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.license      = package["license"]
   s.authors      = package["author"]
 
-  s.platforms    = { :ios => min_ios_version_supported, :osx => "10.14", :tvos => "9.0", :visionos => "1.0" }
+  s.platforms    = { :ios => min_ios_version_supported }
   s.source       = { :git => package["repository"], :tag => "#{s.version}" }
 
   s.source_files = [
@@ -18,7 +18,8 @@ Pod::Spec.new do |s|
     "cxx/**/*.{h,cpp,hpp}"
   ]
   s.pod_target_xcconfig = {
-    "CLANG_CXX_LANGUAGE_STANDARD" => "c++20"
+    "CLANG_CXX_LANGUAGE_STANDARD" => "c++20",
+    "GCC_PREPROCESSOR_DEFINITIONS" => "$(inherited) FOLLY_NO_CONFIG FOLLY_CFG_NO_COROUTINES"
   }
 
   s.public_header_files = [
