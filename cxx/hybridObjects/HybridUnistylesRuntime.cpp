@@ -71,7 +71,7 @@ void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
 
     std::vector<UnistyleDependency> changedDependencies{};
 
-    changedDependencies.reserve(5);
+    changedDependencies.reserve(3);
 
     bool hadAdaptiveThemes = this->getHasAdaptiveThemes();
 
@@ -92,6 +92,11 @@ void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
 
     // if user enabled adaptive themes, then we need to make sure
     // we selected theme based on color scheme
+    this->calculateNewThemeAndDependencies(changedDependencies);
+    this->_onDependenciesChange(changedDependencies);
+};
+
+void HybridUnistylesRuntime::calculateNewThemeAndDependencies(std::vector<UnistyleDependency>& changedDependencies) {
     auto& state = core::UnistylesRegistry::get().getState(*_rt);
     auto colorScheme = this->getColorScheme();
     auto currentThemeName = this->getThemeName();
@@ -105,9 +110,7 @@ void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
 
         state.setTheme(nextTheme);
     }
-
-    this->_onDependenciesChange(changedDependencies);
-};
+}
 
 jsi::Value HybridUnistylesRuntime::updateTheme(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count == 2, "UnistylesRuntime.updateTheme expected to be called with 2 arguments.");
@@ -200,4 +203,16 @@ jsi::Runtime& HybridUnistylesRuntime::getRuntime() {
 void HybridUnistylesRuntime::registerPlatformListener(const std::function<void(std::vector<UnistyleDependency>)>& listener) {
     this->_nativePlatform.registerPlatformListener(listener);
     this->_onDependenciesChange = listener;
+}
+
+void HybridUnistylesRuntime::includeDependenciesForColorSchemeChange(std::vector<UnistyleDependency>& deps) {
+    auto& registry = core::UnistylesRegistry::get();
+    auto& state = registry.getState(*this->_rt);
+
+    // ignore color scheme changes if user has no adaptive themes
+    if (!state.hasAdaptiveThemes()) {
+        return;
+    }
+
+    this->calculateNewThemeAndDependencies(deps);
 }

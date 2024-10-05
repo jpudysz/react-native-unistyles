@@ -221,8 +221,16 @@ void HybridStyleSheet::loadExternalMethods(const jsi::Value& thisValue, jsi::Run
 void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies) {
     auto& registry = core::UnistylesRegistry::get();
     auto parser = parser::Parser(this->_unistylesRuntime);
-    auto dependencyMap = registry.buildDependencyMap(dependencies);
     auto& rt = this->_unistylesRuntime->getRuntime();
+
+    // check if color scheme changed and then if Unistyles state depend on it (adaptive themes)
+    auto colorSchemeIt = std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::COLORSCHEME);
+    
+    if (colorSchemeIt != dependencies.end()) {
+        this->_unistylesRuntime->includeDependenciesForColorSchemeChange(dependencies);
+    }
+  
+    auto dependencyMap = registry.buildDependencyMap(dependencies);
 
     if (dependencyMap.size() == 0) {
         return;

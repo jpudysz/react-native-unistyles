@@ -117,6 +117,7 @@ void core::UnistylesRegistry::removeStyleSheet(int tag) {
     
 DependencyMap core::UnistylesRegistry::buildDependencyMap(std::vector<UnistyleDependency>& deps) {
     DependencyMap dependencyMap;
+    std::set<UnistyleDependency> uniqueDependencies(deps.begin(), deps.end());
  
     for (const auto& styleSheet : this->_styleSheetRegistry) {
         for (const auto& [_, unistyle] : styleSheet->unistyles) {
@@ -125,8 +126,8 @@ DependencyMap core::UnistylesRegistry::buildDependencyMap(std::vector<UnistyleDe
             bool hasAnyOfDependencies = std::any_of(
                 unistyle->dependencies.begin(),
                 unistyle->dependencies.end(),
-                [&deps](UnistyleDependency dep) {
-                    return std::find(deps.begin(), deps.end(), dep) != deps.end();
+                [&uniqueDependencies](UnistyleDependency dep) {
+                    return std::find(uniqueDependencies.begin(), uniqueDependencies.end(), dep) != uniqueDependencies.end();
                 }
             );
             
