@@ -316,10 +316,6 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared u
 
         parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), this->parseSecondLevel(rt, unistyle, valueFromBreakpoint));
     });
-    
-    if (shouldParseVariants) {
-        unistyle->addDependency(UnistyleDependency::VARIANTS);
-    }
 
     if (shouldParseVariants && !variants.empty()) {
         auto propertyValueObject = style.getProperty(rt, "variants").asObject(rt);
