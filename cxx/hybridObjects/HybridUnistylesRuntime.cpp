@@ -110,8 +110,9 @@ void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
 };
 
 jsi::Value HybridUnistylesRuntime::updateTheme(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
-    helpers::assertThat(rt, args[0].isString(), "first argument expected to be a string.");
-    helpers::assertThat(rt, args[1].isObject(), "second argument expected to be a function.");
+    helpers::assertThat(rt, count == 2, "UnistylesRuntime.updateTheme expected to be called with 2 arguments.");
+    helpers::assertThat(rt, args[0].isString(), "UnistylesRuntime.updateTheme expected first argument to be a string.");
+    helpers::assertThat(rt, args[1].isObject(), "UnistylesRuntime.updateTheme expected first argument to be a function.");
 
     auto& registry = core::UnistylesRegistry::get();
     auto themeName = args[0].asString(rt).utf8(rt);

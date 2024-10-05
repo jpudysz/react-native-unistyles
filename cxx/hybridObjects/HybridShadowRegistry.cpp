@@ -4,6 +4,8 @@ using namespace margelo::nitro::unistyles;
 using namespace facebook::react;
 
 jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    helpers::assertThat(rt, count == 2, "Invalid babel transform. ShadowRegistry link expected two arguments.");
+    
     ShadowNode::Shared shadowNodeWrapper = shadowNodeFromValue(rt, args[0]);
     core::Unistyle::Shared unistyleWrapper = core::unistyleFromValue(rt, args[1]);
     
@@ -15,6 +17,8 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
 }
 
 jsi::Value HybridShadowRegistry::unlink(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    helpers::assertThat(rt, count == 2, "Invalid babel transform. ShadowRegistry unlink expected two arguments.");
+    
     ShadowNode::Shared shadowNodeWrapper = shadowNodeFromValue(rt, args[0]);
     core::Unistyle::Shared unistyleWrapper = core::unistyleFromValue(rt, args[1]);
     
