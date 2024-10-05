@@ -63,15 +63,15 @@ void core::UnistylesRegistry::updateTheme(jsi::Runtime& rt, std::string& themeNa
     auto& state = this->getState(rt);
     auto it = state._jsThemes.find(themeName);
     
-    helpers::assertThat(rt, it != state._jsThemes.end(), "you're trying to update theme '" + themeName + "' but it wasn't registered.");
+    helpers::assertThat(rt, it != state._jsThemes.end(), "Unistyles: You're trying to update theme '" + themeName + "' but it wasn't registered.");
     
     auto currentThemeValue = it->second.lock(rt);
     
-    helpers::assertThat(rt, currentThemeValue.isObject(), "unable to update your theme from C++. It was already garbage collected.");
+    helpers::assertThat(rt, currentThemeValue.isObject(), "Unistyles: Unable to update your theme from C++. It was already garbage collected.");
     
     auto result = callback.call(rt, currentThemeValue.asObject(rt));
     
-    helpers::assertThat(rt, result.isObject(), "returned theme is not an object. Please check your updateTheme function.");
+    helpers::assertThat(rt, result.isObject(), "Unistyles: Returned theme is not an object. Please check your updateTheme function.");
 
     it->second = jsi::WeakObject(rt, result.asObject(rt));
 }
@@ -99,7 +99,7 @@ std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(int tag
     return this->_styleSheetRegistry.back();
 }
 
-std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::getStyleSheetById(int tag) {
+void core::UnistylesRegistry::removeStyleSheet(int tag) {
     auto it = std::find_if(
         this->_styleSheetRegistry.begin(),
         this->_styleSheetRegistry.end(),
@@ -111,8 +111,8 @@ std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::getStyleSheetById(int
     if (it == this->_styleSheetRegistry.cend()) {
         throw std::runtime_error("stylesheet with tag: " + std::to_string(tag) + " cannot be found.");
     }
-    
-    return *it;
+
+    this->_styleSheetRegistry.erase(it);
 }
     
 DependencyMap core::UnistylesRegistry::buildDependencyMap(std::vector<UnistyleDependency>& deps) {

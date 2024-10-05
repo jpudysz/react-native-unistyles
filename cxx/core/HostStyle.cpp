@@ -38,8 +38,8 @@ jsi::Function HostStyle::createAddVariantsProxyFunction(jsi::Runtime& rt) {
     auto useVariantsFnName = jsi::PropNameID::forUtf8(rt, helpers::ADD_VARIANTS_FN);
 
     return jsi::Function::createFromHostFunction(rt, useVariantsFnName, 1, [&](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count){
-        helpers::assertThat(rt, count == 1, "useVariants expected to be called with one argument.");
-        helpers::assertThat(rt, arguments[0].isObject(), "useVariants expected to be called with object.");
+        helpers::assertThat(rt, count == 1, "Unistyles: useVariants expected to be called with one argument.");
+        helpers::assertThat(rt, arguments[0].isObject(), "Unistyles: useVariants expected to be called with object.");
 
         auto parser = parser::Parser(this->_unistylesRuntime);
         auto pairs = parser.variantsToPairs(rt, arguments[0].asObject(rt));
