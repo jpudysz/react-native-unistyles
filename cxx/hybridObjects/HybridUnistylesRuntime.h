@@ -58,6 +58,8 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     UnistylesCxxMiniRuntime getMiniRuntime() override;
     jsi::Value getMiniRuntimeAsValue(jsi::Runtime& rt);
     jsi::Runtime& getRuntime();
+    void includeDependenciesForColorSchemeChange(std::vector<UnistyleDependency>& deps);
+    void calculateNewThemeAndDependencies(std::vector<UnistyleDependency>& deps);
 
 private:
     jsi::Runtime* _rt;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "set"
 #include <jsi/jsi.h>
 #include <react/renderer/uimanager/UIManager.h>
 #include <unordered_map>
