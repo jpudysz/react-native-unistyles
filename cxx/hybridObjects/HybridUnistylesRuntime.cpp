@@ -45,7 +45,7 @@ Insets HybridUnistylesRuntime::getInsets() {
 
 Orientation HybridUnistylesRuntime::getOrientation() {
     int orientation = this->_nativePlatform.getOrientation();
-    
+
     return static_cast<Orientation>(orientation);
 };
 
@@ -68,14 +68,17 @@ void HybridUnistylesRuntime::setTheme(const std::string &themeName) {
 
 void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
     auto& registry = core::UnistylesRegistry::get();
-    
+
     std::vector<UnistyleDependency> changedDependencies{};
+
+    changedDependencies.reserve(5);
+
     bool hadAdaptiveThemes = this->getHasAdaptiveThemes();
 
     registry.setPrefersAdaptiveThemes(*_rt, isEnabled);
-    
+
     bool haveAdaptiveThemes = this->getHasAdaptiveThemes();
-    
+
     if (hadAdaptiveThemes != haveAdaptiveThemes) {
         changedDependencies.push_back(UnistyleDependency::ADAPTIVETHEMES);
     }
@@ -83,7 +86,7 @@ void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
     // if user disabled it, or can't have adaptive themes, do nothing
     if (!this->getHasAdaptiveThemes()) {
         this->_onDependenciesChange(changedDependencies);
-        
+
         return;
     }
 
@@ -99,10 +102,10 @@ void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
     if (!currentThemeName.has_value() || nextTheme != currentThemeName.value()) {
         changedDependencies.push_back(UnistyleDependency::THEME);
         changedDependencies.push_back(UnistyleDependency::THEMENAME);
-        
+
         state.setTheme(nextTheme);
     }
-    
+
     this->_onDependenciesChange(changedDependencies);
 };
 
@@ -116,7 +119,7 @@ jsi::Value HybridUnistylesRuntime::updateTheme(jsi::Runtime &rt, const jsi::Valu
     helpers::assertThat(rt, args[1].asObject(rt).isFunction(rt), "second argument expected to be a function.");
 
     registry.updateTheme(rt, themeName, args[1].asObject(rt).asFunction(rt));
-    
+
     this->_onDependenciesChange({UnistyleDependency::THEME});
 
     return jsi::Value::undefined();
@@ -163,7 +166,7 @@ UnistylesCxxMiniRuntime HybridUnistylesRuntime::getMiniRuntime() {
         nativeMiniRuntime.statusBar,
         nativeMiniRuntime.navigationBar
     };
-    
+
     return cxxMiniRuntime;
 }
 
