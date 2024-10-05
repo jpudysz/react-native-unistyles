@@ -571,22 +571,12 @@ bool parser::Parser::shouldApplyCompoundVariants(jsi::Runtime& rt, const Variant
         return false;
     }
 
-    jsi::Array propertyNames = compoundVariant.getPropertyNames(rt);
-    size_t length = propertyNames.size(rt);
-    size_t allConditions = compoundVariant.hasProperty(rt, "styles")
-        ? length - 1
-        : length;
-
-    if (allConditions != variants.size()) {
-        return false;
-    }
-
     for (auto it = variants.cbegin(); it != variants.cend(); ++it) {
         auto variantKey = it->first;
         auto variantValue = it->second;
 
         if (!compoundVariant.hasProperty(rt, variantKey.c_str())) {
-            return false;
+            continue;
         }
 
         auto property = compoundVariant.getProperty(rt, variantKey.c_str());

@@ -45,7 +45,7 @@ HybridUnistylesRuntime.navigationBar = HybridUnistylesRuntime.createHybridNaviga
 HybridUnistylesRuntime._setRootViewBackgroundColor = HybridUnistylesRuntime.setRootViewBackgroundColor
 
 HybridUnistylesRuntime.setRootViewBackgroundColor = (color?: string) => {
-    const parsedColor = processColor(color)
+    const parsedColor = processColor(color) ?? 0
 
     HybridUnistylesRuntime._setRootViewBackgroundColor(parsedColor as number)
 }
