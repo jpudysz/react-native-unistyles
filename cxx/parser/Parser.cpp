@@ -133,6 +133,8 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleShee
         // convert arguments to jsi::Value
         auto metadata = unistyleFn->dynamicFunctionMetadata.value();
         std::vector<jsi::Value> args{};
+        
+        args.reserve(3);
 
         for (int i = 0; i < metadata.count; i++) {
             folly::dynamic& arg = metadata.arguments.at(i);
@@ -177,6 +179,8 @@ shadow::ShadowLeafUpdates parser::Parser::dependencyMapToShadowLeafUpdates(Depen
 // convert jsi::Value arguments to folly::dynamic
 std::vector<folly::dynamic> parser::Parser::parseDynamicFunctionArguments(jsi::Runtime& rt, size_t count, const jsi::Value* arguments) {
     std::vector<folly::dynamic> parsedArgument{};
+    
+    parsedArgument.reserve(3);
 
     for (size_t i = 0; i < count; i++) {
         auto& arg = arguments[i];
@@ -369,7 +373,9 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
 std::vector<UnistyleDependency> parser::Parser::parseDependencies(jsi::Runtime &rt, jsi::Object&& dependencies) {
     helpers::assertThat(rt, dependencies.isArray(rt), "babel transform is invalid. Unexpected type for dependencies. Please report new Github issue.");
 
-    std::vector<UnistyleDependency> parsedDependencies;
+    std::vector<UnistyleDependency> parsedDependencies{};
+    
+    parsedDependencies.reserve(5);
 
     helpers::iterateJSIArray(rt, dependencies.asArray(rt), [&](size_t i, jsi::Value& value){
         auto dependency = static_cast<UnistyleDependency>(value.asNumber());
@@ -387,6 +393,8 @@ jsi::Value parser::Parser::parseTransforms(jsi::Runtime& rt, Unistyle::Shared un
     }
 
     std::vector<jsi::Value> parsedTransforms{};
+    
+    parsedTransforms.reserve(2);
 
     helpers::iterateJSIArray(rt, obj.asArray(rt), [&](size_t i, jsi::Value& value){
         if (!value.isObject()) {
