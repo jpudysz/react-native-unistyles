@@ -42,15 +42,14 @@ jsi::Function HostStyle::createAddVariantsProxyFunction(jsi::Runtime& rt) {
         helpers::assertThat(rt, arguments[0].isObject(), "Unistyles: useVariants expected to be called with object.");
 
         auto parser = parser::Parser(this->_unistylesRuntime);
-        auto pairs = parser.variantsToPairs(rt, arguments[0].asObject(rt));
+        auto pairs = helpers::variantsToPairs(rt, arguments[0].asObject(rt));
 
-        if (pairs == this->_styleSheet->variants) {
+        if (pairs == this->_variants) {
             return jsi::Value::undefined();
         }
 
-        this->_styleSheet->variants = pairs;
-
-        parser.rebuildUnistylesWithVariants(rt, this->_styleSheet);
+        this->_variants = pairs;
+        parser.rebuildUnistylesWithVariants(rt, this->_styleSheet, this->_variants);
 
         return jsi::Value::undefined();
     });
