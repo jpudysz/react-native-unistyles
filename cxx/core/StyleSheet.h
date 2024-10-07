@@ -26,7 +26,6 @@ struct StyleSheet {
     StyleSheetType type;
     jsi::Object rawValue;
     std::unordered_map<std::string, Unistyle::Shared> unistyles{};
-    std::vector<std::pair<std::string, std::string>> variants{};
 };
 
 }

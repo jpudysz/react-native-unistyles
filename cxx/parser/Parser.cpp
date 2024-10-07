@@ -68,14 +68,14 @@ jsi::Object parser::Parser::unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<S
 void parser::Parser::parseUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet) {
     for (const auto& [_, unistyle] : styleSheet->unistyles) {
         if (unistyle->type == core::UnistyleType::Object) {
-            auto result = this->parseFirstLevel(rt, unistyle, styleSheet->variants);
+            auto result = this->parseFirstLevel(rt, unistyle, std::nullopt);
 
             unistyle->parsedStyle = std::move(result);
             unistyle->seal();
         }
 
         if (unistyle->type == core::UnistyleType::DynamicFunction) {
-            auto hostFn = this->createDynamicFunctionProxy(rt, unistyle, styleSheet->variants);
+            auto hostFn = this->createDynamicFunctionProxy(rt, unistyle);
             auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyle);
 
             // defer parsing dynamic functions
@@ -85,39 +85,40 @@ void parser::Parser::parseUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
 }
 
 // rebuild all unistyles in StyleSheet that depends on variants
-void parser::Parser::rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet) {
+void parser::Parser::rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, Variants& variants) {
     for (const auto& [_, unistyle] : styleSheet->unistyles) {
         if (!unistyle->dependsOn(UnistyleDependency::VARIANTS)) {
             continue;
         }
 
-        this->rebuildUnistyle(rt, styleSheet, unistyle);
+        this->rebuildUnistyle(rt, styleSheet, unistyle, variants);
     }
 }
 
 // rebuild all unistyles that are affected by platform event
 void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, DependencyMap& dependencyMap) {
-    for (const auto& [styleSheet, map] : dependencyMap) {
+    for (auto& [styleSheet, map] : dependencyMap) {
         jsi::Object unwrappedStyleSheet = this->unwrapStyleSheet(rt, styleSheet);
 
-        for (const auto& [shadowNode, unistyles] : map) {
-            for (const auto& unistyle : unistyles) {
+        for (auto& [shadowNode, unistyles] : map) {
+            for (auto& [unistyle, variants, parsedStyle] : unistyles) {
                 // StyleSheet might have styles that are not affected
                 if (!unwrappedStyleSheet.hasProperty(rt, unistyle->styleKey.c_str())) {
                     continue;
                 }
 
                 unistyle->rawValue = unwrappedStyleSheet.getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
-                this->rebuildUnistyle(rt, styleSheet, unistyle);
+                this->rebuildUnistyle(rt, styleSheet, unistyle, variants);
+                parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
             }
         }
     }
 }
 
 // rebuild single unistyle
-void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, Unistyle::Shared unistyle) {
+void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, Unistyle::Shared unistyle, const Variants& variants) {
     if (unistyle->type == core::UnistyleType::Object) {
-        auto result = this->parseFirstLevel(rt, unistyle, styleSheet->variants);
+        auto result = this->parseFirstLevel(rt, unistyle, variants);
 
         unistyle->parsedStyle = std::move(result);
     }
@@ -133,7 +134,7 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleShee
         // convert arguments to jsi::Value
         auto metadata = unistyleFn->dynamicFunctionMetadata.value();
         std::vector<jsi::Value> args{};
-        
+
         args.reserve(3);
 
         for (int i = 0; i < metadata.count; i++) {
@@ -148,20 +149,20 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleShee
         auto functionResult = unistyleFn->proxiedFunction.value().callAsConstructor(rt, argStart, metadata.count).asObject(rt);
 
         unistyleFn->unprocessedValue = std::move(functionResult);
-        unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, styleSheet->variants);
+        unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
     }
 }
 
 // convert dependency map to shadow tree updates
-shadow::ShadowLeafUpdates parser::Parser::dependencyMapToShadowLeafUpdates(DependencyMap& dependencyMap) {
+shadow::ShadowLeafUpdates parser::Parser::dependencyMapToShadowLeafUpdates(core::DependencyMap& dependencyMap) {
     shadow::ShadowLeafUpdates updates;
     auto& rt = this->_unistylesRuntime->getRuntime();
 
     for (const auto& [styleSheet, map] : dependencyMap) {
         for (const auto& [shadowNode, unistyles] : map) {
-            for (const auto& unistyle : unistyles) {
-                auto rawProps = this->parseStylesToShadowTreeStyles(rt, unistyle->parsedStyle.value());
-
+            for (const auto& [unistyle, variants, parsedStyle] : unistyles) {
+                auto rawProps = this->parseStylesToShadowTreeStyles(rt, parsedStyle.value());
+                
                 if (updates.contains(shadowNode)) {
                     updates[shadowNode].emplace_back(std::move(rawProps));
 
@@ -179,7 +180,7 @@ shadow::ShadowLeafUpdates parser::Parser::dependencyMapToShadowLeafUpdates(Depen
 // convert jsi::Value arguments to folly::dynamic
 std::vector<folly::dynamic> parser::Parser::parseDynamicFunctionArguments(jsi::Runtime& rt, size_t count, const jsi::Value* arguments) {
     std::vector<folly::dynamic> parsedArgument{};
-    
+
     parsedArgument.reserve(3);
 
     for (size_t i = 0; i < count; i++) {
@@ -234,7 +235,7 @@ std::vector<folly::dynamic> parser::Parser::parseDynamicFunctionArguments(jsi::R
 
 // first level of StyleSheet, we can expect here different properties than on second level
 // eg. variants, compoundVariants, mq, breakpoints etc.
-jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared unistyle, Variants& variants) {
+jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared unistyle, std::optional<Variants> variants) {
     // for objects - we simply operate on them
     // for functions we need to work on the unprocessed result (object)
     auto& style = unistyle->type == core::UnistyleType::Object
@@ -317,15 +318,15 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared u
         parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), this->parseSecondLevel(rt, unistyle, valueFromBreakpoint));
     });
 
-    if (shouldParseVariants && !variants.empty()) {
+    if (shouldParseVariants && variants.has_value() && !variants.value().empty()) {
         auto propertyValueObject = style.getProperty(rt, "variants").asObject(rt);
-        auto parsedVariant = this->parseVariants(rt, unistyle, propertyValueObject, variants);
+        auto parsedVariant = this->parseVariants(rt, unistyle, propertyValueObject, variants.value());
 
         helpers::mergeJSIObjects(rt, parsedStyle, parsedVariant);
 
         if (shouldParseCompoundVariants) {
             auto compoundVariants = style.getProperty(rt, "compoundVariants").asObject(rt);
-            auto parsedCompoundVariants = this->parseCompoundVariants(rt, unistyle, compoundVariants, variants);
+            auto parsedCompoundVariants = this->parseCompoundVariants(rt, unistyle, compoundVariants, variants.value());
 
             helpers::mergeJSIObjects(rt, parsedStyle, parsedCompoundVariants);
         }
@@ -335,14 +336,14 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared u
 }
 
 // function replaces original user dynamic function with additional logic to memoize arguments
-jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unistyle::Shared unistyle, Variants& variants) {
+jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unistyle::Shared unistyle) {
     auto unistylesRuntime = this->_unistylesRuntime;
 
     return jsi::Function::createFromHostFunction(
         rt,
         jsi::PropNameID::forUtf8(rt, unistyle->styleKey),
         1,
-        [this, unistylesRuntime, unistyle, &variants](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        [this, unistylesRuntime, unistyle](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
             auto thisObject = thisVal.asObject(rt);
             auto parser = parser::Parser(unistylesRuntime);
 
@@ -358,7 +359,7 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
             };
 
             unistyleFn->unprocessedValue = jsi::Value(rt, result).asObject(rt);
-            unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
+            unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, std::nullopt);
             unistyleFn->seal();
 
             return jsi::Value(rt, unistyleFn->parsedStyle.value());
@@ -370,7 +371,7 @@ std::vector<UnistyleDependency> parser::Parser::parseDependencies(jsi::Runtime &
     helpers::assertThat(rt, dependencies.isArray(rt), "Unistyles: Babel transform is invalid - unexpected type for dependencies.");
 
     std::vector<UnistyleDependency> parsedDependencies{};
-    
+
     parsedDependencies.reserve(5);
 
     helpers::iterateJSIArray(rt, dependencies.asArray(rt), [&](size_t i, jsi::Value& value){
@@ -389,7 +390,7 @@ jsi::Value parser::Parser::parseTransforms(jsi::Runtime& rt, Unistyle::Shared un
     }
 
     std::vector<jsi::Value> parsedTransforms{};
-    
+
     parsedTransforms.reserve(2);
 
     helpers::iterateJSIArray(rt, obj.asArray(rt), [&](size_t i, jsi::Value& value){
@@ -438,7 +439,7 @@ jsi::Value parser::Parser::getValueFromBreakpoints(jsi::Runtime& rt, Unistyle::S
         auto propertyName = propertyNames.getValueAtIndex(rt, i).asString(rt).utf8(rt);
         auto propertyValue = obj.getProperty(rt, propertyName.c_str());
         auto mq = core::UnistylesMQ{propertyName};
-        
+
         if (mq.isMQ()) {
             unistyle->addDependency(UnistyleDependency::BREAKPOINTS);
         }
@@ -451,11 +452,11 @@ jsi::Value parser::Parser::getValueFromBreakpoints(jsi::Runtime& rt, Unistyle::S
 
     // check orientation breakpoints if user didn't register own breakpoint
     bool hasOrientationBreakpoint = obj.hasProperty(rt, currentOrientation);
-    
+
     if (hasOrientationBreakpoint) {
         unistyle->addDependency(UnistyleDependency::BREAKPOINTS);
     }
-    
+
     if (!hasBreakpoints && hasOrientationBreakpoint) {
         return obj.getProperty(rt, currentOrientation);
     }
@@ -463,7 +464,7 @@ jsi::Value parser::Parser::getValueFromBreakpoints(jsi::Runtime& rt, Unistyle::S
     if (!currentBreakpoint.has_value()) {
         return jsi::Value::undefined();
     }
-    
+
     unistyle->addDependency(UnistyleDependency::BREAKPOINTS);
 
     // if you're still here it means that there is no
@@ -509,7 +510,7 @@ jsi::Object parser::Parser::parseVariants(jsi::Runtime& rt, Unistyle::Shared uni
             : std::nullopt;
 
         // we've got a match, but we need to check some condition
-        auto styles = this->getStylesForVariant(rt, groupValue.asObject(rt), selectedVariant);
+        auto styles = this->getStylesForVariant(rt, groupName, groupValue.asObject(rt), selectedVariant, variants);
 
         // oops, invalid variant
         if (styles.isUndefined() || !styles.isObject()) {
@@ -525,13 +526,19 @@ jsi::Object parser::Parser::parseVariants(jsi::Runtime& rt, Unistyle::Shared uni
 }
 
 // helpers function to support 'default' variants
-jsi::Value parser::Parser::getStylesForVariant(jsi::Runtime& rt, jsi::Object&& groupValue, std::optional<std::string> selectedVariant) {
+jsi::Value parser::Parser::getStylesForVariant(jsi::Runtime& rt, const std::string groupName, jsi::Object&& groupValue, std::optional<std::string> selectedVariant, Variants& variants) {
     // if there is no value, let's try 'default'
     auto selectedVariantKey = selectedVariant.has_value()
         ? selectedVariant.value().c_str()
         : "default";
+    auto hasKey = groupValue.hasProperty(rt, selectedVariantKey);
+    
+    if (hasKey && !selectedVariant.has_value()) {
+        // add 'default' selection to variants map
+        variants.emplace_back(groupName, selectedVariantKey);
+    }
 
-    if (groupValue.hasProperty(rt, selectedVariantKey)) {
+    if (hasKey) {
         return groupValue.getProperty(rt, selectedVariantKey);
     }
 
@@ -660,31 +667,8 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, Unistyle::Shared u
     return parsedStyle;
 }
 
-// helpers function that convert variants from JS to C++ variants
-Variants parser::Parser::variantsToPairs(jsi::Runtime& rt, jsi::Object&& variants) {
-    Variants pairs{};
-
-    helpers::enumerateJSIObject(rt, variants, [&](const std::string& variantName, jsi::Value& variantValue){
-        if (variantValue.isUndefined() || variantValue.isNull()) {
-            return;
-        }
-
-        if (variantValue.isBool()) {
-            pairs.emplace_back(std::make_pair(variantName, variantValue.asBool() ? "true" : "false"));
-
-            return;
-        }
-
-        if (variantValue.isString()) {
-            pairs.emplace_back(std::make_pair(variantName, variantValue.asString(rt).utf8(rt)));
-        }
-    });
-
-    return pairs;
-}
-
 // convert jsi::Object to RawValue with int colors
-RawProps parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, jsi::Object& styles) {
+RawProps parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, const jsi::Object& styles) {
     jsi::Object convertedStyles = jsi::Object(rt);
     auto& state = core::UnistylesRegistry::get().getState(rt);
 

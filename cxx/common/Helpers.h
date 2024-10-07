@@ -7,6 +7,8 @@ using namespace facebook;
 
 namespace margelo::nitro::unistyles::helpers {
 
+using Variants = std::vector<std::pair<std::string, std::string>>;
+
 inline void assertThat(jsi::Runtime& rt, bool condition, const std::string& message) {
     if (!condition) {
         throw jsi::JSError(rt, message);
@@ -88,6 +90,28 @@ inline bool isPlatformColor(jsi::Runtime& rt, jsi::Object& maybePlatformColor) {
 
     // Android
     return maybePlatformColor.hasProperty(rt, "resource_paths") && maybePlatformColor.getProperty(rt, "resource_paths").isObject();
+}
+
+inline Variants variantsToPairs(jsi::Runtime& rt, jsi::Object&& variants) {
+    Variants pairs{};
+
+    helpers::enumerateJSIObject(rt, variants, [&](const std::string& variantName, jsi::Value& variantValue){
+        if (variantValue.isUndefined() || variantValue.isNull()) {
+            return;
+        }
+
+        if (variantValue.isBool()) {
+            pairs.emplace_back(std::make_pair(variantName, variantValue.asBool() ? "true" : "false"));
+
+            return;
+        }
+
+        if (variantValue.isString()) {
+            pairs.emplace_back(std::make_pair(variantName, variantValue.asString(rt).utf8(rt)));
+        }
+    });
+
+    return pairs;
 }
 
 }
