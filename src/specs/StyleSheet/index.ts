@@ -41,4 +41,6 @@ HybridUnistylesStyleSheet.jsMethods = {
     processColor
 }
 
-export const StyleSheet = HybridUnistylesStyleSheet as Omit<UnistylesStyleSheet, 'jsMethods'>
+type PrivateMethods = 'jsMethods'
+
+export const StyleSheet = HybridUnistylesStyleSheet as Omit<UnistylesStyleSheet, PrivateMethods>

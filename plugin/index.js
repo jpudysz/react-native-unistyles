@@ -1,7 +1,8 @@
 const addShadowRegistryImport = require('./import')
 const { getStyleObjectPath, getStyleAttribute } = require('./style')
 const { getRefProp, addRef, overrideRef, hasStringRef } = require('./ref')
-const { isUnistylesStyleSheet, analyzeDependencies } = require('./stylesheet')
+const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyle } = require('./stylesheet')
+const { isUsingVariants, extractVariants } = require('./variants')
 
 module.exports = function ({ types: t }) {
     return {
@@ -12,7 +13,7 @@ module.exports = function ({ types: t }) {
                     state.file.hasAnyUnistyle = false
                     state.file.hasUnistylesImport = false
                     state.file.styleSheetLocalName = ''
-                    state.file.webDynamicFunctions = {}
+                    state.file.tagNumber = 0
                 },
                 exit(path, state) {
                     if (state.file.hasAnyUnistyle) {
@@ -45,7 +46,7 @@ module.exports = function ({ types: t }) {
                     return
                 }
 
-                const stylePath = getStyleObjectPath(t, styleAttr.value.expression, state)
+                const stylePath = getStyleObjectPath(t, styleAttr.value.expression)
 
                 // style prop is not using object expression
                 if (stylePath.length !== 2) {
@@ -65,13 +66,19 @@ module.exports = function ({ types: t }) {
                 const styleProp = stylePath[1]
 
                 refProp
-                    ? overrideRef(t, path, refProp, styleObj, styleProp)
-                    : addRef(t, path, styleObj, styleProp)
+                    ? overrideRef(t, path, refProp, styleObj, styleProp, state)
+                    : addRef(t, path, styleObj, styleProp, state)
             },
             CallExpression(path, state) {
+                if (isUsingVariants(t, path)) {
+                    extractVariants(t, path, state)
+                }
+
                 if (!isUnistylesStyleSheet(t, path, state)) {
                     return
                 }
+
+                addStyleSheetTag(t, path, state)
 
                 const arg = path.node.arguments[0]
 
@@ -79,9 +86,11 @@ module.exports = function ({ types: t }) {
                 if (t.isObjectExpression(arg)) {
                     arg.properties.forEach(property => {
                         if (t.isObjectProperty(property)) {
-                            const propertyValue = t.isArrowFunctionExpression(property.value)
-                                ? property.value.body
-                                : property.value
+                            const propertyValue = getUnistyle(t, property)
+
+                            if (!propertyValue) {
+                                return
+                            }
 
                             analyzeDependencies(t, state, property.key.name, propertyValue)
                         }
@@ -107,9 +116,11 @@ module.exports = function ({ types: t }) {
                     if (t.isObjectExpression(body)) {
                         body.properties.forEach(property => {
                             if (t.isObjectProperty(property)) {
-                                const propertyValue = t.isArrowFunctionExpression(property.value)
-                                    ? property.value.body
-                                    : property.value
+                                const propertyValue = getUnistyle(t, property)
+
+                                if (!propertyValue) {
+                                    return
+                                }
 
                                 analyzeDependencies(t, state, property.key.name, propertyValue, themeLocalName, miniRuntimeLocalName)
                             }
