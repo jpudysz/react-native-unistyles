@@ -1,12 +1,12 @@
 import type { TypeStyle } from 'typestyle'
-import type { ReactNativeStyleSheet } from '../src/types'
-import type { StyleSheetWithSuperPowers, StyleSheet } from '../src/types/stylesheet'
+import type { ReactNativeStyleSheet } from '../types'
+import type { StyleSheetWithSuperPowers, StyleSheet } from '../types/stylesheet'
 import { UnistylesRegistry } from './registry'
 import { keyInObject, reduceObject, toReactNativeClassName } from './utils'
 import { UnistylesRuntime } from './runtime'
 import { createUseVariants } from './useVariants'
 import { UnistylesListener } from './listener'
-import type { UnistyleDependency } from '../src/specs/NativePlatform'
+import type { UnistyleDependency } from '../specs/NativePlatform'
 
 type ListenToDependenciesProps = {
     value: StyleSheet[keyof StyleSheet],

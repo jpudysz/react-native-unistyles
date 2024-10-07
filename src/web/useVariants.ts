@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import type { TypeStyle } from 'typestyle'
-import type { ReactNativeStyleSheet, StyleSheet } from '../src/types'
+import type { ReactNativeStyleSheet, StyleSheet } from '../types'
 import { deepMergeObjects, equal, reduceObject } from './utils'
 import { UnistylesRegistry } from './registry'
 
