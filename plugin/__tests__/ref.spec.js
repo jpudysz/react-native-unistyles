@@ -795,7 +795,7 @@ pluginTester({
                                 UnistylesShadowRegistry.add(_ref, styles.container)
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
-                            style={[styles.container(1, 2, 1)]}
+                            style={[styles.container(1, 2)]}
                         >
                             <Text>Hello world</Text>
                         </View>
@@ -854,7 +854,7 @@ pluginTester({
                             }}
                             style={{
                                 backgroundColor: 'red',
-                                ...styles.container(1, 2, 1)
+                                ...styles.container(1, 2)
                             }}
                         >
                             <Text>Hello world</Text>
@@ -909,7 +909,7 @@ pluginTester({
                                 UnistylesShadowRegistry.add(_ref, uhh.dkk)
                                 return () => UnistylesShadowRegistry.remove(_ref, uhh.dkk)
                             }}
-                            style={uhh.dkk(1)}
+                            style={uhh.dkk()}
                         >
                             <Text>Hello world</Text>
                         </View>
@@ -922,70 +922,6 @@ pluginTester({
                     })
                 })
             `
-        },
-        {
-            title: 'Should increment counter for web dynamic functions',
-            code: `
-                import { useRef } from 'react'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    let myRef = useRef()
-
-                    return (
-                        <View
-                            ref={myRef}
-                            style={styles.container()}
-                        >
-                            <Text style={styles.container()}>
-                                Hello world
-                            </Text>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create({
-                    container: () => ({
-                        backgroundColor: 'red'
-                    })
-                })
-            `,
-            output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
-                import { useRef } from 'react'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    let myRef = useRef()
-
-                    return (
-                        <View
-                            ref={_ref => {
-                                myRef = _ref
-                                UnistylesShadowRegistry.add(_ref, styles.container)
-                                return () => UnistylesShadowRegistry.remove(_ref, styles.container)
-                            }}
-                            style={styles.container(1)}
-                        >
-                            <Text
-                                style={styles.container(2)}
-                                ref={ref => {
-                                    UnistylesShadowRegistry.add(ref, styles.container)
-                                    return () => UnistylesShadowRegistry.remove(ref, styles.container)
-                                }}
-                            >
-                                Hello world
-                            </Text>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create({
-                    container: () => ({
-                        backgroundColor: 'red'
-                    })
-                })
-            `
-        },
+        }
     ]
 })
