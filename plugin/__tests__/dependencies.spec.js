@@ -368,5 +368,71 @@ pluginTester({
                 )
             `
         },
+        {
+            title: 'Should allow user to use arrow functions with body for dynamic functions',
+            code: `
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View style={styles.container}>
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: () => {
+                        const b = 2 + 2
+
+                        return {
+                            backgroundColor: {
+                                sm: theme.colors.blue
+                            },
+                            padding: {
+                                xs: rt.insets.top + b
+                            }
+                        }
+                    }
+                }))
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View
+                            style={styles.container}
+                            ref={ref => {
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                            }}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    (theme, rt) => ({
+                        container: () => {
+                            const b = 2 + 2
+
+                            return {
+                                backgroundColor: {
+                                    sm: theme.colors.blue
+                                },
+                                padding: {
+                                    xs: rt.insets.top + b
+                                },
+                                uni__dependencies: [0, 9]
+                            }
+                        }
+                    }),
+                    276736056
+                )
+            `
+        },
     ]
 })

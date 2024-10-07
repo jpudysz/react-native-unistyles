@@ -171,7 +171,12 @@ function getUnistyle(t, property) {
     }
 
     if (t.isBlockStatement(propertyValue)) {
-        return propertyValue.body[0].argument
+        const returnStatement = propertyValue.body
+            .find(value => t.isReturnStatement(value))
+
+        return returnStatement
+            ? returnStatement.argument
+            : null
     }
 
     return null

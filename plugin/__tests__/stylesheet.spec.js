@@ -413,5 +413,77 @@ pluginTester({
                 }, 793953373)
             `
         },
+        {
+            title: 'Should generates two different ids for 2 stylesheets in the same file',
+            code: `
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View style={styles.container}>
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => {
+                    return {
+                        container: () => ({
+                            backgroundColor: theme.colors.background,
+                            variants: {},
+                            paddingTop: rt.insets.top
+                        })
+                    }
+                })
+                const styles2 = StyleSheet.create((theme, rt) => {
+                    return {
+                        container: () => ({
+                            backgroundColor: theme.colors.background,
+                            variants: {},
+                            paddingTop: rt.insets.top
+                        })
+                    }
+                })
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View
+                            style={styles.container}
+                            ref={ref => {
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                            }}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => {
+                    return {
+                        container: () => ({
+                            backgroundColor: theme.colors.background,
+                            variants: {},
+                            paddingTop: rt.insets.top,
+                            uni__dependencies: [0, 4, 9]
+                        })
+                    }
+                }, 793953373)
+                const styles2 = StyleSheet.create((theme, rt) => {
+                    return {
+                        container: () => ({
+                            backgroundColor: theme.colors.background,
+                            variants: {},
+                            paddingTop: rt.insets.top,
+                            uni__dependencies: [0, 4, 9]
+                        })
+                    }
+                }, 793953374)
+            `
+        },
     ]
 })
