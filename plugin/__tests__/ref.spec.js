@@ -909,6 +909,92 @@ pluginTester({
             `
         },
         {
+            title: 'It should extract variants and pass them to ShadowReigstry',
+            code: `
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    const myRef = useRef()
+
+                    styles.useVariants({
+                        size: 'default'
+                    })
+
+                    return (
+                        <View
+                            ref={myRef}
+                            style={uhh.dkk()}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const uhh = StyleSheet.create({
+                    dkk: () => ({
+                        backgroundColor: 'red',
+                        variants: {
+                            size: {
+                                small: {
+                                    backgroundColor: 'blue'
+                                },
+                                default: {
+                                    backgroundColor: 'green'
+                                }
+                            }
+                        }
+                    })
+                })
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { useRef } from 'react'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    const myRef = useRef()
+                    const __uni__variants = {
+                        size: 'default'
+                    }
+                    styles.useVariants(__uni__variants)
+
+                    return (
+                        <View
+                            ref={_ref => {
+                                myRef.current = _ref
+                                UnistylesShadowRegistry.add(_ref, uhh.dkk, __uni__variants)
+                                return () => UnistylesShadowRegistry.remove(_ref, uhh.dkk)
+                            }}
+                            style={uhh.dkk()}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const uhh = StyleSheet.create(
+                    {
+                        dkk: () => ({
+                            backgroundColor: 'red',
+                            variants: {
+                                size: {
+                                    small: {
+                                        backgroundColor: 'blue'
+                                    },
+                                    default: {
+                                        backgroundColor: 'green'
+                                    }
+                                }
+                            },
+                            uni__dependencies: [4]
+                        })
+                    },
+                    921918562
+                )
+            `
+        },
+        {
             title: 'Should modify registry names if user changes name of member expression',
             code: `
                 import { useRef } from 'react'
