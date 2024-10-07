@@ -47,7 +47,7 @@ module.exports = function ({ types: t }) {
                     return
                 }
 
-                const stylePath = getStyleObjectPath(t, styleAttr.value.expression, state)
+                const stylePath = getStyleObjectPath(t, styleAttr.value.expression)
 
                 // style prop is not using object expression
                 if (stylePath.length !== 2) {
