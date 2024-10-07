@@ -78,7 +78,7 @@ pluginTester({
                         <View
                             style={styles.container}
                             ref={ref => {
-                                UnistylesShadowRegistry.add(ref, styles.container)
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
                             }}
                         >
@@ -130,8 +130,8 @@ pluginTester({
                     return (
                         <View
                             ref={_ref => {
-                                ref = _ref
-                                UnistylesShadowRegistry.add(_ref, styles.container)
+                                ref.current = _ref
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
                             style={styles.container}
@@ -141,11 +141,14 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create({
-                    container: {
-                        backgroundColor: 'red'
-                    }
-                })
+                const styles = StyleSheet.create(
+                    {
+                        container: {
+                            backgroundColor: 'red'
+                        }
+                    },
+                    921918562
+                )
             `
         },
         {
@@ -155,13 +158,13 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View
                             ref={ref => {
                                 doSomething(ref)
-                                myRef = ref
+                                myRef.current = ref
                             }}
                             style={styles.container}
                         >
@@ -182,14 +185,14 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View
                             ref={ref => {
                                 doSomething(ref)
-                                myRef = ref
-                                UnistylesShadowRegistry.add(ref, styles.container)
+                                myRef.current = ref
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined)
                                 return () => {
                                     UnistylesShadowRegistry.remove(ref, styles.container)
                                 }
@@ -201,11 +204,14 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create({
-                    container: {
-                        backgroundColor: 'red'
-                    }
-                })
+                const styles = StyleSheet.create(
+                    {
+                        container: {
+                            backgroundColor: 'red'
+                        }
+                    },
+                    921918562
+                )
             `
         },
         {
@@ -215,13 +221,13 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = React.useRef()
+                    const myRef = React.useRef()
 
                     return (
                         <View
                             ref={ref => {
                                 doSomething(ref)
-                                myRef = ref
+                                myRef.current = ref
 
                                 return () => {
                                     customCleanup()
@@ -246,14 +252,14 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = React.useRef()
+                    const myRef = React.useRef()
 
                     return (
                         <View
                             ref={ref => {
                                 doSomething(ref)
-                                myRef = ref
-                                UnistylesShadowRegistry.add(ref, styles.container)
+                                myRef.current = ref
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined)
                                 return () => {
                                     ;(() => {
                                         customCleanup()
@@ -268,11 +274,14 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create({
-                    container: {
-                        backgroundColor: 'red'
-                    }
-                })
+                const styles = StyleSheet.create(
+                    {
+                        container: {
+                            backgroundColor: 'red'
+                        }
+                    },
+                    921918562
+                )
             `
         },
         {
@@ -282,10 +291,10 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = React.useRef()
+                    const myRef = React.useRef()
                     const fn = ref => {
                         doSomething(ref)
-                        myRef = ref
+                        myRef.current = ref
 
                         return () => {
                             customCleanup2()
@@ -314,17 +323,17 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = React.useRef()
+                    const myRef = React.useRef()
                     const fn = ref => {
                         doSomething(ref)
-                        myRef = ref
+                        myRef.current = ref
                     }
 
                     return (
                         <View
                             ref={_ref => {
                                 fn(_ref)
-                                UnistylesShadowRegistry.add(_ref, styles.container)
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
                                 return () => {
                                     ;(() => {
                                         customCleanup2()
@@ -339,11 +348,14 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create({
-                    container: {
-                        backgroundColor: 'red'
-                    }
-                })
+                const styles = StyleSheet.create(
+                    {
+                        container: {
+                            backgroundColor: 'red'
+                        }
+                    },
+                    921918562
+                )
             `
         },
         {
@@ -353,10 +365,10 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = React.useRef()
+                    const myRef = React.useRef()
                     function fn(ref) {
                         doSomething(ref)
-                        myRef = ref
+                        myRef.current = ref
 
                         return () => {
                             customCleanup2()
@@ -385,17 +397,17 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = React.useRef()
+                    const myRef = React.useRef()
                     function fn(ref) {
                         doSomething(ref)
-                        myRef = ref
+                        myRef.current = ref
                     }
 
                     return (
                         <View
                             ref={_ref => {
                                 fn(_ref)
-                                UnistylesShadowRegistry.add(_ref, styles.container)
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
                                 return () => {
                                     ;(() => {
                                         customCleanup2()
@@ -410,11 +422,14 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create({
-                    container: {
-                        backgroundColor: 'red'
-                    }
-                })
+                const styles = StyleSheet.create(
+                    {
+                        container: {
+                            backgroundColor: 'red'
+                        }
+                    },
+                    921918562
+                )
             `
         },
         {
@@ -424,7 +439,7 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View
@@ -449,7 +464,7 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View
@@ -463,11 +478,14 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create({
-                    container: {
-                        backgroundColor: 'red'
-                    }
-                })
+                const styles = StyleSheet.create(
+                    {
+                        container: {
+                            backgroundColor: 'red'
+                        }
+                    },
+                    921918562
+                )
             `
         },
         {
@@ -477,7 +495,7 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View
@@ -503,7 +521,7 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View
@@ -518,11 +536,14 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create({
-                    container: {
-                        backgroundColor: 'red'
-                    }
-                })
+                const styles = StyleSheet.create(
+                    {
+                        container: {
+                            backgroundColor: 'red'
+                        }
+                    },
+                    921918562
+                )
             `
         },
         {
@@ -532,7 +553,7 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View
@@ -555,7 +576,7 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View ref={myRef} style={[obj1, obj2]}>
@@ -564,11 +585,14 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create({
-                    container: {
-                        backgroundColor: 'red'
-                    }
-                })
+                const styles = StyleSheet.create(
+                    {
+                        container: {
+                            backgroundColor: 'red'
+                        }
+                    },
+                    921918562
+                )
             `
         },
         {
@@ -578,7 +602,7 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View
@@ -607,13 +631,13 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View
                             ref={_ref => {
-                                myRef = _ref
-                                UnistylesShadowRegistry.add(_ref, styles.container)
+                                myRef.current = _ref
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
                             style={{
@@ -628,11 +652,14 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create({
-                    container: {
-                        backgroundColor: 'red'
-                    }
-                })
+                const styles = StyleSheet.create(
+                    {
+                        container: {
+                            backgroundColor: 'red'
+                        }
+                    },
+                    921918562
+                )
             `
         },
         {
@@ -642,7 +669,7 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View
@@ -671,13 +698,13 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View
                             ref={_ref => {
-                                myRef = _ref
-                                UnistylesShadowRegistry.add(_ref, styles.container)
+                                myRef.current = _ref
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
                             style={[
@@ -692,11 +719,14 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create({
-                    container: {
-                        backgroundColor: 'red'
-                    }
-                })
+                const styles = StyleSheet.create(
+                    {
+                        container: {
+                            backgroundColor: 'red'
+                        }
+                    },
+                    921918562
+                )
             `
         },
         {
@@ -706,7 +736,7 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View
@@ -730,13 +760,13 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View
                             ref={_ref => {
-                                myRef = _ref
-                                UnistylesShadowRegistry.add(_ref, styles.container)
+                                myRef.current = _ref
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
                             style={[styles.container]}
@@ -746,11 +776,14 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create({
-                    container: {
-                        backgroundColor: 'red'
-                    }
-                })
+                const styles = StyleSheet.create(
+                    {
+                        container: {
+                            backgroundColor: 'red'
+                        }
+                    },
+                    921918562
+                )
             `
         },
         {
@@ -760,7 +793,7 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View
@@ -786,13 +819,13 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View
                             ref={_ref => {
-                                myRef = _ref
-                                UnistylesShadowRegistry.add(_ref, styles.container)
+                                myRef.current = _ref
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
                             style={[styles.container(1, 2)]}
@@ -802,11 +835,14 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create({
-                    container: () => ({
-                        backgroundColor: 'red'
-                    })
-                })
+                const styles = StyleSheet.create(
+                    {
+                        container: () => ({
+                            backgroundColor: 'red'
+                        })
+                    },
+                    921918562
+                )
             `
         },
         {
@@ -816,7 +852,7 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View
@@ -832,9 +868,9 @@ pluginTester({
                 }
 
                 const styles = StyleSheet.create({
-                    container: () => ({
+                    container: {
                         backgroundColor: 'red'
-                    })
+                    }
                 })
             `,
             output: `
@@ -843,13 +879,13 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View
                             ref={_ref => {
-                                myRef = _ref
-                                UnistylesShadowRegistry.add(_ref, styles.container)
+                                myRef.current = _ref
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
                             style={{
@@ -862,11 +898,14 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create({
-                    container: () => ({
-                        backgroundColor: 'red'
-                    })
-                })
+                const styles = StyleSheet.create(
+                    {
+                        container: {
+                            backgroundColor: 'red'
+                        }
+                    },
+                    921918562
+                )
             `
         },
         {
@@ -876,7 +915,7 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View
@@ -900,13 +939,13 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    let myRef = useRef()
+                    const myRef = useRef()
 
                     return (
                         <View
                             ref={_ref => {
-                                myRef = _ref
-                                UnistylesShadowRegistry.add(_ref, uhh.dkk)
+                                myRef.current = _ref
+                                UnistylesShadowRegistry.add(_ref, uhh.dkk, undefined)
                                 return () => UnistylesShadowRegistry.remove(_ref, uhh.dkk)
                             }}
                             style={uhh.dkk()}
@@ -916,11 +955,14 @@ pluginTester({
                     )
                 }
 
-                const uhh = StyleSheet.create({
-                    dkk: () => ({
-                        backgroundColor: 'red'
-                    })
-                })
+                const uhh = StyleSheet.create(
+                    {
+                        dkk: () => ({
+                            backgroundColor: 'red'
+                        })
+                    },
+                    921918562
+                )
             `
         }
     ]
