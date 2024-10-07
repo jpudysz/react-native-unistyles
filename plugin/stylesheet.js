@@ -161,8 +161,25 @@ function analyzeDependencies(t, state, name, unistyleObj, themeName, rtName) {
     }
 }
 
+function getUnistyle(t, property) {
+    const propertyValue = t.isArrowFunctionExpression(property.value)
+        ? property.value.body
+        : property.value
+
+    if (t.isObjectExpression(propertyValue)) {
+        return propertyValue
+    }
+
+    if (t.isBlockStatement(propertyValue)) {
+        return propertyValue.body[0].argument
+    }
+
+    return null
+}
+
 module.exports = {
     isUnistylesStyleSheet,
     analyzeDependencies,
-    addStyleSheetTag
+    addStyleSheetTag,
+    getUnistyle
 }

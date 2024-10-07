@@ -1,7 +1,7 @@
 const addShadowRegistryImport = require('./import')
 const { getStyleObjectPath, getStyleAttribute } = require('./style')
 const { getRefProp, addRef, overrideRef, hasStringRef } = require('./ref')
-const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag } = require('./stylesheet')
+const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyle } = require('./stylesheet')
 const { isUsingVariants, extractVariants } = require('./variants')
 
 module.exports = function ({ types: t }) {
@@ -14,7 +14,6 @@ module.exports = function ({ types: t }) {
                     state.file.hasUnistylesImport = false
                     state.file.styleSheetLocalName = ''
                     state.file.tagNumber = 0
-                    state.file.webDynamicFunctions = {}
                 },
                 exit(path, state) {
                     if (state.file.hasAnyUnistyle) {
@@ -87,9 +86,11 @@ module.exports = function ({ types: t }) {
                 if (t.isObjectExpression(arg)) {
                     arg.properties.forEach(property => {
                         if (t.isObjectProperty(property)) {
-                            const propertyValue = t.isArrowFunctionExpression(property.value)
-                                ? property.value.body
-                                : property.value
+                            const propertyValue = getUnistyle(t, property)
+
+                            if (!propertyValue) {
+                                return
+                            }
 
                             analyzeDependencies(t, state, property.key.name, propertyValue)
                         }
@@ -115,9 +116,11 @@ module.exports = function ({ types: t }) {
                     if (t.isObjectExpression(body)) {
                         body.properties.forEach(property => {
                             if (t.isObjectProperty(property)) {
-                                const propertyValue = t.isArrowFunctionExpression(property.value)
-                                    ? property.value.body
-                                    : property.value
+                                const propertyValue = getUnistyle(t, property)
+
+                                if (!propertyValue) {
+                                    return
+                                }
 
                                 analyzeDependencies(t, state, property.key.name, propertyValue, themeLocalName, miniRuntimeLocalName)
                             }
