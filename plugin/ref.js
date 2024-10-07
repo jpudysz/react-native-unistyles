@@ -14,14 +14,20 @@ function hasStringRef(t, path) {
     )
 }
 
-function addRef(t, path, styleObj, styleProp) {
+function addRef(t, path, styleObj, styleProp, state) {
+    const hasVariants = state.file.hasVariants
+
     const newRefFunction = t.arrowFunctionExpression(
         [t.identifier('ref')],
         t.blockStatement([
             t.expressionStatement(
                 t.callExpression(
                     t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
-                    [t.identifier('ref'), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
+                    [
+                        t.identifier('ref'),
+                        t.memberExpression(t.identifier(styleObj), t.identifier(styleProp)),
+                        t.identifier(hasVariants ? '__uni__variants' : 'undefined')
+                    ]
                 )
             ),
             t.returnStatement(
@@ -43,7 +49,8 @@ function addRef(t, path, styleObj, styleProp) {
     path.node.openingElement.attributes.push(newRefProp)
 }
 
-function overrideRef(t, path, refProp, styleObj, styleProp) {
+function overrideRef(t, path, refProp, styleObj, styleProp, state) {
+    const hasVariants = state.file.hasVariants
     const uniqueRefName = path.scope.generateUidIdentifier('ref').name
     const isIdentifier = t.isIdentifier(refProp.value.expression)
     const binding = path.scope.getBinding(refProp.value.expression.name)
@@ -60,7 +67,12 @@ function overrideRef(t, path, refProp, styleObj, styleProp) {
                 t.expressionStatement(
                     t.callExpression(
                         t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
-                        [t.identifier(uniqueRefName), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
+
+                        [
+                            t.identifier(uniqueRefName),
+                            t.memberExpression(t.identifier(styleObj), t.identifier(styleProp)),
+                            t.identifier(hasVariants ? '__uni__variants' : 'undefined')
+                        ]
                     )
                 ),
                 t.returnStatement(
@@ -95,7 +107,11 @@ function overrideRef(t, path, refProp, styleObj, styleProp) {
                 t.expressionStatement(
                     t.callExpression(
                         t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
-                        [t.identifier('ref'), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
+                        [
+                            t.identifier('ref'),
+                            t.memberExpression(t.identifier(styleObj), t.identifier(styleProp)),
+                            t.identifier(hasVariants ? '__uni__variants' : 'undefined')
+                        ]
                     )
                 ),
                 // Merged cleanup function
@@ -146,7 +162,11 @@ function overrideRef(t, path, refProp, styleObj, styleProp) {
             t.expressionStatement(
                 t.callExpression(
                     t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
-                    [t.identifier(uniqueRefName), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
+                    [
+                        t.identifier(uniqueRefName),
+                        t.memberExpression(t.identifier(styleObj), t.identifier(styleProp)),
+                        t.identifier(hasVariants ? '__uni__variants' : 'undefined')
+                    ]
                 )
             ),
             t.returnStatement(

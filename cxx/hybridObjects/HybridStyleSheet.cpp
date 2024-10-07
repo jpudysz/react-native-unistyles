@@ -13,20 +13,17 @@ double HybridStyleSheet::get___unid() {
     return this->__unid;
 }
 
-jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
-    helpers::assertThat(rt, count == 1, "StyleSheet.create expected to be called with one argument.");
+jsi::Value HybridStyleSheet::create(jsi::Runtime& rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
+    // second argument is hidden, so validation is perfectly fine
+    helpers::assertThat(rt, count == 2, "StyleSheet.create expected to be called with one argument.");
     helpers::assertThat(rt, arguments[0].isObject(), "StyleSheet.create expected to be called with object or function.");
 
     auto thisStyleSheet = thisVal.asObject(rt);
     auto& registry = core::UnistylesRegistry::get();
-
-    // this might happen only when hot reloading
-    if (this->__unid != -1) {
-        registry.removeStyleSheet(this->__unid);
-    }
+    int unid = arguments[1].asNumber();
 
     jsi::Object rawStyleSheet = arguments[0].asObject(rt);
-    auto registeredStyleSheet = registry.addStyleSheetFromValue(rt, std::move(rawStyleSheet));
+    auto registeredStyleSheet = registry.addStyleSheetFromValue(rt, std::move(rawStyleSheet), unid);
 
     this->__unid = registeredStyleSheet->tag;
 
@@ -225,12 +222,12 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
 
     // check if color scheme changed and then if Unistyles state depend on it (adaptive themes)
     auto colorSchemeIt = std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::COLORSCHEME);
-    
+
     if (colorSchemeIt != dependencies.end()) {
         this->_unistylesRuntime->includeDependenciesForColorSchemeChange(dependencies);
     }
-  
-    auto dependencyMap = registry.buildDependencyMap(dependencies);
+
+    auto dependencyMap = registry.buildDependencyMap(rt, dependencies);
 
     if (dependencyMap.size() == 0) {
         return;

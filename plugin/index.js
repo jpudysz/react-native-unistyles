@@ -1,7 +1,8 @@
 const addShadowRegistryImport = require('./import')
 const { getStyleObjectPath, getStyleAttribute } = require('./style')
 const { getRefProp, addRef, overrideRef, hasStringRef } = require('./ref')
-const { isUnistylesStyleSheet, analyzeDependencies } = require('./stylesheet')
+const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag } = require('./stylesheet')
+const { isUsingVariants, extractVariants } = require('./variants')
 
 module.exports = function ({ types: t }) {
     return {
@@ -12,6 +13,7 @@ module.exports = function ({ types: t }) {
                     state.file.hasAnyUnistyle = false
                     state.file.hasUnistylesImport = false
                     state.file.styleSheetLocalName = ''
+                    state.file.tagNumber = 0
                     state.file.webDynamicFunctions = {}
                 },
                 exit(path, state) {
@@ -65,13 +67,19 @@ module.exports = function ({ types: t }) {
                 const styleProp = stylePath[1]
 
                 refProp
-                    ? overrideRef(t, path, refProp, styleObj, styleProp)
-                    : addRef(t, path, styleObj, styleProp)
+                    ? overrideRef(t, path, refProp, styleObj, styleProp, state)
+                    : addRef(t, path, styleObj, styleProp, state)
             },
             CallExpression(path, state) {
+                if (isUsingVariants(t, path)) {
+                    extractVariants(t, path, state)
+                }
+
                 if (!isUnistylesStyleSheet(t, path, state)) {
                     return
                 }
+
+                addStyleSheetTag(t, path, state)
 
                 const arg = path.node.arguments[0]
 
