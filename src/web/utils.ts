@@ -1,5 +1,5 @@
-import { ColorScheme, type AppThemeName} from '../src/specs/types'
-import type { UnistylesValues } from '../src/types'
+import { ColorScheme, type AppThemeName} from '../specs/types'
+import type { UnistylesValues } from '../types'
 
 export const reduceObject = <TObj extends Record<string, any>, TReducer>(
     obj: TObj,
