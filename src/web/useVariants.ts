@@ -88,8 +88,20 @@ export const createUseVariants = (styles: ReactNativeStyleSheet<StyleSheet>) => 
                 enumerable: false,
                 configurable: true
             })))
-            // @ts-expect-error - apply variant className
-            styleEntry[className] = className
+
+
+            if (styleEntry) {
+                Object.keys(styleEntry ?? {}).forEach(key => {
+                    if (!key.startsWith('variant-')) {
+                        return
+                    }
+
+                    // @ts-expect-error - remove old variants
+                    delete styleEntry[key]
+                })
+                // @ts-expect-error - apply variant className
+                styleEntry[className] = className
+            }
         })
     }
 
