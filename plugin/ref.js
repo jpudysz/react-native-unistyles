@@ -62,7 +62,11 @@ function overrideRef(t, path, refProp, styleObj, styleProp, state) {
             [t.identifier(uniqueRefName)],
             t.blockStatement([
                 t.expressionStatement(
-                    t.assignmentExpression('=', t.identifier(userVariableName), t.identifier(uniqueRefName))
+                    t.assignmentExpression(
+                        '=',
+                        t.memberExpression(t.identifier(userVariableName), t.identifier('current')),
+                        t.identifier(uniqueRefName)
+                    )
                 ),
                 t.expressionStatement(
                     t.callExpression(
@@ -135,6 +139,10 @@ function overrideRef(t, path, refProp, styleObj, styleProp, state) {
 
         refProp.value = t.jsxExpressionContainer(newRefFunction)
 
+        return
+    }
+
+    if (!binding) {
         return
     }
 
