@@ -4,7 +4,7 @@ import type { StyleSheetWithSuperPowers, StyleSheet } from '../types/stylesheet'
 import { UnistylesRegistry } from './registry'
 import { keyInObject, reduceObject, toReactNativeClassName } from './utils'
 import { UnistylesRuntime } from './runtime'
-import { createUseVariants } from './useVariants'
+import { createUseVariants, getVariants } from './variants'
 import { UnistylesListener } from './listener'
 import type { UnistyleDependency } from '../specs/NativePlatform'
 
@@ -20,6 +20,7 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
     const computedStylesheet = typeof stylesheet === 'function'
         ? stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
         : stylesheet
+    let lastlySelectedVariants: Record<string, any> = {}
 
     const listenToDependencies = ({ key, className, unistyles, value, args = [] } : ListenToDependenciesProps) => {
         const dependencies = ('uni__dependencies' in value ? value['uni__dependencies'] : []) as Array<UnistyleDependency>
@@ -55,13 +56,18 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
             return (...args: Array<any>) => {
                 const [id] = args.slice(-1)
                 const result = value(...args.slice(0, -1))
+                const variants = Object.fromEntries(getVariants({ [key]: result } as ReactNativeStyleSheet<StyleSheet>, lastlySelectedVariants))
+                const resultWithVariants = {
+                    ...result,
+                    ...variants[key]
+                }
                 const dispose = disposeMap.get(id)
                 const unistyles = unistylesMap.get(id)
                 const className = classNameMap.get(id)
 
-                if (unistyles && className && dispose) {
-                    dispose()
-                    UnistylesRegistry.updateStyles(unistyles, result, className)
+                if (unistyles && className) {
+                    dispose?.()
+                    UnistylesRegistry.updateStyles(unistyles, resultWithVariants, className)
                     disposeMap.set(id, listenToDependencies({
                         key,
                         value,
@@ -70,10 +76,10 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
                         args
                     }))
 
-                    return toReactNativeClassName(className, result)
+                    return toReactNativeClassName(className, resultWithVariants)
                 }
 
-                const entry = UnistylesRegistry.createStyles(result, key)
+                const entry = UnistylesRegistry.createStyles(resultWithVariants, key)
 
                 classNameMap.set(id, entry.className)
                 unistylesMap.set(id, entry.unistyles)
@@ -85,7 +91,7 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
                     args
                 }))
 
-                return toReactNativeClassName(entry.className, result)
+                return toReactNativeClassName(entry.className, resultWithVariants)
             }
         }
 
@@ -96,7 +102,9 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
         return toReactNativeClassName(className, value)
     }) as ReactNativeStyleSheet<StyleSheet>
 
-    createUseVariants(styles)
+    createUseVariants(styles, newVariants => {
+        lastlySelectedVariants = newVariants
+    })
 
     return styles
 }
