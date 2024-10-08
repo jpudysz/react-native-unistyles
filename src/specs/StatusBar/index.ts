@@ -34,7 +34,7 @@ export const attachStatusBarJSMethods = (hybridObject: UnistylesStatusBar) => {
 
     privateHybrid._setBackgroundColor = hybridObject.setBackgroundColor
     hybridObject.setBackgroundColor = (color?: string) => {
-        const parsedColor = processColor(color)
+        const parsedColor = processColor(color) ?? 0
 
         privateHybrid._setBackgroundColor(parsedColor as number)
     }

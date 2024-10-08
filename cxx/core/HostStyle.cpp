@@ -7,10 +7,12 @@ using namespace facebook;
 std::vector<jsi::PropNameID> HostStyle::getPropertyNames(jsi::Runtime& rt) {
     auto propertyNames = std::vector<jsi::PropNameID> {};
 
+    propertyNames.reserve(8);
+
     for (const auto& pair : this->_styleSheet->unistyles) {
         propertyNames.emplace_back(jsi::PropNameID::forUtf8(rt, pair.first));
     }
-    
+
     return propertyNames;
 }
 
@@ -20,7 +22,7 @@ jsi::Value HostStyle::get(jsi::Runtime& rt, const jsi::PropNameID& propNameId) {
     if (propertyName == helpers::UNISTYLES_ID) {
         return jsi::Value(this->_styleSheet->tag);
     }
-    
+
     if (propertyName == helpers::ADD_VARIANTS_FN) {
         return this->createAddVariantsProxyFunction(rt);
     }
@@ -28,7 +30,7 @@ jsi::Value HostStyle::get(jsi::Runtime& rt, const jsi::PropNameID& propNameId) {
     if (this->_styleSheet->unistyles.contains(propertyName)) {
         return valueFromUnistyle(rt, this->_styleSheet->unistyles[propertyName]);
     }
-    
+
     return jsi::Value::undefined();
 }
 
@@ -36,20 +38,19 @@ jsi::Function HostStyle::createAddVariantsProxyFunction(jsi::Runtime& rt) {
     auto useVariantsFnName = jsi::PropNameID::forUtf8(rt, helpers::ADD_VARIANTS_FN);
 
     return jsi::Function::createFromHostFunction(rt, useVariantsFnName, 1, [&](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count){
-        helpers::assertThat(rt, count == 1, "useVariants expected to be called with one argument.");
-        helpers::assertThat(rt, arguments[0].isObject(), "useVariants expected to be called with object.");
+        helpers::assertThat(rt, count == 1, "Unistyles: useVariants expected to be called with one argument.");
+        helpers::assertThat(rt, arguments[0].isObject(), "Unistyles: useVariants expected to be called with object.");
 
         auto parser = parser::Parser(this->_unistylesRuntime);
-        auto pairs = parser.variantsToPairs(rt, arguments[0].asObject(rt));
-        
-        if (pairs == this->_styleSheet->variants) {
+        auto pairs = helpers::variantsToPairs(rt, arguments[0].asObject(rt));
+
+        if (pairs == this->_variants) {
             return jsi::Value::undefined();
         }
-        
-        this->_styleSheet->variants = pairs;
-        
-        parser.rebuildUnistylesWithVariants(rt, this->_styleSheet);
-        
+
+        this->_variants = pairs;
+        parser.rebuildUnistylesWithVariants(rt, this->_styleSheet, this->_variants);
+
         return jsi::Value::undefined();
     });
 }

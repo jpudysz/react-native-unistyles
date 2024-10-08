@@ -4,17 +4,22 @@ using namespace margelo::nitro::unistyles;
 using namespace facebook::react;
 
 jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    helpers::assertThat(rt, count == 3, "Unistyles: Invalid babel transform 'ShadowRegistry link' expected 3 arguments.");
+    
     ShadowNode::Shared shadowNodeWrapper = shadowNodeFromValue(rt, args[0]);
     core::Unistyle::Shared unistyleWrapper = core::unistyleFromValue(rt, args[1]);
+    core::Variants variants = helpers::variantsToPairs(rt, args[2].asObject(rt));
     
     auto& registry = core::UnistylesRegistry::get();
     
-    registry.linkShadowNodeWithUnistyle(&shadowNodeWrapper->getFamily(), unistyleWrapper);
+    registry.linkShadowNodeWithUnistyle(&shadowNodeWrapper->getFamily(), unistyleWrapper, variants);
     
     return jsi::Value::undefined();
 }
 
 jsi::Value HybridShadowRegistry::unlink(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    helpers::assertThat(rt, count == 2, "Unistyles: Invalid babel transform 'ShadowRegistry unlink' expected 2 arguments.");
+    
     ShadowNode::Shared shadowNodeWrapper = shadowNodeFromValue(rt, args[0]);
     core::Unistyle::Shared unistyleWrapper = core::unistyleFromValue(rt, args[1]);
     
