@@ -13,23 +13,17 @@ double HybridStyleSheet::get___unid() {
     return this->__unid;
 }
 
-jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
-    helpers::assertThat(rt, arguments[0].isObject(), "expected to be called with object or function.");
+jsi::Value HybridStyleSheet::create(jsi::Runtime& rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
+    // second argument is hidden, so validation is perfectly fine
+    helpers::assertThat(rt, count == 2, "StyleSheet.create expected to be called with one argument.");
+    helpers::assertThat(rt, arguments[0].isObject(), "StyleSheet.create expected to be called with object or function.");
 
     auto thisStyleSheet = thisVal.asObject(rt);
     auto& registry = core::UnistylesRegistry::get();
-
-    // this might happen only when hot reloading
-    if (this->__unid != -1) {
-        auto registeredStyleSheet = registry.getStyleSheetById(this->__unid);
-        auto style = std::make_shared<core::HostStyle>(registeredStyleSheet, this->_unistylesRuntime);
-        auto styleHostObject = jsi::Object::createFromHostObject(rt, style);
-
-        return styleHostObject;
-    }
+    int unid = arguments[1].asNumber();
 
     jsi::Object rawStyleSheet = arguments[0].asObject(rt);
-    auto registeredStyleSheet = registry.addStyleSheetFromValue(rt, std::move(rawStyleSheet));
+    auto registeredStyleSheet = registry.addStyleSheetFromValue(rt, std::move(rawStyleSheet), unid);
 
     this->__unid = registeredStyleSheet->tag;
 
@@ -45,7 +39,8 @@ jsi::Value HybridStyleSheet::create(jsi::Runtime &rt, const jsi::Value &thisVal,
 }
 
 jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
-    helpers::assertThat(rt, arguments[0].isObject(), "expected to be called with object.");
+    helpers::assertThat(rt, count == 1, "StyleSheet.configure expected to be called with one argument.");
+    helpers::assertThat(rt, arguments[0].isObject(), "StyleSheet.configure expected to be called with object.");
 
     // create new state
     auto config = arguments[0].asObject(rt);
@@ -55,29 +50,28 @@ jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisV
 
     helpers::enumerateJSIObject(rt, config, [&](const std::string& propertyName, jsi::Value& propertyValue){
         if (propertyName == "settings") {
-            helpers::assertThat(rt, propertyValue.isObject(), "settings must be an object.");
+            helpers::assertThat(rt, propertyValue.isObject(), "StyleSheet.configure's settings must be an object.");
 
             return this->parseSettings(rt, propertyValue.asObject(rt));
         }
 
         if (propertyName == "breakpoints") {
-            helpers::assertThat(rt, propertyValue.isObject(), "breakpoints must be an object.");
+            helpers::assertThat(rt, propertyValue.isObject(), "StyleSheet.configure's breakpoints must be an object.");
 
             return this->parseBreakpoints(rt, propertyValue.asObject(rt));
         }
 
         if (propertyName == "themes") {
-            helpers::assertThat(rt, propertyValue.isObject(), "themes must be an object.");
+            helpers::assertThat(rt, propertyValue.isObject(), "StyleSheet.configure's themes must be an object.");
 
             return this->parseThemes(rt, propertyValue.asObject(rt));
         }
 
-        helpers::assertThat(rt, false, "received unexpected key: '" + std::string(propertyName) + "'.");
+        helpers::assertThat(rt, false, "StyleSheet.configure received unexpected key: '" + std::string(propertyName) + "'.");
     });
 
     verifyAndSelectTheme(rt);
     loadExternalMethods(thisVal, rt);
-    registerCommitHook(rt);
 
     return jsi::Value::undefined();
 }
@@ -87,7 +81,7 @@ void HybridStyleSheet::parseSettings(jsi::Runtime &rt, jsi::Object settings) {
 
     helpers::enumerateJSIObject(rt, settings, [&](const std::string& propertyName, jsi::Value& propertyValue){
         if (propertyName == "adaptiveThemes") {
-            helpers::assertThat(rt, propertyValue.isBool(), "adaptiveThemes configuration must be of boolean type.");
+            helpers::assertThat(rt, propertyValue.isBool(), "StyleSheet.configure's adaptiveThemes must be of boolean type.");
 
             registry.setPrefersAdaptiveThemes(rt, propertyValue.asBool());
 
@@ -96,31 +90,31 @@ void HybridStyleSheet::parseSettings(jsi::Runtime &rt, jsi::Object settings) {
 
         if (propertyName == "initialTheme") {
             if (propertyValue.isObject()) {
-                helpers::assertThat(rt, propertyValue.asObject(rt).isFunction(rt), "initialTheme configuration must be either a string or a function.");
+                helpers::assertThat(rt, propertyValue.asObject(rt).isFunction(rt), "StyleSheet.configure's initialTheme must be either a string or a function.");
 
                 auto result = propertyValue.asObject(rt).asFunction(rt).call(rt);
 
-                helpers::assertThat(rt, result.isString(), "initialTheme resolved from function is not a string. Please check your initialTheme function.");
+                helpers::assertThat(rt, result.isString(), "StyleSheet.configure's initialTheme resolved from function is not a string. Please check your initialTheme function.");
 
                 return registry.setInitialThemeName(rt, result.asString(rt).utf8(rt));
             }
 
-            helpers::assertThat(rt, propertyValue.isString(), "initialTheme configuration must be either a string or a function.");
+            helpers::assertThat(rt, propertyValue.isString(), "StyleSheet.configure's initialTheme must be either a string or a function.");
 
             registry.setInitialThemeName(rt, propertyValue.asString(rt).utf8(rt));
 
             return;
         }
 
-        helpers::assertThat(rt, false, "settings received unexpected key: '" + std::string(propertyName) + "'");
+        helpers::assertThat(rt, false, "StyleSheet.configure's settings received unexpected key: '" + std::string(propertyName) + "'");
     });
 }
 
 void HybridStyleSheet::parseBreakpoints(jsi::Runtime &rt, jsi::Object breakpoints){
     helpers::Breakpoints sortedBreakpoints = helpers::jsiBreakpointsToVecPairs(rt, std::move(breakpoints));
 
-    helpers::assertThat(rt, sortedBreakpoints.size() > 0, "registered breakpoints can't be empty.");
-    helpers::assertThat(rt, sortedBreakpoints.front().second == 0, "first breakpoint must start from 0.");
+    helpers::assertThat(rt, sortedBreakpoints.size() > 0, "StyleSheet.configure's breakpoints can't be empty.");
+    helpers::assertThat(rt, sortedBreakpoints.front().second == 0, "StyleSheet.configure's first breakpoint must start from 0.");
 
     auto& registry = core::UnistylesRegistry::get();
     auto& state = registry.getState(rt);
@@ -133,7 +127,7 @@ void HybridStyleSheet::parseThemes(jsi::Runtime &rt, jsi::Object themes) {
     auto& registry = core::UnistylesRegistry::get();
 
     helpers::enumerateJSIObject(rt, themes, [&](const std::string& propertyName, jsi::Value& propertyValue){
-        helpers::assertThat(rt, propertyValue.isObject(), "registered theme '" + propertyName + "' must be an object.");
+        helpers::assertThat(rt, propertyValue.isObject(), "StyleSheet.configure's registered theme '" + propertyName + "' must be an object.");
 
         registry.registerTheme(rt, propertyName, propertyValue.asObject(rt));
     });
@@ -151,7 +145,7 @@ void HybridStyleSheet::verifyAndSelectTheme(jsi::Runtime &rt) {
 
     // user tries to enable adaptive themes, but didn't register both 'light' and 'dark' themes
     if (prefersAdaptiveThemes && !hasAdaptiveThemes) {
-        helpers::assertThat(rt, false, "you're trying to enable adaptiveThemes, but you didn't register both 'light' and 'dark' themes.");
+        helpers::assertThat(rt, false, "Unistyles: You're trying to enable adaptiveThemes, but you didn't register both 'light' and 'dark' themes.");
     }
 
     // user didn't select initial theme nor can have adaptive themes, and registered more than 1 theme
@@ -175,14 +169,14 @@ void HybridStyleSheet::verifyAndSelectTheme(jsi::Runtime &rt) {
     // user selected both initial theme and adaptive themes
     // we should throw an error as these options are mutually exclusive
     if (hasInitialTheme && hasAdaptiveThemes) {
-        helpers::assertThat(rt, false, "you're trying to set initial theme and enable adaptiveThemes, but these options are mutually exclusive.");
+        helpers::assertThat(rt, false, "Unistyles: You're trying to set initial theme and enable adaptiveThemes, but these options are mutually exclusive.");
     }
 
     // user only selected initial theme
     // validate if following theme exist
     std::string selectedTheme = state.getInitialTheme().value();
 
-    helpers::assertThat(rt, state.hasTheme(selectedTheme), "you're trying to select theme '" + selectedTheme + "' but it wasn't registered.");
+    helpers::assertThat(rt, state.hasTheme(selectedTheme), "Unistyles: You're trying to select theme '" + selectedTheme + "' but it wasn't registered.");
 
     state.setTheme(selectedTheme);
 }
@@ -201,18 +195,18 @@ void HybridStyleSheet::setThemeFromColorScheme(jsi::Runtime& rt) {
 
             return;
         default:
-            throw std::runtime_error("unable to set adaptive theme as your device doesn't support it.");
+            throw std::runtime_error("Unistyles: Unable to set adaptive theme as your device doesn't support it.");
     }
 }
 
 void HybridStyleSheet::loadExternalMethods(const jsi::Value& thisValue, jsi::Runtime& rt) {
     auto jsMethods = thisValue.getObject(rt).getProperty(rt, "jsMethods");
 
-    helpers::assertThat(rt, jsMethods.isObject(), "can't find jsMethods.");
+    helpers::assertThat(rt, jsMethods.isObject(), "Unistyles: Can't find jsMethods.");
 
     auto maybeProcessColorFn = jsMethods.asObject(rt).getProperty(rt, "processColor");
 
-    helpers::assertThat(rt, maybeProcessColorFn.isObject(), "can't load processColor function from JS.");
+    helpers::assertThat(rt, maybeProcessColorFn.isObject(), "Unistyles: Can't load processColor function from JS.");
 
     auto processColorFn = maybeProcessColorFn.asObject(rt).asFunction(rt);
     auto& registry = core::UnistylesRegistry::get();
@@ -224,8 +218,16 @@ void HybridStyleSheet::loadExternalMethods(const jsi::Value& thisValue, jsi::Run
 void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies) {
     auto& registry = core::UnistylesRegistry::get();
     auto parser = parser::Parser(this->_unistylesRuntime);
-    auto dependencyMap = registry.buildDependencyMap(dependencies);
     auto& rt = this->_unistylesRuntime->getRuntime();
+
+    // check if color scheme changed and then if Unistyles state depend on it (adaptive themes)
+    auto colorSchemeIt = std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::COLORSCHEME);
+
+    if (colorSchemeIt != dependencies.end()) {
+        this->_unistylesRuntime->includeDependenciesForColorSchemeChange(dependencies);
+    }
+
+    auto dependencyMap = registry.buildDependencyMap(rt, dependencies);
 
     if (dependencyMap.size() == 0) {
         return;
@@ -236,10 +238,4 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
     auto shadowLeafUpdates = parser.dependencyMapToShadowLeafUpdates(dependencyMap);
 
     shadow::ShadowTreeManager::updateShadowTree(rt, shadowLeafUpdates);
-}
-
-void HybridStyleSheet::registerCommitHook(jsi::Runtime &rt) {
-    UIManager& uiManager = const_cast<UIManager&>(UIManagerBinding::getBinding(rt)->getUIManager());
-
-    this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(uiManager, this->_unistylesRuntime);
 }

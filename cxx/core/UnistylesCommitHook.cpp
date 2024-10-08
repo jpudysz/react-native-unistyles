@@ -3,12 +3,9 @@
 using namespace margelo::nitro::unistyles;
 using namespace facebook::react;
 
-core::UnistylesCommitHook::UnistylesCommitHook(UIManager& uiManager, std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime)
-    : _unistylesRuntime{unistylesRuntime} {
-        uiManager.registerCommitHook(*this);
-    };
-
-core::UnistylesCommitHook::~UnistylesCommitHook() noexcept {}
+core::UnistylesCommitHook::~UnistylesCommitHook() noexcept {
+    _uiManager->unregisterCommitHook(*this);
+}
 
 void core::UnistylesCommitHook::commitHookWasRegistered(const UIManager &uiManager) noexcept {}
 void core::UnistylesCommitHook::commitHookWasUnregistered(const UIManager &uiManager) noexcept {}
@@ -46,8 +43,11 @@ RootShadowNode::Unshared core::UnistylesCommitHook::shadowTreeWillCommit(
 
 shadow::ShadowLeafUpdates core::UnistylesCommitHook::getUnistylesUpdates() {
     auto& registry = core::UnistylesRegistry::get();
+    auto& rt = this->_unistylesRuntime->getRuntime();
     auto parser = parser::Parser(this->_unistylesRuntime);
-    auto dependencyMap = registry.buildDependencyMap();
+    auto dependencyMap = registry.buildDependencyMap(rt);
+    
+    parser.rebuildUnistylesInDependencyMap(rt, dependencyMap);
     
     return parser.dependencyMapToShadowLeafUpdates(dependencyMap);
 }

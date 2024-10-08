@@ -16,11 +16,11 @@ struct StyleSheetRegistry {
     StyleSheetRegistry(const StyleSheetRegistry&) = delete;
     StyleSheetRegistry(StyleSheetRegistry&&) = delete;
 
-    virtual std::shared_ptr<StyleSheet> addStyleSheetFromValue(jsi::Runtime& rt, jsi::Object rawStyleSheet);
-
+    virtual std::shared_ptr<StyleSheet> addStyleSheetFromValue(jsi::Runtime& rt, jsi::Object rawStyleSheet, int unid);
+    
 private:
-    virtual std::shared_ptr<StyleSheet> addFromFunction(jsi::Runtime& rt, unsigned int tag, jsi::Function styleSheetFn);
-    virtual std::shared_ptr<StyleSheet> addFromObject(jsi::Runtime& rt, unsigned int tag, jsi::Object rawStyleSheet);
+    virtual std::shared_ptr<StyleSheet> addFromFunction(jsi::Runtime& rt, int unid, jsi::Function styleSheetFn);
+    virtual std::shared_ptr<StyleSheet> addFromObject(jsi::Runtime& rt, int unid, jsi::Object rawStyleSheet);
 };
 
 }

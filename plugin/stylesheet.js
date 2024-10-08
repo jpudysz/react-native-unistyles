@@ -17,6 +17,19 @@ const UnistyleDependency = {
     NavigationBar: 13
 }
 
+function stringToUniqueId(str) {
+    let hash = 0;
+
+    for (let i = 0; i < str.length; i++) {
+        hash = (hash << 5) - hash + str.charCodeAt(i)
+        hash |= 0
+    }
+
+    const absHash = Math.abs(hash)
+
+    return absHash % 1000000000
+}
+
 function isUnistylesStyleSheet(t, path, state) {
     const callee = path.get('callee')
 
@@ -26,6 +39,13 @@ function isUnistylesStyleSheet(t, path, state) {
         t.isIdentifier(callee.node.object) &&
         callee.node.object.name === state.file.styleSheetLocalName
     )
+}
+
+function addStyleSheetTag(t, path, state) {
+    const callee = path.get('callee')
+    const uniqueId = stringToUniqueId(state.filename) + ++state.file.tagNumber
+
+    callee.container.arguments.push(t.numericLiteral(uniqueId))
 }
 
 function analyzeDependencies(t, state, name, unistyleObj, themeName, rtName) {
@@ -141,7 +161,30 @@ function analyzeDependencies(t, state, name, unistyleObj, themeName, rtName) {
     }
 }
 
+function getUnistyle(t, property) {
+    const propertyValue = t.isArrowFunctionExpression(property.value)
+        ? property.value.body
+        : property.value
+
+    if (t.isObjectExpression(propertyValue)) {
+        return propertyValue
+    }
+
+    if (t.isBlockStatement(propertyValue)) {
+        const returnStatement = propertyValue.body
+            .find(value => t.isReturnStatement(value))
+
+        return returnStatement
+            ? returnStatement.argument
+            : null
+    }
+
+    return null
+}
+
 module.exports = {
     isUnistylesStyleSheet,
-    analyzeDependencies
+    analyzeDependencies,
+    addStyleSheetTag,
+    getUnistyle
 }

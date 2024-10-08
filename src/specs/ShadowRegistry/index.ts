@@ -4,10 +4,10 @@ import type { ShadowNode, Unistyle, ViewHandle } from './types'
 
 interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     // Babel API
-    add(handle?: ViewHandle, style?: Unistyle): void,
+    add(handle?: ViewHandle, style?: Unistyle, variants?: Record<string, string | boolean>): void,
     remove(handle?: ViewHandle, style?: Unistyle): void,
     // JSI
-    link(node: ShadowNode, style: Unistyle): void,
+    link(node: ShadowNode, style: Unistyle, variants?: Record<string, string | boolean>): void,
     unlink(node: ShadowNode, style: Unistyle): void
 }
 
@@ -26,12 +26,12 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
     return node
 }
 
-HybridShadowRegistry.add = (handle, style) => {
+HybridShadowRegistry.add = (handle, style, variants) => {
     if (!handle || !style?.__unid) {
         return
     }
 
-    HybridShadowRegistry.link(findShadowNodeForHandle(handle), style)
+    HybridShadowRegistry.link(findShadowNodeForHandle(handle), style, variants ?? {})
 }
 
 HybridShadowRegistry.remove = (handle, style) => {

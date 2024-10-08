@@ -12,7 +12,7 @@ bool core::UnistylesState::hasAdaptiveThemes() {
 }
 
 void core::UnistylesState::setTheme(std::string themeName) {
-    helpers::assertThat(*_rt, helpers::vecContainsKeys(this->_registeredThemeNames, {themeName}), "You're trying to set theme to: '" + std::string(themeName) + "', but it wasn't registered.");
+    helpers::assertThat(*_rt, helpers::vecContainsKeys(this->_registeredThemeNames, {themeName}), "Unistyles: You're trying to set theme to: '" + std::string(themeName) + "', but it wasn't registered.");
 
     if (themeName != this->_currentThemeName) {
         this->_currentThemeName = themeName;
@@ -31,15 +31,15 @@ jsi::Object core::UnistylesState::getJSTheme() {
         return jsi::Object(*_rt);
     }
 
-    helpers::assertThat(*_rt, _currentThemeName.has_value(), "one of your stylesheets is trying to get the theme, but no theme has been selected yet. Did you forget to select an initial theme?");
+    helpers::assertThat(*_rt, _currentThemeName.has_value(), "Unistyles: One of your stylesheets is trying to get the theme, but no theme has been selected yet. Did you forget to select an initial theme?");
 
     auto it = this->_jsThemes.find(_currentThemeName.value());
 
-    helpers::assertThat(*_rt, it != this->_jsThemes.end(), "you're trying to get theme '" + _currentThemeName.value() + "', but it was not registered. Did you forget to register it with StyleSheet.configure?");
+    helpers::assertThat(*_rt, it != this->_jsThemes.end(), "Unistyles: You're trying to get theme '" + _currentThemeName.value() + "', but it was not registered. Did you forget to register it with StyleSheet.configure?");
 
     auto maybeTheme = it->second.lock(*_rt);
 
-    helpers::assertThat(*_rt, maybeTheme.isObject(), "unable to retrieve your theme from C++ as it has already been garbage collected, likely due to multiple hot reloads. Please live reload the app.");
+    helpers::assertThat(*_rt, maybeTheme.isObject(), "Unistyles: Unable to retrieve your theme from C++ as it has already been garbage collected, likely due to multiple hot reloads. Please live reload the app.");
 
     return maybeTheme.asObject(*_rt);
 }

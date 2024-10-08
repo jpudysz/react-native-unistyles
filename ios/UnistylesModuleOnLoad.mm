@@ -10,8 +10,14 @@ using namespace margelo::nitro;
 
 RCT_EXPORT_MODULE(Unistyles)
 
+__weak RCTSurfacePresenter* _surfacePresenter;
+
 + (BOOL)requiresMainQueueSetup {
     return YES;
+}
+
+- (void)setSurfacePresenter:(id<RCTSurfacePresenterStub>)surfacePresenter {
+    _surfacePresenter = surfacePresenter;
 }
 
 - (void)installJSIBindingsWithRuntime:(jsi::Runtime&)rt {
@@ -31,7 +37,8 @@ RCT_EXPORT_MODULE(Unistyles)
 - (void)createHybrids:(jsi::Runtime&)rt {
     auto nativePlatform = Unistyles::NativePlatform::create();
     auto unistylesRuntime = std::make_shared<HybridUnistylesRuntime>(nativePlatform, rt);
-    auto styleSheet = std::make_shared<HybridStyleSheet>(unistylesRuntime);
+    auto uiManager = [_surfacePresenter scheduler].uiManager;
+    auto styleSheet = std::make_shared<HybridStyleSheet>(unistylesRuntime, uiManager);
 
     HybridObjectRegistry::registerHybridObjectConstructor("UnistylesRuntime", [unistylesRuntime]() -> std::shared_ptr<HybridObject>{
         return unistylesRuntime;
