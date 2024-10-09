@@ -825,6 +825,8 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 myRef.current = _ref
+
+                                styles.container(1, 2, _ref)
                                 UnistylesShadowRegistry.add(_ref, styles.container, undefined)
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
@@ -885,13 +887,12 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 myRef.current = _ref
+
+                                styles.container(1, 2, _ref)
                                 UnistylesShadowRegistry.add(_ref, styles.container, undefined)
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
-                            style={{
-                                backgroundColor: 'red',
-                                ...styles.container(1, 2)
-                            }}
+                            style={{ backgroundColor: 'red', ...styles.container(1, 2) }}
                         >
                             <Text>Hello world</Text>
                         </View>
@@ -963,6 +964,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 myRef.current = _ref
+                                uhh.dkk(_ref)
                                 UnistylesShadowRegistry.add(_ref, uhh.dkk, __uni__variants)
                                 return () => UnistylesShadowRegistry.remove(_ref, uhh.dkk)
                             }}
@@ -1031,6 +1033,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 myRef.current = _ref
+                                uhh.dkk(_ref)
                                 UnistylesShadowRegistry.add(_ref, uhh.dkk, undefined)
                                 return () => UnistylesShadowRegistry.remove(_ref, uhh.dkk)
                             }}
@@ -1045,6 +1048,129 @@ pluginTester({
                     {
                         dkk: () => ({
                             backgroundColor: 'red'
+                        })
+                    },
+                    921918562
+                )
+            `
+        },
+        {
+            title: 'Should pass ref for dynamic functions to bind it to shadow node',
+            code: `
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <React.Fragment>
+                            <View style={styles.container(1, 5)} />
+                            <View style={styles.container(2, 6)} />
+                            <View style={styles.container(5, 1)} />
+                        </React.Fragment>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: (flex, gap) => ({
+                        flex,
+                        gap
+                    })
+                })
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <React.Fragment>
+                            <View
+                                style={styles.container(1, 5)}
+                                ref={ref => {
+                                    styles.container(1, 5, ref)
+                                    UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                    return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                }}
+                            />
+                            <View
+                                style={styles.container(2, 6)}
+                                ref={ref => {
+                                    styles.container(2, 6, ref)
+                                    UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                    return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                }}
+                            />
+                            <View
+                                style={styles.container(5, 1)}
+                                ref={ref => {
+                                    styles.container(5, 1, ref)
+                                    UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                    return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                }}
+                            />
+                        </React.Fragment>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    {
+                        container: (flex, gap) => ({
+                            flex,
+                            gap
+                        })
+                    },
+                    921918562
+                )
+            `
+        },
+        {
+            title: 'Should pass refs for dynamic functions',
+            code: `
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <React.Fragment>
+                            <View style={[styles.container(1, 5), styles.container2(1, 6)]} />
+                        </React.Fragment>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: (flex, gap) => ({
+                        flex,
+                        gap
+                    })
+                })
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <React.Fragment>
+                            <View
+                                style={[styles.container(1, 5), styles.container2(1, 6)]}
+                                ref={ref => {
+                                    styles.container(1, 5, ref)
+                                    UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                    styles.container2(1, 6, ref)
+                                    UnistylesShadowRegistry.add(ref, styles.container2, undefined)
+                                    return () => {
+                                        ;(() => UnistylesShadowRegistry.remove(ref, styles.container))()
+                                        UnistylesShadowRegistry.remove(ref, styles.container2)
+                                    }
+                                }}
+                            />
+                        </React.Fragment>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    {
+                        container: (flex, gap) => ({
+                            flex,
+                            gap
                         })
                     },
                     921918562
