@@ -1,5 +1,5 @@
-import type { UnistylesNavigationBar as NavigationBarSpec } from '../src/specs/NavigtionBar'
-import type { UnistylesStatusBar as StatusBarSpec } from '../src/specs/StatusBar'
+import type { UnistylesNavigationBar as NavigationBarSpec } from '../specs/NavigtionBar'
+import type { UnistylesStatusBar as StatusBarSpec } from '../specs/StatusBar'
 
 export const StatusBar: StatusBarSpec = {
     width: 0,

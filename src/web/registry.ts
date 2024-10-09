@@ -1,5 +1,5 @@
 import { createTypeStyle, TypeStyle } from 'typestyle'
-import type { UnistylesValues } from '../src/types'
+import type { UnistylesValues } from '../types'
 import { convertToTypeStyle } from './convert'
 import { UnistylesState } from './state'
 

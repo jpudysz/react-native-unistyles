@@ -1,12 +1,12 @@
 import { type ReactElement, createElement, createRef } from 'react'
-import type { UnistylesTheme } from '../src/types'
-import type { UnistylesConfig } from '../src/specs/StyleSheet'
-import type { AppBreakpoint, AppThemeName } from '../src/specs/types'
-import type { UnistylesBreakpoints, UnistylesThemes } from '../src/global'
+import type { UnistylesTheme } from '../types'
+import type { UnistylesConfig } from '../specs/StyleSheet'
+import type { AppBreakpoint, AppThemeName } from '../specs/types'
+import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
 import { UnistylesRuntime } from './runtime'
 import { isServer, schemeToTheme } from './utils'
 import { UnistylesListener } from './listener'
-import { UnistyleDependency } from '../src/specs/NativePlatform'
+import { UnistyleDependency } from '../specs/NativePlatform'
 
 class UnistylesStateBuilder {
     private readonly isSSR = isServer()

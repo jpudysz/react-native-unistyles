@@ -1,16 +1,16 @@
-import { ColorScheme, type AppThemeName} from '../src/specs/types'
-import type { UnistylesValues } from '../src/types'
+import { ColorScheme, type AppThemeName} from '../specs/types'
+import type { UnistylesValues } from '../types'
 
 export const reduceObject = <TObj extends Record<string, any>, TReducer>(
     obj: TObj,
     reducer: (value: TObj[keyof TObj], key: keyof TObj) => TReducer,
 ) => Object.fromEntries(Object.entries(obj).map(([key, value]) => [key, reducer(value as TObj[keyof TObj], key)])) as { [K in keyof TObj]: TReducer }
 
-export const toReactNativeClassName = (className: string, values: UnistylesValues) => {
-    const returnValue = {
+export const toReactNativeClassName = (className: string | null, values: UnistylesValues) => {
+    const returnValue = className ? {
         $$css: true,
         [className]: className
-    }
+    } : {}
 
     Object.defineProperties(returnValue, reduceObject(values, value => ({
         value,
