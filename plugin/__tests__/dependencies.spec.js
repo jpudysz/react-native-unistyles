@@ -51,7 +51,7 @@ pluginTester({
                         <View
                             style={styles.container}
                             ref={ref => {
-                                UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
                             }}
                         >
@@ -112,7 +112,7 @@ pluginTester({
                         <View
                             style={styles.container}
                             ref={ref => {
-                                UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
                             }}
                         >
@@ -167,7 +167,7 @@ pluginTester({
                         <View
                             style={styles.container}
                             ref={ref => {
-                                UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
                             }}
                         >
@@ -280,7 +280,7 @@ pluginTester({
                         <View
                             style={styles.container}
                             ref={ref => {
-                                UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
                             }}
                         >
@@ -405,7 +405,7 @@ pluginTester({
                         <View
                             style={styles.container}
                             ref={ref => {
-                                UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
                             }}
                         >

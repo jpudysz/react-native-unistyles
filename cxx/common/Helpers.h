@@ -1,6 +1,8 @@
 #pragma once
 
 #include <jsi/jsi.h>
+#include <jsi/JSIDynamic.h>
+#include <folly/dynamic.h>
 #include <unordered_set>
 
 using namespace facebook;
@@ -112,6 +114,62 @@ inline Variants variantsToPairs(jsi::Runtime& rt, jsi::Object&& variants) {
     });
 
     return pairs;
+}
+
+inline std::vector<folly::dynamic> parseDynamicFunctionArguments(jsi::Runtime& rt, jsi::Array& arguments) {
+    std::vector<folly::dynamic> parsedArgument{};
+    size_t count = arguments.size(rt);
+
+    parsedArgument.reserve(count);
+
+    for (size_t i = 0; i < count; i++) {
+        jsi::Value arg = arguments.getValueAtIndex(rt, i);
+
+        if (arg.isBool()) {
+            parsedArgument.push_back(folly::dynamic(arg.asBool()));
+
+            continue;
+        }
+
+        if (arg.isNumber()) {
+            parsedArgument.push_back(folly::dynamic(arg.asNumber()));
+
+            continue;
+        }
+
+        if (arg.isString()) {
+            parsedArgument.push_back(folly::dynamic(arg.asString(rt).utf8(rt)));
+
+            continue;
+        }
+
+        if (arg.isUndefined()) {
+            parsedArgument.push_back(folly::dynamic());
+
+            continue;
+        }
+
+        if (arg.isNull()) {
+            parsedArgument.push_back(folly::dynamic(nullptr));
+
+            continue;
+        }
+
+        if (!arg.isObject()) {
+            continue;;
+        }
+
+        auto argObj = arg.asObject(rt);
+
+        // allow arrays and objects too
+        if (!argObj.isFunction(rt) && !argObj.isArrayBuffer(rt)) {
+            parsedArgument.push_back(jsi::dynamicFromValue(rt, arg));
+
+            continue;
+        }
+    }
+
+    return parsedArgument;
 }
 
 }

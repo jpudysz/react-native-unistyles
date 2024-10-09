@@ -28,12 +28,11 @@ struct Parser {
     shadow::ShadowLeafUpdates dependencyMapToShadowLeafUpdates(core::DependencyMap& dependencyMap);
 
 private:
-    void rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, Unistyle::Shared unistyle, const Variants& variants);
+    void rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, Unistyle::Shared unistyle, const Variants& variants, std::optional<std::vector<folly::dynamic>>);
     jsi::Object unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
     jsi::Object parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared unistyle, std::optional<Variants> variants);
     jsi::Value parseSecondLevel(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Value& nestedObject);
     jsi::Function createDynamicFunctionProxy(jsi::Runtime& rt, Unistyle::Shared unistyle);
-    std::vector<folly::dynamic> parseDynamicFunctionArguments(jsi::Runtime& rt, size_t count, const jsi::Value* arguments);
     std::vector<UnistyleDependency> parseDependencies(jsi::Runtime &rt, jsi::Object&& dependencies);
     jsi::Value parseTransforms(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Object& obj);
     jsi::Value getValueFromBreakpoints(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Object& obj);

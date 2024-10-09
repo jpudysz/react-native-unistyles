@@ -2,6 +2,7 @@
 
 #include "set"
 #include <jsi/jsi.h>
+#include <folly/dynamic.h>
 #include <react/renderer/uimanager/UIManager.h>
 #include <unordered_map>
 #include <unordered_set>
@@ -20,7 +21,7 @@ using namespace facebook::react;
 
 using DependencyMap = std::unordered_map<
     std::shared_ptr<core::StyleSheet>,
-    std::unordered_map<const ShadowNodeFamily*, std::vector<UnistyleData>>
+    std::unordered_map<const ShadowNodeFamily*, std::vector<std::shared_ptr<UnistyleData>>>
 >;
 
 struct UnistylesRegistry: public StyleSheetRegistry {
@@ -37,7 +38,7 @@ struct UnistylesRegistry: public StyleSheetRegistry {
 
     UnistylesState& getState(jsi::Runtime& rt);
     void createState(jsi::Runtime& rt);
-    void linkShadowNodeWithUnistyle(const ShadowNodeFamily*, const core::Unistyle::Shared, Variants& variants);
+    void linkShadowNodeWithUnistyle(const ShadowNodeFamily*, const core::Unistyle::Shared, Variants& variants, std::vector<folly::dynamic>&);
     void unlinkShadowNodeWithUnistyle(const ShadowNodeFamily*, const core::Unistyle::Shared);
     std::shared_ptr<core::StyleSheet> addStyleSheet(jsi::Runtime& rt, int tag, core::StyleSheetType type, jsi::Object&& rawValue);
     DependencyMap buildDependencyMap(jsi::Runtime& rt, std::vector<UnistyleDependency>& deps);
@@ -48,7 +49,7 @@ private:
 
     std::unordered_map<jsi::Runtime*, UnistylesState> _states{};
     std::unordered_map<jsi::Runtime*, std::unordered_map<int, std::shared_ptr<core::StyleSheet>>> _styleSheetRegistry{};
-    std::unordered_map<const ShadowNodeFamily*, std::vector<std::pair<core::Unistyle::Shared, Variants>>> _shadowRegistry{};
+    std::unordered_map<const ShadowNodeFamily*, std::vector<std::shared_ptr<UnistyleData>>> _shadowRegistry{};
 };
 
 UnistylesRegistry& UnistylesRegistry::get() {
