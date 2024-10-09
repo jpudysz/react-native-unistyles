@@ -7,10 +7,10 @@ import { Typography } from './Typography'
 export const App = () => {
     return (
         <View style={styles.container}>
-            <Typography isBold isPrimary size="large">
+            <Typography isBold isPrimary size="large" value={3}>
                 Hello World
             </Typography>
-            <Typography isBold size="small">
+            <Typography isBold size="small" value={2}>
                 Hello World 2
             </Typography>
         </View>
