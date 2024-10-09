@@ -1,4 +1,4 @@
-import { UnistyleDependency } from '../../src/specs/NativePlatform'
+import { UnistyleDependency } from '../../specs/NativePlatform'
 import { UnistylesRuntime } from '../runtime'
 
 export class UnistylesListenerBuilder {

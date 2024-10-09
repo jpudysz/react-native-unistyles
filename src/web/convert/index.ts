@@ -1,5 +1,5 @@
 import type { NestedCSSProperties } from 'typestyle/lib/types'
-import type { UnistylesValues } from '../../src/types'
+import type { UnistylesValues } from '../../types'
 import { media } from 'typestyle'
 import { isPseudo } from '../pseudo'
 import { convertBreakpoint } from './breakpoint'
