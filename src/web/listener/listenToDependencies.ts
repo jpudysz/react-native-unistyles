@@ -15,7 +15,10 @@ type ListenToDependenciesProps = {
 }
 
 export const listenToDependencies = ({ key, className, unistyles, args = [], stylesheet }: ListenToDependenciesProps) => {
-    const value = keyInObject(stylesheet, key) ? stylesheet[key] : undefined
+    const newComputedStylesheet = typeof stylesheet === 'function'
+        ? stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
+        : stylesheet
+    const value = keyInObject(newComputedStylesheet, key) ? newComputedStylesheet[key] : undefined
 
     if (!value) {
         return
