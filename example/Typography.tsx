@@ -25,14 +25,14 @@ export const Typography: React.FunctionComponent<TypographyProps> = ({
     })
 
     return (
-        <Text style={styles.title(size)}>
+        <Text style={styles.title()}>
             {children}
         </Text>
     )
 }
 
 const styles = StyleSheet.create((theme, rt) => ({
-    title: (size?: string) => ({
+    title: () => ({
         variants: {
             isBold: {
                 true: {
