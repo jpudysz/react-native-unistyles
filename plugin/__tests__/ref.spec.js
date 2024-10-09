@@ -78,7 +78,7 @@ pluginTester({
                         <View
                             style={styles.container}
                             ref={ref => {
-                                UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
                             }}
                         >
@@ -131,7 +131,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 ref.current = _ref
-                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
                             style={styles.container}
@@ -192,7 +192,7 @@ pluginTester({
                             ref={ref => {
                                 doSomething(ref)
                                 myRef.current = ref
-                                UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => {
                                     UnistylesShadowRegistry.remove(ref, styles.container)
                                 }
@@ -259,7 +259,7 @@ pluginTester({
                             ref={ref => {
                                 doSomething(ref)
                                 myRef.current = ref
-                                UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => {
                                     ;(() => {
                                         customCleanup()
@@ -333,7 +333,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 fn(_ref)
-                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined, undefined)
                                 return () => {
                                     ;(() => {
                                         customCleanup2()
@@ -407,7 +407,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 fn(_ref)
-                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined, undefined)
                                 return () => {
                                     ;(() => {
                                         customCleanup2()
@@ -637,7 +637,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 myRef.current = _ref
-                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
                             style={{
@@ -704,7 +704,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 myRef.current = _ref
-                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
                             style={[
@@ -766,7 +766,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 myRef.current = _ref
-                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
                             style={[styles.container]}
@@ -825,9 +825,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 myRef.current = _ref
-
-                                styles.container(1, 2, _ref)
-                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined, [1, 2])
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
                             style={[styles.container(1, 2)]}
@@ -887,9 +885,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 myRef.current = _ref
-
-                                styles.container(1, 2, _ref)
-                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined, [1, 2])
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
                             style={{ backgroundColor: 'red', ...styles.container(1, 2) }}
@@ -964,8 +960,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 myRef.current = _ref
-                                uhh.dkk(_ref)
-                                UnistylesShadowRegistry.add(_ref, uhh.dkk, __uni__variants)
+                                UnistylesShadowRegistry.add(_ref, uhh.dkk, __uni__variants, [])
                                 return () => UnistylesShadowRegistry.remove(_ref, uhh.dkk)
                             }}
                             style={uhh.dkk()}
@@ -1033,8 +1028,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 myRef.current = _ref
-                                uhh.dkk(_ref)
-                                UnistylesShadowRegistry.add(_ref, uhh.dkk, undefined)
+                                UnistylesShadowRegistry.add(_ref, uhh.dkk, undefined, [])
                                 return () => UnistylesShadowRegistry.remove(_ref, uhh.dkk)
                             }}
                             style={uhh.dkk()}
@@ -1086,24 +1080,21 @@ pluginTester({
                             <View
                                 style={styles.container(1, 5)}
                                 ref={ref => {
-                                    styles.container(1, 5, ref)
-                                    UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                    UnistylesShadowRegistry.add(ref, styles.container, undefined, [1, 5])
                                     return () => UnistylesShadowRegistry.remove(ref, styles.container)
                                 }}
                             />
                             <View
                                 style={styles.container(2, 6)}
                                 ref={ref => {
-                                    styles.container(2, 6, ref)
-                                    UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                    UnistylesShadowRegistry.add(ref, styles.container, undefined, [2, 6])
                                     return () => UnistylesShadowRegistry.remove(ref, styles.container)
                                 }}
                             />
                             <View
                                 style={styles.container(5, 1)}
                                 ref={ref => {
-                                    styles.container(5, 1, ref)
-                                    UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                    UnistylesShadowRegistry.add(ref, styles.container, undefined, [5, 1])
                                     return () => UnistylesShadowRegistry.remove(ref, styles.container)
                                 }}
                             />
@@ -1152,10 +1143,8 @@ pluginTester({
                             <View
                                 style={[styles.container(1, 5), styles.container2(1, 6)]}
                                 ref={ref => {
-                                    styles.container(1, 5, ref)
-                                    UnistylesShadowRegistry.add(ref, styles.container, undefined)
-                                    styles.container2(1, 6, ref)
-                                    UnistylesShadowRegistry.add(ref, styles.container2, undefined)
+                                    UnistylesShadowRegistry.add(ref, styles.container, undefined, [1, 5])
+                                    UnistylesShadowRegistry.add(ref, styles.container2, undefined, [1, 6])
                                     return () => {
                                         ;(() => UnistylesShadowRegistry.remove(ref, styles.container))()
                                         UnistylesShadowRegistry.remove(ref, styles.container2)

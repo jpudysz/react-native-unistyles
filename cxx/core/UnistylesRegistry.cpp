@@ -74,19 +74,20 @@ void core::UnistylesRegistry::updateTheme(jsi::Runtime& rt, std::string& themeNa
 void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
     const ShadowNodeFamily* shadowNodeFamily,
     const core::Unistyle::Shared unistyle,
-    Variants& variants
+    Variants& variants,
+    std::vector<folly::dynamic>& arguments
 ) {
     if (!this->_shadowRegistry.contains(shadowNodeFamily)) {
         this->_shadowRegistry[shadowNodeFamily] = {};
     }
 
-    this->_shadowRegistry[shadowNodeFamily].emplace_back(std::make_pair(unistyle, std::move(variants)));
+    this->_shadowRegistry[shadowNodeFamily].emplace_back(std::make_shared<UnistyleData>(unistyle, variants, arguments));
 }
 
 void core::UnistylesRegistry::unlinkShadowNodeWithUnistyle(const ShadowNodeFamily* shadowNodeFamily, const core::Unistyle::Shared unistyle) {
     auto& unistylesVec = this->_shadowRegistry[shadowNodeFamily];
-    auto it = std::find_if(unistylesVec.begin(), unistylesVec.end(), [unistyle](std::pair<core::Unistyle::Shared, Variants> pair){
-        return pair.first == unistyle;
+    auto it = std::find_if(unistylesVec.begin(), unistylesVec.end(), [unistyle](std::shared_ptr<UnistyleData> unistyleData){
+        return unistyleData->unistyle == unistyle;
     });
 
     if (it != unistylesVec.end()) {
@@ -124,12 +125,12 @@ core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt
             for (const auto& pair : this->_shadowRegistry) {
                 const auto& [family, unistyles] = pair;
 
-                for (const auto& [shadowUnistyle, variants] : unistyles) {
-                    if (unistyle != shadowUnistyle) {
+                for (const auto& unistyleData : unistyles) {
+                    if (unistyle != unistyleData->unistyle) {
                         continue;
                     }
 
-                    dependencyMap[styleSheet][family].emplace_back(unistyle, variants);
+                    dependencyMap[styleSheet][family].emplace_back(unistyleData);
                 }
             }
         }
@@ -146,12 +147,12 @@ core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt
             for (const auto& pair : this->_shadowRegistry) {
                 const auto& [family, unistyles] = pair;
 
-                for (const auto& [shadowUnistyle, variants] : unistyles) {
-                    if (unistyle != shadowUnistyle) {
+                for (const auto& unistyleData : unistyles) {
+                    if (unistyle != unistyleData->unistyle) {
                         continue;
                     }
 
-                    dependencyMap[styleSheet][family].emplace_back(unistyle, variants);
+                    dependencyMap[styleSheet][family].emplace_back(unistyleData);
                 }
             }
         }
