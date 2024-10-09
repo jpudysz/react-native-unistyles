@@ -1,27 +1,33 @@
-function getStyleObjectPath(t, node) {
+function getStyleMetadata(t, node, dynamicFunction = null) {
     // {styles.container}
     if (t.isMemberExpression(node)) {
-        return [node.object.name, node.property.name]
+        return [
+            {
+                styleObj: node.object.name,
+                styleProp: node.property.name,
+                dynamicFunction
+            }
+        ]
     }
 
     // [styles.container]
     if (t.isArrayExpression(node)) {
-        return node.elements.flatMap(element => getStyleObjectPath(t, element))
+        return node.elements.flatMap(element => getStyleMetadata(t, element))
     }
 
     // [...styles.container]
     if (t.isSpreadElement(node)) {
-        return getStyleObjectPath(t, node.argument)
+        return getStyleMetadata(t, node.argument)
     }
 
     // {{ ...styles.container }}
     if (t.isObjectExpression(node)) {
-        return node.properties.flatMap(prop => getStyleObjectPath(t, prop.argument))
+        return node.properties.flatMap(prop => getStyleMetadata(t, prop.argument))
     }
 
     // {styles.container(arg1, arg2)}
     if (t.isCallExpression(node)) {
-        return getStyleObjectPath(t, node.callee)
+        return getStyleMetadata(t, node.callee, node)
     }
 
     return []
@@ -36,6 +42,6 @@ function getStyleAttribute(t, path) {
 }
 
 module.exports = {
-    getStyleObjectPath,
+    getStyleMetadata,
     getStyleAttribute
 }

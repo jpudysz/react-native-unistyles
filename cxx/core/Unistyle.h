@@ -14,11 +14,6 @@ enum class UnistyleType {
     DynamicFunction
 };
 
-struct DynamicFunctionMetadata {
-    size_t count;
-    std::vector<folly::dynamic> arguments;
-};
-
 struct Unistyle {
     using Shared = std::shared_ptr<Unistyle>;
 
@@ -75,7 +70,6 @@ struct UnistyleDynamicFunction: public Unistyle {
 
     std::optional<jsi::Object> unprocessedValue;
     std::optional<jsi::Function> proxiedFunction = std::nullopt;
-    std::optional<DynamicFunctionMetadata> dynamicFunctionMetadata = std::nullopt;
 };
 
 }
