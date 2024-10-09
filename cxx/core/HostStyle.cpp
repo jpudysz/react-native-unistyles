@@ -30,6 +30,10 @@ jsi::Value HostStyle::get(jsi::Runtime& rt, const jsi::PropNameID& propNameId) {
     if (this->_styleSheet->unistyles.contains(propertyName)) {
         return valueFromUnistyle(rt, this->_styleSheet->unistyles[propertyName]);
     }
+    
+    if (propertyName == helpers::STYLE_VARIANTS) {
+        return helpers::variantsToValue(rt, this->_variants);
+    }
 
     return jsi::Value::undefined();
 }
@@ -49,6 +53,7 @@ jsi::Function HostStyle::createAddVariantsProxyFunction(jsi::Runtime& rt) {
         }
 
         this->_variants = pairs;
+
         parser.rebuildUnistylesWithVariants(rt, this->_styleSheet, this->_variants);
 
         return jsi::Value::undefined();
