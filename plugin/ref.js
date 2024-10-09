@@ -14,18 +14,24 @@ function hasStringRef(t, path) {
     )
 }
 
-function addRef(t, path, styleObj, styleProp, state) {
+function addRef(t, path, metadata, state) {
     const hasVariants = state.file.hasVariants
 
     const newRefFunction = t.arrowFunctionExpression(
         [t.identifier('ref')],
         t.blockStatement([
+            metadata.dynamicFunction ? t.expressionStatement(
+                t.callExpression(
+                    metadata.dynamicFunction.callee,
+                    metadata.dynamicFunction.arguments.concat(t.identifier('ref'))
+                )
+            ) : null,
             t.expressionStatement(
                 t.callExpression(
                     t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
                     [
                         t.identifier('ref'),
-                        t.memberExpression(t.identifier(styleObj), t.identifier(styleProp)),
+                        t.memberExpression(t.identifier(metadata.styleObj), t.identifier(metadata.styleProp)),
                         t.identifier(hasVariants ? '__uni__variants' : 'undefined')
                     ]
                 )
@@ -34,11 +40,11 @@ function addRef(t, path, styleObj, styleProp, state) {
                 t.arrowFunctionExpression([],
                     t.callExpression(
                         t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('remove')),
-                        [t.identifier('ref'), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
+                        [t.identifier('ref'), t.memberExpression(t.identifier(metadata.styleObj), t.identifier(metadata.styleProp))]
                     )
                 )
             )
-        ])
+        ].filter(Boolean))
     )
 
     const newRefProp = t.jsxAttribute(
@@ -49,7 +55,7 @@ function addRef(t, path, styleObj, styleProp, state) {
     path.node.openingElement.attributes.push(newRefProp)
 }
 
-function overrideRef(t, path, refProp, styleObj, styleProp, state) {
+function overrideRef(t, path, refProp, metadata, state) {
     const hasVariants = state.file.hasVariants
     const uniqueRefName = path.scope.generateUidIdentifier('ref').name
     const isIdentifier = t.isIdentifier(refProp.value.expression)
@@ -68,13 +74,19 @@ function overrideRef(t, path, refProp, styleObj, styleProp, state) {
                         t.identifier(uniqueRefName)
                     )
                 ),
+                metadata.dynamicFunction ? t.expressionStatement(
+                    t.callExpression(
+                        metadata.dynamicFunction.callee,
+                        metadata.dynamicFunction.arguments.concat(t.identifier(uniqueRefName))
+                    )
+                ) : null,
                 t.expressionStatement(
                     t.callExpression(
                         t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
 
                         [
                             t.identifier(uniqueRefName),
-                            t.memberExpression(t.identifier(styleObj), t.identifier(styleProp)),
+                            t.memberExpression(t.identifier(metadata.styleObj), t.identifier(metadata.styleProp)),
                             t.identifier(hasVariants ? '__uni__variants' : 'undefined')
                         ]
                     )
@@ -83,11 +95,11 @@ function overrideRef(t, path, refProp, styleObj, styleProp, state) {
                     t.arrowFunctionExpression([],
                         t.callExpression(
                             t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('remove')),
-                            [t.identifier(uniqueRefName), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
+                            [t.identifier(uniqueRefName), t.memberExpression(t.identifier(metadata.styleObj), t.identifier(metadata.styleProp))]
                         )
                     )
                 )
-            ])
+            ].filter(Boolean))
         )
 
         refProp.value = t.jsxExpressionContainer(newRefFunction)
@@ -108,12 +120,18 @@ function overrideRef(t, path, refProp, styleObj, styleProp, state) {
             [t.identifier('ref')],
             t.blockStatement([
                 ...userStatements.filter(statement => !t.isReturnStatement(statement)),
+                metadata.dynamicFunction ? t.expressionStatement(
+                    t.callExpression(
+                        metadata.dynamicFunction.callee,
+                        metadata.dynamicFunction.arguments.concat(t.identifier('ref'))
+                    )
+                ) : null,
                 t.expressionStatement(
                     t.callExpression(
                         t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
                         [
                             t.identifier('ref'),
-                            t.memberExpression(t.identifier(styleObj), t.identifier(styleProp)),
+                            t.memberExpression(t.identifier(metadata.styleObj), t.identifier(metadata.styleProp)),
                             t.identifier(hasVariants ? '__uni__variants' : 'undefined')
                         ]
                     )
@@ -129,12 +147,12 @@ function overrideRef(t, path, refProp, styleObj, styleProp, state) {
                         t.expressionStatement(
                             t.callExpression(
                                 t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('remove')),
-                                [t.identifier('ref'), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
+                                [t.identifier('ref'), t.memberExpression(t.identifier(metadata.styleObj), t.identifier(metadata.styleProp))]
                             )
                         )
                     ]))
                 )
-            ])
+            ].filter(Boolean))
         )
 
         refProp.value = t.jsxExpressionContainer(newRefFunction)
@@ -167,12 +185,18 @@ function overrideRef(t, path, refProp, styleObj, styleProp, state) {
             t.expressionStatement(
                 t.callExpression(userFunctionName, [t.identifier(uniqueRefName)])
             ),
+            metadata.dynamicFunction ? t.expressionStatement(
+                t.callExpression(
+                    metadata.dynamicFunction.callee,
+                    metadata.dynamicFunction.arguments.concat(t.identifier(uniqueRefName))
+                )
+            ) : null,
             t.expressionStatement(
                 t.callExpression(
                     t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
                     [
                         t.identifier(uniqueRefName),
-                        t.memberExpression(t.identifier(styleObj), t.identifier(styleProp)),
+                        t.memberExpression(t.identifier(metadata.styleObj), t.identifier(metadata.styleProp)),
                         t.identifier(hasVariants ? '__uni__variants' : 'undefined')
                     ]
                 )
@@ -187,12 +211,12 @@ function overrideRef(t, path, refProp, styleObj, styleProp, state) {
                     t.expressionStatement(
                         t.callExpression(
                             t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('remove')),
-                            [t.identifier(uniqueRefName), t.memberExpression(t.identifier(styleObj), t.identifier(styleProp))]
+                            [t.identifier(uniqueRefName), t.memberExpression(t.identifier(metadata.styleObj), t.identifier(metadata.styleProp))]
                         )
                     )
                 ]))
             )
-        ])
+        ].filter(Boolean))
     )
 
     refProp.value = t.jsxExpressionContainer(newRefFunction)

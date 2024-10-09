@@ -1,5 +1,5 @@
 const addShadowRegistryImport = require('./import')
-const { getStyleObjectPath, getStyleAttribute } = require('./style')
+const { getStyleMetadata, getStyleAttribute } = require('./style')
 const { getRefProp, addRef, overrideRef, hasStringRef } = require('./ref')
 const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyle } = require('./stylesheet')
 const { isUsingVariants, extractVariants } = require('./variants')
@@ -46,28 +46,27 @@ module.exports = function ({ types: t }) {
                     return
                 }
 
-                const stylePath = getStyleObjectPath(t, styleAttr.value.expression)
+                const metadata = getStyleMetadata(t, styleAttr.value.expression)
 
                 // style prop is not using object expression
-                if (stylePath.length !== 2) {
+                if (metadata.length === 0) {
                     return
                 }
 
                 // to add import
                 state.file.hasAnyUnistyle = true
 
-                const refProp = getRefProp(t, path)
+                metadata.forEach(meta => {
+                    const refProp = getRefProp(t, path)
 
-                if (!refProp && hasStringRef(t, path)) {
-                    throw new Error("Detected string based ref which is not supported by Unistyles.")
-                }
+                    if (!refProp && hasStringRef(t, path)) {
+                        throw new Error("Detected string based ref which is not supported by Unistyles.")
+                    }
 
-                const styleObj = stylePath[0]
-                const styleProp = stylePath[1]
-
-                refProp
-                    ? overrideRef(t, path, refProp, styleObj, styleProp, state)
-                    : addRef(t, path, styleObj, styleProp, state)
+                    refProp
+                        ? overrideRef(t, path, refProp, meta, state)
+                        : addRef(t, path, meta, state)
+                })
             },
             CallExpression(path, state) {
                 if (isUsingVariants(t, path)) {
