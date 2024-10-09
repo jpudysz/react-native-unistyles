@@ -78,7 +78,7 @@ pluginTester({
                         <View
                             style={styles.container}
                             ref={ref => {
-                                UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
                             }}
                         >
@@ -131,7 +131,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 ref.current = _ref
-                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
                             style={styles.container}
@@ -192,7 +192,7 @@ pluginTester({
                             ref={ref => {
                                 doSomething(ref)
                                 myRef.current = ref
-                                UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => {
                                     UnistylesShadowRegistry.remove(ref, styles.container)
                                 }
@@ -259,7 +259,7 @@ pluginTester({
                             ref={ref => {
                                 doSomething(ref)
                                 myRef.current = ref
-                                UnistylesShadowRegistry.add(ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => {
                                     ;(() => {
                                         customCleanup()
@@ -333,7 +333,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 fn(_ref)
-                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined, undefined)
                                 return () => {
                                     ;(() => {
                                         customCleanup2()
@@ -407,7 +407,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 fn(_ref)
-                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined, undefined)
                                 return () => {
                                     ;(() => {
                                         customCleanup2()
@@ -637,7 +637,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 myRef.current = _ref
-                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
                             style={{
@@ -704,7 +704,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 myRef.current = _ref
-                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
                             style={[
@@ -766,7 +766,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 myRef.current = _ref
-                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
                             style={[styles.container]}
@@ -825,7 +825,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 myRef.current = _ref
-                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined, [1, 2])
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
                             style={[styles.container(1, 2)]}
@@ -885,13 +885,10 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 myRef.current = _ref
-                                UnistylesShadowRegistry.add(_ref, styles.container, undefined)
+                                UnistylesShadowRegistry.add(_ref, styles.container, undefined, [1, 2])
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
-                            style={{
-                                backgroundColor: 'red',
-                                ...styles.container(1, 2)
-                            }}
+                            style={{ backgroundColor: 'red', ...styles.container(1, 2) }}
                         >
                             <Text>Hello world</Text>
                         </View>
@@ -963,7 +960,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 myRef.current = _ref
-                                UnistylesShadowRegistry.add(_ref, uhh.dkk, __uni__variants)
+                                UnistylesShadowRegistry.add(_ref, uhh.dkk, __uni__variants, [])
                                 return () => UnistylesShadowRegistry.remove(_ref, uhh.dkk)
                             }}
                             style={uhh.dkk()}
@@ -1031,7 +1028,7 @@ pluginTester({
                         <View
                             ref={_ref => {
                                 myRef.current = _ref
-                                UnistylesShadowRegistry.add(_ref, uhh.dkk, undefined)
+                                UnistylesShadowRegistry.add(_ref, uhh.dkk, undefined, [])
                                 return () => UnistylesShadowRegistry.remove(_ref, uhh.dkk)
                             }}
                             style={uhh.dkk()}
@@ -1045,6 +1042,124 @@ pluginTester({
                     {
                         dkk: () => ({
                             backgroundColor: 'red'
+                        })
+                    },
+                    921918562
+                )
+            `
+        },
+        {
+            title: 'Should pass ref for dynamic functions to bind it to shadow node',
+            code: `
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <React.Fragment>
+                            <View style={styles.container(1, 5)} />
+                            <View style={styles.container(2, 6)} />
+                            <View style={styles.container(5, 1)} />
+                        </React.Fragment>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: (flex, gap) => ({
+                        flex,
+                        gap
+                    })
+                })
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <React.Fragment>
+                            <View
+                                style={styles.container(1, 5)}
+                                ref={ref => {
+                                    UnistylesShadowRegistry.add(ref, styles.container, undefined, [1, 5])
+                                    return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                }}
+                            />
+                            <View
+                                style={styles.container(2, 6)}
+                                ref={ref => {
+                                    UnistylesShadowRegistry.add(ref, styles.container, undefined, [2, 6])
+                                    return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                }}
+                            />
+                            <View
+                                style={styles.container(5, 1)}
+                                ref={ref => {
+                                    UnistylesShadowRegistry.add(ref, styles.container, undefined, [5, 1])
+                                    return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                }}
+                            />
+                        </React.Fragment>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    {
+                        container: (flex, gap) => ({
+                            flex,
+                            gap
+                        })
+                    },
+                    921918562
+                )
+            `
+        },
+        {
+            title: 'Should pass refs for dynamic functions',
+            code: `
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <React.Fragment>
+                            <View style={[styles.container(1, 5), styles.container2(1, 6)]} />
+                        </React.Fragment>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: (flex, gap) => ({
+                        flex,
+                        gap
+                    })
+                })
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <React.Fragment>
+                            <View
+                                style={[styles.container(1, 5), styles.container2(1, 6)]}
+                                ref={ref => {
+                                    UnistylesShadowRegistry.add(ref, styles.container, undefined, [1, 5])
+                                    UnistylesShadowRegistry.add(ref, styles.container2, undefined, [1, 6])
+                                    return () => {
+                                        ;(() => UnistylesShadowRegistry.remove(ref, styles.container))()
+                                        UnistylesShadowRegistry.remove(ref, styles.container2)
+                                    }
+                                }}
+                            />
+                        </React.Fragment>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    {
+                        container: (flex, gap) => ({
+                            flex,
+                            gap
                         })
                     },
                     921918562

@@ -1,6 +1,6 @@
 {
   "name": "react-native-unistyles",
-  "version": "3.0.0-alpha.7",
+  "version": "3.0.0-alpha.9",
   "description": "Level up your React Native StyleSheet",
   "scripts": {
     "test": "jest",
