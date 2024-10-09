@@ -19,6 +19,7 @@ export const StyleSheet = {
 }
 
 export { UnistylesRuntime } from './runtime'
+export { UnistylesShadowRegistry } from './shadowRegistry'
 export * from './mock'
 
 export const getSSRUnistyles = () => UnistylesRuntime.getSSRUnistyles()

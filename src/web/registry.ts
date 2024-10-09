@@ -4,7 +4,7 @@ import { convertToTypeStyle } from './convert'
 import { UnistylesState } from './state'
 
 class UnistylesRegistryBuilder {
-    createStyles = (stylesheet: UnistylesValues, key: string | number) => {
+    createStyles = (stylesheet: UnistylesValues, key: string) => {
         const stylesTag = UnistylesState.createTag()
         const unistyles = createTypeStyle(stylesTag)
         const typestyleStylesheet = convertToTypeStyle(stylesheet)

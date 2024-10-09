@@ -23,13 +23,3 @@ export const NavigationBar: NavigationBarSpec = {
     __type: 'web',
     name: 'NavigationBar'
 }
-
-export const UnistylesShadowRegistry = {
-    name: 'UnistylesShadowRegistry',
-    __type: 'web',
-    equals: () => true,
-    toString: () => 'UnistylesShadowRegistry',
-    dispose: () => {},
-    add: () => {},
-    remove: () => {},
-}
