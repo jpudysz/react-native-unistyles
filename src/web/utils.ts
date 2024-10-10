@@ -158,7 +158,11 @@ export const createDoubleMap = <TKey, TSecondKey, TValue>() => {
 export const extractHiddenProperties = (object: any) => {
     const hiddenProperties = Object.getOwnPropertyNames(object)
 
-    return Object.fromEntries(hiddenProperties.map(key => [key, object[key]]))
+    return Object.fromEntries(
+        hiddenProperties
+            .filter(key => !key.startsWith('__uni__'))
+            .map(key => [key, object[key]])
+    )
 }
 
 export const isInDocument = (element: HTMLElement) => document.body.contains(element)
