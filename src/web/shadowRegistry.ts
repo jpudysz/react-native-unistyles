@@ -1,6 +1,7 @@
 import type { UnistylesValues } from '../types'
 import { listenToDependencies } from './listener'
 import { UnistylesRegistry } from './registry'
+import { UnistylesRuntime } from './runtime'
 import { createDoubleMap, extractHiddenProperties, extractSecrets, isInDocument } from './utils'
 import { getVariants } from './variants'
 
@@ -20,17 +21,17 @@ class UnistylesShadowRegistryBuilder {
     private readonly disposeMap = createDoubleMap<HTMLElement, string, VoidFunction | undefined>()
     private readonly stylesMap = createDoubleMap<HTMLElement, string, HTMLStyleElement>()
 
-    add = (ref: any, style: UnistylesValues | ((...args: Array<any>) => UnistylesValues)) => {
+    add = (ref: any, _style: UnistylesValues | ((...args: Array<any>) => UnistylesValues), _variants: Record<string, any>, _args?: Array<any>) => {
         if (ref === null) {
             // Remove style tags from the document
-            const { __uni__refs } = extractSecrets(style)
+            const { __uni__refs } = extractSecrets(_style)
 
             __uni__refs.forEach(ref => {
                 if (isInDocument(ref)) {
                     return
                 }
 
-                this.remove(ref, style)
+                this.remove(ref, _style)
             })
 
             return
@@ -40,10 +41,15 @@ class UnistylesShadowRegistryBuilder {
             return
         }
 
-        const { __uni__key, __uni__stylesheet, __uni__refs, __uni__args = [], __uni__variants = {} } = extractSecrets(style)
+        const { __uni__key, __uni__stylesheet, __uni__refs, __uni__args = [], __uni__variants = {} } = extractSecrets(_style)
 
+        const newComputedStylesheet = typeof __uni__stylesheet === 'function'
+            ? __uni__stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
+            : __uni__stylesheet
+        const style = newComputedStylesheet[__uni__key]
+        const args = _args ?? __uni__args
         const resultHidden = typeof style === 'function'
-            ? style(...__uni__args)
+            ? style(...args)
             : style
         const result = extractHiddenProperties(resultHidden)
         const { variants } = Object.fromEntries(getVariants({ variants: result }, __uni__variants))
@@ -59,7 +65,7 @@ class UnistylesShadowRegistryBuilder {
         this.disposeMap.set(ref, __uni__key, listenToDependencies({
             key: __uni__key,
             stylesheet: __uni__stylesheet,
-            args: __uni__args,
+            args,
             className: webUnistyle.className,
             unistyles: webUnistyle.unistyles,
         }))
