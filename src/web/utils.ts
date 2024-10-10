@@ -87,7 +87,7 @@ type UnistyleSecrets = {
     __uni__args?: Array<any>
 }
 
-export const assignSecrets = (object: any, secrets: UnistyleSecrets) => {
+export const assignSecrets = <T>(object: T, secrets: UnistyleSecrets) => {
     Object.defineProperties(object, reduceObject(secrets, value => ({
         value,
         enumerable: false,

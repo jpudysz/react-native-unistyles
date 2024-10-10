@@ -32,13 +32,11 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
                 })
             }
 
-            assignSecrets(dynamicStyle, {
+            return assignSecrets(dynamicStyle, {
                 __uni__key: key,
                 __uni__refs: new Set(),
                 __uni__stylesheet: stylesheet
             })
-
-            return dynamicStyle
         }
 
         const { className, unistyles } = UnistylesRegistry.createStyles(value, key)
