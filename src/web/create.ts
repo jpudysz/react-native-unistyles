@@ -27,7 +27,7 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
                 return getStyles(resultWithVariants)
             }
 
-            assignSecrets(dynamicStyle, { stylesheet, key })
+            assignSecrets(dynamicStyle, { stylesheet, key, refs: new Set() })
 
             return dynamicStyle
         }
@@ -37,7 +37,7 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
         listenToDependencies({ key, unistyles, className, stylesheet })
 
         const staticStyle = getStyles(value)
-        assignSecrets(staticStyle, { stylesheet, key })
+        assignSecrets(staticStyle, { stylesheet, key, refs: new Set() })
 
         return staticStyle
     }) as ReactNativeStyleSheet<StyleSheet>

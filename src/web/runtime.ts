@@ -191,8 +191,6 @@ class UnistylesRuntimeBuilder {
 
         UnistylesState.themes.set(themeName, updater(oldTheme))
     }
-
-    getSSRUnistyles = () => UnistylesState.tags
 }
 
 export const UnistylesRuntime = new UnistylesRuntimeBuilder()

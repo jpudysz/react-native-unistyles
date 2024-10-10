@@ -80,8 +80,9 @@ export const equal = <T>(a: T, b: T) => {
 }
 
 type UnistyleSecrets = {
-    stylesheet: StyleSheetWithSuperPowers<StyleSheet>
-    key: string
+    stylesheet: StyleSheetWithSuperPowers<StyleSheet>,
+    key: string,
+    refs: Set<HTMLElement>
 }
 
 export const assignSecrets = (object: any, secrets: UnistyleSecrets) => {
@@ -105,3 +106,49 @@ export const getStyles = (values: UnistylesValues) => {
 
     return returnValue
 }
+
+export const createDoubleMap = <TKey, TSecondKey, TValue>() => {
+    const map = new Map<TKey, Map<TSecondKey, TValue>>()
+
+    return {
+        get: (key: TKey, secondKey: TSecondKey) => {
+            const mapForKey = map.get(key)
+
+            if (!mapForKey) {
+                return undefined
+            }
+
+            return mapForKey.get(secondKey)
+        },
+        set: (key: TKey, secondKey: TSecondKey, value: TValue) => {
+            const mapForKey = map.get(key) ?? new Map<TSecondKey, TValue>()
+
+            map.set(key, mapForKey)
+            mapForKey.set(secondKey, value)
+        },
+        delete: (key: TKey, secondKey: TSecondKey) => {
+            const mapForKey = map.get(key)
+
+            if (!mapForKey) {
+                return
+            }
+
+            mapForKey.delete(secondKey)
+        },
+        forEach: (callback: (key: TKey, secondKey: TSecondKey, value: TValue) => void) => {
+            map.forEach((mapForKey, key) => {
+                mapForKey.forEach((value, secondKey) => {
+                    callback(key, secondKey, value)
+                })
+            })
+        }
+    }
+}
+
+export const extractHiddenProperties = (object: any) => {
+    const hiddenProperties = Object.getOwnPropertyNames(object)
+
+    return Object.fromEntries(hiddenProperties.map(key => [key, object[key]]))
+}
+
+export const isInDocument = (element: HTMLElement) => document.body.contains(element)
