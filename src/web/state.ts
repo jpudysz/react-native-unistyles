@@ -1,4 +1,3 @@
-import { type ReactElement, createElement, createRef } from 'react'
 import type { UnistylesTheme } from '../types'
 import type { UnistylesConfig } from '../specs/StyleSheet'
 import type { AppBreakpoint, AppThemeName } from '../specs/types'
@@ -10,7 +9,6 @@ import { UnistyleDependency } from '../specs/NativePlatform'
 
 class UnistylesStateBuilder {
     private readonly isSSR = isServer()
-    readonly tags = [] as Array<ReactElement>
 
     themes = new Map<string, UnistylesTheme>()
     themeName?: AppThemeName
@@ -100,48 +98,6 @@ class UnistylesStateBuilder {
                     UnistylesListener.emitChange(UnistyleDependency.Breakpoints)
                 })
             })
-    }
-
-    createTag() {
-        if (!this.isSSR) {
-            const tag = document.createElement('style')
-
-            document.head.appendChild(tag)
-
-            return tag
-        }
-
-        const tagRef = new Proxy(createRef<HTMLStyleElement>(), {
-            set: (target, prop, value) => {
-                // When ref is assigned
-                if ('textContent' in value) {
-                    value.textContent = tag.textContent
-                }
-
-                return Reflect.set(target, prop, value)
-            }
-        })
-        const tagElement = createElement('style', { ref: tagRef, key: this.tags.length }, '')
-        const tag = new Proxy({ textContent: '' }, {
-            set: (target, prop, value) => {
-                if (prop !== 'textContent') {
-                    return false
-                }
-
-                // When css is updated
-                target.textContent = value
-
-                if (tagRef.current) {
-                    tagRef.current.textContent = value
-                }
-
-                return true
-            }
-        })
-
-        this.tags.push(tagElement)
-
-        return tag
     }
 }
 
