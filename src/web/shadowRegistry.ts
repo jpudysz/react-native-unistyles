@@ -20,12 +20,12 @@ class UnistylesShadowRegistryBuilder {
     private readonly disposeMap = createDoubleMap<HTMLElement, string, VoidFunction | undefined>()
     private readonly stylesMap = createDoubleMap<HTMLElement, string, HTMLStyleElement>()
 
-    add = (ref: any, style: UnistylesValues | ((...args: Array<any>) => UnistylesValues), uni_variants: Record<string, any> = {}, args: Array<any> = []) => {
+    add = (ref: any, style: UnistylesValues | ((...args: Array<any>) => UnistylesValues)) => {
         if (ref === null) {
             // Remove style tags from the document
-            const { refs } = extractSecrets(style)
+            const { __uni__refs } = extractSecrets(style)
 
-            refs.forEach(ref => {
+            __uni__refs.forEach(ref => {
                 if (isInDocument(ref)) {
                     return
                 }
@@ -40,25 +40,26 @@ class UnistylesShadowRegistryBuilder {
             return
         }
 
-        const { key, stylesheet, refs } = extractSecrets(style)
+        const { __uni__key, __uni__stylesheet, __uni__refs, __uni__args = [], __uni__variants = {} } = extractSecrets(style)
+
         const resultHidden = typeof style === 'function'
-            ? style(...args)
+            ? style(...__uni__args)
             : style
         const result = extractHiddenProperties(resultHidden)
-        const { variants } = Object.fromEntries(getVariants({ variants: result }, uni_variants))
+        const { variants } = Object.fromEntries(getVariants({ variants: result }, __uni__variants))
         const resultWithVariants = {
             ...result,
             ...variants
         }
-        const storedWebUnistyle = this.webUnistylesMap.get(ref, key)
-        const webUnistyle = storedWebUnistyle ?? UnistylesRegistry.createStyles(resultWithVariants, key)
+        const storedWebUnistyle = this.webUnistylesMap.get(ref, __uni__key)
+        const webUnistyle = storedWebUnistyle ?? UnistylesRegistry.createStyles(resultWithVariants, __uni__key)
 
-        this.webUnistylesMap.set(ref, key, webUnistyle)
-        this.disposeMap.get(ref, key)?.()
-        this.disposeMap.set(ref, key, listenToDependencies({
-            key,
-            stylesheet,
-            args,
+        this.webUnistylesMap.set(ref, __uni__key, webUnistyle)
+        this.disposeMap.get(ref, __uni__key)?.()
+        this.disposeMap.set(ref, __uni__key, listenToDependencies({
+            key: __uni__key,
+            stylesheet: __uni__stylesheet,
+            args: __uni__args,
             className: webUnistyle.className,
             unistyles: webUnistyle.unistyles,
         }))
@@ -69,8 +70,8 @@ class UnistylesShadowRegistryBuilder {
             ref.classList.add(webUnistyle.className)
             webUnistyle.unistyles.setStylesTarget(styleTag)
             document.head.appendChild(styleTag)
-            refs.add(ref)
-            this.stylesMap.set(ref, key, styleTag)
+            __uni__refs.add(ref)
+            this.stylesMap.set(ref, __uni__key, styleTag)
         }
 
         if (storedWebUnistyle) {
@@ -79,13 +80,13 @@ class UnistylesShadowRegistryBuilder {
     }
 
     remove = (ref: HTMLElement, style: UnistylesValues | ((...args: Array<any>) => UnistylesValues)) => {
-        const { key } = extractSecrets(style)
+        const { __uni__key } = extractSecrets(style)
 
-        this.webUnistylesMap.delete(ref, key)
-        this.disposeMap.get(ref, key)?.()
-        this.disposeMap.delete(ref, key)
-        this.stylesMap.get(ref, key)?.remove()
-        this.stylesMap.delete(ref, key)
+        this.webUnistylesMap.delete(ref, __uni__key)
+        this.disposeMap.get(ref, __uni__key)?.()
+        this.disposeMap.delete(ref, __uni__key)
+        this.stylesMap.get(ref, __uni__key)?.remove()
+        this.stylesMap.delete(ref, __uni__key)
     }
 }
 

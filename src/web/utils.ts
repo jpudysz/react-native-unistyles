@@ -80,20 +80,30 @@ export const equal = <T>(a: T, b: T) => {
 }
 
 type UnistyleSecrets = {
-    stylesheet: StyleSheetWithSuperPowers<StyleSheet>,
-    key: string,
-    refs: Set<HTMLElement>
+    __uni__stylesheet: StyleSheetWithSuperPowers<StyleSheet>,
+    __uni__key: string,
+    __uni__refs: Set<HTMLElement>
+    __uni__variants?: Record<string, any>
+    __uni__args?: Array<any>
 }
 
 export const assignSecrets = (object: any, secrets: UnistyleSecrets) => {
-    Object.defineProperty(object, '__unistyles-secrets__', {
-        value: secrets,
+    Object.defineProperties(object, reduceObject(secrets, value => ({
+        value,
         enumerable: false,
         configurable: true
-    })
+    })))
+
+    return object
 }
 
-export const extractSecrets = (object: any): UnistyleSecrets => keyInObject(object, '__unistyles-secrets__') ? object['__unistyles-secrets__'] : {}
+export const extractSecrets = (object: any): UnistyleSecrets => ({
+    '__uni__args': object['__uni__args'],
+    '__uni__key': object['__uni__key'],
+    '__uni__refs': object['__uni__refs'],
+    '__uni__stylesheet': object['__uni__stylesheet'],
+    '__uni__variants': object['__uni__variants']
+})
 
 export const getStyles = (values: UnistylesValues) => {
     const returnValue = {}
