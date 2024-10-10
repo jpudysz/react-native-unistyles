@@ -14,9 +14,9 @@ pluginTester({
     },
     tests: [
         {
-            title: 'Does nothing if there is no import from Unistyles',
+            title: 'Does nothing if there is no import from React Native',
             code: `
-                import { StyleSheet } from 'react-native'
+                import { StyleSheet, View, Text } from 'custom-lib'
 
                 export const Example = () => {
                     return (
@@ -33,7 +33,7 @@ pluginTester({
                 })
             `,
             output: `
-                import { StyleSheet } from 'react-native'
+                import { StyleSheet, View, Text } from 'custom-lib'
 
                 export const Example = () => {
                     return (
@@ -51,9 +51,9 @@ pluginTester({
             `
         },
         {
-            title: 'Adds ref if there is any import from Unistyles',
+            title: 'Adds ref if there is any import from React Native',
             code: `
-                import 'react-native-unistyles'
+                import { View, Text } from 'react-native'
 
                 export const Example = () => {
                     return (
@@ -71,7 +71,7 @@ pluginTester({
             `,
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
-                import 'react-native-unistyles'
+                import { View, Text } from 'react-native'
 
                 export const Example = () => {
                     return (
@@ -95,9 +95,62 @@ pluginTester({
             `
         },
         {
+            title: 'Adds ref only for React Native components',
+            code: `
+                import { View } from 'react-native'
+                import { Text } from 'custom-lib'
+
+                export const Example = () => {
+                    return (
+                        <View style={styles.container}>
+                            <Text style={styles.text}>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: {
+                        backgroundColor: 'red'
+                    },
+                   text: {
+                        color: 'blue'
+                    }
+                })
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View } from 'react-native'
+                import { Text } from 'custom-lib'
+
+                export const Example = () => {
+                    return (
+                        <View
+                            style={styles.container}
+                            ref={ref => {
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
+                                return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                            }}
+                        >
+                            <Text style={styles.text}>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: {
+                        backgroundColor: 'red'
+                    },
+                    text: {
+                        color: 'blue'
+                    }
+                })
+            `
+        },
+        {
             title: 'Preserves user\'s ref',
             code: `
                 import React from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -122,6 +175,7 @@ pluginTester({
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import React from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -155,6 +209,7 @@ pluginTester({
             title: 'Preserves user\'s ref as function',
             code: `
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -182,6 +237,7 @@ pluginTester({
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -218,6 +274,7 @@ pluginTester({
             title: 'Preserves user\'s ref as function with cleanup',
             code: `
                 import React from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -249,6 +306,7 @@ pluginTester({
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import React from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -288,6 +346,7 @@ pluginTester({
             title: 'Preserves user\'s ref as assigned arrow function',
             code: `
                 import React from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -320,6 +379,7 @@ pluginTester({
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import React from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -362,6 +422,7 @@ pluginTester({
             title: 'Preserves user\'s ref as assigned function function',
             code: `
                 import React from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -394,6 +455,7 @@ pluginTester({
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import React from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -436,6 +498,7 @@ pluginTester({
             title: 'Should not modify ref if user is using inline styles',
             code: `
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -461,6 +524,7 @@ pluginTester({
             `,
             output: `
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -492,6 +556,7 @@ pluginTester({
             title: 'Should not modify ref if user is not member accessing styles',
             code: `
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -518,6 +583,7 @@ pluginTester({
             `,
             output: `
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -550,6 +616,7 @@ pluginTester({
             title: 'Should not modify ref if user is not member accessing styles in array',
             code: `
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -573,6 +640,7 @@ pluginTester({
             `,
             output: `
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -599,6 +667,7 @@ pluginTester({
             title: 'Should modify ref if user is using spreads on styles',
             code: `
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -628,6 +697,7 @@ pluginTester({
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -666,6 +736,7 @@ pluginTester({
             title: 'Should modify ref if user is using array for styles',
             code: `
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -695,6 +766,7 @@ pluginTester({
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -733,6 +805,7 @@ pluginTester({
             title: 'Should modify ref if user is using single style in array',
             code: `
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -757,6 +830,7 @@ pluginTester({
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -790,6 +864,7 @@ pluginTester({
             title: 'Should modify ref if user is using dynamic function in array',
             code: `
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -816,6 +891,7 @@ pluginTester({
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -849,6 +925,7 @@ pluginTester({
             title: 'Should modify ref if user is using dynamic function in object',
             code: `
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -876,6 +953,7 @@ pluginTester({
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -909,6 +987,7 @@ pluginTester({
             title: 'It should extract variants and pass them to ShadowReigstry',
             code: `
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -947,6 +1026,7 @@ pluginTester({
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -995,6 +1075,7 @@ pluginTester({
             title: 'Should modify registry names if user changes name of member expression',
             code: `
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -1019,6 +1100,7 @@ pluginTester({
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import { useRef } from 'react'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -1051,6 +1133,7 @@ pluginTester({
         {
             title: 'Should pass ref for dynamic functions to bind it to shadow node',
             code: `
+                import { View } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -1072,6 +1155,7 @@ pluginTester({
             `,
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -1116,6 +1200,7 @@ pluginTester({
         {
             title: 'Should pass refs for dynamic functions',
             code: `
+                import { View } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -1135,6 +1220,7 @@ pluginTester({
             `,
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {

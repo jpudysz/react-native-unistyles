@@ -16,6 +16,7 @@ pluginTester({
         {
             title: 'Should detect dependencies in variants',
             code: `
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -44,6 +45,7 @@ pluginTester({
             `,
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -82,6 +84,7 @@ pluginTester({
         {
             title: 'Should detect dependencies in breakpoints',
             code: `
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -105,6 +108,7 @@ pluginTester({
             `,
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -140,6 +144,7 @@ pluginTester({
         {
             title: 'Should detect dependencies in calculations',
             code: `
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -160,6 +165,7 @@ pluginTester({
             `,
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -192,6 +198,7 @@ pluginTester({
         {
             title: 'Should detect dependencies in _web',
             code: `
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -273,6 +280,7 @@ pluginTester({
             `,
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -371,6 +379,7 @@ pluginTester({
         {
             title: 'Should allow user to use arrow functions with body for dynamic functions',
             code: `
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -398,6 +407,7 @@ pluginTester({
             `,
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
