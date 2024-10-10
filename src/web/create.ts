@@ -24,10 +24,19 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
                     ...variants[key]
                 }
 
-                return getStyles(resultWithVariants)
+                return assignSecrets(getStyles(resultWithVariants), {
+                    __uni__key: key,
+                    __uni__refs: new Set(),
+                    __uni__stylesheet: stylesheet,
+                    __uni__args: args
+                })
             }
 
-            assignSecrets(dynamicStyle, { stylesheet, key, refs: new Set() })
+            assignSecrets(dynamicStyle, {
+                __uni__key: key,
+                __uni__refs: new Set(),
+                __uni__stylesheet: stylesheet
+            })
 
             return dynamicStyle
         }
@@ -37,9 +46,13 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
         listenToDependencies({ key, unistyles, className, stylesheet })
 
         const staticStyle = getStyles(value)
-        assignSecrets(staticStyle, { stylesheet, key, refs: new Set() })
 
-        return staticStyle
+        return assignSecrets(staticStyle, {
+            __uni__key: key,
+            __uni__refs: new Set(),
+            __uni__stylesheet: stylesheet,
+            __uni__variants: {}
+        })
     }) as ReactNativeStyleSheet<StyleSheet>
 
     createUseVariants(styles, newVariants => {

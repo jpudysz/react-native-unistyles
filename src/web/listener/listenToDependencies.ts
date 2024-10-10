@@ -18,12 +18,13 @@ export const listenToDependencies = ({ key, className, unistyles, args = [], sty
     const newComputedStylesheet = typeof stylesheet === 'function'
         ? stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
         : stylesheet
-    const value = keyInObject(newComputedStylesheet, key) ? newComputedStylesheet[key] : undefined
+    const _value = keyInObject(newComputedStylesheet, key) ? newComputedStylesheet[key] : undefined
 
-    if (!value) {
+    if (!_value) {
         return
     }
 
+    const value = typeof _value === 'function' ? _value(...args) : _value
     const dependencies = ('uni__dependencies' in value ? value['uni__dependencies'] : []) as Array<UnistyleDependency>
 
     if (dependencies.length === 0) {
