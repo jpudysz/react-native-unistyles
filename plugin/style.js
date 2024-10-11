@@ -30,6 +30,15 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
         return getStyleMetadata(t, node.callee, node)
     }
 
+    // {styles}
+    if (t.isIdentifier(node)) {
+        return [{
+            styleObj: node.name,
+            styleProp: undefined,
+            dynamicFunction: undefined
+        }]
+    }
+
     return []
 }
 
@@ -41,7 +50,43 @@ function getStyleAttribute(t, path) {
     )
 }
 
+function styleAttributeToArray(t, path) {
+    const styleAttribute = getStyleAttribute(t, path)
+
+    // {{...style.container, ...style.container}}
+    if (t.isObjectExpression(styleAttribute.value.expression)) {
+        const properties = styleAttribute.value.expression.properties
+            .map(property => t.isSpreadElement(property)
+                ? property.argument
+                : t.objectExpression([property])
+            )
+
+        styleAttribute.value.expression = t.arrayExpression(properties)
+
+        return
+    }
+
+    // [{...style.container, ...style.container}]
+    if (t.isArrayExpression(styleAttribute.value.expression)) {
+        const properties = styleAttribute.value.expression.elements
+            .flatMap(property => {
+                if (t.isSpreadElement(property)) {
+                    return property.argument
+                }
+
+                return property
+            })
+
+        styleAttribute.value.expression = t.arrayExpression(properties)
+
+        return
+    }
+
+    styleAttribute.value.expression = t.arrayExpression([styleAttribute.value.expression])
+}
+
 module.exports = {
     getStyleMetadata,
-    getStyleAttribute
+    getStyleAttribute,
+    styleAttributeToArray
 }

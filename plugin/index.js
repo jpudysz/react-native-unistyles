@@ -1,8 +1,28 @@
 const addShadowRegistryImport = require('./import')
-const { getStyleMetadata, getStyleAttribute } = require('./style')
+const { getStyleMetadata, getStyleAttribute, styleAttributeToArray } = require('./style')
 const { getRefProp, addRef, overrideRef, hasStringRef } = require('./ref')
 const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyle } = require('./stylesheet')
 const { isUsingVariants, extractVariants } = require('./variants')
+
+const reactNativeComponentNames = [
+    'View',
+    'Text',
+    'Image',
+    'ImageBackground',
+    'KeyboardAvoidingView',
+    'Modal',
+    'Pressable',
+    'ScrollView',
+    'FlatList',
+    'SectionList',
+    'Switch',
+    'Text',
+    'TextInput',
+    'TouchableHighlight',
+    'TouchableOpacity',
+    'TouchableWithoutFeedback',
+    'VirtualizedList'
+]
 
 module.exports = function ({ types: t }) {
     return {
@@ -14,6 +34,7 @@ module.exports = function ({ types: t }) {
                     state.file.hasUnistylesImport = false
                     state.file.styleSheetLocalName = ''
                     state.file.tagNumber = 0
+                    state.reactNativeImports = {}
                 },
                 exit(path, state) {
                     if (state.file.hasAnyUnistyle) {
@@ -33,9 +54,21 @@ module.exports = function ({ types: t }) {
                         }
                     })
                 }
+
+                if (importSource.includes('react-native')) {
+                    path.node.specifiers.forEach(specifier => {
+                        if (specifier.imported && reactNativeComponentNames.includes(specifier.imported.name)) {
+                            state.reactNativeImports[specifier.local.name] = true
+                        }
+                    })
+                }
             },
             JSXElement(path, state) {
-                if (!state.file.hasUnistylesImport) {
+                const openingElement = path.node.openingElement
+                const openingElementName = openingElement.name.name
+                const isReactNativeComponent = Boolean(state.reactNativeImports[openingElementName])
+
+                if (!isReactNativeComponent) {
                     return
                 }
 
@@ -48,10 +81,12 @@ module.exports = function ({ types: t }) {
 
                 const metadata = getStyleMetadata(t, styleAttr.value.expression)
 
-                // style prop is not using object expression
+                // style prop is using unexpected expression
                 if (metadata.length === 0) {
                     return
                 }
+
+                styleAttributeToArray(t, path)
 
                 // to add import
                 state.file.hasAnyUnistyle = true

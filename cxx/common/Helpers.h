@@ -116,6 +116,16 @@ inline Variants variantsToPairs(jsi::Runtime& rt, jsi::Object&& variants) {
     return pairs;
 }
 
+inline jsi::Object variantsToValue(jsi::Runtime& rt, Variants& variants) {
+    jsi::Object rawVariants = jsi::Object(rt);
+    
+    std::for_each(variants.begin(), variants.end(), [&](std::pair<std::string, std::string>& pair){
+        rawVariants.setProperty(rt, pair.first.c_str(), jsi::String::createFromUtf8(rt, pair.second));
+    });
+    
+    return rawVariants;
+}
+
 inline std::vector<folly::dynamic> parseDynamicFunctionArguments(jsi::Runtime& rt, jsi::Array& arguments) {
     std::vector<folly::dynamic> parsedArgument{};
     size_t count = arguments.size(rt);

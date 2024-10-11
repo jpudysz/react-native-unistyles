@@ -11,6 +11,7 @@
 #include "Parser.h"
 #include "ShadowTreeManager.h"
 #include "UnistylesCommitHook.h"
+#include "UnistylesMountHook.h"
 
 using namespace margelo::nitro::unistyles;
 using namespace facebook::react;
@@ -19,6 +20,7 @@ struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
     HybridStyleSheet(std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime, std::shared_ptr<UIManager> uiManager)
         : HybridObject(TAG), _unistylesRuntime{unistylesRuntime} {
             this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(uiManager, unistylesRuntime);
+            this->_unistylesMountHook = std::make_shared<core::UnistylesMountHook>(uiManager, unistylesRuntime);
             this->_unistylesRuntime->registerPlatformListener(
                   std::bind(&HybridStyleSheet::onPlatformDependenciesChange, this, std::placeholders::_1)
             );
@@ -57,5 +59,6 @@ private:
     double __unid = -1;
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
     std::shared_ptr<core::UnistylesCommitHook> _unistylesCommitHook;
+    std::shared_ptr<core::UnistylesMountHook> _unistylesMountHook;
 };
 
