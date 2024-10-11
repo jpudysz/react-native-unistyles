@@ -16,6 +16,7 @@ pluginTester({
         {
             title: 'Should not add dependencies to StyleSheet if user is not using theme or miniRuntime',
             code: `
+            import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -34,12 +35,13 @@ pluginTester({
             `,
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
                         <View
-                            style={styles.container}
+                            style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
@@ -63,6 +65,7 @@ pluginTester({
         {
             title: 'Should add dependencies to StyleSheet if user is using theme',
             code: `
+            import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -81,12 +84,13 @@ pluginTester({
             `,
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
                         <View
-                            style={styles.container}
+                            style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
@@ -111,6 +115,7 @@ pluginTester({
         {
             title: 'Should add dependencies to StyleSheet even if user did rename import',
             code: `
+                import { View, Text } from 'react-native'
                 import { StyleSheet as ST } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -129,12 +134,13 @@ pluginTester({
             `,
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet as ST } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
                         <View
-                            style={styles.container}
+                            style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
@@ -159,6 +165,7 @@ pluginTester({
         {
             title: 'Should detect variants for object StyleSheet',
             code: `
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -178,12 +185,13 @@ pluginTester({
             `,
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
                         <View
-                            style={styles.container}
+                            style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
@@ -209,6 +217,7 @@ pluginTester({
         {
             title: 'Should detect variants for object StyleSheet and dynamic function',
             code: `
+            import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -228,12 +237,13 @@ pluginTester({
             `,
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
                         <View
-                            style={styles.container}
+                            style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
@@ -259,6 +269,7 @@ pluginTester({
         {
             title: 'Should detect miniRuntime dependency',
             code: `
+            import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -279,12 +290,13 @@ pluginTester({
             `,
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
                         <View
-                            style={styles.container}
+                            style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
@@ -311,6 +323,7 @@ pluginTester({
         {
             title: 'Should detect miniRuntime and theme dependencies even if user renamed it\'s names',
             code: `
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -331,12 +344,13 @@ pluginTester({
             `,
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
                         <View
-                            style={styles.container}
+                            style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
@@ -363,6 +377,7 @@ pluginTester({
         {
             title: 'Should detect dependencies in function',
             code: `
+            import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -385,12 +400,13 @@ pluginTester({
             `,
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
                         <View
-                            style={styles.container}
+                            style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
@@ -416,6 +432,7 @@ pluginTester({
         {
             title: 'Should generates two different ids for 2 stylesheets in the same file',
             code: `
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -447,12 +464,13 @@ pluginTester({
             `,
             output: `
                 import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
                         <View
-                            style={styles.container}
+                            style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)

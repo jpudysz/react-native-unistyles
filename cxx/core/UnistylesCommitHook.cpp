@@ -21,6 +21,7 @@ RootShadowNode::Unshared core::UnistylesCommitHook::shadowTreeWillCommit(
     // skip only unistyles commits
     if (unistylesRootNode->hasUnistylesCommitTrait()) {
         unistylesRootNode->removeUnistylesCommitTrait();
+        unistylesRootNode->addUnistylesMountTrait();
         
         return newRootShadowNode;
     }

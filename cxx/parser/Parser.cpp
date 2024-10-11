@@ -146,7 +146,10 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleShee
         const jsi::Value *argStart = args.data();
 
         // call cached function with memoized arguments
-        auto functionResult = unistyleFn->proxiedFunction.value().callAsConstructor(rt, argStart, dynamicFunctionMetadata.size()).asObject(rt);
+        auto functionResult = unistyleFn->rawValue
+            .asFunction(rt)
+            .callAsConstructor(rt, argStart, dynamicFunctionMetadata.size())
+            .asObject(rt);
 
         unistyleFn->unprocessedValue = std::move(functionResult);
         unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
@@ -290,22 +293,23 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
         [this, unistylesRuntime, unistyle](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
             auto thisObject = thisVal.asObject(rt);
             auto parser = parser::Parser(unistylesRuntime);
-
+            
             // call user function
             auto result = unistyle->rawValue.asFunction(rt).call(rt, args, count);
 
             // memoize metadata to call it later
             auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyle);
-            jsi::Array arguments = jsi::Array(rt, count);
-
-            for (size_t i = 0; i < count; i++) {
-                arguments.setValueAtIndex(rt, i, args[i]);
-            }
 
             unistyleFn->unprocessedValue = jsi::Value(rt, result).asObject(rt);
 
-            // todo pass here variants
-            unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, std::nullopt);
+            jsi::Value rawVariants = thisObject.hasProperty(rt, helpers::STYLE_VARIANTS.c_str())
+                ? thisObject.getProperty(rt, helpers::STYLE_VARIANTS.c_str())
+                : jsi::Value::undefined();
+            std::optional<Variants> variants = rawVariants.isUndefined()
+                ? std::nullopt
+                : std::optional<Variants>(helpers::variantsToPairs(rt, rawVariants.asObject(rt)));
+            
+            unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
             unistyleFn->seal();
 
             return jsi::Value(rt, unistyleFn->parsedStyle.value());

@@ -4,6 +4,7 @@ import {Text} from 'react-native'
 import {StyleSheet} from 'react-native-unistyles'
 
 interface TypographyProps extends PropsWithChildren {
+    value: number,
     isBold?: boolean,
     isCentered?: boolean,
     isPrimary?: boolean,
@@ -15,7 +16,8 @@ export const Typography: React.FunctionComponent<TypographyProps> = ({
     size,
     isBold = false,
     isCentered = false,
-    isPrimary
+    isPrimary,
+    value,
 }) => {
     styles.useVariants({
         isBold,
@@ -25,14 +27,14 @@ export const Typography: React.FunctionComponent<TypographyProps> = ({
     })
 
     return (
-        <Text style={styles.title()}>
+        <Text style={styles.title(value)}>
             {children}
         </Text>
     )
 }
 
 const styles = StyleSheet.create((theme, rt) => ({
-    title: () => ({
+    title: (value: number) => ({
         variants: {
             isBold: {
                 true: {
@@ -54,13 +56,13 @@ const styles = StyleSheet.create((theme, rt) => ({
             },
             size: {
                 small: {
-                    fontSize: rt.fontScale * 10
+                    fontSize: rt.fontScale * 10 * value
                 },
                 large: {
-                    fontSize: rt.fontScale * 30
+                    fontSize: rt.fontScale * 30 * value
                 },
                 default: {
-                    fontSize: rt.fontScale * 20
+                    fontSize: rt.fontScale * 20 * value
                 }
             }
         },
