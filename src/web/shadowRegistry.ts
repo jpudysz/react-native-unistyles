@@ -7,6 +7,7 @@ import { getVariants } from './variants'
 
 type WebUnistyle = ReturnType<typeof UnistylesRegistry.createStyles>
 
+type Style = UnistylesValues | ((...args: Array<any>) => UnistylesValues)
 
 class UnistylesShadowRegistryBuilder {
     // MOCKS
@@ -21,13 +22,26 @@ class UnistylesShadowRegistryBuilder {
     private readonly disposeMap = createDoubleMap<HTMLElement, string, VoidFunction | undefined>()
     private readonly stylesMap = createDoubleMap<HTMLElement, string, HTMLStyleElement>()
 
-    add = (ref: any, _style?: UnistylesValues | ((...args: Array<any>) => UnistylesValues), _variants?: Record<string, any>, _args?: Array<any>) => {
-        if (!_style || !('__uni__key' in _style)) {
+    add = (ref: any, _style?: Style | Array<Style>, _variants?: Record<string, any>, _args?: Array<any>) => {
+        // Style is not provided
+        if (!_style) {
             return
         }
 
+        // Array of styles
+        if (Array.isArray(_style)) {
+            _style.forEach(style => this.add(ref, style, _variants, _args))
+
+            return
+        }
+
+        // Not a unistyle
+        if (!('__uni__key' in _style)) {
+            return
+        }
+
+        // Ref is unmounted, remove style tags from the document
         if (ref === null) {
-            // Remove style tags from the document
             const { __uni__refs } = extractSecrets(_style)
 
             __uni__refs.forEach(ref => {
@@ -41,6 +55,7 @@ class UnistylesShadowRegistryBuilder {
             return
         }
 
+        // Ref is not an HTMLElement
         if (!(ref instanceof HTMLElement)) {
             return
         }
@@ -89,7 +104,7 @@ class UnistylesShadowRegistryBuilder {
         }
     }
 
-    remove = (ref: HTMLElement, style: UnistylesValues | ((...args: Array<any>) => UnistylesValues)) => {
+    remove = (ref: HTMLElement, style: Style) => {
         const { __uni__key } = extractSecrets(style)
 
         this.webUnistylesMap.delete(ref, __uni__key)
