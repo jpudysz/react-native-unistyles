@@ -10,7 +10,7 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
     const computedStylesheet = typeof stylesheet === 'function'
         ? stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
         : stylesheet
-    let lastlySelectedVariants: Record<string, any> = {}
+    const lastlySelectedVariants = new Map<string, any>()
 
     const styles = reduceObject(computedStylesheet, (value, _key) => {
         const key = String(_key)
@@ -18,7 +18,7 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
         if (typeof value === 'function') {
             const dynamicStyle = (...args: Array<any>) => {
                 const result = value(...args)
-                const variants = Object.fromEntries(getVariants({ [key]: result } as ReactNativeStyleSheet<StyleSheet>, lastlySelectedVariants))
+                const variants = Object.fromEntries(getVariants({ [key]: result } as ReactNativeStyleSheet<StyleSheet>, Object.fromEntries(lastlySelectedVariants.entries())))
                 const resultWithVariants = {
                     ...result,
                     ...variants[key]
@@ -28,14 +28,16 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
                     __uni__key: key,
                     __uni__refs: new Set(),
                     __uni__stylesheet: stylesheet,
-                    __uni__args: args
+                    __uni__args: args,
+                    __uni__variants: Object.fromEntries(lastlySelectedVariants.entries())
                 })
             }
 
             return assignSecrets(dynamicStyle, {
                 __uni__key: key,
                 __uni__refs: new Set(),
-                __uni__stylesheet: stylesheet
+                __uni__stylesheet: stylesheet,
+                __uni__variants: Object.fromEntries(lastlySelectedVariants.entries())
             })
         }
 
@@ -49,12 +51,14 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
             __uni__key: key,
             __uni__refs: new Set(),
             __uni__stylesheet: stylesheet,
-            __uni__variants: {}
+            __uni__variants: Object.fromEntries(lastlySelectedVariants.entries())
         })
     }) as ReactNativeStyleSheet<StyleSheet>
 
     createUseVariants(styles, newVariants => {
-        lastlySelectedVariants = newVariants
+        Object.entries(newVariants).forEach(([key, value]) => {
+            lastlySelectedVariants.set(key, value)
+        })
     })
 
     return styles
