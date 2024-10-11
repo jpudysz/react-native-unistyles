@@ -21,7 +21,11 @@ class UnistylesShadowRegistryBuilder {
     private readonly disposeMap = createDoubleMap<HTMLElement, string, VoidFunction | undefined>()
     private readonly stylesMap = createDoubleMap<HTMLElement, string, HTMLStyleElement>()
 
-    add = (ref: any, _style: UnistylesValues | ((...args: Array<any>) => UnistylesValues), _variants: Record<string, any>, _args?: Array<any>) => {
+    add = (ref: any, _style?: UnistylesValues | ((...args: Array<any>) => UnistylesValues), _variants?: Record<string, any>, _args?: Array<any>) => {
+        if (!_style || !('__uni__key' in _style)) {
+            return
+        }
+
         if (ref === null) {
             // Remove style tags from the document
             const { __uni__refs } = extractSecrets(_style)
