@@ -1,5 +1,5 @@
 const addShadowRegistryImport = require('./import')
-const { getStyleMetadata, getStyleAttribute } = require('./style')
+const { getStyleMetadata, getStyleAttribute, styleAttributeToArray } = require('./style')
 const { getRefProp, addRef, overrideRef, hasStringRef } = require('./ref')
 const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyle } = require('./stylesheet')
 const { isUsingVariants, extractVariants } = require('./variants')
@@ -85,6 +85,8 @@ module.exports = function ({ types: t }) {
                 if (metadata.length === 0) {
                     return
                 }
+
+                styleAttributeToArray(t, path)
 
                 // to add import
                 state.file.hasAnyUnistyle = true
