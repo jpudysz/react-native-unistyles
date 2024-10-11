@@ -41,7 +41,7 @@ pluginTester({
                 export const Example = () => {
                     return (
                         <View
-                            style={[styles.container]}
+                            style={styles.container}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
@@ -90,7 +90,7 @@ pluginTester({
                 export const Example = () => {
                     return (
                         <View
-                            style={[styles.container]}
+                            style={styles.container}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
@@ -140,7 +140,7 @@ pluginTester({
                 export const Example = () => {
                     return (
                         <View
-                            style={[styles.container]}
+                            style={styles.container}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
@@ -191,7 +191,7 @@ pluginTester({
                 export const Example = () => {
                     return (
                         <View
-                            style={[styles.container]}
+                            style={styles.container}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
@@ -243,7 +243,7 @@ pluginTester({
                 export const Example = () => {
                     return (
                         <View
-                            style={[styles.container]}
+                            style={styles.container}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
@@ -296,7 +296,7 @@ pluginTester({
                 export const Example = () => {
                     return (
                         <View
-                            style={[styles.container]}
+                            style={styles.container}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
@@ -350,7 +350,7 @@ pluginTester({
                 export const Example = () => {
                     return (
                         <View
-                            style={[styles.container]}
+                            style={styles.container}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
@@ -406,7 +406,7 @@ pluginTester({
                 export const Example = () => {
                     return (
                         <View
-                            style={[styles.container]}
+                            style={styles.container}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)
@@ -470,7 +470,7 @@ pluginTester({
                 export const Example = () => {
                     return (
                         <View
-                            style={[styles.container]}
+                            style={styles.container}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(ref, styles.container)

@@ -835,7 +835,7 @@ pluginTester({
                     return (
                         <View
                             ref={myRef}
-                            style={[styles.container]}
+                            style={styles.container}
                         >
                             <Text>Hello world</Text>
                         </View>
@@ -864,7 +864,7 @@ pluginTester({
                                 UnistylesShadowRegistry.add(_ref, styles.container, undefined, undefined)
                                 return () => UnistylesShadowRegistry.remove(_ref, styles.container)
                             }}
-                            style={[styles.container]}
+                            style={styles.container}
                         >
                             <Text>Hello world</Text>
                         </View>
