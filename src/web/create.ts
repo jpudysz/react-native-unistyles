@@ -1,16 +1,23 @@
 import type { ReactNativeStyleSheet } from '../types'
 import type { StyleSheetWithSuperPowers, StyleSheet } from '../types/stylesheet'
-import { UnistylesRegistry } from './registry'
 import { assignSecrets, reduceObject, getStyles } from './utils'
 import { UnistylesRuntime } from './runtime'
 import { createUseVariants, getVariants } from './variants'
-import { listenToDependencies } from './listener'
 
 export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
     const computedStylesheet = typeof stylesheet === 'function'
         ? stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
         : stylesheet
-    const lastlySelectedVariants = new Map<string, any>()
+    const selectedVariants = new Map<string, any>()
+
+    const copyVariants = () => Object.fromEntries(selectedVariants.entries())
+    const addSecrets = (value: any, key: string, args?: Array<any>) => assignSecrets(value, {
+        __uni__key: key,
+        __uni__refs: new Set(),
+        __uni__stylesheet: stylesheet,
+        __uni__args: args,
+        __uni__variants: copyVariants()
+    })
 
     const styles = reduceObject(computedStylesheet, (value, _key) => {
         const key = String(_key)
@@ -18,48 +25,26 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
         if (typeof value === 'function') {
             const dynamicStyle = (...args: Array<any>) => {
                 const result = value(...args)
-                const variants = Object.fromEntries(getVariants({ [key]: result } as ReactNativeStyleSheet<StyleSheet>, Object.fromEntries(lastlySelectedVariants.entries())))
+                const variants = Object.fromEntries(getVariants({ [key]: result } as ReactNativeStyleSheet<StyleSheet>, copyVariants()))
                 const resultWithVariants = {
                     ...result,
                     ...variants[key]
                 }
 
-                return assignSecrets(getStyles(resultWithVariants), {
-                    __uni__key: key,
-                    __uni__refs: new Set(),
-                    __uni__stylesheet: stylesheet,
-                    __uni__args: args,
-                    __uni__variants: Object.fromEntries(lastlySelectedVariants.entries())
-                })
+                // Add secrets to result of dynamic styles function
+                return addSecrets(getStyles(resultWithVariants), key, args)
             }
 
-            return assignSecrets(dynamicStyle, {
-                __uni__key: key,
-                __uni__refs: new Set(),
-                __uni__stylesheet: stylesheet,
-                __uni__variants: Object.fromEntries(lastlySelectedVariants.entries())
-            })
+            // Add secrets to dynamic styles function
+            return addSecrets(dynamicStyle, key)
         }
 
-        const { className, unistyles } = UnistylesRegistry.createStyles(value, key)
-
-        listenToDependencies({ key, unistyles, className, stylesheet })
-
-        const staticStyle = getStyles(value)
-
-        return assignSecrets(staticStyle, {
-            __uni__key: key,
-            __uni__refs: new Set(),
-            __uni__stylesheet: stylesheet,
-            __uni__variants: Object.fromEntries(lastlySelectedVariants.entries())
-        })
+        // Add secrets to static styles
+        return addSecrets(getStyles(value), key)
     }) as ReactNativeStyleSheet<StyleSheet>
 
-    createUseVariants(styles, newVariants => {
-        Object.entries(newVariants).forEach(([key, value]) => {
-            lastlySelectedVariants.set(key, value)
-        })
-    })
+    // Inject useVariants hook to styles
+    createUseVariants(styles, newVariants => Object.entries(newVariants).forEach(([key, value]) => selectedVariants.set(key, value)))
 
     return styles
 }
