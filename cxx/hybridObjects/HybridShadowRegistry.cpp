@@ -14,7 +14,7 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
 
     auto& registry = core::UnistylesRegistry::get();
 
-    registry.linkShadowNodeWithUnistyle(&shadowNodeWrapper->getFamily(), unistyleWrapper, variants, arguments);
+    registry.linkShadowNodeWithUnistyle(rt, &shadowNodeWrapper->getFamily(), unistyleWrapper, variants, arguments);
 
     return jsi::Value::undefined();
 }
@@ -27,7 +27,7 @@ jsi::Value HybridShadowRegistry::unlink(jsi::Runtime &rt, const jsi::Value &this
 
     auto& registry = core::UnistylesRegistry::get();
 
-    registry.unlinkShadowNodeWithUnistyle(&shadowNodeWrapper->getFamily(), unistyleWrapper);
+    registry.unlinkShadowNodeWithUnistyle(rt, &shadowNodeWrapper->getFamily(), unistyleWrapper);
 
     return jsi::Value::undefined();
 }

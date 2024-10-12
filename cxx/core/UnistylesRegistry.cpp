@@ -72,26 +72,31 @@ void core::UnistylesRegistry::updateTheme(jsi::Runtime& rt, std::string& themeNa
 }
 
 void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
+    jsi::Runtime& rt,
     const ShadowNodeFamily* shadowNodeFamily,
     const core::Unistyle::Shared unistyle,
     Variants& variants,
     std::vector<folly::dynamic>& arguments
 ) {
-    if (!this->_shadowRegistry.contains(shadowNodeFamily)) {
-        this->_shadowRegistry[shadowNodeFamily] = {};
+    if (!this->_shadowRegistry[&rt].contains(shadowNodeFamily)) {
+        this->_shadowRegistry[&rt][shadowNodeFamily] = {};
     }
 
-    this->_shadowRegistry[shadowNodeFamily].emplace_back(std::make_shared<UnistyleData>(unistyle, variants, arguments));
+    this->_shadowRegistry[&rt][shadowNodeFamily].emplace_back(std::make_shared<UnistyleData>(unistyle, variants, arguments));
 }
 
-void core::UnistylesRegistry::unlinkShadowNodeWithUnistyle(const ShadowNodeFamily* shadowNodeFamily, const core::Unistyle::Shared unistyle) {
-    auto& unistylesVec = this->_shadowRegistry[shadowNodeFamily];
+void core::UnistylesRegistry::unlinkShadowNodeWithUnistyle(
+    jsi::Runtime& rt,
+    const ShadowNodeFamily* shadowNodeFamily,
+    const core::Unistyle::Shared unistyle
+) {
+    auto& unistylesVec = this->_shadowRegistry[&rt][shadowNodeFamily];
     auto it = std::find_if(unistylesVec.begin(), unistylesVec.end(), [unistyle](std::shared_ptr<UnistyleData> unistyleData){
         return unistyleData->unistyle == unistyle;
     });
 
     if (it != unistylesVec.end()) {
-        this->_shadowRegistry[shadowNodeFamily].erase(it);
+        this->_shadowRegistry[&rt][shadowNodeFamily].erase(it);
     }
 }
 
@@ -105,7 +110,7 @@ core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt
     DependencyMap dependencyMap;
     std::set<UnistyleDependency> uniqueDependencies(deps.begin(), deps.end());
     
-    for (const auto& [family, unistyles] : this->_shadowRegistry) {
+    for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
         for (const auto& unistyleData : unistyles) {
             bool hasAnyOfDependencies = std::any_of(
                 unistyleData->unistyle->dependencies.begin(),
@@ -135,7 +140,7 @@ core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt
 core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt) {
     DependencyMap dependencyMap;
     
-    for (const auto& [family, unistyles] : this->_shadowRegistry) {
+    for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
         for (const auto& unistyleData : unistyles) {
             dependencyMap[family].emplace_back(unistyleData);
         }
