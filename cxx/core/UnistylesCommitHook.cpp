@@ -25,12 +25,18 @@ RootShadowNode::Unshared core::UnistylesCommitHook::shadowTreeWillCommit(
         
         return newRootShadowNode;
     }
-
+    
+    unistylesRootNode->removeUnistylesMountTrait();
+    
+    auto& registry = core::UnistylesRegistry::get();
     auto shadowLeafUpdates = this->getUnistylesUpdates();
     
     if (shadowLeafUpdates.size() == 0) {
         return newRootShadowNode;
     }
+
+    // this is required, otherwise we end up with old shadow tree in mount hook
+    registry.trafficController.stopUnistylesTraffic();
     
     auto affectedNodes = shadow::ShadowTreeManager::findAffectedNodes(*rootNode, shadowLeafUpdates);
 

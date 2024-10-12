@@ -5,6 +5,7 @@
 #include "HybridUnistylesRuntime.h"
 #include "Parser.h"
 #include "ShadowTreeManager.h"
+#include "ShadowTrafficController.h"
 
 namespace margelo::nitro::unistyles::core {
 

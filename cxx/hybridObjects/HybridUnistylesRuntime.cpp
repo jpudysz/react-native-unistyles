@@ -192,7 +192,7 @@ jsi::Value HybridUnistylesRuntime::getMiniRuntimeAsValue(jsi::Runtime& rt) {
     obj.setProperty(rt, "rtl", JSIConverter<bool>::toJSI(rt, miniRuntime.rtl));
     obj.setProperty(rt, "statusBar", JSIConverter<Dimensions>::toJSI(rt, miniRuntime.statusBar));
     obj.setProperty(rt, "navigationBar", JSIConverter<Dimensions>::toJSI(rt, miniRuntime.navigationBar));
-
+    
     return obj;
 }
 
