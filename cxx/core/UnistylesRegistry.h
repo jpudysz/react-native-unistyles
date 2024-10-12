@@ -19,10 +19,7 @@ struct UnistylesState;
 using namespace facebook;
 using namespace facebook::react;
 
-using DependencyMap = std::unordered_map<
-    std::shared_ptr<core::StyleSheet>,
-    std::unordered_map<const ShadowNodeFamily*, std::vector<std::shared_ptr<UnistyleData>>>
->;
+using DependencyMap = std::unordered_map<const ShadowNodeFamily*, std::vector<std::shared_ptr<UnistyleData>>>;
 
 struct UnistylesRegistry: public StyleSheetRegistry {
     static UnistylesRegistry& get();

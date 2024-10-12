@@ -22,7 +22,7 @@ inline static Unistyle::Shared unistyleFromValue(jsi::Runtime& rt, const jsi::Va
     }
 
     auto obj = value.getObject(rt);
-    
+
     if (!obj.hasNativeState(rt)) {
         throw jsi::JSError(rt, R"(Unistyles: Style is not bound!
 
@@ -38,7 +38,7 @@ Copying a Unistyle style outside of a JSX element will remove its internal C++ s
 
 If you're mixing React Native and Unistyle StyleSheet styles, move your static styles into Unistyles to avoid conflicts.)");
     }
-    
+
     return obj.getNativeState<UnistyleWrapper>(rt)->unistyle;
 }
 
