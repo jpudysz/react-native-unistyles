@@ -531,7 +531,9 @@ bool parser::Parser::shouldApplyCompoundVariants(jsi::Runtime& rt, const Variant
         auto property = compoundVariant.getProperty(rt, variantKey.c_str());
         auto propertyName = property.isBool()
             ? (property.asBool() ? "true" : "false")
-            : property.asString(rt).utf8(rt);
+            : property.isString()
+                ? property.asString(rt).utf8(rt)
+                : "";
 
         if (propertyName != variantValue) {
             return false;

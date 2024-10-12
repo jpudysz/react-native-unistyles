@@ -25,16 +25,15 @@ void core::UnistylesMountHook::shadowTreeDidMount(RootShadowNode::Shared const &
         return;
     }
 
-    shadow::ShadowTreeManager::updateShadowTree(this->_unistylesRuntime->getRuntime(), shadowLeafUpdates);
+    shadow::ShadowTreeManager::updateShadowTree(*this->_rt, shadowLeafUpdates);
 }
 
 shadow::ShadowLeafUpdates core::UnistylesMountHook::getUnistylesUpdates() {
     auto& registry = core::UnistylesRegistry::get();
-    auto& rt = this->_unistylesRuntime->getRuntime();
     auto parser = parser::Parser(this->_unistylesRuntime);
-    auto dependencyMap = registry.buildDependencyMap(rt);
+    auto dependencyMap = registry.buildDependencyMap(*this->_rt);
 
-    parser.rebuildUnistylesInDependencyMap(rt, dependencyMap);
+    parser.rebuildUnistylesInDependencyMap(*this->_rt, dependencyMap);
 
     return parser.dependencyMapToShadowLeafUpdates(dependencyMap);
 }
