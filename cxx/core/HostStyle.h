@@ -22,7 +22,7 @@ struct JSI_EXPORT HostStyle : public jsi::HostObject {
 private:
     std::shared_ptr<StyleSheet> _styleSheet;
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
-    std::vector<std::pair<std::string, std::string>> _variants{};    
+    std::vector<std::pair<std::string, std::string>> _variants{};
 };
 
 }
