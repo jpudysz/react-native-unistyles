@@ -27,7 +27,7 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
 }
 
 HybridShadowRegistry.add = (handle, style, variants, args) => {
-    if (!handle) {
+    if (!handle || typeof style !== 'object') {
         return
     }
 

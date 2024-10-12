@@ -11,6 +11,7 @@
 #include "StyleSheet.h"
 #include "Unistyle.h"
 #include "UnistyleData.h"
+#include "ShadowTrafficController.h"
 
 namespace margelo::nitro::unistyles::core {
 
@@ -40,7 +41,8 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     std::shared_ptr<core::StyleSheet> addStyleSheet(jsi::Runtime& rt, int tag, core::StyleSheetType type, jsi::Object&& rawValue);
     DependencyMap buildDependencyMap(jsi::Runtime& rt, std::vector<UnistyleDependency>& deps);
     DependencyMap buildDependencyMap(jsi::Runtime& rt);
-
+    shadow::ShadowTrafficController trafficController{};
+    
 private:
     UnistylesRegistry() = default;
 

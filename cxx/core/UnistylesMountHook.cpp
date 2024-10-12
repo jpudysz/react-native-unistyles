@@ -12,12 +12,26 @@ void core::UnistylesMountHook::shadowTreeDidMount(RootShadowNode::Shared const &
     auto rootNode = std::const_pointer_cast<RootShadowNode>(rootShadowNode);
     auto unistylesRootNode = std::reinterpret_pointer_cast<core::UnistylesCommitShadowNode>(rootNode);
 
-    // skip only unistyles commits
+    // if this is Unistyles commit, do nothing
     if (unistylesRootNode->hasUnistylesMountTrait()) {
         unistylesRootNode->removeUnistylesMountTrait();
 
         return;
     }
+
+    // this is React Native commit
+    auto& registry = core::UnistylesRegistry::get();
+
+    registry.trafficController.resumeUnistylesTraffic();
+
+    // this will prevent crash when re-rendering view
+    // as Unistyles has nothing to commit yet, but dependency map
+    // will build all the shadow nodes
+    if (!registry.trafficController.hasUnistylesCommit()) {
+        return;
+    }
+
+    registry.trafficController.setHasUnistylesCommit(false);
 
     auto shadowLeafUpdates = this->getUnistylesUpdates();
 
