@@ -109,7 +109,7 @@ std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(jsi::Ru
 core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt, std::vector<UnistyleDependency>& deps) {
     DependencyMap dependencyMap;
     std::set<UnistyleDependency> uniqueDependencies(deps.begin(), deps.end());
-    
+
     for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
         for (const auto& unistyleData : unistyles) {
             bool hasAnyOfDependencies = std::any_of(
@@ -119,27 +119,27 @@ core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt
                     return std::find(uniqueDependencies.begin(), uniqueDependencies.end(), dep) != uniqueDependencies.end();
                 }
             );
-            
+
             if (!hasAnyOfDependencies) {
                 continue;
             }
-            
+
             // we need to take in count all unistyles from the shadowNode
             // as user might be using spreads and not all of them may have dependencies
             for (const auto& unistyleData : unistyles) {
                 dependencyMap[family].emplace_back(unistyleData);
             }
-            
+
             break;
         }
     }
-    
+
     return dependencyMap;
 }
 
 core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt) {
     DependencyMap dependencyMap;
-    
+
     for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
         for (const auto& unistyleData : unistyles) {
             dependencyMap[family].emplace_back(unistyleData);

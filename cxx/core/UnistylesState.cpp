@@ -91,5 +91,5 @@ int core::UnistylesState::parseColor(jsi::Value& maybeColor) {
     // we must convert it to uint32_t first, otherwise color will be broken
     uint32_t color = this->_processColorFn.get()->call(*_rt, maybeColor.asString(*_rt)).asNumber();
 
-    return color;
+    return color ? color : 0;
 }
