@@ -1269,6 +1269,81 @@ pluginTester({
                     921918562
                 )
             `
+        },
+        {
+            title: 'Should keep order of spreads',
+            code: `
+                import { View } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View style={{...styles.container, ...styles.secondProp, ...styles.thirdProp}} />
+                    )
+                }
+
+                const styles = StyleSheet.create(theme => ({
+                    container: {
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: theme.colors.backgroundColor
+                    },
+                    secondProp: {
+                        marginHorizontal: theme.gap(10),
+                        backgroundColor: 'red'
+                    },
+                    thirdProp: {
+                        backgroundColor: 'blue'
+                    }
+                }))
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View
+                            style={[styles.container, styles.secondProp, styles.thirdProp]}
+                            ref={ref => {
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
+                                UnistylesShadowRegistry.add(ref, styles.secondProp, undefined, undefined)
+                                UnistylesShadowRegistry.add(ref, styles.thirdProp, undefined, undefined)
+                                return () => {
+                                    ;(() => {
+                                        ;(() => UnistylesShadowRegistry.remove(ref, styles.container))()
+                                        UnistylesShadowRegistry.remove(ref, styles.secondProp)
+                                    })()
+                                    UnistylesShadowRegistry.remove(ref, styles.thirdProp)
+                                }
+                            }}
+                        />
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    theme => ({
+                        container: {
+                            flex: 1,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: theme.colors.backgroundColor,
+                            uni__dependencies: [0]
+                        },
+                        secondProp: {
+                            marginHorizontal: theme.gap(10),
+                            backgroundColor: 'red',
+                            uni__dependencies: [0]
+                        },
+                        thirdProp: {
+                            backgroundColor: 'blue'
+                        }
+                    }),
+                    921918562
+                )
+            `
         }
     ]
 })

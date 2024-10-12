@@ -104,57 +104,40 @@ std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(jsi::Ru
 core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt, std::vector<UnistyleDependency>& deps) {
     DependencyMap dependencyMap;
     std::set<UnistyleDependency> uniqueDependencies(deps.begin(), deps.end());
-
-    for (const auto& [_, styleSheet] : this->_styleSheetRegistry[&rt]) {
-        for (const auto& [_, unistyle] : styleSheet->unistyles) {
-            // check if in the given stylesheet we have unistyle
-            // that depends on something affected
+    
+    for (const auto& [family, unistyles] : this->_shadowRegistry) {
+        for (const auto& unistyleData : unistyles) {
             bool hasAnyOfDependencies = std::any_of(
-                unistyle->dependencies.begin(),
-                unistyle->dependencies.end(),
+                unistyleData->unistyle->dependencies.begin(),
+                unistyleData->unistyle->dependencies.end(),
                 [&uniqueDependencies](UnistyleDependency dep) {
                     return std::find(uniqueDependencies.begin(), uniqueDependencies.end(), dep) != uniqueDependencies.end();
                 }
             );
-
+            
             if (!hasAnyOfDependencies) {
                 continue;
             }
-
-            // if so, we need to find shadow family too
-            for (const auto& pair : this->_shadowRegistry) {
-                const auto& [family, unistyles] = pair;
-
-                for (const auto& unistyleData : unistyles) {
-                    if (unistyle != unistyleData->unistyle) {
-                        continue;
-                    }
-
-                    dependencyMap[styleSheet][family].emplace_back(unistyleData);
-                }
+            
+            // we need to take in count all unistyles from the shadowNode
+            // as user might be using spreads and not all of them may have dependencies
+            for (const auto& unistyleData : unistyles) {
+                dependencyMap[family].emplace_back(unistyleData);
             }
+            
+            break;
         }
     }
-
+    
     return dependencyMap;
 }
 
 core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt) {
     DependencyMap dependencyMap;
-
-    for (const auto& [_, styleSheet] : this->_styleSheetRegistry[&rt]) {
-        for (const auto& [_, unistyle] : styleSheet->unistyles) {
-            for (const auto& pair : this->_shadowRegistry) {
-                const auto& [family, unistyles] = pair;
-
-                for (const auto& unistyleData : unistyles) {
-                    if (unistyle != unistyleData->unistyle) {
-                        continue;
-                    }
-
-                    dependencyMap[styleSheet][family].emplace_back(unistyleData);
-                }
-            }
+    
+    for (const auto& [family, unistyles] : this->_shadowRegistry) {
+        for (const auto& unistyleData : unistyles) {
+            dependencyMap[family].emplace_back(unistyleData);
         }
     }
 

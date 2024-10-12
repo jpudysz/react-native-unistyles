@@ -6,7 +6,7 @@ import { Typography } from './Typography'
 
 export const App = () => {
     return (
-        <View style={styles.container}>
+        <View style={{...styles.container, ...styles.secondProp, ...styles.thirdProp}}>
             <Typography isBold isPrimary size="large" value={3}>
                 Hello World
             </Typography>
@@ -23,5 +23,12 @@ const styles = StyleSheet.create(theme => ({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: theme.colors.backgroundColor
+    },
+    secondProp: {
+        marginHorizontal: theme.gap(10),
+        backgroundColor: 'red'
+    },
+    thirdProp: {
+        backgroundColor: 'blue'
     }
 }))
