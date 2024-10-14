@@ -21,4 +21,5 @@ export { UnistylesRuntime } from './runtime'
 export { UnistylesShadowRegistry } from './shadowRegistry'
 export * from './mock'
 
+// TODO: Work on SSR
 export const getSSRUnistyles = () => []
