@@ -60,7 +60,7 @@ inline static jsi::Value valueFromUnistyle(jsi::Runtime& rt, Unistyle::Shared un
     auto hostFn = jsi::Value(rt, unistyleFn->proxiedFunction.value()).asObject(rt).asFunction(rt);
 
     hostFn.setNativeState(rt, std::move(wrappedUnistyle));
-    hostFn.setProperty(rt, helpers::UNISTYLES_ID.c_str(), unistyleFn->styleKey);
+    helpers::defineHiddenProperty(rt, hostFn, helpers::UNISTYLES_ID.c_str(), unistyleFn->styleKey);
 
     return std::move(hostFn);
 }

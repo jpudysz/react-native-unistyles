@@ -25,10 +25,13 @@ RootShadowNode::Unshared core::UnistylesCommitHook::shadowTreeWillCommit(
         
         return newRootShadowNode;
     }
-    
-    unistylesRootNode->removeUnistylesMountTrait();
-    
+
     auto& registry = core::UnistylesRegistry::get();
+    
+    if (!registry.trafficController.hasUnistylesCommit()) {
+        return newRootShadowNode;
+    }
+    
     auto shadowLeafUpdates = this->getUnistylesUpdates();
     
     if (shadowLeafUpdates.size() == 0) {

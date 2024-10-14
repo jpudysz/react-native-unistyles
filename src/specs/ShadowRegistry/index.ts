@@ -27,7 +27,13 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
 }
 
 HybridShadowRegistry.add = (handle, style, variants, args) => {
-    if (!handle || typeof style !== 'object') {
+    // virtualized nodes can be null
+    if (!handle || !style) {
+        return
+    }
+
+    // at this point unistyle can be only object or dynamic function
+    if (typeof style !== 'object' && typeof style !== 'function') {
         return
     }
 

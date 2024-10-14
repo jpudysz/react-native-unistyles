@@ -35,8 +35,6 @@ jsi::Value HybridStyleSheet::create(jsi::Runtime& rt, const jsi::Value &thisVal,
     auto style = std::make_shared<core::HostStyle>(registeredStyleSheet, this->_unistylesRuntime);
     auto styleHostObject = jsi::Object::createFromHostObject(rt, style);
 
-    registry.trafficController.setHasUnistylesCommit(true);
-    
     return styleHostObject;
 }
 
