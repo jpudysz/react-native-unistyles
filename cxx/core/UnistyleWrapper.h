@@ -21,7 +21,25 @@ inline static Unistyle::Shared unistyleFromValue(jsi::Runtime& rt, const jsi::Va
         return nullptr;
     }
 
-    return value.getObject(rt).getNativeState<UnistyleWrapper>(rt)->unistyle;
+    auto obj = value.getObject(rt);
+
+    if (!obj.hasNativeState(rt)) {
+        throw jsi::JSError(rt, R"(Unistyles: Style is not bound!
+
+Potential reasons:
+- You likely used the spread operator on a Unistyle style outside of a JSX component
+- You're mixing React Native's StyleSheet styles with Unistyles styles
+
+If you need to merge styles, do it within the style prop of your JSX component:
+
+style={{...styles.container, ...styles.otherProp}} or style={[styles.container, styles.otherProp]}
+
+Copying a Unistyle style outside of a JSX element will remove its internal C++ state, leading to unexpected behavior.
+
+If you're mixing React Native and Unistyle StyleSheet styles, move your static styles into Unistyles to avoid conflicts.)");
+    }
+
+    return obj.getNativeState<UnistyleWrapper>(rt)->unistyle;
 }
 
 inline static jsi::Value valueFromUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle) {

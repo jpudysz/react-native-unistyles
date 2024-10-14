@@ -72,26 +72,31 @@ void core::UnistylesRegistry::updateTheme(jsi::Runtime& rt, std::string& themeNa
 }
 
 void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
+    jsi::Runtime& rt,
     const ShadowNodeFamily* shadowNodeFamily,
     const core::Unistyle::Shared unistyle,
     Variants& variants,
     std::vector<folly::dynamic>& arguments
 ) {
-    if (!this->_shadowRegistry.contains(shadowNodeFamily)) {
-        this->_shadowRegistry[shadowNodeFamily] = {};
+    if (!this->_shadowRegistry[&rt].contains(shadowNodeFamily)) {
+        this->_shadowRegistry[&rt][shadowNodeFamily] = {};
     }
 
-    this->_shadowRegistry[shadowNodeFamily].emplace_back(std::make_shared<UnistyleData>(unistyle, variants, arguments));
+    this->_shadowRegistry[&rt][shadowNodeFamily].emplace_back(std::make_shared<UnistyleData>(unistyle, variants, arguments));
 }
 
-void core::UnistylesRegistry::unlinkShadowNodeWithUnistyle(const ShadowNodeFamily* shadowNodeFamily, const core::Unistyle::Shared unistyle) {
-    auto& unistylesVec = this->_shadowRegistry[shadowNodeFamily];
+void core::UnistylesRegistry::unlinkShadowNodeWithUnistyle(
+    jsi::Runtime& rt,
+    const ShadowNodeFamily* shadowNodeFamily,
+    const core::Unistyle::Shared unistyle
+) {
+    auto& unistylesVec = this->_shadowRegistry[&rt][shadowNodeFamily];
     auto it = std::find_if(unistylesVec.begin(), unistylesVec.end(), [unistyle](std::shared_ptr<UnistyleData> unistyleData){
         return unistyleData->unistyle == unistyle;
     });
 
     if (it != unistylesVec.end()) {
-        this->_shadowRegistry[shadowNodeFamily].erase(it);
+        this->_shadowRegistry[&rt][shadowNodeFamily].erase(it);
     }
 }
 
@@ -105,13 +110,11 @@ core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt
     DependencyMap dependencyMap;
     std::set<UnistyleDependency> uniqueDependencies(deps.begin(), deps.end());
 
-    for (const auto& [_, styleSheet] : this->_styleSheetRegistry[&rt]) {
-        for (const auto& [_, unistyle] : styleSheet->unistyles) {
-            // check if in the given stylesheet we have unistyle
-            // that depends on something affected
+    for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
+        for (const auto& unistyleData : unistyles) {
             bool hasAnyOfDependencies = std::any_of(
-                unistyle->dependencies.begin(),
-                unistyle->dependencies.end(),
+                unistyleData->unistyle->dependencies.begin(),
+                unistyleData->unistyle->dependencies.end(),
                 [&uniqueDependencies](UnistyleDependency dep) {
                     return std::find(uniqueDependencies.begin(), uniqueDependencies.end(), dep) != uniqueDependencies.end();
                 }
@@ -121,18 +124,13 @@ core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt
                 continue;
             }
 
-            // if so, we need to find shadow family too
-            for (const auto& pair : this->_shadowRegistry) {
-                const auto& [family, unistyles] = pair;
-
-                for (const auto& unistyleData : unistyles) {
-                    if (unistyle != unistyleData->unistyle) {
-                        continue;
-                    }
-
-                    dependencyMap[styleSheet][family].emplace_back(unistyleData);
-                }
+            // we need to take in count all unistyles from the shadowNode
+            // as user might be using spreads and not all of them may have dependencies
+            for (const auto& unistyleData : unistyles) {
+                dependencyMap[family].emplace_back(unistyleData);
             }
+
+            break;
         }
     }
 
@@ -142,19 +140,9 @@ core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt
 core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt) {
     DependencyMap dependencyMap;
 
-    for (const auto& [_, styleSheet] : this->_styleSheetRegistry[&rt]) {
-        for (const auto& [_, unistyle] : styleSheet->unistyles) {
-            for (const auto& pair : this->_shadowRegistry) {
-                const auto& [family, unistyles] = pair;
-
-                for (const auto& unistyleData : unistyles) {
-                    if (unistyle != unistyleData->unistyle) {
-                        continue;
-                    }
-
-                    dependencyMap[styleSheet][family].emplace_back(unistyleData);
-                }
-            }
+    for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
+        for (const auto& unistyleData : unistyles) {
+            dependencyMap[family].emplace_back(unistyleData);
         }
     }
 

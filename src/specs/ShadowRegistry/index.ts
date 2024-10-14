@@ -7,7 +7,7 @@ interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     add(handle?: ViewHandle, style?: Unistyle, variants?: Record<string, string | boolean>, args?: Array<any>): void,
     remove(handle?: ViewHandle, style?: Unistyle): void,
     // JSI
-    link(node: ShadowNode, style: Unistyle, variants?: Record<string, string | boolean>, args?: Array<any>): void,
+    link(node: ShadowNode, style?: Unistyle, variants?: Record<string, string | boolean>, args?: Array<any>): void,
     unlink(node: ShadowNode, style: Unistyle): void
 }
 
@@ -27,7 +27,7 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
 }
 
 HybridShadowRegistry.add = (handle, style, variants, args) => {
-    if (!handle || !style?.__unid) {
+    if (!handle || typeof style !== 'object') {
         return
     }
 

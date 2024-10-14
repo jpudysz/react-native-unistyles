@@ -12,12 +12,26 @@ void core::UnistylesMountHook::shadowTreeDidMount(RootShadowNode::Shared const &
     auto rootNode = std::const_pointer_cast<RootShadowNode>(rootShadowNode);
     auto unistylesRootNode = std::reinterpret_pointer_cast<core::UnistylesCommitShadowNode>(rootNode);
 
-    // skip only unistyles commits
+    // if this is Unistyles commit, do nothing
     if (unistylesRootNode->hasUnistylesMountTrait()) {
         unistylesRootNode->removeUnistylesMountTrait();
 
         return;
     }
+
+    // this is React Native commit
+    auto& registry = core::UnistylesRegistry::get();
+
+    registry.trafficController.resumeUnistylesTraffic();
+
+    // this will prevent crash when re-rendering view
+    // as Unistyles has nothing to commit yet, but dependency map
+    // will build all the shadow nodes
+    if (!registry.trafficController.hasUnistylesCommit()) {
+        return;
+    }
+
+    registry.trafficController.setHasUnistylesCommit(false);
 
     auto shadowLeafUpdates = this->getUnistylesUpdates();
 
@@ -25,16 +39,15 @@ void core::UnistylesMountHook::shadowTreeDidMount(RootShadowNode::Shared const &
         return;
     }
 
-    shadow::ShadowTreeManager::updateShadowTree(this->_unistylesRuntime->getRuntime(), shadowLeafUpdates);
+    shadow::ShadowTreeManager::updateShadowTree(*this->_rt, shadowLeafUpdates);
 }
 
 shadow::ShadowLeafUpdates core::UnistylesMountHook::getUnistylesUpdates() {
     auto& registry = core::UnistylesRegistry::get();
-    auto& rt = this->_unistylesRuntime->getRuntime();
     auto parser = parser::Parser(this->_unistylesRuntime);
-    auto dependencyMap = registry.buildDependencyMap(rt);
+    auto dependencyMap = registry.buildDependencyMap(*this->_rt);
 
-    parser.rebuildUnistylesInDependencyMap(rt, dependencyMap);
+    parser.rebuildUnistylesInDependencyMap(*this->_rt, dependencyMap);
 
     return parser.dependencyMapToShadowLeafUpdates(dependencyMap);
 }

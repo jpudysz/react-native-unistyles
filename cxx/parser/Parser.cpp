@@ -20,7 +20,8 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
             styleSheet->unistyles[styleKey] = std::make_shared<UnistyleDynamicFunction>(
                 UnistyleType::DynamicFunction,
                 styleKey,
-                styleValue
+                styleValue,
+                styleSheet
             );
 
             return;
@@ -29,7 +30,8 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
         styleSheet->unistyles[styleKey] = std::make_shared<Unistyle>(
             UnistyleType::Object,
             styleKey,
-            styleValue
+            styleValue,
+            styleSheet
         );
     });
 }
@@ -98,22 +100,22 @@ void parser::Parser::rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_
 
 // rebuild all unistyles that are affected by platform event
 void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, DependencyMap& dependencyMap) {
-    for (auto& [styleSheet, map] : dependencyMap) {
+    for (auto& [shadowNode, unistyles] : dependencyMap) {
+        auto styleSheet = unistyles.begin()->get()->unistyle->parent;
+        
         jsi::Object unwrappedStyleSheet = this->unwrapStyleSheet(rt, styleSheet);
 
-        for (auto& [shadowNode, unistyles] : map) {
-            for (auto& unistyleData : unistyles) {
-                auto& unistyle = unistyleData->unistyle;
+        for (auto& unistyleData : unistyles) {
+            auto& unistyle = unistyleData->unistyle;
 
-                // StyleSheet might have styles that are not affected
-                if (!unwrappedStyleSheet.hasProperty(rt, unistyle->styleKey.c_str())) {
-                    continue;
-                }
-
-                unistyle->rawValue = unwrappedStyleSheet.getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
-                this->rebuildUnistyle(rt, styleSheet, unistyle, unistyleData->variants, unistyleData->dynamicFunctionMetadata);
-                unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
+            // StyleSheet might have styles that are not affected
+            if (!unwrappedStyleSheet.hasProperty(rt, unistyle->styleKey.c_str())) {
+                continue;
             }
+
+            unistyle->rawValue = unwrappedStyleSheet.getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
+            this->rebuildUnistyle(rt, styleSheet, unistyle, unistyleData->variants, unistyleData->dynamicFunctionMetadata);
+            unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
         }
     }
 }
@@ -148,7 +150,7 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleShee
         // call cached function with memoized arguments
         auto functionResult = unistyleFn->rawValue
             .asFunction(rt)
-            .callAsConstructor(rt, argStart, dynamicFunctionMetadata.size())
+            .call(rt, argStart, dynamicFunctionMetadata.size())
             .asObject(rt);
 
         unistyleFn->unprocessedValue = std::move(functionResult);
@@ -160,21 +162,11 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleShee
 shadow::ShadowLeafUpdates parser::Parser::dependencyMapToShadowLeafUpdates(core::DependencyMap& dependencyMap) {
     shadow::ShadowLeafUpdates updates;
     auto& rt = this->_unistylesRuntime->getRuntime();
-
-    for (const auto& [styleSheet, map] : dependencyMap) {
-        for (const auto& [shadowNode, unistyles] : map) {
-            for (const auto& unistyleData : unistyles) {
-                auto rawProps = this->parseStylesToShadowTreeStyles(rt, unistyleData->parsedStyle.value());
-
-                if (updates.contains(shadowNode)) {
-                    updates[shadowNode].emplace_back(std::move(rawProps));
-
-                    continue;
-                }
-
-                updates.emplace(shadowNode, std::vector<RawProps>{std::move(rawProps)});
-            }
-        }
+    
+    for (const auto& [shadowNode, unistyles] : dependencyMap) {
+        auto rawProps = this->parseStylesToShadowTreeStyles(rt, unistyles);
+        
+        updates.emplace(shadowNode, std::move(rawProps));
     }
 
     return updates;
@@ -539,7 +531,9 @@ bool parser::Parser::shouldApplyCompoundVariants(jsi::Runtime& rt, const Variant
         auto property = compoundVariant.getProperty(rt, variantKey.c_str());
         auto propertyName = property.isBool()
             ? (property.asBool() ? "true" : "false")
-            : property.asString(rt).utf8(rt);
+            : property.isString()
+                ? property.asString(rt).utf8(rt)
+                : "";
 
         if (propertyName != variantValue) {
             return false;
@@ -617,18 +611,20 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, Unistyle::Shared u
     return parsedStyle;
 }
 
-// convert jsi::Object to RawValue with int colors
-RawProps parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, const jsi::Object& styles) {
+// convert unistyles to RawValue with int colors
+RawProps parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, const std::vector<std::shared_ptr<UnistyleData>>& unistyles) {
     jsi::Object convertedStyles = jsi::Object(rt);
     auto& state = core::UnistylesRegistry::get().getState(rt);
+    
+    for (const auto& unistyleData : unistyles) {
+        helpers::enumerateJSIObject(rt, unistyleData->parsedStyle.value(), [&](const std::string& propertyName, jsi::Value& propertyValue){
+            if (this->isColor(propertyName)) {
+                return convertedStyles.setProperty(rt, propertyName.c_str(), jsi::Value(state.parseColor(propertyValue)));
+            }
 
-    helpers::enumerateJSIObject(rt, styles, [&](const std::string& propertyName, jsi::Value& propertyValue){
-        if (this->isColor(propertyName)) {
-            return convertedStyles.setProperty(rt, propertyName.c_str(), jsi::Value(state.parseColor(propertyValue)));
-        }
-
-        convertedStyles.setProperty(rt, propertyName.c_str(), propertyValue);
-    });
+            convertedStyles.setProperty(rt, propertyName.c_str(), propertyValue);
+        });
+    }
 
     return RawProps(rt, std::move(convertedStyles));
 }
