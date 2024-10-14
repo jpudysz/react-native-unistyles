@@ -73,7 +73,6 @@ function styleAttributeToArray(t, path) {
                 if (t.isSpreadElement(property)) {
                     return property.argument
                 }
-
                 return property
             })
 

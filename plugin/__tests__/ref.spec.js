@@ -553,6 +553,135 @@ pluginTester({
             `
         },
         {
+            title: 'Should modify ref if user is not member accessing styles',
+            code: `
+                import { useRef } from 'react'
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    const myRef = useRef()
+
+                    return (
+                        <View
+                            ref={myRef}
+                            style={{
+                                ...obj1,
+                                ...obj2
+                            }}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: {
+                        backgroundColor: 'red'
+                    }
+                })
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { useRef } from 'react'
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    const myRef = useRef()
+
+                    return (
+                        <View
+                            ref={_ref => {
+                                myRef.current = _ref
+                                UnistylesShadowRegistry.add(_ref, obj1, undefined, undefined)
+                                UnistylesShadowRegistry.add(_ref, obj2, undefined, undefined)
+                                return () => {
+                                    ;(() => UnistylesShadowRegistry.remove(_ref, obj1))()
+                                    UnistylesShadowRegistry.remove(_ref, obj2)
+                                }
+                            }}
+                            style={[obj1, obj2]}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    {
+                        container: {
+                            backgroundColor: 'red'
+                        }
+                    },
+                    921918562
+                )
+            `
+        },
+        {
+            title: 'Should modify ref if user is not member accessing styles in array',
+            code: `
+                import { useRef } from 'react'
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    const myRef = useRef()
+
+                    return (
+                        <View
+                            ref={myRef}
+                            style={[obj1, obj2]}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    container: {
+                        backgroundColor: 'red'
+                    }
+                })
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { useRef } from 'react'
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    const myRef = useRef()
+
+                    return (
+                        <View
+                            ref={_ref => {
+                                myRef.current = _ref
+                                UnistylesShadowRegistry.add(_ref, obj1, undefined, undefined)
+                                UnistylesShadowRegistry.add(_ref, obj2, undefined, undefined)
+                                return () => {
+                                    ;(() => UnistylesShadowRegistry.remove(_ref, obj1))()
+                                    UnistylesShadowRegistry.remove(_ref, obj2)
+                                }
+                            }}
+                            style={[obj1, obj2]}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    {
+                        container: {
+                            backgroundColor: 'red'
+                        }
+                    },
+                    921918562
+                )
+            `
+        },
+        {
             title: 'Should modify ref if user is using spreads on styles',
             code: `
                 import { useRef } from 'react'
@@ -703,7 +832,7 @@ pluginTester({
                     return (
                         <View
                             ref={myRef}
-                            style={[styles.container]}
+                            style={styles.container}
                         >
                             <Text>Hello world</Text>
                         </View>
@@ -1137,6 +1266,81 @@ pluginTester({
                             gap
                         })
                     },
+                    921918562
+                )
+            `
+        },
+        {
+            title: 'Should keep order of spreads',
+            code: `
+                import { View } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View style={{...styles.container, ...styles.secondProp, ...styles.thirdProp}} />
+                    )
+                }
+
+                const styles = StyleSheet.create(theme => ({
+                    container: {
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: theme.colors.backgroundColor
+                    },
+                    secondProp: {
+                        marginHorizontal: theme.gap(10),
+                        backgroundColor: 'red'
+                    },
+                    thirdProp: {
+                        backgroundColor: 'blue'
+                    }
+                }))
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View
+                            style={[styles.container, styles.secondProp, styles.thirdProp]}
+                            ref={ref => {
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
+                                UnistylesShadowRegistry.add(ref, styles.secondProp, undefined, undefined)
+                                UnistylesShadowRegistry.add(ref, styles.thirdProp, undefined, undefined)
+                                return () => {
+                                    ;(() => {
+                                        ;(() => UnistylesShadowRegistry.remove(ref, styles.container))()
+                                        UnistylesShadowRegistry.remove(ref, styles.secondProp)
+                                    })()
+                                    UnistylesShadowRegistry.remove(ref, styles.thirdProp)
+                                }
+                            }}
+                        />
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    theme => ({
+                        container: {
+                            flex: 1,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: theme.colors.backgroundColor,
+                            uni__dependencies: [0]
+                        },
+                        secondProp: {
+                            marginHorizontal: theme.gap(10),
+                            backgroundColor: 'red',
+                            uni__dependencies: [0]
+                        },
+                        thirdProp: {
+                            backgroundColor: 'blue'
+                        }
+                    }),
                     921918562
                 )
             `

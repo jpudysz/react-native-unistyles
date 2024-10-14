@@ -9,6 +9,13 @@ using AffectedNodes = std::unordered_map<const ShadowNodeFamily*, std::unordered
 void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime& rt, shadow::ShadowLeafUpdates& updates) {
     auto& uiManager = UIManagerBinding::getBinding(rt)->getUIManager();
     const auto &shadowTreeRegistry = uiManager.getShadowTreeRegistry();
+    auto& registry = core::UnistylesRegistry::get();
+    
+    if (registry.trafficController.shouldStop()) {
+        registry.trafficController.setHasUnistylesCommit(true);
+        
+        return;
+    }
 
     shadowTreeRegistry.enumerate([&updates, &rt](const ShadowTree& shadowTree, bool& stop){
         // we could iterate via updates and create multiple commits
@@ -106,14 +113,9 @@ ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(jsi::Runtime& rt
             *shadowNode.getContextContainer()
         };
 
-        updatedProps = shadowNode.getProps();
-
-        // we may have multiple Unistyles for single node, so we must apply them all
-        for (const auto& props: rawPropsIt->second) {
-            updatedProps = shadowNode
-                .getComponentDescriptor()
-                .cloneProps(propsParserContext, updatedProps, RawProps(props));
-        }
+        updatedProps = shadowNode
+            .getComponentDescriptor()
+            .cloneProps(propsParserContext, shadowNode.getProps(), RawProps(rawPropsIt->second));
     }
 
     return shadowNode.clone({

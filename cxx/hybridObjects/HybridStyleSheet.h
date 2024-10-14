@@ -18,9 +18,7 @@ using namespace facebook::react;
 
 struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
     HybridStyleSheet(std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime, std::shared_ptr<UIManager> uiManager)
-        : HybridObject(TAG), _unistylesRuntime{unistylesRuntime} {
-            this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(uiManager, unistylesRuntime);
-            this->_unistylesMountHook = std::make_shared<core::UnistylesMountHook>(uiManager, unistylesRuntime);
+        : HybridObject(TAG), _unistylesRuntime{unistylesRuntime}, _uiManager{uiManager} {
             this->_unistylesRuntime->registerPlatformListener(
                   std::bind(&HybridStyleSheet::onPlatformDependenciesChange, this, std::placeholders::_1)
             );
@@ -54,11 +52,13 @@ private:
     void verifyAndSelectTheme(jsi::Runtime &rt);
     void setThemeFromColorScheme(jsi::Runtime& rt);
     void loadExternalMethods(const jsi::Value& thisValue, jsi::Runtime& rt);
+    void registerHooks(jsi::Runtime& rt);
     void onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies);
 
     double __unid = -1;
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
     std::shared_ptr<core::UnistylesCommitHook> _unistylesCommitHook;
     std::shared_ptr<core::UnistylesMountHook> _unistylesMountHook;
+    std::shared_ptr<UIManager> _uiManager;
 };
 

@@ -7,6 +7,8 @@
 
 namespace margelo::nitro::unistyles::core {
 
+class StyleSheet;
+
 using namespace facebook;
 
 enum class UnistyleType {
@@ -17,8 +19,8 @@ enum class UnistyleType {
 struct Unistyle {
     using Shared = std::shared_ptr<Unistyle>;
 
-    Unistyle(UnistyleType type, std::string styleKey, jsi::Object& rawObject)
-        : styleKey{styleKey}, type{type}, rawValue{std::move(rawObject)} {}
+    Unistyle(UnistyleType type, std::string styleKey, jsi::Object& rawObject, std::shared_ptr<StyleSheet> styleSheet)
+        : styleKey{styleKey}, type{type}, rawValue{std::move(rawObject)}, parent{styleSheet} {}
     virtual ~Unistyle() = default;
 
     Unistyle(const Unistyle&) = delete;
@@ -29,6 +31,7 @@ struct Unistyle {
     jsi::Object rawValue;
     std::optional<jsi::Object> parsedStyle;
     std::vector<UnistyleDependency> dependencies{};
+    std::shared_ptr<StyleSheet> parent;
 
     inline void addDependency(UnistyleDependency dependency) {
         // we can't add dependencies if unistyle is sealed
@@ -62,8 +65,8 @@ struct UnistyleDynamicFunction: public Unistyle {
     // unprocessedValue <- object generated after calling proxy and user's original function
     // parsedStyle <- parsed with Unistyle's parser
 
-    UnistyleDynamicFunction(UnistyleType type, std::string styleKey, jsi::Object& rawObject)
-        : Unistyle(type, styleKey, rawObject) {}
+    UnistyleDynamicFunction(UnistyleType type, std::string styleKey, jsi::Object& rawObject, std::shared_ptr<StyleSheet> styleSheet)
+        : Unistyle(type, styleKey, rawObject, styleSheet) {}
 
     UnistyleDynamicFunction(const UnistyleDynamicFunction&) = delete;
     UnistyleDynamicFunction(UnistyleDynamicFunction&& other) = delete;

@@ -79,7 +79,6 @@ function overrideRef(t, path, refProp, metadata, state) {
                 t.expressionStatement(
                     t.callExpression(
                         t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
-
                         [
                             t.identifier(uniqueRefName),
                             metadata.styleProp
@@ -119,16 +118,19 @@ function overrideRef(t, path, refProp, metadata, state) {
         const userCleanupFunction = userReturnStatement
             ? userReturnStatement.argument
             : null
+        const userRefName = refProp.value.expression.params.length >= 1
+            ? refProp.value.expression.params.at(0).name
+            : 'ref'
 
         const newRefFunction = t.arrowFunctionExpression(
-            [t.identifier('ref')],
+            [t.identifier(userRefName)],
             t.blockStatement([
                 ...userStatements.filter(statement => !t.isReturnStatement(statement)),
                 t.expressionStatement(
                     t.callExpression(
                         t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
                         [
-                            t.identifier('ref'),
+                            t.identifier(userRefName),
                             metadata.styleProp
                                 ? t.memberExpression(t.identifier(metadata.styleObj), t.identifier(metadata.styleProp))
                                 : t.identifier(metadata.styleObj),
@@ -149,7 +151,7 @@ function overrideRef(t, path, refProp, metadata, state) {
                             t.callExpression(
                                 t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('remove')),
                                 [
-                                    t.identifier('ref'),
+                                    t.identifier(userRefName),
                                     metadata.styleProp
                                         ? t.memberExpression(t.identifier(metadata.styleObj), t.identifier(metadata.styleProp))
                                         : t.identifier(metadata.styleObj)

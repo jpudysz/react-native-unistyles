@@ -8,6 +8,6 @@ namespace margelo::nitro::unistyles::shadow {
 using namespace facebook;
 using namespace facebook::react;
 
-using ShadowLeafUpdates = std::unordered_map<const ShadowNodeFamily*, std::vector<RawProps>>;
+using ShadowLeafUpdates = std::unordered_map<const ShadowNodeFamily*, RawProps>;
 
 }
