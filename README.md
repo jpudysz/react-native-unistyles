@@ -28,6 +28,7 @@ Install CocoaPods dependencies / generate native folders with Expo:
 
 ```shell
 pod install
+or
 npx expo prebuild
 ```
 
