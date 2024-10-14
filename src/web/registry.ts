@@ -1,16 +1,14 @@
 import { createTypeStyle, TypeStyle } from 'typestyle'
 import type { UnistylesValues } from '../types'
 import { convertToTypeStyle } from './convert'
-import { UnistylesState } from './state'
 
 class UnistylesRegistryBuilder {
-    createStyles = (stylesheet: UnistylesValues, key: string | number) => {
-        const stylesTag = UnistylesState.createTag()
-        const unistyles = createTypeStyle(stylesTag)
+    createStyles = (stylesheet: UnistylesValues, key: string) => {
+        const unistyles = createTypeStyle()
         const typestyleStylesheet = convertToTypeStyle(stylesheet)
 
         const className = unistyles.style({
-            $debugName: String(key),
+            $debugName: `${key}-${Math.random().toString(16).slice(10)}`,
         }, typestyleStylesheet)
 
         if (stylesheet._web?._css) {
