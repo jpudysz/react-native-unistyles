@@ -1,25 +1,10 @@
 import { ColorScheme, type AppThemeName} from '../specs/types'
-import type { UnistylesValues } from '../types'
+import type { StyleSheet, StyleSheetWithSuperPowers, UnistylesValues } from '../types/stylesheet'
 
 export const reduceObject = <TObj extends Record<string, any>, TReducer>(
     obj: TObj,
     reducer: (value: TObj[keyof TObj], key: keyof TObj) => TReducer,
 ) => Object.fromEntries(Object.entries(obj).map(([key, value]) => [key, reducer(value as TObj[keyof TObj], key)])) as { [K in keyof TObj]: TReducer }
-
-export const toReactNativeClassName = (className: string | null, values: UnistylesValues) => {
-    const returnValue = className ? {
-        $$css: true,
-        [className]: className
-    } : {}
-
-    Object.defineProperties(returnValue, reduceObject(values, value => ({
-        value,
-        enumerable: false,
-        configurable: true
-    })))
-
-    return returnValue
-}
 
 export const keyInObject = <T extends Record<string, any>>(obj: T, key: PropertyKey): key is keyof T => key in obj
 
@@ -93,3 +78,92 @@ export const equal = <T>(a: T, b: T) => {
 
     return keysA.every(key => Object.is(a[key], b[key]) && Object.prototype.hasOwnProperty.call(b, key))
 }
+
+type UnistyleSecrets = {
+    __uni__stylesheet: StyleSheetWithSuperPowers<StyleSheet>,
+    __uni__key: string,
+    __uni__refs: Set<HTMLElement>
+    __uni__variants: Record<string, any>
+    __uni__args?: Array<any>
+}
+
+export const assignSecrets = <T>(object: T, secrets: UnistyleSecrets) => {
+    // @ts-expect-error - assign secrets to object
+    object[`__uni__secrets__${Math.random().toString(16).slice(2)}`] = secrets
+
+    return object
+}
+
+export const extractSecrets = (object: any) => {
+    const secrets = Object.entries(object).reduce((acc, [key, value]) => {
+        if (key.startsWith('__uni__secrets__')) {
+            acc.push(value as UnistyleSecrets)
+        }
+
+        return acc
+    }, [] as Array<UnistyleSecrets>)
+
+    return secrets
+}
+
+export const getStyles = (values: UnistylesValues) => {
+    const returnValue = {}
+
+    Object.defineProperties(returnValue, reduceObject(values, value => ({
+        value,
+        enumerable: false,
+        configurable: true
+    })))
+
+    return returnValue
+}
+
+export const createDoubleMap = <TKey, TSecondKey, TValue>() => {
+    const map = new Map<TKey, Map<TSecondKey, TValue>>()
+
+    return {
+        get: (key: TKey, secondKey: TSecondKey) => {
+            const mapForKey = map.get(key)
+
+            if (!mapForKey) {
+                return undefined
+            }
+
+            return mapForKey.get(secondKey)
+        },
+        set: (key: TKey, secondKey: TSecondKey, value: TValue) => {
+            const mapForKey = map.get(key) ?? new Map<TSecondKey, TValue>()
+
+            map.set(key, mapForKey)
+            mapForKey.set(secondKey, value)
+        },
+        delete: (key: TKey, secondKey: TSecondKey) => {
+            const mapForKey = map.get(key)
+
+            if (!mapForKey) {
+                return
+            }
+
+            mapForKey.delete(secondKey)
+        },
+        forEach: (callback: (key: TKey, secondKey: TSecondKey, value: TValue) => void) => {
+            map.forEach((mapForKey, key) => {
+                mapForKey.forEach((value, secondKey) => {
+                    callback(key, secondKey, value)
+                })
+            })
+        }
+    }
+}
+
+export const extractHiddenProperties = (object: any) => {
+    const hiddenProperties = Object.getOwnPropertyNames(object)
+
+    return Object.fromEntries(
+        hiddenProperties
+            .filter(key => !key.startsWith('__uni__'))
+            .map(key => [key, object[key]])
+    )
+}
+
+export const isInDocument = (element: HTMLElement) => document.body.contains(element)

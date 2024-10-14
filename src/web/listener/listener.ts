@@ -1,7 +1,7 @@
 import { UnistyleDependency } from '../../specs/NativePlatform'
 import { UnistylesRuntime } from '../runtime'
 
-export class UnistylesListenerBuilder {
+class UnistylesListenerBuilder {
     private isInitialized = false
     private listeners = Array.from({ length: Object.keys(UnistyleDependency).length / 2 }, () => new Set<VoidFunction>())
 

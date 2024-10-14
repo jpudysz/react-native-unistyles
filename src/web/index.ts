@@ -1,5 +1,4 @@
 import { create } from './create'
-import { UnistylesRuntime } from './runtime'
 import { UnistylesState } from './state'
 import { deepMergeObjects } from './utils'
 
@@ -19,6 +18,8 @@ export const StyleSheet = {
 }
 
 export { UnistylesRuntime } from './runtime'
+export { UnistylesShadowRegistry } from './shadowRegistry'
 export * from './mock'
 
-export const getSSRUnistyles = () => UnistylesRuntime.getSSRUnistyles()
+// TODO: Work on SSR
+export const getSSRUnistyles = () => []
