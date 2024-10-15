@@ -24,9 +24,12 @@ namespace margelo::nitro::unistyles {
   /**
    * An abstract base class for `UnistylesStyleSheet`
    * Inherit this class to create instances of `HybridUnistylesStyleSheetSpec` in C++.
+   * You must explicitly call `HybridObject`'s constructor yourself, because it is virtual.
    * @example
    * ```cpp
    * class HybridUnistylesStyleSheet: public HybridUnistylesStyleSheetSpec {
+   * public:
+   *   HybridUnistylesStyleSheet(...): HybridObject(TAG) { ... }
    *   // ...
    * };
    * ```
@@ -42,7 +45,7 @@ namespace margelo::nitro::unistyles {
     public:
       // Properties
       virtual double getHairlineWidth() = 0;
-      virtual double get___unid() = 0;
+      virtual double get__unid() = 0;
 
     public:
       // Methods

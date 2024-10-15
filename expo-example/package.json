@@ -4,17 +4,19 @@
   "main": "expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web"
   },
   "dependencies": {
     "@expo/metro-runtime": "3.2.3",
     "expo": "51.0.31",
+    "expo-build-properties": "0.12.5",
     "expo-status-bar": "1.12.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.75.2",
+    "react-native-nitro-modules": "0.11.0",
     "react-native-web": "0.19.12",
     "typestyle": "2.4.0"
   },

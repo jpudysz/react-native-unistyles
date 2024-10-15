@@ -43,9 +43,12 @@ namespace margelo::nitro::unistyles {
   /**
    * An abstract base class for `NativePlatform`
    * Inherit this class to create instances of `HybridNativePlatformSpec` in C++.
+   * You must explicitly call `HybridObject`'s constructor yourself, because it is virtual.
    * @example
    * ```cpp
    * class HybridNativePlatform: public HybridNativePlatformSpec {
+   * public:
+   *   HybridNativePlatform(...): HybridObject(TAG) { ... }
    *   // ...
    * };
    * ```

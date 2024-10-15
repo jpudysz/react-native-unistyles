@@ -9,7 +9,7 @@ double HybridStyleSheet::getHairlineWidth() {
     return nearestPixel / pixelRatio;
 }
 
-double HybridStyleSheet::get___unid() {
+double HybridStyleSheet::get__unid() {
     return this->__unid;
 }
 

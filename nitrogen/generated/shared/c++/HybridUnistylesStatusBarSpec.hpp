@@ -24,9 +24,12 @@ namespace margelo::nitro::unistyles {
   /**
    * An abstract base class for `UnistylesStatusBar`
    * Inherit this class to create instances of `HybridUnistylesStatusBarSpec` in C++.
+   * You must explicitly call `HybridObject`'s constructor yourself, because it is virtual.
    * @example
    * ```cpp
    * class HybridUnistylesStatusBar: public HybridUnistylesStatusBarSpec {
+   * public:
+   *   HybridUnistylesStatusBar(...): HybridObject(TAG) { ... }
    *   // ...
    * };
    * ```

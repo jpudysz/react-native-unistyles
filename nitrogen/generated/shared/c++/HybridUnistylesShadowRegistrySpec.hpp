@@ -24,9 +24,12 @@ namespace margelo::nitro::unistyles {
   /**
    * An abstract base class for `UnistylesShadowRegistry`
    * Inherit this class to create instances of `HybridUnistylesShadowRegistrySpec` in C++.
+   * You must explicitly call `HybridObject`'s constructor yourself, because it is virtual.
    * @example
    * ```cpp
    * class HybridUnistylesShadowRegistry: public HybridUnistylesShadowRegistrySpec {
+   * public:
+   *   HybridUnistylesShadowRegistry(...): HybridObject(TAG) { ... }
    *   // ...
    * };
    * ```

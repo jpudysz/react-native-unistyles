@@ -39,9 +39,12 @@ namespace margelo::nitro::unistyles {
   /**
    * An abstract base class for `UnistylesRuntime`
    * Inherit this class to create instances of `HybridUnistylesRuntimeSpec` in C++.
+   * You must explicitly call `HybridObject`'s constructor yourself, because it is virtual.
    * @example
    * ```cpp
    * class HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
+   * public:
+   *   HybridUnistylesRuntime(...): HybridObject(TAG) { ... }
    *   // ...
    * };
    * ```
