@@ -56,7 +56,6 @@ export const createUseVariants = (styles: ReactNativeStyleSheet<StyleSheet>, set
                     value: selectedVariants
                 })
             })
-
         })
     }
 
