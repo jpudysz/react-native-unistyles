@@ -37,6 +37,35 @@ HybridShadowRegistry.add = (handle, style, variants, args) => {
         return
     }
 
+    if (!style.__unid) {
+        console.warn(`Unistyles: Style is not bound!
+
+Potential reasons:
+a) You created a new Expo or React Native project that references StyleSheet from React Native
+b) You used the spread operator on a Unistyle style outside of a JSX component
+c) You're mixing StyleSheet styles from React Native with Unistyles
+
+a) For new projects
+If you're using a freshly generated project, replace StyleSheet imports from React Native with Unistyles:
+
+- import { StyleSheet } from 'react-native'
++ import { StyleSheet } from 'react-native-unistyles'
+
+b) Merging styles
+If you need to merge styles, do it within the style prop of your JSX component:
+
+style={{...styles.container, ...styles.otherProp}}
+or
+style={[styles.container, styles.otherProp]}
+
+Copying a Unistyle style outside of a JSX element will remove its internal C++ state, leading to unexpected behavior.
+
+c) Mixing styles
+If you're mixing React Native and Unistyle StyleSheet styles, move your static styles into Unistyles to avoid conflicts.\n`)
+
+        return
+    }
+
     HybridShadowRegistry.link(findShadowNodeForHandle(handle), style, variants ?? {}, args ?? [])
 }
 
