@@ -621,6 +621,11 @@ RawProps parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, const s
     auto& state = core::UnistylesRegistry::get().getState(rt);
 
     for (const auto& unistyleData : unistyles) {
+        if (!unistyleData->parsedStyle.has_value()) {
+            // todo this something happens with large dataset, debug it
+            continue;
+        }
+        
         helpers::enumerateJSIObject(rt, unistyleData->parsedStyle.value(), [&](const std::string& propertyName, jsi::Value& propertyValue){
             if (this->isColor(propertyName)) {
                 return convertedStyles.setProperty(rt, propertyName.c_str(), jsi::Value(state.parseColor(propertyValue)));
