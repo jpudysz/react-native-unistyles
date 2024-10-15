@@ -479,8 +479,8 @@ jsi::Value parser::Parser::getStylesForVariant(jsi::Runtime& rt, const std::stri
         : "default";
     auto hasKey = groupValue.hasProperty(rt, selectedVariantKey);
 
-    if (hasKey && !selectedVariant.has_value()) {
-        // add 'default' selection to variants map
+    if (!hasKey || !selectedVariant.has_value()) {
+        // for no key, add 'default' selection to variants map
         variants.emplace_back(groupName, selectedVariantKey);
     }
 
