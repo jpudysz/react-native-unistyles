@@ -4,7 +4,8 @@ export * from './specs'
 export { mq } from './mq'
 export type { UnistylesThemes, UnistylesBreakpoints } from './global'
 // TODO: export Native createUnistylesComponent
-export { createUnistylesComponent } from './web/createUnistylesComponent'
+// can't import it this way, it will break native build
+// export { createUnistylesComponent } from './web/createUnistylesComponent'
 
 // todo verify true min version
 const minReactVersionRequiredByUnistyles = '18.3.1'

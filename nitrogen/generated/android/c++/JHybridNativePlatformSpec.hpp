@@ -11,18 +11,21 @@
 #include <fbjni/fbjni.h>
 #include "HybridNativePlatformSpec.hpp"
 
+
+
+
 namespace margelo::nitro::unistyles {
 
   using namespace facebook;
 
-  class JHybridNativePlatformSpec final: public jni::HybridClass<JHybridNativePlatformSpec, JHybridObject>,
-                                         public HybridNativePlatformSpec {
+  class JHybridNativePlatformSpec: public jni::HybridClass<JHybridNativePlatformSpec, JHybridObject>,
+                                   public virtual HybridNativePlatformSpec {
   public:
     static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/unistyles/HybridNativePlatformSpec;";
     static jni::local_ref<jhybriddata> initHybrid(jni::alias_ref<jhybridobject> jThis);
     static void registerNatives();
 
-  private:
+  protected:
     // C++ constructor (called from Java via `initHybrid()`)
     explicit JHybridNativePlatformSpec(jni::alias_ref<jhybridobject> jThis) :
       HybridObject(HybridNativePlatformSpec::TAG),

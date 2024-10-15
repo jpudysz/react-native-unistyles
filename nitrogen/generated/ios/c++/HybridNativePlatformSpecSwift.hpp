@@ -55,7 +55,7 @@ namespace margelo::nitro::unistyles {
    * the future, HybridNativePlatformSpecCxx can directly inherit from the C++ class HybridNativePlatformSpec
    * to simplify the whole structure and memory management.
    */
-  class HybridNativePlatformSpecSwift final: public HybridNativePlatformSpec {
+  class HybridNativePlatformSpecSwift: public virtual HybridNativePlatformSpec {
   public:
     // Constructor from a Swift instance
     explicit HybridNativePlatformSpecSwift(const Unistyles::HybridNativePlatformSpecCxx& swiftPart):

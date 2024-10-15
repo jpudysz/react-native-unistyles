@@ -17,7 +17,7 @@ import NitroModules
  * - Other HybridObjects need to be wrapped/unwrapped from the Swift TCxx wrapper
  * - Throwing methods need to be wrapped with a Result<T, Error> type, as exceptions cannot be propagated to C++
  */
-public final class HybridNativePlatformSpecCxx {
+public class HybridNativePlatformSpecCxx {
   /**
    * The Swift <> C++ bridge's namespace (`margelo::nitro::unistyles::bridge::swift`)
    * from `Unistyles-Swift-Cxx-Bridge.hpp`.
@@ -28,7 +28,15 @@ public final class HybridNativePlatformSpecCxx {
   /**
    * Holds an instance of the `HybridNativePlatformSpec` Swift protocol.
    */
-  private(set) var implementation: HybridNativePlatformSpec
+  private var implementation: HybridNativePlatformSpec
+
+  /**
+   * Get the actual `HybridNativePlatformSpec` instance this class wraps.
+   */
+  @inline(__always)
+  public func getHybridNativePlatformSpec() -> HybridNativePlatformSpec {
+    return implementation
+  }
 
   /**
    * Create a new `HybridNativePlatformSpecCxx` that wraps the given `HybridNativePlatformSpec`.
@@ -36,15 +44,18 @@ public final class HybridNativePlatformSpecCxx {
    */
   public init(_ implementation: HybridNativePlatformSpec) {
     self.implementation = implementation
+    /* no base class */
   }
 
   /**
    * Contains a (weak) reference to the C++ HybridObject to cache it.
    */
   public var hybridContext: margelo.nitro.HybridContext {
+    @inline(__always)
     get {
       return self.implementation.hybridContext
     }
+    @inline(__always)
     set {
       self.implementation.hybridContext = newValue
     }
@@ -54,6 +65,7 @@ public final class HybridNativePlatformSpecCxx {
    * Get the memory size of the Swift class (plus size of any other allocations)
    * so the JS VM can properly track it and garbage-collect the JS object if needed.
    */
+  @inline(__always)
   public var memorySize: Int {
     return self.implementation.memorySize
   }

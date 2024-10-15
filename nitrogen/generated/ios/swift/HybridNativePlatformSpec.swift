@@ -27,7 +27,7 @@ import NitroModules
  * }
  * ```
  */
-public protocol HybridNativePlatformSpec: HybridObjectSpec {
+public protocol HybridNativePlatformSpec: AnyObject, HybridObjectSpec {
   // Properties
   
 

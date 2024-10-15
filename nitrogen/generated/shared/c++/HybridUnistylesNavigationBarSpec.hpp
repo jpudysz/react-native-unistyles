@@ -24,9 +24,12 @@ namespace margelo::nitro::unistyles {
   /**
    * An abstract base class for `UnistylesNavigationBar`
    * Inherit this class to create instances of `HybridUnistylesNavigationBarSpec` in C++.
+   * You must explicitly call `HybridObject`'s constructor yourself, because it is virtual.
    * @example
    * ```cpp
    * class HybridUnistylesNavigationBar: public HybridUnistylesNavigationBarSpec {
+   * public:
+   *   HybridUnistylesNavigationBar(...): HybridObject(TAG) { ... }
    *   // ...
    * };
    * ```
