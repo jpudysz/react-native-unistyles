@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import type { ReactNativeStyleSheet, StyleSheet } from '../../types'
-import { equal, reduceObject } from '../utils'
+import { equal, keyInObject, reduceObject } from '../utils'
 import { getVariants } from './getVariants'
 
 export const createUseVariants = (styles: ReactNativeStyleSheet<StyleSheet>, setSelectedVariants: (variants: Record<string, any>) => void) => {
@@ -27,6 +27,11 @@ export const createUseVariants = (styles: ReactNativeStyleSheet<StyleSheet>, set
 
         combinedVariantStyles.forEach(([key]) => {
             const styleEntry = styles[key]
+
+            if (!styleEntry) {
+                return
+            }
+
             const selectedVariantStyles = selectedVariantStylesMap.get(key)
 
             Object.defineProperties(styleEntry, reduceObject(selectedVariantStyles ?? {}, value => ({
@@ -34,6 +39,23 @@ export const createUseVariants = (styles: ReactNativeStyleSheet<StyleSheet>, set
                 enumerable: false,
                 configurable: true
             })))
+
+            // Add __uni__variants to static styles
+            Object.keys(styleEntry).forEach(key => {
+                if (!key.startsWith('__uni__secrets__')) {
+                    return
+                }
+
+                const secret = keyInObject(styleEntry, key) ? styleEntry[key] : undefined
+
+                if (!secret) {
+                    return
+                }
+
+                Object.defineProperty(secret, '__uni__variants', {
+                    value: selectedVariants
+                })
+            })
         })
     }
 
