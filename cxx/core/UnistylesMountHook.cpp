@@ -19,27 +19,11 @@ void core::UnistylesMountHook::shadowTreeDidMount(RootShadowNode::Shared const &
         return;
     }
 
-    // this is React Native commit
+    // React Native commit did mount
     auto& registry = core::UnistylesRegistry::get();
 
+    // so, resume Unistyles commits
     registry.trafficController.resumeUnistylesTraffic();
-
-    // this will prevent crash when re-rendering view
-    // as Unistyles has nothing to commit yet, but dependency map
-    // will build all the shadow nodes
-    if (!registry.trafficController.hasUnistylesCommit()) {
-        return;
-    }
-
-    registry.trafficController.setHasUnistylesCommit(false);
-
-    auto shadowLeafUpdates = this->getUnistylesUpdates();
-
-    if (shadowLeafUpdates.size() == 0) {
-        return;
-    }
-
-    shadow::ShadowTreeManager::updateShadowTree(*this->_rt, shadowLeafUpdates);
 }
 
 shadow::ShadowLeafUpdates core::UnistylesMountHook::getUnistylesUpdates() {
@@ -47,7 +31,7 @@ shadow::ShadowLeafUpdates core::UnistylesMountHook::getUnistylesUpdates() {
     auto parser = parser::Parser(this->_unistylesRuntime);
     auto dependencyMap = registry.buildDependencyMap(*this->_rt);
 
-    parser.rebuildUnistylesInDependencyMap(*this->_rt, dependencyMap);
+    // don't rebuild dependency map, at this point it's already done
 
     return parser.dependencyMapToShadowLeafUpdates(dependencyMap);
 }

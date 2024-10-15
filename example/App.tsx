@@ -32,6 +32,6 @@ const styles = StyleSheet.create(theme => ({
         backgroundColor: 'red'
     },
     thirdProp: {
-        backgroundColor: 'blue'
+        backgroundColor: 'green'
     }
 }))

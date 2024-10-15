@@ -236,6 +236,9 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
 
     parser.rebuildUnistylesInDependencyMap(rt, dependencyMap);
 
+    // this is required, otherwise shadow tree will ignore Unistyles commit
+    registry.trafficController.setHasUnistylesCommit(true);
+
     auto shadowLeafUpdates = parser.dependencyMapToShadowLeafUpdates(dependencyMap);
 
     shadow::ShadowTreeManager::updateShadowTree(rt, shadowLeafUpdates);

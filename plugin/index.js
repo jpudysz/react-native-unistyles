@@ -42,6 +42,37 @@ module.exports = function ({ types: t }) {
                     }
                 }
             },
+            FunctionDeclaration(path, state) {
+                const componentName = path.node.id
+                    ? path.node.id.name
+                    : null
+
+                if (componentName) {
+                    state.file.hasVariants = false
+                }
+            },
+            ClassDeclaration(path, state) {
+                const componentName = path.node.id
+                    ? path.node.id.name
+                    : null
+
+                if (componentName) {
+                    state.file.hasVariants = false
+                }
+            },
+            VariableDeclaration(path, state) {
+                path.node.declarations.forEach((declaration) => {
+                    if (t.isArrowFunctionExpression(declaration.init) || t.isFunctionExpression(declaration.init)) {
+                        const componentName = declaration.id
+                            ? declaration.id.name
+                            : null
+
+                        if (componentName) {
+                            state.file.hasVariants = false
+                        }
+                    }
+                })
+            },
             ImportDeclaration(path, state) {
                 const importSource = path.node.source.value
 

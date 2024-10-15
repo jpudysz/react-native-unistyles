@@ -17,30 +17,30 @@ RootShadowNode::Unshared core::UnistylesCommitHook::shadowTreeWillCommit(
 ) noexcept {
     RootShadowNode::Unshared rootNode = newRootShadowNode;
     auto unistylesRootNode = std::reinterpret_pointer_cast<core::UnistylesCommitShadowNode>(newRootShadowNode);
-    
+
     // skip only unistyles commits
     if (unistylesRootNode->hasUnistylesCommitTrait()) {
         unistylesRootNode->removeUnistylesCommitTrait();
         unistylesRootNode->addUnistylesMountTrait();
-        
+
         return newRootShadowNode;
     }
 
     auto& registry = core::UnistylesRegistry::get();
-    
+
     if (!registry.trafficController.hasUnistylesCommit()) {
         return newRootShadowNode;
     }
-    
+
     auto shadowLeafUpdates = this->getUnistylesUpdates();
-    
+
     if (shadowLeafUpdates.size() == 0) {
         return newRootShadowNode;
     }
 
     // this is required, otherwise we end up with old shadow tree in mount hook
     registry.trafficController.stopUnistylesTraffic();
-    
+
     auto affectedNodes = shadow::ShadowTreeManager::findAffectedNodes(*rootNode, shadowLeafUpdates);
 
     return std::static_pointer_cast<RootShadowNode>(shadow::ShadowTreeManager::cloneShadowTree(
@@ -55,8 +55,8 @@ shadow::ShadowLeafUpdates core::UnistylesCommitHook::getUnistylesUpdates() {
     auto& registry = core::UnistylesRegistry::get();
     auto parser = parser::Parser(this->_unistylesRuntime);
     auto dependencyMap = registry.buildDependencyMap(*this->_rt);
-    
-    parser.rebuildUnistylesInDependencyMap(*this->_rt, dependencyMap);
-    
+
+    // don't rebuild dependency map, at this point it's already done
+
     return parser.dependencyMapToShadowLeafUpdates(dependencyMap);
 }
