@@ -10,10 +10,10 @@ void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime& rt, sha
     auto& uiManager = UIManagerBinding::getBinding(rt)->getUIManager();
     const auto &shadowTreeRegistry = uiManager.getShadowTreeRegistry();
     auto& registry = core::UnistylesRegistry::get();
-    
+
     if (registry.trafficController.shouldStop()) {
         registry.trafficController.setHasUnistylesCommit(true);
-        
+
         return;
     }
 
@@ -29,10 +29,10 @@ void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime& rt, sha
                 updates,
                 affectedNodes
             ));
-            
+
             // set unistyles commit trait
             auto unistylesRootNode = std::reinterpret_pointer_cast<core::UnistylesCommitShadowNode>(newRootNode);
-            
+
             unistylesRootNode->addUnistylesCommitTrait();
 
             return newRootNode;
@@ -43,7 +43,7 @@ void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime& rt, sha
         // enableStateReconciliation: https://reactnative.dev/architecture/render-pipeline#react-native-renderer-state-updates
         // mountSynchronously: must be true as this is update from C++ not React
         shadowTree.commit(transaction, {false, true});
-        
+
 
         // for now we're assuming single surface, can be improved in the future
         // stop = true means stop enumerating next shadow tree
