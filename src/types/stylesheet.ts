@@ -27,7 +27,7 @@ type VariantsObject = {
 }
 
 type CustomClassName = {
-    _css?: string | Array<string>
+    _classNames?: string | Array<string>
 }
 
 type CompoundVariant = {
