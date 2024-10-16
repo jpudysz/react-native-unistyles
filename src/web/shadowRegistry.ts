@@ -1,7 +1,6 @@
 import type { UnistylesValues } from '../types'
 import { listenToDependencies } from './listener'
 import { UnistylesRegistry } from './registry'
-import { UnistylesRuntime } from './runtime'
 import { createDoubleMap, extractHiddenProperties, extractSecrets, isInDocument } from './utils'
 import { getVariants } from './variants'
 
@@ -64,9 +63,7 @@ class UnistylesShadowRegistryBuilder {
 
         extractSecrets(_style).forEach(secret => {
             const { __uni__key, __uni__stylesheet, __uni__refs, __uni__variants, __uni__args = [] } = secret
-            const newComputedStylesheet = typeof __uni__stylesheet === 'function'
-                ? __uni__stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
-                : __uni__stylesheet
+            const newComputedStylesheet = UnistylesRegistry.getComputedStylesheet(__uni__stylesheet)
             const style = newComputedStylesheet[__uni__key]
             const args = _args ?? __uni__args
             const resultHidden = typeof style === 'function'

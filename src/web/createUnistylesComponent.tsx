@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { extractHiddenProperties, extractSecrets } from './utils'
-import { UnistylesRuntime } from './runtime'
 import { getVariants } from './variants'
 import { UnistylesListener } from './listener'
+import { UnistylesRegistry } from './registry'
 
 const getStyles = (value: Record<string, any>) => {
     const secrets = extractSecrets(value)
@@ -12,9 +12,7 @@ const getStyles = (value: Record<string, any>) => {
     }
 
     return secrets.reduce((acc, { __uni__stylesheet, __uni__key, __uni__args = [], __uni__variants }) => {
-        const newComputedStylesheet = typeof __uni__stylesheet === 'function'
-            ? __uni__stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
-            : __uni__stylesheet
+        const newComputedStylesheet = UnistylesRegistry.getComputedStylesheet(__uni__stylesheet)
         const style = newComputedStylesheet[__uni__key]
         const resultHidden = typeof style === 'function'
             ? style(...__uni__args)
