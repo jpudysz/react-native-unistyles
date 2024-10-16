@@ -21,7 +21,7 @@ export const convertToTypeStyle = (value: UnistylesValues) => {
         ...value._web
     }).flatMap(([unistylesKey, unistylesValue]) => {
         // Keys to omit
-        if (['_css', '_web', 'variants', 'compoundVariants', 'uni__dependencies', '__unistyles-secrets__'].includes(unistylesKey) || unistylesKey.startsWith('variant-')) {
+        if (['_classNames', '_web', 'variants', 'compoundVariants', 'uni__dependencies', '__unistyles-secrets__'].includes(unistylesKey) || unistylesKey.startsWith('variant-')) {
             return []
         }
 

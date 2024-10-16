@@ -11,17 +11,6 @@ class UnistylesRegistryBuilder {
             $debugName: `${key}-${Math.random().toString(16).slice(10)}`,
         }, typestyleStylesheet)
 
-        if (stylesheet._web?._css) {
-            const customClassName = Array.isArray(stylesheet._web._css)
-                ? stylesheet._web._css.join(' ')
-                : stylesheet._web._css
-
-            return {
-                className: `${className} ${customClassName}`,
-                unistyles
-            }
-        }
-
         return {
             className,
             unistyles
