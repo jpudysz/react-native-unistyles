@@ -94,6 +94,12 @@ class UnistylesShadowRegistryBuilder {
             if (!storedWebUnistyle) {
                 const styleTag = document.createElement('style')
 
+                const additionalClasses = resultWithVariants._web._classNames
+
+                if (additionalClasses) {
+                    ref.classList.add(...Array.isArray(additionalClasses) ? additionalClasses : [additionalClasses])
+                }
+
                 ref.classList.add(webUnistyle.className)
                 webUnistyle.unistyles.setStylesTarget(styleTag)
                 document.head.appendChild(styleTag)
