@@ -2,7 +2,6 @@ import type { TypeStyle } from 'typestyle'
 import type { StyleSheet, StyleSheetWithSuperPowers } from '../../types/stylesheet'
 import type { UnistyleDependency } from '../../specs/NativePlatform'
 import { UnistylesListener } from './listener'
-import { UnistylesRuntime } from '../runtime'
 import { keyInObject } from '../utils'
 import { UnistylesRegistry } from '../registry'
 
@@ -15,9 +14,7 @@ type ListenToDependenciesProps = {
 }
 
 export const listenToDependencies = ({ key, className, unistyles, args = [], stylesheet }: ListenToDependenciesProps) => {
-    const newComputedStylesheet = typeof stylesheet === 'function'
-        ? stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
-        : stylesheet
+    const newComputedStylesheet = UnistylesRegistry.getComputedStylesheet(stylesheet)
     const _value = keyInObject(newComputedStylesheet, key) ? newComputedStylesheet[key] : undefined
 
     if (!_value) {
@@ -32,9 +29,7 @@ export const listenToDependencies = ({ key, className, unistyles, args = [], sty
     }
 
     return UnistylesListener.addListeners(dependencies, () => {
-        const newComputedStylesheet = typeof stylesheet === 'function'
-            ? stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
-            : stylesheet
+        const newComputedStylesheet = UnistylesRegistry.getComputedStylesheet(stylesheet)
 
         if (!keyInObject(newComputedStylesheet, key)) {
             return
