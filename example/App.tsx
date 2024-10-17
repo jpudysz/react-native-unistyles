@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, View, StyleSheet as ST } from 'react-native'
+import { Button, StyleSheet as ST, View } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 import Animated from 'react-native-reanimated'
 import './unistyles'
@@ -10,7 +10,7 @@ export const App = () => {
     const style = {...styles.container, ...styles.secondProp, ...st2.thirdProp, ...{backgroundColor: 'red'}}
 
     return (
-        <CustomView style={style}>
+        <View style={style}>
             <Animated.View style={styles.animated} />
             <Typography isBold isPrimary size="large" isCentered value={2}>
                 Hello World
@@ -19,17 +19,10 @@ export const App = () => {
                 Hello World {count}
             </Typography>
             <Button title="Re-render" onPress={() => setCount(prevState =>  prevState + 1)} />
-        </CustomView>
-    )
-}
-
-const CustomView = ({ style, children }) => {
-    return (
-        <View style={style}>
-            {children}
         </View>
     )
 }
+
 const st2 = ST.create({
     thirdProp: {
         backgroundColor: 'green'
