@@ -35,7 +35,6 @@ module.exports = function ({ types: t }) {
                     state.file.styleSheetLocalName = ''
                     state.file.tagNumber = 0
                     state.file.isClassComponent = false
-                    state.file.isReanimatedImport = false
                     state.reactNativeImports = {}
                 },
                 exit(path, state) {
@@ -96,17 +95,8 @@ module.exports = function ({ types: t }) {
                         }
                     })
                 }
-
-                if (importSource.includes('react-native-reanimated')) {
-                    state.file.isReanimatedImport = true
-                }
             },
             JSXElement(path, state) {
-                // stop processing node_modules components
-                // if (state.filename.includes('node_modules')) {
-                //     return
-                // }
-
                 if (state.file.isClassComponent) {
                     return
                 }
@@ -117,8 +107,7 @@ module.exports = function ({ types: t }) {
                 const isAnimatedComponent = (
                     !isReactNativeComponent &&
                     openingElement.name.object &&
-                    openingElement.name.object.name === 'Animated' &&
-                    state.file.isReanimatedImport
+                    openingElement.name.object.name === 'Animated'
                 )
 
                 if (!isReactNativeComponent && !isAnimatedComponent) {
@@ -150,9 +139,6 @@ module.exports = function ({ types: t }) {
                     if (!refProp && hasStringRef(t, path)) {
                         throw new Error("Detected string based ref which is not supported by Unistyles.")
                     }
-
-                    // todo handle this case:
-                    // x.y.z (for now not supported)
 
                     refProp
                         ? overrideRef(t, path, refProp, meta, state)

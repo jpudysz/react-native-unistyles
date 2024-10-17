@@ -34,7 +34,7 @@ const styles = StyleSheet.create((theme, rt) => ({
         backgroundColor: 'red'
     },
     thirdProp: {
-        backgroundColor: 'green'
+        backgroundColor: 'pink'
     },
     animated: {
         width: 100,

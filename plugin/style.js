@@ -1,10 +1,13 @@
 function getStyleMetadata(t, node, dynamicFunction = null) {
     // {styles.container}
     if (t.isMemberExpression(node)) {
+        const members = t.isMemberExpression(node.object)
+            ? [node.object.object.name, node.object.property.name, node.property.name]
+            : [node.object.name, node.property.name]
+
         return [
             {
-                styleObj: node.object.name,
-                styleProp: node.property.name,
+                members: members.filter(Boolean),
                 dynamicFunction
             }
         ]
@@ -33,8 +36,7 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
     // {styles}
     if (t.isIdentifier(node)) {
         return [{
-            styleObj: node.name,
-            styleProp: undefined,
+            members: [node.name],
             dynamicFunction: undefined
         }]
     }
