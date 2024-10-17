@@ -8,6 +8,7 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
         return [
             {
                 members: members.filter(Boolean),
+                inlineStyle: undefined,
                 dynamicFunction
             }
         ]
@@ -25,7 +26,31 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
 
     // {{ ...styles.container }}
     if (t.isObjectExpression(node)) {
-        return node.properties.flatMap(prop => getStyleMetadata(t, prop.argument))
+        const inlineStyles = []
+
+        const partialResult = node
+            .properties
+            .flatMap(prop => {
+                // handle inline styles
+                if (t.isObjectProperty(prop)) {
+                    inlineStyles.push(prop)
+
+                    return null
+                }
+
+                return getStyleMetadata(t, prop.argument)
+            })
+            .filter(Boolean)
+
+        if (inlineStyles.length > 0) {
+            return partialResult.concat([{
+                members: [],
+                inlineStyle: t.objectExpression(inlineStyles),
+                dynamicFunction: undefined
+            }])
+        }
+
+        return partialResult
     }
 
     // {styles.container(arg1, arg2)}
@@ -33,10 +58,10 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
         return getStyleMetadata(t, node.callee, node)
     }
 
-    // {styles}
     if (t.isIdentifier(node)) {
         return [{
             members: [node.name],
+            inlineStyle: undefined,
             dynamicFunction: undefined
         }]
     }
