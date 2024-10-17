@@ -1344,6 +1344,58 @@ pluginTester({
                     921918562
                 )
             `
+        },
+        {
+            title: 'Should support nested styles',
+            code: `
+                import { View } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ styles }) => {
+                    return (
+                        <View style={styles.nested.prop} />
+                    )
+                }
+
+                const styles = StyleSheet.create(theme => ({
+                    container: {
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: theme.colors.backgroundColor
+                    }
+                }))
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ styles }) => {
+                    return (
+                        <View
+                            style={[styles.nested.prop]}
+                            ref={ref => {
+                                UnistylesShadowRegistry.add(ref, styles.nested.prop, undefined, undefined)
+                                return () => UnistylesShadowRegistry.remove(ref, styles.nested.prop)
+                            }}
+                        />
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    theme => ({
+                        container: {
+                            flex: 1,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: theme.colors.backgroundColor,
+                            uni__dependencies: [0]
+                        }
+                    }),
+                    921918562
+                )
+            `
         }
     ]
 })
