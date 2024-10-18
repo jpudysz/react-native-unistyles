@@ -1,13 +1,59 @@
 import { keyInObject } from '../utils'
-import type { NestedCSSProperties } from 'typestyle/lib/types'
 
-const stylesToSkip = [
+const SKIP_STYLES = [
     'borderCurve',
     'elevation',
     'textAlignVertical',
     'includeFontPadding',
     'overlayColor',
     'tintColor'
+]
+
+const CSS_NUMBER_KEYS = [
+    'animationIterationCount',
+    'borderImageOutset',
+    'borderImageSlice',
+    'borderImageWidth',
+    'boxFlex',
+    'boxFlexGroup',
+    'boxOrdinalGroup',
+    'columnCount',
+    'columns',
+    'counterIncrement',
+    'counterReset',
+    'flex',
+    'flexGrow',
+    'flexPositive',
+    'flexShrink',
+    'flexNegative',
+    'flexOrder',
+    'fontWeight',
+    'gridArea',
+    'gridColumn',
+    'gridColumnEnd',
+    'gridColumnSpan',
+    'gridColumnStart',
+    'gridRow',
+    'gridRowEnd',
+    'gridRowSpan',
+    'gridRowStart',
+    'line-clamp',
+    'line-height',
+    'opacity',
+    'order',
+    'orphans',
+    'tabSize',
+    'widows',
+    'zIndex',
+    'zoom',
+    'fillOpacity',
+    'floodOpacity',
+    'stopOpacity',
+    'strokeDasharray',
+    'strokeDashoffset',
+    'strokeMiterlimit',
+    'strokeOpacity',
+    'strokeWidth'
 ]
 
 const convertMap = {
@@ -73,22 +119,27 @@ const convertMap = {
     }),
     resizeMode: (value: string) => ({
         backgroundSize: value
-    }),
-    lineHeight: (value: number) => ({
-        lineHeight: `${value}px`
-    }),
-} as Record<PropertyKey, (value: any) => NestedCSSProperties>
+    })
+} as Record<PropertyKey, (value: any) => Record<string, any>>
+
+const convertNumber = (key: string, value: any) => {
+    if (typeof value === 'number') {
+        return CSS_NUMBER_KEYS.includes(key, value) ? value : `${value}px`
+    }
+
+    return value
+}
 
 export const getStyle = (key: string, value: any) => {
-    if (stylesToSkip.includes(key)) {
+    if (SKIP_STYLES.includes(key)) {
         return {}
     }
 
     if (keyInObject(convertMap, key)) {
-        return convertMap[key]?.(value) ?? {}
+        return convertMap[key]?.(convertNumber(key, value)) ?? {}
     }
 
     return {
-        [key]: value
+        [key]: convertNumber(key, value)
     }
 }
