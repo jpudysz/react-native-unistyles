@@ -1,7 +1,7 @@
 import type { UnistylesTheme, UnistylesValues } from '../types'
 import type { StyleSheet, StyleSheetWithSuperPowers } from '../types/stylesheet'
 import { UnistylesRuntime } from './runtime'
-import { isServer, keyInObject } from './utils'
+import { extractMediaQueryValue, isServer, keyInObject } from './utils'
 import { UnistylesListener } from './listener'
 import { convertUnistyles } from './convert'
 import type { UnistyleDependency } from '../specs/NativePlatform'
@@ -86,6 +86,7 @@ class UnistylesRegistryBuilder {
             this.stylesheets.set(stylesheet, newComputedStylesheet)
         })
 
+        this.dependenciesMap.set(stylesheet, dependenciesMap)
         this.disposeListenersMap.set(stylesheet, dispose)
     }
 
@@ -139,7 +140,8 @@ class UnistylesRegistryBuilder {
 
             if (typeof value === 'object' && !key.startsWith('_')) {
                 const mediaQuery = getMediaQuery(key)
-                let queryRule: CSSRule | null = Array.from(this.styleTag.sheet.cssRules).find(rule => {
+                const cssRules = Array.from(this.styleTag.sheet.cssRules)
+                let queryRule: CSSRule | null = cssRules.find(rule => {
                     if (!(rule instanceof CSSMediaRule)) {
                         return false
                     }
@@ -148,7 +150,23 @@ class UnistylesRegistryBuilder {
                 }) ?? null
 
                 if (!queryRule) {
-                    queryRule = this.styleTag.sheet.cssRules.item(this.styleTag.sheet.insertRule(`@media ${mediaQuery} {.${hash} {}}`))
+                    const mediaQueryValue = extractMediaQueryValue(mediaQuery)
+                    const ruleIndex = mediaQueryValue
+                        ? cssRules.reduce<number | undefined>((acc, rule, ruleIndex) => {
+                            if (!(rule instanceof CSSMediaRule)) {
+                                return acc
+                            }
+
+                            const ruleMediaQueryValue = extractMediaQueryValue(rule.conditionText)
+
+                            if (ruleMediaQueryValue === undefined) {
+                                return
+                            }
+
+                            return ruleMediaQueryValue > mediaQueryValue ? ruleIndex : acc
+                        }, cssRules.length)
+                        : undefined
+                    queryRule = this.styleTag.sheet.cssRules.item(this.styleTag.sheet.insertRule(`@media ${mediaQuery} {.${hash} {}}`, ruleIndex))
                 }
 
                 if (queryRule instanceof CSSMediaRule) {
@@ -175,6 +193,8 @@ class UnistylesRegistryBuilder {
                         sheet: this.styleTag.sheet!
                     })
                 })
+
+                return
             }
 
             this.applyRule({
@@ -187,7 +207,14 @@ class UnistylesRegistryBuilder {
     }
 
     private applyRule = ({ hash, key, value, sheet }: ApplyRuleProps) => {
-        let rule: CSSRule | null = Array.from(sheet.cssRules).find(rule => rule.cssText.includes(`.${hash}`)) ?? null
+        let rule: CSSRule | null = Array.from(sheet.cssRules).find(rule => {
+            if (!(rule instanceof CSSStyleRule)) {
+                return false
+            }
+
+            // In unistyles pseudos are prefixed with ':' but in css some of them are prefixed with '::'
+            return rule.selectorText.replace('::', ':').includes(hash)
+        }) ?? null
 
         if (!rule) {
             rule = sheet.cssRules.item(sheet.insertRule(`.${hash} {}`))
@@ -198,6 +225,10 @@ class UnistylesRegistryBuilder {
         }
 
         rule.style[key as RemoveReadonlyStyleKeys<typeof key>] = value
+
+        if (key === 'content') {
+            rule.style.setProperty('content', value)
+        }
     }
 
     remove = (value: UnistylesValues) => {
