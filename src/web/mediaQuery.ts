@@ -21,9 +21,5 @@ export const getMediaQuery = (query: string) => {
 
     const minWidth = UnistylesState.breakpoints && keyInObject(UnistylesState.breakpoints, query) ? UnistylesState.breakpoints[query] : undefined
 
-    if (!minWidth) {
-        return ''
-    }
-
-    return `(min-width: ${minWidth}px)`
+    return `(min-width: ${minWidth ?? 0}px)`
 }

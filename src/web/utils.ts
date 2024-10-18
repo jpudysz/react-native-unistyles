@@ -129,3 +129,15 @@ export const extractHiddenProperties = (object: any) => {
 }
 
 export const isInDocument = (element: HTMLElement) => document.body.contains(element)
+
+export const extractMediaQueryValue = (query: string) => {
+    const [_, px] = query.match(/(\d+)px/) ?? []
+
+    if (!px) {
+        return undefined
+    }
+
+    const value = Number(px)
+
+    return isNaN(value) ? undefined : value
+}
