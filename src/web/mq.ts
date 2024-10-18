@@ -1,10 +1,8 @@
-import type { MediaQuery } from 'typestyle/lib/types'
-
 const IS_UNISTYLES_REGEX = /:([hw])\[(\d+)(?:,\s*(\d+|Infinity))?]/
 const UNISTYLES_WIDTH_REGEX = /:(w)\[(\d+)(?:,\s*(\d+|Infinity))?]/
 const UNISTYLES_HEIGHT_REGEX = /:(h)\[(\d+)(?:,\s*(\d+|Infinity))?]/
 
-export const parseMq = (mq: string): MediaQuery => {
+export const parseMq = (mq: string) => {
     const [, width, fromW, toW] = UNISTYLES_WIDTH_REGEX.exec(mq) || []
     const [, height, fromH, toH] = UNISTYLES_HEIGHT_REGEX.exec(mq) || []
 

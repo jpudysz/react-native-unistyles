@@ -1,8 +1,5 @@
-import { media } from 'typestyle'
-import type { NestedCSSProperties } from 'typestyle/lib/types'
 import { deepMergeObjects, warn } from '../utils'
 import { validateShadow } from './shadow'
-import { convertBreakpoint } from './breakpoint'
 import { TEXT_SHADOW_STYLES, type TextShadow } from './types'
 import { extractShadowValue, normalizeColor, normalizeNumericValue } from './utils'
 
@@ -16,7 +13,7 @@ const createTextShadowValue = (style: TextShadow) => {
     return `${offsetX} ${offsetY} ${radius} ${color}`
 }
 
-export const getTextShadowStyle = (styles: Record<string, any>): NestedCSSProperties => {
+export const getTextShadowStyle = (styles: Record<string, any>) => {
     const missingStyles = TEXT_SHADOW_STYLES.filter(key => !(key in styles))
 
     if (missingStyles.length) {
@@ -52,16 +49,18 @@ export const getTextShadowStyle = (styles: Record<string, any>): NestedCSSProper
         const { width, height } = extractShadowValue('textShadowOffset', breakpoint, styles)
         const radius = extractShadowValue('textShadowRadius', breakpoint, styles)
 
-        return media(convertBreakpoint(breakpoint), {
-            textShadow: createTextShadowValue({
-                textShadowColor: color,
-                textShadowOffset: {
-                    width,
-                    height
-                },
-                textShadowRadius: radius
-            })
-        })
+        return {
+            [breakpoint]: {
+                textShadow: createTextShadowValue({
+                    textShadowColor: color,
+                    textShadowOffset: {
+                        width,
+                        height
+                    },
+                    textShadowRadius: radius
+                })
+            }
+        }
     })
 
     // Merge all breakpoints styles into one

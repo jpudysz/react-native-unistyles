@@ -13,7 +13,16 @@ class UnistylesStateBuilder {
     themes = new Map<string, UnistylesTheme>()
     themeName?: AppThemeName
 
-    breakpoint?: AppBreakpoint
+    private matchingBreakpoints = new Map<string, boolean>()
+
+    get breakpoint() {
+        const [currentBreakpoint] = Array.from(this.matchingBreakpoints)
+            .reverse()
+            .find(([_key, value]) => value) ?? []
+
+        return currentBreakpoint as AppBreakpoint | undefined
+    }
+
     breakpoints?: UnistylesBreakpoints
 
     hasAdaptiveThemes = false
@@ -64,8 +73,6 @@ class UnistylesStateBuilder {
     }
 
     private initBreakpoints = (breakpoints = {} as UnistylesBreakpoints) => {
-        const breakpointsMap = new Map<string, MediaQueryList>()
-
         this.breakpoints = breakpoints
 
         Object.entries(breakpoints)
@@ -76,25 +83,10 @@ class UnistylesStateBuilder {
                 }
 
                 const mediaQuery = window.matchMedia(`(min-width: ${value}px)`)
-                breakpointsMap.set(breakpoint, mediaQuery)
-
-                if (mediaQuery.matches) {
-                    this.breakpoint = breakpoint as AppBreakpoint
-                }
+                this.matchingBreakpoints.set(breakpoint, mediaQuery.matches)
 
                 mediaQuery.addEventListener('change', event => {
-                    if (!event.matches) {
-                        const [currentBreakpoint] = Array.from(breakpointsMap).find(([,mq]) => mq.matches) ?? []
-
-                        if (currentBreakpoint) {
-                            this.breakpoint = currentBreakpoint as AppBreakpoint
-                            UnistylesListener.emitChange(UnistyleDependency.Breakpoints)
-                        }
-
-                        return
-                    }
-
-                    this.breakpoint = breakpoint as AppBreakpoint
+                    this.matchingBreakpoints.set(breakpoint, event.matches)
                     UnistylesListener.emitChange(UnistyleDependency.Breakpoints)
                 })
             })
