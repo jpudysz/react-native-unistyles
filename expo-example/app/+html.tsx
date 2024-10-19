@@ -1,3 +1,4 @@
+import React from 'react'
 import { ScrollViewStyleReset } from 'expo-router/html'
 import { type PropsWithChildren } from 'react'
 
