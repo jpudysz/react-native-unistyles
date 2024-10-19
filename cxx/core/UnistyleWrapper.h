@@ -17,34 +17,6 @@ struct UnistyleWrapper: public jsi::NativeState {
     Unistyle::Shared unistyle;
 };
 
-inline static std::string generateStyleKey(std::string& key, int tag) {
-    return std::string("__unid_").append(std::to_string(tag)).append("_").append(key).c_str();
-}
-
-inline static Unistyle::Shared unistyleFromKey(jsi::Runtime& rt, const std::string& key) {
-    std::string prefix = "__unid_";
-
-    if (key.substr(0, prefix.length()) != prefix) {
-        return nullptr;
-    }
-
-    std::string remaining = key.substr(prefix.length());
-
-    size_t underscorePos = remaining.find('_');
-
-    if (underscorePos == std::string::npos) {
-        return nullptr;
-    }
-
-    std::string tagStr = remaining.substr(0, underscorePos);
-
-    auto& registry = UnistylesRegistry::get();
-    auto tag = std::stoi(tagStr);
-    auto styleKey = remaining.substr(underscorePos + 1);
-
-    return registry.findUnistyleFromKey(rt, styleKey, tag);
-}
-
 inline static Unistyle::Shared unistyleFromStaticStyleSheet(jsi::Runtime& rt, jsi::Object& value) {
     auto exoticUnistyle = std::make_shared<Unistyle>(
         UnistyleType::Object,
@@ -60,21 +32,29 @@ inline static Unistyle::Shared unistyleFromStaticStyleSheet(jsi::Runtime& rt, js
 
 
 inline static std::vector<Unistyle::Shared> unistylesFromNonExistentNativeState(jsi::Runtime& rt, jsi::Object& value) {
-    std::vector<Unistyle::Shared> foundUnistyles{};
+    auto hasUnistyleName = value.hasProperty(rt, helpers::NAME_STYLE_KEY.c_str());
 
-    helpers::enumerateJSIObject(rt, value, [&](const std::string& key, jsi::Value& value){
-        auto maybeUnistyle = unistyleFromKey(rt, key);
-
-        if (maybeUnistyle != nullptr) {
-            foundUnistyles.emplace_back(maybeUnistyle);
-        }
-    });
-
-    if (foundUnistyles.size() == 0) {
+    // return wrapped RN/inline style
+    if (!hasUnistyleName) {
         return {unistyleFromStaticStyleSheet(rt, value)};
     }
 
-    return foundUnistyles;
+    throw jsi::JSError(rt, R"(Unistyles: Style is not bound!
+    
+Potential reasons:
+- You likely used the spread operator on a Unistyle style outside of a JSX component
+    
+If you need to merge styles, do it within the style prop of your JSX component:
+    
+style={{...styles.container, ...styles.otherProp}}
+or 
+style={[styles.container, styles.otherProp]}
+
+If you pass computed style prop to component use array syntax:
+
+customStyleProp={[styles.container, styles.otherProp]}
+    
+Copying a Unistyle style outside of a JSX element will remove its internal C++ state, leading to unexpected behavior.)");
 }
 
 inline static std::vector<Unistyle::Shared> unistyleFromValue(jsi::Runtime& rt, const jsi::Value& value) {
@@ -99,7 +79,7 @@ inline static jsi::Value valueFromUnistyle(jsi::Runtime& rt, Unistyle::Shared un
         jsi::Object obj = jsi::Object(rt);
        
         obj.setNativeState(rt, std::move(wrappedUnistyle));
-        obj.setProperty(rt, std::string("__unid_").append(std::to_string(tag)).append("_").append(unistyle->styleKey).c_str(), jsi::Value::undefined());
+        obj.setProperty(rt, helpers::NAME_STYLE_KEY.c_str(), jsi::String::createFromUtf8(rt, unistyle->styleKey));
         
         helpers::mergeJSIObjects(rt, obj, unistyle->parsedStyle.value());
 
@@ -110,7 +90,7 @@ inline static jsi::Value valueFromUnistyle(jsi::Runtime& rt, Unistyle::Shared un
     auto hostFn = jsi::Value(rt, unistyleFn->proxiedFunction.value()).asObject(rt).asFunction(rt);
 
     hostFn.setNativeState(rt, std::move(wrappedUnistyle));
-    hostFn.setProperty(rt, std::string("__unid_").append(std::to_string(tag)).append("_").append(unistyleFn->styleKey).c_str(), jsi::Value::undefined());
+    hostFn.setProperty(rt, helpers::NAME_STYLE_KEY.c_str(), jsi::String::createFromUtf8(rt, unistyleFn->styleKey));
     
     return std::move(hostFn);
 }
