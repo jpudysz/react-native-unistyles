@@ -7,10 +7,10 @@ import { Typography } from './Typography'
 
 export const App = () => {
     const [count, setCount] = React.useState(0)
-    const style = {...styles.container, ...styles.secondProp, ...st2.thirdProp, ...{backgroundColor: 'red'}}
+    const style = {...st2.thirdProp}
 
     return (
-        <View style={style}>
+        <View style={{...styles.container, ...styles.secondProp, ...style}}>
             <Animated.View style={styles.animated} />
             <Typography isBold isPrimary size="large" isCentered value={2}>
                 Hello World
