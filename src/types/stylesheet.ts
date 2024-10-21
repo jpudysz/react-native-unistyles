@@ -5,7 +5,7 @@ import type { UnistylesMiniRuntime } from '../specs'
 import type { ReactNativeStyleSheet } from './breakpoints'
 import type { ExtractVariantNames } from './variants'
 import type { CSSProperties } from 'react'
-import type { Pseudo } from '../web/pseudo'
+import type { Pseudo } from '../web/convert/pseudo'
 
 // these props are treated differently to nest breakpoints and media queries
 type NestedKeys = 'shadowOffset' | 'transform' | 'textShadowOffset'

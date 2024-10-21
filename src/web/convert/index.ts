@@ -1,5 +1,5 @@
 import type { UnistylesValues } from '../../types'
-import { isPseudo } from '../pseudo'
+import { isPseudo } from './pseudo'
 import { getStyle } from './style'
 import { deepMergeObjects } from '../utils'
 import { getTransformStyle } from './transform'
