@@ -216,10 +216,6 @@ class UnistylesRegistryBuilder {
         }
 
         rule.style[key as RemoveReadonlyStyleKeys<typeof key>] = value
-
-        if (key === 'content') {
-            rule.style.setProperty('content', value)
-        }
     }
 
     remove = (value: UnistylesValues) => {
