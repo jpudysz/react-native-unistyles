@@ -8,8 +8,6 @@ import { UnistylesListener } from './listener'
 import { UnistyleDependency } from '../specs/NativePlatform'
 
 class UnistylesStateBuilder {
-    private readonly isSSR = isServer()
-
     themes = new Map<string, UnistylesTheme>()
     themeName?: AppThemeName
 
@@ -32,7 +30,7 @@ class UnistylesStateBuilder {
         this.initBreakpoints(config.breakpoints)
         this.initSettings(config.settings)
 
-        if (this.isSSR) {
+        if (isServer()) {
             return
         }
 

@@ -1,23 +1,12 @@
 import type { UnistylesTheme, UnistylesValues } from '../types'
 import type { StyleSheet, StyleSheetWithSuperPowers } from '../types/stylesheet'
 import { UnistylesRuntime } from './runtime'
-import { extractMediaQueryValue, isServer, keyInObject } from './utils'
+import { extractMediaQueryValue, keyInObject, getMediaQuery, generateHash, extractUnistyleDependencies } from './utils'
 import { UnistylesListener } from './listener'
 import { convertUnistyles } from './convert'
 import type { UnistyleDependency } from '../specs/NativePlatform'
 import type { UnistylesMiniRuntime } from '../specs'
-import { getMediaQuery } from './mediaQuery'
 import { getVariants } from './variants'
-
-const generateHash = (value: any) => {
-    const str = JSON.stringify(value)
-    let hasher = 5381
-    let length = str.length
-
-    while (length--) hasher = (hasher * 33) ^ str.charCodeAt(length)
-
-    return `unistyles-${(hasher >>> 0).toString(36)}`
-}
 
 type AddProps = {
     value: UnistylesValues,
@@ -39,17 +28,24 @@ type RemoveReadonlyStyleKeys<T extends string> = T extends 'length' | 'parentRul
 class UnistylesRegistryBuilder {
     private readonly stylesheets = new Map<StyleSheetWithSuperPowers<StyleSheet>, StyleSheet>()
     private readonly stylesCounter = new Map<string, Set<UnistylesValues>>()
-    private readonly styleTag = document.createElement('style')
+    #styleTag: HTMLStyleElement | null = null
     private readonly disposeListenersMap = new Map<object, VoidFunction>()
     private readonly dependenciesMap = new Map<StyleSheetWithSuperPowers<StyleSheet>, Set<UnistyleDependency>>()
 
-    constructor() {
-        if (isServer()) {
-            return
+    private get styleTag() {
+        const tag = this.#styleTag
+
+        if (!tag) {
+            const newTag = document.createElement('style')
+
+            newTag.id = 'unistyles-web'
+            this.#styleTag = newTag
+            document.head.appendChild(newTag)
+
+            return newTag
         }
 
-        this.styleTag.id = 'unistyles-web'
-        document.head.appendChild(this.styleTag)
+        return tag
     }
 
     getComputedStylesheet = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
@@ -64,8 +60,7 @@ class UnistylesRegistryBuilder {
         }
 
         const createdStylesheet = stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
-        // @ts-expect-error uni__dependencies is hidden
-        const dependencies = Object.values(createdStylesheet).flatMap(value => keyInObject(value, 'uni__dependencies') ? value.uni__dependencies : [])
+        const dependencies = Object.values(createdStylesheet).flatMap(value => extractUnistyleDependencies(value))
 
         this.addDependenciesToStylesheet(stylesheet, dependencies)
         this.stylesheets.set(stylesheet, createdStylesheet)
@@ -96,22 +91,18 @@ class UnistylesRegistryBuilder {
 
         if (!existingCounter || existingCounter.size === 0) {
             const counter = new Set<UnistylesValues>()
+            const dependencies = extractUnistyleDependencies(value)
 
             counter.add(value)
             this.stylesCounter.set(hash, counter)
             this.applyStyles(hash, convertUnistyles(value))
 
-            // @ts-expect-error uni__dependencies is hidden
-            const dependencies: Array<UnistyleDependency> = keyInObject(value, 'uni__dependencies') ? value.uni__dependencies : []
+            UnistylesListener.addListeners(dependencies, async () => {
+                // Move this callback to the end of the event loop
+                await Promise.resolve()
 
-            UnistylesListener.addListeners(dependencies, () => Promise.resolve().then(() => {
                 const newComputedStyleSheet = this.getComputedStylesheet(stylesheet)
-                const newValue = newComputedStyleSheet[key]
-
-                if (!newValue) {
-                    return
-                }
-
+                const newValue = newComputedStyleSheet[key]!
                 const result = typeof newValue === 'function'
                     ? newValue(...args)
                     : newValue
@@ -122,7 +113,7 @@ class UnistylesRegistryBuilder {
                 }
 
                 this.applyStyles(hash, convertUnistyles(resultWithVariants))
-            }))
+            })
 
             return hash
         }
@@ -141,7 +132,7 @@ class UnistylesRegistryBuilder {
             if (typeof value === 'object' && !key.startsWith('_')) {
                 const mediaQuery = getMediaQuery(key)
                 const cssRules = Array.from(this.styleTag.sheet.cssRules)
-                let queryRule: CSSRule | null = cssRules.find(rule => {
+                let queryRule = cssRules.find(rule => {
                     if (!(rule instanceof CSSMediaRule)) {
                         return false
                     }
@@ -207,7 +198,7 @@ class UnistylesRegistryBuilder {
     }
 
     private applyRule = ({ hash, key, value, sheet }: ApplyRuleProps) => {
-        let rule: CSSRule | null = Array.from(sheet.cssRules).find(rule => {
+        let rule = Array.from(sheet.cssRules).find(rule => {
             if (!(rule instanceof CSSStyleRule)) {
                 return false
             }
