@@ -51,15 +51,3 @@ public protocol HybridNativePlatformSpec: AnyObject, HybridObjectSpec {
   func getMiniRuntime() throws -> UnistylesNativeMiniRuntime
   func registerPlatformListener(callback: @escaping ((_ dependencies: [UnistyleDependency]) -> Void)) throws -> Void
 }
-
-public extension HybridNativePlatformSpec {
-  /**
-   * Create a new instance of HybridNativePlatformSpecCxx for the given HybridNativePlatformSpec.
-   *
-   * Instances of HybridNativePlatformSpecCxx can be accessed from C++, and contain
-   * additional required bridging code for C++ <> Swift interop.
-   */
-  func createCxxBridge() -> HybridNativePlatformSpecCxx {
-    return HybridNativePlatformSpecCxx(self)
-  }
-}

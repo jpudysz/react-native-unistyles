@@ -50,7 +50,7 @@ namespace margelo::nitro {
         case hashString("light"): return ColorScheme::LIGHT;
         case hashString("unspecified"): return ColorScheme::UNSPECIFIED;
         default: [[unlikely]]
-          throw std::runtime_error("Cannot convert \"" + unionValue + "\" to enum ColorScheme - invalid value!");
+          throw std::invalid_argument("Cannot convert \"" + unionValue + "\" to enum ColorScheme - invalid value!");
       }
     }
     static inline jsi::Value toJSI(jsi::Runtime& runtime, ColorScheme arg) {
@@ -59,7 +59,7 @@ namespace margelo::nitro {
         case ColorScheme::LIGHT: return JSIConverter<std::string>::toJSI(runtime, "light");
         case ColorScheme::UNSPECIFIED: return JSIConverter<std::string>::toJSI(runtime, "unspecified");
         default: [[unlikely]]
-          throw std::runtime_error("Cannot convert ColorScheme to JS - invalid value: "
+          throw std::invalid_argument("Cannot convert ColorScheme to JS - invalid value: "
                                     + std::to_string(static_cast<int>(arg)) + "!");
       }
     }

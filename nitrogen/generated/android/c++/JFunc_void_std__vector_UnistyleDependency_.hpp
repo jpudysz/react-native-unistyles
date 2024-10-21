@@ -30,16 +30,16 @@ namespace margelo::nitro::unistyles {
     }
 
   public:
-    void call(const jni::alias_ref<jni::JArrayClass<JUnistyleDependency>>& dependencies) {
+    void call(jni::alias_ref<jni::JArrayClass<JUnistyleDependency>> dependencies) {
       return _func([&]() {
-        size_t size = dependencies->size();
-        std::vector<UnistyleDependency> vector;
-        vector.reserve(size);
-        for (size_t i = 0; i < size; i++) {
-          auto element = dependencies->getElement(i);
-          vector.push_back(element->toCpp());
+        size_t __size = dependencies->size();
+        std::vector<UnistyleDependency> __vector;
+        __vector.reserve(__size);
+        for (size_t __i = 0; __i < __size; __i++) {
+          auto __element = dependencies->getElement(__i);
+          __vector.push_back(__element->toCpp());
         }
-        return vector;
+        return __vector;
       }());
     }
 
