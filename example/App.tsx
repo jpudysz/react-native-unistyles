@@ -1,14 +1,17 @@
 import React from 'react'
-import { Button, View } from 'react-native'
+import { Button, StyleSheet as ST, View } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
+import Animated from 'react-native-reanimated'
 import './unistyles'
 import { Typography } from './Typography'
 
 export const App = () => {
     const [count, setCount] = React.useState(0)
+    const style = {...st2.thirdProp}
 
     return (
-        <View style={{...styles.container, ...styles.secondProp, ...styles.thirdProp}}>
+        <View style={{...styles.container, ...styles.secondProp, ...style}}>
+            <Animated.View style={styles.animated} />
             <Typography isBold isPrimary size="large" isCentered value={2}>
                 Hello World
             </Typography>
@@ -20,7 +23,13 @@ export const App = () => {
     )
 }
 
-const styles = StyleSheet.create(theme => ({
+const st2 = ST.create({
+    thirdProp: {
+        backgroundColor: 'green'
+    }
+})
+
+const styles = StyleSheet.create((theme, rt) => ({
     container: {
         flex: 1,
         alignItems: 'center',
@@ -28,10 +37,14 @@ const styles = StyleSheet.create(theme => ({
         backgroundColor: theme.colors.backgroundColor
     },
     secondProp: {
-        marginHorizontal: theme.gap(10),
-        backgroundColor: 'red'
+        backgroundColor: 'blue'
     },
     thirdProp: {
         backgroundColor: 'green'
+    },
+    animated: {
+        width: 100,
+        height: 100,
+        backgroundColor: rt.colorScheme === 'dark' ? 'red' : 'blue'
     }
 }))

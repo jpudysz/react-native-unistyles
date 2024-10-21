@@ -8,7 +8,7 @@ interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     remove(handle?: ViewHandle, style?: Unistyle): void,
     // JSI
     link(node: ShadowNode, style?: Unistyle, variants?: Record<string, string | boolean>, args?: Array<any>): void,
-    unlink(node: ShadowNode, style: Unistyle): void
+    unlink(node: ShadowNode): void
 }
 
 const HybridShadowRegistry = NitroModules.createHybridObject<ShadowRegistry>('UnistylesShadowRegistry')
@@ -32,20 +32,15 @@ HybridShadowRegistry.add = (handle, style, variants, args) => {
         return
     }
 
-    // at this point unistyle can be only object or dynamic function
-    if (typeof style !== 'object' && typeof style !== 'function') {
-        return
-    }
-
     HybridShadowRegistry.link(findShadowNodeForHandle(handle), style, variants ?? {}, args ?? [])
 }
 
-HybridShadowRegistry.remove = (handle, style) => {
-    if (!handle || !style?.__unid) {
+HybridShadowRegistry.remove = handle => {
+    if (!handle) {
         return
     }
 
-    HybridShadowRegistry.unlink(findShadowNodeForHandle(handle), style)
+    HybridShadowRegistry.unlink(findShadowNodeForHandle(handle))
 }
 
 type PrivateMethods =

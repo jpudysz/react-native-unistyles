@@ -34,6 +34,7 @@ module.exports = function ({ types: t }) {
                     state.file.hasUnistylesImport = false
                     state.file.styleSheetLocalName = ''
                     state.file.tagNumber = 0
+                    state.file.isClassComponent = false
                     state.reactNativeImports = {}
                 },
                 exit(path, state) {
@@ -58,6 +59,7 @@ module.exports = function ({ types: t }) {
 
                 if (componentName) {
                     state.file.hasVariants = false
+                    state.file.isClassComponent = true
                 }
             },
             VariableDeclaration(path, state) {
@@ -95,11 +97,20 @@ module.exports = function ({ types: t }) {
                 }
             },
             JSXElement(path, state) {
+                if (state.file.isClassComponent) {
+                    return
+                }
+
                 const openingElement = path.node.openingElement
                 const openingElementName = openingElement.name.name
                 const isReactNativeComponent = Boolean(state.reactNativeImports[openingElementName])
+                const isAnimatedComponent = (
+                    !isReactNativeComponent &&
+                    openingElement.name.object &&
+                    openingElement.name.object.name === 'Animated'
+                )
 
-                if (!isReactNativeComponent) {
+                if (!isReactNativeComponent && !isAnimatedComponent) {
                     return
                 }
 

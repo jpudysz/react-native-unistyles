@@ -105,12 +105,20 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
     for (auto& [shadowNode, unistyles] : dependencyMap) {
         auto styleSheet = unistyles.begin()->get()->unistyle->parent;
 
-        if (!parsedStyleSheets.contains(styleSheet)) {
+        // stylesheet may be optional for exotic unistyles
+        if (styleSheet != nullptr && !parsedStyleSheets.contains(styleSheet)) {
             parsedStyleSheets.emplace(styleSheet, this->unwrapStyleSheet(rt, styleSheet));
         }
 
         for (auto& unistyleData : unistyles) {
             auto& unistyle = unistyleData->unistyle;
+
+            // for RN styles or inline styles, compute styles only once
+            if (unistyle->styleKey == helpers::EXOTIC_STYLE_KEY.c_str() && !unistyleData->parsedStyle.has_value()) {
+                unistyleData->parsedStyle = jsi::Value(rt, unistyle->rawValue).asObject(rt);
+
+                continue;
+            }
 
             // StyleSheet might have styles that are not affected
             if (!parsedStyleSheets[styleSheet].asObject(rt).hasProperty(rt, unistyle->styleKey.c_str())) {
@@ -479,8 +487,8 @@ jsi::Value parser::Parser::getStylesForVariant(jsi::Runtime& rt, const std::stri
         : "default";
     auto hasKey = groupValue.hasProperty(rt, selectedVariantKey);
 
-    if (hasKey && !selectedVariant.has_value()) {
-        // add 'default' selection to variants map
+    if (!hasKey || !selectedVariant.has_value()) {
+        // for no key, add 'default' selection to variants map
         variants.emplace_back(groupName, selectedVariantKey);
     }
 
@@ -621,6 +629,11 @@ RawProps parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, const s
     auto& state = core::UnistylesRegistry::get().getState(rt);
 
     for (const auto& unistyleData : unistyles) {
+        if (!unistyleData->parsedStyle.has_value()) {
+            // todo this something happens with large dataset, debug it
+            continue;
+        }
+
         helpers::enumerateJSIObject(rt, unistyleData->parsedStyle.value(), [&](const std::string& propertyName, jsi::Value& propertyValue){
             if (this->isColor(propertyName)) {
                 return convertedStyles.setProperty(rt, propertyName.c_str(), jsi::Value(state.parseColor(propertyValue)));

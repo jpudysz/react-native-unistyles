@@ -2,7 +2,6 @@
 
 #include <jsi/jsi.h>
 #include "Unistyle.h"
-#include "UnistyleWrapper.h"
 #include "Helpers.h"
 #include "Constants.h"
 
