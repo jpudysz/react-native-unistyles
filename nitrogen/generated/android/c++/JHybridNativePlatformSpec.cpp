@@ -60,53 +60,53 @@ namespace margelo::nitro::unistyles {
   // Methods
   Insets JHybridNativePlatformSpec::getInsets() {
     static const auto method = _javaPart->getClass()->getMethod<jni::local_ref<JInsets>()>("getInsets");
-    auto result = method(_javaPart);
-    return result->toCpp();
+    auto __result = method(_javaPart);
+    return __result->toCpp();
   }
   ColorScheme JHybridNativePlatformSpec::getColorScheme() {
     static const auto method = _javaPart->getClass()->getMethod<jni::local_ref<JColorScheme>()>("getColorScheme");
-    auto result = method(_javaPart);
-    return result->toCpp();
+    auto __result = method(_javaPart);
+    return __result->toCpp();
   }
   double JHybridNativePlatformSpec::getFontScale() {
     static const auto method = _javaPart->getClass()->getMethod<double()>("getFontScale");
-    auto result = method(_javaPart);
-    return result;
+    auto __result = method(_javaPart);
+    return __result;
   }
   double JHybridNativePlatformSpec::getPixelRatio() {
     static const auto method = _javaPart->getClass()->getMethod<double()>("getPixelRatio");
-    auto result = method(_javaPart);
-    return result;
+    auto __result = method(_javaPart);
+    return __result;
   }
   Orientation JHybridNativePlatformSpec::getOrientation() {
     static const auto method = _javaPart->getClass()->getMethod<jni::local_ref<JOrientation>()>("getOrientation");
-    auto result = method(_javaPart);
-    return result->toCpp();
+    auto __result = method(_javaPart);
+    return __result->toCpp();
   }
   std::string JHybridNativePlatformSpec::getContentSizeCategory() {
     static const auto method = _javaPart->getClass()->getMethod<jni::local_ref<jni::JString>()>("getContentSizeCategory");
-    auto result = method(_javaPart);
-    return result->toStdString();
+    auto __result = method(_javaPart);
+    return __result->toStdString();
   }
   Dimensions JHybridNativePlatformSpec::getScreenDimensions() {
     static const auto method = _javaPart->getClass()->getMethod<jni::local_ref<JDimensions>()>("getScreenDimensions");
-    auto result = method(_javaPart);
-    return result->toCpp();
+    auto __result = method(_javaPart);
+    return __result->toCpp();
   }
   Dimensions JHybridNativePlatformSpec::getStatusBarDimensions() {
     static const auto method = _javaPart->getClass()->getMethod<jni::local_ref<JDimensions>()>("getStatusBarDimensions");
-    auto result = method(_javaPart);
-    return result->toCpp();
+    auto __result = method(_javaPart);
+    return __result->toCpp();
   }
   Dimensions JHybridNativePlatformSpec::getNavigationBarDimensions() {
     static const auto method = _javaPart->getClass()->getMethod<jni::local_ref<JDimensions>()>("getNavigationBarDimensions");
-    auto result = method(_javaPart);
-    return result->toCpp();
+    auto __result = method(_javaPart);
+    return __result->toCpp();
   }
   bool JHybridNativePlatformSpec::getPrefersRtlDirection() {
     static const auto method = _javaPart->getClass()->getMethod<jboolean()>("getPrefersRtlDirection");
-    auto result = method(_javaPart);
-    return result;
+    auto __result = method(_javaPart);
+    return __result;
   }
   void JHybridNativePlatformSpec::setRootViewBackgroundColor(double color) {
     static const auto method = _javaPart->getClass()->getMethod<void(double /* color */)>("setRootViewBackgroundColor");
@@ -134,8 +134,8 @@ namespace margelo::nitro::unistyles {
   }
   UnistylesNativeMiniRuntime JHybridNativePlatformSpec::getMiniRuntime() {
     static const auto method = _javaPart->getClass()->getMethod<jni::local_ref<JUnistylesNativeMiniRuntime>()>("getMiniRuntime");
-    auto result = method(_javaPart);
-    return result->toCpp();
+    auto __result = method(_javaPart);
+    return __result->toCpp();
   }
   void JHybridNativePlatformSpec::registerPlatformListener(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>& callback) {
     static const auto method = _javaPart->getClass()->getMethod<void(jni::alias_ref<JFunc_void_std__vector_UnistyleDependency_::javaobject> /* callback */)>("registerPlatformListener");

@@ -116,8 +116,8 @@ abstract class HybridNativePlatformSpec: HybridObject() {
   @DoNotStrip
   @Keep
   private fun registerPlatformListener(callback: Func_void_std__vector_UnistyleDependency_): Unit {
-    val result = registerPlatformListener(callback.toLambda())
-    return result
+    val __result = registerPlatformListener(callback.toLambda())
+    return __result
   }
 
   private external fun initHybrid(): HybridData

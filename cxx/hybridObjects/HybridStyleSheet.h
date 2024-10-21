@@ -43,7 +43,7 @@ struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
     };
 
     double getHairlineWidth() override;
-    double get__unid() override;
+    double getUnid() override;
     
 private:
     void parseSettings(jsi::Runtime& rt, jsi::Object settings);

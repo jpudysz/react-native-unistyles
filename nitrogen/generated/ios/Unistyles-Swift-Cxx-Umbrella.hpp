@@ -14,24 +14,12 @@ namespace margelo::nitro::unistyles { enum class ColorScheme; }
 namespace margelo::nitro::unistyles { struct Dimensions; }
 // Forward declaration of `HybridNativePlatformSpec` to properly resolve imports.
 namespace margelo::nitro::unistyles { class HybridNativePlatformSpec; }
-// Forward declaration of `HybridUnistylesNavigationBarSpec` to properly resolve imports.
-namespace margelo::nitro::unistyles { class HybridUnistylesNavigationBarSpec; }
-// Forward declaration of `HybridUnistylesRuntimeSpec` to properly resolve imports.
-namespace margelo::nitro::unistyles { class HybridUnistylesRuntimeSpec; }
-// Forward declaration of `HybridUnistylesShadowRegistrySpec` to properly resolve imports.
-namespace margelo::nitro::unistyles { class HybridUnistylesShadowRegistrySpec; }
-// Forward declaration of `HybridUnistylesStatusBarSpec` to properly resolve imports.
-namespace margelo::nitro::unistyles { class HybridUnistylesStatusBarSpec; }
-// Forward declaration of `HybridUnistylesStyleSheetSpec` to properly resolve imports.
-namespace margelo::nitro::unistyles { class HybridUnistylesStyleSheetSpec; }
 // Forward declaration of `Insets` to properly resolve imports.
 namespace margelo::nitro::unistyles { struct Insets; }
 // Forward declaration of `Orientation` to properly resolve imports.
 namespace margelo::nitro::unistyles { enum class Orientation; }
 // Forward declaration of `UnistyleDependency` to properly resolve imports.
 namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
-// Forward declaration of `UnistylesCxxMiniRuntime` to properly resolve imports.
-namespace margelo::nitro::unistyles { struct UnistylesCxxMiniRuntime; }
 // Forward declaration of `UnistylesNativeMiniRuntime` to properly resolve imports.
 namespace margelo::nitro::unistyles { struct UnistylesNativeMiniRuntime; }
 
@@ -39,19 +27,12 @@ namespace margelo::nitro::unistyles { struct UnistylesNativeMiniRuntime; }
 #include "ColorScheme.hpp"
 #include "Dimensions.hpp"
 #include "HybridNativePlatformSpec.hpp"
-#include "HybridUnistylesNavigationBarSpec.hpp"
-#include "HybridUnistylesRuntimeSpec.hpp"
-#include "HybridUnistylesShadowRegistrySpec.hpp"
-#include "HybridUnistylesStatusBarSpec.hpp"
-#include "HybridUnistylesStyleSheetSpec.hpp"
 #include "Insets.hpp"
 #include "Orientation.hpp"
 #include "UnistyleDependency.hpp"
-#include "UnistylesCxxMiniRuntime.hpp"
 #include "UnistylesNativeMiniRuntime.hpp"
 #include <functional>
 #include <memory>
-#include <optional>
 #include <string>
 #include <vector>
 
@@ -67,16 +48,6 @@ namespace margelo::nitro::unistyles { struct UnistylesNativeMiniRuntime; }
 // Forward declarations of Swift defined types
 // Forward declaration of `HybridNativePlatformSpecCxx` to properly resolve imports.
 namespace Unistyles { class HybridNativePlatformSpecCxx; }
-// Forward declaration of `HybridUnistylesNavigationBarSpecCxx` to properly resolve imports.
-namespace Unistyles { class HybridUnistylesNavigationBarSpecCxx; }
-// Forward declaration of `HybridUnistylesRuntimeSpecCxx` to properly resolve imports.
-namespace Unistyles { class HybridUnistylesRuntimeSpecCxx; }
-// Forward declaration of `HybridUnistylesShadowRegistrySpecCxx` to properly resolve imports.
-namespace Unistyles { class HybridUnistylesShadowRegistrySpecCxx; }
-// Forward declaration of `HybridUnistylesStatusBarSpecCxx` to properly resolve imports.
-namespace Unistyles { class HybridUnistylesStatusBarSpecCxx; }
-// Forward declaration of `HybridUnistylesStyleSheetSpecCxx` to properly resolve imports.
-namespace Unistyles { class HybridUnistylesStyleSheetSpecCxx; }
 
 // Include Swift defined types
 #if __has_include("Unistyles-Swift.h")

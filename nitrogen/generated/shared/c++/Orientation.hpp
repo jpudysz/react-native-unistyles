@@ -48,7 +48,7 @@ namespace margelo::nitro {
         case hashString("portrait"): return Orientation::PORTRAIT;
         case hashString("landscape"): return Orientation::LANDSCAPE;
         default: [[unlikely]]
-          throw std::runtime_error("Cannot convert \"" + unionValue + "\" to enum Orientation - invalid value!");
+          throw std::invalid_argument("Cannot convert \"" + unionValue + "\" to enum Orientation - invalid value!");
       }
     }
     static inline jsi::Value toJSI(jsi::Runtime& runtime, Orientation arg) {
@@ -56,7 +56,7 @@ namespace margelo::nitro {
         case Orientation::PORTRAIT: return JSIConverter<std::string>::toJSI(runtime, "portrait");
         case Orientation::LANDSCAPE: return JSIConverter<std::string>::toJSI(runtime, "landscape");
         default: [[unlikely]]
-          throw std::runtime_error("Cannot convert Orientation to JS - invalid value: "
+          throw std::invalid_argument("Cannot convert Orientation to JS - invalid value: "
                                     + std::to_string(static_cast<int>(arg)) + "!");
       }
     }
