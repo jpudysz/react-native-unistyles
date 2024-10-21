@@ -1,8 +1,5 @@
-import type { NestedCSSProperties } from 'typestyle/lib/types'
 import type { UnistylesValues } from '../../types'
-import { media } from 'typestyle'
-import { isPseudo } from '../pseudo'
-import { convertBreakpoint } from './breakpoint'
+import { isPseudo } from './pseudo'
 import { getStyle } from './style'
 import { deepMergeObjects } from '../utils'
 import { getTransformStyle } from './transform'
@@ -10,7 +7,7 @@ import { isBoxShadow, isTextShadow, isTransform } from './utils'
 import { getTextShadowStyle } from './textShadow'
 import { getBoxShadowStyle } from './boxShadow'
 
-export const convertToTypeStyle = (value: UnistylesValues) => {
+export const convertUnistyles = (value: UnistylesValues) => {
     // Flag to mark if textShadow is already created
     let hasTextShadow = false
     // Flag to mark if boxShadow is already created
@@ -27,13 +24,9 @@ export const convertToTypeStyle = (value: UnistylesValues) => {
 
         // Pseudo classes :hover, :before etc.
         if (isPseudo(unistylesKey)) {
-            const typestyleValues = convertToTypeStyle(unistylesValue as UnistylesValues)
+            const flattenValues = convertUnistyles(unistylesValue as UnistylesValues)
 
-            return {
-                $nest: {
-                    [unistylesKey.replace('_', '&:')]: typestyleValues
-                }
-            }
+            return { [unistylesKey]: flattenValues }
         }
 
         // Text shadow
@@ -66,13 +59,13 @@ export const convertToTypeStyle = (value: UnistylesValues) => {
         // Breakpoints
         if (typeof unistylesValue === 'object' && unistylesValue !== null) {
             return Object.entries(unistylesValue).map(([breakpointKey, breakpointValue]) => {
-                return media(convertBreakpoint(breakpointKey), getStyle(unistylesKey, breakpointValue))
+                return { [breakpointKey]: getStyle(unistylesKey, breakpointValue) }
             })
         }
 
         // Regular styles
         return getStyle(unistylesKey, unistylesValue)
-    }) as Array<NestedCSSProperties>
+    }) as Array<Record<string, any>>
 
     return deepMergeObjects(...stylesArray)
 }
