@@ -1,8 +1,5 @@
-import { media } from 'typestyle'
-import type { NestedCSSProperties } from 'typestyle/lib/types'
 import { deepMergeObjects, keyInObject } from '../utils'
 import { normalizeNumericValue } from './utils'
-import { convertBreakpoint } from './breakpoint'
 
 type Transforms = Array<Record<string, any>>
 
@@ -39,7 +36,7 @@ const createTransformValue = (transforms: Transforms) => transforms
     .filter(Boolean)
     .join(' ')
 
-export const getTransformStyle = (transforms: Transforms): NestedCSSProperties => {
+export const getTransformStyle = (transforms: Transforms) => {
     const breakpoints = new Set<string>()
     const normalTransforms: Transforms = []
 
@@ -78,12 +75,14 @@ export const getTransformStyle = (transforms: Transforms): NestedCSSProperties =
             return []
         })
 
-        return media(convertBreakpoint(breakpoint), {
-            transform: createTransformValue(transformsPerBreakpoint)
-        })
+        return [{
+            [breakpoint]: {
+                transform: createTransformValue(transformsPerBreakpoint)
+            }
+        }]
     })
 
-    return deepMergeObjects({
+    return deepMergeObjects<Record<string, any>>({
         transform: createTransformValue(normalTransforms)
     }, ...breakpointTransforms)
 }
