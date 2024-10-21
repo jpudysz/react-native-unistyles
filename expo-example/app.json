@@ -3,9 +3,10 @@
     "name": "expo-example",
     "slug": "expo-example",
     "version": "1.0.0",
+    "scheme": "expo-example",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
@@ -37,7 +38,8 @@
       ]
     ],
     "web": {
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "bundler": "metro"
     }
   }
 }

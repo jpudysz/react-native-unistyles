@@ -74,7 +74,7 @@ void core::UnistylesRegistry::updateTheme(jsi::Runtime& rt, std::string& themeNa
 void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
     jsi::Runtime& rt,
     const ShadowNodeFamily* shadowNodeFamily,
-    const core::Unistyle::Shared unistyle,
+    std::vector<core::Unistyle::Shared>& unistyles,
     Variants& variants,
     std::vector<folly::dynamic>& arguments
 ) {
@@ -82,22 +82,23 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
         this->_shadowRegistry[&rt][shadowNodeFamily] = {};
     }
 
-    this->_shadowRegistry[&rt][shadowNodeFamily].emplace_back(std::make_shared<UnistyleData>(unistyle, variants, arguments));
+    std::for_each(unistyles.begin(), unistyles.end(), [&, this](Unistyle::Shared unistyle){
+        this->_shadowRegistry[&rt][shadowNodeFamily].emplace_back(std::make_shared<UnistyleData>(unistyle, variants, arguments));
+    });
 }
 
-void core::UnistylesRegistry::unlinkShadowNodeWithUnistyle(
-    jsi::Runtime& rt,
-    const ShadowNodeFamily* shadowNodeFamily,
-    const core::Unistyle::Shared unistyle
-) {
-    auto& unistylesVec = this->_shadowRegistry[&rt][shadowNodeFamily];
-    auto it = std::find_if(unistylesVec.begin(), unistylesVec.end(), [unistyle](std::shared_ptr<UnistyleData> unistyleData){
-        return unistyleData->unistyle == unistyle;
-    });
+void core::UnistylesRegistry::unlinkShadowNodeWithUnistyles(jsi::Runtime& rt, const ShadowNodeFamily* shadowNodeFamily) {
+    this->_shadowRegistry[&rt][shadowNodeFamily].clear();
+}
 
-    if (it != unistylesVec.end()) {
-        this->_shadowRegistry[&rt][shadowNodeFamily].erase(it);
+core::Unistyle::Shared core::UnistylesRegistry::findUnistyleFromKey(jsi::Runtime& rt, std::string styleKey, int tag) {
+    auto targetStyleSheet = this->_styleSheetRegistry[&rt][tag];
+    
+    if (targetStyleSheet == nullptr) {
+        return nullptr;
     }
+    
+    return targetStyleSheet.get()->unistyles[styleKey];
 }
 
 std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(jsi::Runtime& rt, int unid, core::StyleSheetType type, jsi::Object&& rawValue) {

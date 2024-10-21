@@ -44,7 +44,7 @@ pluginTester({
                             style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
-                                return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
                             <Text>Hello world</Text>
@@ -93,7 +93,7 @@ pluginTester({
                             style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
-                                return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
                             <Text>Hello world</Text>
@@ -143,7 +143,7 @@ pluginTester({
                             style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
-                                return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
                             <Text>Hello world</Text>
@@ -194,7 +194,7 @@ pluginTester({
                             style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
-                                return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
                             <Text>Hello world</Text>
@@ -246,7 +246,7 @@ pluginTester({
                             style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
-                                return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
                             <Text>Hello world</Text>
@@ -299,7 +299,7 @@ pluginTester({
                             style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
-                                return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
                             <Text>Hello world</Text>
@@ -353,7 +353,7 @@ pluginTester({
                             style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
-                                return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
                             <Text>Hello world</Text>
@@ -409,7 +409,7 @@ pluginTester({
                             style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
-                                return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
                             <Text>Hello world</Text>
@@ -473,7 +473,7 @@ pluginTester({
                             style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
-                                return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
                             <Text>Hello world</Text>

@@ -79,7 +79,7 @@ pluginTester({
                             style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
-                                return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
                             <Text>Hello world</Text>
@@ -128,7 +128,7 @@ pluginTester({
                             style={[styles.container]}
                             ref={ref => {
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
-                                return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
                             <Text style={styles.text}>Hello world</Text>
@@ -186,7 +186,7 @@ pluginTester({
                             ref={_ref => {
                                 ref.current = _ref
                                 UnistylesShadowRegistry.add(_ref, styles.container, undefined, undefined)
-                                return () => UnistylesShadowRegistry.remove(_ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(_ref)
                             }}
                             style={[styles.container]}
                         >
@@ -250,7 +250,7 @@ pluginTester({
                                 myRef.current = ref
                                 UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
                                 return () => {
-                                    UnistylesShadowRegistry.remove(ref, styles.container)
+                                    UnistylesShadowRegistry.remove(ref)
                                 }
                             }}
                             style={[styles.container]}
@@ -322,7 +322,7 @@ pluginTester({
                                     ;(() => {
                                         customCleanup()
                                     })()
-                                    UnistylesShadowRegistry.remove(ref, styles.container)
+                                    UnistylesShadowRegistry.remove(ref)
                                 }
                             }}
                             style={[styles.container]}
@@ -398,7 +398,7 @@ pluginTester({
                                     ;(() => {
                                         customCleanup2()
                                     })()
-                                    UnistylesShadowRegistry.remove(_ref, styles.container)
+                                    UnistylesShadowRegistry.remove(_ref)
                                 }
                             }}
                             style={[styles.container]}
@@ -474,7 +474,7 @@ pluginTester({
                                     ;(() => {
                                         customCleanup2()
                                     })()
-                                    UnistylesShadowRegistry.remove(_ref, styles.container)
+                                    UnistylesShadowRegistry.remove(_ref)
                                 }
                             }}
                             style={[styles.container]}
@@ -523,6 +523,7 @@ pluginTester({
                 })
             `,
             output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import { useRef } from 'react'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
@@ -532,10 +533,19 @@ pluginTester({
 
                     return (
                         <View
-                            ref={myRef}
-                            style={{
-                                backgroundColor: 'red'
+                            ref={_ref => {
+                                myRef.current = _ref
+                                UnistylesShadowRegistry.add(
+                                    _ref,
+                                    {
+                                        backgroundColor: 'red'
+                                    },
+                                    undefined,
+                                    undefined
+                                )
+                                return () => UnistylesShadowRegistry.remove(_ref)
                             }}
+                            style={[{ backgroundColor: 'red' }]}
                         >
                             <Text>Hello world</Text>
                         </View>
@@ -597,8 +607,8 @@ pluginTester({
                                 UnistylesShadowRegistry.add(_ref, obj1, undefined, undefined)
                                 UnistylesShadowRegistry.add(_ref, obj2, undefined, undefined)
                                 return () => {
-                                    ;(() => UnistylesShadowRegistry.remove(_ref, obj1))()
-                                    UnistylesShadowRegistry.remove(_ref, obj2)
+                                    ;(() => UnistylesShadowRegistry.remove(_ref))()
+                                    UnistylesShadowRegistry.remove(_ref)
                                 }
                             }}
                             style={[obj1, obj2]}
@@ -660,8 +670,8 @@ pluginTester({
                                 UnistylesShadowRegistry.add(_ref, obj1, undefined, undefined)
                                 UnistylesShadowRegistry.add(_ref, obj2, undefined, undefined)
                                 return () => {
-                                    ;(() => UnistylesShadowRegistry.remove(_ref, obj1))()
-                                    UnistylesShadowRegistry.remove(_ref, obj2)
+                                    ;(() => UnistylesShadowRegistry.remove(_ref))()
+                                    UnistylesShadowRegistry.remove(_ref)
                                 }
                             }}
                             style={[obj1, obj2]}
@@ -726,14 +736,20 @@ pluginTester({
                             ref={_ref => {
                                 myRef.current = _ref
                                 UnistylesShadowRegistry.add(_ref, styles.container, undefined, undefined)
-                                return () => UnistylesShadowRegistry.remove(_ref, styles.container)
-                            }}
-                            style={[
-                                styles.container,
-                                {
-                                    backgroundColor: 'red'
+                                UnistylesShadowRegistry.add(
+                                    _ref,
+                                    {
+                                        backgroundColor: 'red'
+                                    },
+                                    undefined,
+                                    undefined
+                                )
+                                return () => {
+                                    ;(() => UnistylesShadowRegistry.remove(_ref))()
+                                    UnistylesShadowRegistry.remove(_ref)
                                 }
-                            ]}
+                            }}
+                            style={[styles.container, { backgroundColor: 'red' }]}
                         >
                             <Text>Hello world</Text>
                         </View>
@@ -795,14 +811,20 @@ pluginTester({
                             ref={_ref => {
                                 myRef.current = _ref
                                 UnistylesShadowRegistry.add(_ref, styles.container, undefined, undefined)
-                                return () => UnistylesShadowRegistry.remove(_ref, styles.container)
-                            }}
-                            style={[
-                                styles.container,
-                                {
-                                    backgroundColor: 'red'
+                                UnistylesShadowRegistry.add(
+                                    _ref,
+                                    {
+                                        backgroundColor: 'red'
+                                    },
+                                    undefined,
+                                    undefined
+                                )
+                                return () => {
+                                    ;(() => UnistylesShadowRegistry.remove(_ref))()
+                                    UnistylesShadowRegistry.remove(_ref)
                                 }
-                            ]}
+                            }}
+                            style={[styles.container, { backgroundColor: 'red' }]}
                         >
                             <Text>Hello world</Text>
                         </View>
@@ -859,7 +881,7 @@ pluginTester({
                             ref={_ref => {
                                 myRef.current = _ref
                                 UnistylesShadowRegistry.add(_ref, styles.container, undefined, undefined)
-                                return () => UnistylesShadowRegistry.remove(_ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(_ref)
                             }}
                             style={[styles.container]}
                         >
@@ -920,7 +942,7 @@ pluginTester({
                             ref={_ref => {
                                 myRef.current = _ref
                                 UnistylesShadowRegistry.add(_ref, styles.container, undefined, [1, 2])
-                                return () => UnistylesShadowRegistry.remove(_ref, styles.container)
+                                return () => UnistylesShadowRegistry.remove(_ref)
                             }}
                             style={[styles.container(1, 2)]}
                         >
@@ -982,7 +1004,11 @@ pluginTester({
                             ref={_ref => {
                                 myRef.current = _ref
                                 UnistylesShadowRegistry.add(_ref, styles.container, undefined, [1, 2])
-                                return () => UnistylesShadowRegistry.remove(_ref, styles.container)
+                                UnistylesShadowRegistry.add(_ref, { backgroundColor: 'red' }, undefined, undefined)
+                                return () => {
+                                    ;(() => UnistylesShadowRegistry.remove(_ref))()
+                                    UnistylesShadowRegistry.remove(_ref)
+                                }
                             }}
                             style={[{ backgroundColor: 'red' }, styles.container(1, 2)]}
                         >
@@ -1059,7 +1085,7 @@ pluginTester({
                             ref={_ref => {
                                 myRef.current = _ref
                                 UnistylesShadowRegistry.add(_ref, uhh.dkk, __uni__variants, [])
-                                return () => UnistylesShadowRegistry.remove(_ref, uhh.dkk)
+                                return () => UnistylesShadowRegistry.remove(_ref)
                             }}
                             style={[uhh.dkk()]}
                         >
@@ -1129,7 +1155,7 @@ pluginTester({
                             ref={_ref => {
                                 myRef.current = _ref
                                 UnistylesShadowRegistry.add(_ref, uhh.dkk, undefined, [])
-                                return () => UnistylesShadowRegistry.remove(_ref, uhh.dkk)
+                                return () => UnistylesShadowRegistry.remove(_ref)
                             }}
                             style={[uhh.dkk()]}
                         >
@@ -1183,21 +1209,21 @@ pluginTester({
                                 style={[styles.container(1, 5)]}
                                 ref={ref => {
                                     UnistylesShadowRegistry.add(ref, styles.container, undefined, [1, 5])
-                                    return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                    return () => UnistylesShadowRegistry.remove(ref)
                                 }}
                             />
                             <View
                                 style={[styles.container(2, 6)]}
                                 ref={ref => {
                                     UnistylesShadowRegistry.add(ref, styles.container, undefined, [2, 6])
-                                    return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                    return () => UnistylesShadowRegistry.remove(ref)
                                 }}
                             />
                             <View
                                 style={[styles.container(5, 1)]}
                                 ref={ref => {
                                     UnistylesShadowRegistry.add(ref, styles.container, undefined, [5, 1])
-                                    return () => UnistylesShadowRegistry.remove(ref, styles.container)
+                                    return () => UnistylesShadowRegistry.remove(ref)
                                 }}
                             />
                         </React.Fragment>
@@ -1250,8 +1276,8 @@ pluginTester({
                                     UnistylesShadowRegistry.add(ref, styles.container, undefined, [1, 5])
                                     UnistylesShadowRegistry.add(ref, styles.container2, undefined, [1, 6])
                                     return () => {
-                                        ;(() => UnistylesShadowRegistry.remove(ref, styles.container))()
-                                        UnistylesShadowRegistry.remove(ref, styles.container2)
+                                        ;(() => UnistylesShadowRegistry.remove(ref))()
+                                        UnistylesShadowRegistry.remove(ref)
                                     }
                                 }}
                             />
@@ -1313,10 +1339,10 @@ pluginTester({
                                 UnistylesShadowRegistry.add(ref, styles.thirdProp, undefined, undefined)
                                 return () => {
                                     ;(() => {
-                                        ;(() => UnistylesShadowRegistry.remove(ref, styles.container))()
-                                        UnistylesShadowRegistry.remove(ref, styles.secondProp)
+                                        ;(() => UnistylesShadowRegistry.remove(ref))()
+                                        UnistylesShadowRegistry.remove(ref)
                                     })()
-                                    UnistylesShadowRegistry.remove(ref, styles.thirdProp)
+                                    UnistylesShadowRegistry.remove(ref)
                                 }
                             }}
                         />
@@ -1339,6 +1365,58 @@ pluginTester({
                         },
                         thirdProp: {
                             backgroundColor: 'blue'
+                        }
+                    }),
+                    921918562
+                )
+            `
+        },
+        {
+            title: 'Should support nested styles',
+            code: `
+                import { View } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ styles }) => {
+                    return (
+                        <View style={styles.nested.prop} />
+                    )
+                }
+
+                const styles = StyleSheet.create(theme => ({
+                    container: {
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: theme.colors.backgroundColor
+                    }
+                }))
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ styles }) => {
+                    return (
+                        <View
+                            style={[styles.nested.prop]}
+                            ref={ref => {
+                                UnistylesShadowRegistry.add(ref, styles.nested.prop, undefined, undefined)
+                                return () => UnistylesShadowRegistry.remove(ref)
+                            }}
+                        />
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    theme => ({
+                        container: {
+                            flex: 1,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: theme.colors.backgroundColor,
+                            uni__dependencies: [0]
                         }
                     }),
                     921918562

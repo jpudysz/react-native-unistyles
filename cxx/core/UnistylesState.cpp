@@ -88,8 +88,14 @@ int core::UnistylesState::parseColor(jsi::Value& maybeColor) {
         return 0;
     }
     
-    // we must convert it to uint32_t first, otherwise color will be broken
-    uint32_t color = this->_processColorFn.get()->call(*_rt, maybeColor.asString(*_rt)).asNumber();
-
-    return color ? color : 0;
+    auto colorString = maybeColor.asString(*_rt);
+    
+    if (!this->_colorCache.contains(colorString.utf8(*_rt).c_str())) {
+        // we must convert it to uint32_t first, otherwise color will be broken
+        uint32_t color = this->_processColorFn.get()->call(*_rt, colorString).asNumber();
+        
+        this->_colorCache[colorString.utf8(*_rt).c_str()] = color ? color : 0;
+    }
+    
+    return this->_colorCache[colorString.utf8(*_rt).c_str()];
 }

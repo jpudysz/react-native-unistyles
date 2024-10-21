@@ -14,6 +14,17 @@ function hasStringRef(t, path) {
     )
 }
 
+function memberExpressionFromArray(t, identifiers) {
+    // possible for inline styles
+    if (identifiers.length === 0) {
+        return undefined
+    }
+
+    const [base, ...members] = identifiers
+
+    return members.reduce((object, property) => t.memberExpression(object, t.identifier(property)), t.identifier(base))
+}
+
 function addRef(t, path, metadata, state) {
     const hasVariants = state.file.hasVariants
 
@@ -25,9 +36,7 @@ function addRef(t, path, metadata, state) {
                     t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
                     [
                         t.identifier('ref'),
-                        metadata.styleProp
-                            ? t.memberExpression(t.identifier(metadata.styleObj), t.identifier(metadata.styleProp))
-                            : t.identifier(metadata.styleObj),
+                        memberExpressionFromArray(t, metadata.members) || metadata.inlineStyle,
                         t.identifier(hasVariants ? '__uni__variants' : 'undefined'),
                         metadata.dynamicFunction ? t.arrayExpression(metadata.dynamicFunction.arguments) : t.identifier('undefined')
                     ]
@@ -37,12 +46,7 @@ function addRef(t, path, metadata, state) {
                 t.arrowFunctionExpression([],
                     t.callExpression(
                         t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('remove')),
-                        [
-                            t.identifier('ref'),
-                            metadata.styleProp
-                                ? t.memberExpression(t.identifier(metadata.styleObj), t.identifier(metadata.styleProp))
-                                : t.identifier(metadata.styleObj)
-                        ]
+                        [t.identifier('ref')]
                     )
                 )
             )
@@ -81,9 +85,7 @@ function overrideRef(t, path, refProp, metadata, state) {
                         t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
                         [
                             t.identifier(uniqueRefName),
-                            metadata.styleProp
-                                ? t.memberExpression(t.identifier(metadata.styleObj), t.identifier(metadata.styleProp))
-                                : t.identifier(metadata.styleObj),
+                            memberExpressionFromArray(t, metadata.members) || metadata.inlineStyle,
                             t.identifier(hasVariants ? '__uni__variants' : 'undefined'),
                             metadata.dynamicFunction ? t.arrayExpression(metadata.dynamicFunction.arguments) : t.identifier('undefined')
                         ]
@@ -94,10 +96,7 @@ function overrideRef(t, path, refProp, metadata, state) {
                         t.callExpression(
                             t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('remove')),
                             [
-                                t.identifier(uniqueRefName),
-                                metadata.styleProp
-                                    ? t.memberExpression(t.identifier(metadata.styleObj), t.identifier(metadata.styleProp))
-                                    : t.identifier(metadata.styleObj)
+                                t.identifier(uniqueRefName)
                             ]
                         )
                     )
@@ -131,9 +130,7 @@ function overrideRef(t, path, refProp, metadata, state) {
                         t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
                         [
                             t.identifier(userRefName),
-                            metadata.styleProp
-                                ? t.memberExpression(t.identifier(metadata.styleObj), t.identifier(metadata.styleProp))
-                                : t.identifier(metadata.styleObj),
+                            memberExpressionFromArray(t, metadata.members) || metadata.inlineStyle,
                             t.identifier(hasVariants ? '__uni__variants' : 'undefined'),
                             metadata.dynamicFunction ? t.arrayExpression(metadata.dynamicFunction.arguments) : t.identifier('undefined')
                         ]
@@ -151,10 +148,7 @@ function overrideRef(t, path, refProp, metadata, state) {
                             t.callExpression(
                                 t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('remove')),
                                 [
-                                    t.identifier(userRefName),
-                                    metadata.styleProp
-                                        ? t.memberExpression(t.identifier(metadata.styleObj), t.identifier(metadata.styleProp))
-                                        : t.identifier(metadata.styleObj)
+                                    t.identifier(userRefName)
                                 ]
                             )
                         )
@@ -198,9 +192,7 @@ function overrideRef(t, path, refProp, metadata, state) {
                     t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
                     [
                         t.identifier(uniqueRefName),
-                        metadata.styleProp
-                            ? t.memberExpression(t.identifier(metadata.styleObj), t.identifier(metadata.styleProp))
-                            : t.identifier(metadata.styleObj),
+                        memberExpressionFromArray(t, metadata.members) || metadata.inlineStyle,
                         t.identifier(hasVariants ? '__uni__variants' : 'undefined'),
                         metadata.dynamicFunction ? t.arrayExpression(metadata.dynamicFunction.arguments) : t.identifier('undefined')
                     ]
@@ -217,14 +209,11 @@ function overrideRef(t, path, refProp, metadata, state) {
                         t.callExpression(
                             t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('remove')),
                             [
-                                t.identifier(uniqueRefName),
-                                metadata.styleProp
-                                    ? t.memberExpression(t.identifier(metadata.styleObj), t.identifier(metadata.styleProp))
-                                    : t.identifier(metadata.styleObj)
+                                t.identifier(uniqueRefName)
                             ]
                         )
                     )
-                ]))
+                ].filter(Boolean)))
             )
         ])
     )

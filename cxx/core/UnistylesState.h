@@ -43,6 +43,7 @@ private:
     std::vector<std::string> _registeredThemeNames{};
     std::optional<std::string> _currentThemeName = std::nullopt;
     std::shared_ptr<jsi::Function> _processColorFn;
+    std::unordered_map<std::string, uint32_t> _colorCache{};
 
     friend class UnistylesRegistry;
 };

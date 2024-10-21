@@ -7,5 +7,7 @@ static const std::string ADD_VARIANTS_FN = "useVariants";
 static const std::string STYLE_DEPENDENCIES = "uni__dependencies";
 static const std::string STYLE_VARIANTS = "uni__variants";
 static const std::string WEB_STYLE_KEY = "_web";
+static const std::string EXOTIC_STYLE_KEY = "_exotic";
+static const std::string NAME_STYLE_KEY = "__unistyles_name";
 
 }
