@@ -1,6 +1,6 @@
 import type { UnistylesValues } from '../types'
 import { UnistylesRegistry } from './registry'
-import { equal, extractSecrets, extractUnistyleDependencies, isInDocument } from './utils'
+import { createDoubleMap, equal, extractSecrets, extractUnistyleDependencies, isInDocument } from './utils'
 import { getVariants } from './variants'
 
 type Style = UnistylesValues | ((...args: Array<any>) => UnistylesValues)
@@ -14,8 +14,8 @@ class UnistylesShadowRegistryBuilder {
     dispose = () => {}
     // END MOCKS
 
-    private resultsMap = new Map<HTMLElement, UnistylesValues>
-    private classNamesMap = new Map<HTMLElement, Array<string>>()
+    private resultsMap = createDoubleMap<HTMLElement, string, UnistylesValues>()
+    private classNamesMap = createDoubleMap<HTMLElement, string, Array<string>>()
 
     add = (ref: any, _style?: Style | Array<Style>, _variants?: Record<string, any>, _args?: Array<any>) => {
         // Style is not provided
@@ -39,15 +39,15 @@ class UnistylesShadowRegistryBuilder {
         if (ref === null) {
             const secrets = extractSecrets(_style)
 
-            secrets.forEach(({ __uni__refs }) => {
+            secrets.forEach(({ __uni__refs, __uni__key }) => {
                 __uni__refs.forEach(ref => {
                     if (isInDocument(ref)) {
                         return
                     }
 
-                    const oldResult = this.resultsMap.get(ref)
-                    this.resultsMap.delete(ref)
-                    this.classNamesMap.delete(ref)
+                    const oldResult = this.resultsMap.get(ref, __uni__key)
+                    this.resultsMap.delete(ref, __uni__key)
+                    this.classNamesMap.delete(ref, __uni__key)
 
                     if (oldResult) {
                         UnistylesRegistry.remove(oldResult)
@@ -77,14 +77,14 @@ class UnistylesShadowRegistryBuilder {
                 ...result,
                 ...variantsResult
             }
-            const oldResult = this.resultsMap.get(ref)
+            const oldResult = this.resultsMap.get(ref, __uni__key)
 
             // If results are the same do nothing
             if (equal(oldResult, resultWithVariants)) {
                 return
             }
 
-            const oldClassNames = this.classNamesMap.get(ref)
+            const oldClassNames = this.classNamesMap.get(ref, __uni__key)
 
             // Remove old styles
             if (oldResult) {
@@ -93,7 +93,7 @@ class UnistylesShadowRegistryBuilder {
 
             // Remove old classnames from the ref
             oldClassNames?.forEach(className => ref.classList.remove(className))
-            this.resultsMap.set(ref, resultWithVariants)
+            this.resultsMap.set(ref, __uni__key, resultWithVariants)
 
             const className = UnistylesRegistry.add({
                 key: __uni__key,
@@ -112,7 +112,7 @@ class UnistylesShadowRegistryBuilder {
             }
 
             __uni__refs.add(ref)
-            this.classNamesMap.set(ref, newClassNames)
+            this.classNamesMap.set(ref, __uni__key, newClassNames)
             // Add new classnames to the ref
             ref.classList.add(...newClassNames)
         })
