@@ -223,18 +223,24 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
 
     // check if color scheme changed and then if Unistyles state depend on it (adaptive themes)
     auto colorSchemeIt = std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::COLORSCHEME);
+    auto hasNewColorScheme = colorSchemeIt != dependencies.end();
+    
+    // in a later step, we will rebuild only Unistyles with mounted StyleSheets
+    // however, user may have StyleSheets with components that haven't mounted yet
+    // we need to rebuild all dependent StyleSheets as well
+    auto dependentStyleSheets = registry.getStyleSheetsToRefresh(rt, hasNewColorScheme, dependencies.size() > 1);
 
-    if (colorSchemeIt != dependencies.end()) {
+    if (hasNewColorScheme) {
         this->_unistylesRuntime->includeDependenciesForColorSchemeChange(dependencies);
     }
-
+    
     auto dependencyMap = registry.buildDependencyMap(rt, dependencies);
 
     if (dependencyMap.size() == 0) {
         return;
     }
 
-    parser.rebuildUnistylesInDependencyMap(rt, dependencyMap);
+    parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets);
 
     // this is required, otherwise shadow tree will ignore Unistyles commit
     registry.trafficController.setHasUnistylesCommit(true);

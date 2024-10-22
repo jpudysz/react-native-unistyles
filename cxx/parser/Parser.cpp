@@ -99,9 +99,16 @@ void parser::Parser::rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_
 }
 
 // rebuild all unistyles that are affected by platform event
-void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, DependencyMap& dependencyMap) {
+void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, DependencyMap& dependencyMap, std::vector<std::shared_ptr<core::StyleSheet>> styleSheets) {
     std::unordered_map<std::shared_ptr<StyleSheet>, jsi::Value> parsedStyleSheets{};
+    std::unordered_map<std::shared_ptr<core::Unistyle>, bool> parsedUnistyles{};
 
+    // parse all stylesheets that depends on changes
+    for (auto styleSheet : styleSheets) {
+        parsedStyleSheets.emplace(styleSheet, this->unwrapStyleSheet(rt, styleSheet));
+    }
+
+    // then parse all visible Unistyles
     for (auto& [shadowNode, unistyles] : dependencyMap) {
         auto styleSheet = unistyles.begin()->get()->unistyle->parent;
 
@@ -116,6 +123,10 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
             // for RN styles or inline styles, compute styles only once
             if (unistyle->styleKey == helpers::EXOTIC_STYLE_KEY.c_str() && !unistyleData->parsedStyle.has_value()) {
                 unistyleData->parsedStyle = jsi::Value(rt, unistyle->rawValue).asObject(rt);
+                
+                if (!parsedUnistyles.contains(unistyle)) {
+                    parsedUnistyles.emplace(unistyle, true);
+                }
 
                 continue;
             }
@@ -128,6 +139,21 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
             unistyle->rawValue = parsedStyleSheets[styleSheet].asObject(rt).getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
             this->rebuildUnistyle(rt, styleSheet, unistyle, unistyleData->variants, unistyleData->dynamicFunctionMetadata);
             unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
+            
+            if (!parsedUnistyles.contains(unistyle)) {
+                parsedUnistyles.emplace(unistyle, true);
+            }
+        }
+    }
+    
+    // parse whatever left in StyleSheets
+    for (auto styleSheet : styleSheets) {
+        for (auto& [_, unistyle] : styleSheet->unistyles) {
+            if (!parsedUnistyles.contains(unistyle)) {
+                parsedUnistyles.emplace(unistyle, true);
+                unistyle->rawValue = parsedStyleSheets[styleSheet].asObject(rt).getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
+                this->rebuildUnistyle(rt, styleSheet, unistyle, {}, std::nullopt);
+            }
         }
     }
 }
