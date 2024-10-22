@@ -149,3 +149,29 @@ core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt
 
     return dependencyMap;
 }
+
+std::vector<std::shared_ptr<core::StyleSheet>> core::UnistylesRegistry::getStyleSheetsToRefresh(jsi::Runtime& rt, bool themeDidChange, bool runtimeDidChange) {
+    std::vector<std::shared_ptr<core::StyleSheet>> stylesheetsToRefresh{};
+    
+    if (!themeDidChange && !runtimeDidChange) {
+        return stylesheetsToRefresh;
+    }
+    
+    auto& styleSheets = this->_styleSheetRegistry[&rt];
+    
+    std::for_each(styleSheets.begin(), styleSheets.end(), [&](std::pair<int, std::shared_ptr<core::StyleSheet>> pair){
+        auto& [_, styleSheet] = pair;
+        
+        if (styleSheet->type == StyleSheetType::ThemableWithMiniRuntime && runtimeDidChange) {
+            stylesheetsToRefresh.emplace_back(styleSheet);
+            
+            return;
+        }
+        
+        if (styleSheet->type == StyleSheetType::Themable && themeDidChange) {
+            stylesheetsToRefresh.emplace_back(styleSheet);
+        }
+    });
+    
+    return stylesheetsToRefresh;
+}
