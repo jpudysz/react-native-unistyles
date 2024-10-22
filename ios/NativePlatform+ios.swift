@@ -1,12 +1,14 @@
 #if os(iOS)
 
 import Foundation
+import Combine
 import NitroModules
 
 typealias CxxListener = (Array<UnistyleDependency>) -> Void
 
 class NativeIOSPlatform: HybridNativePlatformSpec {
     var miniRuntime: UnistylesNativeMiniRuntime?
+    var cancellables = Set<AnyCancellable>()
 
     var listeners: Array<CxxListener> = []
     var hybridContext = margelo.nitro.HybridContext()
