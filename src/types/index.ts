@@ -17,5 +17,5 @@ export type {
     UnistyleImage
 } from './stylesheet'
 export type { ReactNativeStyleSheet } from './breakpoints'
-export type { ExtractVariantNames } from './variants'
+export type { ExtractVariantNames, UnistylesVariants } from './variants'
 export { AndroidContentSizeCategory, IOSContentSizeCategory, WebContentSizeCategory } from './accessibility'

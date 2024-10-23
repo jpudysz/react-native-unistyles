@@ -2,13 +2,10 @@ import React from 'react'
 import type { PropsWithChildren } from 'react'
 import {Text} from 'react-native'
 import {StyleSheet} from 'react-native-unistyles'
+import type {UnistylesVariants} from 'react-native-unistyles'
 
-interface TypographyProps extends PropsWithChildren {
-    value: number,
-    isBold?: boolean,
-    isCentered?: boolean,
-    isPrimary?: boolean,
-    size?: 'large' | 'small',
+interface TypographyProps extends PropsWithChildren, UnistylesVariants<typeof styles> {
+    value: number
 }
 
 export const Typography: React.FunctionComponent<TypographyProps> = ({

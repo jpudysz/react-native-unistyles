@@ -4,6 +4,7 @@ export * from './specs'
 export { mq } from './mq'
 export type { UnistylesThemes, UnistylesBreakpoints } from './global'
 export { useTheme, useBreakpoint } from './core'
+export type { UnistylesVariants } from './types'
 
 // TODO: export Native createUnistylesComponent
 // can't import it this way, it will break native build
