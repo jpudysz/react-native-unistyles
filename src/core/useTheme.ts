@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { UnistylesRuntime } from '../web'
 import { UnistylesListener } from '../web/listener'
-import { UnistyleDependency } from '../specs'
+import { UnistyleDependency } from '../specs/NativePlatform'
 
 export const useTheme = () => {
     const [theme, setTheme] = useState(UnistylesRuntime.getTheme())
