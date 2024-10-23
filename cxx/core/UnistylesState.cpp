@@ -57,6 +57,10 @@ jsi::Object core::UnistylesState::getJSThemeByName(std::string& themeName) {
 }
 
 void core::UnistylesState::computeCurrentBreakpoint(int screenWidth) {
+    if (this->_sortedBreakpointPairs.size() == 0) {
+        return;
+    }
+
     this->_currentBreakpointName = helpers::getBreakpointFromScreenWidth(
         screenWidth,
         this->_sortedBreakpointPairs

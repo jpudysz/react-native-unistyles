@@ -88,16 +88,16 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
 }
 
 void core::UnistylesRegistry::unlinkShadowNodeWithUnistyles(jsi::Runtime& rt, const ShadowNodeFamily* shadowNodeFamily) {
-    this->_shadowRegistry[&rt][shadowNodeFamily].clear();
+    this->_shadowRegistry[&rt].erase(shadowNodeFamily);
 }
 
 core::Unistyle::Shared core::UnistylesRegistry::findUnistyleFromKey(jsi::Runtime& rt, std::string styleKey, int tag) {
     auto targetStyleSheet = this->_styleSheetRegistry[&rt][tag];
-    
+
     if (targetStyleSheet == nullptr) {
         return nullptr;
     }
-    
+
     return targetStyleSheet.get()->unistyles[styleKey];
 }
 
@@ -152,26 +152,26 @@ core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt
 
 std::vector<std::shared_ptr<core::StyleSheet>> core::UnistylesRegistry::getStyleSheetsToRefresh(jsi::Runtime& rt, bool themeDidChange, bool runtimeDidChange) {
     std::vector<std::shared_ptr<core::StyleSheet>> stylesheetsToRefresh{};
-    
+
     if (!themeDidChange && !runtimeDidChange) {
         return stylesheetsToRefresh;
     }
-    
+
     auto& styleSheets = this->_styleSheetRegistry[&rt];
-    
+
     std::for_each(styleSheets.begin(), styleSheets.end(), [&](std::pair<int, std::shared_ptr<core::StyleSheet>> pair){
         auto& [_, styleSheet] = pair;
-        
+
         if (styleSheet->type == StyleSheetType::ThemableWithMiniRuntime && runtimeDidChange) {
             stylesheetsToRefresh.emplace_back(styleSheet);
-            
+
             return;
         }
-        
+
         if (styleSheet->type == StyleSheetType::Themable && themeDidChange) {
             stylesheetsToRefresh.emplace_back(styleSheet);
         }
     });
-    
+
     return stylesheetsToRefresh;
 }

@@ -23,6 +23,7 @@ export interface UnistylesStyleSheet extends UnistylesStyleSheetSpec {
     flatten: typeof NativeStyleSheetType.flatten,
 
     // overridden methods
+    init(): void,
     create: CreateUnistylesStyleSheet,
     configure(config: UnistylesConfig): void,
     jsMethods: {
@@ -41,6 +42,8 @@ HybridUnistylesStyleSheet.jsMethods = {
     processColor
 }
 
-type PrivateMethods = 'jsMethods' | 'addChangeListener'
+HybridUnistylesStyleSheet.init()
+
+type PrivateMethods = 'jsMethods' | 'addChangeListener' | 'init'
 
 export const StyleSheet = HybridUnistylesStyleSheet as Omit<UnistylesStyleSheet, PrivateMethods>

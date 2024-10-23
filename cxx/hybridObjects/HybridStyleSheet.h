@@ -32,11 +32,16 @@ struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
                       const jsi::Value& thisValue,
                       const jsi::Value* args,
                       size_t count);
+    jsi::Value init(jsi::Runtime& rt,
+                      const jsi::Value& thisValue,
+                      const jsi::Value* args,
+                      size_t count);
 
     void loadHybridMethods() override {
         HybridUnistylesStyleSheetSpec::loadHybridMethods();
 
         registerHybrids(this, [](Prototype& prototype) {
+            prototype.registerRawHybridMethod("init", 1, &HybridStyleSheet::init);
             prototype.registerRawHybridMethod("create", 1, &HybridStyleSheet::create);
             prototype.registerRawHybridMethod("configure", 1, &HybridStyleSheet::configure);
         });
