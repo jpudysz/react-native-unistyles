@@ -44,6 +44,7 @@ struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
 
     double getHairlineWidth() override;
     double getUnid() override;
+    std::function<void ()> addChangeListener(const std::function<void (const std::vector<UnistyleDependency> &)>& onChanged) override;
     
 private:
     void parseSettings(jsi::Runtime& rt, jsi::Object settings);
@@ -54,8 +55,10 @@ private:
     void loadExternalMethods(const jsi::Value& thisValue, jsi::Runtime& rt);
     void registerHooks(jsi::Runtime& rt);
     void onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies);
+    void notifyJSListeners(std::vector<UnistyleDependency>& dependencies);
 
     double __unid = -1;
+    std::vector<std::unique_ptr<const std::function<void(std::vector<UnistyleDependency>&)>>> _changeListeners{};
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
     std::shared_ptr<core::UnistylesCommitHook> _unistylesCommitHook;
     std::shared_ptr<core::UnistylesMountHook> _unistylesMountHook;

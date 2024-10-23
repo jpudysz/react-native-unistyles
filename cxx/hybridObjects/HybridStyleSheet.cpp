@@ -216,6 +216,11 @@ void HybridStyleSheet::loadExternalMethods(const jsi::Value& thisValue, jsi::Run
     state.registerProcessColorFunction(std::move(processColorFn));
 }
 
+void HybridStyleSheet::registerHooks(jsi::Runtime& rt) {
+    this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(this->_uiManager, this->_unistylesRuntime, rt);
+    this->_unistylesMountHook = std::make_shared<core::UnistylesMountHook>(this->_uiManager, this->_unistylesRuntime, rt);
+}
+
 void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies) {
     auto& registry = core::UnistylesRegistry::get();
     auto parser = parser::Parser(this->_unistylesRuntime);
@@ -224,7 +229,7 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
     // check if color scheme changed and then if Unistyles state depend on it (adaptive themes)
     auto colorSchemeIt = std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::COLORSCHEME);
     auto hasNewColorScheme = colorSchemeIt != dependencies.end();
-    
+
     // in a later step, we will rebuild only Unistyles with mounted StyleSheets
     // however, user may have StyleSheets with components that haven't mounted yet
     // we need to rebuild all dependent StyleSheets as well
@@ -233,7 +238,9 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
     if (hasNewColorScheme) {
         this->_unistylesRuntime->includeDependenciesForColorSchemeChange(dependencies);
     }
-    
+
+    this->notifyJSListeners(dependencies);
+
     auto dependencyMap = registry.buildDependencyMap(rt, dependencies);
 
     if (dependencyMap.size() == 0) {
@@ -250,7 +257,26 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
     shadow::ShadowTreeManager::updateShadowTree(rt, shadowLeafUpdates);
 }
 
-void HybridStyleSheet::registerHooks(jsi::Runtime& rt) {
-    this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(this->_uiManager, this->_unistylesRuntime, rt);
-    this->_unistylesMountHook = std::make_shared<core::UnistylesMountHook>(this->_uiManager, this->_unistylesRuntime, rt);
+void HybridStyleSheet::notifyJSListeners(std::vector<UnistyleDependency>& dependencies) {
+    if (dependencies.size() > 0) {
+        std::for_each(this->_changeListeners.begin(), this->_changeListeners.end(), [&](auto& listener){
+            (*listener)(dependencies);
+        });
+    }
+}
+
+std::function<void ()> HybridStyleSheet::addChangeListener(const std::function<void (const std::vector<UnistyleDependency>&)>& onChanged) {
+    auto listener = std::make_unique<std::function<void(std::vector<UnistyleDependency>&)>>(onChanged);
+
+    this->_changeListeners.push_back(std::move(listener));
+
+    return [this, listenerPtr = this->_changeListeners.back().get()](){
+        auto it = std::find_if(this->_changeListeners.begin(), this->_changeListeners.end(), [listenerPtr](auto& ptr) {
+            return ptr.get() == listenerPtr;
+        });
+
+        if (it != this->_changeListeners.end()) {
+            this->_changeListeners.erase(it);
+        }
+    };
 }

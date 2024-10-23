@@ -4,7 +4,7 @@ import type { UnistylesRuntime as UnistylesRuntimeSpec, UnistylesMiniRuntime } f
 import type { AppBreakpoint, AppTheme, AppThemeName, Color, ColorScheme, Orientation } from '../types'
 import { attachStatusBarJSMethods, type UnistylesStatusBar } from '../StatusBar'
 import { attachNavigationBarJSMethods, type UnistylesNavigationBar } from '../NavigtionBar'
-import type { AndroidContentSizeCategory, IOSContentSizeCategory } from '../../types'
+import type { AndroidContentSizeCategory, IOSContentSizeCategory, UnistylesTheme } from '../../types'
 import { isIOS } from '../../common'
 
 export interface UnistylesRuntimePrivate extends Omit<UnistylesRuntimeSpec, 'setRootViewBackgroundColor'> {
@@ -18,6 +18,7 @@ export interface UnistylesRuntimePrivate extends Omit<UnistylesRuntimeSpec, 'set
     statusBar: UnistylesStatusBar,
     navigationBar: UnistylesNavigationBar,
 
+    getTheme(themeName?: string): UnistylesTheme,
     setTheme(themeName: AppThemeName): void
     updateTheme(themeName: AppThemeName, updater: (currentTheme: AppTheme) => AppTheme): void,
     setRootViewBackgroundColor(color?: string): void,

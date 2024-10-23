@@ -112,6 +112,24 @@ void HybridUnistylesRuntime::calculateNewThemeAndDependencies(std::vector<Unisty
     }
 }
 
+jsi::Value HybridUnistylesRuntime::getTheme(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    helpers::assertThat(rt, count <= 1, "UnistylesRuntime.getTheme expected to be called with 0 or 1 argument.");
+    
+    auto& state = core::UnistylesRegistry::get().getState(*_rt);
+    
+    if (count == 1) {
+        helpers::assertThat(rt, args[0].isString(), "UnistylesRuntime.getTheme expected to be called with string.");
+        
+        auto themeName = args[0].asString(rt).utf8(rt);
+        
+        helpers::assertThat(rt, state.hasTheme(themeName), "Unistyles: You're trying to get theme '" + themeName + "' but it wasn't registered.");
+        
+        return state.getJSThemeByName(themeName);
+    }
+    
+    return state.getCurrentJSTheme();
+}
+
 jsi::Value HybridUnistylesRuntime::updateTheme(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count == 2, "UnistylesRuntime.updateTheme expected to be called with 2 arguments.");
     helpers::assertThat(rt, args[0].isString(), "UnistylesRuntime.updateTheme expected first argument to be a string.");

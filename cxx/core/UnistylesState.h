@@ -28,7 +28,8 @@ struct UnistylesState {
     std::optional<std::string> getCurrentBreakpointName();
     std::vector<std::pair<std::string, double>> getSortedBreakpointPairs();
 
-    jsi::Object getJSTheme();
+    jsi::Object getCurrentJSTheme();
+    jsi::Object getJSThemeByName(std::string& themeName);
     int parseColor(jsi::Value& color);
     void computeCurrentBreakpoint(int screenWidth);
     void registerProcessColorFunction(jsi::Function&& fn);

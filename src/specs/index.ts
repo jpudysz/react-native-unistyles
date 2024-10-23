@@ -5,11 +5,13 @@ import { StyleSheet } from './StyleSheet'
 import { UnistylesShadowRegistry } from './ShadowRegistry'
 import type { UnistylesMiniRuntime } from './UnistylesRuntime'
 import { StatusBarStyle, ColorScheme, Orientation } from './types'
+import { UnistyleDependency } from './NativePlatform'
 
 export {
     StatusBarStyle,
     ColorScheme,
-    Orientation
+    Orientation,
+    UnistyleDependency
 }
 
 export {

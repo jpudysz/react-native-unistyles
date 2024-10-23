@@ -23,7 +23,7 @@ std::optional<std::string>& core::UnistylesState::getCurrentThemeName() {
     return this->_currentThemeName;
 }
 
-jsi::Object core::UnistylesState::getJSTheme() {
+jsi::Object core::UnistylesState::getCurrentJSTheme() {
     auto hasSomeThemes = _registeredThemeNames.size() > 0;
 
     // return empty object, if user didn't register any themes
@@ -36,6 +36,18 @@ jsi::Object core::UnistylesState::getJSTheme() {
     auto it = this->_jsThemes.find(_currentThemeName.value());
 
     helpers::assertThat(*_rt, it != this->_jsThemes.end(), "Unistyles: You're trying to get theme '" + _currentThemeName.value() + "', but it was not registered. Did you forget to register it with StyleSheet.configure?");
+
+    auto maybeTheme = it->second.lock(*_rt);
+
+    helpers::assertThat(*_rt, maybeTheme.isObject(), "Unistyles: Unable to retrieve your theme from C++ as it has already been garbage collected, likely due to multiple hot reloads. Please live reload the app.");
+
+    return maybeTheme.asObject(*_rt);
+}
+
+jsi::Object core::UnistylesState::getJSThemeByName(std::string& themeName) {
+    auto it = this->_jsThemes.find(themeName);
+
+    helpers::assertThat(*_rt, it != this->_jsThemes.end(), "Unistyles: You're trying to get theme '" + themeName + "', but it was not registered. Did you forget to register it with StyleSheet.configure?");
 
     auto maybeTheme = it->second.lock(*_rt);
 

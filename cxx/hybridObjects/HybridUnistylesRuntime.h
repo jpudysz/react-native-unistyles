@@ -15,6 +15,10 @@ namespace margelo::nitro::unistyles {
 struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     HybridUnistylesRuntime(Unistyles::HybridNativePlatformSpecCxx nativePlatform, jsi::Runtime& rt) : HybridObject(TAG), _nativePlatform{nativePlatform}, _rt{&rt} {}
 
+    jsi::Value getTheme(jsi::Runtime& rt,
+                            const jsi::Value& thisValue,
+                            const jsi::Value* args,
+                            size_t count);
     jsi::Value updateTheme(jsi::Runtime& rt,
                             const jsi::Value& thisValue,
                             const jsi::Value* args,
@@ -32,6 +36,7 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
         HybridUnistylesRuntimeSpec::loadHybridMethods();
 
         registerHybrids(this, [](Prototype& prototype) {
+            prototype.registerRawHybridMethod("getTheme", 1, &HybridUnistylesRuntime::getTheme);
             prototype.registerRawHybridMethod("updateTheme", 1, &HybridUnistylesRuntime::updateTheme);
             prototype.registerRawHybridMethod("createHybridStatusBar", 0, &HybridUnistylesRuntime::createHybridStatusBar);
             prototype.registerRawHybridMethod("createHybridNavigationBar", 0, &HybridUnistylesRuntime::createHybridNavigationBar);

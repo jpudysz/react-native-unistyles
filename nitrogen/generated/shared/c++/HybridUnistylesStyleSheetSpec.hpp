@@ -13,9 +13,12 @@
 #error NitroModules cannot be found! Are you sure you installed NitroModules properly?
 #endif
 
+// Forward declaration of `UnistyleDependency` to properly resolve imports.
+namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 
-
-
+#include <functional>
+#include <vector>
+#include "UnistyleDependency.hpp"
 
 namespace margelo::nitro::unistyles {
 
@@ -49,7 +52,7 @@ namespace margelo::nitro::unistyles {
 
     public:
       // Methods
-      
+      virtual std::function<void()> addChangeListener(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>& onChanged) = 0;
 
     protected:
       // Hybrid Setup
