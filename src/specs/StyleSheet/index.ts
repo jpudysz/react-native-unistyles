@@ -41,6 +41,6 @@ HybridUnistylesStyleSheet.jsMethods = {
     processColor
 }
 
-type PrivateMethods = 'jsMethods'
+type PrivateMethods = 'jsMethods' | 'addChangeListener'
 
 export const StyleSheet = HybridUnistylesStyleSheet as Omit<UnistylesStyleSheet, PrivateMethods>
