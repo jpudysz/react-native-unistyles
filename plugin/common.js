@@ -34,7 +34,8 @@ function getIdentifierNameFromExpression(t, memberExpression) {
             getIdentifierNameFromExpression(t, memberExpression.test.left),
             getIdentifierNameFromExpression(t, memberExpression.test.right),
             getIdentifierNameFromExpression(t, memberExpression.alternate),
-            getIdentifierNameFromExpression(t,memberExpression.consequent),
+            getIdentifierNameFromExpression(t, memberExpression.consequent),
+            getIdentifierNameFromExpression(t, memberExpression.test)
         ].flat()
     }
 
@@ -66,6 +67,7 @@ function getSecondPropertyName(t, memberExpression) {
             getSecondPropertyName(t, memberExpression.test.right),
             getSecondPropertyName(t, memberExpression.alternate),
             getSecondPropertyName(t, memberExpression.consequent),
+            getSecondPropertyName(t, memberExpression.test)
         ].flat()
     }
 

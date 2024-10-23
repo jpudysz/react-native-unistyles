@@ -31,7 +31,8 @@ export interface UnistylesNativeMiniRuntime {
     readonly rtl: boolean
     readonly statusBar: Dimensions,
     readonly navigationBar: Dimensions
-    readonly orientation: Orientation
+    readonly isPortrait: boolean,
+    readonly isLandscape: boolean
 }
 
 // represents any native API that can communicate with Unistyles

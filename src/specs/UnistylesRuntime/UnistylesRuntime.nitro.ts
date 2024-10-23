@@ -10,7 +10,6 @@ type Orientation = 'portrait' | 'landscape'
 export interface UnistylesCxxMiniRuntime extends UnistylesNativeMiniRuntime {
     readonly themeName?: string,
     readonly breakpoint?: string,
-    readonly orientation: Orientation,
     readonly hasAdaptiveThemes: boolean,
 }
 

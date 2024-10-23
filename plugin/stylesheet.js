@@ -100,7 +100,8 @@ function analyzeDependencies(t, state, name, unistyleObj, themeName, rtName) {
 
                             return
                         }
-                        case 'orientation': {
+                        case 'isPortrait':
+                        case 'isLandscape': {
                             dependencies.push(UnistyleDependency.Orientation)
 
                             return

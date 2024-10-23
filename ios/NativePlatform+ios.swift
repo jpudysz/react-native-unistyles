@@ -31,6 +31,8 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     }
 
     func buildMiniRuntime() -> UnistylesNativeMiniRuntime {
+        let orientation = self.getOrientation()
+        
         return UnistylesNativeMiniRuntime(
             colorScheme: self.getColorScheme(),
             screen: self.getScreenDimensions(),
@@ -41,7 +43,8 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
             rtl: self.getPrefersRtlDirection(),
             statusBar: self.getStatusBarDimensions(),
             navigationBar: self.getNavigationBarDimensions(),
-            orientation: self.getOrientation()
+            isPortrait: orientation == .portrait,
+            isLandscape: orientation == .landscape
         )
     }
 

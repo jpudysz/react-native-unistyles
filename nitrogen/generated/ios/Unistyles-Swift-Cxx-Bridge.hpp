@@ -46,7 +46,7 @@ namespace margelo::nitro::unistyles::bridge::swift {
     vector.reserve(size);
     return vector;
   }
-  
+
   // pragma MARK: std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>
   /**
    * Specialized version of `std::function<void(const std::vector<UnistyleDependency>&)>`.
@@ -74,7 +74,7 @@ namespace margelo::nitro::unistyles::bridge::swift {
   inline std::shared_ptr<Func_void_std__vector_UnistyleDependency__Wrapper> share_Func_void_std__vector_UnistyleDependency_(const Func_void_std__vector_UnistyleDependency_& value) {
     return std::make_shared<Func_void_std__vector_UnistyleDependency__Wrapper>(value);
   }
-  
+
   // pragma MARK: std::shared_ptr<margelo::nitro::unistyles::HybridNativePlatformSpec>
   /**
    * Specialized version of `std::shared_ptr<margelo::nitro::unistyles::HybridNativePlatformSpec>`.

@@ -16,8 +16,6 @@
 #include "JColorScheme.hpp"
 #include "JDimensions.hpp"
 #include "JInsets.hpp"
-#include "JOrientation.hpp"
-#include "Orientation.hpp"
 #include <string>
 
 namespace margelo::nitro::unistyles {
@@ -56,8 +54,10 @@ namespace margelo::nitro::unistyles {
       jni::local_ref<JDimensions> statusBar = this->getFieldValue(fieldStatusBar);
       static const auto fieldNavigationBar = clazz->getField<JDimensions>("navigationBar");
       jni::local_ref<JDimensions> navigationBar = this->getFieldValue(fieldNavigationBar);
-      static const auto fieldOrientation = clazz->getField<JOrientation>("orientation");
-      jni::local_ref<JOrientation> orientation = this->getFieldValue(fieldOrientation);
+      static const auto fieldIsPortrait = clazz->getField<jboolean>("isPortrait");
+      jboolean isPortrait = this->getFieldValue(fieldIsPortrait);
+      static const auto fieldIsLandscape = clazz->getField<jboolean>("isLandscape");
+      jboolean isLandscape = this->getFieldValue(fieldIsLandscape);
       return UnistylesNativeMiniRuntime(
         colorScheme->toCpp(),
         screen->toCpp(),
@@ -68,7 +68,8 @@ namespace margelo::nitro::unistyles {
         rtl,
         statusBar->toCpp(),
         navigationBar->toCpp(),
-        orientation->toCpp()
+        isPortrait,
+        isLandscape
       );
     }
 
@@ -88,7 +89,8 @@ namespace margelo::nitro::unistyles {
         value.rtl,
         JDimensions::fromCpp(value.statusBar),
         JDimensions::fromCpp(value.navigationBar),
-        JOrientation::fromCpp(value.orientation)
+        value.isPortrait,
+        value.isLandscape
       );
     }
   };
