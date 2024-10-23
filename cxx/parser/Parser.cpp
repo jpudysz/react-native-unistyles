@@ -47,7 +47,7 @@ jsi::Object parser::Parser::unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<S
 
     // StyleSheet is a function
     auto& state = core::UnistylesRegistry::get().getState(rt);
-    auto theme = state.getJSTheme();
+    auto theme = state.getCurrentJSTheme();
 
     if (styleSheet->type == StyleSheetType::Themable) {
         return styleSheet->rawValue

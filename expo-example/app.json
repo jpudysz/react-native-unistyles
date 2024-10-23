@@ -4,7 +4,7 @@
     "slug": "expo-example",
     "version": "1.0.0",
     "scheme": "expo-example",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "automatic",
     "splash": {

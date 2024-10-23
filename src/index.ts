@@ -3,6 +3,8 @@ import React from 'react'
 export * from './specs'
 export { mq } from './mq'
 export type { UnistylesThemes, UnistylesBreakpoints } from './global'
+export { useTheme, useBreakpoint } from './core'
+
 // TODO: export Native createUnistylesComponent
 // can't import it this way, it will break native build
 // export { createUnistylesComponent } from './web/createUnistylesComponent'
