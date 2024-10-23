@@ -90,6 +90,16 @@ inline bool isPlatformColor(jsi::Runtime& rt, jsi::Object& maybePlatformColor) {
         return true;
     }
 
+    auto isIOSDynamicColor =
+        maybePlatformColor.hasProperty(rt, "dynamic") &&
+        maybePlatformColor.getProperty(rt, "dynamic").isObject() &&
+        maybePlatformColor.getProperty(rt, "dynamic").asObject(rt).hasProperty(rt, "dark") &&
+        maybePlatformColor.getProperty(rt, "dynamic").asObject(rt).hasProperty(rt, "light");
+    
+    if (isIOSDynamicColor) {
+        return true;
+    }
+
     // Android
     return maybePlatformColor.hasProperty(rt, "resource_paths") && maybePlatformColor.getProperty(rt, "resource_paths").isObject();
 }
