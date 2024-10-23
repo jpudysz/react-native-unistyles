@@ -67,17 +67,7 @@ class UnistylesRuntimeBuilder {
     }
 
     get theme() {
-        if (!this.themeName) {
-            throw new Error('🦄 No theme selected!')
-        }
-
-        const theme = UnistylesState.themes.get(this.themeName)
-
-        if (!theme) {
-            throw new Error(`🦄 Theme "${this.themeName}" is not registered!`)
-        }
-
-        return theme
+        return this.getTheme(this.themeName)
     }
 
     get pixelRatio() {
