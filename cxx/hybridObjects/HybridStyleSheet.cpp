@@ -42,11 +42,7 @@ jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisV
     helpers::assertThat(rt, count == 1, "StyleSheet.configure expected to be called with one argument.");
     helpers::assertThat(rt, arguments[0].isObject(), "StyleSheet.configure expected to be called with object.");
 
-    // create new state
     auto config = arguments[0].asObject(rt);
-    auto& registry = core::UnistylesRegistry::get();
-
-    registry.createState(rt);
 
     helpers::enumerateJSIObject(rt, config, [&](const std::string& propertyName, jsi::Value& propertyValue){
         if (propertyName == "settings") {
@@ -71,9 +67,19 @@ jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisV
     });
 
     verifyAndSelectTheme(rt);
+
+    return jsi::Value::undefined();
+}
+
+jsi::Value HybridStyleSheet::init(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
+    // create new state
+    auto& registry = core::UnistylesRegistry::get();
+
+    registry.createState(rt);
+    
     loadExternalMethods(thisVal, rt);
     registerHooks(rt);
-
+    
     return jsi::Value::undefined();
 }
 
