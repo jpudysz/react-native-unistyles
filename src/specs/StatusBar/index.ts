@@ -8,6 +8,11 @@ interface PrivateUnistylesStatusBar extends Omit<UnistylesStatusBarSpec, 'setBac
     setStyle(style: StatusBarStyle, animated?: boolean): void,
     setHidden(isHidden: boolean, animation?: StatusBarHiddenAnimation): void,
     _setHidden(isHidden: boolean, animation?: StatusBarHiddenAnimation): void,
+    /**
+     * Apps targeting Android SDK 35
+     * This API is deprecated as status bar background color is always transparent
+     * @deprecated
+     */
     setBackgroundColor(color?: string): void,
     _setBackgroundColor(color?: Color): void
 }

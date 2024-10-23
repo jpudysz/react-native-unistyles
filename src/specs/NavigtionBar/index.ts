@@ -3,6 +3,11 @@ import type { UnistylesNavigationBar as UnistylesNavigationBarSpec } from './Uni
 import type { Color } from '../types'
 
 interface PrivateUnistylesNavigationBar extends Omit<UnistylesNavigationBarSpec, 'setBackgroundColor'> {
+    /**
+     * Apps targeting Android SDK 35
+     * This API is deprecated but continues to affect 3-button navigation
+     * @deprecated
+     */
     setBackgroundColor(color?: string): void,
     _setBackgroundColor(color?: Color): void
 }
