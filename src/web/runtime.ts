@@ -67,17 +67,7 @@ class UnistylesRuntimeBuilder {
     }
 
     get theme() {
-        if (!this.themeName) {
-            throw new Error('🦄 No theme selected!')
-        }
-
-        const theme = UnistylesState.themes.get(this.themeName)
-
-        if (!theme) {
-            throw new Error(`🦄 Theme "${this.themeName}" is not registered!`)
-        }
-
-        return theme
+        return this.getTheme(this.themeName)
     }
 
     get pixelRatio() {
@@ -134,7 +124,8 @@ class UnistylesRuntimeBuilder {
             themeName: this.themeName,
             contentSizeCategory: this.contentSizeCategory,
             breakpoint: this.breakpoint,
-            orientation: this.orientation,
+            isLandscape: this.orientation === Orientation.Landscape,
+            isPortrait: this.orientation === Orientation.Portrait,
             pixelRatio: this.pixelRatio,
             screen: this.screen,
             fontScale: this.fontScale,
@@ -190,6 +181,20 @@ class UnistylesRuntimeBuilder {
         }
 
         UnistylesState.themes.set(themeName, updater(oldTheme))
+    }
+
+    getTheme = (themeName = this.themeName) => {
+        if (!themeName) {
+            throw new Error('🦄 No theme selected!')
+        }
+
+        const theme = UnistylesState.themes.get(themeName)
+
+        if (!theme) {
+            throw new Error(`🦄 Theme "${this.themeName}" is not registered!`)
+        }
+
+        return theme
     }
 }
 
