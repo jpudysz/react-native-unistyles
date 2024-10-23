@@ -27,9 +27,5 @@
     "strict": true,
     "target": "esnext",
     "verbatimModuleSyntax": true
-  },
-  "exclude": [
-    "examples/vision/visionos",
-    "cxx/tests"
-  ]
+  }
 }

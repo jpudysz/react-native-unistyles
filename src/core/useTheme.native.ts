@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { StyleSheet, UnistyleDependency, UnistylesRuntime } from '../specs'
 import type { UnistylesStyleSheet } from '../specs'
+import type { UnistylesTheme } from '../types'
 
-export const useTheme = () => {
+export const useTheme = (): UnistylesTheme => {
     const [theme, setTheme] = useState(UnistylesRuntime.getTheme())
 
     useEffect(() => {
