@@ -225,6 +225,13 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
     auto& registry = core::UnistylesRegistry::get();
     auto parser = parser::Parser(this->_unistylesRuntime);
     auto& rt = this->_unistylesRuntime->getRuntime();
+    
+    // re-compute new breakpoint
+    auto dimensionsIt = std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::DIMENSIONS);
+    
+    if (dimensionsIt != dependencies.end()) {
+        registry.getState(rt).computeCurrentBreakpoint(this->_unistylesRuntime->getScreen().width);
+    }
 
     // check if color scheme changed and then if Unistyles state depend on it (adaptive themes)
     auto colorSchemeIt = std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::COLORSCHEME);
