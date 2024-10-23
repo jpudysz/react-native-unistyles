@@ -18,8 +18,8 @@ public extension UnistylesNativeMiniRuntime {
   /**
    * Create a new instance of `UnistylesNativeMiniRuntime`.
    */
-  init(colorScheme: ColorScheme, screen: Dimensions, contentSizeCategory: String, insets: Insets, pixelRatio: Double, fontScale: Double, rtl: Bool, statusBar: Dimensions, navigationBar: Dimensions, orientation: Orientation) {
-    self.init(colorScheme, screen, std.string(contentSizeCategory), insets, pixelRatio, fontScale, rtl, statusBar, navigationBar, orientation)
+  init(colorScheme: ColorScheme, screen: Dimensions, contentSizeCategory: String, insets: Insets, pixelRatio: Double, fontScale: Double, rtl: Bool, statusBar: Dimensions, navigationBar: Dimensions, isPortrait: Bool, isLandscape: Bool) {
+    self.init(colorScheme, screen, std.string(contentSizeCategory), insets, pixelRatio, fontScale, rtl, statusBar, navigationBar, isPortrait, isLandscape)
   }
 
   var colorScheme: ColorScheme {
@@ -121,14 +121,25 @@ public extension UnistylesNativeMiniRuntime {
     }
   }
   
-  var orientation: Orientation {
+  var isPortrait: Bool {
     @inline(__always)
     get {
-      return self.__orientation
+      return self.__isPortrait
     }
     @inline(__always)
     set {
-      self.__orientation = newValue
+      self.__isPortrait = newValue
+    }
+  }
+  
+  var isLandscape: Bool {
+    @inline(__always)
+    get {
+      return self.__isLandscape
+    }
+    @inline(__always)
+    set {
+      self.__isLandscape = newValue
     }
   }
 }

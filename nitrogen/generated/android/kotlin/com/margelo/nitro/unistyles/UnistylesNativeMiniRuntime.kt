@@ -25,5 +25,6 @@ data class UnistylesNativeMiniRuntime(
   val rtl: Boolean,
   val statusBar: Dimensions,
   val navigationBar: Dimensions,
-  val orientation: Orientation
+  val isPortrait: Boolean,
+  val isLandscape: Boolean
 )

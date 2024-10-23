@@ -36,7 +36,8 @@ extension UnistylesNativeMiniRuntime {
             dependencies.append(UnistyleDependency.breakpoints)
         }
 
-        if (lhs.orientation != rhs.orientation) {
+        // no need to check isLandscape, as it's always opposite
+        if (lhs.isPortrait != rhs.isPortrait) {
             dependencies.append(UnistyleDependency.orientation)
         }
 
