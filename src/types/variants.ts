@@ -21,3 +21,9 @@ type ExtractSubVariantKeys<T> = T extends object
 type ExtractVariant<T> = T extends { variants: infer V }
     ? { [key in keyof V]?: ExtractSubVariantKeys<V[key]> }
     : T
+
+export type UnistylesVariants<ST> = ST extends { useVariants: infer V }
+    ? V extends (variants: infer T) => void
+        ? T
+        : never
+    : never
