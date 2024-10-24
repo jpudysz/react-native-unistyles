@@ -17,6 +17,7 @@ struct UnistylesState {
     UnistylesState(const UnistylesState&) = delete;
     UnistylesState(const UnistylesState&&) = delete;
 
+    bool hasUserConfig = false;
     bool hasAdaptiveThemes();
     bool hasInitialTheme();
     bool getPrefersAdaptiveThemes();
