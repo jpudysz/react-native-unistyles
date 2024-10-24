@@ -1,5 +1,5 @@
 import type { UnistyleDependency } from '../../specs/NativePlatform'
-import { ColorScheme, Orientation, type AppThemeName } from '../../specs/types'
+import { type AppThemeName, ColorScheme, Orientation } from '../../specs/types'
 import type { StyleSheet, StyleSheetWithSuperPowers, UnistylesValues } from '../../types/stylesheet'
 import { isUnistylesMq, parseMq } from '../mq'
 import { UnistylesState } from '../state'

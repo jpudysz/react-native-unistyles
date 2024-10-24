@@ -27,5 +27,10 @@
     "strict": true,
     "target": "esnext",
     "verbatimModuleSyntax": true
-  }
+  },
+  "exclude": [
+    "example",
+    "expo-example",
+    "docs"
+  ]
 }
