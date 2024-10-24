@@ -67,6 +67,10 @@ jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisV
     });
 
     verifyAndSelectTheme(rt);
+    
+    auto& state = core::UnistylesRegistry::get().getState(rt);
+    
+    state.hasUserConfig = true;
 
     return jsi::Value::undefined();
 }
