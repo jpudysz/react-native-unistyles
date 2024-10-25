@@ -9,7 +9,7 @@ export const App = () => {
     const [count, setCount] = React.useState(0)
 
     return (
-        <View style={{...styles.container, ...styles.secondProp, ...styles.thirdProp}}>
+        <View style={{...styles.container, ...styles.secondProp}}>
             <Animated.View style={styles.animated} />
             <Typography isBold isPrimary size="large" isCentered value={2}>
                 Hello World
@@ -30,7 +30,7 @@ const styles = StyleSheet.create((theme, rt) => ({
         backgroundColor: theme.colors.backgroundColor
     },
     secondProp: {
-        backgroundColor: 'blue'
+        backgroundColor: theme.colors.backgroundColor
     },
     thirdProp: {
         backgroundColor: rt.isPortrait ? 'blue' : 'green'
@@ -38,6 +38,8 @@ const styles = StyleSheet.create((theme, rt) => ({
     animated: {
         width: 100,
         height: 100,
+        filter: 'brightness(0.2) opacity(0.99)',
+        boxShadow: '5 5 5 0 rgba(255, 0, 0, 0.5)',
         backgroundColor: rt.colorScheme === 'dark' ? 'red' : 'blue'
     }
 }))
