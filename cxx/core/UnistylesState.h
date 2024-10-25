@@ -37,7 +37,7 @@ struct UnistylesState {
 
 private:
     jsi::Runtime* _rt;
-    std::unordered_map<std::string, jsi::WeakObject> _jsThemes{};
+    std::unordered_map<std::string, jsi::Value> _jsThemes{};
     std::optional<bool> _prefersAdaptiveThemes = std::nullopt;
     std::optional<std::string> _initialThemeName = std::nullopt;
     std::optional<std::string> _currentBreakpointName = std::nullopt;
