@@ -28,7 +28,7 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     UnistylesRegistry(const UnistylesRegistry&) = delete;
     UnistylesRegistry(const UnistylesRegistry&&) = delete;
 
-    void registerTheme(jsi::Runtime& rt, std::string name, jsi::Object&& theme);
+    void registerTheme(jsi::Runtime& rt, std::string name, jsi::Value& theme);
     void registerBreakpoints(jsi::Runtime& rt, std::vector<std::pair<std::string, double>>& sortedBreakpoints);
     void setPrefersAdaptiveThemes(jsi::Runtime& rt, bool prefersAdaptiveThemes);
     void setInitialThemeName(jsi::Runtime& rt, std::string themeName);

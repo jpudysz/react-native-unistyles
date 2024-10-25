@@ -87,3 +87,5 @@ cxx/tests/Testing/
 cxx/tests/hermes/
 cxx/tests/hermes-debug/
 cxx/tests/cmake-build-debug-coverage/
+
+src/**/*.js

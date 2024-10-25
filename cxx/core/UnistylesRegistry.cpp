@@ -5,10 +5,10 @@ using namespace margelo::nitro::unistyles;
 using namespace facebook;
 using namespace facebook::react;
 
-void core::UnistylesRegistry::registerTheme(jsi::Runtime& rt, std::string name, jsi::Object&& theme) {
+void core::UnistylesRegistry::registerTheme(jsi::Runtime& rt, std::string name, jsi::Value& theme) {
     auto& state = this->getState(rt);
 
-    state._jsThemes.emplace(name, jsi::WeakObject(rt, std::move(theme)));
+    state._jsThemes.emplace(name, std::move(theme));
     state._registeredThemeNames.push_back(name);
 }
 
@@ -60,15 +60,11 @@ void core::UnistylesRegistry::updateTheme(jsi::Runtime& rt, std::string& themeNa
 
     helpers::assertThat(rt, it != state._jsThemes.end(), "Unistyles: You're trying to update theme '" + themeName + "' but it wasn't registered.");
 
-    auto currentThemeValue = it->second.lock(rt);
-
-    helpers::assertThat(rt, currentThemeValue.isObject(), "Unistyles: Unable to update your theme from C++. It was already garbage collected.");
-
-    auto result = callback.call(rt, currentThemeValue.asObject(rt));
+    auto result = callback.call(rt, it->second);
 
     helpers::assertThat(rt, result.isObject(), "Unistyles: Returned theme is not an object. Please check your updateTheme function.");
 
-    it->second = jsi::WeakObject(rt, result.asObject(rt));
+    it->second = result.asObject(rt);
 }
 
 void core::UnistylesRegistry::linkShadowNodeWithUnistyle(

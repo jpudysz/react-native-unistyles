@@ -140,10 +140,9 @@ void HybridStyleSheet::parseThemes(jsi::Runtime &rt, jsi::Object themes) {
     helpers::enumerateJSIObject(rt, themes, [&](const std::string& propertyName, jsi::Value& propertyValue){
         helpers::assertThat(rt, propertyValue.isObject(), "StyleSheet.configure's registered theme '" + propertyName + "' must be an object.");
 
-        registry.registerTheme(rt, propertyName, propertyValue.asObject(rt));
+        registry.registerTheme(rt, propertyName, propertyValue);
     });
 }
-
 
 void HybridStyleSheet::verifyAndSelectTheme(jsi::Runtime &rt) {
     auto& state = core::UnistylesRegistry::get().getState(rt);
