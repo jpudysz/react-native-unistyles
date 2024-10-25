@@ -1,4 +1,4 @@
-import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
+import type { BoxShadowValue, ImageStyle, TextStyle, ViewStyle, FilterFunction } from 'react-native'
 import type { ShadowOffset, TransformStyles, UnistylesTheme } from './core'
 import type { UnistylesBreakpoints } from '../global'
 import type { UnistylesMiniRuntime } from '../specs'
@@ -8,7 +8,7 @@ import type { CSSProperties } from 'react'
 import type { Pseudo } from '../web/convert/pseudo'
 
 // these props are treated differently to nest breakpoints and media queries
-type NestedKeys = 'shadowOffset' | 'transform' | 'textShadowOffset'
+type NestedKeys = 'shadowOffset' | 'transform' | 'textShadowOffset' | 'boxShadow' | 'filter'
 
 export type UnistyleView = Omit<ViewStyle, NestedKeys>
 export type UnistyleText = Omit<TextStyle, NestedKeys>
@@ -17,7 +17,9 @@ export type UnistyleImage = Omit<ImageStyle, NestedKeys>
 type UnistyleNestedStyles = {
     shadowOffset?: ToDeepUnistyles<ShadowOffset>,
     textShadowOffset?: ToDeepUnistyles<ShadowOffset>,
-    transform?: Array<ToDeepUnistyles<TransformStyles>>
+    transform?: Array<ToDeepUnistyles<TransformStyles>>,
+    boxShadow?: Array<ToDeepUnistyles<BoxShadowValue>> | string,
+    filter?: Array<ToDeepUnistyles<FilterFunction>> | string
 }
 
 type VariantsObject = {

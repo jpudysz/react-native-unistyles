@@ -270,6 +270,18 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared u
 
             return;
         }
+        
+        if (propertyName == "boxShadow" && propertyValueObject.isArray(rt)) {
+            parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), parseBoxShadow(rt, unistyle, propertyValueObject));
+
+            return;
+        }
+        
+        if (propertyName == "filter" && propertyValueObject.isArray(rt)) {
+            parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), parseFilters(rt, unistyle, propertyValueObject));
+
+            return;
+        }
 
         if (propertyName == "fontVariant" && propertyValueObject.isArray(rt)) {
             parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), propertyValue);
@@ -365,10 +377,6 @@ std::vector<UnistyleDependency> parser::Parser::parseDependencies(jsi::Runtime &
 
 // eg. [{ scale: 2 }, { translateX: 100 }]
 jsi::Value parser::Parser::parseTransforms(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Object& obj) {
-    if (!obj.isArray(rt)) {
-        return jsi::Value::undefined();
-    }
-
     std::vector<jsi::Value> parsedTransforms{};
 
     parsedTransforms.reserve(2);
@@ -393,6 +401,67 @@ jsi::Value parser::Parser::parseTransforms(jsi::Runtime& rt, Unistyle::Shared un
 
     for (size_t i = 0; i < parsedTransforms.size(); i++) {
         result.setValueAtIndex(rt, i, parsedTransforms[i]);
+    }
+
+    return result;
+}
+
+// eg [{offsetX: 5, offsetY: 5, blurRadius: 5, spreadDistance: 0, color: ‘rgba(255, 0, 0, 0.5)’}]
+jsi::Value parser::Parser::parseBoxShadow(jsi::Runtime &rt, Unistyle::Shared unistyle, jsi::Object &obj) {
+    std::vector<jsi::Value> parsedBoxShadows{};
+    
+    parsedBoxShadows.reserve(2);
+    
+    helpers::iterateJSIArray(rt, obj.asArray(rt), [&](size_t i, jsi::Value& value){
+        if (!value.isObject()) {
+            return;
+        }
+
+        auto parsedResult = this->parseSecondLevel(rt, unistyle, value);
+
+        parsedBoxShadows.emplace_back(std::move(parsedResult));
+    });
+    
+    // create jsi::Array result with correct box shadows
+    jsi::Array result = jsi::Array(rt, parsedBoxShadows.size());
+
+    for (size_t i = 0; i < parsedBoxShadows.size(); i++) {
+        result.setValueAtIndex(rt, i, parsedBoxShadows[i]);
+    }
+
+    return result;
+}
+
+// eg. [{ brightness: 0.5 }, { opacity: 0.25 }]
+jsi::Value parser::Parser::parseFilters(jsi::Runtime &rt, Unistyle::Shared unistyle, jsi::Object &obj) {
+    std::vector<jsi::Value> parsedFilters{};
+
+    parsedFilters.reserve(2);
+    
+    helpers::iterateJSIArray(rt, obj.asArray(rt), [&](size_t i, jsi::Value& value){
+        if (!value.isObject()) {
+            return;
+        }
+
+        auto parsedResult = this->parseSecondLevel(rt, unistyle, value);
+
+        // take only one filter per object
+        jsi::Array propertyNames = parsedResult.asObject(rt).getPropertyNames(rt);
+        size_t length = propertyNames.size(rt);
+        
+        // ignore no filters
+        if (length == 0) {
+            return;
+        }
+
+        parsedFilters.emplace_back(std::move(parsedResult));
+    });
+    
+    // create jsi::Array result with correct filters
+    jsi::Array result = jsi::Array(rt, parsedFilters.size());
+
+    for (size_t i = 0; i < parsedFilters.size(); i++) {
+        result.setValueAtIndex(rt, i, parsedFilters[i]);
     }
 
     return result;
