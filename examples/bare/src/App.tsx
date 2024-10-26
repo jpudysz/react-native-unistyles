@@ -28,6 +28,7 @@ export const App: React.FunctionComponent = () => {
             >
                 <Text>Switch theme</Text>
             </Pressable>
+            <View style={styles.box} />
         </View>
     )
 }
@@ -65,5 +66,20 @@ const stylesheet = createStyleSheet((theme, rt) => ({
     },
     bold: {
         fontWeight: 'bold'
+    },
+    box: {
+        height: 100,
+        width: 100,
+        position: 'absolute',
+        backgroundColor: theme.colors.fog,
+        filter: [
+            {
+                brightness: 0.2
+            },
+            {
+                opacity: 0.5
+            }
+        ],
+        boxShadow: '0 0 10 10 rgba(255, 0, 0, 0.5)'
     }
 }))
