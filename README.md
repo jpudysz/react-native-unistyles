@@ -28,6 +28,7 @@ Install CocoaPods dependencies / generate native folders with Expo:
 
 ```shell
 pod install
+or
 npx expo prebuild
 ```
 
@@ -67,6 +68,12 @@ npx expo prebuild
 </a>
 <a href="https://github.com/mwarger">
      <img src="https://avatars.githubusercontent.com/u/686823?v=4" height="70px" width="70px" alt="mwarger" />
+</a>
+<a href="https://github.com/biw">
+     <img src="https://avatars.githubusercontent.com/u/6139501?v=4" height="70px" width="70px" alt="biw" />
+</a>
+<a href="https://github.com/happyfloat">
+     <img src="https://avatars.githubusercontent.com/u/186333704?s=200&v=4" height="70px" width="70px" alt="happyfloat" />
 </a>
 
 ## Past sponsors
