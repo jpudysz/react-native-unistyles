@@ -1,6 +1,6 @@
 import type { UnistylesTheme } from '../types'
 import type { UnistylesConfig } from '../specs/StyleSheet'
-import type { AppBreakpoint, AppThemeName } from '../specs/types'
+import type { AppBreakpoint, AppTheme, AppThemeName } from '../specs/types'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
 import { UnistylesRuntime } from './runtime'
 import { isServer, schemeToTheme } from './utils'
@@ -39,7 +39,7 @@ class UnistylesStateBuilder {
 
     private initThemes = (themes = {} as UnistylesThemes) => {
         Object.entries(themes).forEach(([themeName, theme]) => {
-            this.themes.set(themeName, theme)
+            this.themes.set(themeName, theme as AppTheme)
         })
     }
 
@@ -61,7 +61,7 @@ class UnistylesStateBuilder {
 
         // Adaptive themes
         if (settings.adaptiveThemes) {
-            this.themeName = schemeToTheme(UnistylesRuntime.colorScheme)
+            this.themeName = schemeToTheme(UnistylesRuntime.colorScheme) as AppThemeName
 
             return
         }

@@ -160,7 +160,7 @@ class UnistylesRuntimeBuilder {
             return
         }
 
-        this.setTheme(schemeToTheme(UnistylesRuntime.colorScheme))
+        this.setTheme(schemeToTheme(UnistylesRuntime.colorScheme) as AppThemeName)
     }
 
     setRootViewBackgroundColor = (hex: string, alpha?: number) => {
