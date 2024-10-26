@@ -49,6 +49,14 @@ export const parseStyle = <T extends RNStyle>(
             return acc
         }
 
+        if ((key === 'boxShadow' || key === 'filter') && Array.isArray(value)) {
+            acc[key] = value
+                .map(value => parseStyle(value, variant, false))
+                .filter(value => Object.keys(value).length === 1)
+
+            return acc
+        }
+
         if (key === 'fontVariant' && Array.isArray(value)) {
             acc[key] = value
 
