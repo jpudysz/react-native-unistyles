@@ -1,11 +1,11 @@
 import type { UnistyleDependency } from '../../specs/NativePlatform'
-import { type AppThemeName, ColorScheme, Orientation } from '../../specs/types'
+import { ColorScheme, Orientation } from '../../specs/types'
 import type { StyleSheet, StyleSheetWithSuperPowers, UnistylesValues } from '../../types/stylesheet'
 import { isUnistylesMq, parseMq } from '../mq'
 import { UnistylesState } from '../state'
 import { keyInObject, reduceObject } from './common'
 
-export const schemeToTheme = (scheme: ColorScheme): AppThemeName => {
+export const schemeToTheme = (scheme: ColorScheme): string => {
     switch (scheme) {
         case ColorScheme.Dark:
             return 'dark'
