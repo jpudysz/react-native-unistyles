@@ -163,7 +163,7 @@ describe('styles', () => {
             }
 
             const parsedStyles = parseStyle(
-                style as StyleSheet,
+                style as unknown as StyleSheet,
                 {}
             )
 

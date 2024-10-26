@@ -1,6 +1,6 @@
 import type { ShadowStyleIOS, TextStyle, TransformsStyle } from 'react-native'
 
-type TransformArrayElement<T> = T extends Array<infer U> ? U : never
+type TransformArrayElement<T> = T extends ReadonlyArray<infer U> ? U : never
 type BoxShadow = Required<ShadowStyleIOS>
 type TextShadow = Required<Pick<TextStyle, 'textShadowColor' | 'textShadowOffset' | 'textShadowRadius'>>
 type Transforms = Array<TransformArrayElement<TransformsStyle['transform']>>
