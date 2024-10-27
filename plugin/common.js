@@ -104,6 +104,15 @@ function getSecondPropertyName(t, memberExpression) {
         current = current.object
     }
 
+    // special case for IME
+    if (propertyName && t.isIdentifier(propertyName) && propertyName.name === 'insets') {
+        if (t.isIdentifier(memberExpression.property) && memberExpression.property.name === "ime") {
+            return [memberExpression.property.name]
+        }
+
+        return [propertyName.name]
+    }
+
     if (propertyName && t.isIdentifier(propertyName)) {
         return [propertyName.name]
     }

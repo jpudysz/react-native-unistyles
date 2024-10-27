@@ -22,6 +22,9 @@ struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
             this->_unistylesRuntime->registerPlatformListener(
                   std::bind(&HybridStyleSheet::onPlatformDependenciesChange, this, std::placeholders::_1)
             );
+            this->_unistylesRuntime->registerImeListener(
+                  std::bind(&HybridStyleSheet::onImeChange, this)
+            );
       }
 
     jsi::Value create(jsi::Runtime& rt,
@@ -50,7 +53,7 @@ struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
     double getHairlineWidth() override;
     double getUnid() override;
     std::function<void ()> addChangeListener(const std::function<void (const std::vector<UnistyleDependency> &)>& onChanged) override;
-    
+
 private:
     void parseSettings(jsi::Runtime& rt, jsi::Object settings);
     void parseBreakpoints(jsi::Runtime& rt, jsi::Object breakpoints);
@@ -60,6 +63,7 @@ private:
     void loadExternalMethods(const jsi::Value& thisValue, jsi::Runtime& rt);
     void registerHooks(jsi::Runtime& rt);
     void onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies);
+    void onImeChange();
     void notifyJSListeners(std::vector<UnistyleDependency>& dependencies);
 
     double __unid = -1;

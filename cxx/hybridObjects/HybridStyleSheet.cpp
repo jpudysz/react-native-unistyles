@@ -67,9 +67,9 @@ jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisV
     });
 
     verifyAndSelectTheme(rt);
-    
+
     auto& state = core::UnistylesRegistry::get().getState(rt);
-    
+
     state.hasUserConfig = true;
 
     return jsi::Value::undefined();
@@ -80,10 +80,10 @@ jsi::Value HybridStyleSheet::init(jsi::Runtime &rt, const jsi::Value &thisVal, c
     auto& registry = core::UnistylesRegistry::get();
 
     registry.createState(rt);
-    
+
     loadExternalMethods(thisVal, rt);
     registerHooks(rt);
-    
+
     return jsi::Value::undefined();
 }
 
@@ -234,10 +234,10 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
     auto& registry = core::UnistylesRegistry::get();
     auto parser = parser::Parser(this->_unistylesRuntime);
     auto& rt = this->_unistylesRuntime->getRuntime();
-    
+
     // re-compute new breakpoint
     auto dimensionsIt = std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::DIMENSIONS);
-    
+
     if (dimensionsIt != dependencies.end()) {
         registry.getState(rt).computeCurrentBreakpoint(this->_unistylesRuntime->getScreen().width);
     }
@@ -264,6 +264,32 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
     }
 
     parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets);
+
+    // this is required, otherwise shadow tree will ignore Unistyles commit
+    registry.trafficController.setHasUnistylesCommit(true);
+
+    auto shadowLeafUpdates = parser.dependencyMapToShadowLeafUpdates(dependencyMap);
+
+    shadow::ShadowTreeManager::updateShadowTree(rt, shadowLeafUpdates);
+}
+
+void HybridStyleSheet::onImeChange() {
+    auto& registry = core::UnistylesRegistry::get();
+    auto parser = parser::Parser(this->_unistylesRuntime);
+    auto& rt = this->_unistylesRuntime->getRuntime();
+    std::vector<UnistyleDependency> dependencies{UnistyleDependency::IME};
+
+    // this function should be as fast as possible
+    // multiple values will be emitted in the short period of time ~0.25s
+    this->notifyJSListeners(dependencies);
+
+    auto dependencyMap = registry.buildDependencyMap(rt, dependencies);
+
+    if (dependencyMap.size() == 0) {
+        return;
+    }
+
+    parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, {});
 
     // this is required, otherwise shadow tree will ignore Unistyles commit
     registry.trafficController.setHasUnistylesCommit(true);

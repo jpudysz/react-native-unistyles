@@ -29,5 +29,6 @@ enum class UnistyleDependency {
   PIXELRATIO,
   FONTSCALE,
   STATUSBAR,
-  NAVIGATIONBAR
+  NAVIGATIONBAR,
+  IME
 }

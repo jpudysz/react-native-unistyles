@@ -306,4 +306,20 @@ public class HybridNativePlatformSpecCxx {
       fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(__message))")
     }
   }
+  
+  @inline(__always)
+  public func registerImeListener(callback: bridge.Func_void) -> Void {
+    do {
+      try self.__implementation.registerImeListener(callback: { () -> (() -> Void) in
+        let __sharedClosure = bridge.share_Func_void(callback)
+        return { () -> Void in
+          __sharedClosure.pointee.call()
+        }
+      }())
+      return 
+    } catch {
+      let __message = "\(error.localizedDescription)"
+      fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(__message))")
+    }
+  }
 }

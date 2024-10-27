@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, View } from 'react-native'
+import { Button, TextInput, View } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 import Animated from 'react-native-reanimated'
 import './unistyles'
@@ -18,6 +18,7 @@ export const App = () => {
                 Hello World {count}
             </Typography>
             <Button title="Re-render" onPress={() => setCount(prevState =>  prevState + 1)} />
+            <TextInput placeholder="Click me"/>
         </View>
     )
 }
@@ -26,11 +27,13 @@ const styles = StyleSheet.create((theme, rt) => ({
     container: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: theme.colors.backgroundColor
+        justifyContent: 'flex-end',
+        backgroundColor: theme.colors.backgroundColor,
+        marginBottom: rt.insets.bottom
     },
     secondProp: {
-        backgroundColor: theme.colors.backgroundColor
+        backgroundColor: theme.colors.backgroundColor,
+        paddingBottom: rt.insets.ime
     },
     thirdProp: {
         backgroundColor: rt.isPortrait ? 'blue' : 'green'

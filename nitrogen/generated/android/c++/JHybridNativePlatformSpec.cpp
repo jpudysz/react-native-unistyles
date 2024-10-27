@@ -36,6 +36,7 @@ namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 #include "UnistyleDependency.hpp"
 #include "JFunc_void_std__vector_UnistyleDependency_.hpp"
 #include "JUnistyleDependency.hpp"
+#include "JFunc_void.hpp"
 
 namespace margelo::nitro::unistyles {
 
@@ -140,6 +141,10 @@ namespace margelo::nitro::unistyles {
   void JHybridNativePlatformSpec::registerPlatformListener(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>& callback) {
     static const auto method = _javaPart->getClass()->getMethod<void(jni::alias_ref<JFunc_void_std__vector_UnistyleDependency_::javaobject> /* callback */)>("registerPlatformListener");
     method(_javaPart, JFunc_void_std__vector_UnistyleDependency_::fromCpp(callback));
+  }
+  void JHybridNativePlatformSpec::registerImeListener(const std::function<void()>& callback) {
+    static const auto method = _javaPart->getClass()->getMethod<void(jni::alias_ref<JFunc_void::javaobject> /* callback */)>("registerImeListener");
+    method(_javaPart, JFunc_void::fromCpp(callback));
   }
 
 } // namespace margelo::nitro::unistyles

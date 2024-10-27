@@ -50,4 +50,5 @@ public protocol HybridNativePlatformSpec: AnyObject, HybridObjectSpec {
   func setImmersiveMode(isEnabled: Bool) throws -> Void
   func getMiniRuntime() throws -> UnistylesNativeMiniRuntime
   func registerPlatformListener(callback: @escaping ((_ dependencies: [UnistyleDependency]) -> Void)) throws -> Void
+  func registerImeListener(callback: @escaping (() -> Void)) throws -> Void
 }
