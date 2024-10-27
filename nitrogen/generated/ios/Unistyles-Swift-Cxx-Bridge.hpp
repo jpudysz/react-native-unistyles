@@ -65,7 +65,7 @@ namespace margelo::nitro::unistyles::bridge::swift {
   private:
     std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)> _function;
   };
-  inline Func_void_std__vector_UnistyleDependency_ create_Func_void_std__vector_UnistyleDependency_(void* _Nonnull closureHolder, void(* _Nonnull call)(void* _Nonnull /* closureHolder */, std::vector<UnistyleDependency>), void(* _Nonnull destroy)(void* _Nonnull)) {
+  inline Func_void_std__vector_UnistyleDependency_ create_Func_void_std__vector_UnistyleDependency_(void* NONNULL closureHolder, void(* NONNULL call)(void* NONNULL /* closureHolder */, std::vector<UnistyleDependency>), void(* NONNULL destroy)(void* NONNULL)) {
     std::shared_ptr<void> sharedClosureHolder(closureHolder, destroy);
     return Func_void_std__vector_UnistyleDependency_([sharedClosureHolder, call](const std::vector<UnistyleDependency>& dependencies) -> void {
       call(sharedClosureHolder.get(), dependencies);
@@ -73,6 +73,34 @@ namespace margelo::nitro::unistyles::bridge::swift {
   }
   inline std::shared_ptr<Func_void_std__vector_UnistyleDependency__Wrapper> share_Func_void_std__vector_UnistyleDependency_(const Func_void_std__vector_UnistyleDependency_& value) {
     return std::make_shared<Func_void_std__vector_UnistyleDependency__Wrapper>(value);
+  }
+
+  // pragma MARK: std::function<void()>
+  /**
+   * Specialized version of `std::function<void()>`.
+   */
+  using Func_void = std::function<void()>;
+  /**
+   * Wrapper class for a `std::function<void()>`, this can be used from Swift.
+   */
+  class Func_void_Wrapper final {
+  public:
+    explicit Func_void_Wrapper(const std::function<void()>& func): _function(func) {}
+    explicit Func_void_Wrapper(std::function<void()>&& func): _function(std::move(func)) {}
+    inline void call() const {
+      _function();
+    }
+  private:
+    std::function<void()> _function;
+  };
+  inline Func_void create_Func_void(void* _Nonnull closureHolder, void(* _Nonnull call)(void* _Nonnull /* closureHolder */), void(* _Nonnull destroy)(void* _Nonnull)) {
+    std::shared_ptr<void> sharedClosureHolder(closureHolder, destroy);
+    return Func_void([sharedClosureHolder, call]() -> void {
+      call(sharedClosureHolder.get());
+    });
+  }
+  inline std::shared_ptr<Func_void_Wrapper> share_Func_void(const Func_void& value) {
+    return std::make_shared<Func_void_Wrapper>(value);
   }
 
   // pragma MARK: std::shared_ptr<margelo::nitro::unistyles::HybridNativePlatformSpec>

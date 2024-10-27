@@ -13,6 +13,7 @@
 
 #include "JHybridNativePlatformSpec.hpp"
 #include "JFunc_void_std__vector_UnistyleDependency_.hpp"
+#include "JFunc_void.hpp"
 
 namespace margelo::nitro::unistyles {
 
@@ -25,6 +26,7 @@ int initialize(JavaVM* vm) {
     // Register native JNI methods
     margelo::nitro::unistyles::JHybridNativePlatformSpec::registerNatives();
     margelo::nitro::unistyles::JFunc_void_std__vector_UnistyleDependency_::registerNatives();
+    margelo::nitro::unistyles::JFunc_void::registerNatives();
 
     // Register Nitro Hybrid Objects
     

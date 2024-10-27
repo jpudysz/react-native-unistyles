@@ -4,13 +4,16 @@ import Foundation
 import Combine
 import NitroModules
 
-typealias CxxListener = (Array<UnistyleDependency>) -> Void
+typealias CxxDependencyListener = (Array<UnistyleDependency>) -> Void
+typealias CxxImeListener = () -> Void
 
 class NativeIOSPlatform: HybridNativePlatformSpec {
     var miniRuntime: UnistylesNativeMiniRuntime?
+    var keyboardAnimation = KeyboardAnimation()
     var cancellables = Set<AnyCancellable>()
 
-    var listeners: Array<CxxListener> = []
+    var dependencyListeners: Array<CxxDependencyListener> = []
+    var imeListeners: Array<CxxImeListener> = []
     var hybridContext = margelo.nitro.HybridContext()
     var memorySize: Int {
         return getSizeOf(self)
@@ -20,10 +23,12 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         self.miniRuntime = self.buildMiniRuntime()
 
         setupPlatformListeners()
+        setupKeyboardListeners()
     }
 
     deinit {
         removePlatformListeners()
+        removeKeyboardListeners()
     }
 
     func getMiniRuntime() -> UnistylesNativeMiniRuntime {
@@ -32,7 +37,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
 
     func buildMiniRuntime() -> UnistylesNativeMiniRuntime {
         let orientation = self.getOrientation()
-        
+
         return UnistylesNativeMiniRuntime(
             colorScheme: self.getColorScheme(),
             screen: self.getScreenDimensions(),
@@ -193,7 +198,13 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
 
             let safeArea = window.safeAreaInsets
 
-            return Insets(top: safeArea.top, bottom: safeArea.bottom, left: safeArea.left, right: safeArea.right, ime: 0)
+            return Insets(
+                top: safeArea.top,
+                bottom: safeArea.bottom,
+                left: safeArea.left,
+                right: safeArea.right,
+                ime: keyboardAnimation.animatedImeInset
+            )
         }
 
         if Thread.isMainThread {
@@ -279,7 +290,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     func getNavigationBarDimensions() -> Dimensions {
         return Dimensions(width: 0, height: 0);
     }
-    
+
     func setStatusBarHidden(isHidden: Bool) throws {
         self.onWindowChange(Notification(name: NSNotification.Name("RCTWindowFrameDidChangeNotification")))
     }

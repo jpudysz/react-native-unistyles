@@ -63,6 +63,7 @@ namespace margelo::nitro::unistyles {
     void setImmersiveMode(bool isEnabled) override;
     UnistylesNativeMiniRuntime getMiniRuntime() override;
     void registerPlatformListener(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>& callback) override;
+    void registerImeListener(const std::function<void()>& callback) override;
 
   private:
     friend HybridBase;

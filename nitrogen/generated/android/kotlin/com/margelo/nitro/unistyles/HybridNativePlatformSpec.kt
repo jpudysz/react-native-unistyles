@@ -119,6 +119,17 @@ abstract class HybridNativePlatformSpec: HybridObject() {
     val __result = registerPlatformListener(callback.toLambda())
     return __result
   }
+  
+  @DoNotStrip
+  @Keep
+  abstract fun registerImeListener(callback: () -> Unit): Unit
+  
+  @DoNotStrip
+  @Keep
+  private fun registerImeListener(callback: Func_void): Unit {
+    val __result = registerImeListener(callback.toLambda())
+    return __result
+  }
 
   private external fun initHybrid(): HybridData
 

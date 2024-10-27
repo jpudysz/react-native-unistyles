@@ -14,14 +14,24 @@ extension NativeIOSPlatform {
 
     func removePlatformListeners() {
         cancellables.removeAll()
+        dependencyListeners.removeAll()
+        imeListeners.removeAll()
     }
 
-    func registerPlatformListener(callback: @escaping (CxxListener)) throws {
-        listeners.append(callback)
+    func registerPlatformListener(callback: @escaping (CxxDependencyListener)) throws {
+        self.dependencyListeners.append(callback)
+    }
+
+    func registerImeListener(callback: @escaping (() -> Void)) throws {
+        self.imeListeners.append(callback)
     }
 
     func emitCxxEvent(dependencies: Array<UnistyleDependency>) {
-        self.listeners.forEach { $0(dependencies) }
+        self.dependencyListeners.forEach { $0(dependencies) }
+    }
+
+    func emitImeEvent() {
+        self.imeListeners.forEach { $0() }
     }
 
     @objc func onWindowChange(_ notification: Notification) {
@@ -29,7 +39,7 @@ extension NativeIOSPlatform {
         guard let currentMiniRuntime = self.miniRuntime else {
             return
         }
-        
+
         let newMiniRuntime = self.buildMiniRuntime()
         let changedDependencies = UnistylesNativeMiniRuntime.diff(lhs: currentMiniRuntime, rhs: newMiniRuntime)
 

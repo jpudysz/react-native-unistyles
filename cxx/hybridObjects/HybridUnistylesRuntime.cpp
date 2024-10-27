@@ -114,19 +114,19 @@ void HybridUnistylesRuntime::calculateNewThemeAndDependencies(std::vector<Unisty
 
 jsi::Value HybridUnistylesRuntime::getTheme(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count <= 1, "UnistylesRuntime.getTheme expected to be called with 0 or 1 argument.");
-    
+
     auto& state = core::UnistylesRegistry::get().getState(*_rt);
-    
+
     if (count == 1) {
         helpers::assertThat(rt, args[0].isString(), "UnistylesRuntime.getTheme expected to be called with string.");
-        
+
         auto themeName = args[0].asString(rt).utf8(rt);
-        
+
         helpers::assertThat(rt, state.hasTheme(themeName), "Unistyles: You're trying to get theme '" + themeName + "' but it wasn't registered.");
-        
+
         return state.getJSThemeByName(themeName);
     }
-    
+
     return state.getCurrentJSTheme();
 }
 
@@ -212,7 +212,7 @@ jsi::Value HybridUnistylesRuntime::getMiniRuntimeAsValue(jsi::Runtime& rt) {
     obj.setProperty(rt, "navigationBar", JSIConverter<Dimensions>::toJSI(rt, miniRuntime.navigationBar));
     obj.setProperty(rt, "isPortrait", JSIConverter<bool>::toJSI(rt, miniRuntime.isPortrait));
     obj.setProperty(rt, "isLandscape", JSIConverter<bool>::toJSI(rt, miniRuntime.isLandscape));
-    
+
     return obj;
 }
 
@@ -223,6 +223,10 @@ jsi::Runtime& HybridUnistylesRuntime::getRuntime() {
 void HybridUnistylesRuntime::registerPlatformListener(const std::function<void(std::vector<UnistyleDependency>)>& listener) {
     this->_nativePlatform.registerPlatformListener(listener);
     this->_onDependenciesChange = listener;
+}
+
+void HybridUnistylesRuntime::registerImeListener(const std::function<void()>& listener) {
+    this->_nativePlatform.registerImeListener(listener);
 }
 
 void HybridUnistylesRuntime::includeDependenciesForColorSchemeChange(std::vector<UnistyleDependency>& deps) {

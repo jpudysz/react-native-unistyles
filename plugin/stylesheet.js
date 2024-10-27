@@ -14,7 +14,8 @@ const UnistyleDependency = {
     PixelRatio: 10,
     FontScale: 11,
     StatusBar: 12,
-    NavigationBar: 13
+    NavigationBar: 13,
+    Ime: 14
 }
 
 function stringToUniqueId(str) {
@@ -108,6 +109,11 @@ function analyzeDependencies(t, state, name, unistyleObj, themeName, rtName) {
                         }
                         case 'contentSizeCategory': {
                             dependencies.push(UnistyleDependency.ContentSizeCategory)
+
+                            return
+                        }
+                        case 'ime': {
+                            dependencies.push(UnistyleDependency.Ime)
 
                             return
                         }

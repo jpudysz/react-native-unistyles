@@ -18,7 +18,8 @@ export enum UnistyleDependency {
     PixelRatio = 10,
     FontScale = 11,
     StatusBar = 12,
-    NavigationBar = 13
+    NavigationBar = 13,
+    Ime = 14
 }
 
 export interface UnistylesNativeMiniRuntime {
@@ -58,5 +59,6 @@ export interface NativePlatform extends HybridObject<{ ios: 'swift', android: 'k
 
     // private
     getMiniRuntime(): UnistylesNativeMiniRuntime,
-    registerPlatformListener(callback: (dependencies: Array<UnistyleDependency>) => void): void
+    registerPlatformListener(callback: (dependencies: Array<UnistyleDependency>) => void): void,
+    registerImeListener(callback: () => void): void
 }
