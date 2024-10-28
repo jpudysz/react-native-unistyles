@@ -1,6 +1,6 @@
 import type { UnistylesValues } from '../types'
 import { UnistylesRegistry } from './registry'
-import { createDoubleMap, equal, extractSecrets, extractUnistyleDependencies, isInDocument } from './utils'
+import { createDoubleMap, deepMergeObjects, equal, extractSecrets, extractUnistyleDependencies, isInDocument } from './utils'
 import { getVariants } from './variants'
 
 type Style = UnistylesValues | ((...args: Array<any>) => UnistylesValues)
@@ -73,10 +73,7 @@ class UnistylesShadowRegistryBuilder {
                 ? style(...args)
                 : style
             const { variantsResult } = Object.fromEntries(getVariants({ variantsResult: result }, variants))
-            const resultWithVariants = {
-                ...result,
-                ...variantsResult
-            }
+            const resultWithVariants = deepMergeObjects(result, variantsResult ?? {})
             const oldResult = this.resultsMap.get(ref, __uni__key)
 
             // If results are the same do nothing
