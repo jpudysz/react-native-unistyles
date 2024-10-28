@@ -1,6 +1,6 @@
 import type { ReactNativeStyleSheet } from '../types'
 import type { StyleSheetWithSuperPowers, StyleSheet } from '../types/stylesheet'
-import { assignSecrets, reduceObject, getStyles } from './utils'
+import { assignSecrets, reduceObject, getStyles, deepMergeObjects } from './utils'
 import { UnistylesRuntime } from './runtime'
 import { createUseVariants, getVariants } from './variants'
 
@@ -26,10 +26,7 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
             const dynamicStyle = (...args: Array<any>) => {
                 const result = value(...args)
                 const variants = Object.fromEntries(getVariants({ [key]: result } as ReactNativeStyleSheet<StyleSheet>, copyVariants()))
-                const resultWithVariants = {
-                    ...result,
-                    ...variants[key]
-                }
+                const resultWithVariants = deepMergeObjects(result, variants[key] ?? {})
 
                 // Add secrets to result of dynamic styles function
                 return addSecrets(getStyles(resultWithVariants), key, args)
