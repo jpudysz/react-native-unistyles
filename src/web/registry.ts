@@ -1,7 +1,7 @@
 import type { UnistylesTheme, UnistylesValues } from '../types'
 import type { StyleSheet, StyleSheetWithSuperPowers } from '../types/stylesheet'
 import { UnistylesRuntime } from './runtime'
-import { extractMediaQueryValue, keyInObject, getMediaQuery, generateHash, extractUnistyleDependencies } from './utils'
+import { extractMediaQueryValue, keyInObject, getMediaQuery, generateHash, extractUnistyleDependencies, deepMergeObjects } from './utils'
 import { UnistylesListener } from './listener'
 import { convertUnistyles } from './convert'
 import type { UnistyleDependency } from '../specs/NativePlatform'
@@ -107,10 +107,7 @@ class UnistylesRegistryBuilder {
                     ? newValue(...args)
                     : newValue
                 const { variantsResult } = Object.fromEntries(getVariants({ variantsResult: result }, variants))
-                const resultWithVariants = {
-                    ...result,
-                    ...variantsResult
-                }
+                const resultWithVariants = deepMergeObjects(result, variantsResult ?? {})
 
                 this.applyStyles(hash, convertUnistyles(resultWithVariants))
             })
