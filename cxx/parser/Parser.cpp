@@ -15,7 +15,6 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
 
         jsi::Object styleValue = propertyValue.asObject(rt);
 
-
         if (styleValue.isFunction(rt)) {
             styleSheet->unistyles[styleKey] = std::make_shared<UnistyleDynamicFunction>(
                 UnistyleType::DynamicFunction,

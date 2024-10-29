@@ -86,6 +86,7 @@ namespace margelo::nitro::unistyles {
       virtual UnistylesNativeMiniRuntime getMiniRuntime() = 0;
       virtual void registerPlatformListener(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>& callback) = 0;
       virtual void registerImeListener(const std::function<void()>& callback) = 0;
+      virtual void unregisterPlatformListeners() = 0;
 
     protected:
       // Hybrid Setup

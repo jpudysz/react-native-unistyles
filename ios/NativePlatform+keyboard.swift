@@ -17,6 +17,8 @@ extension NativeIOSPlatform {
     }
 
     func removeKeyboardListeners() {
+        keyboardAnimation.displayLink?.invalidate()
+
         NotificationCenter.default.removeObserver(
              self,
              name: UIResponder.keyboardWillShowNotification,

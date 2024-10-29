@@ -39,7 +39,7 @@ __weak RCTSurfacePresenter* _surfacePresenter;
 - (void)createHybrids:(jsi::Runtime&)rt {
     auto runOnJSThread = ([executor = _runtimeExecutor](std::function<void(jsi::Runtime& rt)> &&callback) {
         __block auto objcCallback = callback;
-        
+
         [executor execute:^(jsi::Runtime& rt){
             objcCallback(rt);
         }];

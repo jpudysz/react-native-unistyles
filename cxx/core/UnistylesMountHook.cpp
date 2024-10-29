@@ -25,13 +25,3 @@ void core::UnistylesMountHook::shadowTreeDidMount(RootShadowNode::Shared const &
     // so, resume Unistyles commits
     registry.trafficController.resumeUnistylesTraffic();
 }
-
-shadow::ShadowLeafUpdates core::UnistylesMountHook::getUnistylesUpdates() {
-    auto& registry = core::UnistylesRegistry::get();
-    auto parser = parser::Parser(this->_unistylesRuntime);
-    auto dependencyMap = registry.buildDependencyMap(*this->_rt);
-
-    // don't rebuild dependency map, at this point it's already done
-
-    return parser.dependencyMapToShadowLeafUpdates(dependencyMap);
-}
