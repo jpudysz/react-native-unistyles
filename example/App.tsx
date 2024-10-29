@@ -1,24 +1,48 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { Button, TextInput, View } from 'react-native'
-import { StyleSheet } from 'react-native-unistyles'
-import Animated from 'react-native-reanimated'
+import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withRepeat,
+    withSequence,
+    withTiming
+} from 'react-native-reanimated'
 import './unistyles'
 import { Typography } from './Typography'
 
 export const App = () => {
-    const [count, setCount] = React.useState(0)
+    const [, setCount] = React.useState(0)
+    const countRef = useRef(0)
+    const rotationAnimation = useSharedValue(0)
+
+    rotationAnimation.value = withRepeat(
+        withSequence(withTiming(25, { duration: 150 }), withTiming(0, { duration: 150 })),
+        -1
+    )
+
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ rotate: `${rotationAnimation.value}deg` }],
+    }))
 
     return (
-        <View style={{...styles.container, ...styles.secondProp}}>
-            <Animated.View style={styles.animated} />
-            <Typography isBold isPrimary size="large" isCentered value={2}>
-                Hello World
+        <View style={styles.container}>
+            <Animated.View style={[styles.animated, animatedStyle]} />
+            <Typography isBold isPrimary size="large" isCentered value={1.5}>
+                Keyboard insets
             </Typography>
             <Typography isBold={false} size="small" value={2.22}>
-                Hello World {count}
+                Re-render count: {countRef.current++}
             </Typography>
-            <Button title="Re-render" onPress={() => setCount(prevState =>  prevState + 1)} />
-            <TextInput placeholder="Click me"/>
+            <Button title="Force re-render" onPress={() => setCount(prevState =>  prevState + 1)} />
+            <Button title="Change theme" onPress={() => {
+                if (UnistylesRuntime.themeName === 'light') {
+                    UnistylesRuntime.setTheme('dark')
+                } else {
+                    UnistylesRuntime.setTheme('light')
+                }
+            }} />
+            <TextInput style={styles.input} />
         </View>
     )
 }
@@ -29,20 +53,31 @@ const styles = StyleSheet.create((theme, rt) => ({
         alignItems: 'center',
         justifyContent: 'flex-end',
         backgroundColor: theme.colors.backgroundColor,
-        marginBottom: rt.insets.bottom
+        paddingHorizontal: theme.gap(2),
+        paddingBottom: rt.insets.ime
     },
     secondProp: {
-        backgroundColor: theme.colors.backgroundColor,
-        paddingBottom: rt.insets.ime
+        backgroundColor: theme.colors.backgroundColor
     },
     thirdProp: {
         backgroundColor: rt.isPortrait ? 'blue' : 'green'
     },
+    input: {
+        height: 50,
+        borderWidth: 1,
+        width: '100%',
+        padding: theme.gap(2),
+        borderRadius: theme.gap(1),
+        borderColor: theme.colors.typography,
+        marginBottom: rt.insets.bottom
+    },
     animated: {
         width: 100,
         height: 100,
-        filter: 'brightness(0.2) opacity(0.99)',
-        boxShadow: '5 5 5 0 rgba(255, 0, 0, 0.5)',
+        opacity: 0.79,
+        borderWidth: 1,
+        marginBottom: theme.gap(3),
+        borderColor: theme.colors.typography,
         backgroundColor: rt.colorScheme === 'dark' ? 'red' : 'blue'
     }
 }))

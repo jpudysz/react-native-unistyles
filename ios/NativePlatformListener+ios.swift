@@ -35,7 +35,6 @@ extension NativeIOSPlatform {
     }
 
     @objc func onWindowChange(_ notification: Notification) {
-        // add small delay (10ms) to make sure all values are up ot date
         guard let currentMiniRuntime = self.miniRuntime else {
             return
         }
