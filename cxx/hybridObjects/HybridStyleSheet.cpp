@@ -226,18 +226,16 @@ void HybridStyleSheet::loadExternalMethods(const jsi::Value& thisValue, jsi::Run
 }
 
 void HybridStyleSheet::registerHooks(jsi::Runtime& rt) {
-    this->_unistylesRuntime->_runOnJSThread([this](jsi::Runtime& rt){
-        this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(this->_uiManager, this->_unistylesRuntime, rt);
-        this->_unistylesMountHook = std::make_shared<core::UnistylesMountHook>(this->_uiManager, this->_unistylesRuntime, rt);
-    });
+    this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(this->_uiManager, this->_unistylesRuntime, rt);
+    this->_unistylesMountHook = std::make_shared<core::UnistylesMountHook>(this->_uiManager);
 }
 
 void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies) {
     if (this->_unistylesRuntime == nullptr) {
         return;
     }
-    
-    this->_unistylesRuntime->_runOnJSThread([this, &dependencies](jsi::Runtime& rt){
+
+    this->_unistylesRuntime->runOnJSThread([this, &dependencies](jsi::Runtime& rt){
         auto& registry = core::UnistylesRegistry::get();
         auto parser = parser::Parser(this->_unistylesRuntime);
 
@@ -284,14 +282,12 @@ void HybridStyleSheet::onImeChange() {
     if (this->_unistylesRuntime == nullptr) {
         return;
     }
-    
-    // this function should be as fast as possible
-    // multiple values will be emitted in the short period of time ~0.25s
-    this->_unistylesRuntime->_runOnJSThread([this](jsi::Runtime& rt){
+
+    this->_unistylesRuntime->runOnJSThread([this](jsi::Runtime& rt){
         auto& registry = core::UnistylesRegistry::get();
         auto parser = parser::Parser(this->_unistylesRuntime);
         std::vector<UnistyleDependency> dependencies{UnistyleDependency::IME};
-        
+
         this->notifyJSListeners(dependencies);
 
         auto dependencyMap = registry.buildDependencyMap(rt, dependencies);

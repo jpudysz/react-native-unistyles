@@ -146,5 +146,9 @@ namespace margelo::nitro::unistyles {
     static const auto method = _javaPart->getClass()->getMethod<void(jni::alias_ref<JFunc_void::javaobject> /* callback */)>("registerImeListener");
     method(_javaPart, JFunc_void::fromCpp(callback));
   }
+  void JHybridNativePlatformSpec::unregisterPlatformListeners() {
+    static const auto method = _javaPart->getClass()->getMethod<void()>("unregisterPlatformListeners");
+    method(_javaPart);
+  }
 
 } // namespace margelo::nitro::unistyles

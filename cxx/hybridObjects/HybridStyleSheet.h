@@ -26,6 +26,10 @@ struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
                   std::bind(&HybridStyleSheet::onImeChange, this)
             );
       }
+    
+    ~HybridStyleSheet() {
+        this->_unistylesRuntime->unregisterPlatformListeners();
+    }
 
     jsi::Value create(jsi::Runtime& rt,
                       const jsi::Value& thisValue,

@@ -13,9 +13,7 @@ extension NativeIOSPlatform {
     }
 
     func removePlatformListeners() {
-        cancellables.removeAll()
-        dependencyListeners.removeAll()
-        imeListeners.removeAll()
+        self.unregisterPlatformListeners()
     }
 
     func registerPlatformListener(callback: @escaping (CxxDependencyListener)) throws {
@@ -32,6 +30,12 @@ extension NativeIOSPlatform {
 
     func emitImeEvent() {
         self.imeListeners.forEach { $0() }
+    }
+    
+    func unregisterPlatformListeners() {
+        cancellables.removeAll()
+        dependencyListeners.removeAll()
+        imeListeners.removeAll()
     }
 
     @objc func onWindowChange(_ notification: Notification) {

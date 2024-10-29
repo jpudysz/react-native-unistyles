@@ -146,6 +146,9 @@ namespace margelo::nitro::unistyles {
     inline void registerImeListener(const std::function<void()>& callback) override {
       _swiftPart.registerImeListener(callback);
     }
+    inline void unregisterPlatformListeners() override {
+      _swiftPart.unregisterPlatformListeners();
+    }
 
   private:
     Unistyles::HybridNativePlatformSpecCxx _swiftPart;

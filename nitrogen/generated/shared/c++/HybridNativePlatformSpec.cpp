@@ -33,6 +33,7 @@ namespace margelo::nitro::unistyles {
       prototype.registerHybridMethod("getMiniRuntime", &HybridNativePlatformSpec::getMiniRuntime);
       prototype.registerHybridMethod("registerPlatformListener", &HybridNativePlatformSpec::registerPlatformListener);
       prototype.registerHybridMethod("registerImeListener", &HybridNativePlatformSpec::registerImeListener);
+      prototype.registerHybridMethod("unregisterPlatformListeners", &HybridNativePlatformSpec::unregisterPlatformListeners);
     });
   }
 

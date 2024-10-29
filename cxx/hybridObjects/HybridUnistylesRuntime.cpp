@@ -229,6 +229,10 @@ void HybridUnistylesRuntime::registerImeListener(const std::function<void()>& li
     this->_nativePlatform.registerImeListener(listener);
 }
 
+void HybridUnistylesRuntime::unregisterPlatformListeners() {
+    this->_nativePlatform.unregisterPlatformListeners();
+}
+
 void HybridUnistylesRuntime::includeDependenciesForColorSchemeChange(std::vector<UnistyleDependency>& deps) {
     auto& registry = core::UnistylesRegistry::get();
     auto& state = registry.getState(*this->_rt);
