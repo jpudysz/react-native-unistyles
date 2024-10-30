@@ -7202,8 +7202,8 @@ __metadata:
     jest: 29.7.0
     react: 18.3.1
     react-native: 0.76.1
-    react-native-blurhash: ^2.0.3
-    react-native-nitro-modules: 0.13.0
+    react-native-blurhash: 2.0.3
+    react-native-nitro-modules: 0.14.0
     react-native-reanimated: 3.16.1
     react-native-unistyles: "workspace:*"
     react-test-renderer: 18.3.1
@@ -11693,18 +11693,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nitro-codegen@npm:0.13.0":
-  version: 0.13.0
-  resolution: "nitro-codegen@npm:0.13.0"
+"nitro-codegen@npm:0.14.0":
+  version: 0.14.0
+  resolution: "nitro-codegen@npm:0.14.0"
   dependencies:
     chalk: ^5.3.0
-    react-native-nitro-modules: ^0.13.0
+    react-native-nitro-modules: ^0.14.0
     ts-morph: ^24.0.0
     yargs: ^17.7.2
     zod: ^3.23.8
   bin:
     nitro-codegen: lib/index.js
-  checksum: 97e6b055710bdbd42e3121edb2b94ffbc4fece46b1c3262f54f3610199ab26fa02b0a6fd94f6e548f67481f663948d67dfea64e74ef80143291189804c55e55f
+  checksum: 00756eebbacf7287a9f898e98570c285481b032b814b98f4e769627cb2ca8cd436379ebd6357a1c3a9c55c10b859c6ca5296dc29cbe92a2e114dac7641403c2e
   languageName: node
   linkType: hard
 
@@ -12801,7 +12801,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-blurhash@npm:^2.0.3":
+"react-native-blurhash@npm:2.0.3":
   version: 2.0.3
   resolution: "react-native-blurhash@npm:2.0.3"
   peerDependencies:
@@ -12843,13 +12843,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-nitro-modules@npm:0.13.0, react-native-nitro-modules@npm:^0.13.0":
-  version: 0.13.0
-  resolution: "react-native-nitro-modules@npm:0.13.0"
+"react-native-nitro-modules@npm:0.14.0, react-native-nitro-modules@npm:^0.14.0":
+  version: 0.14.0
+  resolution: "react-native-nitro-modules@npm:0.14.0"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 39953325d88bab1a9e3d18972ee4f1cb3800e3e62654fd1ba6387b7d05fd8c6d9d84ed1da1a0e89520f1cd62a9961c1761903b81402ef4c8e2e3451b2b7a08d2
+  checksum: f482da49fd505473f929078a9fab1e26a8a666377bbc583f50a3a43c09ba7303446f6896c7b35416f6bc032934da32258a850bf8f65a0799a9c68f61987c47cf
   languageName: node
   linkType: hard
 
@@ -12913,11 +12913,11 @@ __metadata:
     husky: 9.1.6
     jest: 29.7.0
     metro-react-native-babel-preset: 0.77.0
-    nitro-codegen: 0.13.0
+    nitro-codegen: 0.14.0
     react: 18.3.1
     react-native: 0.76.0
     react-native-builder-bob: 0.30.2
-    react-native-nitro-modules: 0.13.0
+    react-native-nitro-modules: 0.14.0
     react-test-renderer: 18.3.1
     release-it: 17.10.0
     typescript: 5.6.3
