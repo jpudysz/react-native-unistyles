@@ -1,5 +1,4 @@
 #include "UnistylesMountHook.h"
-#include "ShadowTreeManager.h"
 
 using namespace margelo::nitro::unistyles;
 using namespace facebook::react;

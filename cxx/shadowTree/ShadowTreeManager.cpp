@@ -17,14 +17,13 @@ void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime& rt, sha
         return;
     }
 
-    shadowTreeRegistry.enumerate([&updates, &rt](const ShadowTree& shadowTree, bool& stop){
+    shadowTreeRegistry.enumerate([&updates](const ShadowTree& shadowTree, bool& stop){
         // we could iterate via updates and create multiple commits
         // but it can cause performance issues for hundreds of nodes
         // so let's mutate Shadow Tree in single transaction
         auto transaction = [&](const RootShadowNode& oldRootShadowNode) {
             auto affectedNodes = shadow::ShadowTreeManager::findAffectedNodes(oldRootShadowNode, updates);
             auto newRootNode = std::static_pointer_cast<RootShadowNode>(shadow::ShadowTreeManager::cloneShadowTree(
-                rt,
                 oldRootShadowNode,
                 updates,
                 affectedNodes
@@ -90,7 +89,7 @@ AffectedNodes shadow::ShadowTreeManager::findAffectedNodes(const RootShadowNode&
 
 // based on Reanimated algorithm
 // clone affected nodes recursively, inject props and commit tree
-ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(jsi::Runtime& rt, const ShadowNode &shadowNode, ShadowLeafUpdates& updates, AffectedNodes& affectedNodes) {
+ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode &shadowNode, ShadowLeafUpdates& updates, AffectedNodes& affectedNodes) {
     const auto family = &shadowNode.getFamily();
     const auto rawPropsIt = updates.find(family);
     const auto childrenIt = affectedNodes.find(family);
@@ -100,7 +99,7 @@ ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(jsi::Runtime& rt
     if (childrenIt != affectedNodes.end()) {
         // get all indexes of children and clone it recursively
         for (const auto index : childrenIt->second) {
-            children[index] = cloneShadowTree(rt, *children[index], updates, affectedNodes);
+            children[index] = cloneShadowTree(*children[index], updates, affectedNodes);
         }
     }
 

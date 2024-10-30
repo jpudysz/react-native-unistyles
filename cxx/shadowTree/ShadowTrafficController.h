@@ -1,5 +1,7 @@
 #pragma once
 
+#import "ShadowLeafUpdate.h"
+
 namespace margelo::nitro::unistyles::shadow {
 
 // Like a traffic officer managing a jam, this struct ensures everything
@@ -24,6 +26,8 @@ struct ShadowTrafficController {
     inline void resumeUnistylesTraffic() {
         this->_canCommit = true;
     }
+    
+    std::unordered_map<jsi::Runtime*, shadow::ShadowLeafUpdates> _unistylesUpdates{};
     
 private:
     bool _hasCommit = false;

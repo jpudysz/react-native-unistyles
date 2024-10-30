@@ -11,6 +11,7 @@ using namespace margelo::nitro;
 RCT_EXPORT_MODULE(Unistyles)
 
 __weak RCTSurfacePresenter* _surfacePresenter;
+@synthesize runtimeExecutor = _runtimeExecutor;
 
 + (BOOL)requiresMainQueueSetup {
     return YES;
@@ -25,6 +26,8 @@ __weak RCTSurfacePresenter* _surfacePresenter;
     // check if this is live reload, if so let's replace UnistylesRuntime with new runtime
     auto hasUnistylesRuntime = HybridObjectRegistry::hasHybridObject("UnistylesRuntime");
 
+    auto& registry = core::UnistylesRegistry::get();
+
     if (hasUnistylesRuntime) {
         HybridObjectRegistry::unregisterHybridObjectConstructor("UnistylesRuntime");
         HybridObjectRegistry::unregisterHybridObjectConstructor("UnistylesStyleSheet");
@@ -35,8 +38,15 @@ __weak RCTSurfacePresenter* _surfacePresenter;
 }
 
 - (void)createHybrids:(jsi::Runtime&)rt {
+    auto runOnJSThread = ([executor = _runtimeExecutor](std::function<void(jsi::Runtime& rt)> &&callback) {
+        __block auto objcCallback = callback;
+        
+        [executor execute:^(jsi::Runtime& rt){
+            objcCallback(rt);
+        }];
+    });
     auto nativePlatform = Unistyles::NativePlatform::create();
-    auto unistylesRuntime = std::make_shared<HybridUnistylesRuntime>(nativePlatform, rt);
+    auto unistylesRuntime = std::make_shared<HybridUnistylesRuntime>(nativePlatform, rt, runOnJSThread);
     auto uiManager = [_surfacePresenter scheduler].uiManager;
     auto styleSheet = std::make_shared<HybridStyleSheet>(unistylesRuntime, uiManager);
 

@@ -26,7 +26,7 @@ struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
                   std::bind(&HybridStyleSheet::onImeChange, this)
             );
       }
-    
+
     ~HybridStyleSheet() {
         this->_unistylesRuntime->unregisterPlatformListeners();
     }
