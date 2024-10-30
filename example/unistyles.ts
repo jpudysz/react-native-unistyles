@@ -14,7 +14,8 @@ const lightTheme = {
         ...sharedColors,
         backgroundColor: '#ffffff',
         typography: '#000000',
-        accent: sharedColors.blood
+        accent: sharedColors.blood,
+        test: 'blue'
     },
     gap: (v: number) => v * 8
 }
@@ -24,7 +25,8 @@ const darkTheme = {
         ...sharedColors,
         backgroundColor: '#000000',
         typography: '#ffffff',
-        accent: sharedColors.barbie
+        accent: sharedColors.barbie,
+        test: 'red'
     },
     gap: (v: number) => v * 8
 }
@@ -34,7 +36,8 @@ const premiumTheme = {
         ...sharedColors,
         backgroundColor: sharedColors.barbie,
         typography: '#76278f',
-        accent: '#000000'
+        accent: '#000000',
+        test: 'orange'
     },
     gap: (v: number) => v * 8
 }

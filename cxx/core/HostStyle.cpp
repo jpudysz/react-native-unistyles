@@ -22,7 +22,7 @@ jsi::Value HostStyle::get(jsi::Runtime& rt, const jsi::PropNameID& propNameId) {
     if (propertyName == helpers::UNISTYLES_ID) {
         return jsi::Value(this->_styleSheet->tag);
     }
-
+    
     if (propertyName == helpers::ADD_VARIANTS_FN) {
         return this->createAddVariantsProxyFunction(rt);
     }

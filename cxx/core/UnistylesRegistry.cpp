@@ -158,7 +158,7 @@ std::vector<std::shared_ptr<core::StyleSheet>> core::UnistylesRegistry::getStyle
     std::for_each(styleSheets.begin(), styleSheets.end(), [&](std::pair<int, std::shared_ptr<core::StyleSheet>> pair){
         auto& [_, styleSheet] = pair;
 
-        if (styleSheet->type == StyleSheetType::ThemableWithMiniRuntime && runtimeDidChange) {
+        if (styleSheet->type == StyleSheetType::ThemableWithMiniRuntime && (themeDidChange || runtimeDidChange)) {
             stylesheetsToRefresh.emplace_back(styleSheet);
 
             return;

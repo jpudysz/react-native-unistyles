@@ -3,6 +3,7 @@
 #include <jsi/jsi.h>
 #include <jsi/JSIDynamic.h>
 #include <folly/dynamic.h>
+#include "Unistyles-Swift-Cxx-Umbrella.hpp"
 #include <unordered_set>
 
 using namespace facebook;
@@ -190,6 +191,16 @@ inline std::vector<folly::dynamic> parseDynamicFunctionArguments(jsi::Runtime& r
     }
 
     return parsedArgument;
+}
+
+inline static jsi::Array dependenciesToJSIArray(jsi::Runtime& rt, const std::vector<UnistyleDependency>& vec) {
+    jsi::Array result(rt, vec.size());
+
+    for (size_t i = 0; i < vec.size(); i++) {
+        result.setValueAtIndex(rt, i, jsi::Value(static_cast<int>(vec[i])));
+    }
+
+    return result;
 }
 
 }

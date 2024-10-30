@@ -122,7 +122,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
             // for RN styles or inline styles, compute styles only once
             if (unistyle->styleKey == helpers::EXOTIC_STYLE_KEY.c_str() && !unistyleData->parsedStyle.has_value()) {
                 unistyleData->parsedStyle = jsi::Value(rt, unistyle->rawValue).asObject(rt);
-                
+
                 if (!parsedUnistyles.contains(unistyle)) {
                     parsedUnistyles.emplace(unistyle, true);
                 }
@@ -138,13 +138,13 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
             unistyle->rawValue = parsedStyleSheets[styleSheet].asObject(rt).getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
             this->rebuildUnistyle(rt, styleSheet, unistyle, unistyleData->variants, unistyleData->dynamicFunctionMetadata);
             unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
-            
+
             if (!parsedUnistyles.contains(unistyle)) {
                 parsedUnistyles.emplace(unistyle, true);
             }
         }
     }
-    
+
     // parse whatever left in StyleSheets
     for (auto styleSheet : styleSheets) {
         for (auto& [_, unistyle] : styleSheet->unistyles) {
@@ -269,13 +269,13 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared u
 
             return;
         }
-        
+
         if (propertyName == "boxShadow" && propertyValueObject.isArray(rt)) {
             parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), parseBoxShadow(rt, unistyle, propertyValueObject));
 
             return;
         }
-        
+
         if (propertyName == "filter" && propertyValueObject.isArray(rt)) {
             parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), parseFilters(rt, unistyle, propertyValueObject));
 
@@ -353,7 +353,12 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
             unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
             unistyleFn->seal();
 
-            return jsi::Value(rt, unistyleFn->parsedStyle.value());
+            // include dependencies for createUnistylesComponent
+            jsi::Object style = jsi::Value(rt, unistyleFn->parsedStyle.value()).asObject(rt);
+
+            helpers::defineHiddenProperty(rt, style, helpers::STYLE_DEPENDENCIES, helpers::dependenciesToJSIArray(rt, unistyle->dependencies));
+
+            return style;
     });
 }
 
@@ -408,9 +413,9 @@ jsi::Value parser::Parser::parseTransforms(jsi::Runtime& rt, Unistyle::Shared un
 // eg [{offsetX: 5, offsetY: 5, blurRadius: 5, spreadDistance: 0, color: ‘rgba(255, 0, 0, 0.5)’}]
 jsi::Value parser::Parser::parseBoxShadow(jsi::Runtime &rt, Unistyle::Shared unistyle, jsi::Object &obj) {
     std::vector<jsi::Value> parsedBoxShadows{};
-    
+
     parsedBoxShadows.reserve(2);
-    
+
     helpers::iterateJSIArray(rt, obj.asArray(rt), [&](size_t i, jsi::Value& value){
         if (!value.isObject()) {
             return;
@@ -420,7 +425,7 @@ jsi::Value parser::Parser::parseBoxShadow(jsi::Runtime &rt, Unistyle::Shared uni
 
         parsedBoxShadows.emplace_back(std::move(parsedResult));
     });
-    
+
     // create jsi::Array result with correct box shadows
     jsi::Array result = jsi::Array(rt, parsedBoxShadows.size());
 
@@ -436,7 +441,7 @@ jsi::Value parser::Parser::parseFilters(jsi::Runtime &rt, Unistyle::Shared unist
     std::vector<jsi::Value> parsedFilters{};
 
     parsedFilters.reserve(2);
-    
+
     helpers::iterateJSIArray(rt, obj.asArray(rt), [&](size_t i, jsi::Value& value){
         if (!value.isObject()) {
             return;
@@ -447,7 +452,7 @@ jsi::Value parser::Parser::parseFilters(jsi::Runtime &rt, Unistyle::Shared unist
         // take only one filter per object
         jsi::Array propertyNames = parsedResult.asObject(rt).getPropertyNames(rt);
         size_t length = propertyNames.size(rt);
-        
+
         // ignore no filters
         if (length == 0) {
             return;
@@ -455,7 +460,7 @@ jsi::Value parser::Parser::parseFilters(jsi::Runtime &rt, Unistyle::Shared unist
 
         parsedFilters.emplace_back(std::move(parsedResult));
     });
-    
+
     // create jsi::Array result with correct filters
     jsi::Array result = jsi::Array(rt, parsedFilters.size());
 
