@@ -13,8 +13,7 @@
 namespace margelo::nitro::unistyles {
 
 struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
-    HybridUnistylesRuntime(Unistyles::HybridNativePlatformSpecCxx nativePlatform, jsi::Runtime& rt, std::function<void(std::function<void(jsi::Runtime&)>&&)> runOnJSThread)
-        : HybridObject(TAG), _nativePlatform{nativePlatform}, _rt{&rt}, runOnJSThread(std::move(runOnJSThread)) {}
+    HybridUnistylesRuntime(Unistyles::HybridNativePlatformSpecCxx nativePlatform, jsi::Runtime& rt) : HybridObject(TAG), _nativePlatform{nativePlatform}, _rt{&rt} {}
 
     jsi::Value getTheme(jsi::Runtime& rt,
                             const jsi::Value& thisValue,
@@ -68,7 +67,6 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     jsi::Runtime& getRuntime();
     void includeDependenciesForColorSchemeChange(std::vector<UnistyleDependency>& deps);
     void calculateNewThemeAndDependencies(std::vector<UnistyleDependency>& deps);
-    std::function<void(std::function<void(jsi::Runtime&)>&&)> runOnJSThread;
 
 private:
     jsi::Runtime* _rt;

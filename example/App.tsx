@@ -1,6 +1,7 @@
 import React, { useRef } from 'react'
 import { Button, TextInput, View } from 'react-native'
-import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
+import { Blurhash } from 'react-native-blurhash'
+import { createUnistylesComponent, StyleSheet } from 'react-native-unistyles'
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
@@ -10,6 +11,14 @@ import Animated, {
 } from 'react-native-reanimated'
 import './unistyles'
 import { Typography } from './Typography'
+
+const UniButton = createUnistylesComponent(Button, (theme) => ({
+    color: theme.colors.test
+}))
+
+const UniBlurhash = createUnistylesComponent(Blurhash, () => ({
+    style: styles.blurhash()
+}))
 
 export const App = () => {
     const [, setCount] = React.useState(0)
@@ -34,14 +43,11 @@ export const App = () => {
             <Typography isBold={false} size="small" value={2.22}>
                 Re-render count: {countRef.current++}
             </Typography>
-            <Button title="Force re-render" onPress={() => setCount(prevState =>  prevState + 1)} />
-            <Button title="Change theme" onPress={() => {
-                if (UnistylesRuntime.themeName === 'light') {
-                    UnistylesRuntime.setTheme('dark')
-                } else {
-                    UnistylesRuntime.setTheme('light')
-                }
-            }} />
+            <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6."  />
+            <UniButton
+                title="Force re-render"
+                onPress={() => setCount(prevState =>  prevState + 1)}
+            />
             <TextInput style={styles.input} />
         </View>
     )
@@ -79,5 +85,11 @@ const styles = StyleSheet.create((theme, rt) => ({
         marginBottom: theme.gap(3),
         borderColor: theme.colors.typography,
         backgroundColor: rt.colorScheme === 'dark' ? 'red' : 'blue'
-    }
+    },
+    blurhash: () => ({
+        height: 100,
+        width: 100,
+        borderWidth: 5,
+        borderColor: theme.colors.test
+    })
 }))

@@ -40,20 +40,20 @@ inline static std::vector<Unistyle::Shared> unistylesFromNonExistentNativeState(
     }
 
     throw jsi::JSError(rt, R"(Unistyles: Style is not bound!
-    
+
 Potential reasons:
 - You likely used the spread operator on a Unistyle style outside of a JSX component
-    
+
 If you need to merge styles, do it within the style prop of your JSX component:
-    
+
 style={{...styles.container, ...styles.otherProp}}
-or 
+or
 style={[styles.container, styles.otherProp]}
 
 If you pass computed style prop to component use array syntax:
 
 customStyleProp={[styles.container, styles.otherProp]}
-    
+
 Copying a Unistyle style outside of a JSX element will remove its internal C++ state, leading to unexpected behavior.)");
 }
 
@@ -77,10 +77,11 @@ inline static jsi::Value valueFromUnistyle(jsi::Runtime& rt, Unistyle::Shared un
 
     if (unistyle->type == UnistyleType::Object) {
         jsi::Object obj = jsi::Object(rt);
-       
+
         obj.setNativeState(rt, std::move(wrappedUnistyle));
         obj.setProperty(rt, helpers::NAME_STYLE_KEY.c_str(), jsi::String::createFromUtf8(rt, unistyle->styleKey));
-        
+
+        helpers::defineHiddenProperty(rt, obj, helpers::STYLE_DEPENDENCIES.c_str(), helpers::dependenciesToJSIArray(rt, unistyle->dependencies));
         helpers::mergeJSIObjects(rt, obj, unistyle->parsedStyle.value());
 
         return obj;
@@ -91,7 +92,7 @@ inline static jsi::Value valueFromUnistyle(jsi::Runtime& rt, Unistyle::Shared un
 
     hostFn.setNativeState(rt, std::move(wrappedUnistyle));
     hostFn.setProperty(rt, helpers::NAME_STYLE_KEY.c_str(), jsi::String::createFromUtf8(rt, unistyleFn->styleKey));
-    
+
     return std::move(hostFn);
 }
 
