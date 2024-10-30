@@ -18,7 +18,7 @@ using AffectedNodes = std::unordered_map<const ShadowNodeFamily *, std::unordere
 struct ShadowTreeManager {
     static void updateShadowTree(jsi::Runtime& rt, shadow::ShadowLeafUpdates& updates);
     static AffectedNodes findAffectedNodes(const RootShadowNode& rootNode, ShadowLeafUpdates& updates);
-    static ShadowNode::Unshared cloneShadowTree(jsi::Runtime& rt, const ShadowNode &shadowNode, ShadowLeafUpdates& updates, AffectedNodes& affectedNodes);
+    static ShadowNode::Unshared cloneShadowTree(const ShadowNode &shadowNode, ShadowLeafUpdates& updates, AffectedNodes& affectedNodes);
 };
 
 }

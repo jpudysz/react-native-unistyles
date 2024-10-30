@@ -230,57 +230,58 @@ void HybridStyleSheet::loadExternalMethods(const jsi::Value& thisValue, jsi::Run
 }
 
 void HybridStyleSheet::registerHooks(jsi::Runtime& rt) {
-    this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(this->_uiManager, this->_unistylesRuntime, rt);
+    this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(this->_uiManager, rt);
     this->_unistylesMountHook = std::make_shared<core::UnistylesMountHook>(this->_uiManager);
 }
 
-void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies) {
+void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependency> unistylesDependencies) {
     if (this->_unistylesRuntime == nullptr) {
         return;
     }
 
-    auto& registry = core::UnistylesRegistry::get();
-    auto& rt = this->_unistylesRuntime->getRuntime();
-    auto parser = parser::Parser(this->_unistylesRuntime);
+    this->_unistylesRuntime->runOnJSThread([this, unistylesDependencies](jsi::Runtime& rt){
+        auto& registry = core::UnistylesRegistry::get();
+        auto parser = parser::Parser(this->_unistylesRuntime);
+        auto dependencies = std::move(unistylesDependencies);
 
-    // re-compute new breakpoint
-    auto dimensionsIt = std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::DIMENSIONS);
+        // re-compute new breakpoint
+        auto dimensionsIt = std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::DIMENSIONS);
 
-    if (dimensionsIt != dependencies.end()) {
-        registry.getState(rt).computeCurrentBreakpoint(this->_unistylesRuntime->getScreen().width);
-    }
+        if (dimensionsIt != dependencies.end()) {
+            registry.getState(rt).computeCurrentBreakpoint(this->_unistylesRuntime->getScreen().width);
+        }
 
-    // check if color scheme changed and then if Unistyles state depend on it (adaptive themes)
-    auto colorSchemeIt = std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::COLORSCHEME);
-    auto hasNewColorScheme = colorSchemeIt != dependencies.end();
+        // check if color scheme changed and then if Unistyles state depend on it (adaptive themes)
+        auto colorSchemeIt = std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::COLORSCHEME);
+        auto hasNewColorScheme = colorSchemeIt != dependencies.end();
 
-    // in a later step, we will rebuild only Unistyles with mounted StyleSheets
-    // however, user may have StyleSheets with components that haven't mounted yet
-    // we need to rebuild all dependent StyleSheets as well
-    auto dependentStyleSheets = registry.getStyleSheetsToRefresh(rt, hasNewColorScheme, dependencies.size() > 1);
+        // in a later step, we will rebuild only Unistyles with mounted StyleSheets
+        // however, user may have StyleSheets with components that haven't mounted yet
+        // we need to rebuild all dependent StyleSheets as well
+        auto dependentStyleSheets = registry.getStyleSheetsToRefresh(rt, hasNewColorScheme, dependencies.size() > 1);
 
-    if (hasNewColorScheme) {
-        this->_unistylesRuntime->includeDependenciesForColorSchemeChange(dependencies);
-    }
+        if (hasNewColorScheme) {
+            this->_unistylesRuntime->includeDependenciesForColorSchemeChange(dependencies);
+        }
 
-    auto dependencyMap = registry.buildDependencyMap(rt, dependencies);
+        auto dependencyMap = registry.buildDependencyMap(rt, dependencies);
 
-    if (dependencyMap.size() == 0) {
+        if (dependencyMap.size() == 0) {
+            this->notifyJSListeners(dependencies);
+
+            return;
+        }
+
+        parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets);
+
         this->notifyJSListeners(dependencies);
-        
-        return;
-    }
 
-    parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets);
+        // this is required, otherwise shadow tree will ignore Unistyles commit
+        registry.trafficController.setHasUnistylesCommit(true);
+        parser.rebuildShadowLeafUpdates(dependencyMap);
 
-    this->notifyJSListeners(dependencies);
-
-    // this is required, otherwise shadow tree will ignore Unistyles commit
-    registry.trafficController.setHasUnistylesCommit(true);
-
-    auto shadowLeafUpdates = parser.dependencyMapToShadowLeafUpdates(dependencyMap);
-
-    shadow::ShadowTreeManager::updateShadowTree(rt, shadowLeafUpdates);
+        shadow::ShadowTreeManager::updateShadowTree(rt, registry.trafficController._unistylesUpdates[&rt]);
+    });
 }
 
 void HybridStyleSheet::onImeChange() {
@@ -288,27 +289,28 @@ void HybridStyleSheet::onImeChange() {
         return;
     }
 
-    auto& registry = core::UnistylesRegistry::get();
-    auto parser = parser::Parser(this->_unistylesRuntime);
-    auto&rt = this->_unistylesRuntime->getRuntime();
-    std::vector<UnistyleDependency> dependencies{UnistyleDependency::IME};
+    this->_unistylesRuntime->runOnJSThread([this](jsi::Runtime& rt){
+        auto& registry = core::UnistylesRegistry::get();
+        auto parser = parser::Parser(this->_unistylesRuntime);
 
-    this->notifyJSListeners(dependencies);
+        std::vector<UnistyleDependency> dependencies{UnistyleDependency::IME};
 
-    auto dependencyMap = registry.buildDependencyMap(rt, dependencies);
+        this->notifyJSListeners(dependencies);
 
-    if (dependencyMap.size() == 0) {
-        return;
-    }
+        auto dependencyMap = registry.buildDependencyMap(rt, dependencies);
 
-    parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, {});
+        if (dependencyMap.size() == 0) {
+            return;
+        }
 
-    // this is required, otherwise shadow tree will ignore Unistyles commit
-    registry.trafficController.setHasUnistylesCommit(true);
+        parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, {});
 
-    auto shadowLeafUpdates = parser.dependencyMapToShadowLeafUpdates(dependencyMap);
+        // this is required, otherwise shadow tree will ignore Unistyles commit
+        registry.trafficController.setHasUnistylesCommit(true);
+        parser.rebuildShadowLeafUpdates(dependencyMap);
 
-    shadow::ShadowTreeManager::updateShadowTree(rt, shadowLeafUpdates);
+        shadow::ShadowTreeManager::updateShadowTree(rt, registry.trafficController._unistylesUpdates[&rt]);
+    });
 }
 
 void HybridStyleSheet::notifyJSListeners(std::vector<UnistyleDependency>& dependencies) {

@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { Button, TextInput, View } from 'react-native'
+import { Button, ScrollView, Text, TextInput, View } from 'react-native'
 import { Blurhash } from 'react-native-blurhash'
 import { createUnistylesComponent, StyleSheet } from 'react-native-unistyles'
 import Animated, {
@@ -18,6 +18,11 @@ const UniButton = createUnistylesComponent(Button, (theme) => ({
 
 const UniBlurhash = createUnistylesComponent(Blurhash, () => ({
     style: styles.blurhash()
+}))
+
+const UniScrollView = createUnistylesComponent(ScrollView, () => ({
+    style: styles.scrollView,
+    contentContainerStyle: styles.contentContainerStyle
 }))
 
 export const App = () => {
@@ -43,6 +48,13 @@ export const App = () => {
             <Typography isBold={false} size="small" value={2.22}>
                 Re-render count: {countRef.current++}
             </Typography>
+            <UniScrollView>
+                {Array.from({ length: 100 }).map((_, i) => (
+                    <View key={i}>
+                        <Text style={styles.scrollViewText}>{i}</Text>
+                    </View>
+                ))}
+            </UniScrollView>
             <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6."  />
             <UniButton
                 title="Force re-render"
@@ -91,5 +103,17 @@ const styles = StyleSheet.create((theme, rt) => ({
         width: 100,
         borderWidth: 5,
         borderColor: theme.colors.test
-    })
+    }),
+    scrollView: {
+        width: '100%',
+        backgroundColor: theme.colors.accent
+    },
+    contentContainerStyle: {
+        transform: [{
+            translateX: rt.colorScheme === 'dark' ? -100 : 100
+        }]
+    },
+    scrollViewText: {
+        color: theme.colors.typography
+    }
 }))

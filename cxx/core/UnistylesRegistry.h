@@ -44,7 +44,7 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     Unistyle::Shared findUnistyleFromKey(jsi::Runtime& rt, std::string styleKey, int tag);
     DependencyMap buildDependencyMap(jsi::Runtime& rt);
     shadow::ShadowTrafficController trafficController{};
-    
+
 private:
     UnistylesRegistry() = default;
 
