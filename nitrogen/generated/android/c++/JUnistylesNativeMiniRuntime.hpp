@@ -65,11 +65,11 @@ namespace margelo::nitro::unistyles {
         insets->toCpp(),
         pixelRatio,
         fontScale,
-        rtl,
+        static_cast<bool>(rtl),
         statusBar->toCpp(),
         navigationBar->toCpp(),
-        isPortrait,
-        isLandscape
+        static_cast<bool>(isPortrait),
+        static_cast<bool>(isLandscape)
       );
     }
 
