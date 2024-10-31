@@ -24,17 +24,19 @@ struct ShadowTrafficController {
         this->_canCommit = true;
     }
 
-    inline shadow::ShadowLeafUpdates getUpdates(jsi::Runtime& rt) {
+    inline shadow::ShadowLeafUpdates& getUpdates() {
         std::lock_guard<std::mutex> lock(_mutex);
-        // return copy
-        return _unistylesUpdates[&rt];
+
+        return _unistylesUpdates;
     }
 
     inline void setUpdates(jsi::Runtime& rt, shadow::ShadowLeafUpdates& newUpdates) {
         std::lock_guard<std::mutex> lock(_mutex);
 
-        auto& targetUpdates = _unistylesUpdates[&rt];
+        auto& targetUpdates = _unistylesUpdates;
 
+        // this is important as overriding updates may skip some interim changes
+        // Unistyles emits different events so this will make sure that everything is synced
         std::for_each(newUpdates.begin(), newUpdates.end(), [&targetUpdates](auto& pair){
             if (targetUpdates.contains(pair.first)) {
                 targetUpdates[pair.first] = std::move(pair.second);
@@ -48,7 +50,7 @@ struct ShadowTrafficController {
 
 private:
     std::atomic<bool> _canCommit = false;
-    std::unordered_map<jsi::Runtime*, shadow::ShadowLeafUpdates> _unistylesUpdates{};
+    shadow::ShadowLeafUpdates _unistylesUpdates{};
 
     // this struct should be accessed in thread-safe manner. Otherwise shadow tree updates
     // from different threads will break it
