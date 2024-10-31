@@ -120,23 +120,33 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
             auto& unistyle = unistyleData->unistyle;
 
             // for RN styles or inline styles, compute styles only once
-            if (unistyle->styleKey == helpers::EXOTIC_STYLE_KEY.c_str() && !unistyleData->parsedStyle.has_value()) {
-                unistyleData->parsedStyle = jsi::Value(rt, unistyle->rawValue).asObject(rt);
+            if (unistyle->styleKey == helpers::EXOTIC_STYLE_KEY.c_str()) {
+                if (!unistyleData->parsedStyle.has_value()) {
+                    unistyleData->parsedStyle = jsi::Value(rt, unistyle->rawValue).asObject(rt);
 
-                if (!parsedUnistyles.contains(unistyle)) {
-                    parsedUnistyles.emplace(unistyle, true);
+                    if (!parsedUnistyles.contains(unistyle)) {
+                        parsedUnistyles.emplace(unistyle, true);
+                    }
                 }
 
                 continue;
             }
 
+            // reference Unistyles StyleSheet as we may mix them for one style
+            auto unistyleStyleSheet = unistyle->parent;
+
+            // we may hit now other StyleSheets that are referenced from affected nodes
+            if (unistyleStyleSheet != nullptr && !parsedStyleSheets.contains(unistyleStyleSheet)) {
+                parsedStyleSheets.emplace(unistyleStyleSheet, this->unwrapStyleSheet(rt, unistyleStyleSheet));
+            }
+
             // StyleSheet might have styles that are not affected
-            if (!parsedStyleSheets[styleSheet].asObject(rt).hasProperty(rt, unistyle->styleKey.c_str())) {
+            if (!parsedStyleSheets[unistyleStyleSheet].asObject(rt).hasProperty(rt, unistyle->styleKey.c_str())) {
                 continue;
             }
 
-            unistyle->rawValue = parsedStyleSheets[styleSheet].asObject(rt).getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
-            this->rebuildUnistyle(rt, styleSheet, unistyle, unistyleData->variants, unistyleData->dynamicFunctionMetadata);
+            unistyle->rawValue = parsedStyleSheets[unistyleStyleSheet].asObject(rt).getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
+            this->rebuildUnistyle(rt, unistyleStyleSheet, unistyle, unistyleData->variants, unistyleData->dynamicFunctionMetadata);
             unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
 
             if (!parsedUnistyles.contains(unistyle)) {
@@ -207,7 +217,10 @@ void parser::Parser::rebuildShadowLeafUpdates(core::DependencyMap& dependencyMap
         updates.emplace(shadowNode, std::move(rawProps));
     }
 
-    registry.trafficController._unistylesUpdates[&rt] = std::move(updates);
+    registry.trafficController.setUpdates(rt, updates);
+
+    // this is required, we need to indicate that there are new changes
+    registry.trafficController.resumeUnistylesTraffic();
 }
 
 // first level of StyleSheet, we can expect here different properties than on second level

@@ -26,8 +26,6 @@ __weak RCTSurfacePresenter* _surfacePresenter;
     // check if this is live reload, if so let's replace UnistylesRuntime with new runtime
     auto hasUnistylesRuntime = HybridObjectRegistry::hasHybridObject("UnistylesRuntime");
 
-    auto& registry = core::UnistylesRegistry::get();
-
     if (hasUnistylesRuntime) {
         HybridObjectRegistry::unregisterHybridObjectConstructor("UnistylesRuntime");
         HybridObjectRegistry::unregisterHybridObjectConstructor("UnistylesStyleSheet");
@@ -40,7 +38,7 @@ __weak RCTSurfacePresenter* _surfacePresenter;
 - (void)createHybrids:(jsi::Runtime&)rt {
     auto runOnJSThread = ([executor = _runtimeExecutor](std::function<void(jsi::Runtime& rt)> &&callback) {
         __block auto objcCallback = callback;
-        
+
         [executor execute:^(jsi::Runtime& rt){
             objcCallback(rt);
         }];

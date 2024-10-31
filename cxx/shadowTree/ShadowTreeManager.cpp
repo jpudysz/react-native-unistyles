@@ -6,14 +6,13 @@ using namespace facebook;
 
 using AffectedNodes = std::unordered_map<const ShadowNodeFamily*, std::unordered_set<int>>;
 
-void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime& rt, shadow::ShadowLeafUpdates& updates) {
+void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime& rt) {
+    auto& registry = core::UnistylesRegistry::get();
     auto& uiManager = UIManagerBinding::getBinding(rt)->getUIManager();
     const auto &shadowTreeRegistry = uiManager.getShadowTreeRegistry();
-    auto& registry = core::UnistylesRegistry::get();
+    auto updates = registry.trafficController.getUpdates(rt);
 
-    if (registry.trafficController.shouldStop()) {
-        registry.trafficController.setHasUnistylesCommit(true);
-
+    if (updates.size() == 0) {
         return;
     }
 
@@ -29,7 +28,7 @@ void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime& rt, sha
                 affectedNodes
             ));
 
-            // set unistyles commit trait
+            // set unistyles trait
             auto unistylesRootNode = std::reinterpret_pointer_cast<core::UnistylesCommitShadowNode>(newRootNode);
 
             unistylesRootNode->addUnistylesCommitTrait();
@@ -94,6 +93,7 @@ ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode
     const auto rawPropsIt = updates.find(family);
     const auto childrenIt = affectedNodes.find(family);
     auto children = shadowNode.getChildren();
+    auto& registry = core::UnistylesRegistry::get();
 
     // for each affected node
     if (childrenIt != affectedNodes.end()) {
@@ -112,9 +112,13 @@ ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode
             *shadowNode.getContextContainer()
         };
 
-        updatedProps = shadowNode
-            .getComponentDescriptor()
-            .cloneProps(propsParserContext, shadowNode.getProps(), RawProps(rawPropsIt->second));
+        {
+            auto lock = registry.trafficController.lock();
+            
+            updatedProps = shadowNode
+                .getComponentDescriptor()
+                .cloneProps(propsParserContext, shadowNode.getProps(), RawProps(rawPropsIt->second));
+        }
     }
 
     return shadowNode.clone({
