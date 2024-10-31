@@ -112,13 +112,9 @@ ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode
             *shadowNode.getContextContainer()
         };
 
-        {
-            auto lock = registry.trafficController.lock();
-            
-            updatedProps = shadowNode
-                .getComponentDescriptor()
-                .cloneProps(propsParserContext, shadowNode.getProps(), RawProps(rawPropsIt->second));
-        }
+        updatedProps = shadowNode
+            .getComponentDescriptor()
+            .cloneProps(propsParserContext, shadowNode.getProps(), RawProps(rawPropsIt->second));
     }
 
     return shadowNode.clone({
