@@ -10,7 +10,7 @@ void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime& rt) {
     auto& registry = core::UnistylesRegistry::get();
     auto& uiManager = UIManagerBinding::getBinding(rt)->getUIManager();
     const auto &shadowTreeRegistry = uiManager.getShadowTreeRegistry();
-    auto updates = registry.trafficController.getUpdates(rt);
+    auto updates = registry.trafficController.getUpdates();
 
     if (updates.size() == 0) {
         return;
@@ -93,7 +93,6 @@ ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode
     const auto rawPropsIt = updates.find(family);
     const auto childrenIt = affectedNodes.find(family);
     auto children = shadowNode.getChildren();
-    auto& registry = core::UnistylesRegistry::get();
 
     // for each affected node
     if (childrenIt != affectedNodes.end()) {

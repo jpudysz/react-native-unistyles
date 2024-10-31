@@ -26,11 +26,10 @@ RootShadowNode::Unshared core::UnistylesCommitHook::shadowTreeWillCommit(
         return newRootShadowNode;
     }
 
-
     // this is React Native / Reanimated commit
     // merge Unistyles updates before it completes
     auto& registry = core::UnistylesRegistry::get();
-    auto shadowLeafUpdates = registry.trafficController.getUpdates(*_rt);
+    auto& shadowLeafUpdates = registry.trafficController.getUpdates();
 
     // oops, not updates from Unistyles yet, skip it!
     if (shadowLeafUpdates.size() == 0) {
