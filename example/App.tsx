@@ -42,7 +42,7 @@ export const App = () => {
     return (
         <View style={styles.container}>
             <Animated.View style={[styles.animated, animatedStyle]} />
-            <Typography isBold isPrimary size="small" isCentered value={1.5}>
+            <Typography isBold isPrimary size="large" isCentered value={1.5}>
                 Keyboard insets
             </Typography>
             <Text style={styles.text}>

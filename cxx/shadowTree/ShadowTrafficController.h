@@ -24,10 +24,6 @@ struct ShadowTrafficController {
         this->_canCommit = true;
     }
 
-    inline std::lock_guard<std::mutex> lock() {
-        return std::lock_guard<std::mutex>(_mutex);
-    }
-
     inline shadow::ShadowLeafUpdates getUpdates(jsi::Runtime& rt) {
         std::lock_guard<std::mutex> lock(_mutex);
         // return copy

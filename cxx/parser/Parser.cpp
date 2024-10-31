@@ -737,7 +737,7 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, Unistyle::Shared u
 }
 
 // convert unistyles to RawValue with int colors
-RawProps parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, const std::vector<std::shared_ptr<UnistyleData>>& unistyles) {
+folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, const std::vector<std::shared_ptr<UnistyleData>>& unistyles) {
     jsi::Object convertedStyles = jsi::Object(rt);
     auto& state = core::UnistylesRegistry::get().getState(rt);
 
@@ -756,7 +756,7 @@ RawProps parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, const s
         });
     }
 
-    return RawProps(rt, std::move(convertedStyles));
+    return jsi::dynamicFromValue(rt, std::move(convertedStyles));
 }
 
 // check is styleKey contains color
