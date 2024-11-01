@@ -372,6 +372,11 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
 
             helpers::defineHiddenProperty(rt, style, helpers::STYLE_DEPENDENCIES, helpers::dependenciesToJSIArray(rt, unistyle->dependencies));
 
+            // update shadow leaf updates to indicate newest changes
+            auto& registry = core::UnistylesRegistry::get();
+
+            registry.shadowLeafUpdateFromUnistyle(rt, unistyle);
+
             return style;
     });
 }
@@ -736,15 +741,15 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, Unistyle::Shared u
     return parsedStyle;
 }
 
-// convert unistyles to RawValue with int colors
+// convert unistyles to folly with int colors
 folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, const std::vector<std::shared_ptr<UnistyleData>>& unistyles) {
     jsi::Object convertedStyles = jsi::Object(rt);
     auto& state = core::UnistylesRegistry::get().getState(rt);
 
     for (const auto& unistyleData : unistyles) {
+        // this can happen for exotic stylesheets
         if (!unistyleData->parsedStyle.has_value()) {
-            // todo this something happens with large dataset, debug it
-            continue;
+            unistyleData->parsedStyle = jsi::Value(rt, unistyleData->unistyle->rawValue).asObject(rt);
         }
 
         helpers::enumerateJSIObject(rt, unistyleData->parsedStyle.value(), [&](const std::string& propertyName, jsi::Value& propertyValue){
@@ -755,6 +760,26 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
             convertedStyles.setProperty(rt, propertyName.c_str(), propertyValue);
         });
     }
+
+    return jsi::dynamicFromValue(rt, std::move(convertedStyles));
+}
+
+folly::dynamic parser::Parser::parseUnistyleToShadowTreeStyles(jsi::Runtime& rt, const Unistyle::Shared unistyle) {
+    jsi::Object convertedStyles = jsi::Object(rt);
+    auto& state = core::UnistylesRegistry::get().getState(rt);
+
+    // can happen for exotic styles
+    if (!unistyle->parsedStyle.has_value()) {
+        unistyle->parsedStyle = jsi::Value(rt, unistyle->rawValue).asObject(rt);
+    }
+
+    helpers::enumerateJSIObject(rt, unistyle->parsedStyle.value(), [&](const std::string& propertyName, jsi::Value& propertyValue){
+        if (this->isColor(propertyName)) {
+            return convertedStyles.setProperty(rt, propertyName.c_str(), jsi::Value(state.parseColor(propertyValue)));
+        }
+
+        convertedStyles.setProperty(rt, propertyName.c_str(), propertyValue);
+    });
 
     return jsi::dynamicFromValue(rt, std::move(convertedStyles));
 }
