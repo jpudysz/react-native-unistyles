@@ -120,23 +120,33 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
             auto& unistyle = unistyleData->unistyle;
 
             // for RN styles or inline styles, compute styles only once
-            if (unistyle->styleKey == helpers::EXOTIC_STYLE_KEY.c_str() && !unistyleData->parsedStyle.has_value()) {
-                unistyleData->parsedStyle = jsi::Value(rt, unistyle->rawValue).asObject(rt);
+            if (unistyle->styleKey == helpers::EXOTIC_STYLE_KEY.c_str()) {
+                if (!unistyleData->parsedStyle.has_value()) {
+                    unistyleData->parsedStyle = jsi::Value(rt, unistyle->rawValue).asObject(rt);
 
-                if (!parsedUnistyles.contains(unistyle)) {
-                    parsedUnistyles.emplace(unistyle, true);
+                    if (!parsedUnistyles.contains(unistyle)) {
+                        parsedUnistyles.emplace(unistyle, true);
+                    }
                 }
 
                 continue;
             }
 
+            // reference Unistyles StyleSheet as we may mix them for one style
+            auto unistyleStyleSheet = unistyle->parent;
+
+            // we may hit now other StyleSheets that are referenced from affected nodes
+            if (unistyleStyleSheet != nullptr && !parsedStyleSheets.contains(unistyleStyleSheet)) {
+                parsedStyleSheets.emplace(unistyleStyleSheet, this->unwrapStyleSheet(rt, unistyleStyleSheet));
+            }
+
             // StyleSheet might have styles that are not affected
-            if (!parsedStyleSheets[styleSheet].asObject(rt).hasProperty(rt, unistyle->styleKey.c_str())) {
+            if (!parsedStyleSheets[unistyleStyleSheet].asObject(rt).hasProperty(rt, unistyle->styleKey.c_str())) {
                 continue;
             }
 
-            unistyle->rawValue = parsedStyleSheets[styleSheet].asObject(rt).getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
-            this->rebuildUnistyle(rt, styleSheet, unistyle, unistyleData->variants, unistyleData->dynamicFunctionMetadata);
+            unistyle->rawValue = parsedStyleSheets[unistyleStyleSheet].asObject(rt).getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
+            this->rebuildUnistyle(rt, unistyleStyleSheet, unistyle, unistyleData->variants, unistyleData->dynamicFunctionMetadata);
             unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
 
             if (!parsedUnistyles.contains(unistyle)) {
@@ -207,7 +217,10 @@ void parser::Parser::rebuildShadowLeafUpdates(core::DependencyMap& dependencyMap
         updates.emplace(shadowNode, std::move(rawProps));
     }
 
-    registry.trafficController._unistylesUpdates[&rt] = std::move(updates);
+    registry.trafficController.setUpdates(rt, updates);
+
+    // this is required, we need to indicate that there are new changes
+    registry.trafficController.resumeUnistylesTraffic();
 }
 
 // first level of StyleSheet, we can expect here different properties than on second level
@@ -358,6 +371,11 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
             jsi::Object style = jsi::Value(rt, unistyleFn->parsedStyle.value()).asObject(rt);
 
             helpers::defineHiddenProperty(rt, style, helpers::STYLE_DEPENDENCIES, helpers::dependenciesToJSIArray(rt, unistyle->dependencies));
+
+            // update shadow leaf updates to indicate newest changes
+            auto& registry = core::UnistylesRegistry::get();
+
+            registry.shadowLeafUpdateFromUnistyle(rt, unistyle);
 
             return style;
     });
@@ -723,15 +741,15 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, Unistyle::Shared u
     return parsedStyle;
 }
 
-// convert unistyles to RawValue with int colors
-RawProps parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, const std::vector<std::shared_ptr<UnistyleData>>& unistyles) {
+// convert unistyles to folly with int colors
+folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, const std::vector<std::shared_ptr<UnistyleData>>& unistyles) {
     jsi::Object convertedStyles = jsi::Object(rt);
     auto& state = core::UnistylesRegistry::get().getState(rt);
 
     for (const auto& unistyleData : unistyles) {
+        // this can happen for exotic stylesheets
         if (!unistyleData->parsedStyle.has_value()) {
-            // todo this something happens with large dataset, debug it
-            continue;
+            unistyleData->parsedStyle = jsi::Value(rt, unistyleData->unistyle->rawValue).asObject(rt);
         }
 
         helpers::enumerateJSIObject(rt, unistyleData->parsedStyle.value(), [&](const std::string& propertyName, jsi::Value& propertyValue){
@@ -743,7 +761,27 @@ RawProps parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, const s
         });
     }
 
-    return RawProps(rt, std::move(convertedStyles));
+    return jsi::dynamicFromValue(rt, std::move(convertedStyles));
+}
+
+folly::dynamic parser::Parser::parseUnistyleToShadowTreeStyles(jsi::Runtime& rt, const Unistyle::Shared unistyle) {
+    jsi::Object convertedStyles = jsi::Object(rt);
+    auto& state = core::UnistylesRegistry::get().getState(rt);
+
+    // can happen for exotic styles
+    if (!unistyle->parsedStyle.has_value()) {
+        unistyle->parsedStyle = jsi::Value(rt, unistyle->rawValue).asObject(rt);
+    }
+
+    helpers::enumerateJSIObject(rt, unistyle->parsedStyle.value(), [&](const std::string& propertyName, jsi::Value& propertyValue){
+        if (this->isColor(propertyName)) {
+            return convertedStyles.setProperty(rt, propertyName.c_str(), jsi::Value(state.parseColor(propertyValue)));
+        }
+
+        convertedStyles.setProperty(rt, propertyName.c_str(), propertyValue);
+    });
+
+    return jsi::dynamicFromValue(rt, std::move(convertedStyles));
 }
 
 // check is styleKey contains color

@@ -230,8 +230,8 @@ void HybridStyleSheet::loadExternalMethods(const jsi::Value& thisValue, jsi::Run
 }
 
 void HybridStyleSheet::registerHooks(jsi::Runtime& rt) {
-    this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(this->_uiManager, rt);
-    this->_unistylesMountHook = std::make_shared<core::UnistylesMountHook>(this->_uiManager);
+    this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(this->_uiManager);
+    this->_unistylesMountHook = std::make_shared<core::UnistylesMountHook>(this->_uiManager, rt);
 }
 
 void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependency> unistylesDependencies) {
@@ -273,14 +273,10 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
         }
 
         parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets);
-
-        this->notifyJSListeners(dependencies);
-
-        // this is required, otherwise shadow tree will ignore Unistyles commit
-        registry.trafficController.setHasUnistylesCommit(true);
         parser.rebuildShadowLeafUpdates(dependencyMap);
-
-        shadow::ShadowTreeManager::updateShadowTree(rt, registry.trafficController._unistylesUpdates[&rt]);
+        
+        this->notifyJSListeners(dependencies);
+        shadow::ShadowTreeManager::updateShadowTree(rt);
     });
 }
 
@@ -304,12 +300,8 @@ void HybridStyleSheet::onImeChange() {
         }
 
         parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, {});
-
-        // this is required, otherwise shadow tree will ignore Unistyles commit
-        registry.trafficController.setHasUnistylesCommit(true);
         parser.rebuildShadowLeafUpdates(dependencyMap);
-
-        shadow::ShadowTreeManager::updateShadowTree(rt, registry.trafficController._unistylesUpdates[&rt]);
+        shadow::ShadowTreeManager::updateShadowTree(rt);
     });
 }
 

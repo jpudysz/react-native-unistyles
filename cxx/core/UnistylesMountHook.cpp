@@ -18,9 +18,11 @@ void core::UnistylesMountHook::shadowTreeDidMount(RootShadowNode::Shared const &
         return;
     }
 
-    // React Native commit did mount
+    // this is React Native or Reanimated commit
+    // one more time merge Unistyles changes
     auto& registry = core::UnistylesRegistry::get();
 
-    // so, resume Unistyles commits
-    registry.trafficController.resumeUnistylesTraffic();
+    if (!registry.trafficController.shouldStop()) {
+        shadow::ShadowTreeManager::updateShadowTree(*_rt);
+    }
 }

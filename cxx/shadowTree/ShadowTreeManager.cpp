@@ -6,14 +6,13 @@ using namespace facebook;
 
 using AffectedNodes = std::unordered_map<const ShadowNodeFamily*, std::unordered_set<int>>;
 
-void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime& rt, shadow::ShadowLeafUpdates& updates) {
+void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime& rt) {
+    auto& registry = core::UnistylesRegistry::get();
     auto& uiManager = UIManagerBinding::getBinding(rt)->getUIManager();
     const auto &shadowTreeRegistry = uiManager.getShadowTreeRegistry();
-    auto& registry = core::UnistylesRegistry::get();
+    auto updates = registry.trafficController.getUpdates();
 
-    if (registry.trafficController.shouldStop()) {
-        registry.trafficController.setHasUnistylesCommit(true);
-
+    if (updates.size() == 0) {
         return;
     }
 
@@ -29,7 +28,7 @@ void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime& rt, sha
                 affectedNodes
             ));
 
-            // set unistyles commit trait
+            // set unistyles trait
             auto unistylesRootNode = std::reinterpret_pointer_cast<core::UnistylesCommitShadowNode>(newRootNode);
 
             unistylesRootNode->addUnistylesCommitTrait();
