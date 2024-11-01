@@ -45,16 +45,19 @@ export const App = () => {
             <Typography isBold isPrimary size="large" isCentered value={1.5}>
                 Keyboard insets
             </Typography>
+            <Text style={styles.text}>
+                👋🏼
+            </Text>
             <Typography isBold={false} size="small" value={2.22}>
                 Re-render count: {countRef.current++}
             </Typography>
-            <UniScrollView>
-                {Array.from({ length: 100 }).map((_, i) => (
-                    <View key={i}>
-                        <Text style={styles.scrollViewText}>{i}</Text>
-                    </View>
-                ))}
-            </UniScrollView>
+            {/* <UniScrollView> */}
+            {/*     {Array.from({ length: 100 }).map((_, i) => ( */}
+            {/*         <View key={i}> */}
+            {/*             <Text style={styles.scrollViewText}>{i}</Text> */}
+            {/*         </View> */}
+            {/*     ))} */}
+            {/* </UniScrollView> */}
             <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6."  />
             <UniButton
                 title="Force re-render"
@@ -115,5 +118,9 @@ const styles = StyleSheet.create((theme, rt) => ({
     },
     scrollViewText: {
         color: theme.colors.typography
+    },
+    text: {
+        fontSize: 30,
+        lineHeight: 40
     }
 }))

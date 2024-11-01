@@ -9,7 +9,6 @@
 #include "Constants.h"
 #include "Breakpoints.h"
 #include "Parser.h"
-#include "ShadowTreeManager.h"
 #include "UnistylesCommitHook.h"
 #include "UnistylesMountHook.h"
 
