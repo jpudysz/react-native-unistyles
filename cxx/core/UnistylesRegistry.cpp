@@ -1,5 +1,6 @@
 #include "UnistylesRegistry.h"
 #include "UnistylesState.h"
+#include "Parser.h"
 
 using namespace margelo::nitro::unistyles;
 using namespace facebook;
@@ -74,13 +75,25 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
     Variants& variants,
     std::vector<folly::dynamic>& arguments
 ) {
+    auto parser = parser::Parser(nullptr);
+    shadow::ShadowLeafUpdates updates;
+
     if (!this->_shadowRegistry[&rt].contains(shadowNodeFamily)) {
         this->_shadowRegistry[&rt][shadowNodeFamily] = {};
     }
 
     std::for_each(unistyles.begin(), unistyles.end(), [&, this](Unistyle::Shared unistyle){
         this->_shadowRegistry[&rt][shadowNodeFamily].emplace_back(std::make_shared<UnistyleData>(unistyle, variants, arguments));
+
+        // add or update node for shadow leaf updates
+        // dynamic functions are parsed later
+        if (unistyle->type == UnistyleType::Object) {
+            updates[shadowNodeFamily] = parser.parseUnistyleToShadowTreeStyles(rt, unistyle);
+        }
     });
+
+    this->trafficController.setUpdates(rt, updates);
+    this->trafficController.resumeUnistylesTraffic();
 }
 
 void core::UnistylesRegistry::unlinkShadowNodeWithUnistyles(jsi::Runtime& rt, const ShadowNodeFamily* shadowNodeFamily) {
@@ -134,16 +147,21 @@ core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt
     return dependencyMap;
 }
 
-core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt) {
-    DependencyMap dependencyMap;
+// called from proxied function only, we don't know host
+// so we need to rebuild all instances as they may have different variants
+void core::UnistylesRegistry::shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle) {
+    shadow::ShadowLeafUpdates updates;
+    auto parser = parser::Parser(nullptr);
 
     for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
         for (const auto& unistyleData : unistyles) {
-            dependencyMap[family].emplace_back(unistyleData);
+            if (unistyleData->unistyle == unistyle) {
+                updates[family] = parser.parseStylesToShadowTreeStyles(rt, {unistyleData});
+            }
         }
     }
 
-    return dependencyMap;
+    this->trafficController.setUpdates(rt, updates);
 }
 
 std::vector<std::shared_ptr<core::StyleSheet>> core::UnistylesRegistry::getStyleSheetsToRefresh(jsi::Runtime& rt, bool themeDidChange, bool runtimeDidChange) {
