@@ -2,25 +2,34 @@ import React, { type ComponentProps, type ComponentType, useEffect, useRef, useS
 import type { UnistylesTheme } from '../types'
 import { StyleSheet, UnistyleDependency, UnistylesRuntime, type UnistylesStyleSheet } from '../specs'
 
-type Mappings<T extends ComponentType<any>> = (theme: UnistylesTheme) => Partial<ComponentProps<T>>
+type Mappings<T extends ComponentType<any>> = (theme: UnistylesTheme) => Partial<Omit<ComponentProps<T>, typeof SUPPORTED_STYLE_PROPS[number]>>
+
+const SUPPORTED_STYLE_PROPS = ['style', 'contentContainerStyle'] as const
 
 export const createUnistylesComponent = <T extends ComponentType<any>>(Component: T, mappings: Mappings<T> = () => ({})) => {
     return (props: ComponentProps<T>) => {
         const [theme, setTheme] = useState<UnistylesTheme>(UnistylesRuntime.getTheme())
         const [, setRt] = useState(0)
-        const stylesRef = useRef()
+        const stylesRef = useRef<Record<string, any>>({})
         const isForcedRef = useRef(false)
 
         if (!isForcedRef.current) {
-            stylesRef.current = props?.style
-        }
+            SUPPORTED_STYLE_PROPS.forEach(propName => {
+                if (props?.[propName]) {
+                    if (Array.isArray(props[propName])) {
+                        console.error(`🦄 Unistyles: createUnistylesComponent requires ${propName} to be an object. Please check props for component: ${Component.displayName}`)
+                    }
 
-        if (props?.style && Array.isArray(props.style)) {
-            console.error(`🦄 Unistyles: createUnistylesComponent requires style to be an object. Please check props for component: ${Component.displayName}`)
-        }
+                    if (props[propName].__unistyles_name && !props[propName].__proto__?.getStyle) {
+                        console.error(`🦄 Unistyles: createUnistylesComponent received style that is not bound. You likely used the spread operator on a Unistyle style. Please check props for component: ${Component.displayName}`)
+                    }
 
-        if (props?.style && props.style.__unistyles_name && !props.style.__proto__?.getStyle) {
-            console.error(`🦄 Unistyles: createUnistylesComponent received style that is not bound. You likely used the spread operator on a Unistyle style. Please check props for component: ${Component.displayName}`)
+                    stylesRef.current = {
+                        ...stylesRef.current,
+                        [propName]: props[propName]
+                    }
+                }
+            })
         }
 
         useEffect(() => {
@@ -29,7 +38,17 @@ export const createUnistylesComponent = <T extends ComponentType<any>>(Component
 
                 if (dependencies.includes(UnistyleDependency.Theme) && (!componentDependencies ||componentDependencies.includes(UnistyleDependency.Theme))) {
                     setTheme(UnistylesRuntime.getTheme())
-                    stylesRef.current = props?.style?.__proto__?.getStyle() || props?.style
+
+                    // override with Unistyles styles
+                    SUPPORTED_STYLE_PROPS.forEach(propName => {
+                        if (props?.[propName]) {
+                            stylesRef.current = {
+                                ...stylesRef.current,
+                                [propName]: props[propName].__proto__?.getStyle() || props[propName]
+                            }
+                        }
+                    })
+
                     isForcedRef.current = true
                 }
 
@@ -56,10 +75,13 @@ export const createUnistylesComponent = <T extends ComponentType<any>>(Component
         })
 
         // override with Unistyles styles
-        if (mergedProps.style) {
-            mergedProps.style = stylesRef.current
-            isForcedRef.current = false
-        }
+        SUPPORTED_STYLE_PROPS.forEach(propName => {
+            if (mergedProps[propName]) {
+                mergedProps[propName] = stylesRef.current[propName]
+            }
+        })
+
+        isForcedRef.current = false
 
         return <Component {...mergedProps} />
     }
