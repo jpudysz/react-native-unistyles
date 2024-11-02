@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import { Button, ScrollView, Text, TextInput, View } from 'react-native'
 import { Blurhash } from 'react-native-blurhash'
-import { createUnistylesComponent, StyleSheet } from 'react-native-unistyles'
+import { createUnistylesComponent, StyleSheet, Display, Hide, mq } from 'react-native-unistyles'
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
@@ -39,9 +39,16 @@ export const App = () => {
             <Typography isBold isPrimary size="large" isCentered value={1.5}>
                 Keyboard insets
             </Typography>
-            <Text style={styles.text}>
-                👋🏼
-            </Text>
+            <Display mq={mq.width(0, 400).and.height(700, 1000)}>
+                <Text style={styles.text}>
+                    👋🏼D
+                </Text>
+            </Display>
+            <Hide mq={mq.only.width('sm', 500)}>
+                <Text style={styles.text}>
+                    👋🏼H
+                </Text>
+            </Hide>
             <Typography isBold={false} size="small" value={2.22}>
                 Re-render count: {countRef.current++}
             </Typography>
