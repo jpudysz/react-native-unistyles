@@ -1,5 +1,5 @@
 export * from './specs'
 export { mq } from './mq'
 export type { UnistylesThemes, UnistylesBreakpoints } from './global'
-export { useTheme, useBreakpoint, createUnistylesComponent } from './core'
+export { createUnistylesComponent } from './core'
 export type { UnistylesVariants } from './types'
