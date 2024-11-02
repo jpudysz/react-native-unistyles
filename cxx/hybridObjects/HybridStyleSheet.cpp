@@ -233,8 +233,10 @@ void HybridStyleSheet::registerHooks(jsi::Runtime& rt) {
     // cleanup Shadow updates
     core::UnistylesRegistry::get().trafficController.restore();
     
-    this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(this->_uiManager);
-    this->_unistylesMountHook = std::make_shared<core::UnistylesMountHook>(this->_uiManager, rt);
+    this->_unistylesRuntime->runOnJSThread([this](jsi::Runtime& rt){
+        this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(this->_uiManager);
+        this->_unistylesMountHook = std::make_shared<core::UnistylesMountHook>(this->_uiManager, rt);
+    });
 }
 
 void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependency> unistylesDependencies) {
