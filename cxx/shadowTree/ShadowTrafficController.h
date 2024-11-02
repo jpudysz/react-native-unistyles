@@ -49,6 +49,8 @@ struct ShadowTrafficController {
     }
 
     inline void restore() {
+        std::lock_guard<std::mutex> lock(_mutex);
+        
         _unistylesUpdates = {};
         _canCommit = false;
     }

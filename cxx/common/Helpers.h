@@ -96,7 +96,7 @@ inline bool isPlatformColor(jsi::Runtime& rt, jsi::Object& maybePlatformColor) {
         maybePlatformColor.getProperty(rt, "dynamic").isObject() &&
         maybePlatformColor.getProperty(rt, "dynamic").asObject(rt).hasProperty(rt, "dark") &&
         maybePlatformColor.getProperty(rt, "dynamic").asObject(rt).hasProperty(rt, "light");
-    
+
     if (isIOSDynamicColor) {
         return true;
     }
@@ -127,6 +127,16 @@ inline Variants variantsToPairs(jsi::Runtime& rt, jsi::Object&& variants) {
     return pairs;
 }
 
+inline jsi::Object pairsToVariantsValue(jsi::Runtime& rt, Variants& pairs) {
+    auto variantsValue = jsi::Object(rt);
+
+    std::for_each(pairs.begin(), pairs.end(), [&rt, &variantsValue](std::pair<std::string, std::string>& pair){
+        variantsValue.setProperty(rt, jsi::PropNameID::forUtf8(rt, pair.first), jsi::String::createFromUtf8(rt, pair.second));
+    });
+
+    return variantsValue;
+}
+
 inline jsi::Object variantsToValue(jsi::Runtime& rt, Variants& variants) {
     jsi::Object rawVariants = jsi::Object(rt);
 
@@ -137,7 +147,7 @@ inline jsi::Object variantsToValue(jsi::Runtime& rt, Variants& variants) {
     return rawVariants;
 }
 
-inline std::vector<folly::dynamic> parseDynamicFunctionArguments(jsi::Runtime& rt, jsi::Array& arguments) {
+inline std::vector<folly::dynamic> parseDynamicFunctionArguments(jsi::Runtime& rt, jsi::Array&& arguments) {
     std::vector<folly::dynamic> parsedArgument{};
     size_t count = arguments.size(rt);
 
@@ -191,6 +201,18 @@ inline std::vector<folly::dynamic> parseDynamicFunctionArguments(jsi::Runtime& r
     }
 
     return parsedArgument;
+}
+
+inline jsi::Array functionArgumentsToArray(jsi::Runtime& rt, const jsi::Value* args, size_t count) {
+    auto arr = jsi::Array(rt, count);
+
+    for (size_t i = 0; i < count; i++) {
+        const jsi::Value& arg = args[i];
+
+        arr.setValueAtIndex(rt, i, arg);
+    }
+
+    return arr;
 }
 
 inline static jsi::Array dependenciesToJSIArray(jsi::Runtime& rt, const std::vector<UnistyleDependency>& vec) {

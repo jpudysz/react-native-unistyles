@@ -230,6 +230,9 @@ void HybridStyleSheet::loadExternalMethods(const jsi::Value& thisValue, jsi::Run
 }
 
 void HybridStyleSheet::registerHooks(jsi::Runtime& rt) {
+    // cleanup Shadow updates
+    core::UnistylesRegistry::get().trafficController.restore();
+    
     this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(this->_uiManager);
     this->_unistylesMountHook = std::make_shared<core::UnistylesMountHook>(this->_uiManager, rt);
 }
