@@ -49,9 +49,9 @@ export const App = () => {
                 style={styles.scrollView}
                 contentContainerStyle={styles.contentContainerStyle}
             >
-                {Array.from({ length: 100 }).map((_, i) => (
-                    <View key={i}>
-                        <Text style={styles.scrollViewText}>{i}</Text>
+                {Array.from({ length: 100 }).map((_, index) => (
+                    <View key={index}>
+                        <Text style={{ ...index % 2 === 0 ? styles.text : {} }}>{index + 1}</Text>
                     </View>
                 ))}
             </UniScrollView>
@@ -118,6 +118,7 @@ const styles = StyleSheet.create((theme, rt) => ({
     },
     text: {
         fontSize: 30,
-        lineHeight: 40
+        lineHeight: 40,
+        color: theme.colors.typography
     }
 }))

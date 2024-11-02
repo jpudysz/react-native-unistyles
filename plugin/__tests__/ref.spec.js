@@ -1422,6 +1422,115 @@ pluginTester({
                     921918562
                 )
             `
+        },
+        {
+            title: 'Should support conditional styles',
+            code: `
+                import { View } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ condition }) => {
+                    return (
+                        <View style={condition ? styles.container : {}} />
+                    )
+                }
+
+                const styles = StyleSheet.create(theme => ({
+                    container: {
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: theme.colors.backgroundColor
+                    }
+                }))
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ condition }) => {
+                    return (
+                        <View
+                            style={[condition ? styles.container : {}]}
+                            ref={ref => {
+                                UnistylesShadowRegistry.add(ref, condition ? styles.container : {}, undefined, undefined)
+                                return () => UnistylesShadowRegistry.remove(ref)
+                            }}
+                        />
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    theme => ({
+                        container: {
+                            flex: 1,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: theme.colors.backgroundColor,
+                            uni__dependencies: [0]
+                        }
+                    }),
+                    921918562
+                )
+            `
+        },
+        {
+            title: 'Should support conditional styles on existing refs',
+            code: `
+                import { useRef } from 'react'
+                import { View } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ condition }) => {
+                    const ref = useRef()
+                    return (
+                        <View ref={ref} style={condition ? styles.container : {}} />
+                    )
+                }
+
+                const styles = StyleSheet.create(theme => ({
+                    container: {
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: theme.colors.backgroundColor
+                    }
+                }))
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { useRef } from 'react'
+                import { View } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ condition }) => {
+                    const ref = useRef()
+                    return (
+                        <View
+                            ref={_ref => {
+                                ref.current = _ref
+                                UnistylesShadowRegistry.add(_ref, condition ? styles.container : {}, undefined, undefined)
+                                return () => UnistylesShadowRegistry.remove(_ref)
+                            }}
+                            style={[condition ? styles.container : {}]}
+                        />
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    theme => ({
+                        container: {
+                            flex: 1,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: theme.colors.backgroundColor,
+                            uni__dependencies: [0]
+                        }
+                    }),
+                    921918562
+                )
+            `
         }
     ]
 })
