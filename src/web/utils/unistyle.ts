@@ -1,7 +1,7 @@
 import type { UnistyleDependency } from '../../specs/NativePlatform'
 import { ColorScheme, Orientation } from '../../specs/types'
 import type { StyleSheet, StyleSheetWithSuperPowers, UnistylesValues } from '../../types/stylesheet'
-import { isUnistylesMq, parseMq } from '../mq'
+import { isUnistylesMq, parseMq } from '../../mq'
 import { UnistylesState } from '../state'
 import { keyInObject, reduceObject } from './common'
 

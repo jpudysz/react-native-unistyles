@@ -64,6 +64,8 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     void setImmersiveMode(bool isEnabled) override;
     void setRootViewBackgroundColor(double color) override;
     UnistylesCxxMiniRuntime getMiniRuntime() override;
+    std::unordered_map<std::string, double> getBreakpoints() override;
+    
     jsi::Value getMiniRuntimeAsValue(jsi::Runtime& rt);
     jsi::Runtime& getRuntime();
     void includeDependenciesForColorSchemeChange(std::vector<UnistyleDependency>& deps);

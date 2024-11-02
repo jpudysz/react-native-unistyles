@@ -57,6 +57,18 @@ double HybridUnistylesRuntime::getFontScale() {
     return this->_nativePlatform.getFontScale();
 };
 
+std::unordered_map<std::string, double> HybridUnistylesRuntime::getBreakpoints() {
+    auto& state = core::UnistylesRegistry::get().getState(*_rt);
+    auto sortedBreakpointPairs = state.getSortedBreakpointPairs();
+    std::unordered_map<std::string, double> breakpoints{};
+    
+    std::for_each(sortedBreakpointPairs.begin(), sortedBreakpointPairs.end(), [&breakpoints](std::pair<std::string, double>& pair){
+        breakpoints[pair.first] = pair.second;
+    });
+    
+    return breakpoints;
+}
+
 void HybridUnistylesRuntime::setTheme(const std::string &themeName) {
     helpers::assertThat(*_rt, !this->getHasAdaptiveThemes(), "Unistyles: You're trying to set theme to: '" + themeName + "', but adaptiveThemes are enabled.");
 
