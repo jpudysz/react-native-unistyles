@@ -17,11 +17,7 @@ const UniButton = createUnistylesComponent(Button, (theme) => ({
 }))
 
 const UniBlurhash = createUnistylesComponent(Blurhash)
-
-const UniScrollView = createUnistylesComponent(ScrollView, () => ({
-    style: styles.scrollView,
-    contentContainerStyle: styles.contentContainerStyle
-}))
+const UniScrollView = createUnistylesComponent(ScrollView)
 
 export const App = () => {
     const [, setCount] = React.useState(0)
@@ -49,13 +45,16 @@ export const App = () => {
             <Typography isBold={false} size="small" value={2.22}>
                 Re-render count: {countRef.current++}
             </Typography>
-            {/* <UniScrollView> */}
-            {/*     {Array.from({ length: 100 }).map((_, i) => ( */}
-            {/*         <View key={i}> */}
-            {/*             <Text style={styles.scrollViewText}>{i}</Text> */}
-            {/*         </View> */}
-            {/*     ))} */}
-            {/* </UniScrollView> */}
+            <UniScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.contentContainerStyle}
+            >
+                {Array.from({ length: 100 }).map((_, i) => (
+                    <View key={i}>
+                        <Text style={styles.scrollViewText}>{i}</Text>
+                    </View>
+                ))}
+            </UniScrollView>
             <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6." style={styles.blurhash}  />
             <UniButton
                 title="Force re-render"
@@ -111,7 +110,7 @@ const styles = StyleSheet.create((theme, rt) => ({
     },
     contentContainerStyle: {
         transform: [{
-            translateX: rt.colorScheme === 'dark' ? -100 : 100
+            translateX: rt.colorScheme === 'dark' ? 100 : 200
         }]
     },
     scrollViewText: {
