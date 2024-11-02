@@ -30,7 +30,7 @@ struct ShadowTrafficController {
         return _unistylesUpdates;
     }
 
-    inline void setUpdates(jsi::Runtime& rt, shadow::ShadowLeafUpdates& newUpdates) {
+    inline void setUpdates(shadow::ShadowLeafUpdates& newUpdates) {
         std::lock_guard<std::mutex> lock(_mutex);
 
         auto& targetUpdates = _unistylesUpdates;
@@ -46,6 +46,16 @@ struct ShadowTrafficController {
 
             targetUpdates.emplace(pair.first, std::move(pair.second));
         });
+    }
+
+    inline void removeFromUpdates(const ShadowNodeFamily* family) {
+        auto it = std::find_if(_unistylesUpdates.begin(), _unistylesUpdates.end(), [family](auto& pair){
+            return family == pair.first;
+        });
+
+        if (it != _unistylesUpdates.end()) {
+            _unistylesUpdates.erase(it);
+        }
     }
 
 private:

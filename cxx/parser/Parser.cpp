@@ -217,7 +217,7 @@ void parser::Parser::rebuildShadowLeafUpdates(core::DependencyMap& dependencyMap
         updates.emplace(shadowNode, std::move(rawProps));
     }
 
-    registry.trafficController.setUpdates(rt, updates);
+    registry.trafficController.setUpdates(updates);
 
     // this is required, we need to indicate that there are new changes
     registry.trafficController.resumeUnistylesTraffic();
@@ -749,7 +749,7 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
     for (const auto& unistyleData : unistyles) {
         // this can happen for exotic stylesheets
         if (!unistyleData->parsedStyle.has_value()) {
-            unistyleData->parsedStyle = jsi::Value(rt, unistyleData->unistyle->rawValue).asObject(rt);
+            return nullptr;
         }
 
         helpers::enumerateJSIObject(rt, unistyleData->parsedStyle.value(), [&](const std::string& propertyName, jsi::Value& propertyValue){
@@ -770,7 +770,7 @@ folly::dynamic parser::Parser::parseUnistyleToShadowTreeStyles(jsi::Runtime& rt,
 
     // can happen for exotic styles
     if (!unistyle->parsedStyle.has_value()) {
-        unistyle->parsedStyle = jsi::Value(rt, unistyle->rawValue).asObject(rt);
+        return nullptr;
     }
 
     helpers::enumerateJSIObject(rt, unistyle->parsedStyle.value(), [&](const std::string& propertyName, jsi::Value& propertyValue){

@@ -92,11 +92,12 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
         }
     });
 
-    this->trafficController.setUpdates(rt, updates);
+    this->trafficController.setUpdates(updates);
     this->trafficController.resumeUnistylesTraffic();
 }
 
 void core::UnistylesRegistry::unlinkShadowNodeWithUnistyles(jsi::Runtime& rt, const ShadowNodeFamily* shadowNodeFamily) {
+    this->trafficController.removeFromUpdates(shadowNodeFamily);
     this->_shadowRegistry[&rt].erase(shadowNodeFamily);
 }
 
@@ -161,7 +162,7 @@ void core::UnistylesRegistry::shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Uni
         }
     }
 
-    this->trafficController.setUpdates(rt, updates);
+    this->trafficController.setUpdates(updates);
 }
 
 std::vector<std::shared_ptr<core::StyleSheet>> core::UnistylesRegistry::getStyleSheetsToRefresh(jsi::Runtime& rt, bool themeDidChange, bool runtimeDidChange) {
