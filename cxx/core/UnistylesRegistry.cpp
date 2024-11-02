@@ -97,7 +97,6 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
 }
 
 void core::UnistylesRegistry::unlinkShadowNodeWithUnistyles(jsi::Runtime& rt, const ShadowNodeFamily* shadowNodeFamily) {
-    this->trafficController.removeFromUpdates(shadowNodeFamily);
     this->_shadowRegistry[&rt].erase(shadowNodeFamily);
 }
 

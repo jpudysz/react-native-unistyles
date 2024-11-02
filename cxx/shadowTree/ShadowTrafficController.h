@@ -48,14 +48,9 @@ struct ShadowTrafficController {
         });
     }
 
-    inline void removeFromUpdates(const ShadowNodeFamily* family) {
-        auto it = std::find_if(_unistylesUpdates.begin(), _unistylesUpdates.end(), [family](auto& pair){
-            return family == pair.first;
-        });
-
-        if (it != _unistylesUpdates.end()) {
-            _unistylesUpdates.erase(it);
-        }
+    inline void restore() {
+        _unistylesUpdates = {};
+        _canCommit = false;
     }
 
 private:
