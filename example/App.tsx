@@ -16,9 +16,7 @@ const UniButton = createUnistylesComponent(Button, (theme) => ({
     color: theme.colors.test
 }))
 
-const UniBlurhash = createUnistylesComponent(Blurhash, () => ({
-    style: styles.blurhash()
-}))
+const UniBlurhash = createUnistylesComponent(Blurhash)
 
 const UniScrollView = createUnistylesComponent(ScrollView, () => ({
     style: styles.scrollView,
@@ -58,7 +56,7 @@ export const App = () => {
             {/*         </View> */}
             {/*     ))} */}
             {/* </UniScrollView> */}
-            <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6."  />
+            <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6." style={styles.blurhash}  />
             <UniButton
                 title="Force re-render"
                 onPress={() => setCount(prevState =>  prevState + 1)}
@@ -101,12 +99,12 @@ const styles = StyleSheet.create((theme, rt) => ({
         borderColor: theme.colors.typography,
         backgroundColor: rt.colorScheme === 'dark' ? 'red' : 'blue'
     },
-    blurhash: () => ({
+    blurhash: {
         height: 100,
         width: 100,
         borderWidth: 5,
         borderColor: theme.colors.test
-    }),
+    },
     scrollView: {
         width: '100%',
         backgroundColor: theme.colors.accent

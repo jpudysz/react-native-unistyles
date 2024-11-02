@@ -1,4 +1,5 @@
 #include "Parser.h"
+#include "UnistyleWrapper.h"
 
 using namespace margelo::nitro::unistyles;
 using namespace facebook;
@@ -107,7 +108,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
         parsedStyleSheets.emplace(styleSheet, this->unwrapStyleSheet(rt, styleSheet));
     }
 
-    // then parse all visible Unistyles
+    // then parse all visible Unistyles managed by Unistyle
     for (auto& [shadowNode, unistyles] : dependencyMap) {
         auto styleSheet = unistyles.begin()->get()->unistyle->parent;
 
@@ -155,13 +156,12 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
         }
     }
 
-    // parse whatever left in StyleSheets
+    // parse whatever left in StyleSheets to be later accessible
+    // for createUnistylesComponent
     for (auto styleSheet : styleSheets) {
         for (auto& [_, unistyle] : styleSheet->unistyles) {
             if (!parsedUnistyles.contains(unistyle)) {
-                parsedUnistyles.emplace(unistyle, true);
                 unistyle->rawValue = parsedStyleSheets[styleSheet].asObject(rt).getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
-                this->rebuildUnistyle(rt, styleSheet, unistyle, {}, std::nullopt);
             }
         }
     }
@@ -367,10 +367,10 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
             unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
             unistyleFn->seal();
 
-            // include dependencies for createUnistylesComponent
             jsi::Object style = jsi::Value(rt, unistyleFn->parsedStyle.value()).asObject(rt);
 
-            helpers::defineHiddenProperty(rt, style, helpers::STYLE_DEPENDENCIES, helpers::dependenciesToJSIArray(rt, unistyle->dependencies));
+            // include dependencies for createUnistylesComponent
+            style.setProperty(rt, "__proto__", generateUnistylesPrototype(rt, unistylesRuntime, unistyle, variants, helpers::functionArgumentsToArray(rt, args, count)));
 
             // update shadow leaf updates to indicate newest changes
             auto& registry = core::UnistylesRegistry::get();

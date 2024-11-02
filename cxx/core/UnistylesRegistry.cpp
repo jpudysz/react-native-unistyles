@@ -88,7 +88,13 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
         // add or update node for shadow leaf updates
         // dynamic functions are parsed later
         if (unistyle->type == UnistyleType::Object) {
-            updates[shadowNodeFamily] = parser.parseUnistyleToShadowTreeStyles(rt, unistyle);
+            for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
+                for (const auto& unistyleData : unistyles) {
+                    if (unistyleData->unistyle == unistyle && family == shadowNodeFamily) {
+                        updates[family] = parser.parseStylesToShadowTreeStyles(rt, {unistyleData});
+                    }
+                }
+            }
         }
     });
 
