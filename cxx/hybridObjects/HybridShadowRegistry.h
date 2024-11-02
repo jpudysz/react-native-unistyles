@@ -9,7 +9,9 @@
 namespace margelo::nitro::unistyles {
 
 struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
-    HybridShadowRegistry(): HybridObject(TAG) {}
+    HybridShadowRegistry(): HybridObject(TAG) {
+        core::UnistylesRegistry::get().trafficController.restore();
+    }
     
     jsi::Value link(jsi::Runtime& rt,
                             const jsi::Value& thisValue,
