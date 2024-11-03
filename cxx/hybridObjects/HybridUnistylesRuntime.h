@@ -2,7 +2,7 @@
 
 #include "HybridUnistylesRuntimeSpec.hpp"
 #include "HybridNativePlatformSpec.hpp"
-#include "Unistyles-Swift-Cxx-Umbrella.hpp"
+#include "NativePlatform.h"
 #include "UnistylesState.h"
 #include "HybridUnistylesStatusBarSpec.hpp"
 #include "HybridNavigationBar.h"
@@ -65,7 +65,7 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     void setRootViewBackgroundColor(double color) override;
     UnistylesCxxMiniRuntime getMiniRuntime() override;
     std::unordered_map<std::string, double> getBreakpoints() override;
-    
+
     jsi::Value getMiniRuntimeAsValue(jsi::Runtime& rt);
     jsi::Runtime& getRuntime();
     void includeDependenciesForColorSchemeChange(std::vector<UnistyleDependency>& deps);
