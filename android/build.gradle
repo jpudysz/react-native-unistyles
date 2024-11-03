@@ -14,7 +14,7 @@ buildscript {
 
 apply plugin: 'com.android.library'
 apply plugin: 'org.jetbrains.kotlin.android'
-apply from: '../nitrogen/generated/android/Unistyles+autolinking.gradle'
+apply from: '../nitrogen/generated/android/unistyles+autolinking.gradle'
 
 def resolveBuildType() {
     Gradle gradle = getGradle()
