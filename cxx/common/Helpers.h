@@ -3,7 +3,7 @@
 #include <jsi/jsi.h>
 #include <jsi/JSIDynamic.h>
 #include <folly/dynamic.h>
-#include "Unistyles-Swift-Cxx-Umbrella.hpp"
+#include "NativePlatform.h"
 #include <unordered_set>
 
 using namespace facebook;

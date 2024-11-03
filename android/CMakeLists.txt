@@ -13,6 +13,7 @@ add_library(unistyles
 
 include_directories(
     ./src/main/cxx
+    ../cxx
     ../cxx/common
     ../cxx/core
     ../cxx/hybridObjects
