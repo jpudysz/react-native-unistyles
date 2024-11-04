@@ -3,7 +3,7 @@ import { normalizeNumericValue } from '../utils'
 import { deepMergeObjects, keyInObject } from '../../utils'
 
 const createBoxShadowValue = (style: BoxShadowValue) => {
-    const { offsetX, offsetY, blurRadius = 0, spreadDistance = 0, color = '', inset } = style
+    const { offsetX, offsetY, blurRadius = 0, spreadDistance = 0, color = '#000', inset } = style
 
     return `${inset ? 'inset ' : ''}${normalizeNumericValue(offsetX)} ${normalizeNumericValue(offsetY)} ${normalizeNumericValue(blurRadius as number)} ${normalizeNumericValue(spreadDistance as number)} ${color}`
 }
