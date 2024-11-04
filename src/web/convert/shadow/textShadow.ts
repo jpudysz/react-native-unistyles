@@ -1,40 +1,20 @@
-import { deepMergeObjects, warn } from '../utils'
-import { validateShadow } from './shadow'
-import { TEXT_SHADOW_STYLES, type TextShadow } from './types'
-import { extractShadowValue, normalizeColor, normalizeNumericValue } from './utils'
+import { deepMergeObjects } from '../../utils'
+import { TEXT_SHADOW_STYLES, type TextShadow } from '../types'
+import { extractShadowValue, normalizeColor, normalizeNumericValue } from '../utils'
+import { getShadowBreakpoints } from './getShadowBreakpoints'
 
 const createTextShadowValue = (style: TextShadow) => {
     const { textShadowColor, textShadowOffset, textShadowRadius } = style
-    const offsetX = normalizeNumericValue(textShadowOffset.width)
-    const offsetY = normalizeNumericValue(textShadowOffset.height)
-    const radius = normalizeNumericValue(textShadowRadius)
-    const color = normalizeColor(textShadowColor as string)
+    const offsetX = normalizeNumericValue(textShadowOffset?.width ?? 0)
+    const offsetY = normalizeNumericValue(textShadowOffset?.height ?? 0)
+    const radius = normalizeNumericValue(textShadowRadius ?? 0)
+    const color = normalizeColor((textShadowColor ?? '#000000') as string)
 
     return `${offsetX} ${offsetY} ${radius} ${color}`
 }
 
 export const getTextShadowStyle = (styles: Record<string, any>) => {
-    const missingStyles = TEXT_SHADOW_STYLES.filter(key => !(key in styles))
-
-    if (missingStyles.length) {
-        warn(`can't apply text shadow as you miss these properties: ${missingStyles.join(', ')}`)
-
-        return {}
-    }
-
-    const breakpointsSet = new Set<string>()
-
-    try {
-        validateShadow(TEXT_SHADOW_STYLES, styles, breakpointsSet)
-    } catch (error) {
-        if (typeof error === 'string') {
-            warn(error)
-        }
-
-        return {}
-    }
-
-    const breakpoints = Array.from(breakpointsSet)
+    const breakpoints = getShadowBreakpoints(TEXT_SHADOW_STYLES, styles)
 
     // If no breakpoints were used return styles without media queries
     if (breakpoints.length === 0) {
