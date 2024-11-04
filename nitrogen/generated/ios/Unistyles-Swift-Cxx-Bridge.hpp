@@ -7,12 +7,6 @@
 
 #pragma once
 
-#if __has_include(<NitroModules/NitroDefines.hpp>)
-#include <NitroModules/NitroDefines.hpp>
-#else
-#error NitroModules cannot be found! Are you sure you installed NitroModules properly?
-#endif
-
 // Forward declarations of C++ defined types
 // Forward declaration of `HybridNativePlatformSpec` to properly resolve imports.
 namespace margelo::nitro::unistyles { class HybridNativePlatformSpec; }
@@ -46,7 +40,7 @@ namespace margelo::nitro::unistyles::bridge::swift {
     vector.reserve(size);
     return vector;
   }
-
+  
   // pragma MARK: std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>
   /**
    * Specialized version of `std::function<void(const std::vector<UnistyleDependency>&)>`.
@@ -65,7 +59,7 @@ namespace margelo::nitro::unistyles::bridge::swift {
   private:
     std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)> _function;
   };
-  inline Func_void_std__vector_UnistyleDependency_ create_Func_void_std__vector_UnistyleDependency_(void* NONNULL closureHolder, void(* NONNULL call)(void* NONNULL /* closureHolder */, std::vector<UnistyleDependency>), void(* NONNULL destroy)(void* NONNULL)) {
+  inline Func_void_std__vector_UnistyleDependency_ create_Func_void_std__vector_UnistyleDependency_(void* _Nonnull closureHolder, void(* _Nonnull call)(void* _Nonnull /* closureHolder */, std::vector<UnistyleDependency>), void(* _Nonnull destroy)(void* _Nonnull)) {
     std::shared_ptr<void> sharedClosureHolder(closureHolder, destroy);
     return Func_void_std__vector_UnistyleDependency_([sharedClosureHolder, call](const std::vector<UnistyleDependency>& dependencies) -> void {
       call(sharedClosureHolder.get(), dependencies);
@@ -74,7 +68,7 @@ namespace margelo::nitro::unistyles::bridge::swift {
   inline std::shared_ptr<Func_void_std__vector_UnistyleDependency__Wrapper> share_Func_void_std__vector_UnistyleDependency_(const Func_void_std__vector_UnistyleDependency_& value) {
     return std::make_shared<Func_void_std__vector_UnistyleDependency__Wrapper>(value);
   }
-
+  
   // pragma MARK: std::function<void()>
   /**
    * Specialized version of `std::function<void()>`.
@@ -102,7 +96,7 @@ namespace margelo::nitro::unistyles::bridge::swift {
   inline std::shared_ptr<Func_void_Wrapper> share_Func_void(const Func_void& value) {
     return std::make_shared<Func_void_Wrapper>(value);
   }
-
+  
   // pragma MARK: std::shared_ptr<margelo::nitro::unistyles::HybridNativePlatformSpec>
   /**
    * Specialized version of `std::shared_ptr<margelo::nitro::unistyles::HybridNativePlatformSpec>`.

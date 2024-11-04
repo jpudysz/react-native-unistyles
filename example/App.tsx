@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
-import { Button, TextInput, View } from 'react-native'
+import { Button, ScrollView, Text, TextInput, View } from 'react-native'
 import { Blurhash } from 'react-native-blurhash'
-import { createUnistylesComponent, StyleSheet } from 'react-native-unistyles'
+import { createUnistylesComponent, StyleSheet, Display, Hide, mq } from 'react-native-unistyles'
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
@@ -16,9 +16,8 @@ const UniButton = createUnistylesComponent(Button, (theme) => ({
     color: theme.colors.test
 }))
 
-const UniBlurhash = createUnistylesComponent(Blurhash, () => ({
-    style: styles.blurhash()
-}))
+const UniBlurhash = createUnistylesComponent(Blurhash)
+const UniScrollView = createUnistylesComponent(ScrollView)
 
 export const App = () => {
     const [, setCount] = React.useState(0)
@@ -40,10 +39,30 @@ export const App = () => {
             <Typography isBold isPrimary size="large" isCentered value={1.5}>
                 Keyboard insets
             </Typography>
+            <Display mq={mq.width(0, 400).and.height(700, 1000)}>
+                <Text style={styles.text}>
+                    👋🏼D
+                </Text>
+            </Display>
+            <Hide mq={mq.only.width('sm', 500)}>
+                <Text style={styles.text}>
+                    👋🏼H
+                </Text>
+            </Hide>
             <Typography isBold={false} size="small" value={2.22}>
                 Re-render count: {countRef.current++}
             </Typography>
-            <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6."  />
+            <UniScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.contentContainerStyle}
+            >
+                {Array.from({ length: 100 }).map((_, index) => (
+                    <View key={index}>
+                        <Text style={{ ...index % 2 === 0 ? styles.text : {} }}>{index + 1}</Text>
+                    </View>
+                ))}
+            </UniScrollView>
+            <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6." style={styles.blurhash}  />
             <UniButton
                 title="Force re-render"
                 onPress={() => setCount(prevState =>  prevState + 1)}
@@ -86,10 +105,27 @@ const styles = StyleSheet.create((theme, rt) => ({
         borderColor: theme.colors.typography,
         backgroundColor: rt.colorScheme === 'dark' ? 'red' : 'blue'
     },
-    blurhash: () => ({
+    blurhash: {
         height: 100,
         width: 100,
         borderWidth: 5,
         borderColor: theme.colors.test
-    })
+    },
+    scrollView: {
+        width: '100%',
+        backgroundColor: theme.colors.accent
+    },
+    contentContainerStyle: {
+        transform: [{
+            translateX: rt.colorScheme === 'dark' ? 100 : 200
+        }]
+    },
+    scrollViewText: {
+        color: theme.colors.typography
+    },
+    text: {
+        fontSize: 30,
+        lineHeight: 40,
+        color: theme.colors.typography
+    }
 }))

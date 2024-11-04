@@ -1,7 +1,7 @@
 {
   "cxxNamespace": ["unistyles"],
   "ios": {
-    "iosModulename": "Unistyles"
+    "iosModuleName": "Unistyles"
   },
   "android": {
     "androidNamespace": ["unistyles"],

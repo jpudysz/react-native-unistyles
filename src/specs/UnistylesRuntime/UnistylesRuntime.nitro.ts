@@ -30,6 +30,7 @@ export interface UnistylesRuntime extends HybridObject<{ ios: 'c++', android: 'c
     readonly themeName?: string,
     readonly contentSizeCategory: string,
     readonly breakpoint?: string,
+    readonly breakpoints: Record<string, number>,
     readonly insets: Insets,
     readonly orientation: Orientation,
     readonly pixelRatio: number,

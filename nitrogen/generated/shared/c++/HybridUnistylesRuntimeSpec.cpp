@@ -20,6 +20,7 @@ namespace margelo::nitro::unistyles {
       prototype.registerHybridGetter("themeName", &HybridUnistylesRuntimeSpec::getThemeName);
       prototype.registerHybridGetter("contentSizeCategory", &HybridUnistylesRuntimeSpec::getContentSizeCategory);
       prototype.registerHybridGetter("breakpoint", &HybridUnistylesRuntimeSpec::getBreakpoint);
+      prototype.registerHybridGetter("breakpoints", &HybridUnistylesRuntimeSpec::getBreakpoints);
       prototype.registerHybridGetter("insets", &HybridUnistylesRuntimeSpec::getInsets);
       prototype.registerHybridGetter("orientation", &HybridUnistylesRuntimeSpec::getOrientation);
       prototype.registerHybridGetter("pixelRatio", &HybridUnistylesRuntimeSpec::getPixelRatio);
