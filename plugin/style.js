@@ -9,7 +9,8 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
             {
                 members: members.filter(Boolean),
                 inlineStyle: undefined,
-                dynamicFunction
+                dynamicFunction,
+                conditionalExpression: undefined
             }
         ]
     }
@@ -46,7 +47,8 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
             return partialResult.concat([{
                 members: [],
                 inlineStyle: t.objectExpression(inlineStyles),
-                dynamicFunction: undefined
+                dynamicFunction: undefined,
+                conditionalExpression: undefined
             }])
         }
 
@@ -62,7 +64,17 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
         return [{
             members: [node.name],
             inlineStyle: undefined,
-            dynamicFunction: undefined
+            dynamicFunction: undefined,
+            conditionalExpression: undefined
+        }]
+    }
+
+    if (t.isConditionalExpression(node)) {
+        return [{
+            members: [],
+            inlineStyle: undefined,
+            dynamicFunction: undefined,
+            conditionalExpression: node
         }]
     }
 

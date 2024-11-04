@@ -3,7 +3,7 @@
 #include "string"
 #include <jsi/jsi.h>
 #include <folly/dynamic.h>
-#include "Unistyles-Swift-Cxx-Umbrella.hpp"
+#include "NativePlatform.h"
 
 namespace margelo::nitro::unistyles::core {
 

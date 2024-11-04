@@ -32,6 +32,11 @@ HybridShadowRegistry.add = (handle, style, variants, args) => {
         return
     }
 
+    // don't register Reanimated styles
+    if (style?.initial?.updater) {
+        return
+    }
+
     HybridShadowRegistry.link(findShadowNodeForHandle(handle), style, variants ?? {}, args ?? [])
 }
 

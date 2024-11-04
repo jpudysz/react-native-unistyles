@@ -25,5 +25,8 @@ export type ViewHandle = {
 }
 
 export type Unistyle = {
-    __unid?: number
+    __unid?: number,
+    initial?: {
+        updater?: () => void
+    }
 }

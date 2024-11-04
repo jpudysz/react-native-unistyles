@@ -2,7 +2,7 @@
 
 #include "HybridUnistylesRuntimeSpec.hpp"
 #include "HybridNativePlatformSpec.hpp"
-#include "Unistyles-Swift-Cxx-Umbrella.hpp"
+#include "NativePlatform.h"
 #include "UnistylesState.h"
 #include "HybridUnistylesStatusBarSpec.hpp"
 #include "HybridNavigationBar.h"
@@ -13,7 +13,8 @@
 namespace margelo::nitro::unistyles {
 
 struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
-    HybridUnistylesRuntime(Unistyles::HybridNativePlatformSpecCxx nativePlatform, jsi::Runtime& rt) : HybridObject(TAG), _nativePlatform{nativePlatform}, _rt{&rt} {}
+    HybridUnistylesRuntime(Unistyles::HybridNativePlatformSpecCxx nativePlatform, jsi::Runtime& rt, std::function<void(std::function<void(jsi::Runtime&)>&&)> runOnJSThread)
+        : HybridObject(TAG), _nativePlatform{nativePlatform}, _rt{&rt}, runOnJSThread(std::move(runOnJSThread)) {}
 
     jsi::Value getTheme(jsi::Runtime& rt,
                             const jsi::Value& thisValue,
@@ -63,10 +64,13 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     void setImmersiveMode(bool isEnabled) override;
     void setRootViewBackgroundColor(double color) override;
     UnistylesCxxMiniRuntime getMiniRuntime() override;
+    std::unordered_map<std::string, double> getBreakpoints() override;
+
     jsi::Value getMiniRuntimeAsValue(jsi::Runtime& rt);
     jsi::Runtime& getRuntime();
     void includeDependenciesForColorSchemeChange(std::vector<UnistyleDependency>& deps);
     void calculateNewThemeAndDependencies(std::vector<UnistyleDependency>& deps);
+    std::function<void(std::function<void(jsi::Runtime&)>&&)> runOnJSThread;
 
 private:
     jsi::Runtime* _rt;

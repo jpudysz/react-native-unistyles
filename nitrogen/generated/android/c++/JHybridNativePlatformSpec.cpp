@@ -107,7 +107,7 @@ namespace margelo::nitro::unistyles {
   bool JHybridNativePlatformSpec::getPrefersRtlDirection() {
     static const auto method = _javaPart->getClass()->getMethod<jboolean()>("getPrefersRtlDirection");
     auto __result = method(_javaPart);
-    return __result;
+    return static_cast<bool>(__result);
   }
   void JHybridNativePlatformSpec::setRootViewBackgroundColor(double color) {
     static const auto method = _javaPart->getClass()->getMethod<void(double /* color */)>("setRootViewBackgroundColor");

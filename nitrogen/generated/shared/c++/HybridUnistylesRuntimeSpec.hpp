@@ -28,6 +28,7 @@ namespace margelo::nitro::unistyles { struct UnistylesCxxMiniRuntime; }
 #include "Dimensions.hpp"
 #include <optional>
 #include <string>
+#include <unordered_map>
 #include "Insets.hpp"
 #include "Orientation.hpp"
 #include "UnistylesCxxMiniRuntime.hpp"
@@ -65,6 +66,7 @@ namespace margelo::nitro::unistyles {
       virtual std::optional<std::string> getThemeName() = 0;
       virtual std::string getContentSizeCategory() = 0;
       virtual std::optional<std::string> getBreakpoint() = 0;
+      virtual std::unordered_map<std::string, double> getBreakpoints() = 0;
       virtual Insets getInsets() = 0;
       virtual Orientation getOrientation() = 0;
       virtual double getPixelRatio() = 0;

@@ -28,7 +28,7 @@ jsi::Value HostStyle::get(jsi::Runtime& rt, const jsi::PropNameID& propNameId) {
     }
 
     if (this->_styleSheet->unistyles.contains(propertyName)) {
-        return valueFromUnistyle(rt, this->_styleSheet->unistyles[propertyName], this->_styleSheet->tag);
+        return valueFromUnistyle(rt, this->_unistylesRuntime, this->_styleSheet->unistyles[propertyName], this->_styleSheet->tag);
     }
     
     if (propertyName == helpers::STYLE_VARIANTS) {
