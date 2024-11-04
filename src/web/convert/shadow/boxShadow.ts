@@ -1,41 +1,20 @@
-import { deepMergeObjects, warn } from '../utils'
-import { validateShadow } from './shadow'
-import { BOX_SHADOW_STYLES, type BoxShadow } from './types'
-import { extractShadowValue, normalizeColor, normalizeNumericValue } from './utils'
+import { deepMergeObjects } from '../../utils'
+import { BOX_SHADOW_STYLES, type BoxShadow } from '../types'
+import { extractShadowValue, normalizeColor, normalizeNumericValue } from '../utils'
+import { getShadowBreakpoints } from './getShadowBreakpoints'
 
 const createBoxShadowValue = (style: BoxShadow) => {
-    // at this point every prop is present
     const { shadowColor, shadowOffset, shadowOpacity, shadowRadius } = style
-    const offsetX = normalizeNumericValue(shadowOffset.width)
-    const offsetY = normalizeNumericValue(shadowOffset.height)
-    const radius = normalizeNumericValue(shadowRadius)
-    const color = normalizeColor(shadowColor as string, shadowOpacity as number)
+    const offsetX = normalizeNumericValue(shadowOffset?.width ?? 0)
+    const offsetY = normalizeNumericValue(shadowOffset?.height ?? 0)
+    const radius = normalizeNumericValue(shadowRadius ?? 0)
+    const color = normalizeColor((shadowColor ?? '#000000') as string, (shadowOpacity ?? 1) as number)
 
     return `${offsetX} ${offsetY} ${radius} ${color}`
 }
 
 export const getBoxShadowStyle = (styles: Record<string, any>) => {
-    const missingStyles = BOX_SHADOW_STYLES.filter(key => !(key in styles))
-
-    if (missingStyles.length) {
-        warn(`can't apply box shadow as you miss these properties: ${missingStyles.join(', ')}`)
-
-        return {}
-    }
-
-    const breakpointsSet = new Set<string>()
-
-    try {
-        validateShadow(BOX_SHADOW_STYLES, styles, breakpointsSet)
-    } catch (error) {
-        if (typeof error === 'string') {
-            warn(error)
-        }
-
-        return {}
-    }
-
-    const breakpoints = Array.from(breakpointsSet)
+    const breakpoints = getShadowBreakpoints(BOX_SHADOW_STYLES, styles)
 
     // If no breakpoints were used return styles without media queries
     if (breakpoints.length === 0) {

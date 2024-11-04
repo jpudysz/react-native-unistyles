@@ -67,3 +67,5 @@ export const generateHash = (value: any) => {
 
     return `unistyles-${(hasher >>> 0).toString(36)}`
 }
+
+export const hyphenate = (propertyName: string) => propertyName.replace(/[A-Z]/g, (m: string) => `-${m.toLowerCase()}`)
