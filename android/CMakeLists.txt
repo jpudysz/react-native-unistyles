@@ -11,6 +11,8 @@ add_library(unistyles
     ${PLATFORM_SRC}
 )
 
+include("${CMAKE_SOURCE_DIR}/../nitrogen/generated/android/unistyles+autolinking.cmake")
+
 include_directories(
     ./src/main/cxx
     ../cxx
@@ -20,7 +22,6 @@ include_directories(
     ../cxx/parser
     ../cxx/shadowTree
 )
-include("${CMAKE_SOURCE_DIR}/../nitrogen/generated/android/unistyles+autolinking.cmake")
 
 string(APPEND CMAKE_CXX_FLAGS "-DFOLLY_NO_CONFIG")
 
@@ -35,13 +36,13 @@ set_target_properties(unistyles PROPERTIES
 # find_package(ReactAndroid REQUIRED CONFIG)
 # find_package(fbjni REQUIRED CONFIG)
 
-if (ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
-    # target_link_libraries(unistyles ReactAndroid::reactnative)
-else()
-    target_link_libraries(unistyles
-        ReactAndroid::turbomodulejsijni
-        # ReactAndroid::react_nativemodule_core
-        android
-        fbjni::fbjni
-    )
-endif()
+#if (ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
+#     target_link_libraries(unistyles ReactAndroid::reactnative)
+#else()
+#    target_link_libraries(unistyles
+#        ReactAndroid::turbomodulejsijni
+#        ReactAndroid::react_nativemodule_core
+#         android
+#        fbjni::fbjni
+#    )
+#endif()
