@@ -12,7 +12,7 @@ export const useMedia = (config: { mq: symbol }) => {
             return false
         }
 
-        const parsedMq =  parseMq(maybeMq)
+        const parsedMq = parseMq(maybeMq)
 
         if (!isValidMq(parsedMq)) {
             console.error(`🦄 Unistyles: Received invalid mq where min is greater than max: ${maybeMq}`)

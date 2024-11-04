@@ -10,7 +10,7 @@ export const convertUnistyles = (value: UnistylesValues) => {
     // Flag to mark if textShadow is already created
     let hasTextShadow = false
     // Flag to mark if boxShadow is already created
-    let hasBoxShadow = false
+    let hasShadow = false
 
     const stylesArray = Object.entries({
         ...value,
@@ -39,13 +39,13 @@ export const convertUnistyles = (value: UnistylesValues) => {
             return getTextShadowStyle(value)
         }
 
-        // Box shadow
+        // RN shadows
         if (isShadow(unistylesKey)) {
-            if (hasBoxShadow) {
+            if (hasShadow) {
                 return []
             }
 
-            hasBoxShadow = true
+            hasShadow = true
 
             return getBoxShadowStyle(value)
         }
