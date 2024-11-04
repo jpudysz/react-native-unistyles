@@ -53,7 +53,7 @@ private:
     std::unordered_map<jsi::Runtime*, std::unordered_map<const ShadowNodeFamily*, std::vector<std::shared_ptr<UnistyleData>>>> _shadowRegistry{};
 };
 
-UnistylesRegistry& UnistylesRegistry::get() {
+inline UnistylesRegistry& UnistylesRegistry::get() {
     static UnistylesRegistry cache;
 
     return cache;
