@@ -55,7 +55,7 @@ class UnistylesRuntimeBuilder {
     }
 
     get breakpoints() {
-        return Object.keys(UnistylesState.breakpoints ?? {})
+        return UnistylesState.breakpoints ?? {}
     }
 
     get breakpoint() {

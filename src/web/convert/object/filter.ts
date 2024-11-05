@@ -21,7 +21,7 @@ export const getFilterStyle = (filters: Array<Filters>) => {
             return []
         }
 
-        const breakpoints = Object.keys(dropShadowValue).filter(key => UnistylesRuntime.breakpoints.includes(key) || isUnistylesMq(key))
+        const breakpoints = Object.keys(dropShadowValue).filter(key => Object.keys(UnistylesRuntime.breakpoints).includes(key) || isUnistylesMq(key))
         const breakpointsDropShadow = Object.fromEntries(breakpoints.map(breakpoint => [breakpoint, getDropShadowStyle(dropShadowValue[breakpoint])]))
 
         if (breakpoints.length === 0) {
