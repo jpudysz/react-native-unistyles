@@ -79,13 +79,13 @@ class UnistylesShadowRegistryBuilder {
                 : style
             const { variantsResult } = Object.fromEntries(getVariants({ variantsResult: result }, variants))
             const resultWithVariants = deepMergeObjects(result, variantsResult ?? {})
-            
+
             // Get stored result from queue
             const storedResult = this.queuedResultMap.get(ref) ?? {}
             // Merge stored result with new result
             const newResult = deepMergeObjects(storedResult, resultWithVariants)
             const timeout = this.timeoutMap.get(ref)
-            
+
             // Add callback to the queue and remove old one
             this.queuedResultMap.set(ref, newResult)
             clearTimeout(timeout)
@@ -96,28 +96,28 @@ class UnistylesShadowRegistryBuilder {
                 if (equal(oldResult, newResult)) {
                     return
                 }
-    
+
                 const oldClassNames = this.classNamesMap.get(ref)
-    
+
                 // Remove old styles
                 if (oldResult) {
                     UnistylesRegistry.remove(oldResult)
                 }
-    
+
                 // Remove old classnames from the ref
                 oldClassNames?.forEach(className => ref.classList.remove(className))
                 this.resultsMap.set(ref, newResult)
-    
+
                 const { hash, existingHash } = UnistylesRegistry.add(newResult)
                 const injectedClassNames: Array<string> = newResult?._web?._classNames ?? []
                 const newClassNames = injectedClassNames.concat(hash)
                 const dependencies = extractUnistyleDependencies(newResult)
-    
+
                 if (typeof __uni__stylesheet === 'function') {
                     // Add dependencies from dynamic styles to stylesheet
                     UnistylesRegistry.addDependenciesToStylesheet(__uni__stylesheet, dependencies)
                 }
-    
+
                 __uni__refs.add(ref)
                 this.classNamesMap.set(ref, newClassNames)
                 // Add new classnames to the ref
@@ -130,7 +130,7 @@ class UnistylesShadowRegistryBuilder {
             }, 0))
 
             // Listen for theme / runtime changes
-            const dispose = UnistylesListener.addListeners(extractUnistyleDependencies(newResult), async () => {
+            const dispose = UnistylesListener.addListeners(extractUnistyleDependencies(newResult), () => {
                 const hash = this.hashMap.get(ref)
 
                 // Dispose listener if there is no hash
@@ -139,9 +139,6 @@ class UnistylesShadowRegistryBuilder {
 
                     return
                 }
-                
-                // Move this callback to the end of the event loop
-                await Promise.resolve()
 
                 const newComputedStyleSheet = UnistylesRegistry.getComputedStylesheet(__uni__stylesheet)
                 const newValue = newComputedStyleSheet[__uni__key]!
