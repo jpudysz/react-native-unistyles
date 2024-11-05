@@ -1,3 +1,5 @@
+package com.unistyles
+
 import com.margelo.nitro.unistyles.ColorScheme
 import com.margelo.nitro.unistyles.Dimensions
 import com.margelo.nitro.unistyles.HybridNativePlatformSpec
