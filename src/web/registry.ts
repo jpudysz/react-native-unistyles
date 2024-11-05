@@ -66,7 +66,7 @@ class UnistylesRegistryBuilder {
 
         dependencies.forEach(dependency => dependenciesMap.add(dependency))
 
-        const dispose = UnistylesListener.addListeners(Array.from(dependenciesMap), () => {
+        const dispose = UnistylesListener.addStylesheetListeners(Array.from(dependenciesMap), () => {
             const newComputedStylesheet = stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
 
             this.stylesheets.set(stylesheet, newComputedStylesheet)
