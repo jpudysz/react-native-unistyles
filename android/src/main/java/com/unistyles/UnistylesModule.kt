@@ -1,21 +1,28 @@
 package com.unistyles
 
 import android.util.Log
-import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.fbreact.specs.NativeTurboUnistylesSpec
+import com.facebook.jni.HybridData
+import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.RuntimeExecutor
+import com.facebook.react.fabric.FabricUIManager
 import com.facebook.react.turbomodule.core.interfaces.BindingsInstallerHolder
 import com.facebook.react.turbomodule.core.interfaces.TurboModuleWithJSIBindings
+import com.facebook.react.uimanager.UIManagerHelper
+import com.facebook.react.uimanager.common.UIManagerType
 
 class UnistylesModule(reactContext: ReactApplicationContext): NativeTurboUnistylesSpec(reactContext), TurboModuleWithJSIBindings {
+    private val _hybridData by lazy {
+        initializeHybridData(reactContext)
+    }
+
     companion object {
         const val NAME = NativeTurboUnistylesSpec.NAME
 
         init {
             try {
                 System.loadLibrary("unistyles")
-
-                Log.i(NAME, "Installed Unistyles \uD83E\uDD84!")
             } catch (error: Throwable) {
                 Log.e(NAME, "Failed to load Unistyles C++ library! Is it properly linked?", error)
 
@@ -24,6 +31,22 @@ class UnistylesModule(reactContext: ReactApplicationContext): NativeTurboUnistyl
         }
     }
 
+    init {
+        _hybridData
+    }
+
+    private fun initializeHybridData(reactContext: ReactApplicationContext): HybridData {
+        val runtimeExecutor = reactContext.catalystInstance?.runtimeExecutor
+            ?: throw IllegalStateException("Unistyles: React Native runtime executor is not available. Please follow installation guides.")
+        val fabricUIManager = UIManagerHelper.getUIManager(reactContext, UIManagerType.FABRIC) as? FabricUIManager
+            ?: throw IllegalStateException("Unistyles: Fabric UI Manager is not available. Please follow installation guides.")
+
+        return initHybrid(runtimeExecutor, fabricUIManager)
+    }
+
     @DoNotStrip
     external override fun getBindingsInstaller(): BindingsInstallerHolder
+
+    @DoNotStrip
+    private external fun initHybrid(runtimeExecutor: RuntimeExecutor, fabricUIManager: FabricUIManager): HybridData
 }
