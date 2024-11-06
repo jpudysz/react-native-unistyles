@@ -26,6 +26,11 @@ const useShadowRegistry = (style?: Record<string, any>) => {
             })
     }
 
+    useEffect(() => () => {
+        // Remove styles on unmount
+        UnistylesShadowRegistry.add(null, style)
+    })
+
     return classNames
 }
 
