@@ -4,8 +4,10 @@ import { UnistylesRuntime } from './runtime'
 class UnistylesListenerBuilder {
     private isInitialized = false
     private listeners = Array.from({ length: Object.keys(UnistyleDependency).length / 2 }, () => new Set<VoidFunction>())
+    private stylesheetListeners = Array.from({ length: Object.keys(UnistyleDependency).length / 2 }, () => new Set<VoidFunction>())
 
     emitChange = (dependency: UnistyleDependency) => {
+        this.stylesheetListeners[dependency]?.forEach(listener => listener())
         this.listeners[dependency]?.forEach(listener => listener())
     }
 
@@ -26,6 +28,14 @@ class UnistylesListenerBuilder {
 
         return () => {
             dependencies.forEach(dependency => this.listeners[dependency]?.delete(listener))
+        }
+    }
+
+    addStylesheetListeners = (dependencies: Array<UnistyleDependency>, listener: VoidFunction) => {
+        dependencies.forEach(dependency => this.stylesheetListeners[dependency]?.add(listener))
+
+        return () => {
+            dependencies.forEach(dependency => this.stylesheetListeners[dependency]?.delete(listener))
         }
     }
 }

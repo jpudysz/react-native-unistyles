@@ -68,40 +68,4 @@ export const generateHash = (value: any) => {
     return `unistyles-${(hasher >>> 0).toString(36)}`
 }
 
-export const createDoubleMap = <TKey, TSecondKey, TValue>() => {
-    const map = new Map<TKey, Map<TSecondKey, TValue>>()
-
-    return {
-        get: (key: TKey, secondKey: TSecondKey) => {
-            const mapForKey = map.get(key)
-
-            if (!mapForKey) {
-                return undefined
-            }
-
-            return mapForKey.get(secondKey)
-        },
-        set: (key: TKey, secondKey: TSecondKey, value: TValue) => {
-            const mapForKey = map.get(key) ?? new Map<TSecondKey, TValue>()
-
-            map.set(key, mapForKey)
-            mapForKey.set(secondKey, value)
-        },
-        delete: (key: TKey, secondKey: TSecondKey) => {
-            const mapForKey = map.get(key)
-
-            if (!mapForKey) {
-                return
-            }
-
-            mapForKey.delete(secondKey)
-        },
-        forEach: (callback: (key: TKey, secondKey: TSecondKey, value: TValue) => void) => {
-            map.forEach((mapForKey, key) => {
-                mapForKey.forEach((value, secondKey) => {
-                    callback(key, secondKey, value)
-                })
-            })
-        }
-    }
-}
+export const hyphenate = (propertyName: string) => propertyName.replace(/[A-Z]/g, (m: string) => `-${m.toLowerCase()}`)

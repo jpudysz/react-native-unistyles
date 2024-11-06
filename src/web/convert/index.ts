@@ -2,16 +2,15 @@ import type { UnistylesValues } from '../../types'
 import { isPseudo } from './pseudo'
 import { getStyle } from './style'
 import { deepMergeObjects } from '../utils'
-import { getTransformStyle } from './transform'
-import { isBoxShadow, isTextShadow, isTransform } from './utils'
-import { getTextShadowStyle } from './textShadow'
-import { getBoxShadowStyle } from './boxShadow'
+import { getTransformStyle, getBoxShadow, getFilterStyle } from './object'
+import { isShadow, isFilter, isTextShadow, isTransform, isBoxShadow } from './utils'
+import { getTextShadowStyle, getBoxShadowStyle } from './shadow'
 
 export const convertUnistyles = (value: UnistylesValues) => {
     // Flag to mark if textShadow is already created
     let hasTextShadow = false
     // Flag to mark if boxShadow is already created
-    let hasBoxShadow = false
+    let hasShadow = false
 
     const stylesArray = Object.entries({
         ...value,
@@ -40,15 +39,23 @@ export const convertUnistyles = (value: UnistylesValues) => {
             return getTextShadowStyle(value)
         }
 
-        // Box shadow
-        if (isBoxShadow(unistylesKey)) {
-            if (hasBoxShadow) {
+        // RN shadows
+        if (isShadow(unistylesKey)) {
+            if (hasShadow) {
                 return []
             }
 
-            hasBoxShadow = true
+            hasShadow = true
 
             return getBoxShadowStyle(value)
+        }
+
+        if (isFilter(unistylesKey, unistylesValue)) {
+            return getFilterStyle(unistylesValue)
+        }
+
+        if (isBoxShadow(unistylesKey, unistylesValue)) {
+            return getBoxShadow(unistylesValue)
         }
 
         // Transforms
