@@ -98,7 +98,11 @@ export const getMediaQuery = (query: string) => {
 }
 
 export const extractUnistyleDependencies = (value: any) => {
+    if (!value) {
+        return []
+    }
+
     const dependencies: Array<UnistyleDependency> = keyInObject(value, 'uni__dependencies') ? value.uni__dependencies : []
 
-    return dependencies
+    return Array.isArray(dependencies) ? dependencies : []
 }

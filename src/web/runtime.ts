@@ -54,6 +54,10 @@ class UnistylesRuntimeBuilder {
         return WebContentSizeCategory.Unspecified
     }
 
+    get breakpoints() {
+        return UnistylesState.breakpoints ?? {}
+    }
+
     get breakpoint() {
         return UnistylesState.breakpoint
     }

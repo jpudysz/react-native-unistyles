@@ -1,17 +1,23 @@
 // based on react-native-web normalizer
 // https://github.com/necolas/react-native-web
 import normalizeColors from '@react-native/normalize-colors'
-import { BOX_SHADOW_STYLES, TEXT_SHADOW_STYLES, type AllShadow, type AllShadowKeys } from './types'
+import { BOX_SHADOW_STYLES, TEXT_SHADOW_STYLES, type AllShadow, type AllShadowKeys, type Filters } from './types'
+import type { TransformStyles } from '../../types/core'
+import type { BoxShadowValue } from 'react-native'
 
-export const isTransform = (key: string, value: any): value is Array<Record<string, any>> => key === 'transform' && Array.isArray(value)
+export const isTransform = (key: string, value: any): value is Array<TransformStyles> => key === 'transform' && Array.isArray(value)
 
 export const isTextShadow = (key: string) => TEXT_SHADOW_STYLES.includes(key as typeof TEXT_SHADOW_STYLES[number])
 
-export const isBoxShadow = (key: string) => BOX_SHADOW_STYLES.includes(key as typeof BOX_SHADOW_STYLES[number])
+export const isShadow = (key: string) => BOX_SHADOW_STYLES.includes(key as typeof BOX_SHADOW_STYLES[number])
 
-export const normalizeNumericValue = (value: number) => value ? `${value}px` : value
+export const isFilter = (key: string, value: any): value is Array<Filters> => key === 'filter' && Array.isArray(value)
 
-export const normalizeColor = (color: string, opacity: number = 1) => {
+export const isBoxShadow = (key: string, value: any): value is Array<BoxShadowValue> => key === 'boxShadow' && Array.isArray(value)
+
+export const normalizeNumericValue = (value: number | string) => value && typeof value === 'number' ? `${value}px` : value
+
+export const normalizeColor = (color: string, opacity = 1) => {
     // If the opacity is 1 there's no need to normalize the color
     if (opacity === 1) {
         return color

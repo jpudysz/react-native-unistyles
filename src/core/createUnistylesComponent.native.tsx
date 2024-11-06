@@ -1,13 +1,13 @@
-import React, { type ComponentProps, type ComponentType, useEffect, useRef, useState } from 'react'
+import React, { type ComponentType, useEffect, useRef, useState } from 'react'
 import type { UnistylesTheme } from '../types'
 import { StyleSheet, UnistyleDependency, UnistylesRuntime, type UnistylesStyleSheet } from '../specs'
-
-type Mappings<T extends ComponentType<any>> = (theme: UnistylesTheme) => Partial<Omit<ComponentProps<T>, typeof SUPPORTED_STYLE_PROPS[number]>>
+import type { PartialBy } from '../types/common'
 
 const SUPPORTED_STYLE_PROPS = ['style', 'contentContainerStyle'] as const
+type SupportedStyleProps = typeof SUPPORTED_STYLE_PROPS[number]
 
-export const createUnistylesComponent = <T extends ComponentType<any>>(Component: T, mappings: Mappings<T> = () => ({})) => {
-    return (props: ComponentProps<T>) => {
+export const createUnistylesComponent =<TProps extends Record<string, any>, TMappings extends Partial<Omit<TProps, SupportedStyleProps>>>(Component: ComponentType<TProps>, mappings?: (theme: UnistylesTheme) => TMappings) => {
+    return (props: PartialBy<TProps, keyof TMappings | SupportedStyleProps>) => {
         const [theme, setTheme] = useState<UnistylesTheme>(UnistylesRuntime.getTheme())
         const [, setRt] = useState(0)
         const stylesRef = useRef<Record<string, any>>({})
@@ -20,6 +20,7 @@ export const createUnistylesComponent = <T extends ComponentType<any>>(Component
                         console.error(`🦄 Unistyles: createUnistylesComponent requires ${propName} to be an object. Please check props for component: ${Component.displayName}`)
                     }
 
+                    // @ts-expect-error - this is hidden from TS
                     if (props[propName].__unistyles_name && !props[propName].__proto__?.getStyle) {
                         console.error(`🦄 Unistyles: createUnistylesComponent received style that is not bound. You likely used the spread operator on a Unistyle style. Please check props for component: ${Component.displayName}`)
                     }
@@ -34,7 +35,7 @@ export const createUnistylesComponent = <T extends ComponentType<any>>(Component
 
         useEffect(() => {
             const removeChangeListener = (StyleSheet as UnistylesStyleSheet).addChangeListener(dependencies => {
-                const componentDependencies = (props.style?.__proto__.uni__dependencies || mappings(theme).style?.__proto__.uni__dependencies) as Array<UnistyleDependency>
+                const componentDependencies = (props.style?.__proto__.uni__dependencies || mappings?.(theme).style?.__proto__.uni__dependencies) as Array<UnistyleDependency>
 
                 if (dependencies.includes(UnistyleDependency.Theme) && (!componentDependencies ||componentDependencies.includes(UnistyleDependency.Theme))) {
                     setTheme(UnistylesRuntime.getTheme())
@@ -44,6 +45,7 @@ export const createUnistylesComponent = <T extends ComponentType<any>>(Component
                         if (props?.[propName]) {
                             stylesRef.current = {
                                 ...stylesRef.current,
+                                // @ts-expect-error - this is hidden from TS
                                 [propName]: props[propName].__proto__?.getStyle() || props[propName]
                             }
                         }
@@ -62,16 +64,16 @@ export const createUnistylesComponent = <T extends ComponentType<any>>(Component
             }
         }, [])
 
-        const mergedProps = { ...mappings(theme) } as ComponentProps<T>
+        const mergedProps = mappings?.(theme) as Record<string, any>
 
         Object.keys(props).forEach(key => {
             if (key in mergedProps) {
-                mergedProps[key] = Object.assign(props[key], mergedProps[key])
+                mergedProps[key] = Object.assign(props[key as keyof typeof props], mergedProps[key])
 
                 return
             }
 
-            mergedProps[key] = props[key]
+            mergedProps[key] = props[key as keyof typeof props]
         })
 
         // override with Unistyles styles
@@ -83,6 +85,6 @@ export const createUnistylesComponent = <T extends ComponentType<any>>(Component
 
         isForcedRef.current = false
 
-        return <Component {...mergedProps} />
+        return <Component {...mergedProps as TProps} />
     }
 }
