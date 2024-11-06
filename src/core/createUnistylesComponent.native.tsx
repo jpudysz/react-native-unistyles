@@ -4,9 +4,10 @@ import { StyleSheet, UnistyleDependency, UnistylesRuntime, type UnistylesStyleSh
 import type { PartialBy } from '../types/common'
 
 const SUPPORTED_STYLE_PROPS = ['style', 'contentContainerStyle'] as const
+type SupportedStyleProps = typeof SUPPORTED_STYLE_PROPS[number]
 
-export const createUnistylesComponent =<TProps extends Record<string, any>, TMappings extends Partial<TProps>>(Component: ComponentType<TProps>, mappings?: (theme: UnistylesTheme) => TMappings) => {
-    return (props: PartialBy<TProps, keyof TMappings | typeof SUPPORTED_STYLE_PROPS[number]>) => {
+export const createUnistylesComponent =<TProps extends Record<string, any>, TMappings extends Partial<Omit<TProps, SupportedStyleProps>>>(Component: ComponentType<TProps>, mappings?: (theme: UnistylesTheme) => TMappings) => {
+    return (props: PartialBy<TProps, keyof TMappings | SupportedStyleProps>) => {
         const [theme, setTheme] = useState<UnistylesTheme>(UnistylesRuntime.getTheme())
         const [, setRt] = useState(0)
         const stylesRef = useRef<Record<string, any>>({})

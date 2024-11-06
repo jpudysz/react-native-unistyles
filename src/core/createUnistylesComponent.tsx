@@ -10,6 +10,8 @@ import { equal } from '../web/utils'
 const SUPPORTED_STYLE_PROPS = ['style', 'contentContainerStyle'] as const
 const ALL_DEPENDENCIES = Object.values(UnistyleDependency).filter((dependency): dependency is UnistyleDependency => typeof dependency === 'number')
 
+type SupportedStyleProps = typeof SUPPORTED_STYLE_PROPS[number]
+
 const useShadowRegistry = (style?: Record<string, any>) => {
     const [classNames, setClassNames] = useState<Array<string>>([])
     const [ref] = useState(document.createElement('div'))
@@ -34,8 +36,8 @@ const useShadowRegistry = (style?: Record<string, any>) => {
     return classNames
 }
 
-export const createUnistylesComponent = <TProps extends Record<string, any>, TMappings extends Partial<TProps>>(Component: ComponentType<TProps>, mappings?: (theme: UnistylesTheme) => TMappings) => {
-    return (props: PartialBy<TProps, keyof TMappings | typeof SUPPORTED_STYLE_PROPS[number]>) => {
+export const createUnistylesComponent = <TProps extends Record<string, any>, TMappings extends Partial<Omit<TProps, SupportedStyleProps>>>(Component: ComponentType<TProps>, mappings?: (theme: UnistylesTheme) => TMappings) => {
+    return (props: PartialBy<TProps, keyof TMappings | SupportedStyleProps>) => {
         const [mappingsProps, setMappingsProps] = useState(mappings?.(UnistylesRuntime.getTheme()))
         const styleClassNames = useShadowRegistry(props.style)
         const contentContainerStyleClassNames = useShadowRegistry(props.contentContainerStyle)
