@@ -14,9 +14,8 @@ import com.margelo.nitro.unistyles.HybridNativePlatformSpec
 
 @Suppress("KotlinJniMissingFunction")
 class UnistylesModule(reactContext: ReactApplicationContext): NativeTurboUnistylesSpec(reactContext), TurboModuleWithJSIBindings {
-    private val _hybridData by lazy {
-        initializeHybridData(reactContext)
-    }
+    @DoNotStrip
+    private var mHybridData: HybridData?
     private val _nativePlatform = NativePlatform()
 
     companion object {
@@ -24,7 +23,7 @@ class UnistylesModule(reactContext: ReactApplicationContext): NativeTurboUnistyl
     }
 
     init {
-        _hybridData
+        mHybridData = initializeHybridData(reactContext)
     }
 
     private fun initializeHybridData(reactContext: ReactApplicationContext): HybridData {

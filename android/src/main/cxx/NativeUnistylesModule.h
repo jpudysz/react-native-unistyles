@@ -31,7 +31,7 @@ struct UnistylesModule : public jni::HybridClass<UnistylesModule> {
         jni::alias_ref<JHybridNativePlatformSpec::javaobject> nativePlatform
     );
 
-    static jni::local_ref<BindingsInstallerHolder::javaobject> getBindingsInstaller(jni::alias_ref<UnistylesModule::jhybriddata> jThis);
+    static jni::local_ref<BindingsInstallerHolder::javaobject> getBindingsInstaller(jni::alias_ref<UnistylesModule::javaobject> jThis);
 
 private:
     std::shared_ptr<UIManager> _uiManager;

@@ -13,6 +13,8 @@
 /// apply from: '../nitrogen/generated/android/unistyles+autolinking.gradle'
 /// ```
 
+logger.warn("[NitroModules] 🔥 unistyles is boosted by nitro!")
+
 android {
   sourceSets {
     main {
