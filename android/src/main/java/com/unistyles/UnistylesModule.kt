@@ -1,6 +1,5 @@
 package com.unistyles
 
-import android.util.Log
 import com.facebook.fbreact.specs.NativeTurboUnistylesSpec
 import com.facebook.jni.HybridData
 import com.facebook.proguard.annotations.DoNotStrip
@@ -11,24 +10,17 @@ import com.facebook.react.turbomodule.core.interfaces.BindingsInstallerHolder
 import com.facebook.react.turbomodule.core.interfaces.TurboModuleWithJSIBindings
 import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.common.UIManagerType
+import com.margelo.nitro.unistyles.HybridNativePlatformSpec
 
+@Suppress("KotlinJniMissingFunction")
 class UnistylesModule(reactContext: ReactApplicationContext): NativeTurboUnistylesSpec(reactContext), TurboModuleWithJSIBindings {
     private val _hybridData by lazy {
         initializeHybridData(reactContext)
     }
+    private val _nativePlatform = NativePlatform()
 
     companion object {
         const val NAME = NativeTurboUnistylesSpec.NAME
-
-        init {
-            try {
-                System.loadLibrary("unistyles")
-            } catch (error: Throwable) {
-                Log.e(NAME, "Failed to load Unistyles C++ library! Is it properly linked?", error)
-
-                throw error
-            }
-        }
     }
 
     init {
@@ -41,12 +33,16 @@ class UnistylesModule(reactContext: ReactApplicationContext): NativeTurboUnistyl
         val fabricUIManager = UIManagerHelper.getUIManager(reactContext, UIManagerType.FABRIC) as? FabricUIManager
             ?: throw IllegalStateException("Unistyles: Fabric UI Manager is not available. Please follow installation guides.")
 
-        return initHybrid(runtimeExecutor, fabricUIManager)
+        return initHybrid(runtimeExecutor, fabricUIManager, _nativePlatform)
     }
 
     @DoNotStrip
     external override fun getBindingsInstaller(): BindingsInstallerHolder
 
     @DoNotStrip
-    private external fun initHybrid(runtimeExecutor: RuntimeExecutor, fabricUIManager: FabricUIManager): HybridData
+    private external fun initHybrid(
+        runtimeExecutor: RuntimeExecutor,
+        fabricUIManager: FabricUIManager,
+        nativePlatform: HybridNativePlatformSpec
+    ): HybridData
 }
