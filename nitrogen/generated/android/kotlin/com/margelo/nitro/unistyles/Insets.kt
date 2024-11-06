@@ -9,6 +9,7 @@ package com.margelo.nitro.unistyles
 
 import androidx.annotation.Keep
 import com.facebook.proguard.annotations.DoNotStrip
+import com.margelo.nitro.core.*
 
 /**
  * Represents the JavaScript object/struct "Insets".
