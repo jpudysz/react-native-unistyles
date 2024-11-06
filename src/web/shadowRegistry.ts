@@ -22,7 +22,7 @@ class UnistylesShadowRegistryBuilder {
     private timeoutMap = new Map<HTMLElement, NodeJS.Timeout>()
     private queuedResultMap = new Map<HTMLElement, Record<string, any>>()
 
-    add = (ref: any, _style?: Style | Array<Style>, _variants?: Record<string, any>, _args?: Array<any>) => {
+    add = (ref: any, _style?: Style | Array<Style>, _variants?: Record<string, any>, _args?: Array<any>) => new Promise<Array<string>>(resolve => {
         // Style is not provided
         if (!_style) {
             return
@@ -122,6 +122,7 @@ class UnistylesShadowRegistryBuilder {
                 this.classNamesMap.set(ref, newClassNames)
                 // Add new classnames to the ref
                 ref.classList.add(...newClassNames)
+                resolve(newClassNames)
 
                 // If it is new hash add it to the map to use for the listener
                 if (!existingHash) {
@@ -151,7 +152,7 @@ class UnistylesShadowRegistryBuilder {
                 UnistylesRegistry.applyStyles(hash, convertUnistyles(resultWithVariants))
             })
         })
-    }
+    })
 
     remove = () => {}
 }
