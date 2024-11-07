@@ -16,7 +16,7 @@ import com.margelo.nitro.unistyles.HybridNativePlatformSpec
 class UnistylesModule(reactContext: ReactApplicationContext): NativeTurboUnistylesSpec(reactContext), TurboModuleWithJSIBindings {
     @DoNotStrip
     private var mHybridData: HybridData?
-    private val _nativePlatform = NativePlatform(reactContext)
+    private val _nativePlatform = NativePlatformAndroid(reactContext)
 
     companion object {
         const val NAME = NativeTurboUnistylesSpec.NAME
@@ -24,6 +24,10 @@ class UnistylesModule(reactContext: ReactApplicationContext): NativeTurboUnistyl
 
     init {
         mHybridData = initializeHybridData(reactContext)
+    }
+
+    override fun invalidate() {
+        _nativePlatform.invalidate()
     }
 
     private fun initializeHybridData(reactContext: ReactApplicationContext): HybridData {
