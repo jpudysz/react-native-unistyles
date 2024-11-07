@@ -93,7 +93,6 @@ void parser::Parser::rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_
             continue;
         }
 
-        // todo skip dynamic functions
         this->rebuildUnistyle(rt, styleSheet, unistyle, variants, std::nullopt);
     }
 }
