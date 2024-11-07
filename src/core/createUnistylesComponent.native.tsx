@@ -64,7 +64,7 @@ export const createUnistylesComponent =<TProps extends Record<string, any>, TMap
             }
         }, [])
 
-        const mergedProps = mappings?.(theme) as Record<string, any>
+        const mergedProps = mappings?.(theme) as Record<string, any> ?? {}
 
         Object.keys(props).forEach(key => {
             if (key in mergedProps) {
