@@ -10,10 +10,11 @@ import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsCompat
 import com.facebook.react.bridge.ReactApplicationContext
 import com.margelo.nitro.unistyles.Insets
+import com.margelo.nitro.unistyles.UnistyleDependency
 
 typealias CxxImeListener = () -> Unit
 
-class NativePlatformInsets(private val reactContext: ReactApplicationContext) {
+class NativePlatformInsets(private val reactContext: ReactApplicationContext, private val diffMiniRuntime: () -> Array<UnistyleDependency>) {
     private val _imeListeners: MutableList<CxxImeListener> = mutableListOf()
     private var _insets: Insets = Insets(0.0, 0.0, 0.0, 0.0, 0.0)
 
@@ -78,6 +79,8 @@ class NativePlatformInsets(private val reactContext: ReactApplicationContext) {
             insets.right.toDouble(),
             insetBottom.toDouble()
         )
+
+        diffMiniRuntime()
     }
 
     fun startInsetsListener() {
