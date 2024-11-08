@@ -23,6 +23,6 @@ void core::UnistylesMountHook::shadowTreeDidMount(RootShadowNode::Shared const &
     auto& registry = core::UnistylesRegistry::get();
 
     if (!registry.trafficController.shouldStop()) {
-        shadow::ShadowTreeManager::updateShadowTree(this->_unistylesRuntime->getRuntime());
+        shadow::ShadowTreeManager::updateShadowTree(this->_uiManager->getShadowTreeRegistry());
     }
 }
