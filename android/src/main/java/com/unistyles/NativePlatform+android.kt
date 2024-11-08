@@ -23,8 +23,8 @@ import com.margelo.nitro.unistyles.UnistylesNativeMiniRuntime
 import java.util.Locale
 
 class NativePlatformAndroid(private val reactContext: ReactApplicationContext): HybridNativePlatformSpec(), LifecycleEventListener {
-    private var _miniRuntime: UnistylesNativeMiniRuntime = buildMiniRuntime()
     private val _insets = NativePlatformInsets(reactContext)
+    private var _miniRuntime: UnistylesNativeMiniRuntime = buildMiniRuntime()
     private val _listener = NativePlatformListener(reactContext) { this.diffMiniRuntime() }
 
     init {
