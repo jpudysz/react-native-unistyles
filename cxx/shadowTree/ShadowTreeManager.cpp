@@ -6,13 +6,11 @@ using namespace facebook;
 
 using AffectedNodes = std::unordered_map<const ShadowNodeFamily*, std::unordered_set<int>>;
 
-void shadow::ShadowTreeManager::updateShadowTree(facebook::jsi::Runtime& rt) {
+void shadow::ShadowTreeManager::updateShadowTree(const ShadowTreeRegistry& shadowTreeRegistry) {
     auto& registry = core::UnistylesRegistry::get();
-    auto& uiManager = UIManagerBinding::getBinding(rt)->getUIManager();
-    const auto &shadowTreeRegistry = uiManager.getShadowTreeRegistry();
     auto updates = registry.trafficController.getUpdates();
 
-    if (updates.size() == 0) {
+    if (updates.empty()) {
         return;
     }
 

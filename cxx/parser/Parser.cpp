@@ -98,7 +98,7 @@ void parser::Parser::rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_
 }
 
 // rebuild all unistyles that are affected by platform event
-void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, DependencyMap& dependencyMap, std::vector<std::shared_ptr<core::StyleSheet>> styleSheets) {
+void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, DependencyMap& dependencyMap, std::vector<std::shared_ptr<core::StyleSheet>>& styleSheets) {
     std::unordered_map<std::shared_ptr<StyleSheet>, jsi::Value> parsedStyleSheets{};
     std::unordered_map<std::shared_ptr<core::Unistyle>, bool> parsedUnistyles{};
 
@@ -120,7 +120,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
             auto& unistyle = unistyleData->unistyle;
 
             // for RN styles or inline styles, compute styles only once
-            if (unistyle->styleKey == helpers::EXOTIC_STYLE_KEY.c_str()) {
+            if (unistyle->styleKey == helpers::EXOTIC_STYLE_KEY) {
                 if (!unistyleData->parsedStyle.has_value()) {
                     unistyleData->parsedStyle = jsi::Value(rt, unistyle->rawValue).asObject(rt);
 
@@ -205,10 +205,9 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleShee
 }
 
 // convert dependency map to shadow tree updates
-void parser::Parser::rebuildShadowLeafUpdates(core::DependencyMap& dependencyMap) {
+void parser::Parser::rebuildShadowLeafUpdates(jsi::Runtime& rt, core::DependencyMap& dependencyMap) {
     shadow::ShadowLeafUpdates updates;
     auto& registry = core::UnistylesRegistry::get();
-    auto& rt = this->_unistylesRuntime->getRuntime();
 
     for (const auto& [shadowNode, unistyles] : dependencyMap) {
         auto rawProps = this->parseStylesToShadowTreeStyles(rt, unistyles);
@@ -759,26 +758,6 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
             convertedStyles.setProperty(rt, propertyName.c_str(), propertyValue);
         });
     }
-
-    return jsi::dynamicFromValue(rt, std::move(convertedStyles));
-}
-
-folly::dynamic parser::Parser::parseUnistyleToShadowTreeStyles(jsi::Runtime& rt, const Unistyle::Shared unistyle) {
-    jsi::Object convertedStyles = jsi::Object(rt);
-    auto& state = core::UnistylesRegistry::get().getState(rt);
-
-    // can happen for exotic styles
-    if (!unistyle->parsedStyle.has_value()) {
-        return nullptr;
-    }
-
-    helpers::enumerateJSIObject(rt, unistyle->parsedStyle.value(), [&](const std::string& propertyName, jsi::Value& propertyValue){
-        if (this->isColor(propertyName)) {
-            return convertedStyles.setProperty(rt, propertyName.c_str(), jsi::Value(state.parseColor(propertyValue)));
-        }
-
-        convertedStyles.setProperty(rt, propertyName.c_str(), propertyValue);
-    });
 
     return jsi::dynamicFromValue(rt, std::move(convertedStyles));
 }

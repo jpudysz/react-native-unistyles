@@ -110,16 +110,6 @@ void core::UnistylesRegistry::unlinkShadowNodeWithUnistyles(jsi::Runtime& rt, co
     this->_shadowRegistry[&rt].erase(shadowNodeFamily);
 }
 
-core::Unistyle::Shared core::UnistylesRegistry::findUnistyleFromKey(jsi::Runtime& rt, std::string styleKey, int tag) {
-    auto targetStyleSheet = this->_styleSheetRegistry[&rt][tag];
-
-    if (targetStyleSheet == nullptr) {
-        return nullptr;
-    }
-
-    return targetStyleSheet.get()->unistyles[styleKey];
-}
-
 std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(jsi::Runtime& rt, int unid, core::StyleSheetType type, jsi::Object&& rawValue) {
     this->_styleSheetRegistry[&rt][unid] = std::make_shared<core::StyleSheet>(unid, type, std::move(rawValue));
 

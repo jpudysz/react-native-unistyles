@@ -49,7 +49,7 @@ jni::local_ref<BindingsInstallerHolder::javaobject> UnistylesModule::getBindings
         }
 
         auto runOnJSThread = [&runtimeExecutor](std::function<void(jsi::Runtime&)>&& callback) {
-            runtimeExecutor([&](jsi::Runtime &rt) {
+            runtimeExecutor([callback = std::move(callback)](jsi::Runtime &rt) {
                 callback(rt);
             });
         };

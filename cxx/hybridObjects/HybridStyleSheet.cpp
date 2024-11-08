@@ -15,7 +15,7 @@ double HybridStyleSheet::getUnid() {
 
 jsi::Value HybridStyleSheet::create(jsi::Runtime& rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
     if (count == 1) {
-        helpers::assertThat(rt, count == 2, "Unistyles is not initialized correctly. Please add babel plugin to your babel config.");
+        helpers::assertThat(rt, false, "Unistyles is not initialized correctly. Please add babel plugin to your babel config.");
     }
 
     // second argument is hidden, so validation is perfectly fine
@@ -128,7 +128,7 @@ void HybridStyleSheet::parseSettings(jsi::Runtime &rt, jsi::Object settings) {
 void HybridStyleSheet::parseBreakpoints(jsi::Runtime &rt, jsi::Object breakpoints){
     helpers::Breakpoints sortedBreakpoints = helpers::jsiBreakpointsToVecPairs(rt, std::move(breakpoints));
 
-    helpers::assertThat(rt, sortedBreakpoints.size() > 0, "StyleSheet.configure's breakpoints can't be empty.");
+    helpers::assertThat(rt, !sortedBreakpoints.empty(), "StyleSheet.configure's breakpoints can't be empty.");
     helpers::assertThat(rt, sortedBreakpoints.front().second == 0, "StyleSheet.configure's first breakpoint must start from 0.");
 
     auto& registry = core::UnistylesRegistry::get();
@@ -197,7 +197,7 @@ void HybridStyleSheet::verifyAndSelectTheme(jsi::Runtime &rt) {
 
 void HybridStyleSheet::setThemeFromColorScheme(jsi::Runtime& rt) {
     auto& state = core::UnistylesRegistry::get().getState(rt);
-    ColorScheme colorScheme = static_cast<ColorScheme>(this->_unistylesRuntime->getColorScheme());
+    auto colorScheme = static_cast<ColorScheme>(this->_unistylesRuntime->getColorScheme());
 
     switch (colorScheme) {
         case ColorScheme::LIGHT:
@@ -232,7 +232,7 @@ void HybridStyleSheet::loadExternalMethods(const jsi::Value& thisValue, jsi::Run
 void HybridStyleSheet::registerHooks(jsi::Runtime& rt) {
     // cleanup Shadow updates
     core::UnistylesRegistry::get().trafficController.restore();
-    
+
     this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(this->_uiManager);
     this->_unistylesMountHook = std::make_shared<core::UnistylesMountHook>(this->_uiManager, this->_unistylesRuntime);
 }
@@ -248,20 +248,20 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
         auto dependencies = std::move(unistylesDependencies);
 
         // re-compute new breakpoint
-        auto dimensionsIt = std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::DIMENSIONS);
+        auto dimensionsIt = std::find(unistylesDependencies.begin(), unistylesDependencies.end(), UnistyleDependency::DIMENSIONS);
 
-        if (dimensionsIt != dependencies.end()) {
+        if (dimensionsIt != unistylesDependencies.end()) {
             registry.getState(rt).computeCurrentBreakpoint(this->_unistylesRuntime->getScreen().width);
         }
 
         // check if color scheme changed and then if Unistyles state depend on it (adaptive themes)
-        auto colorSchemeIt = std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::COLORSCHEME);
-        auto hasNewColorScheme = colorSchemeIt != dependencies.end();
+        auto colorSchemeIt = std::find(unistylesDependencies.begin(), unistylesDependencies.end(), UnistyleDependency::COLORSCHEME);
+        auto hasNewColorScheme = colorSchemeIt != unistylesDependencies.end();
 
         // in a later step, we will rebuild only Unistyles with mounted StyleSheets
         // however, user may have StyleSheets with components that haven't mounted yet
         // we need to rebuild all dependent StyleSheets as well
-        auto dependentStyleSheets = registry.getStyleSheetsToRefresh(rt, hasNewColorScheme, dependencies.size() > 1);
+        auto dependentStyleSheets = registry.getStyleSheetsToRefresh(rt, hasNewColorScheme, unistylesDependencies.size() > 1);
 
         if (hasNewColorScheme) {
             this->_unistylesRuntime->includeDependenciesForColorSchemeChange(dependencies);
@@ -269,17 +269,17 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
 
         auto dependencyMap = registry.buildDependencyMap(rt, dependencies);
 
-        if (dependencyMap.size() == 0) {
+        if (dependencyMap.empty()) {
             this->notifyJSListeners(dependencies);
 
             return;
         }
 
         parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets);
-        parser.rebuildShadowLeafUpdates(dependencyMap);
-        
+        parser.rebuildShadowLeafUpdates(rt, dependencyMap);
+
         this->notifyJSListeners(dependencies);
-        shadow::ShadowTreeManager::updateShadowTree(rt);
+        shadow::ShadowTreeManager::updateShadowTree(UIManagerBinding::getBinding(rt)->getUIManager().getShadowTreeRegistry());
     });
 }
 
@@ -298,18 +298,21 @@ void HybridStyleSheet::onImeChange() {
 
         auto dependencyMap = registry.buildDependencyMap(rt, dependencies);
 
-        if (dependencyMap.size() == 0) {
+        if (dependencyMap.empty()) {
             return;
         }
+        
+        std::vector<std::shared_ptr<core::StyleSheet>> styleSheet;
 
-        parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, {});
-        parser.rebuildShadowLeafUpdates(dependencyMap);
-        shadow::ShadowTreeManager::updateShadowTree(rt);
+        parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, styleSheet);
+        parser.rebuildShadowLeafUpdates(rt, dependencyMap);
+
+        shadow::ShadowTreeManager::updateShadowTree(UIManagerBinding::getBinding(rt)->getUIManager().getShadowTreeRegistry());
     });
 }
 
 void HybridStyleSheet::notifyJSListeners(std::vector<UnistyleDependency>& dependencies) {
-    if (dependencies.size() > 0) {
+    if (!dependencies.empty()) {
         std::for_each(this->_changeListeners.begin(), this->_changeListeners.end(), [&](auto& listener){
             (*listener)(dependencies);
         });
