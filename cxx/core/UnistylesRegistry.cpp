@@ -108,6 +108,10 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
 
 void core::UnistylesRegistry::unlinkShadowNodeWithUnistyles(jsi::Runtime& rt, const ShadowNodeFamily* shadowNodeFamily) {
     this->_shadowRegistry[&rt].erase(shadowNodeFamily);
+
+    if (this->_shadowRegistry[&rt].empty()) {
+        this->_shadowRegistry.erase(&rt);
+    }
 }
 
 std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(jsi::Runtime& rt, int unid, core::StyleSheetType type, jsi::Object&& rawValue) {
@@ -156,11 +160,7 @@ void core::UnistylesRegistry::shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Uni
     for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
         for (const auto& unistyleData : unistyles) {
             if (unistyleData->unistyle == unistyle) {
-                auto propsToUpdate = parser.parseStylesToShadowTreeStyles(rt, {unistyleData});
-
-                if (propsToUpdate != nullptr) {
-                    updates[family] = propsToUpdate;
-                }
+                updates[family] = parser.parseStylesToShadowTreeStyles(rt, {unistyleData});
             }
         }
     }
