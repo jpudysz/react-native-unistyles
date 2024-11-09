@@ -32,17 +32,5 @@ set_target_properties(unistyles PROPERTIES
     POSITION_INDEPENDENT_CODE ON
 )
 
-# todo included by nitrogen
-# find_package(ReactAndroid REQUIRED CONFIG)
-# find_package(fbjni REQUIRED CONFIG)
-
-#if (ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
-#     target_link_libraries(unistyles ReactAndroid::reactnative)
-#else()
-#    target_link_libraries(unistyles
-#        ReactAndroid::turbomodulejsijni
-#        ReactAndroid::react_nativemodule_core
-#         android
-#        fbjni::fbjni
-#    )
-#endif()
+# For React Native 0.76 and above, we don't need to link anything
+# as NitroModules will automatically add ReactAndroid::reactnative prefab

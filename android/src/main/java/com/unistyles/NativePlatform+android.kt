@@ -135,16 +135,14 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
 
     override fun getStatusBarDimensions(): Dimensions {
         val screenWidth = getScreenDimensions().width
-        val pixelRatio = getPixelRatio()
 
-        return Dimensions(screenWidth, _insets.getInsets().top / pixelRatio)
+        return Dimensions(screenWidth, _insets.getInsets().top)
     }
 
     override fun getNavigationBarDimensions(): Dimensions {
         val screenWidth = getScreenDimensions().width
-        val pixelRatio = getPixelRatio()
 
-        return Dimensions(screenWidth, _insets.getInsets().bottom / pixelRatio)
+        return Dimensions(screenWidth, _insets.getInsets().bottom)
     }
 
     override fun getPrefersRtlDirection(): Boolean {
