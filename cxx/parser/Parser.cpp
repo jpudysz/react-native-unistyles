@@ -216,8 +216,6 @@ void parser::Parser::rebuildShadowLeafUpdates(jsi::Runtime& rt, core::Dependency
     }
 
     registry.trafficController.setUpdates(updates);
-
-    // this is required, we need to indicate that there are new changes
     registry.trafficController.resumeUnistylesTraffic();
 }
 
