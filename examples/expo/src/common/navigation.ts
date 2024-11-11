@@ -31,7 +31,8 @@ export enum DemoNames {
     UpdateTheme = 'UpdateThemeScreen',
     AndroidStatusBarNavigationBar = 'AndroidStatusBarNavigationBarScreen',
     Layout = 'LayoutScreen',
-    Keyboard = 'KeyboardScreen'
+    Keyboard = 'KeyboardScreen',
+    TwoThemesWithProvider = 'TwoThemesWithProvider',
 }
 
 export type DemoStackParams = {
@@ -66,6 +67,7 @@ export type DemoStackParams = {
     [DemoNames.AndroidStatusBarNavigationBar]: undefined,
     [DemoNames.Layout]: undefined,
     [DemoNames.Keyboard]: undefined
+    [DemoNames.TwoThemesWithProvider]: undefined,
 }
 
 export type NavigationProps<S extends DemoNames = DemoNames.Home> = NavigationProp<DemoStackParams, S>

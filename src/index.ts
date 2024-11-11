@@ -6,7 +6,7 @@ import type { UnistylesThemes, UnistylesBreakpoints } from './global'
 import { ScreenOrientation, AndroidContentSizeCategory, IOSContentSizeCategory } from './common'
 import { useStyles } from './useStyles'
 import { createStyleSheet } from './createStyleSheet'
-
+import { UnistylesProvider } from './context'
 /**
  * Utility to interact with the Unistyles
  * (should be called only once)
@@ -40,7 +40,8 @@ export {
     AndroidContentSizeCategory,
     IOSContentSizeCategory,
     UnistylesRegistry,
-    UnistylesRuntime
+    UnistylesRuntime,
+    UnistylesProvider
 }
 
 export type {
