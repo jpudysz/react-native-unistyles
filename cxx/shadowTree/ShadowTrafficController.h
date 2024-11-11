@@ -41,6 +41,14 @@ struct ShadowTrafficController {
             targetUpdates.emplace(pair.first, std::move(pair.second));
         });
     }
+    
+    inline void removeShadowNode(const ShadowNodeFamily* shadowNodeFamily) {
+        std::lock_guard<std::mutex> lock(_mutex);
+        
+        if (_unistylesUpdates.contains(shadowNodeFamily)) {
+            _unistylesUpdates.erase(shadowNodeFamily);
+        }
+    }
 
     inline void restore() {
         _unistylesUpdates = {};

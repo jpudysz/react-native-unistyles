@@ -78,10 +78,6 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
     auto parser = parser::Parser(nullptr);
     shadow::ShadowLeafUpdates updates;
 
-    if (!this->_shadowRegistry[&rt].contains(shadowNodeFamily)) {
-        this->_shadowRegistry[&rt][shadowNodeFamily] = {};
-    }
-
     std::for_each(unistyles.begin(), unistyles.end(), [&, this](Unistyle::Shared unistyle){
         this->_shadowRegistry[&rt][shadowNodeFamily].emplace_back(std::make_shared<UnistyleData>(unistyle, variants, arguments));
 
@@ -108,6 +104,7 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
 
 void core::UnistylesRegistry::unlinkShadowNodeWithUnistyles(jsi::Runtime& rt, const ShadowNodeFamily* shadowNodeFamily) {
     this->_shadowRegistry[&rt].erase(shadowNodeFamily);
+    this->trafficController.removeShadowNode(shadowNodeFamily);
 
     if (this->_shadowRegistry[&rt].empty()) {
         this->_shadowRegistry.erase(&rt);
@@ -160,7 +157,11 @@ void core::UnistylesRegistry::shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Uni
     for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
         for (const auto& unistyleData : unistyles) {
             if (unistyleData->unistyle == unistyle) {
-                updates[family] = parser.parseStylesToShadowTreeStyles(rt, {unistyleData});
+                auto rawProps = parser.parseStylesToShadowTreeStyles(rt, { unistyleData });
+
+                if (!rawProps.empty()) {
+                    updates[family] = rawProps;
+                }
             }
         }
     }
