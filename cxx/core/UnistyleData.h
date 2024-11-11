@@ -12,7 +12,7 @@ struct UnistyleData {
         : unistyle{unistyle}, variants(std::move(variants)), dynamicFunctionMetadata{std::move(arguments)} {}
 
     UnistyleData(const UnistyleData&) = delete;
-    UnistyleData(UnistyleData&& other): unistyle{other.unistyle}, variants(std::move(other.variants)) {}
+    UnistyleData(UnistyleData&& other) = delete;
 
     core::Unistyle::Shared unistyle;
     core::Variants variants;
