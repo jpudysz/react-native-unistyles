@@ -25,7 +25,7 @@ std::optional<std::string>& core::UnistylesState::getCurrentThemeName() {
 
 jsi::Object core::UnistylesState::getCurrentJSTheme() {
     auto hasSomeThemes = _registeredThemeNames.size() > 0;
-    
+
     if (!hasSomeThemes && !this->hasUserConfig) {
         helpers::assertThat(*_rt, false, "Unistyles: One of your stylesheets is trying to get the theme, but no theme has been selected yet. Did you forget to call StyleSheet.configure? If you called it, make sure you did so before any StyleSheet.create.");
     }
@@ -99,15 +99,18 @@ int core::UnistylesState::parseColor(jsi::Value& maybeColor) {
     if (!maybeColor.isString()) {
         return 0;
     }
-    
+
     auto colorString = maybeColor.asString(*_rt);
-    
+
     if (!this->_colorCache.contains(colorString.utf8(*_rt).c_str())) {
-        // we must convert it to uint32_t first, otherwise color will be broken
-        uint32_t color = this->_processColorFn.get()->call(*_rt, colorString).asNumber();
-        
+        #ifdef ANDROID
+            int color = this->_processColorFn.get()->call(*_rt, colorString).asNumber();
+        #else
+            uint32_t color = this->_processColorFn.get()->call(*_rt, colorString).asNumber();
+        #endif
+
         this->_colorCache[colorString.utf8(*_rt).c_str()] = color ? color : 0;
     }
-    
+
     return this->_colorCache[colorString.utf8(*_rt).c_str()];
 }

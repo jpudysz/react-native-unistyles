@@ -23,7 +23,7 @@ include_directories(
     ../cxx/shadowTree
 )
 
-string(APPEND CMAKE_CXX_FLAGS "-DFOLLY_NO_CONFIG")
+string(APPEND CMAKE_CXX_FLAGS "-DFOLLY_NO_CONFIG=1 -DFOLLY_CFG_NO_COROUTINES=1 -DFOLLY_MOBILE=1")
 
 set_target_properties(unistyles PROPERTIES
     CXX_STANDARD 20

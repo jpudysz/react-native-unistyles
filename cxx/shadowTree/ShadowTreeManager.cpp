@@ -109,9 +109,15 @@ ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode
             *shadowNode.getContextContainer()
         };
 
+        #ifdef ANDROID
+            auto newProps = folly::dynamic::merge(shadowNode.getProps()->rawProps, rawPropsIt->second);
+        #else
+            auto newProps = rawPropsIt->second;
+        #endif
+
         updatedProps = shadowNode
             .getComponentDescriptor()
-            .cloneProps(propsParserContext, shadowNode.getProps(), RawProps(rawPropsIt->second));
+            .cloneProps(propsParserContext, shadowNode.getProps(), RawProps(newProps));
     }
 
     return shadowNode.clone({
