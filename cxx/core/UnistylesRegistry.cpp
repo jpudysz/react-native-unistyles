@@ -87,11 +87,7 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
             for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
                 for (const auto& unistyleData : unistyles) {
                     if (unistyleData->unistyle == unistyle && family == shadowNodeFamily) {
-                        auto propsToUpdate = parser.parseStylesToShadowTreeStyles(rt, {unistyleData});
-
-                        if (propsToUpdate != nullptr) {
-                            updates[family] = propsToUpdate;
-                        }
+                        updates[family] = parser.parseStylesToShadowTreeStyles(rt, {unistyleData});
                     }
                 }
             }
@@ -157,11 +153,7 @@ void core::UnistylesRegistry::shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Uni
     for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
         for (const auto& unistyleData : unistyles) {
             if (unistyleData->unistyle == unistyle) {
-                auto rawProps = parser.parseStylesToShadowTreeStyles(rt, { unistyleData });
-
-                if (!rawProps.empty()) {
-                    updates[family] = rawProps;
-                }
+                updates[family] = parser.parseStylesToShadowTreeStyles(rt, { unistyleData });
             }
         }
     }
