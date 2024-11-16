@@ -46,7 +46,7 @@ export const createUnistylesComponent =<TProps extends Record<string, any>, TMap
                             stylesRef.current = {
                                 ...stylesRef.current,
                                 // @ts-expect-error - this is hidden from TS
-                                [propName]: props[propName].__proto__?.getStyle() || props[propName]
+                                [propName]: props[propName].__proto__?.getStyle?.() || props[propName]
                             }
                         }
                     })
