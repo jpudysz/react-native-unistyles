@@ -496,5 +496,57 @@ pluginTester({
                 )
             `
         },
+        {
+            title: 'Should correctly detect dependency from Array accessor',
+            code: `
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View style={styles.container}>
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: (headerColors, colorMap) => ({
+                        backgroundColor: headerColors[rt.colorScheme],
+                        paddingBottom: colorMap[theme.colors.primary]
+                    })
+                }))
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View
+                            style={[styles.container]}
+                            ref={ref => {
+                                UnistylesShadowRegistry.add(ref, styles.container, undefined, undefined)
+                                return () => UnistylesShadowRegistry.remove(ref)
+                            }}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    (theme, rt) => ({
+                        container: (headerColors, colorMap) => ({
+                            backgroundColor: headerColors[rt.colorScheme],
+                            paddingBottom: colorMap[theme.colors.primary],
+                            uni__dependencies: [5, 0]
+                        })
+                    }),
+                    276736056
+                )
+            `
+        },
     ]
 })

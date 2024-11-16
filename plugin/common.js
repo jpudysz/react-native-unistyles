@@ -1,5 +1,9 @@
 function getIdentifierNameFromExpression(t, memberExpression) {
     if (t.isMemberExpression(memberExpression)) {
+        if (memberExpression.computed) {
+            return getIdentifierNameFromExpression(t, memberExpression.property).flat()
+        }
+
         const object = memberExpression.object
 
         // If the object is an Identifier, return its name
@@ -96,7 +100,9 @@ function getSecondPropertyName(t, memberExpression) {
         return []
     }
 
-    let current = memberExpression
+    let current = memberExpression.computed
+        ? memberExpression.property
+        : memberExpression
     let propertyName = null
 
     while (t.isMemberExpression(current)) {
