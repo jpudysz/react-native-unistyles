@@ -110,7 +110,8 @@ ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode
         };
 
         #ifdef ANDROID
-            auto newProps = folly::dynamic::merge(shadowNode.getProps()->rawProps, rawPropsIt->second);
+            auto safeProps = rawPropsIt->second == nullptr ? folly::dynamic::object() : rawPropsIt->second;
+            auto newProps = folly::dynamic::merge(shadowNode.getProps()->rawProps, safeProps);
         #else
             auto newProps = rawPropsIt->second;
         #endif
