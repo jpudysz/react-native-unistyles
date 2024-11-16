@@ -58,17 +58,18 @@ class NativePlatformInsets(private val reactContext: ReactApplicationContext, pr
 
         // Android 10 and below - set bottom insets to 0 while keyboard is visible and use default bottom insets otherwise
         // Android 11 and above - animate bottom insets while keyboard is appearing and disappearing
-        val imeInsets = insetsCompat.getInsets(WindowInsetsCompat.Type.ime())
-        val insetBottom = when(imeInsets.bottom > 0) {
-            true -> {
-                if (Build.VERSION.SDK_INT >= 30 && animatedBottomInsets != null) {
-                    animatedBottomInsets
-                } else {
-                    0
-                }
-            }
-            else -> {
+        val imeInsets = if (Build.VERSION.SDK_INT >= 30) {
+            animatedBottomInsets ?: this._insets.ime
+        } else {
+            val nextBottomInset = insetsCompat.getInsets(WindowInsetsCompat.Type.ime()).bottom - insets.bottom
+
+            // call new IME event here, as for SDK >= 30 it's called in AnimationCallback
+            this@NativePlatformInsets.emitImeEvent()
+
+            if (nextBottomInset < 0) {
                 0
+            } else {
+                nextBottomInset
             }
         }
 
@@ -77,7 +78,7 @@ class NativePlatformInsets(private val reactContext: ReactApplicationContext, pr
             insets.bottom.toDouble(),
             insets.left.toDouble(),
             insets.right.toDouble(),
-            insetBottom.toDouble()
+            imeInsets.toDouble()
         )
 
         diffMiniRuntime()
@@ -97,32 +98,16 @@ class NativePlatformInsets(private val reactContext: ReactApplicationContext, pr
                     ViewCompat.setWindowInsetsAnimationCallback(
                         mainView,
                         object : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP) {
-                            var initialBottomInsets = 0.0
-                            var isGoingUp = false
-
-                            override fun onPrepare(animation: WindowInsetsAnimationCompat) {
-                                val insets = ViewCompat.getRootWindowInsets(mainView)
-                                val isKeyboardVisible = insets?.isVisible(WindowInsetsCompat.Type.ime()) ?: false
-
-                                if (!isKeyboardVisible) {
-                                    val density = reactContext.resources.displayMetrics.density
-
-                                    initialBottomInsets = this@NativePlatformInsets.getInsets().bottom * density
-                                }
-
-                                isGoingUp = !isKeyboardVisible
-                            }
-
                             override fun onProgress(
                                 insets: WindowInsetsCompat,
                                 runningAnimations: List<WindowInsetsAnimationCompat>
                             ): WindowInsetsCompat {
-                                runningAnimations.firstOrNull()?.let { animation ->
-                                    val progress = animation.fraction
-                                    val nextBottomInset = if (isGoingUp) {
-                                        initialBottomInsets - (progress * initialBottomInsets)
+                                runningAnimations.firstOrNull()?.let {
+                                    val bottomInset = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom.toDouble() - this@NativePlatformInsets._insets.bottom
+                                    val nextBottomInset = if (bottomInset < 0) {
+                                        0.0
                                     } else {
-                                        initialBottomInsets - (initialBottomInsets - (progress * initialBottomInsets))
+                                        bottomInset
                                     }
 
                                     this@NativePlatformInsets.setInsets(insets, activity.window, nextBottomInset)
