@@ -32,7 +32,6 @@ inline static Unistyle::Shared unistyleFromStaticStyleSheet(jsi::Runtime& rt, js
     return exoticUnistyle;
 }
 
-
 inline static std::vector<Unistyle::Shared> unistylesFromNonExistentNativeState(jsi::Runtime& rt, jsi::Object& value) {
     auto hasUnistyleName = value.hasProperty(rt, helpers::NAME_STYLE_KEY.c_str());
 
@@ -71,7 +70,7 @@ inline static jsi::Object generateUnistylesPrototype(
     auto hostFn = jsi::Function::createFromHostFunction(rt, jsi::PropNameID::forUtf8(rt, "getStyle"), 0, [unistyle, unistylesRuntime](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count){
         auto variants = helpers::variantsToPairs(rt, thisValue.asObject(rt).getProperty(rt, "variants").asObject(rt));
         auto arguments = helpers::parseDynamicFunctionArguments(rt, thisValue.asObject(rt).getProperty(rt, "arguments").asObject(rt).asArray(rt));
-        
+
         parser::Parser(unistylesRuntime).rebuildUnistyle(rt, unistyle->parent, unistyle, variants, std::make_optional<std::vector<folly::dynamic>>(arguments));
 
         return jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);

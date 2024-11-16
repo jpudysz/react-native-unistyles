@@ -21,6 +21,8 @@ struct ShadowTrafficController {
     }
 
     inline shadow::ShadowLeafUpdates& getUpdates() {
+        std::lock_guard<std::mutex> lock(_mutex);
+ 
         return _unistylesUpdates;
     }
 
@@ -51,6 +53,8 @@ struct ShadowTrafficController {
     }
 
     inline void restore() {
+        std::lock_guard<std::mutex> lock(_mutex);
+        
         _unistylesUpdates = {};
         _canCommit = false;
     }

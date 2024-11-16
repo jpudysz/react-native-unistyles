@@ -62,7 +62,7 @@ export const App = () => {
                     </View>
                 ))}
             </UniScrollView>
-            {/* <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6." style={styles.blurhash}  /> */}
+            <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6." style={styles.blurhash}  />
             <UniButton
                 title="Force re-render"
                 onPress={() => setCount(prevState =>  prevState + 1)}

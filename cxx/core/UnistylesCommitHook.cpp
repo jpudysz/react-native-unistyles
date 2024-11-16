@@ -31,7 +31,7 @@ RootShadowNode::Unshared core::UnistylesCommitHook::shadowTreeWillCommit(
     auto& registry = core::UnistylesRegistry::get();
     auto& shadowLeafUpdates = registry.trafficController.getUpdates();
 
-    // oops, not updates from Unistyles yet, skip it!
+    // oops, no updates from Unistyles yet, skip it!
     if (shadowLeafUpdates.size() == 0) {
         return newRootShadowNode;
     }
