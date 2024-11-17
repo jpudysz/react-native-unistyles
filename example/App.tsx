@@ -52,24 +52,20 @@ export const App = () => {
             <Typography isBold={false} size="small" value={2.22}>
                 Re-render count: {countRef.current++}
             </Typography>
-            {/* <UniScrollView */}
-            {/*     style={styles.scrollView} */}
-            {/*     contentContainerStyle={styles.contentContainerStyle} */}
-            {/* > */}
-            {/*     {Array.from({ length: 100 }).map((_, index) => ( */}
-            {/*         <View key={index}> */}
-            {/*             <Text style={{ ...index % 2 === 0 ? styles.text : {} }}>{index + 1}</Text> */}
-            {/*         </View> */}
-            {/*     ))} */}
-            {/* </UniScrollView> */}
+            <UniScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.contentContainerStyle}
+            >
+                {Array.from({ length: 20 }).map((_, index) => (
+                    <View key={index}>
+                        <Text style={{ ...index % 2 === 0 ? styles.text : {} }}>{index + 1}</Text>
+                    </View>
+                ))}
+            </UniScrollView>
             <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6." style={styles.blurhash}  />
             <UniButton
                 title="Force re-render"
-                onPress={() => {
-                    // UnistylesRuntime.setAdaptiveThemes(false)
-                    // UnistylesRuntime.setTheme('light')
-                    setCount(prevState =>  prevState + 1)
-                }}
+                onPress={() => setCount(prevState =>  prevState + 1)}
             />
             <TextInput style={styles.input} />
         </View>
@@ -83,7 +79,11 @@ const styles = StyleSheet.create((theme, rt) => ({
         justifyContent: 'flex-end',
         backgroundColor: theme.colors.backgroundColor,
         paddingHorizontal: theme.gap(2),
-        paddingBottom: rt.insets.ime
+        transform: [
+            {
+                translateY: rt.insets.ime * -1
+            }
+        ]
     },
     secondProp: {
         backgroundColor: theme.colors.backgroundColor
@@ -98,7 +98,7 @@ const styles = StyleSheet.create((theme, rt) => ({
         padding: theme.gap(2),
         borderRadius: theme.gap(1),
         borderColor: theme.colors.typography,
-        marginBottom: rt.insets.bottom
+        marginBottom: rt.insets.bottom + 10
     },
     animated: {
         width: 100,

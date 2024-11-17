@@ -63,34 +63,30 @@ class NativePlatformInsets(
 
         // Android 10 and below - set bottom insets to 0 while keyboard is visible and use default bottom insets otherwise
         // Android 11 and above - animate bottom insets while keyboard is appearing and disappearing
-        val imeInsets = if (animatedBottomInsets != null && Build.VERSION.SDK_INT >= 30) {
-            animatedBottomInsets
-        } else {
-            val nextBottomInset = insetsCompat.getInsets(WindowInsetsCompat.Type.ime()).bottom - insets.bottom
-
-            if (nextBottomInset < 0) {
-                0.0
-            } else {
-                nextBottomInset
+        val imeInsets = when {
+            animatedBottomInsets != null && Build.VERSION.SDK_INT >= 30 -> animatedBottomInsets
+            Build.VERSION.SDK_INT < 30 -> {
+                val nextBottomInset = insetsCompat.getInsets(WindowInsetsCompat.Type.ime()).bottom - insets.bottom
+                maxOf(nextBottomInset, 0).toDouble()
             }
+            else -> 0.0
         }
 
-        val shouldEmitImeEvent = Build.VERSION.SDK_INT < 30 && imeInsets != this._insets.ime
+        val shouldEmitImeEvent = Build.VERSION.SDK_INT < 30 && imeInsets != this._insets.ime || animatedBottomInsets != null && Build.VERSION.SDK_INT >= 30
 
         this._insets = Insets(
             statusBarTopInset.toDouble(),
             insets.bottom.toDouble(),
             insets.left.toDouble(),
             insets.right.toDouble(),
-            imeInsets.toDouble()
+            imeInsets
         )
 
+        diffMiniRuntime()
+
         if (shouldEmitImeEvent) {
-            // call new IME event here, as for SDK >= 30 it's called in AnimationCallback
             this@NativePlatformInsets.emitImeEvent(this.getMiniRuntime())
         }
-
-        diffMiniRuntime()
     }
 
     fun startInsetsListener() {
@@ -120,7 +116,6 @@ class NativePlatformInsets(
                                     }
 
                                     this@NativePlatformInsets.setInsets(insets, activity.window, nextBottomInset)
-                                    this@NativePlatformInsets.emitImeEvent(this@NativePlatformInsets.getMiniRuntime())
                                 }
 
                                 return insets
