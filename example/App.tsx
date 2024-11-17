@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import { Button, ScrollView, Text, TextInput, View } from 'react-native'
 import { Blurhash } from 'react-native-blurhash'
-import { createUnistylesComponent, StyleSheet, Display, Hide, mq } from 'react-native-unistyles'
+import { createUnistylesComponent, StyleSheet, Display, Hide, mq, UnistylesRuntime } from 'react-native-unistyles'
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
@@ -52,20 +52,24 @@ export const App = () => {
             <Typography isBold={false} size="small" value={2.22}>
                 Re-render count: {countRef.current++}
             </Typography>
-            <UniScrollView
-                style={styles.scrollView}
-                contentContainerStyle={styles.contentContainerStyle}
-            >
-                {Array.from({ length: 100 }).map((_, index) => (
-                    <View key={index}>
-                        <Text style={{ ...index % 2 === 0 ? styles.text : {} }}>{index + 1}</Text>
-                    </View>
-                ))}
-            </UniScrollView>
+            {/* <UniScrollView */}
+            {/*     style={styles.scrollView} */}
+            {/*     contentContainerStyle={styles.contentContainerStyle} */}
+            {/* > */}
+            {/*     {Array.from({ length: 100 }).map((_, index) => ( */}
+            {/*         <View key={index}> */}
+            {/*             <Text style={{ ...index % 2 === 0 ? styles.text : {} }}>{index + 1}</Text> */}
+            {/*         </View> */}
+            {/*     ))} */}
+            {/* </UniScrollView> */}
             <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6." style={styles.blurhash}  />
             <UniButton
                 title="Force re-render"
-                onPress={() => setCount(prevState =>  prevState + 1)}
+                onPress={() => {
+                    // UnistylesRuntime.setAdaptiveThemes(false)
+                    // UnistylesRuntime.setTheme('light')
+                    setCount(prevState =>  prevState + 1)
+                }}
             />
             <TextInput style={styles.input} />
         </View>
