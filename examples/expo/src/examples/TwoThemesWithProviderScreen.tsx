@@ -3,22 +3,14 @@ import { Text, View } from 'react-native'
 import { createStyleSheet, useStyles, UnistylesRuntime, useInitialTheme, UnistylesProvider } from 'react-native-unistyles'
 import { Button, DemoScreen } from '../components'
 
-export const TwoThemesWithProviderScreen: React.FunctionComponent = () => {
-    return (
-        <UnistylesProvider>
-            <TwoThemesWithProviderScreenContent />
-        </UnistylesProvider>
-    )
-}
-const TwoThemesWithProviderScreenContent: React.FunctionComponent = () => {
-    // if you have 2 or more themes, you need to select one of them
-    // keep in mind that everything is synchronous and so fast, that you can set it in the same screen 🔥
-    // two more notes:
-    // call it before useStyles
-    // if you won't do that you will get UNISTYLES_THEME_NOT_FOUND error
-    useInitialTheme('premium')
+export const TwoThemesWithProviderScreen: React.FunctionComponent = () => (
+    <UnistylesProvider>
+        <TwoThemesWithProviderScreenContent />
+    </UnistylesProvider>
+)
 
-    // you can also skip useInitialTheme and set the theme during UnistylesRegistry.addConfig({}) call
+const TwoThemesWithProviderScreenContent: React.FunctionComponent = () => {
+    useInitialTheme('premium')
 
     const { styles, theme } = useStyles(stylesheet)
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { NativeEventEmitter, NativeModules } from 'react-native'
 import type { UnistylesBreakpoints } from './global'
 import { unistyles } from './core'
 import type {
@@ -11,7 +12,6 @@ import type {
     UnistylesThemeEvent
 } from './types'
 import { UnistylesEventType } from './common'
-import { NativeEventEmitter, NativeModules } from 'react-native'
 
 export type TUnistylesContext = {
     plugins: Array<string>;
@@ -87,5 +87,9 @@ export const UnistylesProvider = ({ children }: { children: React.ReactNode }) =
         return subscription.remove
     }, [])
 
-    return <UnistylesContext.Provider value={{ theme, layout, plugins }}>{children}</UnistylesContext.Provider>
+    return (
+        <UnistylesContext.Provider value={{ theme, layout, plugins }}>
+            {children}
+        </UnistylesContext.Provider>
+    )
 }
