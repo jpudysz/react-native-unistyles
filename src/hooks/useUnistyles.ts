@@ -8,7 +8,7 @@ import { UnistylesContext } from '../context'
 const unistylesEvents = new NativeEventEmitter(NativeModules.Unistyles)
 
 export const useUnistyles = () => {
-    const unistylesContext = useContext(UnistylesContext);
+    const unistylesContext = useContext(UnistylesContext)
     const [plugins, setPlugins] = useState(unistyles.runtime.enabledPlugins)
     const [theme, setTheme] = useState(unistyles.registry.getTheme(unistyles.runtime.themeName))
     const [layout, setLayout] = useState({
@@ -70,7 +70,7 @@ export const useUnistyles = () => {
         )
 
         return subscription.remove
-    }, [])
+    }, [unistylesContext])
 
     if (unistylesContext !== undefined) {
         return {
@@ -79,7 +79,7 @@ export const useUnistyles = () => {
             layout: unistylesContext.layout
         }
     }
-    
+
     return {
         plugins,
         theme,
