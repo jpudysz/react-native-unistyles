@@ -286,18 +286,18 @@ public class HybridNativePlatformSpecCxx {
   }
   
   @inline(__always)
-  public func registerPlatformListener(callback: bridge.Func_void_std__vector_UnistyleDependency_) -> Void {
+  public func registerPlatformListener(callback: bridge.Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime) -> Void {
     do {
-      try self.__implementation.registerPlatformListener(callback: { () -> (([UnistyleDependency]) -> Void) in
-        let __sharedClosure = bridge.share_Func_void_std__vector_UnistyleDependency_(callback)
-        return { (__dependencies: [UnistyleDependency]) -> Void in
+      try self.__implementation.registerPlatformListener(callback: { () -> (([UnistyleDependency], UnistylesNativeMiniRuntime) -> Void) in
+        let __sharedClosure = bridge.share_Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime(callback)
+        return { (__dependencies: [UnistyleDependency], __miniRuntime: UnistylesNativeMiniRuntime) -> Void in
           __sharedClosure.pointee.call({ () -> bridge.std__vector_UnistyleDependency_ in
           var __vector = bridge.create_std__vector_UnistyleDependency_(__dependencies.count)
           for __item in __dependencies {
             __vector.push_back(__item)
           }
           return __vector
-        }())
+        }(), __miniRuntime)
         }
       }())
       return 
@@ -308,12 +308,12 @@ public class HybridNativePlatformSpecCxx {
   }
   
   @inline(__always)
-  public func registerImeListener(callback: bridge.Func_void) -> Void {
+  public func registerImeListener(callback: bridge.Func_void_UnistylesNativeMiniRuntime) -> Void {
     do {
-      try self.__implementation.registerImeListener(callback: { () -> (() -> Void) in
-        let __sharedClosure = bridge.share_Func_void(callback)
-        return { () -> Void in
-          __sharedClosure.pointee.call()
+      try self.__implementation.registerImeListener(callback: { () -> ((UnistylesNativeMiniRuntime) -> Void) in
+        let __sharedClosure = bridge.share_Func_void_UnistylesNativeMiniRuntime(callback)
+        return { (__miniRuntime: UnistylesNativeMiniRuntime) -> Void in
+          __sharedClosure.pointee.call(__miniRuntime)
         }
       }())
       return 

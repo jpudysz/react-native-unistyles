@@ -34,9 +34,9 @@ namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 #include <functional>
 #include <vector>
 #include "UnistyleDependency.hpp"
-#include "JFunc_void_std__vector_UnistyleDependency_.hpp"
+#include "JFunc_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime.hpp"
 #include "JUnistyleDependency.hpp"
-#include "JFunc_void.hpp"
+#include "JFunc_void_UnistylesNativeMiniRuntime.hpp"
 
 namespace margelo::nitro::unistyles {
 
@@ -138,13 +138,13 @@ namespace margelo::nitro::unistyles {
     auto __result = method(_javaPart);
     return __result->toCpp();
   }
-  void JHybridNativePlatformSpec::registerPlatformListener(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>& callback) {
-    static const auto method = _javaPart->getClass()->getMethod<void(jni::alias_ref<JFunc_void_std__vector_UnistyleDependency_::javaobject> /* callback */)>("registerPlatformListener");
-    method(_javaPart, JFunc_void_std__vector_UnistyleDependency_::fromCpp(callback));
+  void JHybridNativePlatformSpec::registerPlatformListener(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>& callback) {
+    static const auto method = _javaPart->getClass()->getMethod<void(jni::alias_ref<JFunc_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime::javaobject> /* callback */)>("registerPlatformListener");
+    method(_javaPart, JFunc_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime::fromCpp(callback));
   }
-  void JHybridNativePlatformSpec::registerImeListener(const std::function<void()>& callback) {
-    static const auto method = _javaPart->getClass()->getMethod<void(jni::alias_ref<JFunc_void::javaobject> /* callback */)>("registerImeListener");
-    method(_javaPart, JFunc_void::fromCpp(callback));
+  void JHybridNativePlatformSpec::registerImeListener(const std::function<void(const UnistylesNativeMiniRuntime& /* miniRuntime */)>& callback) {
+    static const auto method = _javaPart->getClass()->getMethod<void(jni::alias_ref<JFunc_void_UnistylesNativeMiniRuntime::javaobject> /* callback */)>("registerImeListener");
+    method(_javaPart, JFunc_void_UnistylesNativeMiniRuntime::fromCpp(callback));
   }
   void JHybridNativePlatformSpec::unregisterPlatformListeners() {
     static const auto method = _javaPart->getClass()->getMethod<void()>("unregisterPlatformListeners");

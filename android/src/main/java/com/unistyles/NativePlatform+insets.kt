@@ -11,10 +11,15 @@ import androidx.core.view.WindowInsetsCompat
 import com.facebook.react.bridge.ReactApplicationContext
 import com.margelo.nitro.unistyles.Insets
 import com.margelo.nitro.unistyles.UnistyleDependency
+import com.margelo.nitro.unistyles.UnistylesNativeMiniRuntime
 
-typealias CxxImeListener = () -> Unit
+typealias CxxImeListener = (miniRuntime: UnistylesNativeMiniRuntime) -> Unit
 
-class NativePlatformInsets(private val reactContext: ReactApplicationContext, private val diffMiniRuntime: () -> Array<UnistyleDependency>) {
+class NativePlatformInsets(
+    private val reactContext: ReactApplicationContext,
+    private val getMiniRuntime: () -> UnistylesNativeMiniRuntime,
+    private val diffMiniRuntime: () -> Array<UnistyleDependency>
+) {
     private val _imeListeners: MutableList<CxxImeListener> = mutableListOf()
     private var _insets: Insets = Insets(0.0, 0.0, 0.0, 0.0, 0.0)
 
@@ -58,30 +63,30 @@ class NativePlatformInsets(private val reactContext: ReactApplicationContext, pr
 
         // Android 10 and below - set bottom insets to 0 while keyboard is visible and use default bottom insets otherwise
         // Android 11 and above - animate bottom insets while keyboard is appearing and disappearing
-        val imeInsets = if (Build.VERSION.SDK_INT >= 30) {
-            animatedBottomInsets ?: this._insets.ime
-        } else {
-            val nextBottomInset = insetsCompat.getInsets(WindowInsetsCompat.Type.ime()).bottom - insets.bottom
-
-            // call new IME event here, as for SDK >= 30 it's called in AnimationCallback
-            this@NativePlatformInsets.emitImeEvent()
-
-            if (nextBottomInset < 0) {
-                0
-            } else {
-                nextBottomInset
+        val imeInsets = when {
+            animatedBottomInsets != null && Build.VERSION.SDK_INT >= 30 -> animatedBottomInsets
+            Build.VERSION.SDK_INT < 30 -> {
+                val nextBottomInset = insetsCompat.getInsets(WindowInsetsCompat.Type.ime()).bottom - insets.bottom
+                maxOf(nextBottomInset, 0).toDouble()
             }
+            else -> 0.0
         }
+
+        val shouldEmitImeEvent = Build.VERSION.SDK_INT < 30 && imeInsets != this._insets.ime || animatedBottomInsets != null && Build.VERSION.SDK_INT >= 30
 
         this._insets = Insets(
             statusBarTopInset.toDouble(),
             insets.bottom.toDouble(),
             insets.left.toDouble(),
             insets.right.toDouble(),
-            imeInsets.toDouble()
+            imeInsets
         )
 
         diffMiniRuntime()
+
+        if (shouldEmitImeEvent) {
+            this@NativePlatformInsets.emitImeEvent(this.getMiniRuntime())
+        }
     }
 
     fun startInsetsListener() {
@@ -111,7 +116,6 @@ class NativePlatformInsets(private val reactContext: ReactApplicationContext, pr
                                     }
 
                                     this@NativePlatformInsets.setInsets(insets, activity.window, nextBottomInset)
-                                    this@NativePlatformInsets.emitImeEvent()
                                 }
 
                                 return insets
@@ -123,9 +127,9 @@ class NativePlatformInsets(private val reactContext: ReactApplicationContext, pr
         }
     }
 
-    fun emitImeEvent() {
+    fun emitImeEvent(miniRuntime: UnistylesNativeMiniRuntime) {
         _imeListeners.forEach { listener ->
-            listener()
+            listener(miniRuntime)
         }
     }
 

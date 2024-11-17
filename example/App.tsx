@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import { Button, ScrollView, Text, TextInput, View } from 'react-native'
 import { Blurhash } from 'react-native-blurhash'
-import { createUnistylesComponent, StyleSheet, Display, Hide, mq } from 'react-native-unistyles'
+import { createUnistylesComponent, StyleSheet, Display, Hide, mq, UnistylesRuntime } from 'react-native-unistyles'
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
@@ -56,7 +56,7 @@ export const App = () => {
                 style={styles.scrollView}
                 contentContainerStyle={styles.contentContainerStyle}
             >
-                {Array.from({ length: 100 }).map((_, index) => (
+                {Array.from({ length: 20 }).map((_, index) => (
                     <View key={index}>
                         <Text style={{ ...index % 2 === 0 ? styles.text : {} }}>{index + 1}</Text>
                     </View>
@@ -79,7 +79,11 @@ const styles = StyleSheet.create((theme, rt) => ({
         justifyContent: 'flex-end',
         backgroundColor: theme.colors.backgroundColor,
         paddingHorizontal: theme.gap(2),
-        paddingBottom: rt.insets.ime
+        transform: [
+            {
+                translateY: rt.insets.ime * -1
+            }
+        ]
     },
     secondProp: {
         backgroundColor: theme.colors.backgroundColor
@@ -94,7 +98,7 @@ const styles = StyleSheet.create((theme, rt) => ({
         padding: theme.gap(2),
         borderRadius: theme.gap(1),
         borderColor: theme.colors.typography,
-        marginBottom: rt.insets.bottom
+        marginBottom: rt.insets.bottom + 10
     },
     animated: {
         width: 100,
