@@ -8,10 +8,15 @@ import android.os.Handler
 import android.os.Looper
 import com.facebook.react.bridge.ReactApplicationContext
 import com.margelo.nitro.unistyles.UnistyleDependency
+import com.margelo.nitro.unistyles.UnistylesNativeMiniRuntime
 
-typealias CxxDependencyListener = (dependencies: Array<UnistyleDependency>) -> Unit
+typealias CxxDependencyListener = (dependencies: Array<UnistyleDependency>, miniRuntime: UnistylesNativeMiniRuntime) -> Unit
 
-class NativePlatformListener(private val reactContext: ReactApplicationContext, private val diffMiniRuntime: () -> Array<UnistyleDependency>) {
+class NativePlatformListener(
+    private val reactContext: ReactApplicationContext,
+    private val getMiniRuntime: () -> UnistylesNativeMiniRuntime,
+    private val diffMiniRuntime: () -> Array<UnistyleDependency>
+) {
     private val _dependencyListeners: MutableList<CxxDependencyListener> = mutableListOf()
 
     private val configurationChangeReceiver = object : BroadcastReceiver() {
@@ -38,9 +43,9 @@ class NativePlatformListener(private val reactContext: ReactApplicationContext, 
         this._dependencyListeners.clear()
     }
 
-    private fun emitCxxEvent(dependencies: Array<UnistyleDependency>) {
+    private fun emitCxxEvent(dependencies: Array<UnistyleDependency>, miniRuntime: UnistylesNativeMiniRuntime) {
         this._dependencyListeners.forEach { listener ->
-            listener(dependencies)
+            listener(dependencies, miniRuntime)
         }
     }
 
@@ -48,7 +53,7 @@ class NativePlatformListener(private val reactContext: ReactApplicationContext, 
         val changedDependencies = diffMiniRuntime()
 
         if (changedDependencies.isNotEmpty()) {
-            emitCxxEvent(changedDependencies)
+            emitCxxEvent(changedDependencies, getMiniRuntime())
         }
     }
 }

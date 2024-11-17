@@ -111,22 +111,22 @@ abstract class HybridNativePlatformSpec: HybridObject() {
   
   @DoNotStrip
   @Keep
-  abstract fun registerPlatformListener(callback: (dependencies: Array<UnistyleDependency>) -> Unit): Unit
+  abstract fun registerPlatformListener(callback: (dependencies: Array<UnistyleDependency>, miniRuntime: UnistylesNativeMiniRuntime) -> Unit): Unit
   
   @DoNotStrip
   @Keep
-  private fun registerPlatformListener(callback: Func_void_std__vector_UnistyleDependency_): Unit {
+  private fun registerPlatformListener(callback: Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime): Unit {
     val __result = registerPlatformListener(callback.toLambda())
     return __result
   }
   
   @DoNotStrip
   @Keep
-  abstract fun registerImeListener(callback: () -> Unit): Unit
+  abstract fun registerImeListener(callback: (miniRuntime: UnistylesNativeMiniRuntime) -> Unit): Unit
   
   @DoNotStrip
   @Keep
-  private fun registerImeListener(callback: Func_void): Unit {
+  private fun registerImeListener(callback: Func_void_UnistylesNativeMiniRuntime): Unit {
     val __result = registerImeListener(callback.toLambda())
     return __result
   }

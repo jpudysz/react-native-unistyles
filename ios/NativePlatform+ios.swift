@@ -4,8 +4,8 @@ import Foundation
 import Combine
 import NitroModules
 
-typealias CxxDependencyListener = (Array<UnistyleDependency>) -> Void
-typealias CxxImeListener = () -> Void
+typealias CxxDependencyListener = (Array<UnistyleDependency>, UnistylesNativeMiniRuntime) -> Void
+typealias CxxImeListener = (UnistylesNativeMiniRuntime) -> Void
 
 class NativeIOSPlatform: HybridNativePlatformSpec {
     var miniRuntime: UnistylesNativeMiniRuntime?
