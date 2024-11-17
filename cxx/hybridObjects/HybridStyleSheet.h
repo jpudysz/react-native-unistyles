@@ -21,13 +21,16 @@ struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
             this->_unistylesRuntime->registerPlatformListener(
                   std::bind(&HybridStyleSheet::onPlatformDependenciesChange, this, std::placeholders::_1)
             );
+            this->_unistylesRuntime->registerNativePlatformListener(
+                  std::bind(&HybridStyleSheet::onPlatformNativeDependenciesChange, this, std::placeholders::_1, std::placeholders::_2)
+            );
             this->_unistylesRuntime->registerImeListener(
-                  std::bind(&HybridStyleSheet::onImeChange, this)
+                  std::bind(&HybridStyleSheet::onImeChange, this, std::placeholders::_1)
             );
       }
 
     ~HybridStyleSheet() {
-        this->_unistylesRuntime->unregisterPlatformListeners();
+        this->_unistylesRuntime->unregisterNativePlatformListeners();
     }
 
     jsi::Value create(jsi::Runtime& rt,
@@ -66,7 +69,8 @@ private:
     void loadExternalMethods(const jsi::Value& thisValue, jsi::Runtime& rt);
     void registerHooks(jsi::Runtime& rt);
     void onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies);
-    void onImeChange();
+    void onPlatformNativeDependenciesChange(std::vector<UnistyleDependency> dependencies, UnistylesNativeMiniRuntime miniRuntime);
+    void onImeChange(UnistylesNativeMiniRuntime miniRuntime);
     void notifyJSListeners(std::vector<UnistyleDependency>& dependencies);
 
     double __unid = -1;

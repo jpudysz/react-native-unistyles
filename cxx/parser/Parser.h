@@ -24,13 +24,13 @@ struct Parser {
     void buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
     void parseUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
     void rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, Variants& variants);
-    void rebuildUnistylesInDependencyMap(jsi::Runtime& rt, core::DependencyMap& dependencyMap, std::vector<std::shared_ptr<core::StyleSheet>>& styleSheets);
+    void rebuildUnistylesInDependencyMap(jsi::Runtime& rt, core::DependencyMap& dependencyMap, std::vector<std::shared_ptr<core::StyleSheet>>& styleSheets, std::optional<UnistylesNativeMiniRuntime> maybeMiniRuntime);
     void rebuildShadowLeafUpdates(jsi::Runtime& rt, core::DependencyMap& dependencyMap);
     folly::dynamic parseStylesToShadowTreeStyles(jsi::Runtime& rt, const std::vector<std::shared_ptr<UnistyleData>>& unistyles);
     void rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, Unistyle::Shared unistyle, const Variants& variants, std::optional<std::vector<folly::dynamic>>);
 
 private:
-    jsi::Object unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
+    jsi::Object unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, std::optional<UnistylesNativeMiniRuntime>);
     jsi::Object parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared unistyle, std::optional<Variants> variants);
     jsi::Value parseSecondLevel(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Value& nestedObject);
     jsi::Function createDynamicFunctionProxy(jsi::Runtime& rt, Unistyle::Shared unistyle);

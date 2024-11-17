@@ -9,7 +9,7 @@ using Variants = std::vector<std::pair<std::string, std::string>>;
 
 // called only once while processing StyleSheet.create
 void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet) {
-    jsi::Object unwrappedStyleSheet = this->unwrapStyleSheet(rt, styleSheet);
+    jsi::Object unwrappedStyleSheet = this->unwrapStyleSheet(rt, styleSheet, std::nullopt);
 
     helpers::enumerateJSIObject(rt, unwrappedStyleSheet, [&](const std::string& styleKey, jsi::Value& propertyValue){
         helpers::assertThat(rt, propertyValue.isObject(), "Unistyles: Style with name '" + styleKey + "' is not a function or object.");
@@ -36,7 +36,7 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
     });
 }
 
-jsi::Object parser::Parser::unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet) {
+jsi::Object parser::Parser::unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, std::optional<UnistylesNativeMiniRuntime> maybeMiniRuntime) {
     // firstly we need to get object representation of user's StyleSheet
     // StyleSheet can be a function or an object
 
@@ -58,7 +58,7 @@ jsi::Object parser::Parser::unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<S
 
     // stylesheet also has a mini runtime dependency
     // StyleSheetType::ThemableWithMiniRuntime
-    auto miniRuntime = this->_unistylesRuntime->getMiniRuntimeAsValue(rt);
+    auto miniRuntime = this->_unistylesRuntime->getMiniRuntimeAsValue(rt, maybeMiniRuntime);
 
     return styleSheet->rawValue
         .asFunction(rt)
@@ -98,13 +98,13 @@ void parser::Parser::rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_
 }
 
 // rebuild all unistyles that are affected by platform event
-void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, DependencyMap& dependencyMap, std::vector<std::shared_ptr<core::StyleSheet>>& styleSheets) {
+void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, DependencyMap& dependencyMap, std::vector<std::shared_ptr<core::StyleSheet>>& styleSheets, std::optional<UnistylesNativeMiniRuntime> maybeMiniRuntime) {
     std::unordered_map<std::shared_ptr<StyleSheet>, jsi::Value> parsedStyleSheets{};
     std::unordered_map<std::shared_ptr<core::Unistyle>, bool> parsedUnistyles{};
 
     // parse all stylesheets that depends on changes
     for (auto styleSheet : styleSheets) {
-        parsedStyleSheets.emplace(styleSheet, this->unwrapStyleSheet(rt, styleSheet));
+        parsedStyleSheets.emplace(styleSheet, this->unwrapStyleSheet(rt, styleSheet, maybeMiniRuntime));
     }
 
     // then parse all visible Unistyles managed by Unistyle
@@ -113,7 +113,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
 
         // stylesheet may be optional for exotic unistyles
         if (styleSheet != nullptr && !parsedStyleSheets.contains(styleSheet)) {
-            parsedStyleSheets.emplace(styleSheet, this->unwrapStyleSheet(rt, styleSheet));
+            parsedStyleSheets.emplace(styleSheet, this->unwrapStyleSheet(rt, styleSheet, maybeMiniRuntime));
         }
 
         for (auto& unistyleData : unistyles) {
@@ -137,7 +137,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
 
             // we may hit now other StyleSheets that are referenced from affected nodes
             if (unistyleStyleSheet != nullptr && !parsedStyleSheets.contains(unistyleStyleSheet)) {
-                parsedStyleSheets.emplace(unistyleStyleSheet, this->unwrapStyleSheet(rt, unistyleStyleSheet));
+                parsedStyleSheets.emplace(unistyleStyleSheet, this->unwrapStyleSheet(rt, unistyleStyleSheet, maybeMiniRuntime));
             }
 
             // StyleSheet might have styles that are not affected

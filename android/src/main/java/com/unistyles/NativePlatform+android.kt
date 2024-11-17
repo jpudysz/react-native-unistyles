@@ -23,9 +23,9 @@ import com.margelo.nitro.unistyles.UnistylesNativeMiniRuntime
 import java.util.Locale
 
 class NativePlatformAndroid(private val reactContext: ReactApplicationContext): HybridNativePlatformSpec(), LifecycleEventListener {
-    private val _insets = NativePlatformInsets(reactContext) { this.diffMiniRuntime() }
+    private val _insets = NativePlatformInsets(reactContext, this::getMiniRuntime) { this.diffMiniRuntime() }
     private var _miniRuntime: UnistylesNativeMiniRuntime = buildMiniRuntime()
-    private val _listener = NativePlatformListener(reactContext) { this.diffMiniRuntime() }
+    private val _listener = NativePlatformListener(reactContext, this::getMiniRuntime) { this.diffMiniRuntime() }
 
     init {
         reactContext.addLifecycleEventListener(this)
@@ -279,11 +279,11 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
         return changedDependencies
     }
 
-    override fun registerPlatformListener(callback: (dependencies: Array<UnistyleDependency>) -> Unit) {
+    override fun registerPlatformListener(callback: (dependencies: Array<UnistyleDependency>, miniRuntime: UnistylesNativeMiniRuntime) -> Unit) {
         this._listener.addPlatformListener(callback)
     }
 
-    override fun registerImeListener(callback: () -> Unit) {
+    override fun registerImeListener(callback: (miniRuntime: UnistylesNativeMiniRuntime) -> Unit) {
         this._insets.addImeListener(callback)
     }
 

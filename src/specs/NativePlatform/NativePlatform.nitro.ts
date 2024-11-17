@@ -59,7 +59,7 @@ export interface NativePlatform extends HybridObject<{ ios: 'swift', android: 'k
 
     // private
     getMiniRuntime(): UnistylesNativeMiniRuntime,
-    registerPlatformListener(callback: (dependencies: Array<UnistyleDependency>) => void): void,
-    registerImeListener(callback: () => void): void,
+    registerPlatformListener(callback: (dependencies: Array<UnistyleDependency>, miniRuntime: UnistylesNativeMiniRuntime) => void): void,
+    registerImeListener(callback: (miniRuntime: UnistylesNativeMiniRuntime) => void): void,
     unregisterPlatformListeners(): void
 }

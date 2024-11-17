@@ -56,8 +56,9 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     double getPixelRatio() override;
     double getFontScale() override;
     void registerPlatformListener(const std::function<void(std::vector<UnistyleDependency>)>& listener);
-    void registerImeListener(const std::function<void()>& listener);
-    void unregisterPlatformListeners();
+    void registerNativePlatformListener(const std::function<void(std::vector<UnistyleDependency>, UnistylesNativeMiniRuntime)>& listener);
+    void registerImeListener(const std::function<void(UnistylesNativeMiniRuntime)>& listener);
+    void unregisterNativePlatformListeners();
 
     void setTheme(const std::string &themeName) override;
     void setAdaptiveThemes(bool isEnabled) override;
@@ -66,7 +67,9 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     UnistylesCxxMiniRuntime getMiniRuntime() override;
     std::unordered_map<std::string, double> getBreakpoints() override;
 
-    jsi::Value getMiniRuntimeAsValue(jsi::Runtime& rt);
+    jsi::Runtime& getRuntime();
+    UnistylesCxxMiniRuntime buildMiniRuntimeFromNativeRuntime(UnistylesNativeMiniRuntime& nativeMiniRuntime);
+    jsi::Value getMiniRuntimeAsValue(jsi::Runtime& rt, std::optional<UnistylesNativeMiniRuntime> maybeMiniRuntime);
     void includeDependenciesForColorSchemeChange(std::vector<UnistyleDependency>& deps);
     void calculateNewThemeAndDependencies(std::vector<UnistyleDependency>& deps);
     std::function<void(std::function<void(jsi::Runtime&)>&&)> runOnJSThread;
@@ -77,6 +80,7 @@ private:
     std::shared_ptr<HybridStatusBar> _statusBar;
     Unistyles::HybridNativePlatformSpecCxx _nativePlatform;
     std::function<void(std::vector<UnistyleDependency>)> _onDependenciesChange;
+    std::function<void(std::vector<UnistyleDependency>, UnistylesNativeMiniRuntime)> _onNativeDependenciesChange;
 };
 
 }

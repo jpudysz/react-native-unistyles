@@ -140,10 +140,10 @@ namespace margelo::nitro::unistyles {
       auto __result = _swiftPart.getMiniRuntime();
       return __result;
     }
-    inline void registerPlatformListener(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>& callback) override {
+    inline void registerPlatformListener(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>& callback) override {
       _swiftPart.registerPlatformListener(callback);
     }
-    inline void registerImeListener(const std::function<void()>& callback) override {
+    inline void registerImeListener(const std::function<void(const UnistylesNativeMiniRuntime& /* miniRuntime */)>& callback) override {
       _swiftPart.registerImeListener(callback);
     }
     inline void unregisterPlatformListeners() override {
