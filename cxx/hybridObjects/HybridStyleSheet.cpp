@@ -242,7 +242,7 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
     if (dependencies.size() == 0) {
         return;
     }
-    
+
     auto& registry = core::UnistylesRegistry::get();
     auto& rt = this->_unistylesRuntime->getRuntime();
     auto parser = parser::Parser(this->_unistylesRuntime);
@@ -253,7 +253,7 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
 
         return;
     }
-    
+
     // in a later step, we will rebuild only Unistyles with mounted StyleSheets
     // however, user may have StyleSheets with components that haven't mounted yet
     // we need to rebuild all dependent StyleSheets as well
@@ -271,44 +271,46 @@ void HybridStyleSheet::onPlatformNativeDependenciesChange(std::vector<UnistyleDe
     if (dependencies.size() == 0 || this->_unistylesRuntime == nullptr) {
         return;
     }
-    
-    auto& registry = core::UnistylesRegistry::get();
-    auto& rt = this->_unistylesRuntime->getRuntime();
-    auto parser = parser::Parser(this->_unistylesRuntime);
-    
-    // re-compute new breakpoint
-    auto dimensionsIt = std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::DIMENSIONS);
 
-    if (dimensionsIt != dependencies.end()) {
-        registry.getState(rt).computeCurrentBreakpoint(this->_unistylesRuntime->getScreen().width);
-    }
-    
-    // check if color scheme changed and then if Unistyles state depend on it (adaptive themes)
-    auto colorSchemeIt = std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::COLORSCHEME);
-    auto hasNewColorScheme = colorSchemeIt != dependencies.end();
-    
-    if (hasNewColorScheme) {
-        this->_unistylesRuntime->includeDependenciesForColorSchemeChange(dependencies);
-    }
-    
-    auto dependencyMap = registry.buildDependencyMap(rt, dependencies);
+    this->_unistylesRuntime->runOnJSThread([this, dependencies, miniRuntime](jsi::Runtime& rt){
+        auto& registry = core::UnistylesRegistry::get();
+        auto parser = parser::Parser(this->_unistylesRuntime);
+        auto unistyleDependencies = std::move(dependencies);
 
-    if (dependencyMap.empty()) {
-        this->notifyJSListeners(dependencies);
+        // re-compute new breakpoint
+        auto dimensionsIt = std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::DIMENSIONS);
 
-        return;
-    }
-    
-    // in a later step, we will rebuild only Unistyles with mounted StyleSheets
-    // however, user may have StyleSheets with components that haven't mounted yet
-    // we need to rebuild all dependent StyleSheets as well
-    auto dependentStyleSheets = registry.getStyleSheetsToRefresh(rt, dependencies);
+        if (dimensionsIt != dependencies.end()) {
+            registry.getState(rt).computeCurrentBreakpoint(this->_unistylesRuntime->getScreen().width);
+        }
 
-    parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets, miniRuntime);
-    parser.rebuildShadowLeafUpdates(rt, dependencyMap);
+        // check if color scheme changed and then if Unistyles state depend on it (adaptive themes)
+        auto colorSchemeIt = std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::COLORSCHEME);
+        auto hasNewColorScheme = colorSchemeIt != dependencies.end();
 
-    this->notifyJSListeners(dependencies);
-    shadow::ShadowTreeManager::updateShadowTree(UIManagerBinding::getBinding(rt)->getUIManager().getShadowTreeRegistry());
+        if (hasNewColorScheme) {
+            this->_unistylesRuntime->includeDependenciesForColorSchemeChange(unistyleDependencies);
+        }
+
+        auto dependencyMap = registry.buildDependencyMap(rt, unistyleDependencies);
+
+        if (dependencyMap.empty()) {
+            this->notifyJSListeners(unistyleDependencies);
+
+            return;
+        }
+
+        // in a later step, we will rebuild only Unistyles with mounted StyleSheets
+        // however, user may have StyleSheets with components that haven't mounted yet
+        // we need to rebuild all dependent StyleSheets as well
+        auto dependentStyleSheets = registry.getStyleSheetsToRefresh(rt, unistyleDependencies);
+
+        parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets, miniRuntime);
+        parser.rebuildShadowLeafUpdates(rt, dependencyMap);
+
+        this->notifyJSListeners(unistyleDependencies);
+        shadow::ShadowTreeManager::updateShadowTree(UIManagerBinding::getBinding(rt)->getUIManager().getShadowTreeRegistry());
+    });
 }
 
 void HybridStyleSheet::onImeChange(UnistylesNativeMiniRuntime miniRuntime) {
@@ -324,10 +326,10 @@ void HybridStyleSheet::onImeChange(UnistylesNativeMiniRuntime miniRuntime) {
 
         if (dependencyMap.empty()) {
             this->notifyJSListeners(dependencies);
-            
+
             return;
         }
-        
+
         // we don't care about other unmounted stylesheets as their not visible
         // so user won't see any changes
         std::vector<std::shared_ptr<core::StyleSheet>> dependentStyleSheets;
