@@ -283,7 +283,11 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
     });
 }
 
-void HybridStyleSheet::onImeChange() {
+void HybridStyleSheet::onPlatformNativeDependenciesChange(std::vector<UnistyleDependency> dependencies, UnistylesNativeMiniRuntime miniRuntime) {
+    // todo
+}
+
+void HybridStyleSheet::onImeChange(UnistylesNativeMiniRuntime miniRuntime) {
     if (this->_unistylesRuntime == nullptr) {
         return;
     }

@@ -8,20 +8,33 @@
 #pragma once
 
 // Forward declarations of C++ defined types
+// Forward declaration of `ColorScheme` to properly resolve imports.
+namespace margelo::nitro::unistyles { enum class ColorScheme; }
+// Forward declaration of `Dimensions` to properly resolve imports.
+namespace margelo::nitro::unistyles { struct Dimensions; }
 // Forward declaration of `HybridNativePlatformSpec` to properly resolve imports.
 namespace margelo::nitro::unistyles { class HybridNativePlatformSpec; }
+// Forward declaration of `Insets` to properly resolve imports.
+namespace margelo::nitro::unistyles { struct Insets; }
 // Forward declaration of `UnistyleDependency` to properly resolve imports.
 namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
+// Forward declaration of `UnistylesNativeMiniRuntime` to properly resolve imports.
+namespace margelo::nitro::unistyles { struct UnistylesNativeMiniRuntime; }
 
 // Forward declarations of Swift defined types
 // Forward declaration of `HybridNativePlatformSpecCxx` to properly resolve imports.
 namespace Unistyles { class HybridNativePlatformSpecCxx; }
 
 // Include C++ defined types
+#include "ColorScheme.hpp"
+#include "Dimensions.hpp"
 #include "HybridNativePlatformSpec.hpp"
+#include "Insets.hpp"
 #include "UnistyleDependency.hpp"
+#include "UnistylesNativeMiniRuntime.hpp"
 #include <functional>
 #include <memory>
+#include <string>
 #include <vector>
 
 /**
@@ -41,60 +54,60 @@ namespace margelo::nitro::unistyles::bridge::swift {
     return vector;
   }
   
-  // pragma MARK: std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>
+  // pragma MARK: std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>
   /**
-   * Specialized version of `std::function<void(const std::vector<UnistyleDependency>&)>`.
+   * Specialized version of `std::function<void(const std::vector<UnistyleDependency>&, const UnistylesNativeMiniRuntime&)>`.
    */
-  using Func_void_std__vector_UnistyleDependency_ = std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>;
+  using Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime = std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>;
   /**
-   * Wrapper class for a `std::function<void(const std::vector<UnistyleDependency>& / * dependencies * /)>`, this can be used from Swift.
+   * Wrapper class for a `std::function<void(const std::vector<UnistyleDependency>& / * dependencies * /, const UnistylesNativeMiniRuntime& / * miniRuntime * /)>`, this can be used from Swift.
    */
-  class Func_void_std__vector_UnistyleDependency__Wrapper final {
+  class Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_Wrapper final {
   public:
-    explicit Func_void_std__vector_UnistyleDependency__Wrapper(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>& func): _function(func) {}
-    explicit Func_void_std__vector_UnistyleDependency__Wrapper(std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>&& func): _function(std::move(func)) {}
-    inline void call(std::vector<UnistyleDependency> dependencies) const {
-      _function(dependencies);
+    explicit Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_Wrapper(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>& func): _function(func) {}
+    explicit Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_Wrapper(std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>&& func): _function(std::move(func)) {}
+    inline void call(std::vector<UnistyleDependency> dependencies, UnistylesNativeMiniRuntime miniRuntime) const {
+      _function(dependencies, miniRuntime);
     }
   private:
-    std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)> _function;
+    std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)> _function;
   };
-  inline Func_void_std__vector_UnistyleDependency_ create_Func_void_std__vector_UnistyleDependency_(void* _Nonnull closureHolder, void(* _Nonnull call)(void* _Nonnull /* closureHolder */, std::vector<UnistyleDependency>), void(* _Nonnull destroy)(void* _Nonnull)) {
+  inline Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime create_Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime(void* _Nonnull closureHolder, void(* _Nonnull call)(void* _Nonnull /* closureHolder */, std::vector<UnistyleDependency>, UnistylesNativeMiniRuntime), void(* _Nonnull destroy)(void* _Nonnull)) {
     std::shared_ptr<void> sharedClosureHolder(closureHolder, destroy);
-    return Func_void_std__vector_UnistyleDependency_([sharedClosureHolder, call](const std::vector<UnistyleDependency>& dependencies) -> void {
-      call(sharedClosureHolder.get(), dependencies);
+    return Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime([sharedClosureHolder, call](const std::vector<UnistyleDependency>& dependencies, const UnistylesNativeMiniRuntime& miniRuntime) -> void {
+      call(sharedClosureHolder.get(), dependencies, miniRuntime);
     });
   }
-  inline std::shared_ptr<Func_void_std__vector_UnistyleDependency__Wrapper> share_Func_void_std__vector_UnistyleDependency_(const Func_void_std__vector_UnistyleDependency_& value) {
-    return std::make_shared<Func_void_std__vector_UnistyleDependency__Wrapper>(value);
+  inline std::shared_ptr<Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_Wrapper> share_Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime(const Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime& value) {
+    return std::make_shared<Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_Wrapper>(value);
   }
   
-  // pragma MARK: std::function<void()>
+  // pragma MARK: std::function<void(const UnistylesNativeMiniRuntime& /* miniRuntime */)>
   /**
-   * Specialized version of `std::function<void()>`.
+   * Specialized version of `std::function<void(const UnistylesNativeMiniRuntime&)>`.
    */
-  using Func_void = std::function<void()>;
+  using Func_void_UnistylesNativeMiniRuntime = std::function<void(const UnistylesNativeMiniRuntime& /* miniRuntime */)>;
   /**
-   * Wrapper class for a `std::function<void()>`, this can be used from Swift.
+   * Wrapper class for a `std::function<void(const UnistylesNativeMiniRuntime& / * miniRuntime * /)>`, this can be used from Swift.
    */
-  class Func_void_Wrapper final {
+  class Func_void_UnistylesNativeMiniRuntime_Wrapper final {
   public:
-    explicit Func_void_Wrapper(const std::function<void()>& func): _function(func) {}
-    explicit Func_void_Wrapper(std::function<void()>&& func): _function(std::move(func)) {}
-    inline void call() const {
-      _function();
+    explicit Func_void_UnistylesNativeMiniRuntime_Wrapper(const std::function<void(const UnistylesNativeMiniRuntime& /* miniRuntime */)>& func): _function(func) {}
+    explicit Func_void_UnistylesNativeMiniRuntime_Wrapper(std::function<void(const UnistylesNativeMiniRuntime& /* miniRuntime */)>&& func): _function(std::move(func)) {}
+    inline void call(UnistylesNativeMiniRuntime miniRuntime) const {
+      _function(miniRuntime);
     }
   private:
-    std::function<void()> _function;
+    std::function<void(const UnistylesNativeMiniRuntime& /* miniRuntime */)> _function;
   };
-  inline Func_void create_Func_void(void* _Nonnull closureHolder, void(* _Nonnull call)(void* _Nonnull /* closureHolder */), void(* _Nonnull destroy)(void* _Nonnull)) {
+  inline Func_void_UnistylesNativeMiniRuntime create_Func_void_UnistylesNativeMiniRuntime(void* _Nonnull closureHolder, void(* _Nonnull call)(void* _Nonnull /* closureHolder */, UnistylesNativeMiniRuntime), void(* _Nonnull destroy)(void* _Nonnull)) {
     std::shared_ptr<void> sharedClosureHolder(closureHolder, destroy);
-    return Func_void([sharedClosureHolder, call]() -> void {
-      call(sharedClosureHolder.get());
+    return Func_void_UnistylesNativeMiniRuntime([sharedClosureHolder, call](const UnistylesNativeMiniRuntime& miniRuntime) -> void {
+      call(sharedClosureHolder.get(), miniRuntime);
     });
   }
-  inline std::shared_ptr<Func_void_Wrapper> share_Func_void(const Func_void& value) {
-    return std::make_shared<Func_void_Wrapper>(value);
+  inline std::shared_ptr<Func_void_UnistylesNativeMiniRuntime_Wrapper> share_Func_void_UnistylesNativeMiniRuntime(const Func_void_UnistylesNativeMiniRuntime& value) {
+    return std::make_shared<Func_void_UnistylesNativeMiniRuntime_Wrapper>(value);
   }
   
   // pragma MARK: std::shared_ptr<margelo::nitro::unistyles::HybridNativePlatformSpec>

@@ -12,8 +12,8 @@
 #include <NitroModules/HybridObjectRegistry.hpp>
 
 #include "JHybridNativePlatformSpec.hpp"
-#include "JFunc_void_std__vector_UnistyleDependency_.hpp"
-#include "JFunc_void.hpp"
+#include "JFunc_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime.hpp"
+#include "JFunc_void_UnistylesNativeMiniRuntime.hpp"
 
 namespace margelo::nitro::unistyles {
 
@@ -25,8 +25,8 @@ int initialize(JavaVM* vm) {
   return facebook::jni::initialize(vm, [] {
     // Register native JNI methods
     margelo::nitro::unistyles::JHybridNativePlatformSpec::registerNatives();
-    margelo::nitro::unistyles::JFunc_void_std__vector_UnistyleDependency_::registerNatives();
-    margelo::nitro::unistyles::JFunc_void::registerNatives();
+    margelo::nitro::unistyles::JFunc_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime::registerNatives();
+    margelo::nitro::unistyles::JFunc_void_UnistylesNativeMiniRuntime::registerNatives();
 
     // Register Nitro Hybrid Objects
     

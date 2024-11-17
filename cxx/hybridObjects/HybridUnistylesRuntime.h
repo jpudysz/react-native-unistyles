@@ -56,8 +56,9 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     double getPixelRatio() override;
     double getFontScale() override;
     void registerPlatformListener(const std::function<void(std::vector<UnistyleDependency>)>& listener);
-    void registerImeListener(const std::function<void()>& listener);
-    void unregisterPlatformListeners();
+    void registerNativePlatformListener(const std::function<void(std::vector<UnistyleDependency>, UnistylesNativeMiniRuntime)>& listener);
+    void registerImeListener(const std::function<void(UnistylesNativeMiniRuntime)>& listener);
+    void unregisterNativePlatformListeners();
 
     void setTheme(const std::string &themeName) override;
     void setAdaptiveThemes(bool isEnabled) override;
@@ -77,6 +78,7 @@ private:
     std::shared_ptr<HybridStatusBar> _statusBar;
     Unistyles::HybridNativePlatformSpecCxx _nativePlatform;
     std::function<void(std::vector<UnistyleDependency>)> _onDependenciesChange;
+    std::function<void(std::vector<UnistyleDependency>, UnistylesNativeMiniRuntime)> _onNativeDependenciesChange;
 };
 
 }

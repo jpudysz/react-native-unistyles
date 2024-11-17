@@ -49,7 +49,7 @@ public protocol HybridNativePlatformSpec: AnyObject, HybridObjectSpec {
   func setStatusBarBackgroundColor(color: Double) throws -> Void
   func setImmersiveMode(isEnabled: Bool) throws -> Void
   func getMiniRuntime() throws -> UnistylesNativeMiniRuntime
-  func registerPlatformListener(callback: @escaping ((_ dependencies: [UnistyleDependency]) -> Void)) throws -> Void
-  func registerImeListener(callback: @escaping (() -> Void)) throws -> Void
+  func registerPlatformListener(callback: @escaping ((_ dependencies: [UnistyleDependency], _ miniRuntime: UnistylesNativeMiniRuntime) -> Void)) throws -> Void
+  func registerImeListener(callback: @escaping ((_ miniRuntime: UnistylesNativeMiniRuntime) -> Void)) throws -> Void
   func unregisterPlatformListeners() throws -> Void
 }

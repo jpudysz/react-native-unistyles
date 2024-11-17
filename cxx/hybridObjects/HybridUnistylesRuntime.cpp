@@ -228,16 +228,20 @@ jsi::Value HybridUnistylesRuntime::getMiniRuntimeAsValue(jsi::Runtime& rt) {
     return obj;
 }
 
-void HybridUnistylesRuntime::registerPlatformListener(const std::function<void(std::vector<UnistyleDependency>)>& listener) {
-    this->_nativePlatform.registerPlatformListener(listener);
+void HybridUnistylesRuntime::registerPlatformListener(const std::function<void (std::vector<UnistyleDependency>)>& listener) {
     this->_onDependenciesChange = listener;
 }
 
-void HybridUnistylesRuntime::registerImeListener(const std::function<void()>& listener) {
+void HybridUnistylesRuntime::registerNativePlatformListener(const std::function<void(std::vector<UnistyleDependency>, UnistylesNativeMiniRuntime)>& listener) {
+    this->_nativePlatform.registerPlatformListener(listener);
+    this->_onNativeDependenciesChange = listener;
+}
+
+void HybridUnistylesRuntime::registerImeListener(const std::function<void(UnistylesNativeMiniRuntime)>& listener) {
     this->_nativePlatform.registerImeListener(listener);
 }
 
-void HybridUnistylesRuntime::unregisterPlatformListeners() {
+void HybridUnistylesRuntime::unregisterNativePlatformListeners() {
     this->_nativePlatform.unregisterPlatformListeners();
 }
 

@@ -68,8 +68,8 @@ namespace margelo::nitro::unistyles {
     void setStatusBarBackgroundColor(double color) override;
     void setImmersiveMode(bool isEnabled) override;
     UnistylesNativeMiniRuntime getMiniRuntime() override;
-    void registerPlatformListener(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */)>& callback) override;
-    void registerImeListener(const std::function<void()>& callback) override;
+    void registerPlatformListener(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>& callback) override;
+    void registerImeListener(const std::function<void(const UnistylesNativeMiniRuntime& /* miniRuntime */)>& callback) override;
     void unregisterPlatformListeners() override;
 
   private:

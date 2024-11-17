@@ -20,16 +20,16 @@ extension NativeIOSPlatform {
         self.dependencyListeners.append(callback)
     }
 
-    func registerImeListener(callback: @escaping (() -> Void)) throws {
+    func registerImeListener(callback: @escaping ((UnistylesNativeMiniRuntime) -> Void)) throws {
         self.imeListeners.append(callback)
     }
 
-    func emitCxxEvent(dependencies: Array<UnistyleDependency>) {
-        self.dependencyListeners.forEach { $0(dependencies) }
+    func emitCxxEvent(dependencies: Array<UnistyleDependency>, updatedMiniRuntime: UnistylesNativeMiniRuntime) {
+        self.dependencyListeners.forEach { $0(dependencies, updatedMiniRuntime) }
     }
 
-    func emitImeEvent() {
-        self.imeListeners.forEach { $0() }
+    func emitImeEvent(updatedMiniRuntime: UnistylesNativeMiniRuntime) {
+        self.imeListeners.forEach { $0(updatedMiniRuntime) }
     }
     
     func unregisterPlatformListeners() {
@@ -48,7 +48,7 @@ extension NativeIOSPlatform {
 
         if (changedDependencies.count > 0) {
             self.miniRuntime = newMiniRuntime
-            self.emitCxxEvent(dependencies: changedDependencies)
+            self.emitCxxEvent(dependencies: changedDependencies, updatedMiniRuntime: newMiniRuntime)
         }
     }
 }

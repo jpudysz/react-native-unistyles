@@ -72,8 +72,8 @@ extension NativeIOSPlatform {
         // Interpolate between 'from' and 'to'
         keyboardAnimation.animatedImeInset = keyboardAnimation.from + (keyboardAnimation.to - keyboardAnimation.from) * CGFloat(easedProgress)
 
-        self.emitImeEvent()
         self.miniRuntime?.insets.ime = keyboardAnimation.animatedImeInset
+        self.emitImeEvent(updatedMiniRuntime: self.miniRuntime!)
 
         if linearProgress >= 1 {
             keyboardAnimation.displayLink?.invalidate()
