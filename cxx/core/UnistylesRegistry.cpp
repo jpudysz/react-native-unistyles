@@ -161,9 +161,15 @@ void core::UnistylesRegistry::shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Uni
     this->trafficController.setUpdates(updates);
 }
 
-std::vector<std::shared_ptr<core::StyleSheet>> core::UnistylesRegistry::getStyleSheetsToRefresh(jsi::Runtime& rt, bool themeDidChange, bool runtimeDidChange) {
+std::vector<std::shared_ptr<core::StyleSheet>> core::UnistylesRegistry::getStyleSheetsToRefresh(jsi::Runtime& rt, std::vector<UnistyleDependency>& unistylesDependencies) {
     std::vector<std::shared_ptr<core::StyleSheet>> stylesheetsToRefresh{};
-
+    auto themeDidChangeIt = std::find(unistylesDependencies.begin(),
+                                      unistylesDependencies.end(),
+                                      UnistyleDependency::THEME);
+    auto themeDidChange = themeDidChangeIt != unistylesDependencies.end();
+    auto runtimeDidChange = (themeDidChange && unistylesDependencies.size() > 1) || unistylesDependencies.size() > 0;
+    
+    // if nothing changed, skip further lookup
     if (!themeDidChange && !runtimeDidChange) {
         return stylesheetsToRefresh;
     }
@@ -173,10 +179,24 @@ std::vector<std::shared_ptr<core::StyleSheet>> core::UnistylesRegistry::getStyle
     std::for_each(styleSheets.begin(), styleSheets.end(), [&](std::pair<int, std::shared_ptr<core::StyleSheet>> pair){
         auto& [_, styleSheet] = pair;
 
-        if (styleSheet->type == StyleSheetType::ThemableWithMiniRuntime && (themeDidChange || runtimeDidChange)) {
-            stylesheetsToRefresh.emplace_back(styleSheet);
-
-            return;
+        if (styleSheet->type == StyleSheetType::ThemableWithMiniRuntime) {
+            for (const auto& unistylePair: styleSheet->unistyles) {
+                auto& [_, unistyle] = unistylePair;
+                
+                bool hasAnyOfDependencies = std::any_of(
+                    unistyle->dependencies.begin(),
+                    unistyle->dependencies.end(),
+                    [&unistylesDependencies](UnistyleDependency dep) {
+                        return std::find(unistylesDependencies.begin(), unistylesDependencies.end(), dep) != unistylesDependencies.end();
+                    }
+                );
+                
+                if (hasAnyOfDependencies) {
+                    stylesheetsToRefresh.emplace_back(styleSheet);
+                    
+                    return;
+                }
+            }
         }
 
         if (styleSheet->type == StyleSheetType::Themable && themeDidChange) {

@@ -67,7 +67,9 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     UnistylesCxxMiniRuntime getMiniRuntime() override;
     std::unordered_map<std::string, double> getBreakpoints() override;
 
-    jsi::Value getMiniRuntimeAsValue(jsi::Runtime& rt);
+    jsi::Runtime& getRuntime();
+    UnistylesCxxMiniRuntime buildMiniRuntimeFromNativeRuntime(UnistylesNativeMiniRuntime& nativeMiniRuntime);
+    jsi::Value getMiniRuntimeAsValue(jsi::Runtime& rt, std::optional<UnistylesNativeMiniRuntime> maybeMiniRuntime);
     void includeDependenciesForColorSchemeChange(std::vector<UnistyleDependency>& deps);
     void calculateNewThemeAndDependencies(std::vector<UnistyleDependency>& deps);
     std::function<void(std::function<void(jsi::Runtime&)>&&)> runOnJSThread;
