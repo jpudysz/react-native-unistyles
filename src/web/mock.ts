@@ -6,7 +6,6 @@ export const StatusBar: StatusBarSpec = {
     height: 0,
     setStyle: () => {},
     setHidden: () => {},
-    setBackgroundColor: () => {},
     equals: () => true,
     toString: () => 'StatusBar',
     __type: 'web',
@@ -17,8 +16,8 @@ export const NavigationBar: NavigationBarSpec = {
     width: 0,
     height: 0,
     setHidden: () => {},
-    setBackgroundColor: () => {},
     equals: () => true,
+    dispose: () => {},
     toString: () => 'NavigationBar',
     __type: 'web',
     name: 'NavigationBar'
