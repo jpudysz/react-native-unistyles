@@ -34,7 +34,7 @@ function arrayFromDynamicFunctionArgs(t, metadata) {
     const memberExpressions = metadata
         .map(meta => meta.dynamicFunction
             ? t.arrayExpression(meta.dynamicFunction.arguments)
-            : t.identifier('null'))
+            : t.arrayExpression([]))
         .filter(Boolean)
 
 

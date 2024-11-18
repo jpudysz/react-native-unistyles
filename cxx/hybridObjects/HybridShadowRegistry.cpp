@@ -14,12 +14,6 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     auto& registry = core::UnistylesRegistry::get();
     
     helpers::iterateJSIArray(rt, rawArguments, [&rt, &arguments](size_t index, jsi::Value& value){
-        if (value.isNull()) {
-            arguments.push_back({});
-            
-            return;
-        }
-        
         arguments.push_back(helpers::parseDynamicFunctionArguments(rt, value.asObject(rt).asArray(rt)));
     });
     
