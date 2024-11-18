@@ -1,3 +1,5 @@
+const { PRESSABLE_STATE_NAME } = require('./common')
+
 function getRefProp(t, path) {
     return path.node.openingElement.attributes.find(attr =>
         t.isJSXAttribute(attr) &&
@@ -32,15 +34,37 @@ function arrayExpressionFromMetadata(t, metadata) {
 
 function arrayFromDynamicFunctionArgs(t, metadata) {
     const memberExpressions = metadata
-        .map(meta => meta.dynamicFunction
-            ? t.arrayExpression(meta.dynamicFunction.arguments)
-            : t.arrayExpression([]))
-        .filter(Boolean)
+        .map(meta => {
+            if (meta.dynamicFunction && meta.dynamicFunction.arguments) {
+                const args = meta.dynamicFunction.arguments.map(arg => {
+                    // special case for pressable
+                    if (t.isIdentifier(arg) && arg.name === PRESSABLE_STATE_NAME) {
+                        // replace with { pressed: false }
+                        return t.objectExpression([
+                            t.objectProperty(
+                                t.identifier("pressed"),
+                                t.booleanLiteral(false)
+                            )
+                        ])
+                    }
 
+                    if (t.isMemberExpression(arg) && arg.object.name === PRESSABLE_STATE_NAME) {
+                        return t.identifier('false')
+                    }
+
+                    return arg
+                })
+
+                return t.arrayExpression(args)
+            }
+
+
+            return t.arrayExpression([])
+        })
+        .filter(Boolean)
 
     return t.arrayExpression(memberExpressions)
 }
-
 function addRef(t, path, metadata, state) {
     const hasVariants = state.file.hasVariants
 
