@@ -1,11 +1,11 @@
-import React, { useEffect, useState, type ComponentType, forwardRef } from 'react'
+import React, { useEffect, useState, type ComponentType, forwardRef, useRef, useMemo } from 'react'
 import type { UnistylesTheme } from '../types'
 import { UnistylesRuntime } from '../specs'
 import { UnistyleDependency } from '../specs/NativePlatform'
 import type { PartialBy } from '../types/common'
 import { UnistylesListener } from '../web/listener'
 import { UnistylesShadowRegistry } from '../web'
-import { deepMergeObjects } from '../web/utils'
+import { deepMergeObjects, equal } from '../web/utils'
 
 const SUPPORTED_STYLE_PROPS = ['style', 'contentContainerStyle'] as const
 const ALL_DEPENDENCIES = Object.values(UnistyleDependency).filter((dependency): dependency is UnistyleDependency => typeof dependency === 'number')
@@ -14,9 +14,22 @@ type SupportedStyleProps = typeof SUPPORTED_STYLE_PROPS[number]
 
 const useShadowRegistry = (style?: Record<string, any>) => {
     const [ref] = useState(document.createElement('div'))
-    const classNames = style
-        ? UnistylesShadowRegistry.add(ref, [style], undefined, []) ?? []
-        : []
+    const oldClassNames = useRef<Array<string>>([])
+    const classNames = useMemo(() => {
+        if (!style) {
+            return []
+        }
+
+        const newClassNames = UnistylesShadowRegistry.add(ref, [style], undefined, []) ?? []
+
+        if (equal(oldClassNames.current, newClassNames)) {
+            return oldClassNames.current
+        }
+
+        oldClassNames.current = newClassNames
+
+        return newClassNames
+    }, [style])
 
     useEffect(() => () => {
         // Remove styles on unmount
