@@ -5,7 +5,7 @@ import { UnistyleDependency } from '../specs/NativePlatform'
 import type { PartialBy } from '../types/common'
 import { UnistylesListener } from '../web/listener'
 import { UnistylesShadowRegistry } from '../web'
-import { equal } from '../web/utils'
+import { deepMergeObjects } from '../web/utils'
 
 const SUPPORTED_STYLE_PROPS = ['style', 'contentContainerStyle'] as const
 const ALL_DEPENDENCIES = Object.values(UnistyleDependency).filter((dependency): dependency is UnistyleDependency => typeof dependency === 'number')
@@ -13,24 +13,16 @@ const ALL_DEPENDENCIES = Object.values(UnistyleDependency).filter((dependency): 
 type SupportedStyleProps = typeof SUPPORTED_STYLE_PROPS[number]
 
 const useShadowRegistry = (style?: Record<string, any>) => {
-    const [classNames, setClassNames] = useState<Array<string>>([])
     const [ref] = useState(document.createElement('div'))
-
-    if (style) {
-        UnistylesShadowRegistry
-            .add(ref, style)
-            .then(newClassNames => {
-                if (equal(classNames, newClassNames)) {
-                    return
-                }
-
-                setClassNames(newClassNames)
-            })
-    }
+    const classNames = style
+        ? UnistylesShadowRegistry.add(ref, [style], undefined, []) ?? []
+        : []
 
     useEffect(() => () => {
         // Remove styles on unmount
-        UnistylesShadowRegistry.add(null, style)
+        if (style) {
+            UnistylesShadowRegistry.add(null, [style], undefined, [])
+        }
     })
 
     return classNames
@@ -58,8 +50,7 @@ export const createUnistylesComponent = <TProps extends Record<string, any>, TMa
         }, [mappingsProps, narrowedProps.style])
 
         const combinedProps = {
-            ...mappingsProps,
-            ...props,
+            ...deepMergeObjects(props, (mappingsProps ?? {}) as object),
             ...narrowedProps.style ? {
                 style: {
                     $$css: true,

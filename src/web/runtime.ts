@@ -5,7 +5,7 @@ import { WebContentSizeCategory } from '../types'
 import { UnistylesListener } from './listener'
 import { NavigationBar, StatusBar } from './mock'
 import { UnistylesState } from './state'
-import { hexToRGBA, isServer, schemeToTheme } from './utils'
+import { isServer, schemeToTheme } from './utils'
 
 class UnistylesRuntimeBuilder {
     lightMedia = this.getLightMedia()
@@ -47,6 +47,10 @@ class UnistylesRuntimeBuilder {
     }
 
     get themeName() {
+        if (UnistylesState.hasAdaptiveThemes) {
+            return schemeToTheme(this.colorScheme)
+        }
+
         return UnistylesState.themeName
     }
 
@@ -167,12 +171,12 @@ class UnistylesRuntimeBuilder {
         this.setTheme(schemeToTheme(UnistylesRuntime.colorScheme) as AppThemeName)
     }
 
-    setRootViewBackgroundColor = (hex: string, alpha?: number) => {
+    setRootViewBackgroundColor = (color: string) => {
         if (isServer()) {
             return
         }
 
-        document.documentElement.style.backgroundColor = alpha ? hexToRGBA(hex, alpha) : hex
+        document.documentElement.style.backgroundColor = color
     }
 
     setImmersiveMode = () => {}

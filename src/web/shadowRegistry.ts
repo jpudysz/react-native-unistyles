@@ -20,7 +20,7 @@ class UnistylesShadowRegistryBuilder {
     private hashMap = new Map<HTMLElement, string>()
     private classNamesMap = new Map<HTMLElement, Array<string>>()
 
-    add = (ref: any, _style: Array<Style>, _variants: Record<string, any> | undefined, _args: Array<Array<any>>) => new Promise<Array<string>>(resolve => {
+    add = (ref: any, _style: Array<Style>, _variants: Record<string, any> | undefined, _args: Array<Array<any>>) => {
         // Style is not provided
         if (!_style) {
             return
@@ -54,7 +54,7 @@ class UnistylesShadowRegistryBuilder {
             return
         }
 
-        const styles = _style.filter(style => Object.keys(style).some(key => key.startsWith('__uni__')))
+        const styles = _style.filter(style => Object.keys(style ?? {}).some(key => key.startsWith('__uni__')))
 
         // No unistyles
         if (styles.length === 0) {
@@ -129,13 +129,14 @@ class UnistylesShadowRegistryBuilder {
         this.classNamesMap.set(ref, newClassNames)
         // Add new classnames to the ref
         ref.classList.add(...newClassNames)
-        resolve(newClassNames)
 
         // If it is new hash add it to the map to use for the listener
         if (!existingHash) {
             this.hashMap.set(ref, hash)
         }
-    })
+
+        return newClassNames
+    }
 
     remove = () => {}
 }
