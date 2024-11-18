@@ -10,6 +10,7 @@
 #import <React/RCTScheduler.h>
 #import <React/RCTRuntimeExecutorModule.h>
 #import <ReactCommon/RCTRuntimeExecutor.h>
+#import <ReactCommon/RCTTurboModuleWithJSIBindings.h>
 
 @interface UnistylesModule: RCTEventEmitter<NativeTurboUnistylesSpec>
 @end
