@@ -7226,6 +7226,7 @@ __metadata:
     react: 18.3.1
     react-native: 0.76.1
     react-native-blurhash: 2.1.0
+    react-native-edge-to-edge: 1.1.2
     react-native-nitro-modules: 0.16.2
     react-native-reanimated: 3.16.1
     react-native-unistyles: "workspace:*"
@@ -12866,6 +12867,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-edge-to-edge@npm:1.1.2":
+  version: 1.1.2
+  resolution: "react-native-edge-to-edge@npm:1.1.2"
+  peerDependencies:
+    react: ">=18.2.0"
+    react-native: ">=0.73.0"
+  checksum: 8527538f5328287f89a6bb7492beb6425e68bf33f47067c879c1c5e1904568055837b5d80c8cd62ae55e409dee6190d39da20ad8923b588c2bb652bd76241800
+  languageName: node
+  linkType: hard
+
 "react-native-nitro-modules@npm:0.16.2, react-native-nitro-modules@npm:^0.16.2":
   version: 0.16.2
   resolution: "react-native-nitro-modules@npm:0.16.2"
@@ -12940,6 +12951,7 @@ __metadata:
     react: 18.3.1
     react-native: 0.76.0
     react-native-builder-bob: 0.30.2
+    react-native-edge-to-edge: 1.1.2
     react-native-nitro-modules: 0.16.2
     react-test-renderer: 18.3.1
     release-it: 17.10.0

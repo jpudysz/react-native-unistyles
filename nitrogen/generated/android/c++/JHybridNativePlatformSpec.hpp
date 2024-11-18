@@ -62,10 +62,8 @@ namespace margelo::nitro::unistyles {
     Dimensions getNavigationBarDimensions() override;
     bool getPrefersRtlDirection() override;
     void setRootViewBackgroundColor(double color) override;
-    void setNavigationBarBackgroundColor(double color) override;
     void setNavigationBarHidden(bool isHidden) override;
     void setStatusBarHidden(bool isHidden) override;
-    void setStatusBarBackgroundColor(double color) override;
     void setImmersiveMode(bool isEnabled) override;
     UnistylesNativeMiniRuntime getMiniRuntime() override;
     void registerPlatformListener(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>& callback) override;

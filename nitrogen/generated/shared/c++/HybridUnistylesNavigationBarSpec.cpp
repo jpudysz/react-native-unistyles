@@ -16,7 +16,6 @@ namespace margelo::nitro::unistyles {
     registerHybrids(this, [](Prototype& prototype) {
       prototype.registerHybridGetter("width", &HybridUnistylesNavigationBarSpec::getWidth);
       prototype.registerHybridGetter("height", &HybridUnistylesNavigationBarSpec::getHeight);
-      prototype.registerHybridMethod("setBackgroundColor", &HybridUnistylesNavigationBarSpec::setBackgroundColor);
       prototype.registerHybridMethod("setHidden", &HybridUnistylesNavigationBarSpec::setHidden);
     });
   }

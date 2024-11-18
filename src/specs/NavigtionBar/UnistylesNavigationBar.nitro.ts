@@ -5,6 +5,5 @@ export interface UnistylesNavigationBar extends HybridObject<{ ios: 'c++', andro
     readonly width: number,
     readonly height: number,
 
-    setBackgroundColor(color: number): void,
     setHidden(isHidden: boolean): void
 }

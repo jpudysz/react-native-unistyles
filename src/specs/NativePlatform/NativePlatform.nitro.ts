@@ -51,10 +51,8 @@ export interface NativePlatform extends HybridObject<{ ios: 'swift', android: 'k
     getPrefersRtlDirection(): boolean,
 
     setRootViewBackgroundColor(color: number): void,
-    setNavigationBarBackgroundColor?(color: number): void,
     setNavigationBarHidden?(isHidden: boolean): void,
     setStatusBarHidden(isHidden: boolean): void,
-    setStatusBarBackgroundColor?(color: number): void,
     setImmersiveMode(isEnabled: boolean): void,
 
     // private
