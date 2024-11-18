@@ -1,4 +1,4 @@
-import React, { useEffect, useState, type ComponentType } from 'react'
+import React, { useEffect, useState, type ComponentType, forwardRef } from 'react'
 import type { UnistylesTheme } from '../types'
 import { UnistylesRuntime } from '../specs'
 import { UnistyleDependency } from '../specs/NativePlatform'
@@ -37,10 +37,11 @@ const useShadowRegistry = (style?: Record<string, any>) => {
 }
 
 export const createUnistylesComponent = <TProps extends Record<string, any>, TMappings extends Partial<Omit<TProps, SupportedStyleProps>>>(Component: ComponentType<TProps>, mappings?: (theme: UnistylesTheme) => TMappings) => {
-    return (props: PartialBy<TProps, keyof TMappings | SupportedStyleProps>) => {
+    return forwardRef<unknown, PartialBy<TProps, keyof TMappings | SupportedStyleProps>>((props, ref) => {
+        const narrowedProps = props as PartialBy<TProps, keyof TMappings | SupportedStyleProps>
         const [mappingsProps, setMappingsProps] = useState(mappings?.(UnistylesRuntime.getTheme()))
-        const styleClassNames = useShadowRegistry(props.style)
-        const contentContainerStyleClassNames = useShadowRegistry(props.contentContainerStyle)
+        const styleClassNames = useShadowRegistry(narrowedProps.style)
+        const contentContainerStyleClassNames = useShadowRegistry(narrowedProps.contentContainerStyle)
 
         useEffect(() => {
             const disposeMappings = UnistylesListener.addListeners(ALL_DEPENDENCIES, () => {
@@ -54,18 +55,18 @@ export const createUnistylesComponent = <TProps extends Record<string, any>, TMa
             })
 
             return () => disposeMappings()
-        }, [mappingsProps, props.style])
+        }, [mappingsProps, narrowedProps.style])
 
         const combinedProps = {
             ...mappingsProps,
             ...props,
-            ...props.style ? {
+            ...narrowedProps.style ? {
                 style: {
                     $$css: true,
                     'unistyles': styleClassNames.join(' ')
                 },
             } : {},
-            ...props.contentContainerStyle ? {
+            ...narrowedProps.contentContainerStyle ? {
                 style: {
                     $$css: true,
                     'unistyles': contentContainerStyleClassNames.join(' ')
@@ -73,6 +74,6 @@ export const createUnistylesComponent = <TProps extends Record<string, any>, TMa
             } : {},
         } as unknown as TProps
 
-        return <Component {...combinedProps} />
-    }
+        return <Component {...combinedProps} ref={ref} />
+    })
 }

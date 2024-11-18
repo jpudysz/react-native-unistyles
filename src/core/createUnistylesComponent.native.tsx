@@ -1,4 +1,4 @@
-import React, { type ComponentType, useEffect, useRef, useState } from 'react'
+import React, { type ComponentType, forwardRef, useEffect, useRef, useState } from 'react'
 import type { UnistylesTheme } from '../types'
 import { StyleSheet, UnistyleDependency, UnistylesRuntime, type UnistylesStyleSheet } from '../specs'
 import type { PartialBy } from '../types/common'
@@ -6,8 +6,9 @@ import type { PartialBy } from '../types/common'
 const SUPPORTED_STYLE_PROPS = ['style', 'contentContainerStyle'] as const
 type SupportedStyleProps = typeof SUPPORTED_STYLE_PROPS[number]
 
-export const createUnistylesComponent =<TProps extends Record<string, any>, TMappings extends Partial<Omit<TProps, SupportedStyleProps>>>(Component: ComponentType<TProps>, mappings?: (theme: UnistylesTheme) => TMappings) => {
-    return (props: PartialBy<TProps, keyof TMappings | SupportedStyleProps>) => {
+export const createUnistylesComponent = <TProps extends Record<string, any>, TMappings extends Partial<Omit<TProps, SupportedStyleProps>>>(Component: ComponentType<TProps>, mappings?: (theme: UnistylesTheme) => TMappings) => {
+    return forwardRef<unknown, PartialBy<TProps, keyof TMappings | SupportedStyleProps>>((props, ref) => {
+        const narrowedProps = props as PartialBy<TProps, keyof TMappings | SupportedStyleProps>
         const [theme, setTheme] = useState<UnistylesTheme>(UnistylesRuntime.getTheme())
         const [, setRt] = useState(0)
         const stylesRef = useRef<Record<string, any>>({})
@@ -15,8 +16,8 @@ export const createUnistylesComponent =<TProps extends Record<string, any>, TMap
 
         if (!isForcedRef.current) {
             SUPPORTED_STYLE_PROPS.forEach(propName => {
-                if (props?.[propName]) {
-                    if (Array.isArray(props[propName])) {
+                if (narrowedProps?.[propName]) {
+                    if (Array.isArray(narrowedProps[propName])) {
                         console.error(`🦄 Unistyles: createUnistylesComponent requires ${propName} to be an object. Please check props for component: ${Component.displayName}`)
                     }
 
@@ -27,7 +28,7 @@ export const createUnistylesComponent =<TProps extends Record<string, any>, TMap
 
                     stylesRef.current = {
                         ...stylesRef.current,
-                        [propName]: props[propName]
+                        [propName]: narrowedProps[propName]
                     }
                 }
             })
@@ -35,14 +36,14 @@ export const createUnistylesComponent =<TProps extends Record<string, any>, TMap
 
         useEffect(() => {
             const removeChangeListener = (StyleSheet as UnistylesStyleSheet).addChangeListener(dependencies => {
-                const componentDependencies = (props.style?.__proto__.uni__dependencies || mappings?.(theme).style?.__proto__.uni__dependencies) as Array<UnistyleDependency>
+                const componentDependencies = (narrowedProps.style?.__proto__.uni__dependencies || mappings?.(theme).style?.__proto__.uni__dependencies) as Array<UnistyleDependency>
 
                 if (dependencies.includes(UnistyleDependency.Theme) && (!componentDependencies ||componentDependencies.includes(UnistyleDependency.Theme))) {
                     setTheme(UnistylesRuntime.getTheme())
 
                     // override with Unistyles styles
                     SUPPORTED_STYLE_PROPS.forEach(propName => {
-                        if (props?.[propName]) {
+                        if (narrowedProps?.[propName]) {
                             stylesRef.current = {
                                 ...stylesRef.current,
                                 // @ts-expect-error - this is hidden from TS
@@ -85,6 +86,6 @@ export const createUnistylesComponent =<TProps extends Record<string, any>, TMap
 
         isForcedRef.current = false
 
-        return <Component {...mergedProps as TProps} />
-    }
+        return <Component {...mergedProps as TProps} ref={ref} />
+    })
 }
