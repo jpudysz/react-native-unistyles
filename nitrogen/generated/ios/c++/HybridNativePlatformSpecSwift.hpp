@@ -121,17 +121,11 @@ namespace margelo::nitro::unistyles {
     inline void setRootViewBackgroundColor(double color) override {
       _swiftPart.setRootViewBackgroundColor(std::forward<decltype(color)>(color));
     }
-    inline void setNavigationBarBackgroundColor(double color) override {
-      _swiftPart.setNavigationBarBackgroundColor(std::forward<decltype(color)>(color));
-    }
     inline void setNavigationBarHidden(bool isHidden) override {
       _swiftPart.setNavigationBarHidden(std::forward<decltype(isHidden)>(isHidden));
     }
     inline void setStatusBarHidden(bool isHidden) override {
       _swiftPart.setStatusBarHidden(std::forward<decltype(isHidden)>(isHidden));
-    }
-    inline void setStatusBarBackgroundColor(double color) override {
-      _swiftPart.setStatusBarBackgroundColor(std::forward<decltype(color)>(color));
     }
     inline void setImmersiveMode(bool isEnabled) override {
       _swiftPart.setImmersiveMode(std::forward<decltype(isEnabled)>(isEnabled));

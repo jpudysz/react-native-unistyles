@@ -3,7 +3,7 @@ import { NitroModules } from 'react-native-nitro-modules'
 import type { UnistylesRuntime as UnistylesRuntimeSpec, UnistylesMiniRuntime } from './UnistylesRuntime.nitro'
 import type { AppBreakpoint, AppTheme, AppThemeName, Color, ColorScheme, Orientation } from '../types'
 import { attachStatusBarJSMethods, type UnistylesStatusBar } from '../StatusBar'
-import { attachNavigationBarJSMethods, type UnistylesNavigationBar } from '../NavigtionBar'
+import { type UnistylesNavigationBar } from '../NavigtionBar'
 import type { AndroidContentSizeCategory, IOSContentSizeCategory, UnistylesTheme } from '../../types'
 import { isIOS } from '../../common'
 import type { UnistylesThemes } from '../../global'
@@ -57,7 +57,6 @@ if (isIOS) {
 }
 
 attachStatusBarJSMethods(HybridUnistylesRuntime.statusBar)
-attachNavigationBarJSMethods(HybridUnistylesRuntime.navigationBar)
 
 export const Runtime = HybridUnistylesRuntime as UnistylesRuntime
 
