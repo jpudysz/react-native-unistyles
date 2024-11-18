@@ -8,7 +8,6 @@ import android.view.View
 import android.view.WindowManager
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.facebook.react.bridge.LifecycleEventListener
@@ -28,6 +27,7 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
     private val _listener = NativePlatformListener(reactContext, this::getMiniRuntime) { this.diffMiniRuntime() }
 
     init {
+        checkEdgeToEdge()
         reactContext.addLifecycleEventListener(this)
     }
 
@@ -37,7 +37,6 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
     }
 
     override fun onHostResume() {
-        enableEdgeToEdge()
         _insets.startInsetsListener()
     }
 
@@ -168,15 +167,6 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
         }
     }
 
-    @Suppress("DEPRECATION")
-    override fun setNavigationBarBackgroundColor(color: Double) {
-        reactContext.currentActivity?.let { activity ->
-            activity.runOnUiThread {
-                activity.window.navigationBarColor = color.toInt()
-            }
-        }
-    }
-
     override fun setNavigationBarHidden(isHidden: Boolean) {
         reactContext.currentActivity?.let { activity ->
             WindowInsetsControllerCompat(activity.window, activity.window.decorView).apply {
@@ -227,16 +217,6 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
                         }
                     }
                 }
-            }
-        }
-    }
-
-    @Suppress("DEPRECATION")
-    override fun setStatusBarBackgroundColor(color: Double) {
-        reactContext.currentActivity?.let { activity ->
-            activity.runOnUiThread {
-                activity.window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-                activity.window.statusBarColor = color.toInt()
             }
         }
     }
@@ -292,11 +272,14 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
         this._insets.removeImeListeners()
     }
 
-    private fun enableEdgeToEdge() {
-        reactContext.currentActivity?.let { activity ->
-            activity.runOnUiThread {
-                WindowCompat.setDecorFitsSystemWindows(activity.window, false)
-            }
+    private fun checkEdgeToEdge() {
+        // react-native-edge-to-edge will set setDecorFitsSystemWindows automatically
+        // if it's present we assume that edge-to-edge is enabled
+
+        try {
+            Class.forName("com.zoontek.rnedgetoedge.EdgeToEdgePackage")
+        } catch (exception: ClassNotFoundException) {
+            throw IllegalStateException("Unistyles: react-native-edge-to-edge is not installed.")
         }
     }
 }

@@ -25,10 +25,8 @@ namespace margelo::nitro::unistyles {
       prototype.registerHybridMethod("getNavigationBarDimensions", &HybridNativePlatformSpec::getNavigationBarDimensions);
       prototype.registerHybridMethod("getPrefersRtlDirection", &HybridNativePlatformSpec::getPrefersRtlDirection);
       prototype.registerHybridMethod("setRootViewBackgroundColor", &HybridNativePlatformSpec::setRootViewBackgroundColor);
-      prototype.registerHybridMethod("setNavigationBarBackgroundColor", &HybridNativePlatformSpec::setNavigationBarBackgroundColor);
       prototype.registerHybridMethod("setNavigationBarHidden", &HybridNativePlatformSpec::setNavigationBarHidden);
       prototype.registerHybridMethod("setStatusBarHidden", &HybridNativePlatformSpec::setStatusBarHidden);
-      prototype.registerHybridMethod("setStatusBarBackgroundColor", &HybridNativePlatformSpec::setStatusBarBackgroundColor);
       prototype.registerHybridMethod("setImmersiveMode", &HybridNativePlatformSpec::setImmersiveMode);
       prototype.registerHybridMethod("getMiniRuntime", &HybridNativePlatformSpec::getMiniRuntime);
       prototype.registerHybridMethod("registerPlatformListener", &HybridNativePlatformSpec::registerPlatformListener);

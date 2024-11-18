@@ -220,17 +220,6 @@ public class HybridNativePlatformSpecCxx {
   }
   
   @inline(__always)
-  public func setNavigationBarBackgroundColor(color: Double) -> Void {
-    do {
-      try self.__implementation.setNavigationBarBackgroundColor(color: color)
-      return 
-    } catch {
-      let __message = "\(error.localizedDescription)"
-      fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(__message))")
-    }
-  }
-  
-  @inline(__always)
   public func setNavigationBarHidden(isHidden: Bool) -> Void {
     do {
       try self.__implementation.setNavigationBarHidden(isHidden: isHidden)
@@ -245,17 +234,6 @@ public class HybridNativePlatformSpecCxx {
   public func setStatusBarHidden(isHidden: Bool) -> Void {
     do {
       try self.__implementation.setStatusBarHidden(isHidden: isHidden)
-      return 
-    } catch {
-      let __message = "\(error.localizedDescription)"
-      fatalError("Swift errors can currently not be propagated to C++! See https://github.com/swiftlang/swift/issues/75290 (Error: \(__message))")
-    }
-  }
-  
-  @inline(__always)
-  public func setStatusBarBackgroundColor(color: Double) -> Void {
-    do {
-      try self.__implementation.setStatusBarBackgroundColor(color: color)
       return 
     } catch {
       let __message = "\(error.localizedDescription)"

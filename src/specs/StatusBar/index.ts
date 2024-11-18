@@ -1,6 +1,6 @@
-import { processColor, StatusBar as NativeStatusBar } from 'react-native'
+import { StatusBar as NativeStatusBar } from 'react-native'
 import type { UnistylesStatusBar as UnistylesStatusBarSpec } from './UnistylesStatusBar.nitro'
-import { type Color, StatusBarStyle } from '../types'
+import { StatusBarStyle } from '../types'
 
 export type StatusBarHiddenAnimation = 'none' | 'fade' | 'slide'
 
@@ -8,13 +8,6 @@ interface PrivateUnistylesStatusBar extends Omit<UnistylesStatusBarSpec, 'setBac
     setStyle(style: StatusBarStyle, animated?: boolean): void,
     setHidden(isHidden: boolean, animation?: StatusBarHiddenAnimation): void,
     _setHidden(isHidden: boolean, animation?: StatusBarHiddenAnimation): void,
-    /**
-     * Apps targeting Android SDK 35
-     * This API is deprecated as status bar background color is always transparent
-     * @deprecated
-     */
-    setBackgroundColor(color?: string): void,
-    _setBackgroundColor(color?: Color): void
 }
 
 export const attachStatusBarJSMethods = (hybridObject: UnistylesStatusBar) => {
@@ -36,17 +29,9 @@ export const attachStatusBarJSMethods = (hybridObject: UnistylesStatusBar) => {
         NativeStatusBar.setHidden(isHidden, animation)
         privateHybrid._setHidden(isHidden)
     }
-
-    privateHybrid._setBackgroundColor = hybridObject.setBackgroundColor
-    hybridObject.setBackgroundColor = (color?: string) => {
-        const parsedColor = processColor(color) ?? 0
-
-        privateHybrid._setBackgroundColor(parsedColor as number)
-    }
 }
 
 type PrivateMethods =
-    | '_setBackgroundColor'
     | '_setHidden'
     | 'dispose'
 

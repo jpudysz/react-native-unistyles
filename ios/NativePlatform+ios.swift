@@ -296,9 +296,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     }
 
     // not implemented for iOS as there are no such APIs
-    func setNavigationBarBackgroundColor(color: Double) throws {}
     func setNavigationBarHidden(isHidden: Bool) throws {}
-    func setStatusBarBackgroundColor(color: Double) throws {}
 
     // implemented from JS
     func setImmersiveMode(isEnabled: Bool) throws {}
