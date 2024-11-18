@@ -5,7 +5,7 @@ import { isUnistylesMq, parseMq } from '../../mq'
 import { UnistylesState } from '../state'
 import { keyInObject, reduceObject } from './common'
 
-export const schemeToTheme = (scheme: ColorScheme): string => {
+export const schemeToTheme = (scheme: ColorScheme) => {
     switch (scheme) {
         case ColorScheme.Dark:
             return 'dark'
