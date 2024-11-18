@@ -113,10 +113,6 @@ namespace margelo::nitro::unistyles {
     static const auto method = _javaPart->getClass()->getMethod<void(double /* color */)>("setRootViewBackgroundColor");
     method(_javaPart, color);
   }
-  void JHybridNativePlatformSpec::setNavigationBarBackgroundColor(double color) {
-    static const auto method = _javaPart->getClass()->getMethod<void(double /* color */)>("setNavigationBarBackgroundColor");
-    method(_javaPart, color);
-  }
   void JHybridNativePlatformSpec::setNavigationBarHidden(bool isHidden) {
     static const auto method = _javaPart->getClass()->getMethod<void(jboolean /* isHidden */)>("setNavigationBarHidden");
     method(_javaPart, isHidden);
@@ -124,10 +120,6 @@ namespace margelo::nitro::unistyles {
   void JHybridNativePlatformSpec::setStatusBarHidden(bool isHidden) {
     static const auto method = _javaPart->getClass()->getMethod<void(jboolean /* isHidden */)>("setStatusBarHidden");
     method(_javaPart, isHidden);
-  }
-  void JHybridNativePlatformSpec::setStatusBarBackgroundColor(double color) {
-    static const auto method = _javaPart->getClass()->getMethod<void(double /* color */)>("setStatusBarBackgroundColor");
-    method(_javaPart, color);
   }
   void JHybridNativePlatformSpec::setImmersiveMode(bool isEnabled) {
     static const auto method = _javaPart->getClass()->getMethod<void(jboolean /* isEnabled */)>("setImmersiveMode");

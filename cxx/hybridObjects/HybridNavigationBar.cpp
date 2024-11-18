@@ -1,9 +1,5 @@
 #include "HybridNavigationBar.h"
 
-void HybridNavigationBar::setBackgroundColor(double color) {
-    this->_nativePlatform.setNavigationBarBackgroundColor(color);
-};
-
 void HybridNavigationBar::setHidden(bool isHidden) {
     this->_nativePlatform.setNavigationBarHidden(isHidden);
 };
