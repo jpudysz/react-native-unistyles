@@ -17,8 +17,28 @@ class UnistylesListenerBuilder {
         }
 
         this.isInitialized = true
-        UnistylesRuntime.darkMedia?.addEventListener('change', () => this.emitChange(UnistyleDependency.ColorScheme))
-        UnistylesRuntime.lightMedia?.addEventListener('change', () => this.emitChange(UnistyleDependency.ColorScheme))
+        UnistylesRuntime.darkMedia?.addEventListener('change', event => {
+            if (!event.matches) {
+                return
+            }
+
+            this.emitChange(UnistyleDependency.ColorScheme)
+
+            if (UnistylesRuntime.hasAdaptiveThemes) {
+                this.emitChange(UnistyleDependency.Theme)
+            }
+        })
+        UnistylesRuntime.lightMedia?.addEventListener('change', event => {
+            if (!event.matches) {
+                return
+            }
+
+            this.emitChange(UnistyleDependency.ColorScheme)
+
+            if (UnistylesRuntime.hasAdaptiveThemes) {
+                this.emitChange(UnistyleDependency.Theme)
+            }
+        })
         window.addEventListener('orientationchange', () => this.emitChange(UnistyleDependency.Orientation))
         window.addEventListener('resize', () => this.emitChange(UnistyleDependency.Dimensions))
     }
