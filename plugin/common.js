@@ -61,10 +61,18 @@ function getIdentifierNameFromExpression(t, memberExpression) {
             .flatMap(property => getIdentifierNameFromExpression(t, property.value))
     }
 
+    if (t.isUnaryExpression(memberExpression)) {
+        return getIdentifierNameFromExpression(t, memberExpression.argument.object)
+    }
+
     return []
 }
 
 function getSecondPropertyName(t, memberExpression) {
+    if (t.isUnaryExpression(memberExpression)) {
+        return getSecondPropertyName(t, memberExpression.argument.object)
+    }
+
     if (t.isConditionalExpression(memberExpression)) {
         return [
             getSecondPropertyName(t, memberExpression.test.left),
