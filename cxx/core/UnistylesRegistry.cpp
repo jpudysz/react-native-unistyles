@@ -73,13 +73,15 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
     const ShadowNodeFamily* shadowNodeFamily,
     std::vector<core::Unistyle::Shared>& unistyles,
     Variants& variants,
-    std::vector<folly::dynamic>& arguments
+    std::vector<std::vector<folly::dynamic>>& arguments
 ) {
     auto parser = parser::Parser(nullptr);
     shadow::ShadowLeafUpdates updates;
+    
+    for (size_t index = 0; index < unistyles.size(); index++) {
+        Unistyle::Shared unistyle = unistyles[index];
 
-    std::for_each(unistyles.begin(), unistyles.end(), [&, this](Unistyle::Shared unistyle){
-        this->_shadowRegistry[&rt][shadowNodeFamily].emplace_back(std::make_shared<UnistyleData>(unistyle, variants, arguments));
+        this->_shadowRegistry[&rt][shadowNodeFamily].emplace_back(std::make_shared<UnistyleData>(unistyle, variants, arguments[index]));
 
         // add or update node for shadow leaf updates
         // dynamic functions are parsed later
@@ -92,7 +94,7 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
                 }
             }
         }
-    });
+    }
 
     this->trafficController.setUpdates(updates);
     this->trafficController.resumeUnistylesTraffic();

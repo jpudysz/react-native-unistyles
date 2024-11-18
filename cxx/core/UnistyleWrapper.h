@@ -85,18 +85,35 @@ inline static jsi::Object generateUnistylesPrototype(
 }
 
 inline static std::vector<Unistyle::Shared> unistyleFromValue(jsi::Runtime& rt, const jsi::Value& value) {
-    if (value.isNull()) {
+    if (value.isNull() || !value.isObject()) {
         return {};
     }
+    
+    auto maybeArray = value.asObject(rt);
+    
+    helpers::assertThat(rt, maybeArray.isArray(rt), "Unistyles: can't retrieve Unistyle state from node as it's not an array.");
+    
+    std::vector<Unistyle::Shared> unistyles;
+    jsi::Array unistylesArray = maybeArray.asArray(rt);
+    
+    helpers::iterateJSIArray(rt, unistylesArray, [&rt, &unistyles](size_t index, jsi::Value& value){
+        auto obj = value.getObject(rt);
 
-    auto obj = value.getObject(rt);
+        // possible if user used React Native styles or inline styles or did spread styles
+        if (!obj.hasNativeState(rt)) {
+            auto exoticUnistyles = unistylesFromNonExistentNativeState(rt, obj);
+            
+            for (auto& exoticUnistyle: exoticUnistyles) {
+                unistyles.emplace_back(exoticUnistyle);
+            }
+            
+            return;
+        }
 
-    // possible if user used React Native styles or inline styles or did spread styles
-    if (!obj.hasNativeState(rt)) {
-        return unistylesFromNonExistentNativeState(rt, obj);
-    }
-
-    return {value.getObject(rt).getNativeState<UnistyleWrapper>(rt)->unistyle};
+        unistyles.emplace_back(value.getObject(rt).getNativeState<UnistyleWrapper>(rt)->unistyle);
+    });
+    
+    return unistyles;
 }
 
 inline static jsi::Value valueFromUnistyle(jsi::Runtime& rt, std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime, Unistyle::Shared unistyle, int tag) {

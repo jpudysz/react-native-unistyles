@@ -133,17 +133,15 @@ module.exports = function ({ types: t }) {
                 // to add import
                 state.file.hasAnyUnistyle = true
 
-                metadata.forEach(meta => {
-                    const refProp = getRefProp(t, path)
+                const refProp = getRefProp(t, path)
 
-                    if (!refProp && hasStringRef(t, path)) {
-                        throw new Error("Detected string based ref which is not supported by Unistyles.")
-                    }
+                if (!refProp && hasStringRef(t, path)) {
+                    throw new Error("Detected string based ref which is not supported by Unistyles.")
+                }
 
-                    refProp
-                        ? overrideRef(t, path, refProp, meta, state)
-                        : addRef(t, path, meta, state)
-                })
+                refProp
+                    ? overrideRef(t, path, refProp, metadata, state)
+                    : addRef(t, path, metadata, state)
             },
             CallExpression(path, state) {
                 if (isUsingVariants(t, path)) {

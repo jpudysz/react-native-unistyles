@@ -9,10 +9,20 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     ShadowNode::Shared shadowNodeWrapper = shadowNodeFromValue(rt, args[0]);
     std::vector<core::Unistyle::Shared> unistyleWrappers = core::unistyleFromValue(rt, args[1]);
     core::Variants variants = helpers::variantsToPairs(rt, args[2].asObject(rt));
-    std::vector<folly::dynamic> arguments = helpers::parseDynamicFunctionArguments(rt, args[3].asObject(rt).asArray(rt));
-
+    jsi::Array rawArguments = args[3].asObject(rt).asArray(rt);
+    std::vector<std::vector<folly::dynamic>> arguments;
     auto& registry = core::UnistylesRegistry::get();
-
+    
+    helpers::iterateJSIArray(rt, rawArguments, [&rt, &arguments](size_t index, jsi::Value& value){
+        if (value.isNull()) {
+            arguments.push_back({});
+            
+            return;
+        }
+        
+        arguments.push_back(helpers::parseDynamicFunctionArguments(rt, value.asObject(rt).asArray(rt)));
+    });
+    
     registry.linkShadowNodeWithUnistyle(rt, &shadowNodeWrapper->getFamily(), unistyleWrappers, variants, arguments);
 
     return jsi::Value::undefined();

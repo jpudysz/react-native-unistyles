@@ -27,32 +27,22 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
 
     // {{ ...styles.container }}
     if (t.isObjectExpression(node)) {
-        const inlineStyles = []
-
-        const partialResult = node
+        return node
             .properties
             .flatMap(prop => {
                 // handle inline styles
                 if (t.isObjectProperty(prop)) {
-                    inlineStyles.push(prop)
-
-                    return null
+                    return [{
+                        members: [],
+                        inlineStyle: t.objectExpression([prop]),
+                        dynamicFunction: undefined,
+                        conditionalExpression: undefined
+                    }]
                 }
 
                 return getStyleMetadata(t, prop.argument)
             })
             .filter(Boolean)
-
-        if (inlineStyles.length > 0) {
-            return partialResult.concat([{
-                members: [],
-                inlineStyle: t.objectExpression(inlineStyles),
-                dynamicFunction: undefined,
-                conditionalExpression: undefined
-            }])
-        }
-
-        return partialResult
     }
 
     // {styles.container(arg1, arg2)}

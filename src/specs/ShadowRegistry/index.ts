@@ -4,10 +4,10 @@ import type { ShadowNode, Unistyle, ViewHandle } from './types'
 
 interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     // Babel API
-    add(handle?: ViewHandle, style?: Unistyle, variants?: Record<string, string | boolean>, args?: Array<any>): void,
-    remove(handle?: ViewHandle, style?: Unistyle): void,
+    add(handle?: ViewHandle, styles?: Array<Unistyle>, variants?: Record<string, string | boolean>, args?: Array<Array<any>>): void,
+    remove(handle?: ViewHandle): void,
     // JSI
-    link(node: ShadowNode, style?: Unistyle, variants?: Record<string, string | boolean>, args?: Array<any>): void,
+    link(node: ShadowNode, styles?: Array<Unistyle>, variants?: Record<string, string | boolean>, args?: Array<Array<any>>): void,
     unlink(node: ShadowNode): void
 }
 
@@ -26,18 +26,16 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
     return node
 }
 
-HybridShadowRegistry.add = (handle, style, variants, args) => {
+HybridShadowRegistry.add = (handle, styles, variants, args) => {
     // virtualized nodes can be null
-    if (!handle || !style) {
+    if (!handle || !styles || !Array.isArray(styles)) {
         return
     }
 
-    // don't register Reanimated styles
-    if (style?.initial?.updater) {
-        return
-    }
-
-    HybridShadowRegistry.link(findShadowNodeForHandle(handle), style, variants ?? {}, args ?? [])
+    // filter Reanimated styles
+    const filteredStyles = styles.filter(style => !style?.initial?.updater)
+console.log(filteredStyles, variants, args)
+    HybridShadowRegistry.link(findShadowNodeForHandle(handle), filteredStyles, variants ?? {}, args ?? [])
 }
 
 HybridShadowRegistry.remove = handle => {

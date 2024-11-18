@@ -14,15 +14,31 @@ function hasStringRef(t, path) {
     )
 }
 
-function memberExpressionFromArray(t, identifiers) {
-    // possible for inline styles
-    if (identifiers.length === 0) {
-        return undefined
-    }
+function arrayExpressionFromMetadata(t, metadata) {
+    const memberExpressions = metadata
+        .map(meta => {
+            // possible for inline styles
+            if (meta.members.length === 0) {
+                return meta.inlineStyle || meta.conditionalExpression
+            }
 
-    const [base, ...members] = identifiers
+            const [base, ...members] = meta.members
 
-    return members.reduce((object, property) => t.memberExpression(object, t.identifier(property)), t.identifier(base))
+            return members.reduce((object, property) => t.memberExpression(object, t.identifier(property)), t.identifier(base))
+        })
+
+    return t.arrayExpression(memberExpressions)
+}
+
+function arrayFromDynamicFunctionArgs(t, metadata) {
+    const memberExpressions = metadata
+        .map(meta => meta.dynamicFunction
+            ? t.arrayExpression(meta.dynamicFunction.arguments)
+            : t.identifier('null'))
+        .filter(Boolean)
+
+
+    return t.arrayExpression(memberExpressions)
 }
 
 function addRef(t, path, metadata, state) {
@@ -36,9 +52,9 @@ function addRef(t, path, metadata, state) {
                     t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
                     [
                         t.identifier('ref'),
-                        memberExpressionFromArray(t, metadata.members) || metadata.inlineStyle || metadata.conditionalExpression,
+                        arrayExpressionFromMetadata(t, metadata),
                         t.identifier(hasVariants ? '__uni__variants' : 'undefined'),
-                        metadata.dynamicFunction ? t.arrayExpression(metadata.dynamicFunction.arguments) : t.identifier('undefined')
+                        arrayFromDynamicFunctionArgs(t, metadata)
                     ]
                 )
             ),
@@ -85,9 +101,9 @@ function overrideRef(t, path, refProp, metadata, state) {
                         t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
                         [
                             t.identifier(uniqueRefName),
-                            memberExpressionFromArray(t, metadata.members) || metadata.inlineStyle || metadata.conditionalExpression,
+                            arrayExpressionFromMetadata(t, metadata),
                             t.identifier(hasVariants ? '__uni__variants' : 'undefined'),
-                            metadata.dynamicFunction ? t.arrayExpression(metadata.dynamicFunction.arguments) : t.identifier('undefined')
+                            arrayFromDynamicFunctionArgs(t, metadata)
                         ]
                     )
                 ),
@@ -130,9 +146,9 @@ function overrideRef(t, path, refProp, metadata, state) {
                         t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
                         [
                             t.identifier(userRefName),
-                            memberExpressionFromArray(t, metadata.members) || metadata.inlineStyle || metadata.conditionalExpression,
+                            arrayExpressionFromMetadata(t, metadata),
                             t.identifier(hasVariants ? '__uni__variants' : 'undefined'),
-                            metadata.dynamicFunction ? t.arrayExpression(metadata.dynamicFunction.arguments) : t.identifier('undefined')
+                            arrayFromDynamicFunctionArgs(t, metadata)
                         ]
                     )
                 ),
@@ -192,9 +208,9 @@ function overrideRef(t, path, refProp, metadata, state) {
                     t.memberExpression(t.identifier('UnistylesShadowRegistry'), t.identifier('add')),
                     [
                         t.identifier(uniqueRefName),
-                        memberExpressionFromArray(t, metadata.members) || metadata.inlineStyle || metadata.conditionalExpression,
+                        arrayExpressionFromMetadata(t, metadata),
                         t.identifier(hasVariants ? '__uni__variants' : 'undefined'),
-                        metadata.dynamicFunction ? t.arrayExpression(metadata.dynamicFunction.arguments) : t.identifier('undefined')
+                        arrayFromDynamicFunctionArgs(t, metadata)
                     ]
                 )
             ),
