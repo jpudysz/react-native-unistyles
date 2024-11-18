@@ -12951,7 +12951,6 @@ __metadata:
     react: 18.3.1
     react-native: 0.76.0
     react-native-builder-bob: 0.30.2
-    react-native-edge-to-edge: 1.1.2
     react-native-nitro-modules: 0.16.2
     react-test-renderer: 18.3.1
     release-it: 17.10.0
@@ -12960,6 +12959,8 @@ __metadata:
     "@react-native/normalize-colors": "*"
     react: "*"
     react-native: "*"
+    react-native-edge-to-edge: "*"
+    react-native-nitro-modules: "*"
   languageName: unknown
   linkType: soft
 

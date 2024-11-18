@@ -59,9 +59,6 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
-  "dependencies": {
-    "react-native-edge-to-edge": "1.1.2"
-  },
   "devDependencies": {
     "@babel/plugin-syntax-jsx": "7.25.9",
     "@biomejs/biome": "1.9.4",
@@ -89,7 +86,9 @@
   "peerDependencies": {
     "@react-native/normalize-colors": "*",
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-edge-to-edge": "*",
+    "react-native-nitro-modules": "*"
   },
   "workspaces": [
     "example",
