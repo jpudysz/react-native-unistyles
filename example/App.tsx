@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { Button, ScrollView, Text, TextInput, View } from 'react-native'
+import { Button, Pressable, PressableStateCallbackType, ScrollView, Text, TextInput, View } from 'react-native'
 import { Blurhash } from 'react-native-blurhash'
 import { createUnistylesComponent, StyleSheet, Display, Hide, mq, UnistylesRuntime } from 'react-native-unistyles'
 import Animated, {
@@ -67,6 +67,11 @@ export const App = () => {
                 title="Force re-render"
                 onPress={() => setCount(prevState =>  prevState + 1)}
             />
+            <Pressable style={state => styles.pressable(state)} onPress={() => {}}>
+                <Typography value={1.1}>
+                    Pressable test
+                </Typography>
+            </Pressable>
             <TextInput style={styles.input} />
         </View>
     )
@@ -131,5 +136,8 @@ const styles = StyleSheet.create((theme, rt) => ({
         fontSize: 30,
         lineHeight: 40,
         color: theme.colors.typography
-    }
+    },
+    pressable: (state: PressableStateCallbackType) => ({
+        backgroundColor: state.pressed ? 'red' : 'blue'
+    })
 }))
