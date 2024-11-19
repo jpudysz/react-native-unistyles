@@ -5,7 +5,8 @@ import { UnistyleDependency } from '../specs/NativePlatform'
 import type { PartialBy } from '../types/common'
 import { UnistylesListener } from '../web/listener'
 import { UnistylesShadowRegistry } from '../web'
-import { deepMergeObjects, equal } from '../web/utils'
+import { equal } from '../web/utils'
+import { deepMergeObjects } from '../utils'
 
 const SUPPORTED_STYLE_PROPS = ['style', 'contentContainerStyle'] as const
 const ALL_DEPENDENCIES = Object.values(UnistyleDependency).filter((dependency): dependency is UnistyleDependency => typeof dependency === 'number')

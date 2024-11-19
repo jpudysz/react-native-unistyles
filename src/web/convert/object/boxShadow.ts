@@ -1,6 +1,7 @@
 import type { BoxShadowValue } from 'react-native'
 import { normalizeNumericValue } from '../utils'
-import { deepMergeObjects, keyInObject } from '../../utils'
+import { keyInObject } from '../../utils'
+import { deepMergeObjects } from '../../../utils'
 
 const createBoxShadowValue = (style: BoxShadowValue) => {
     const { offsetX, offsetY, blurRadius = 0, spreadDistance = 0, color = '#000', inset } = style
