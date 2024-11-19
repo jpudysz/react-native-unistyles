@@ -1,5 +1,5 @@
 const addShadowRegistryImport = require('./import')
-const { getStyleMetadata, getStyleAttribute, styleAttributeToArray } = require('./style')
+const { getStyleMetadata, getStyleAttribute, styleAttributeToArray, handlePressable } = require('./style')
 const { getRefProp, addRef, overrideRef, hasStringRef } = require('./ref')
 const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyle } = require('./stylesheet')
 const { isUsingVariants, extractVariants } = require('./variants')
@@ -126,6 +126,10 @@ module.exports = function ({ types: t }) {
                 // style prop is using unexpected expression
                 if (metadata.length === 0) {
                     return
+                }
+
+                if (openingElementName === 'Pressable') {
+                    handlePressable(t, path, styleAttr, metadata)
                 }
 
                 styleAttributeToArray(t, path)
