@@ -8,6 +8,7 @@ import android.view.View
 import android.view.WindowManager
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.facebook.react.bridge.LifecycleEventListener
@@ -279,7 +280,15 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
         try {
             Class.forName("com.zoontek.rnedgetoedge.EdgeToEdgePackage")
         } catch (exception: ClassNotFoundException) {
-            throw IllegalStateException("Unistyles: react-native-edge-to-edge is not installed.")
+            enableEdgeToEdge()
+        }
+    }
+
+    private fun enableEdgeToEdge() {
+        reactContext.currentActivity?.let { activity ->
+            activity.runOnUiThread {
+                WindowCompat.setDecorFitsSystemWindows(activity.window, false)
+            }
         }
     }
 }
