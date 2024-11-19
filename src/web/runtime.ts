@@ -48,7 +48,7 @@ class UnistylesRuntimeBuilder {
 
     get themeName() {
         if (UnistylesState.hasAdaptiveThemes) {
-            return schemeToTheme(this.colorScheme)
+            return schemeToTheme(this.colorScheme) as AppThemeName
         }
 
         return UnistylesState.themeName
