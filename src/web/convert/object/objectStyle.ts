@@ -1,4 +1,5 @@
-import { deepMergeObjects, keyInObject } from '../../utils'
+import { deepMergeObjects } from '../../../utils'
+import { keyInObject } from '../../utils'
 
 type Styles = Record<string, any>
 type Normalize<TStyles extends Styles> = (key: keyof TStyles, value: TStyles[keyof TStyles]) => any

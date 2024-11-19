@@ -1,7 +1,7 @@
 import type { UnistylesValues } from '../../types'
 import { isPseudo } from './pseudo'
 import { getStyle } from './style'
-import { deepMergeObjects } from '../utils'
+import { deepMergeObjects } from '../../utils'
 import { getTransformStyle, getBoxShadow, getFilterStyle } from './object'
 import { isShadow, isFilter, isTextShadow, isTransform, isBoxShadow } from './utils'
 import { getTextShadowStyle, getBoxShadowStyle } from './shadow'
