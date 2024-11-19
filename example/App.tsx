@@ -67,7 +67,7 @@ export const App = () => {
                 title="Force re-render"
                 onPress={() => setCount(prevState =>  prevState + 1)}
             />
-            <Pressable style={state => styles.pressable(state)} onPress={() => {}}>
+            <Pressable style={styles.pressable} onPress={() => {}}>
                 <Typography value={1.1}>
                     Pressable test
                 </Typography>
