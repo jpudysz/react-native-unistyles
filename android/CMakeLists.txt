@@ -34,3 +34,6 @@ set_target_properties(unistyles PROPERTIES
 
 # For React Native 0.76 and above, we don't need to link anything
 # as NitroModules will automatically add ReactAndroid::reactnative prefab
+if (ReactAndroid_VERSION_MINOR LESS 76)
+    message(FATAL_ERROR "Unistyles 3.0 requires min. React Native version to be 0.76")
+endif ()
