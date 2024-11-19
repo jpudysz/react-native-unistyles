@@ -79,3 +79,13 @@ dependencies {
     implementation 'com.facebook.react:react-native'
     implementation project(":react-native-nitro-modules")
 }
+
+tasks.register("checkNativeTurboUnistylesSpec") {
+    doLast {
+        if (!isNewArchitectureEnabled()) {
+            throw new GradleException("Unistyles 3.0 requires your project to have New Architecture enabled.")
+        }
+    }
+}
+
+preBuild.dependsOn checkNativeTurboUnistylesSpec
