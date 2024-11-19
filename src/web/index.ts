@@ -1,6 +1,6 @@
 import { create } from './create'
 import { UnistylesState } from './state'
-import { deepMergeObjects } from './utils'
+import { deepMergeObjects } from '../utils'
 
 export const StyleSheet = {
     configure: UnistylesState.init,

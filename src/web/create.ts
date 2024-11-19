@@ -1,6 +1,7 @@
 import type { ReactNativeStyleSheet } from '../types'
 import type { StyleSheetWithSuperPowers, StyleSheet } from '../types/stylesheet'
-import { assignSecrets, reduceObject, getStyles, deepMergeObjects } from './utils'
+import { assignSecrets, reduceObject, getStyles } from './utils'
+import { deepMergeObjects } from '../utils'
 import { UnistylesRuntime } from './runtime'
 import { createUseVariants, getVariants } from './variants'
 

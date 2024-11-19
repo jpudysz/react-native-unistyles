@@ -1,4 +1,4 @@
-import { deepMergeObjects } from '../../utils'
+import { deepMergeObjects } from '../../../utils'
 import { TEXT_SHADOW_STYLES, type TextShadow } from '../types'
 import { extractShadowValue, normalizeColor, normalizeNumericValue } from '../utils'
 import { getShadowBreakpoints } from './getShadowBreakpoints'

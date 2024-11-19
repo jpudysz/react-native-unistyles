@@ -2,6 +2,7 @@ import React, { type ComponentType, forwardRef, useEffect, useRef, useState } fr
 import type { UnistylesTheme } from '../types'
 import { StyleSheet, UnistyleDependency, UnistylesRuntime, type UnistylesStyleSheet } from '../specs'
 import type { PartialBy } from '../types/common'
+import { deepMergeObjects } from '../utils'
 
 const SUPPORTED_STYLE_PROPS = ['style', 'contentContainerStyle'] as const
 type SupportedStyleProps = typeof SUPPORTED_STYLE_PROPS[number]
@@ -66,26 +67,17 @@ export const createUnistylesComponent = <TProps extends Record<string, any>, TMa
         }, [])
 
         const mergedProps = mappings?.(theme) as Record<string, any> ?? {}
-
-        Object.keys(props).forEach(key => {
-            if (key in mergedProps) {
-                mergedProps[key] = Object.assign(props[key as keyof typeof props], mergedProps[key])
-
-                return
-            }
-
-            mergedProps[key] = props[key as keyof typeof props]
-        })
+        const finalProps = deepMergeObjects(mergedProps, props)
 
         // override with Unistyles styles
         SUPPORTED_STYLE_PROPS.forEach(propName => {
-            if (mergedProps[propName]) {
-                mergedProps[propName] = stylesRef.current[propName]
+            if (finalProps[propName]) {
+                finalProps[propName] = stylesRef.current[propName]
             }
         })
 
         isForcedRef.current = false
 
-        return <Component {...mergedProps as TProps} ref={ref} />
+        return <Component {...finalProps as TProps} ref={ref} />
     })
 }
