@@ -32,8 +32,11 @@ HybridShadowRegistry.add = (handle, styles, variants, args) => {
         return
     }
 
-    // filter Reanimated styles
-    const filteredStyles = styles.filter(style => !style?.initial?.updater)
+    // filter Reanimated styles and styles that are undefined
+    const filteredStyles = styles
+        .filter(style => !style?.initial?.updater)
+        .filter(Boolean)
+
     HybridShadowRegistry.link(findShadowNodeForHandle(handle), filteredStyles, variants ?? {}, args ?? [])
 }
 
