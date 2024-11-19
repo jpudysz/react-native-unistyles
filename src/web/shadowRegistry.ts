@@ -2,7 +2,8 @@ import type { UnistylesValues } from '../types'
 import { convertUnistyles } from './convert'
 import { UnistylesListener } from './listener'
 import { UnistylesRegistry } from './registry'
-import { deepMergeObjects, equal, extractSecrets, extractUnistyleDependencies, isInDocument } from './utils'
+import { deepMergeObjects } from '../utils'
+import { equal, extractSecrets, extractUnistyleDependencies, isInDocument } from './utils'
 import { getVariants } from './variants'
 
 type Style = UnistylesValues | ((...args: Array<any>) => UnistylesValues)
