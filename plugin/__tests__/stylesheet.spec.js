@@ -1046,7 +1046,9 @@ pluginTester({
                             <Pressable
                                 style={state => (typeof styles.pressable === 'function' ? styles.pressable(state) : styles.pressable)}
                                 ref={ref => {
-                                    UnistylesShadowRegistry.add(ref, [styles.pressable], undefined, [[typeof styles.pressable === 'function' ? { pressed: false} : []]])
+                                    UnistylesShadowRegistry.add(ref, [styles.pressable], undefined, [
+                                        [typeof styles.pressable === 'function' ? { pressed: false } : []]
+                                    ])
                                     return () => UnistylesShadowRegistry.remove(ref)
                                 }}
                             >

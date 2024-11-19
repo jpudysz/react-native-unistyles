@@ -32,7 +32,10 @@ function arrayExpressionFromMetadata(t, metadata) {
     return t.arrayExpression(memberExpressions)
 }
 
-function arrayFromDynamicFunctionArgs(t, metadata) {
+function arrayFromDynamicFunctionArgs(t, metadata, path) {
+    const hasPressableDynamicFunction = path.node.openingElement.attributes
+        .find(attr => t.isJSXIdentifier(attr.name) && attr.name.name === "style" && t.isArrowFunctionExpression(attr.value.expression))
+
     const memberExpressions = metadata
         .map(meta => {
             if (meta.dynamicFunction && meta.dynamicFunction.arguments) {
@@ -58,6 +61,28 @@ function arrayFromDynamicFunctionArgs(t, metadata) {
                 return t.arrayExpression(args)
             }
 
+            // typeof styles.pressable === "function" ? { pressed: false } : []
+            if (hasPressableDynamicFunction) {
+                return t.arrayExpression([
+                    t.conditionalExpression(
+                        t.binaryExpression(
+                            "===",
+                            t.unaryExpression(
+                                "typeof",
+                                t.identifier("styles.pressable")
+                            ),
+                            t.stringLiteral("function")
+                        ),
+                        t.objectExpression([
+                            t.objectProperty(
+                                t.identifier("pressed"),
+                                t.booleanLiteral(false)
+                            )
+                        ]),
+                        t.arrayExpression([])
+                    )
+                ])
+            }
 
             return t.arrayExpression([])
         })
@@ -78,7 +103,7 @@ function addRef(t, path, metadata, state) {
                         t.identifier('ref'),
                         arrayExpressionFromMetadata(t, metadata),
                         t.identifier(hasVariants ? '__uni__variants' : 'undefined'),
-                        arrayFromDynamicFunctionArgs(t, metadata)
+                        arrayFromDynamicFunctionArgs(t, metadata, path)
                     ]
                 )
             ),
@@ -127,7 +152,7 @@ function overrideRef(t, path, refProp, metadata, state) {
                             t.identifier(uniqueRefName),
                             arrayExpressionFromMetadata(t, metadata),
                             t.identifier(hasVariants ? '__uni__variants' : 'undefined'),
-                            arrayFromDynamicFunctionArgs(t, metadata)
+                            arrayFromDynamicFunctionArgs(t, metadata, path)
                         ]
                     )
                 ),
@@ -172,7 +197,7 @@ function overrideRef(t, path, refProp, metadata, state) {
                             t.identifier(userRefName),
                             arrayExpressionFromMetadata(t, metadata),
                             t.identifier(hasVariants ? '__uni__variants' : 'undefined'),
-                            arrayFromDynamicFunctionArgs(t, metadata)
+                            arrayFromDynamicFunctionArgs(t, metadata, path)
                         ]
                     )
                 ),
@@ -234,7 +259,7 @@ function overrideRef(t, path, refProp, metadata, state) {
                         t.identifier(uniqueRefName),
                         arrayExpressionFromMetadata(t, metadata),
                         t.identifier(hasVariants ? '__uni__variants' : 'undefined'),
-                        arrayFromDynamicFunctionArgs(t, metadata)
+                        arrayFromDynamicFunctionArgs(t, metadata, path)
                     ]
                 )
             ),

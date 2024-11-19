@@ -138,6 +138,7 @@ const styles = StyleSheet.create((theme, rt) => ({
         color: theme.colors.typography
     },
     pressable: (state: PressableStateCallbackType) => ({
-        backgroundColor: state.pressed ? 'red' : 'blue'
+        backgroundColor: !state.pressed ? theme.colors.accent : theme.colors.backgroundColor,
+        marginBottom: rt.insets.bottom
     })
 }))
