@@ -79,6 +79,8 @@ lib/
 # docs
 coverage
 docs/dist
+docs/.astro
+docs/.yarn
 
 # cxx
 cxx/tests/cmake-build-debug/
