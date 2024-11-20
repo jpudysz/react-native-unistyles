@@ -1,8 +1,8 @@
 :root {
-    --background: #8e7cc4;
+    --background: #080023;
     --white: #fff;
     --black: #000;
-    --pink: #e46fbb;
+    --pink: #e427Ab;
 }
 
 * {
@@ -19,6 +19,9 @@
 
 body {
     background-color: var(--background);
+    background-image: url('./stars.svg');
+    background-position: top center;
+    background-size: cover;
     color: #fff;
     font-family: 'Nunito Variable', sans-serif;
 }
