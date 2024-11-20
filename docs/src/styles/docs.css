@@ -6,13 +6,19 @@
 	--sl-color-accent-high: #FF5ED7;
 	--sl-color-white: var(--white);
     --sl-color-hairline-light: var(--border);
-    --sl-color-bg-sidebar: transparent;
-    --sl-color-bg-nav: rgba(0, 0, 0, 0.15);
+    --sl-color-bg-sidebar: #141523;
+    --sl-color-bg-nav: #141523;
     --sl-color-text: var(--white);
     --sl-color-gray-3: var(--white);
     --sl-color-gray-2: var(--border);
+    --sl-color-gray-5: #353841;
     --sl-color-gray-6: #23262f;
-    --sl-color-black: transparent;
+    --sl-color-bg-inline-code: var(--sl-color-gray-6);
+    --sl-color-black: #141523;
+    --ec-brdWd: 1px;
+    --ec-brdCol: var(--border)!important;
+    --ec-frm-edTabBarBrdCol: var(--border)!important;
+    --ec-frm-edActTabBg: rgba(255, 255, 255, 0.1)!important;
 }
 
 .site-title {
@@ -31,7 +37,7 @@ a[aria-current="page"]:hover {
 }
 
 .sidebar-pane, .header {
-    border-color: var(--border);
+    border-color: var(--border)!important;
 }
 
 .right-sidebar-panel {
@@ -56,4 +62,20 @@ starlight-theme-select {
 
 figcaption.header {
     margin-bottom: -16px!important;
+}
+
+.header::before {
+    border-bottom: 1px solid var(--border)!important;
+}
+
+.top-level > li > details > ul > li {
+    padding-top: 16px;
+}
+
+.sl-steps > li::before {
+    box-shadow: inset 0 0 0 1px var(--border);
+}
+
+html {
+    color-scheme: dark!important;
 }

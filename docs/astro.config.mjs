@@ -1,12 +1,16 @@
 import { defineConfig } from 'astro/config'
 import starlight from '@astrojs/starlight'
 import sitemap from '@astrojs/sitemap'
-import expressiveCode from 'astro-expressive-code'
+import expressiveCode, { ExpressiveCodeTheme } from 'astro-expressive-code'
+import fs from 'node:fs'
+
+const themeJson = fs.readFileSync(new URL(`./theme.json`, import.meta.url), 'utf8')
+const customTheme = ExpressiveCodeTheme.fromJSONString(themeJson)
 
 export default defineConfig({
 	integrations: [
         expressiveCode({
-            theme: 'night-owl',
+            themes: [customTheme],
             languages: ['typescript', 'tsx']
         }),
 		starlight({
