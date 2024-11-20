@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import { Button, Pressable, PressableStateCallbackType, ScrollView, Text, TextInput, View } from 'react-native'
 import { Blurhash } from 'react-native-blurhash'
-import { createUnistylesComponent, StyleSheet, Display, Hide, mq, UnistylesRuntime } from 'react-native-unistyles'
+import { createUnistylesComponent, StyleSheet, Display, Hide, mq } from 'react-native-unistyles'
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
@@ -67,7 +67,7 @@ export const App = () => {
                 title="Force re-render"
                 onPress={() => setCount(prevState =>  prevState + 1)}
             />
-            <Pressable style={styles.pressable} onPress={() => {}}>
+            <Pressable style={state => styles.pressable(state)} onPress={() => {}}>
                 <Typography value={1.1}>
                     Pressable test
                 </Typography>

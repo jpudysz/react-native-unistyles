@@ -1,5 +1,9 @@
 const { PRESSABLE_STATE_NAME } = require('./common')
 
+function generateUniqueId() {
+    return `${Math.random().toString(36).substring(2, 9)}`
+}
+
 function getRefProp(t, path) {
     return path.node.openingElement.attributes.find(attr =>
         t.isJSXAttribute(attr) &&
@@ -90,7 +94,8 @@ function arrayFromDynamicFunctionArgs(t, metadata, path) {
 
     return t.arrayExpression(memberExpressions)
 }
-function addRef(t, path, metadata, state) {
+
+function addRef(t, path, metadata, state, uniquePressableId) {
     const hasVariants = state.file.hasVariants
 
     const newRefFunction = t.arrowFunctionExpression(
@@ -103,8 +108,9 @@ function addRef(t, path, metadata, state) {
                         t.identifier('ref'),
                         arrayExpressionFromMetadata(t, metadata),
                         t.identifier(hasVariants ? '__uni__variants' : 'undefined'),
-                        arrayFromDynamicFunctionArgs(t, metadata, path)
-                    ]
+                        arrayFromDynamicFunctionArgs(t, metadata, path),
+                        uniquePressableId ? t.stringLiteral(uniquePressableId) : undefined
+                    ].filter(Boolean)
                 )
             ),
             t.returnStatement(
@@ -126,7 +132,7 @@ function addRef(t, path, metadata, state) {
     path.node.openingElement.attributes.push(newRefProp)
 }
 
-function overrideRef(t, path, refProp, metadata, state) {
+function overrideRef(t, path, refProp, metadata, state, uniquePressableId) {
     const hasVariants = state.file.hasVariants
     const uniqueRefName = path.scope.generateUidIdentifier('ref').name
     const isIdentifier = t.isIdentifier(refProp.value.expression)
@@ -152,8 +158,9 @@ function overrideRef(t, path, refProp, metadata, state) {
                             t.identifier(uniqueRefName),
                             arrayExpressionFromMetadata(t, metadata),
                             t.identifier(hasVariants ? '__uni__variants' : 'undefined'),
-                            arrayFromDynamicFunctionArgs(t, metadata, path)
-                        ]
+                            arrayFromDynamicFunctionArgs(t, metadata, path),
+                            uniquePressableId ? t.stringLiteral(uniquePressableId) : undefined
+                        ].filter(Boolean)
                     )
                 ),
                 t.returnStatement(
@@ -197,8 +204,9 @@ function overrideRef(t, path, refProp, metadata, state) {
                             t.identifier(userRefName),
                             arrayExpressionFromMetadata(t, metadata),
                             t.identifier(hasVariants ? '__uni__variants' : 'undefined'),
-                            arrayFromDynamicFunctionArgs(t, metadata, path)
-                        ]
+                            arrayFromDynamicFunctionArgs(t, metadata, path),
+                            uniquePressableId ? t.stringLiteral(uniquePressableId) : undefined
+                        ].filter(Boolean)
                     )
                 ),
                 // Merged cleanup function
@@ -259,8 +267,9 @@ function overrideRef(t, path, refProp, metadata, state) {
                         t.identifier(uniqueRefName),
                         arrayExpressionFromMetadata(t, metadata),
                         t.identifier(hasVariants ? '__uni__variants' : 'undefined'),
-                        arrayFromDynamicFunctionArgs(t, metadata, path)
-                    ]
+                        arrayFromDynamicFunctionArgs(t, metadata, path),
+                        uniquePressableId ? t.stringLiteral(uniquePressableId) : undefined
+                    ].filter(Boolean)
                 )
             ),
             t.returnStatement(
@@ -291,5 +300,6 @@ module.exports = {
     getRefProp,
     addRef,
     overrideRef,
-    hasStringRef
+    hasStringRef,
+    generateUniqueId
 }
