@@ -1,4 +1,5 @@
 const { PRESSABLE_STATE_NAME } = require('./common')
+const { generateUniqueId } = require('./ref')
 
 function getStyleMetadata(t, node, dynamicFunction = null) {
     // {styles.container}
@@ -143,6 +144,8 @@ function handlePressable(t, path, styleAttr, metadata) {
             t.identifier(members[0])
         )
 
+        const uniquePressableId = generateUniqueId()
+
         // state => typeof style.pressable === 'function' ? style.pressable(state) : style.pressable
         styleAttr.value.expression = t.arrowFunctionExpression(
             [t.identifier("state")],
@@ -157,13 +160,18 @@ function handlePressable(t, path, styleAttr, metadata) {
                 ),
                 t.callExpression(
                     stylePath,
-                    [t.identifier("state")]
+                    [t.identifier("state"), t.objectExpression([
+                        t.objectProperty(
+                            t.identifier("__uni_pressable_id"),
+                            t.stringLiteral(uniquePressableId)
+                        )
+                    ])]
                 ),
                 stylePath
             )
         )
 
-        return
+        return uniquePressableId
     }
 
     // {style.pressable(1, 2)}
@@ -212,8 +220,19 @@ function handlePressable(t, path, styleAttr, metadata) {
             return arg
         })
 
+        const uniquePressableId = generateUniqueId()
+
+        args.arguments.push(t.objectExpression([
+            t.objectProperty(
+                t.identifier("__uni_pressable_id"),
+                t.stringLiteral(uniquePressableId)
+            )
+        ]))
+
         // update arrow function arg name
         styleExpression.params[0].name = PRESSABLE_STATE_NAME
+
+        return uniquePressableId
     }
 }
 
