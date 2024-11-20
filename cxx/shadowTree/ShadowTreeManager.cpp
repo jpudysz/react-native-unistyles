@@ -109,6 +109,10 @@ ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode
             *shadowNode.getContextContainer()
         };
 
+        // this is important and critical
+        // first of all Android doesn't like nullish props (they work perfectly fine on iOS)
+        // second of all Android props MUST be constructed from previous props, otherwise RawProps::~RawProps error occurs
+        // Meta wants to remove shadowNode.getProps()->rawProps, but for now it's the only viable solution
         #ifdef ANDROID
             auto safeProps = rawPropsIt->second == nullptr ? folly::dynamic::object() : rawPropsIt->second;
             auto newProps = folly::dynamic::merge(shadowNode.getProps()->rawProps, safeProps);

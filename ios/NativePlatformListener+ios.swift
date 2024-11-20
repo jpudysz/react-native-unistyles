@@ -4,7 +4,6 @@ extension NativeIOSPlatform {
     func setupPlatformListeners() {
         NotificationCenter.default.publisher(for: NSNotification.Name("RCTWindowFrameDidChangeNotification"))
             // add small delay (10ms) to make sure all values are up ot date
-            // we MUST call it on current thread, otherwise random crashes occurs
             .delay(for: .milliseconds(10), scheduler: RunLoop.current)
             .sink { [weak self] notification in
                 self?.onWindowChange(notification)

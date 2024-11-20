@@ -187,11 +187,22 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
             return getContentSizeCategoryFn()
         }
     }
+    
+    func getMainWindow() -> UIWindow? {
+        guard let mainWindow = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .flatMap({ $0.windows })
+            .first(where: { $0.isKeyWindow }) else {
+            return nil
+        }
+        
+        return mainWindow
+    }
 
     // todo handle IME animation
     func getInsets() -> Insets {
         func getInsetsFn() -> Insets {
-            guard let window = UIApplication.shared.windows.first else {
+            guard let window = getMainWindow() else {
                 // this should never happen, but it's better to return zeros
                 return Insets(top: 0, bottom: 0, left: 0, right: 0, ime: 0)
             }
@@ -235,7 +246,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
 
     func getStatusBarDimensions() -> Dimensions {
         func getStatusBarDimensionsFn() -> Dimensions {
-            guard let window = UIApplication.shared.windows.first,
+            guard let window = getMainWindow(),
                   let statusBarManager = window.windowScene?.statusBarManager else {
                 // this should never happen, but it's better to return defaults
                 return Dimensions(width: 0, height: 0)
