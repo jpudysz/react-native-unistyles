@@ -1,17 +1,10 @@
 ---
 title: Introduction
+description: What is Unistyles?
 ---
 
 import { Card, Tabs, TabItem, CardGrid, Icon, Steps } from '@astrojs/starlight/components'
-import Seo from '../../../components/Seo.astro'
-import Logo from '../../../assets/logo.svg'
-
-<Seo
-    seo={{
-        title: 'Introduction',
-        description: 'What is Unistyles?'
-    }}
->
+import Logo from '../../../../assets/logo.svg'
 
 <div style="display:flex;justify-content:center;flex-direction:column;align-items:center;">
     <img
@@ -95,5 +88,3 @@ const stylesheet = createStyleSheet(theme => ({
 The library offers first-class support for `TypeScript`, providing guidance with Intellisense as you create your extended StyleSheets.
 
 Are you ready to give it a try?
-
-</Seo>

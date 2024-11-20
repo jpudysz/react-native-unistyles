@@ -1,32 +1,189 @@
 ---
 import '@fontsource-variable/nunito'
-
-import Features from '../components/Features.astro'
-import Footer from '../components/Footer.astro'
-import Hero from '../components/Hero.astro'
-import Nav from '../components/nav/Nav.astro'
-import Seo from '../components/Seo.astro'
 import '../styles/home.css'
-
-const homeSeo = {
-    title: 'Welcome to Unistyles 2.0 | Unistyles',
-    description: 'Level up your React Native StyleSheet'
-}
+import { Button } from '../components'
+import { SEO } from 'astro-seo'
 ---
 
-<Seo seo={homeSeo}>
-    <Nav />
-    <main>
-        <Hero />
-        <Features />
-        <Footer />
-    </main>
-</Seo>
+<!doctype html>
+<html lang="pl">
+	<head>
+        <SEO
+            charset="UTF-8"
+            title="LP"
+            description="LP"
+            extend={{
+                link: [
+                    { rel: 'icon', href: './favicon.png' }
+                ],
+                meta: [
+                    { name: 'viewport', content: 'width=device-width, viewport-fit=cover, height=device-height, initial-scale=1' },
+                    { name: 'generator', content: Astro.generator },
+                    { name: 'keywords', content: 'LP' },
+                    { name: 'msapplication-TileColor', content: '#84161F' },
+                    { name: 'theme-color', content: '#84161F' }
+                ]
+            }}
+        />
+	</head>
+	<body>
+        <main>
+            <div class="content-container">
+                <div class="content">
+                    <h1>
+                        Welcome to&nbsp;<b>Unistyles&nbsp;<span class="version">3.0</span></b>
+                    </h1>
+                    <h2>
+                        Level up your React&nbsp;Native&nbsp;StyleSheet!
+                    </h2>
+                    <div class="button-container">
+                        <Button
+                            text='Get started'
+                            href='v3/start/introduction'
+                        />
+                        <Button
+                            text='Github'
+                            href='https://github.com/jpudysz/react-native-unistyles'
+                            github
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="unicorn-container">
+                <div class="light" />
+                <img class="clouds" src="./clouds.svg" />
+                <img class="unicorn" src="./unicorn.svg" />
+            </div>
+            <div class="blend" />
+        </main>
+    </body>
+</html>
 
 <style>
     main {
-        margin-top: 100px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        gap: 100px;
+        overflow: hidden;
+
+        @media (max-width: 991px) {
+            flex-direction: column-reverse;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            gap: 0px;
+            padding-top: 160px;
+        }
+    }
+
+    h1 {
+        font-size: clamp(40px, 3.5vw, 64px);
+        font-weight: 500;
+        margin-bottom: 8px;
+        line-height: 1.1em;
+
+        @media (max-width: 991px) {
+            margin-bottom: 20px;
+        }
+    }
+
+    h2 {
+        font-size: clamp(20px, 2vw, 28px);
+        font-weight: 600;
+        margin-bottom: 42px;
+
+        @media (max-width: 991px) {
+            margin-bottom: 32px;
+        }
+    }
+
+    .version {
+        color: var(--pink);
+
+        &::selection {
+            color: var(--white);
+        }
+    }
+
+    .button-container {
+        display: flex;
+        gap: 16px;
+    }
+
+    .content-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: center;
+        height: 100vh;
+        padding-bottom: 40px;
+        width: 50%;
+        z-index: 20;
+        padding-left: 32px;
+
+        @media (max-width: 991px) {
+            height: auto;
+            width: auto;
+            align-items: flex-start;
+            padding: 0 16px;
+        }
+    }
+
+    .content {
+        @media (max-width: 991px) {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
+    .unicorn-container {
         position: relative;
-        overflow-x: hidden;
+        width: 40%;
+        max-width: 1000px;
+        height: min(40vw, 1000px);
+
+        @media (max-width: 991px) {
+            width: 100%;
+            max-width: 600px;
+            translate: 15% 0%;
+        }
+    }
+
+    .light {
+        position: absolute;
+        width: 90%;
+        aspect-ratio: 1;
+        right: 30%;
+        bottom: min(6vw, 130px);
+        background: radial-gradient(50% 50% at center, rgba(0, 234, 255, 0.8), cubic-bezier(0.3, 0, 0.1, 1), transparent);
+    }
+
+    .clouds {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 140%;
+    }
+
+    .unicorn {
+        position: absolute;
+        bottom: min(3.4vw, 83px);
+        right: 16%;
+        width: 90%;
+
+        @media (max-width: 991px) {
+            bottom: min(8vw, 50px);
+        }
+    }
+
+    .blend {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(8, 0, 35, 0) 0%, rgba(242, 38, 181, 0.5) 150%);
+        mix-blend-mode: overlay;
     }
 </style>
