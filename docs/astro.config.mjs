@@ -7,6 +7,47 @@ import fs from 'node:fs'
 const themeJson = fs.readFileSync(new URL(`./theme.json`, import.meta.url), 'utf8')
 const customTheme = ExpressiveCodeTheme.fromJSONString(themeJson)
 
+const oldPaths = {
+    'start': [
+        'basic-usage',
+        'benchmarks',
+        'introduction',
+        'migration-from-1',
+        'migration-from-stylesheet',
+        'setup',
+    ],
+    'reference': [
+        'breakpoints',
+        'compound-variants',
+        'content-size-category',
+        'create-stylesheet',
+        'debugging',
+        'dimensions',
+        'dynamic-functions',
+        'edge-to-edge',
+        'errors',
+        'faq',
+        'media-queries',
+        'plugins',
+        'server-side-rendering',
+        'testing',
+        'theming',
+        'unistyles-registry',
+        'unistyles-runtime',
+        'use-initial-theme',
+        'use-styles',
+        'variants',
+        'web-support'
+    ],
+    'other': [
+        'for-library-authors',
+        'for-sponsors',
+    ],
+    'examples': [
+        'all'
+    ]
+}
+
 export default defineConfig({
 	integrations: [
         expressiveCode({
@@ -34,6 +75,13 @@ export default defineConfig({
 				}
 			],
 		}),
-        sitemap()
+        sitemap(),
 	],
+    redirects: Object.fromEntries(Object.entries(oldPaths).flatMap(([parentpath, subPaths]) => {
+        return subPaths.map(subPath => {
+            const path = `/${parentpath}/${subPath}`
+
+            return [path, `/v2${path}`]
+        })
+    }))
 });
