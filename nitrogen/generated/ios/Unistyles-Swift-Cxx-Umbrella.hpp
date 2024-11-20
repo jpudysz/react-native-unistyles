@@ -43,7 +43,7 @@ namespace margelo::nitro::unistyles { struct UnistylesNativeMiniRuntime; }
 #include <NitroModules/ArrayBufferHolder.hpp>
 #include <NitroModules/AnyMapHolder.hpp>
 #include <NitroModules/HybridContext.hpp>
-#include <NitroModules/PromiseHolder.hpp>
+#include <NitroModules/RuntimeError.hpp>
 
 // Forward declarations of Swift defined types
 // Forward declaration of `HybridNativePlatformSpecCxx` to properly resolve imports.

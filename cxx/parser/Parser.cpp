@@ -210,6 +210,7 @@ void parser::Parser::rebuildShadowLeafUpdates(jsi::Runtime& rt, core::Dependency
     auto& registry = core::UnistylesRegistry::get();
 
     for (const auto& [shadowNode, unistyles] : dependencyMap) {
+        // this step is required to parse string colors eg. #000000 to int representation
         auto rawProps = this->parseStylesToShadowTreeStyles(rt, unistyles);
 
         updates.emplace(shadowNode, std::move(rawProps));
@@ -347,7 +348,7 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
 
             // call user function
             auto result = unistyle->rawValue.asFunction(rt).call(rt, args, count);
-
+  
             // memoize metadata to call it later
             auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyle);
 
@@ -377,7 +378,7 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
     });
 }
 
-// function convert babel generated dependencies to C++ dependencies
+// function converts babel generated dependencies to C++ dependencies
 std::vector<UnistyleDependency> parser::Parser::parseDependencies(jsi::Runtime &rt, jsi::Object&& dependencies) {
     helpers::assertThat(rt, dependencies.isArray(rt), "Unistyles: Babel transform is invalid - unexpected type for dependencies.");
 
@@ -640,7 +641,7 @@ jsi::Object parser::Parser::parseCompoundVariants(jsi::Runtime& rt, Unistyle::Sh
     return parsedCompoundVariants;
 }
 
-// check every condition in compound variants, support boolean variants
+// check every condition in compound variants, supports boolean variants
 bool parser::Parser::shouldApplyCompoundVariants(jsi::Runtime& rt, const Variants& variants, jsi::Object& compoundVariant) {
     if (variants.empty()) {
         return false;

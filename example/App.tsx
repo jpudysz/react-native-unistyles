@@ -72,6 +72,11 @@ export const App = () => {
                     Pressable test
                 </Typography>
             </Pressable>
+            <Pressable style={styles.pressable} onPress={() => {}}>
+                <Typography value={1.1}>
+                    Pressable test 2
+                </Typography>
+            </Pressable>
             <TextInput style={styles.input} />
         </View>
     )
@@ -84,6 +89,7 @@ const styles = StyleSheet.create((theme, rt) => ({
         justifyContent: 'flex-end',
         backgroundColor: theme.colors.backgroundColor,
         paddingHorizontal: theme.gap(2),
+        paddingTop: rt.insets.top,
         transform: [
             {
                 translateY: rt.insets.ime * -1
