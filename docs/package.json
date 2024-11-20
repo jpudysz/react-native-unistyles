@@ -1,5 +1,6 @@
 {
   "name": "react-native-unistyles-docs",
+  "type": "module",
   "version": "1.0.0",
   "scripts": {
     "dev": "astro dev",
@@ -9,18 +10,17 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/sitemap": "3.1.6",
-    "@astrojs/starlight": "0.25.5",
-    "@fontsource-variable/nunito": "5.0.19",
-    "astro": "4.13.3",
-    "astro-expressive-code": "0.35.6",
+    "@astrojs/check": "0.9.4",
+    "@astrojs/sitemap": "3.2.1",
+    "@astrojs/starlight": "0.29.2",
+    "@fontsource-variable/nunito": "5.1.0",
+    "astro": "4.16.13",
+    "astro-expressive-code": "0.38.3",
     "astro-seo": "0.8.4",
     "autoprefixer": "10.4.20",
-    "motion": "10.18.0",
     "postcss-easing-gradients": "3.0.1",
-    "postcss-nested": "6.2.0",
-    "sharp": "0.33.4",
-    "swiper": "11.1.9"
-  },
-  "private": true
+    "postcss-nested": "7.0.2",
+    "sharp": "0.33.5",
+    "typescript": "5.6.3"
+  }
 }
