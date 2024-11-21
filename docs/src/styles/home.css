@@ -19,9 +19,6 @@
 
 body {
     background-color: var(--background);
-    background-image: url('./stars.svg');
-    background-position: top center;
-    background-size: cover;
     color: #fff;
     font-family: 'Nunito Variable', sans-serif;
 }
