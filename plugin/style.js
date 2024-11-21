@@ -1,6 +1,3 @@
-const { PRESSABLE_STATE_NAME } = require('./common')
-const { generateUniqueId } = require('./ref')
-
 function getStyleMetadata(t, node, dynamicFunction = null) {
     // {styles.container}
     if (t.isMemberExpression(node)) {
@@ -71,11 +68,6 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
         }]
     }
 
-    // pressable
-    if (t.isArrowFunctionExpression(node)) {
-        return getStyleMetadata(t, node.body, node)
-    }
-
     return []
 }
 
@@ -89,12 +81,6 @@ function getStyleAttribute(t, path) {
 
 function styleAttributeToArray(t, path) {
     const styleAttribute = getStyleAttribute(t, path)
-
-    // special case for pressable
-    // {state => styles.pressable(state)}
-    if (t.isArrowFunctionExpression(styleAttribute.value.expression)) {
-        return
-    }
 
     // {{...style.container, ...style.container}}
     if (t.isObjectExpression(styleAttribute.value.expression)) {
@@ -133,45 +119,7 @@ function handlePressable(t, path, styleAttr, metadata) {
     // {style.pressable}
     // the worst case, we don't know if user rely on state
     if (t.isMemberExpression(styleExpression)) {
-        const members = metadata.at(0).members
-
-        if (members.length === 0) {
-            return
-        }
-
-        const stylePath = members.slice(1).reduce(
-            (acc, property) => t.memberExpression(acc, t.identifier(property)),
-            t.identifier(members[0])
-        )
-
-        const uniquePressableId = generateUniqueId()
-
-        // state => typeof style.pressable === 'function' ? style.pressable(state) : style.pressable
-        styleAttr.value.expression = t.arrowFunctionExpression(
-            [t.identifier("state")],
-            t.conditionalExpression(
-                t.binaryExpression(
-                    "===",
-                    t.unaryExpression(
-                        "typeof",
-                        stylePath
-                    ),
-                    t.stringLiteral("function")
-                ),
-                t.callExpression(
-                    stylePath,
-                    [t.identifier("state"), t.objectExpression([
-                        t.objectProperty(
-                            t.identifier("__uni_pressable_id"),
-                            t.stringLiteral(uniquePressableId)
-                        )
-                    ])]
-                ),
-                stylePath
-            )
-        )
-
-        return uniquePressableId
+        return
     }
 
     // {style.pressable(1, 2)}
@@ -194,45 +142,7 @@ function handlePressable(t, path, styleAttr, metadata) {
     if (t.isArrowFunctionExpression(styleExpression) && styleExpression.params.length > 0) {
         // already a function, we need to set state to false
         // and pass it to C++ as in background it will never be true
-        const args = metadata.at(0).dynamicFunction
-
-        if (!t.isCallExpression(args) || args.arguments.length === 0) {
-            return
-        }
-
-        // get state local name
-        const stateIdentifier = styleExpression.params[0]
-
-        if (!stateIdentifier || !t.isIdentifier(stateIdentifier)) {
-            return
-        }
-
-        // replace state name with matching identifier
-        args.arguments.map(arg => {
-            if (t.isIdentifier(arg) && arg.name === stateIdentifier.name) {
-                arg.name = PRESSABLE_STATE_NAME
-            }
-
-            if (t.isMemberExpression(arg) && arg.object.name === stateIdentifier.name) {
-                arg.object.name = PRESSABLE_STATE_NAME
-            }
-
-            return arg
-        })
-
-        const uniquePressableId = generateUniqueId()
-
-        args.arguments.push(t.objectExpression([
-            t.objectProperty(
-                t.identifier("__uni_pressable_id"),
-                t.stringLiteral(uniquePressableId)
-            )
-        ]))
-
-        // update arrow function arg name
-        styleExpression.params[0].name = PRESSABLE_STATE_NAME
-
-        return uniquePressableId
+        return
     }
 }
 
