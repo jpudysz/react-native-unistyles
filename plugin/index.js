@@ -130,13 +130,13 @@ module.exports = function ({ types: t }) {
 
                 const metadata = getStyleMetadata(t, styleAttr.value.expression)
 
+                if (openingElementName === 'Pressable') {
+                    return handlePressable(t, path, styleAttr, metadata)
+                }
+
                 // style prop is using unexpected expression
                 if (metadata.length === 0) {
                     return
-                }
-
-                if (openingElementName === 'Pressable') {
-                    handlePressable(t, path, styleAttr, metadata)
                 }
 
                 styleAttributeToArray(t, path)
