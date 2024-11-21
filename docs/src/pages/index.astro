@@ -27,6 +27,7 @@ import { SEO } from 'astro-seo'
         />
 	</head>
 	<body>
+        <canvas class="galaxy" />
         <main>
             <div class="content-container">
                 <div class="content">
@@ -51,15 +52,24 @@ import { SEO } from 'astro-seo'
             </div>
             <div class="unicorn-container">
                 <div class="light" />
-                <img class="clouds" src="./clouds.svg" />
-                <img class="unicorn" src="./unicorn.svg" />
+                <img class="clouds" src="./clouds.svg" alt="clouds" />
+                <img class="unicorn" src="./unicorn.svg" alt="unicorn" />
             </div>
             <div class="blend" />
         </main>
     </body>
 </html>
 
+<script src="../animate.ts" />
+
 <style>
+    canvas {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+    }
+
     main {
         display: flex;
         justify-content: space-around;
@@ -158,6 +168,7 @@ import { SEO } from 'astro-seo'
         right: 30%;
         bottom: min(6vw, 130px);
         background: radial-gradient(50% 50% at center, rgba(0, 234, 255, 0.8), cubic-bezier(0.3, 0, 0.1, 1), transparent);
+        transition: transform 0.1s linear;
     }
 
     .clouds {
@@ -165,6 +176,7 @@ import { SEO } from 'astro-seo'
         bottom: 0;
         right: 0;
         width: 140%;
+        transition: transform 0.1s linear;
     }
 
     .unicorn {
@@ -172,6 +184,7 @@ import { SEO } from 'astro-seo'
         bottom: min(3.4vw, 83px);
         right: 16%;
         width: 90%;
+        transition: transform 0.1s linear;
 
         @media (max-width: 991px) {
             bottom: min(8vw, 50px);
