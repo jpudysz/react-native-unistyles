@@ -82,21 +82,3 @@ const animate = () => {
 }
 
 requestAnimationFrame(animate)
-
-const createAnimation = (updateFn: (progress: number) => void, duration: number, end: number) => {
-    let startTime: number | null = null
-
-    const animate = (currentTime: number) => {
-        if (startTime === null) startTime = currentTime
-        const elapsedTime = currentTime - startTime
-        const progress = Math.min(elapsedTime / duration, end)
-
-        updateFn(progress)
-
-        if (progress < end) {
-            requestAnimationFrame(animate)
-        }
-    }
-
-    requestAnimationFrame(animate)
-}
