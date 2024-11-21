@@ -79,6 +79,7 @@
     "react-native": "0.76.0",
     "react-native-builder-bob": "0.30.2",
     "react-native-nitro-modules": "0.17.0",
+    "react-native-web": "0.19.13",
     "react-test-renderer": "18.3.1",
     "release-it": "17.10.0",
     "typescript": "5.6.3"
