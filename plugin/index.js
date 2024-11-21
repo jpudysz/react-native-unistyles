@@ -1,4 +1,4 @@
-const addShadowRegistryImport = require('./import')
+const addUnistylesImport = require('./import')
 const { getStyleMetadata, getStyleAttribute, styleAttributeToArray, handlePressable } = require('./style')
 const { getRefProp, addRef, overrideRef, hasStringRef } = require('./ref')
 const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyle } = require('./stylesheet')
@@ -32,6 +32,7 @@ module.exports = function ({ types: t }) {
                 enter(path, state) {
                     state.file.hasAnyUnistyle = false
                     state.file.hasUnistylesImport = false
+                    state.file.shouldIncludePressable = false
                     state.file.styleSheetLocalName = ''
                     state.file.tagNumber = 0
                     state.file.isClassComponent = false
@@ -39,7 +40,7 @@ module.exports = function ({ types: t }) {
                 },
                 exit(path, state) {
                     if (state.file.hasAnyUnistyle) {
-                        addShadowRegistryImport(t, path)
+                        addUnistylesImport(t, path, state)
                     }
                 }
             },
@@ -89,7 +90,13 @@ module.exports = function ({ types: t }) {
                 }
 
                 if (importSource.includes('react-native')) {
-                    path.node.specifiers.forEach(specifier => {
+                    path.node.specifiers.forEach((specifier, index) => {
+                        if (specifier.imported && specifier.imported.name === 'Pressable' && specifier.local.name !== 'NativePressableReactNative') {
+                            path.node.specifiers.splice(index, 1)
+
+                            state.file.shouldIncludePressable = true
+                        }
+
                         if (specifier.imported && reactNativeComponentNames.includes(specifier.imported.name)) {
                             state.reactNativeImports[specifier.local.name] = true
                         }

@@ -1,5 +1,5 @@
 import React, { forwardRef, useRef } from 'react'
-import { Pressable as PressableBase, type PressableProps as Props, View } from 'react-native'
+import { Pressable as NativePressableReactNative, type PressableProps as Props, View } from 'react-native'
 import { UnistylesShadowRegistry } from '../specs'
 
 type PressableProps = Props & {
@@ -10,7 +10,7 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
     const storedRef = useRef<View | null>()
 
     return (
-        <PressableBase
+        <NativePressableReactNative
             {...props}
             ref={ref => {
                 storedRef.current = ref

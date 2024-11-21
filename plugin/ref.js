@@ -31,9 +31,6 @@ function arrayExpressionFromMetadata(t, metadata) {
 }
 
 function arrayFromDynamicFunctionArgs(t, metadata, path) {
-    const hasPressableDynamicFunction = path.node.openingElement.attributes
-        .find(attr => t.isJSXIdentifier(attr.name) && attr.name.name === "style" && t.isArrowFunctionExpression(attr.value.expression))
-
     const memberExpressions = metadata
         .map(meta => meta.dynamicFunction
             ? t.arrayExpression(meta.dynamicFunction.arguments)
