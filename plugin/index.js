@@ -128,9 +128,9 @@ module.exports = function ({ types: t }) {
                     return
                 }
 
-                const uniquePressableId = openingElementName === 'Pressable'
-                    ? handlePressable(t, path, styleAttr, metadata)
-                    : undefined
+                if (openingElementName === 'Pressable') {
+                    handlePressable(t, path, styleAttr, metadata)
+                }
 
                 styleAttributeToArray(t, path)
 
@@ -144,8 +144,8 @@ module.exports = function ({ types: t }) {
                 }
 
                 refProp
-                    ? overrideRef(t, path, refProp, metadata, state, uniquePressableId)
-                    : addRef(t, path, metadata, state, uniquePressableId)
+                    ? overrideRef(t, path, refProp, metadata, state)
+                    : addRef(t, path, metadata, state)
             },
             CallExpression(path, state) {
                 if (isUsingVariants(t, path)) {

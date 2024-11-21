@@ -138,10 +138,7 @@ function getSecondPropertyName(t, memberExpression) {
     return []
 }
 
-const PRESSABLE_STATE_NAME = '__uni_pressable_state'
-
 module.exports = {
     getIdentifierNameFromExpression,
-    getSecondPropertyName,
-    PRESSABLE_STATE_NAME
+    getSecondPropertyName
 }

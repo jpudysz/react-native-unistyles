@@ -334,26 +334,6 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared u
     return parsedStyle;
 }
 
-std::optional<std::string> parser::Parser::getUniquePressableIdFromArguments(jsi::Runtime& rt, const jsi::Value* args, size_t count) {
-    if (count == 0) {
-        return std::nullopt;
-    }
-
-    auto& lastArg = args[count - 1];
-
-    if (!lastArg.isObject()) {
-        return std::nullopt;
-    }
-
-    auto lastArgObj = lastArg.asObject(rt);
-
-    if (!lastArgObj.hasProperty(rt, helpers::UNI_PRESSABLE_ID.c_str())) {
-        return std::nullopt;
-    }
-
-    return lastArgObj.getProperty(rt, helpers::UNI_PRESSABLE_ID.c_str()).asString(rt).utf8(rt);
-}
-
 // function replaces original user dynamic function with additional logic to memoize arguments
 jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unistyle::Shared unistyle) {
     auto unistylesRuntime = this->_unistylesRuntime;
@@ -392,7 +372,7 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
             // update shadow leaf updates to indicate newest changes
             auto& registry = core::UnistylesRegistry::get();
 
-            registry.shadowLeafUpdateFromUnistyle(rt, unistyle, getUniquePressableIdFromArguments(rt, args, count));
+            registry.shadowLeafUpdateFromUnistyle(rt, unistyle);
 
             return style;
     });
