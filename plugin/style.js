@@ -115,16 +115,18 @@ function styleAttributeToArray(t, path) {
 
 function handlePressable(t, path, styleAttr, metadata) {
     const styleExpression = styleAttr.value.expression
-
     // {style.pressable}
-    // the worst case, we don't know if user rely on state
     if (t.isMemberExpression(styleExpression)) {
+        // user may care about state, but didn't pass
+        // any arguments, so we can ignore it
+
         return
     }
 
     // {style.pressable(1, 2)}
     if (t.isCallExpression(styleExpression)) {
         // user already called dynamic function
+        // and doesn't care about state
         // there is no work to do
         return
     }
@@ -140,9 +142,38 @@ function handlePressable(t, path, styleAttr, metadata) {
 
     // {state => style.pressable(state, 1, 2)}
     if (t.isArrowFunctionExpression(styleExpression) && styleExpression.params.length > 0) {
-        // already a function, we need to set state to false
-        // and pass it to C++ as in background it will never be true
-        return
+        // user used state with custom args we need to getBoundArgs
+        // detect between arrow function with body and arrow function
+        const wrapper = t.isBlockStatement(styleExpression.body)
+            ? styleExpression.body.body.find(node => t.isReturnStatement(node))
+            : styleExpression.body
+        const pressableArgs = t.isCallExpression(wrapper)
+            ? wrapper.arguments
+            : wrapper.argument.arguments
+        const callee = t.isCallExpression(wrapper)
+            ? wrapper.callee
+            : wrapper.argument.callee
+
+        const getBoundArgsCall = t.callExpression(
+            t.identifier('getBoundArgs'),
+            [callee]
+        )
+        const bindCall = t.callExpression(
+            t.memberExpression(getBoundArgsCall, t.identifier('bind')),
+            [t.identifier('undefined'), ...pressableArgs]
+        )
+
+        // arrow function
+        if (t.isCallExpression(wrapper)) {
+            styleExpression.body = bindCall
+
+            return
+        }
+
+        // arrow function with body
+        if (wrapper) {
+            wrapper.argument = bindCall
+        }
     }
 }
 
