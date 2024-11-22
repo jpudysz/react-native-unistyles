@@ -262,6 +262,13 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
+"reference/unistyles-provider.mdx": {
+	id: "reference/unistyles-provider.mdx";
+  slug: "reference/unistyles-provider";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
 "reference/unistyles-registry.mdx": {
 	id: "reference/unistyles-registry.mdx";
   slug: "reference/unistyles-registry";

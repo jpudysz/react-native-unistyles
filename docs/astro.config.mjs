@@ -64,6 +64,11 @@ export default defineConfig({
                             link: '/reference/use-styles/'
                         },
                         {
+                            label: 'UnistylesProvider',
+                            link: '/reference/unistyles-provider/',
+                            badge: 'New'
+                        },
+                        {
                             label: 'Dynamic functions',
                             link: '/reference/dynamic-functions/'
                         },
@@ -105,8 +110,7 @@ export default defineConfig({
                         },
                         {
                             label: 'Unistyles Runtime',
-                            link: '/reference/unistyles-runtime/',
-                            badge: 'Updated'
+                            link: '/reference/unistyles-runtime/'
                         },
                         {
                             label: 'Content size category',
