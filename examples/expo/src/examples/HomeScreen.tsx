@@ -514,7 +514,7 @@ export const HomeScreen = () => {
                             UnistylesRegistry
                                 .addThemes({
                                     light: lightTheme,
-                                    premium: premiumTheme
+                                    dark: darkTheme
                                     // we need to cast it to UnistylesThemes as we already registered 3 themes with TypeScript under styles/index.ts,
                                     // but we want to demonstrate how to register two themes
                                 } as UnistylesThemes)

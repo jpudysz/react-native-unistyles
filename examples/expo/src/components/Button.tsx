@@ -5,12 +5,14 @@ type ButtonProps = {
     color?: string,
     textColor?: string,
     title: string,
+    alignCenter?: boolean,
     onPress: VoidFunction
 }
 
 export const Button: React.FunctionComponent<ButtonProps> = ({
     onPress,
     title,
+    alignCenter = false,
     textColor = 'white',
     color = '#29cbfa'
 }) => (
@@ -22,7 +24,7 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
             borderRadius: 10
         }}
     >
-        <Text style={{ color: textColor }}>
+        <Text style={{ color: textColor, textAlign: alignCenter ? 'center' : undefined }}>
             {title}
         </Text>
     </Pressable>

@@ -1,7 +1,11 @@
 import React from 'react'
-import { Text, View } from 'react-native'
-import { createStyleSheet, useStyles, UnistylesRuntime, useInitialTheme, UnistylesProvider } from 'react-native-unistyles'
+import { ScrollView, Text, View } from 'react-native'
+import { createStyleSheet, useStyles, UnistylesProvider, UnistylesRuntime } from 'react-native-unistyles'
 import { Button, DemoScreen } from '../components'
+
+type BoxProps = {
+    index: number
+}
 
 export const ReactProviderScreen: React.FunctionComponent = () => (
     <UnistylesProvider>
@@ -9,27 +13,48 @@ export const ReactProviderScreen: React.FunctionComponent = () => (
     </UnistylesProvider>
 )
 
-const ReactProviderScreenScreenContent: React.FunctionComponent = () => {
-    useInitialTheme('premium')
+const Box: React.FunctionComponent<BoxProps> = ({ index }) => {
+    const { styles } = useStyles(stylesheet)
 
-    const { styles, theme } = useStyles(stylesheet)
+    return (
+        <View style={styles.box}>
+            <Text style={styles.text}>
+                {index + 1}
+            </Text>
+        </View>
+    )
+}
+
+const ReactProviderScreenScreenContent: React.FunctionComponent = () => {
+    const { styles } = useStyles(stylesheet)
 
     return (
         <DemoScreen>
             <View style={styles.container}>
-                <Text style={styles.text}>
-                    This screen has two themes registered with `UnistylesRegistry.addThemes` function.
+                <Text style={styles.title}>
+                    This screen uses UnistylesProvider that may help if your app have hundreds of useStyles hooks.
                 </Text>
-                <Text style={styles.text}>
-                    It also shows a way to switch the theme from anywhere of your app. You can do that importing `UnistylesRuntime` and calling `setTheme` function.
+                <Text style={styles.title}>
+                    Rendering 1000 boxes with 1000 useStyles hooks:
                 </Text>
-                <Text style={styles.text}>
-                    This screen uses {UnistylesRuntime.themeName} theme.
-                </Text>
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    {Array.from({ length: 1000 }).map((_, index) => (
+                        <Box
+                            key={index}
+                            index={index}
+                        />
+                    ))}
+                </ScrollView>
+            </View>
+            <View style={styles.absolutView}>
                 <Button
-                    title="Switch theme"
-                    color={theme.colors.accent}
-                    onPress={() => UnistylesRuntime.setTheme(UnistylesRuntime.themeName === 'light' ? 'premium' : 'light')}
+                    alignCenter
+                    title="Change theme"
+                    onPress={() => {
+                        UnistylesRuntime.themeName === 'light'
+                            ? UnistylesRuntime.setTheme('dark')
+                            : UnistylesRuntime.setTheme('light')
+                    }}
                 />
             </View>
         </DemoScreen>
@@ -45,8 +70,30 @@ const stylesheet = createStyleSheet(theme => ({
         backgroundColor: theme.colors.backgroundColor,
         rowGap: 20
     },
+    title: {
+        fontSize: 20,
+        textAlign: 'center',
+        color: theme.colors.typography
+    },
     text: {
         textAlign: 'center',
         color: theme.colors.typography
+    },
+    boxes: {
+        flexDirection: 'row'
+    },
+    box: {
+        height: 40,
+        width: 40,
+        justifyContent: 'center',
+        marginBottom: 10,
+        backgroundColor: theme.colors.accent
+    },
+    absolutView: {
+        position: 'absolute',
+        bottom: 0,
+        left: 50,
+        right: 50,
+        height: 100
     }
 }))
