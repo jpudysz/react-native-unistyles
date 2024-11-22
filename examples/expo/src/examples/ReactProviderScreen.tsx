@@ -3,13 +3,13 @@ import { Text, View } from 'react-native'
 import { createStyleSheet, useStyles, UnistylesRuntime, useInitialTheme, UnistylesProvider } from 'react-native-unistyles'
 import { Button, DemoScreen } from '../components'
 
-export const TwoThemesWithProviderScreen: React.FunctionComponent = () => (
+export const ReactProviderScreen: React.FunctionComponent = () => (
     <UnistylesProvider>
-        <TwoThemesWithProviderScreenContent />
+        <ReactProviderScreenScreenContent />
     </UnistylesProvider>
 )
 
-const TwoThemesWithProviderScreenContent: React.FunctionComponent = () => {
+const ReactProviderScreenScreenContent: React.FunctionComponent = () => {
     useInitialTheme('premium')
 
     const { styles, theme } = useStyles(stylesheet)
