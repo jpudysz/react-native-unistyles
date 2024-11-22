@@ -8,7 +8,7 @@
     "tsc": "node_modules/typescript/bin/tsc --noEmit",
     "lint": "biome lint",
     "prepare": "husky && bob build",
-    "precommit": "concurrently 'bun tsc' 'bun lint' 'bun test'",
+    "precommit": "concurrently 'yarn tsc' 'yarn lint' 'yarn test'",
     "release": "release-it"
   },
   "main": "lib/commonjs/index",
@@ -42,11 +42,7 @@
     "react-native",
     "ios",
     "android",
-    "react-native-macos",
-    "react-native-windows",
     "react-native-web",
-    "react-native-tvos",
-    "react-native-visionos",
     "expo"
   ],
   "repository": "https://github.com/jpudysz/react-native-unistyles",
