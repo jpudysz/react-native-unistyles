@@ -1,5 +1,5 @@
-import React, { forwardRef, useRef } from 'react'
-import { Pressable as NativePressableReactNative, type PressableProps as Props, type View, type ViewStyle } from 'react-native'
+import React, { forwardRef, useEffect, useRef } from 'react'
+import { Pressable as NativePressableReactNative, type PressableProps as Props, View, type ViewStyle } from 'react-native'
 import { UnistylesShadowRegistry } from '../specs'
 
 type WebPressableState = {
@@ -29,19 +29,21 @@ const events = {
 } satisfies Partial<Record<keyof HTMLElementEventMap, Partial<WebPressableState>>>
 
 export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ...props }, passedRef) => {
-    const pressableState = useRef<WebPressableState>(initialState)
+    const storedRef = useRef<View | null>()
+    const state = useRef<WebPressableState>(initialState)
+    const styleRef = useRef(style)
 
-    const styleEvents = (ref: HTMLDivElement | null) => {
-        if (!ref) {
-            return
-        }
+    useEffect(() => {
+        styleRef.current = style
+    }, [style])
 
-        const handler = (newState: Partial<WebPressableState>) => async () => {
-            pressableState.current = { ...pressableState.current, ...newState }
+    useEffect(() => {
+        const handler = (newState: Partial<WebPressableState>) => () => {
+            state.current = { ...state.current, ...newState }
 
-            const styleResult = typeof style === 'function'
-                ? style(pressableState.current)
-                : style
+            const styleResult = typeof styleRef.current === 'function'
+                ? styleRef.current(state.current)
+                : styleRef.current
             const fnArgs = typeof styleResult === 'function'
                 // @ts-expect-error - this is hidden from TS
                 ? styleResult.getBoundArgs()
@@ -51,8 +53,15 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                 : styleResult
 
             // @ts-expect-error - this is hidden from TS
-            UnistylesShadowRegistry.add(ref, [extractedResult], variants, [fnArgs])
+            UnistylesShadowRegistry.add(storedRef.current, [extractedResult], variants, [fnArgs])
         }
+
+        if (!storedRef.current) {
+            return
+        }
+
+        // ref on the web is dom element
+        const ref = storedRef.current as unknown as HTMLDivElement
 
         Object.entries(events).forEach(([event, state]) => {
             ref.addEventListener(event, handler(state))
@@ -63,12 +72,13 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                 ref.removeEventListener(event, handler(state))
             })
         }
-    }
+    }, [])
 
     return (
         <NativePressableReactNative
             {...props}
             ref={ref => {
+                storedRef.current = ref
                 const styleResult = typeof style === 'function'
                     ? style(initialState)
                     : style
@@ -84,21 +94,8 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                     passedRef.current = ref
                 }
 
-                const returnFn = typeof passedRef === 'function'
-                    ? passedRef(ref)
-                    : () => {}
-
                 // @ts-expect-error - this is hidden from TS
                 UnistylesShadowRegistry.add(ref, [extractedResult], variants, [fnArgs])
-                const dispose = styleEvents(ref as unknown as HTMLDivElement)
-
-                return () => {
-                    dispose?.()
-
-                    if (typeof returnFn === 'function') {
-                        returnFn()
-                    }
-                }
             }}
         />
     )
