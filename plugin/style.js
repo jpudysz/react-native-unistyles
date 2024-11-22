@@ -113,7 +113,16 @@ function styleAttributeToArray(t, path) {
     styleAttribute.value.expression = t.arrayExpression([styleAttribute.value.expression])
 }
 
-function handlePressable(t, path, styleAttr, metadata) {
+function handlePressable(t, path, styleAttr, metadata, state) {
+    if (state.file.hasVariants) {
+        const variants = t.jsxAttribute(
+            t.jsxIdentifier('variants'),
+            t.jsxExpressionContainer(t.identifier('__uni__variants'))
+        );
+
+        path.node.openingElement.attributes.push(variants)
+    }
+
     const styleExpression = styleAttr.value.expression
     // {style.pressable}
     if (t.isMemberExpression(styleExpression)) {
