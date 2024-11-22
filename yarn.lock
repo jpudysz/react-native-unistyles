@@ -1790,7 +1790,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:7.26.0, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.18.6, @babel/runtime@npm:^7.23.2, @babel/runtime@npm:^7.25.0, @babel/runtime@npm:^7.8.4":
+"@babel/runtime@npm:7.26.0, @babel/runtime@npm:^7.18.6, @babel/runtime@npm:^7.23.2, @babel/runtime@npm:^7.25.0, @babel/runtime@npm:^7.8.4":
   version: 7.26.0
   resolution: "@babel/runtime@npm:7.26.0"
   dependencies:
@@ -4045,28 +4045,6 @@ __metadata:
   dependencies:
     "@sinonjs/commons": ^3.0.0
   checksum: 614d30cb4d5201550c940945d44c9e0b6d64a888ff2cd5b357f95ad6721070d6b8839cd10e15b76bf5e14af0bcc1d8f9ec00d49a46318f1f669a4bec1d7f3148
-  languageName: node
-  linkType: hard
-
-"@testing-library/react-hooks@npm:8.0.1":
-  version: 8.0.1
-  resolution: "@testing-library/react-hooks@npm:8.0.1"
-  dependencies:
-    "@babel/runtime": ^7.12.5
-    react-error-boundary: ^3.1.0
-  peerDependencies:
-    "@types/react": ^16.9.0 || ^17.0.0
-    react: ^16.9.0 || ^17.0.0
-    react-dom: ^16.9.0 || ^17.0.0
-    react-test-renderer: ^16.9.0 || ^17.0.0
-  peerDependenciesMeta:
-    "@types/react":
-      optional: true
-    react-dom:
-      optional: true
-    react-test-renderer:
-      optional: true
-  checksum: 7fe44352e920deb5cb1876f80d64e48615232072c9d5382f1e0284b3aab46bb1c659a040b774c45cdf084a5257b8fe463f7e08695ad8480d8a15635d4d3d1f6d
   languageName: node
   linkType: hard
 
@@ -12607,17 +12585,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-error-boundary@npm:^3.1.0":
-  version: 3.1.4
-  resolution: "react-error-boundary@npm:3.1.4"
-  dependencies:
-    "@babel/runtime": ^7.12.5
-  peerDependencies:
-    react: ">=16.13.1"
-  checksum: f36270a5d775a25c8920f854c0d91649ceea417b15b5bc51e270a959b0476647bb79abb4da3be7dd9a4597b029214e8fe43ea914a7f16fa7543c91f784977f1b
-  languageName: node
-  linkType: hard
-
 "react-is@npm:^16.12.0 || ^17.0.0 || ^18.0.0, react-is@npm:^18.0.0, react-is@npm:^18.3.1":
   version: 18.3.1
   resolution: "react-is@npm:18.3.1"
@@ -12745,7 +12712,6 @@ __metadata:
     "@commitlint/config-conventional": 19.6.0
     "@react-native/normalize-colors": 0.76.3
     "@release-it/conventional-changelog": 9.0.3
-    "@testing-library/react-hooks": 8.0.1
     "@types/jest": 29.5.14
     "@types/react": 18.3.12
     babel-plugin-tester: 11.0.4
