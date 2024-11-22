@@ -504,7 +504,7 @@ pluginTester({
             `
         },
         {
-            title: 'Should do nothing if pressable already called dynamic function',
+            title: 'Should wrap pressable with getBoundArgs if dynamic function is already called',
             code: `
                 import { View, Pressable, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
@@ -569,7 +569,7 @@ pluginTester({
             `
         },
         {
-            title: 'Should do nothing if pressable is parameterless arrow function and style is dynamic function',
+            title: 'Should wrap pressable with getBoundArgs if style is dynamic function wrapper in arrow function',
             code: `
                 import { View, Pressable, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
@@ -611,7 +611,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable style={() => getBoundArgs(styles.pressable).bind(undefined, 1, 2)} rawStyle={[]}>
+                            <Pressable style={() => getBoundArgs(styles.pressable).bind(undefined, 1, 2)} rawStyle={[styles.pressable]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -676,7 +676,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable style={() => styles.pressable} rawStyle={[]}>
+                            <Pressable style={() => styles.pressable} rawStyle={[styles.pressable]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -699,7 +699,7 @@ pluginTester({
             `
         },
         {
-            title: 'Should pass pressable state to dynamic function and pressable false to C++',
+            title: 'Should pass pressable state to dynamic function and be wrapper in getBoundArgs',
             code: `
                 import { View, Pressable, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
@@ -741,7 +741,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state)} rawStyle={[]}>
+                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state)} rawStyle={[styles.pressable]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -764,7 +764,7 @@ pluginTester({
             `
         },
         {
-            title: 'Should pass pressable state and other arguments to dynamic function and pressable false to C++',
+            title: 'Should pass all arguments to dynamic function and be wrapper in getBoundArgs',
             code: `
                 import { View, Pressable, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
@@ -806,137 +806,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state, 1)} rawStyle={[]}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top,
-                            uni__dependencies: [0, 4, 9]
-                        }),
-                        pressable: (state, times) => ({
-                            marginRight: state.pressed ? 10 : 20 * times
-                        })
-                    }
-                }, 793953373)
-            `
-        },
-        {
-            title: 'Should pass pressable state to dynamic function and false to C++',
-            code: `
-                import { View, Pressable, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View style={styles.container}>
-                            <Pressable style={state => styles.pressable(state.pressed)}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top
-                        }),
-                        pressable: (state, times) => ({
-                            marginRight: state.pressed ? 10 : 20 * times
-                        })
-                    }
-                })
-            `,
-            output: `
-                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
-                import { View, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
-                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state.pressed)} rawStyle={[]}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top,
-                            uni__dependencies: [0, 4, 9]
-                        }),
-                        pressable: (state, times) => ({
-                            marginRight: state.pressed ? 10 : 20 * times
-                        })
-                    }
-                }, 793953373)
-            `
-        },
-        {
-            title: 'Should pass pressable state and other arguments to dynamic function and false to C++',
-            code: `
-                import { View, Pressable, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View style={styles.container}>
-                            <Pressable style={state => styles.pressable(state.pressed, 1)}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top
-                        }),
-                        pressable: (state, times) => ({
-                            marginRight: state.pressed ? 10 : 20 * times
-                        })
-                    }
-                })
-            `,
-            output: `
-                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
-                import { View, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
-                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state.pressed, 1)} rawStyle={[]}>
+                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state, 1)} rawStyle={[styles.pressable]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -1070,7 +940,152 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state.pressed, 1)} rawStyle={[]}>
+                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state.pressed, 1)} rawStyle={[styles.pressable]}>
+                                <Text>Hello world</Text>
+                            </Pressable>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => {
+                    return {
+                        container: () => ({
+                            backgroundColor: theme.colors.background,
+                            variants: {},
+                            paddingTop: rt.insets.top,
+                            uni__dependencies: [0, 4, 9]
+                        }),
+                        pressable: (state, times) => ({
+                            marginRight: state.pressed ? 10 : 20 * times,
+                            backgroundColor: state.pressed ? theme.colors.barbie : theme.colors.background,
+                            uni__dependencies: [0]
+                        })
+                    }
+                }, 793953373)
+            `
+        },
+        {
+            title: 'Should pass variants to pressable',
+            code: `
+                import { View, Pressable, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    styles.useVariants({})
+
+                    return (
+                        <View style={styles.container}>
+                            <Pressable style={state => styles.pressable(state.pressed, 1)}>
+                                <Text>Hello world</Text>
+                            </Pressable>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => {
+                    return {
+                        container: () => ({
+                            backgroundColor: theme.colors.background,
+                            variants: {},
+                            paddingTop: rt.insets.top
+                        }),
+                        pressable: (state, times) => ({
+                            marginRight: state.pressed ? 10 : 20 * times,
+                            backgroundColor: state.pressed ? theme.colors.barbie : theme.colors.background
+                        })
+                    }
+                })
+            `,
+            output: `
+                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    const __uni__variants = {}
+                    styles.useVariants(__uni__variants)
+
+                    return (
+                        <View
+                            style={[styles.container]}
+                            ref={ref => {
+                                UnistylesShadowRegistry.add(ref, [styles.container], __uni__variants, [[]])
+                                return () => UnistylesShadowRegistry.remove(ref)
+                            }}
+                        >
+                            <Pressable
+                                style={state => getBoundArgs(styles.pressable).bind(undefined, state.pressed, 1)}
+                                variants={__uni__variants}
+                                rawStyle={[styles.pressable]}
+                            >
+                                <Text>Hello world</Text>
+                            </Pressable>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => {
+                    return {
+                        container: () => ({
+                            backgroundColor: theme.colors.background,
+                            variants: {},
+                            paddingTop: rt.insets.top,
+                            uni__dependencies: [0, 4, 9]
+                        }),
+                        pressable: (state, times) => ({
+                            marginRight: state.pressed ? 10 : 20 * times,
+                            backgroundColor: state.pressed ? theme.colors.barbie : theme.colors.background,
+                            uni__dependencies: [0]
+                        })
+                    }
+                }, 793953373)
+            `
+        },
+        {
+            title: 'Should pass more raw styles to pressable',
+            code: `
+                import { View, Pressable, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View style={styles.container}>
+                            <Pressable style={[styles.pressable, styles.container]}>
+                                <Text>Hello world</Text>
+                            </Pressable>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => {
+                    return {
+                        container: () => ({
+                            backgroundColor: theme.colors.background,
+                            variants: {},
+                            paddingTop: rt.insets.top
+                        }),
+                        pressable: (state, times) => ({
+                            marginRight: state.pressed ? 10 : 20 * times,
+                            backgroundColor: state.pressed ? theme.colors.barbie : theme.colors.background
+                        })
+                    }
+                })
+            `,
+            output: `
+                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View
+                            style={[styles.container]}
+                            ref={ref => {
+                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
+                                return () => UnistylesShadowRegistry.remove(ref)
+                            }}
+                        >
+                            <Pressable style={[styles.pressable, styles.container]} rawStyle={[styles.pressable, styles.container]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>

@@ -68,6 +68,10 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
         }]
     }
 
+    if (t.isArrowFunctionExpression(node)) {
+        return getStyleMetadata(t, node.body, node)
+    }
+
     return []
 }
 
@@ -118,7 +122,7 @@ function handlePressable(t, path, styleAttr, metadata, state) {
         const variants = t.jsxAttribute(
             t.jsxIdentifier('variants'),
             t.jsxExpressionContainer(t.identifier('__uni__variants'))
-        );
+        )
 
         path.node.openingElement.attributes.push(variants)
     }
