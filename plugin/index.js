@@ -1,4 +1,4 @@
-const addShadowRegistryImport = require('./import')
+const addUnistylesImport = require('./import')
 const { getStyleMetadata, getStyleAttribute, styleAttributeToArray, handlePressable } = require('./style')
 const { getRefProp, addRef, overrideRef, hasStringRef } = require('./ref')
 const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyle } = require('./stylesheet')
@@ -32,6 +32,8 @@ module.exports = function ({ types: t }) {
                 enter(path, state) {
                     state.file.hasAnyUnistyle = false
                     state.file.hasUnistylesImport = false
+                    state.file.shouldIncludePressable = false
+                    state.file.hasVariants = false
                     state.file.styleSheetLocalName = ''
                     state.file.tagNumber = 0
                     state.file.isClassComponent = false
@@ -39,7 +41,7 @@ module.exports = function ({ types: t }) {
                 },
                 exit(path, state) {
                     if (state.file.hasAnyUnistyle) {
-                        addShadowRegistryImport(t, path)
+                        addUnistylesImport(t, path, state)
                     }
                 }
             },
@@ -90,10 +92,18 @@ module.exports = function ({ types: t }) {
 
                 if (importSource.includes('react-native')) {
                     path.node.specifiers.forEach(specifier => {
+                        if (specifier.imported && specifier.imported.name === 'Pressable' && specifier.local.name !== 'NativePressableReactNative') {
+                            state.file.shouldIncludePressable = true
+                        }
+
                         if (specifier.imported && reactNativeComponentNames.includes(specifier.imported.name)) {
                             state.reactNativeImports[specifier.local.name] = true
                         }
                     })
+                }
+
+                if (importSource.includes('react-native-web/dist/exports/Pressable')) {
+                    state.file.shouldIncludePressable = true
                 }
             },
             JSXElement(path, state) {
@@ -123,14 +133,14 @@ module.exports = function ({ types: t }) {
 
                 const metadata = getStyleMetadata(t, styleAttr.value.expression)
 
+                if (openingElementName === 'Pressable') {
+                    return handlePressable(t, path, styleAttr, metadata, state)
+                }
+
                 // style prop is using unexpected expression
                 if (metadata.length === 0) {
                     return
                 }
-
-                const uniquePressableId = openingElementName === 'Pressable'
-                    ? handlePressable(t, path, styleAttr, metadata)
-                    : undefined
 
                 styleAttributeToArray(t, path)
 
@@ -144,8 +154,8 @@ module.exports = function ({ types: t }) {
                 }
 
                 refProp
-                    ? overrideRef(t, path, refProp, metadata, state, uniquePressableId)
-                    : addRef(t, path, metadata, state, uniquePressableId)
+                    ? overrideRef(t, path, refProp, metadata, state)
+                    : addRef(t, path, metadata, state)
             },
             CallExpression(path, state) {
                 if (isUsingVariants(t, path)) {

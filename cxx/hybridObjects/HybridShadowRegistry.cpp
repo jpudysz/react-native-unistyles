@@ -11,8 +11,8 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     core::Variants variants = helpers::variantsToPairs(rt, args[2].asObject(rt));
     jsi::Array rawArguments = args[3].asObject(rt).asArray(rt);
     std::optional<std::string> uniquePressableId = args[4].isUndefined()
-        ? std::nullopt
-        : std::make_optional<std::string>(args[4].asString(rt).utf8(rt));
+            ? std::nullopt
+            : std::make_optional<std::string>(args[4].asString(rt).utf8(rt));
     std::vector<std::vector<folly::dynamic>> arguments;
     auto& registry = core::UnistylesRegistry::get();
     

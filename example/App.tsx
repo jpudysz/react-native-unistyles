@@ -67,16 +67,17 @@ export const App = () => {
                 title="Force re-render"
                 onPress={() => setCount(prevState =>  prevState + 1)}
             />
-            <Pressable style={state => styles.pressable(state)} onPress={() => {}}>
-                <Typography value={1.1}>
-                    Pressable test
-                </Typography>
-            </Pressable>
-            <Pressable style={styles.pressable} onPress={() => {}}>
-                <Typography value={1.1}>
-                    Pressable test 2
-                </Typography>
-            </Pressable>
+            {Array.from({ length: 3}).map((_, index) => (
+                <Pressable
+                    key={index}
+                    style={styles.pressable}
+                    onPress={() => {}}
+                >
+                    <Typography value={1.1}>
+                        Pressable test {index + 1}
+                    </Typography>
+                </Pressable>
+            ))}
             <TextInput style={styles.input} />
         </View>
     )

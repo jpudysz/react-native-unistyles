@@ -334,26 +334,6 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared u
     return parsedStyle;
 }
 
-std::optional<std::string> parser::Parser::getUniquePressableIdFromArguments(jsi::Runtime& rt, const jsi::Value* args, size_t count) {
-    if (count == 0) {
-        return std::nullopt;
-    }
-
-    auto& lastArg = args[count - 1];
-
-    if (!lastArg.isObject()) {
-        return std::nullopt;
-    }
-
-    auto lastArgObj = lastArg.asObject(rt);
-
-    if (!lastArgObj.hasProperty(rt, helpers::UNI_PRESSABLE_ID.c_str())) {
-        return std::nullopt;
-    }
-
-    return lastArgObj.getProperty(rt, helpers::UNI_PRESSABLE_ID.c_str()).asString(rt).utf8(rt);
-}
-
 // function replaces original user dynamic function with additional logic to memoize arguments
 jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unistyle::Shared unistyle) {
     auto unistylesRuntime = this->_unistylesRuntime;
@@ -363,7 +343,9 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
         jsi::PropNameID::forUtf8(rt, unistyle->styleKey),
         1,
         [this, unistylesRuntime, unistyle](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
-            auto thisObject = thisVal.asObject(rt);
+            auto thisObject = thisVal.isObject()
+                ? thisVal.asObject(rt)
+                : jsi::Object(rt);
             auto parser = parser::Parser(unistylesRuntime);
 
             // call user function
@@ -391,8 +373,11 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
 
             // update shadow leaf updates to indicate newest changes
             auto& registry = core::UnistylesRegistry::get();
+            auto lastArg = count == 0
+                ? jsi::Value::undefined()
+                : jsi::Value(rt, args[count - 1]);
 
-            registry.shadowLeafUpdateFromUnistyle(rt, unistyle, getUniquePressableIdFromArguments(rt, args, count));
+            registry.shadowLeafUpdateFromUnistyle(rt, unistyle, lastArg);
 
             return style;
     });
