@@ -1,76 +1,13 @@
-import { NativeEventEmitter, NativeModules } from 'react-native'
-import { useContext, useEffect, useState } from 'react'
-import { unistyles } from '../core'
-import { UnistylesEventType } from '../common'
-import type { UnistylesEvents, UnistylesMobileLayoutEvent, UnistylesThemeEvent } from '../types'
-import { UnistylesContext } from '../context'
-
-const unistylesEvents = new NativeEventEmitter(NativeModules.Unistyles)
+import { useContext } from 'react'
+import { UnistylesContext } from '../UnistylesProvider'
+import { useSharedContext } from './useSharedContext'
 
 export const useUnistyles = () => {
     const unistylesContext = useContext(UnistylesContext)
-    const [plugins, setPlugins] = useState(unistyles.runtime.enabledPlugins)
-    const [theme, setTheme] = useState(unistyles.registry.getTheme(unistyles.runtime.themeName))
-    const [layout, setLayout] = useState({
-        breakpoint: unistyles.runtime.breakpoint,
-        orientation: unistyles.runtime.orientation,
-        screen: {
-            width: unistyles.runtime.screen.width,
-            height: unistyles.runtime.screen.height
-        },
-        statusBar: {
-            width: unistyles.runtime.statusBar.width,
-            height: unistyles.runtime.statusBar.height
-        },
-        navigationBar: {
-            width: unistyles.runtime.navigationBar.width,
-            height: unistyles.runtime.navigationBar.height
-        },
-        insets: {
-            top: unistyles.runtime.insets.top,
-            bottom: unistyles.runtime.insets.bottom,
-            left: unistyles.runtime.insets.left,
-            right: unistyles.runtime.insets.right
-        }
+    const { theme, layout, plugins } = useSharedContext({
+        useContext: unistylesContext !== undefined,
+        deps: unistylesContext ? [unistylesContext] : []
     })
-
-    useEffect(() => {
-        if (unistylesContext !== undefined) {
-            return
-        }
-
-        const subscription = unistylesEvents.addListener(
-            '__unistylesOnChange',
-            (event: UnistylesEvents) => {
-                switch (event.type) {
-                    case UnistylesEventType.Theme: {
-                        const themeEvent = event as UnistylesThemeEvent
-
-                        return setTheme(unistyles.registry.getTheme(themeEvent.payload.themeName))
-                    }
-                    case UnistylesEventType.Layout: {
-                        const layoutEvent = event as UnistylesMobileLayoutEvent
-
-                        return setLayout({
-                            breakpoint: layoutEvent.payload.breakpoint,
-                            orientation: layoutEvent.payload.orientation,
-                            screen: layoutEvent.payload.screen,
-                            statusBar: layoutEvent.payload.statusBar,
-                            insets: layoutEvent.payload.insets,
-                            navigationBar: layoutEvent.payload.navigationBar
-                        })
-                    }
-                    case UnistylesEventType.Plugin: {
-                        return setPlugins(unistyles.runtime.enabledPlugins)
-                    }
-                    default:
-                        return
-                }
-            }
-        )
-
-        return subscription.remove
-    }, [unistylesContext])
 
     if (unistylesContext !== undefined) {
         return {
