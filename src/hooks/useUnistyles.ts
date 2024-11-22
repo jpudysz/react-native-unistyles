@@ -1,12 +1,14 @@
 import { NativeEventEmitter, NativeModules } from 'react-native'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { unistyles } from '../core'
 import { UnistylesEventType } from '../common'
 import type { UnistylesEvents, UnistylesMobileLayoutEvent, UnistylesThemeEvent } from '../types'
+import { UnistylesContext } from '../context'
 
 const unistylesEvents = new NativeEventEmitter(NativeModules.Unistyles)
 
 export const useUnistyles = () => {
+    const unistylesContext = useContext(UnistylesContext)
     const [plugins, setPlugins] = useState(unistyles.runtime.enabledPlugins)
     const [theme, setTheme] = useState(unistyles.registry.getTheme(unistyles.runtime.themeName))
     const [layout, setLayout] = useState({
@@ -33,6 +35,10 @@ export const useUnistyles = () => {
     })
 
     useEffect(() => {
+        if (unistylesContext !== undefined) {
+            return
+        }
+
         const subscription = unistylesEvents.addListener(
             '__unistylesOnChange',
             (event: UnistylesEvents) => {
@@ -64,7 +70,15 @@ export const useUnistyles = () => {
         )
 
         return subscription.remove
-    }, [])
+    }, [unistylesContext])
+
+    if (unistylesContext !== undefined) {
+        return {
+            plugins: unistylesContext.plugins,
+            theme: unistylesContext.theme,
+            layout: unistylesContext.layout
+        }
+    }
 
     return {
         plugins,

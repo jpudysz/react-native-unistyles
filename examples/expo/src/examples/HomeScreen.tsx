@@ -72,6 +72,23 @@ export const HomeScreen = () => {
                         }}
                     />
                     <DemoLink
+                        description="Two themes with provider"
+                        onPress={() => {
+                            UnistylesRegistry
+                                .addThemes({
+                                    light: lightTheme,
+                                    premium: premiumTheme
+                                    // we need to cast it to UnistylesThemes as we already registered 3 themes with TypeScript under styles/index.ts,
+                                    // but we want to demonstrate how to register two themes
+                                } as UnistylesThemes)
+                                .addConfig({
+                                    initialTheme: 'light'
+                                })
+
+                            navigation.navigate(DemoNames.TwoThemesWithProvider)
+                        }}
+                    />
+                    <DemoLink
                         description="Light/Dark themes"
                         onPress={() => {
                             UnistylesRegistry
