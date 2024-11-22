@@ -6,7 +6,7 @@ export const deepMergeObjects = <T extends Record<PropertyKey, any>>(...sources:
             const sourceValue = source[key]
             const targetValue = target[key]
 
-            if (Object(sourceValue) == sourceValue && Object(targetValue) === targetValue) {
+            if (Object(sourceValue) === sourceValue && Object(targetValue) === targetValue) {
                 // @ts-expect-error - can't assign to generic
                 target[key] = deepMergeObjects(targetValue, sourceValue)
 

@@ -1,5 +1,5 @@
 import type { HybridObject } from 'react-native-nitro-modules'
-import { type Dimensions, type Insets } from '../types'
+import type { Dimensions, Insets } from '../types'
 
 type ColorScheme = 'dark' | 'light' | 'unspecified'
 type Orientation = 'portrait' | 'landscape'

@@ -1,5 +1,6 @@
 import React, { forwardRef, useEffect, useRef } from 'react'
-import { Pressable as NativePressableReactNative, type PressableProps as Props, View, type ViewStyle } from 'react-native'
+import { Pressable as NativePressableReactNative } from 'react-native'
+import type { PressableProps as Props, View, ViewStyle } from 'react-native'
 import { UnistylesShadowRegistry } from '../specs'
 
 type WebPressableState = {

@@ -153,7 +153,7 @@ class UnistylesRegistryBuilder {
                         hash: `${hash}${key.replace('_', ':')}`,
                         key: pseudoKey,
                         value: pseudoValue,
-                        sheet: this.styleTag.sheet!
+                        sheet: this.styleTag.sheet as CSSStyleSheet
                     })
                 })
 
