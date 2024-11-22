@@ -1,5 +1,6 @@
 import type { FilterFunction, TextStyle, ViewStyle } from 'react-native'
 import type { ToDeepUnistyles } from '../../types/stylesheet'
+import type { UnionToIntersection } from '../../types'
 
 export type ShadowOffset = ToDeepUnistyles<{ width: number, height: number }>
 
@@ -15,7 +16,6 @@ export type AllShadow = TextShadow & BoxShadow
 
 export type AllShadowKeys = keyof AllShadow
 
-type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never
 type FilterKeys = keyof UnionToIntersection<FilterFunction>
 
 export type Filters = {

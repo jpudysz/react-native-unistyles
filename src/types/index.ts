@@ -1,4 +1,4 @@
-export type { Optional, Nullable } from './common'
+export type { Optional, Nullable, UnionToIntersection } from './common'
 export type {
     NestedStylePairs,
     UnistylesTheme,

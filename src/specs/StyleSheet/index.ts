@@ -6,8 +6,9 @@ import type { UnistylesBreakpoints, UnistylesThemes } from '../../global'
 import type { CreateUnistylesStyleSheet } from '../../types'
 
 type UnistylesSettings = {
-    adaptiveThemes?: boolean,
-    initialTheme?: (() => keyof UnistylesThemes) | keyof UnistylesThemes
+    initialTheme: (() => keyof UnistylesThemes) | keyof UnistylesThemes
+} | {
+    adaptiveThemes: boolean
 }
 
 export type UnistylesConfig = {
