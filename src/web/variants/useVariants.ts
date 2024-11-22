@@ -7,7 +7,7 @@ export const createUseVariants = (styles: ReactNativeStyleSheet<StyleSheet>, set
     const useVariants = (selectedVariants: Record<string, any>) => {
         const [selectedVariantStylesMap] = useState(() => new Map<string, Record<string, any>>())
         const lastSelectedVariantsRef = useRef<Record<string, any>>()
-        // Variable that determines if variants have changed and we need to recalculate styles
+        // Variable that determines if variants have changed, and we need to recalculate styles
         const variantsChanged = !equal(lastSelectedVariantsRef.current, selectedVariants)
 
         if (variantsChanged) {

@@ -15,14 +15,6 @@ export const schemeToTheme = (scheme: ColorScheme) => {
     }
 }
 
-export const hexToRGBA = (hex: string, opacity: number) => hex
-    .replace('#', '')
-    .split(/(?=(?:..)*$)/)
-    .map(x => parseInt(x, 16))
-    .filter(num => !isNaN(num))
-    .reduce((acc, color) => `${acc}${color},`, 'rgba(')
-    .concat(`${opacity})`)
-
 export type UnistyleSecrets = {
     __uni__stylesheet: StyleSheetWithSuperPowers<StyleSheet>,
     __uni__key: string,

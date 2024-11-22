@@ -59,7 +59,7 @@ class UnistylesStateBuilder {
         // Adaptive themes
         if (settings.adaptiveThemes) {
             if (!this.themes.get('light') || !this.themes.get('dark')) {
-                throw error("You're trying to enable adaptiveThemes, but you didn't register both 'light' and 'dark' themes.")
+                throw error(`You're trying to enable adaptiveThemes, but you didn't register both 'light' and 'dark' themes.`)
             }
 
             this.themeName = schemeToTheme(UnistylesRuntime.colorScheme) as AppThemeName
