@@ -533,8 +533,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
-                import { View, Pressable, Text } from 'react-native'
+                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -546,13 +546,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable
-                                style={[styles.pressable(1, 2)]}
-                                ref={ref => {
-                                    UnistylesShadowRegistry.add(ref, [styles.pressable], undefined, [[1, 2]])
-                                    return () => UnistylesShadowRegistry.remove(ref)
-                                }}
-                            >
+                            <Pressable style={() => getBoundArgs(styles.pressable).bind(undefined, 1, 2)} rawStyle={[styles.pressable]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -604,8 +598,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
-                import { View, Pressable, Text } from 'react-native'
+                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -617,13 +611,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable
-                                style={[styles.pressable(1, 2)]}
-                                ref={ref => {
-                                    UnistylesShadowRegistry.add(ref, [styles.pressable], undefined, [[1, 2]])
-                                    return () => UnistylesShadowRegistry.remove(ref)
-                                }}
-                            >
+                            <Pressable style={() => getBoundArgs(styles.pressable).bind(undefined, 1, 2)} rawStyle={[]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -675,8 +663,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
-                import { View, Pressable, Text } from 'react-native'
+                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -688,13 +676,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable
-                                style={[styles.pressable]}
-                                ref={ref => {
-                                    UnistylesShadowRegistry.add(ref, [styles.pressable], undefined, [[]])
-                                    return () => UnistylesShadowRegistry.remove(ref)
-                                }}
-                            >
+                            <Pressable style={() => styles.pressable} rawStyle={[]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -746,8 +728,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
-                import { View, Pressable, Text } from 'react-native'
+                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -759,13 +741,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable
-                                style={__uni_pressable_state => styles.pressable(__uni_pressable_state)}
-                                ref={ref => {
-                                    UnistylesShadowRegistry.add(ref, [styles.pressable], undefined, [[{ pressed: false }]])
-                                    return () => UnistylesShadowRegistry.remove(ref)
-                                }}
-                            >
+                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state)} rawStyle={[]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -817,8 +793,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
-                import { View, Pressable, Text } from 'react-native'
+                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -830,13 +806,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable
-                                style={__uni_pressable_state => styles.pressable(__uni_pressable_state, 1)}
-                                ref={ref => {
-                                    UnistylesShadowRegistry.add(ref, [styles.pressable], undefined, [[{ pressed: false }, 1]])
-                                    return () => UnistylesShadowRegistry.remove(ref)
-                                }}
-                            >
+                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state, 1)} rawStyle={[]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -888,8 +858,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
-                import { View, Pressable, Text } from 'react-native'
+                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -901,13 +871,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable
-                                style={__uni_pressable_state => styles.pressable(__uni_pressable_state.pressed)}
-                                ref={ref => {
-                                    UnistylesShadowRegistry.add(ref, [styles.pressable], undefined, [[false]])
-                                    return () => UnistylesShadowRegistry.remove(ref)
-                                }}
-                            >
+                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state.pressed)} rawStyle={[]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -959,8 +923,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
-                import { View, Pressable, Text } from 'react-native'
+                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -972,13 +936,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable
-                                style={__uni_pressable_state => styles.pressable(__uni_pressable_state.pressed, 1)}
-                                ref={ref => {
-                                    UnistylesShadowRegistry.add(ref, [styles.pressable], undefined, [[false, 1]])
-                                    return () => UnistylesShadowRegistry.remove(ref)
-                                }}
-                            >
+                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state.pressed, 1)} rawStyle={[]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -1030,8 +988,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
-                import { View, Pressable, Text } from 'react-native'
+                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -1044,13 +1002,8 @@ pluginTester({
                             }}
                         >
                             <Pressable
-                                style={state => (typeof styles.pressable === 'function' ? styles.pressable(state) : styles.pressable)}
-                                ref={ref => {
-                                    UnistylesShadowRegistry.add(ref, [styles.pressable], undefined, [
-                                        [typeof styles.pressable === 'function' ? { pressed: false } : []]
-                                    ])
-                                    return () => UnistylesShadowRegistry.remove(ref)
-                                }}
+                                style={state => (typeof styles.pressable === 'function' ? getBoundArgs(styles.pressable).bind(undefined, state) : styles.pressable)}
+                                rawStyle={[styles.pressable]}
                             >
                                 <Text>Hello world</Text>
                             </Pressable>
@@ -1104,8 +1057,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
-                import { View, Pressable, Text } from 'react-native'
+                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -1117,13 +1070,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable
-                                style={__uni_pressable_state => styles.pressable(__uni_pressable_state.pressed, 1)}
-                                ref={ref => {
-                                    UnistylesShadowRegistry.add(ref, [styles.pressable], undefined, [[false, 1]])
-                                    return () => UnistylesShadowRegistry.remove(ref)
-                                }}
-                            >
+                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state.pressed, 1)} rawStyle={[]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>

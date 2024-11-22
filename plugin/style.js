@@ -211,6 +211,11 @@ function handlePressable(t, path, styleAttr, metadata, state) {
         const wrapper = t.isBlockStatement(styleExpression.body)
             ? styleExpression.body.body.find(node => t.isReturnStatement(node))
             : styleExpression.body
+
+        if (t.isMemberExpression(wrapper)) {
+            return
+        }
+
         const pressableArgs = t.isCallExpression(wrapper)
             ? wrapper.arguments
             : wrapper.argument.arguments
@@ -246,6 +251,11 @@ function handlePressable(t, path, styleAttr, metadata, state) {
         const wrapper = t.isBlockStatement(styleExpression.body)
             ? styleExpression.body.body.find(node => t.isReturnStatement(node))
             : styleExpression.body
+
+        if (t.isMemberExpression(wrapper)) {
+            return
+        }
+
         const pressableArgs = t.isCallExpression(wrapper)
             ? wrapper.arguments
             : wrapper.argument.arguments
