@@ -60,7 +60,7 @@
     "@biomejs/biome": "1.9.4",
     "@commitlint/config-conventional": "19.6.0",
     "@react-native/normalize-colors": "0.76.3",
-    "@release-it/conventional-changelog": "9.0.3",
+    "@release-it/conventional-changelog": "8.0.2",
     "@types/jest": "29.5.14",
     "@types/react": "18.3.12",
     "babel-plugin-tester": "11.0.4",
@@ -126,8 +126,7 @@
     },
     "plugins": {
       "@release-it/conventional-changelog": {
-        "preset": "angular",
-        "whatBump": false
+        "preset": "angular"
       }
     }
   },
