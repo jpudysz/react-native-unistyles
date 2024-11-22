@@ -1,11 +1,15 @@
 import type { ReactNativeStyleSheet } from '../types'
 import type { StyleSheetWithSuperPowers, StyleSheet } from '../types/stylesheet'
-import { assignSecrets, reduceObject, getStyles } from './utils'
+import { assignSecrets, reduceObject, getStyles, error } from './utils'
 import { deepMergeObjects } from '../utils'
 import { UnistylesRuntime } from './runtime'
 import { createUseVariants, getVariants } from './variants'
 
-export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
+export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, id?: string) => {
+    if (!id) {
+        throw error('Unistyles is not initialized correctly. Please add babel plugin to your babel config.')
+    }
+
     const computedStylesheet = typeof stylesheet === 'function'
         ? stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
         : stylesheet
