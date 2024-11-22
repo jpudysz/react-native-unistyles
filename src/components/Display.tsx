@@ -1,5 +1,5 @@
 import React, { type PropsWithChildren } from 'react'
-import { useMedia } from './useMedia'
+import { useMedia } from '../hooks'
 
 type DisplayProps = { mq: symbol } & PropsWithChildren
 

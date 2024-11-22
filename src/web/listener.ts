@@ -17,6 +17,7 @@ class UnistylesListenerBuilder {
         }
 
         this.isInitialized = true
+
         UnistylesRuntime.darkMedia?.addEventListener('change', event => {
             if (!event.matches) {
                 return
@@ -39,6 +40,7 @@ class UnistylesListenerBuilder {
                 this.emitChange(UnistyleDependency.Theme)
             }
         })
+
         window.addEventListener('orientationchange', () => this.emitChange(UnistyleDependency.Orientation))
         window.addEventListener('resize', () => this.emitChange(UnistyleDependency.Dimensions))
     }

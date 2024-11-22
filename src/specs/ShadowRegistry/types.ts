@@ -8,7 +8,8 @@ export type ShadowNode = {
 
 export type ViewHandle = {
     __internalInstanceHandle?: {
-        stateNode?: StateNode
+        stateNode?: StateNode,
+        elementType?: string
     },
     getScrollResponder?: () => {
         getNativeScrollRef?: () => ({

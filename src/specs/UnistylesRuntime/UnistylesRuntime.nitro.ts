@@ -6,7 +6,7 @@ import type { UnistylesNativeMiniRuntime } from '../NativePlatform'
 type ColorScheme = 'light' | 'dark' | 'unspecified'
 type Orientation = 'portrait' | 'landscape'
 
-// used for Nitro. It's Native + Cxx types
+// used for Nitro. It's (Native + Cxx) type
 export interface UnistylesCxxMiniRuntime extends UnistylesNativeMiniRuntime {
     readonly themeName?: string,
     readonly breakpoint?: string,
