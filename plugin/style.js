@@ -123,6 +123,21 @@ function handlePressable(t, path, styleAttr, metadata, state) {
         path.node.openingElement.attributes.push(variants)
     }
 
+    // add raw C++ style as prop to be bound
+    const props = metadata
+        .map(meta => meta.members)
+        .filter(members => members.length > 0)
+        .flatMap(members => t.memberExpression(...members.map(member => t.identifier(member))))
+
+    const rawStyles = t.jsxAttribute(
+        t.jsxIdentifier('rawStyle'),
+        t.jsxExpressionContainer(t.arrayExpression([
+            ...props
+        ]))
+    )
+
+    path.node.openingElement.attributes.push(rawStyles)
+
     const styleExpression = styleAttr.value.expression
     // {style.pressable}
     if (t.isMemberExpression(styleExpression)) {

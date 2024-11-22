@@ -1,6 +1,6 @@
 import React from 'react'
-import { PressableStateCallbackType, Text, View } from 'react-native'
-import { Pressable, StyleSheet } from 'react-native-unistyles'
+import { StyleSheet } from 'react-native-unistyles'
+import { PressableStateCallbackType, Text, View, Pressable } from 'react-native'
 
 export default function HomeScreen() {
     return (
@@ -26,7 +26,7 @@ const styles = StyleSheet.create(theme => ({
         fontWeight: 'bold',
         color: theme.colors.typography
     },
-    pressable: (state: PressableStateCallbackType, a?: any) => ({
+    pressable: (state: PressableStateCallbackType) => ({
         backgroundColor: state.pressed ? 'red' : 'blue'
     })
 }))

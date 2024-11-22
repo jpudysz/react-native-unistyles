@@ -91,10 +91,8 @@ module.exports = function ({ types: t }) {
                 }
 
                 if (importSource.includes('react-native')) {
-                    path.node.specifiers.forEach((specifier, index) => {
+                    path.node.specifiers.forEach(specifier => {
                         if (specifier.imported && specifier.imported.name === 'Pressable' && specifier.local.name !== 'NativePressableReactNative') {
-                            path.node.specifiers.splice(index, 1)
-
                             state.file.shouldIncludePressable = true
                         }
 
@@ -102,6 +100,10 @@ module.exports = function ({ types: t }) {
                             state.reactNativeImports[specifier.local.name] = true
                         }
                     })
+                }
+
+                if (importSource.includes('react-native-web/dist/exports/Pressable')) {
+                    state.file.shouldIncludePressable = true
                 }
             },
             JSXElement(path, state) {
