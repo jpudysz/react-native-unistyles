@@ -7,7 +7,7 @@ export const keyInObject = <T extends Record<string, any>>(obj: T, key: Property
 
 export const isServer = () => typeof window === 'undefined'
 
-export const warn = (message: string) => console.warn(`🦄 [react-native-unistyles] ${message}`)
+export const error = (message: string) => new Error(`Unistyles: ${message}`)
 
 export const equal = <T>(a: T, b: T) => {
     if (Object.is(a, b)) {

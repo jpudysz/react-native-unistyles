@@ -5,7 +5,7 @@ import { WebContentSizeCategory } from '../types'
 import { UnistylesListener } from './listener'
 import { NavigationBar, StatusBar } from './mock'
 import { UnistylesState } from './state'
-import { isServer, schemeToTheme } from './utils'
+import { error, isServer, schemeToTheme } from './utils'
 
 class UnistylesRuntimeBuilder {
     lightMedia = this.getLightMedia()
@@ -152,6 +152,10 @@ class UnistylesRuntimeBuilder {
     }
 
     setTheme = (themeName: AppThemeName) => {
+        if (this.hasAdaptiveThemes) {
+            throw error(`You're trying to set theme to: '${themeName}', but adaptiveThemes are enabled.`)
+        }
+
         if (themeName === UnistylesRuntime.themeName) {
             return
         }
@@ -185,21 +189,17 @@ class UnistylesRuntimeBuilder {
         const oldTheme = UnistylesState.themes.get(themeName)
 
         if (!oldTheme) {
-            throw new Error(`🦄 Theme "${themeName}" is not registered!`)
+            throw error(`Unistyles: You're trying to update theme "${themeName}" but it wasn't registered.`)
         }
 
         UnistylesState.themes.set(themeName, updater(oldTheme))
     }
 
     getTheme = (themeName = this.themeName) => {
-        if (!themeName) {
-            throw new Error('🦄 No theme selected!')
-        }
+        const theme = UnistylesState.themes.get(themeName ?? '')
 
-        const theme = UnistylesState.themes.get(themeName)
-
-        if (!theme) {
-            throw new Error(`🦄 Theme "${this.themeName}" is not registered!`)
+        if (!themeName || !theme) {
+            throw error(`You're trying to get theme "${themeName}" but it wasn't registered.`)
         }
 
         return theme
