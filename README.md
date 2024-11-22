@@ -75,6 +75,12 @@ npx expo prebuild
 <a href="https://github.com/happyfloat">
      <img src="https://avatars.githubusercontent.com/u/186333704?s=200&v=4" height="70px" width="70px" alt="happyfloat" />
 </a>
+<a href="https://github.com">
+     <img src="https://avatars.githubusercontent.com/u/138339?v=4" height="70px" width="70px" alt="anonymous" />
+</a>
+<a href="https://github.com/hyoban">
+     <img src="https://avatars.githubusercontent.com/u/38493346?v=4" height="70px" width="70px" alt="hyoban" />
+</a>
 
 ## Past sponsors
 
