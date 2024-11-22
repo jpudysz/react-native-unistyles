@@ -33,6 +33,7 @@ module.exports = function ({ types: t }) {
                     state.file.hasAnyUnistyle = false
                     state.file.hasUnistylesImport = false
                     state.file.shouldIncludePressable = false
+                    state.file.hasVariants = false
                     state.file.styleSheetLocalName = ''
                     state.file.tagNumber = 0
                     state.file.isClassComponent = false
@@ -131,7 +132,7 @@ module.exports = function ({ types: t }) {
                 const metadata = getStyleMetadata(t, styleAttr.value.expression)
 
                 if (openingElementName === 'Pressable') {
-                    return handlePressable(t, path, styleAttr, metadata)
+                    return handlePressable(t, path, styleAttr, metadata, state)
                 }
 
                 // style prop is using unexpected expression
