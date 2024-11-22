@@ -373,8 +373,11 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
 
             // update shadow leaf updates to indicate newest changes
             auto& registry = core::UnistylesRegistry::get();
+            auto lastArg = count == 0
+                ? jsi::Value::undefined()
+                : jsi::Value(rt, args[count - 1]);
 
-            registry.shadowLeafUpdateFromUnistyle(rt, unistyle);
+            registry.shadowLeafUpdateFromUnistyle(rt, unistyle, lastArg);
 
             return style;
     });
