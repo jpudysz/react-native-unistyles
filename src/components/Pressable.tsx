@@ -1,5 +1,6 @@
 import React, { forwardRef, useRef } from 'react'
-import { Pressable as NativePressableReactNative, type PressableProps as Props, View } from 'react-native'
+import { Pressable as NativePressableReactNative } from 'react-native'
+import type { PressableProps as Props, View } from 'react-native'
 import { UnistylesShadowRegistry } from '../specs'
 import { getId } from '../core'
 

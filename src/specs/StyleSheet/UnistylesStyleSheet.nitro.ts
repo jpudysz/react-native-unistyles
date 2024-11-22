@@ -1,5 +1,5 @@
 import type { HybridObject } from 'react-native-nitro-modules'
-import { UnistyleDependency } from '../NativePlatform'
+import type { UnistyleDependency } from '../NativePlatform'
 
 export interface UnistylesStyleSheet extends HybridObject<{ ios: 'c++', android: 'c++' }> {
     readonly hairlineWidth: number

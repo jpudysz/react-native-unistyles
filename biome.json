@@ -2,7 +2,7 @@
   "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
   "files": {
     "include": ["src/**/*.ts", "src/**/*.tsx"],
-    "ignore": ["src/utils/hash32.ts", "examples"]
+    "ignore": ["example", "expo-example", "docs", "plugin"]
   },
   "formatter": {
     "enabled": true,

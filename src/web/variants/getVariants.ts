@@ -16,7 +16,7 @@ export const getVariants = (styles: ReactNativeStyleSheet<StyleSheet>, selectedV
         .map(([key, { variants, compoundVariants = [] }]) => {
             const variantStyles = Object.entries(variants).flatMap(([variant, styles]) => {
                 const selectedVariant = selectedVariants[variant]
-                const selectedVariantStyles = styles[selectedVariant] ?? styles['default']
+                const selectedVariantStyles = styles[selectedVariant] ?? styles.default
 
                 if (!selectedVariantStyles) {
                     return []

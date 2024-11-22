@@ -35,8 +35,8 @@ export const normalizeColor = (color: string, opacity = 1) => {
     if (hex.length === 8) {
         const [r = 0, g = 0, b = 0, a = 1] = hex
             .split(/(?=(?:..)*$)/)
-            .map(x => parseInt(x, 16))
-            .filter(num => !isNaN(num))
+            .map(x => Number.parseInt(x, 16))
+            .filter(num => !Number.isNaN(num))
 
         return `rgba(${r},${g},${b},${(a / 255) * opacity})`
     }

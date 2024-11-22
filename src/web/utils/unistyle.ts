@@ -65,7 +65,9 @@ export const extractMediaQueryValue = (query: string) => {
 
     const value = Number(px)
 
-    return isNaN(value) ? undefined : value
+    return Number.isNaN(value)
+        ? undefined
+        : value
 }
 
 export const getMediaQuery = (query: string) => {

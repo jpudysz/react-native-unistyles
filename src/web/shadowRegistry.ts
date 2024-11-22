@@ -65,7 +65,7 @@ class UnistylesShadowRegistryBuilder {
         const parsedStyles = styles.flatMap((style, styleIndex) => extractSecrets(style).map(secret => {
             const { __uni__key, __uni__stylesheet, __uni__variants, __uni__args = [], __uni__refs } = secret
             const newComputedStylesheet = UnistylesRegistry.getComputedStylesheet(__uni__stylesheet)
-            const style = newComputedStylesheet[__uni__key]!
+            const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
             const variants = _variants && Object.keys(_variants).length > 0 ? _variants : __uni__variants
             const args = _args[styleIndex] ? _args[styleIndex] : __uni__args
             const result = typeof style === 'function'
@@ -93,7 +93,7 @@ class UnistylesShadowRegistryBuilder {
                 }
 
                 const newComputedStyleSheet = UnistylesRegistry.getComputedStylesheet(__uni__stylesheet)
-                const newValue = newComputedStyleSheet[__uni__key]!
+                const newValue = newComputedStyleSheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
                 const result = typeof newValue === 'function'
                     ? newValue(...args)
                     : newValue
