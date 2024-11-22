@@ -1,2 +1,2 @@
 # Temporarily disabled
-# bun precommit
+yarn precommit

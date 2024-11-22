@@ -22,7 +22,7 @@
 ## Installation
 
 ```shell
-bun install react-native-unistyles
+yarn install react-native-unistyles
 ```
 Install CocoaPods dependencies / generate native folders with Expo:
 
