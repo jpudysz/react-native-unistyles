@@ -82,7 +82,8 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
     for (size_t index = 0; index < unistyles.size(); index++) {
         Unistyle::Shared unistyle = unistyles[index];
 
-        this->_shadowRegistry[&rt][shadowNodeFamily].emplace_back(std::make_shared<UnistyleData>(unistyle, variants, arguments[index], uniquePressableId));
+        this->_shadowRegistry[&rt][shadowNodeFamily]
+            .emplace_back(std::make_shared<UnistyleData>(unistyle, variants, arguments[index], uniquePressableId));
 
         // add or update node for shadow leaf updates
         // dynamic functions are parsed later
@@ -149,16 +150,21 @@ core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt
 
 // called from proxied function only, we don't know host
 // so we need to rebuild all instances as they may have different variants
-void core::UnistylesRegistry::shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle, std::optional<std::string> uniquePressableId) {
+void core::UnistylesRegistry::shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Value& maybePressableId) {
     shadow::ShadowLeafUpdates updates;
     auto parser = parser::Parser(nullptr);
+    std::optional<std::string> pressableId = maybePressableId.isString()
+        ? std::make_optional(maybePressableId.asString(rt).utf8(rt))
+        : std::nullopt;
 
     for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
         for (const auto& unistyleData : unistyles) {
             if (unistyleData->unistyle == unistyle) {
                 // special case for pressable
-                if (uniquePressableId.has_value() && unistyleData->pressableId.has_value() && uniquePressableId.value() == unistyleData->pressableId.value()) {
-                    unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
+                if (pressableId.has_value() && unistyleData->pressableId.has_value()) {
+                    if (pressableId.value() == unistyleData->pressableId.value()) {
+                        unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
+                    }
                 }
                 
                 updates[family] = parser.parseStylesToShadowTreeStyles(rt, { unistyleData });

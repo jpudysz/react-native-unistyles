@@ -41,7 +41,7 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     void unlinkShadowNodeWithUnistyles(jsi::Runtime& rt, const ShadowNodeFamily*);
     std::shared_ptr<core::StyleSheet> addStyleSheet(jsi::Runtime& rt, int tag, core::StyleSheetType type, jsi::Object&& rawValue);
     DependencyMap buildDependencyMap(jsi::Runtime& rt, std::vector<UnistyleDependency>& deps);
-    void shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle, std::optional<std::string> uniquePressableId);
+    void shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Value& maybePressableId);
     shadow::ShadowTrafficController trafficController{};
 
 private:
