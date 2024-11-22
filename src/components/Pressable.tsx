@@ -14,6 +14,13 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
             {...props}
             ref={ref => {
                 storedRef.current = ref
+                const styleResult = typeof style === 'function'
+                    ? style({ pressed: false })
+                    : style
+                const fnArgs = typeof styleResult === 'function'
+                    // @ts-expect-error - this is hidden from TS
+                    ? styleResult.getBoundArgs()
+                    : []
 
                 if (typeof passedRef === 'object' && passedRef !== null) {
                     passedRef.current = ref
@@ -22,6 +29,9 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                 const returnFn = typeof passedRef === 'function'
                     ? passedRef(ref)
                     : () => {}
+
+                // @ts-expect-error - this is hidden from TS
+                UnistylesShadowRegistry.add(ref, [styleResult], variants, [fnArgs])
 
                 return () => {
                     // @ts-expect-error - this is hidden from TS
@@ -46,7 +56,10 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                     UnistylesShadowRegistry.add(storedRef.current, [styleResult], variants, [fnArgs])
                 }
 
-                return styleResult
+                return typeof styleResult === 'function'
+                    // @ts-expect-error - this is hidden from TS
+                    ? styleResult()
+                    : styleResult
             }}
         />
     )

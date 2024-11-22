@@ -343,7 +343,9 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
         jsi::PropNameID::forUtf8(rt, unistyle->styleKey),
         1,
         [this, unistylesRuntime, unistyle](jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
-            auto thisObject = thisVal.asObject(rt);
+            auto thisObject = thisVal.isObject()
+                ? thisVal.asObject(rt)
+                : jsi::Object(rt);
             auto parser = parser::Parser(unistylesRuntime);
 
             // call user function
