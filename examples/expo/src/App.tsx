@@ -28,7 +28,6 @@ export const App: React.FunctionComponent = () => (
                 <Stack.Screen name={DemoNames.NoThemes} component={Screens.NoThemesScreen} />
                 <Stack.Screen name={DemoNames.SingleTheme} component={Screens.SingleThemeScreen} />
                 <Stack.Screen name={DemoNames.TwoThemes} component={Screens.TwoThemesScreen} />
-                <Stack.Screen name={DemoNames.TwoThemesWithProvider} component={Screens.TwoThemesWithProviderScreen} />
                 <Stack.Screen name={DemoNames.LightDarkThemes} component={Screens.LightDarkThemesScreen} />
                 <Stack.Screen name={DemoNames.MultipleThemes} component={Screens.MultipleThemesScreen} />
                 <Stack.Screen name={DemoNames.MultipleThemesAdaptive} component={Screens.MultipleThemesAdaptiveScreen} />
@@ -60,6 +59,7 @@ export const App: React.FunctionComponent = () => (
                 <Stack.Screen name={DemoNames.UpdateTheme} component={Screens.UpdateThemeScreen} />
                 <Stack.Screen name={DemoNames.AndroidStatusBarNavigationBar} component={Screens.AndroidStatusBarNavigationBarScreen} />
                 <Stack.Screen name={DemoNames.Keyboard} component={Screens.KeyboardScreen} />
+                <Stack.Screen name={DemoNames.ReactProvider} component={Screens.ReactProviderScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     </SafeAreaProvider>
