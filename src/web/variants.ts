@@ -34,9 +34,9 @@ export const getVariants = (styles: ReactNativeStyleSheet<StyleSheet>, selectedV
 
                 return styles
             })
-            
+
             const mergedVariantStyles = deepMergeObjects(...variantStyles, ...compoundVariantStyles)
-            
+
             return [key, mergedVariantStyles] as const
         })
 }
