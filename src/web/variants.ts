@@ -1,5 +1,5 @@
-import type { ReactNativeStyleSheet, StyleSheet } from '../../types'
-import { deepMergeObjects } from '../../utils'
+import type { ReactNativeStyleSheet, StyleSheet } from '../types'
+import { deepMergeObjects } from '../utils'
 
 type StylesWithVariants = {
     variants: Record<string, any>,
@@ -34,9 +34,9 @@ export const getVariants = (styles: ReactNativeStyleSheet<StyleSheet>, selectedV
 
                 return styles
             })
-
+            
             const mergedVariantStyles = deepMergeObjects(...variantStyles, ...compoundVariantStyles)
-
+            
             return [key, mergedVariantStyles] as const
         })
 }
