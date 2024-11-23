@@ -3,7 +3,7 @@ import type { StyleSheetWithSuperPowers, StyleSheet } from '../types/stylesheet'
 import { assignSecrets, reduceObject, getStyles, error } from './utils'
 import { deepMergeObjects } from '../utils'
 import { UnistylesRuntime } from './runtime'
-import { createUseVariants, getVariants } from './variants'
+import { getVariants } from './variants'
 
 export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, id?: string) => {
     if (!id) {
@@ -46,7 +46,12 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, id?: s
     }) as ReactNativeStyleSheet<StyleSheet>
 
     // Inject useVariants hook to styles
-    createUseVariants(styles, newVariants => Object.entries(newVariants).forEach(([key, value]) => selectedVariants.set(key, value)))
+    Object.defineProperty(styles, 'useVariants', {
+        value: (variants: Record<string, string | boolean>) => {
+            Object.entries(variants).forEach(([key, value]) => selectedVariants.set(key, value))
+        },
+        configurable: false,
+    })
 
     return styles
 }
