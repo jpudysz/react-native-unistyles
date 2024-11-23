@@ -67,7 +67,7 @@ class UnistylesShadowRegistryBuilder {
             const newComputedStylesheet = UnistylesRegistry.getComputedStylesheet(__uni__stylesheet)
             const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
             const variants = _variants && Object.keys(_variants).length > 0 ? _variants : __uni__variants
-            const args = _args[styleIndex] ? _args[styleIndex] : __uni__args
+            const args = _args[styleIndex] && _args[styleIndex].length > 0 ? _args[styleIndex] : __uni__args
             const result = typeof style === 'function'
                 ? style(...args)
                 : style
