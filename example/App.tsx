@@ -70,7 +70,7 @@ export const App = () => {
             {Array.from({ length: 3}).map((_, index) => (
                 <Pressable
                     key={index}
-                    style={styles.pressable}
+                    style={({ pressed }) => [styles.other, { height: 75 }, pressed && styles.pressable(pressed)]}
                     onPress={() => {}}
                 >
                     <Typography value={1.1}>
@@ -144,8 +144,13 @@ const styles = StyleSheet.create((theme, rt) => ({
         lineHeight: 40,
         color: theme.colors.typography
     },
-    pressable: (state: PressableStateCallbackType) => ({
-        backgroundColor: !state.pressed ? theme.colors.accent : theme.colors.backgroundColor,
+    other: {
+        height: 100,
+        width: 100,
+        backgroundColor: theme.colors.aloes
+    },
+    pressable: (pressed: boolean) => ({
+        backgroundColor: !pressed ? theme.colors.accent : theme.colors.backgroundColor,
         marginBottom: rt.insets.bottom
     })
 }))

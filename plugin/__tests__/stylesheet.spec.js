@@ -1118,7 +1118,7 @@ pluginTester({
                 export const Example = ({ height }) => {
                     return (
                         <View style={styles.container}>
-                            <Pressable style={({ pressed }) => [styles.sectionItem, { height }, pressed && styles.pressed]}>
+                            <Pressable style={({ pressed }) => [styles.sectionItem, styles.other(1), { height }, pressed && styles.pressed]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -1151,8 +1151,13 @@ pluginTester({
                             }}
                         >
                             <Pressable
-                                style={({ pressed }) => [styles.sectionItem, { height }, pressed && styles.pressed]}
-                                rawStyle={[styles.sectionItem, { height }, pressed && styles.pressed]}
+                                style={({ pressed }) => [
+                                    typeof styles.sectionItem === 'function' ? getBoundArgs(styles.sectionItem).bind(undefined) : styles.sectionItem,
+                                    getBoundArgs(styles.other).bind(undefined, 1),
+                                    { height },
+                                    pressed && (typeof styles.pressed === 'function' ? getBoundArgs(styles.pressed).bind(undefined) : styles.pressed)
+                                ]}
+                                rawStyle={[styles.sectionItem, styles.other, { height }, styles.pressed]}
                             >
                                 <Text>Hello world</Text>
                             </Pressable>
@@ -1178,6 +1183,168 @@ pluginTester({
             `
         },
         {
+            title: 'Should handle nested function with getBoundArgs',
+            code: `
+                import { View, Pressable, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ height }) => {
+                    return (
+                        <View style={styles.container}>
+                            <Pressable style={({ pressed }) => [styles.sectionItem, { height }, pressed && styles.pressed(pressed), pressed ? styles.pressed : styles.notPressed]}>
+                                <Text>Hello world</Text>
+                            </Pressable>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => ({
+                    sectionItem: {
+                        width: 100,
+                        height: 100,
+                        theme: theme.colors.red
+                    },
+                    pressed: pressed => ({
+                        marginBottom: rt.insets.bottom
+                    })
+                }))
+            `,
+            output: `
+                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ height }) => {
+                    return (
+                        <View
+                            style={[styles.container]}
+                            ref={ref => {
+                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
+                                return () => UnistylesShadowRegistry.remove(ref)
+                            }}
+                        >
+                            <Pressable
+                                style={({ pressed }) => [
+                                    typeof styles.sectionItem === 'function' ? getBoundArgs(styles.sectionItem).bind(undefined) : styles.sectionItem,
+                                    { height },
+                                    pressed && styles.pressed(pressed),
+                                    pressed
+                                        ? typeof styles.pressed === 'function'
+                                            ? getBoundArgs(styles.pressed).bind(undefined)
+                                            : styles.pressed
+                                        : typeof styles.notPressed === 'function'
+                                        ? getBoundArgs(styles.notPressed).bind(undefined)
+                                        : styles.notPressed
+                                ]}
+                                rawStyle={[styles.sectionItem, { height }, styles.pressed]}
+                            >
+                                <Text>Hello world</Text>
+                            </Pressable>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    (theme, rt) => ({
+                        sectionItem: {
+                            width: 100,
+                            height: 100,
+                            theme: theme.colors.red,
+                            uni__dependencies: [0]
+                        },
+                        pressed: pressed => ({
+                            marginBottom: rt.insets.bottom,
+                            uni__dependencies: [9]
+                        })
+                    }),
+                    793953373
+                )
+            `
+        },
+        {
+            title: 'Should handle nested function with getBoundArgs with no arg',
+            code: `
+                import { View, Pressable, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ height }) => {
+                    const pressed = true
+
+                    return (
+                        <View style={styles.container}>
+                            <Pressable style={() => [styles.sectionItem, { height }, pressed && styles.pressed(pressed), pressed ? styles.pressed : styles.notPressed]}>
+                                <Text>Hello world</Text>
+                            </Pressable>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => ({
+                    sectionItem: {
+                        width: 100,
+                        height: 100,
+                        theme: theme.colors.red
+                    },
+                    pressed: pressed => ({
+                        marginBottom: rt.insets.bottom
+                    })
+                }))
+            `,
+            output: `
+                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ height }) => {
+                    const pressed = true
+
+                    return (
+                        <View
+                            style={[styles.container]}
+                            ref={ref => {
+                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
+                                return () => UnistylesShadowRegistry.remove(ref)
+                            }}
+                        >
+                            <Pressable
+                                style={() => [
+                                    typeof styles.sectionItem === 'function' ? getBoundArgs(styles.sectionItem).bind(undefined) : styles.sectionItem,
+                                    { height },
+                                    pressed && styles.pressed(pressed),
+                                    pressed
+                                        ? typeof styles.pressed === 'function'
+                                            ? getBoundArgs(styles.pressed).bind(undefined)
+                                            : styles.pressed
+                                        : typeof styles.notPressed === 'function'
+                                        ? getBoundArgs(styles.notPressed).bind(undefined)
+                                        : styles.notPressed
+                                ]}
+                                rawStyle={[styles.sectionItem, { height }, styles.pressed]}
+                            >
+                                <Text>Hello world</Text>
+                            </Pressable>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    (theme, rt) => ({
+                        sectionItem: {
+                            width: 100,
+                            height: 100,
+                            theme: theme.colors.red,
+                            uni__dependencies: [0]
+                        },
+                        pressed: pressed => ({
+                            marginBottom: rt.insets.bottom,
+                            uni__dependencies: [9]
+                        })
+                    }),
+                    793953373
+                )
+            `
+        },
+        {
             title: 'Should handle all the weird syntaxes',
             code: `
                 import { View, Text } from 'react-native'
@@ -1186,7 +1353,7 @@ pluginTester({
                 export const Example = ({ height }) => {
                     return (
                         <View style={styles.container}>
-                            <View style={[styles.sectionItem, { height }, pressed && styles.pressed]}>
+                            <View style={[styles.sectionItem, { height }, pressed && styles.pressed, pressed ? styles.pressed : styles.notPressed]}>
                                 <Text>Hello world</Text>
                             </View>
                         </View>
@@ -1219,9 +1386,14 @@ pluginTester({
                             }}
                         >
                             <View
-                                style={[styles.sectionItem, { height }, pressed && styles.pressed]}
+                                style={[styles.sectionItem, { height }, pressed && styles.pressed, pressed ? styles.pressed : styles.notPressed]}
                                 ref={ref => {
-                                    UnistylesShadowRegistry.add(ref, [styles.sectionItem, { height }, pressed && styles.pressed], undefined, [[], [], []])
+                                    UnistylesShadowRegistry.add(
+                                        ref,
+                                        [styles.sectionItem, { height }, pressed && styles.pressed, pressed ? styles.pressed : styles.notPressed],
+                                        undefined,
+                                        [[], [], [], []]
+                                    )
                                     return () => UnistylesShadowRegistry.remove(ref)
                                 }}
                             >

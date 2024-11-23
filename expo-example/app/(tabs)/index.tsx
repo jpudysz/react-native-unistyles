@@ -3,9 +3,10 @@ import { StyleSheet } from 'react-native-unistyles'
 import { PressableStateCallbackType, Text, View, Pressable } from 'react-native'
 
 export default function HomeScreen() {
+    const height = 75
     return (
         <View style={styles.container}>
-            <Pressable style={styles.pressable}>
+            <Pressable style={({ pressed }) => [styles.other, { height }, pressed && styles.pressable(pressed)]}>
                 <Text style={styles.text}>
                     HomeScreen
                 </Text>
@@ -26,7 +27,12 @@ const styles = StyleSheet.create(theme => ({
         fontWeight: 'bold',
         color: theme.colors.typography
     },
-    pressable: (state: PressableStateCallbackType) => ({
-        backgroundColor: state.pressed ? 'red' : 'blue'
+    other: {
+        height: 100,
+        width: 100,
+        backgroundColor: theme.colors.aloes
+    },
+    pressable: (pressed: boolean) => ({
+        backgroundColor: pressed ? 'red' : 'blue'
     })
 }))
