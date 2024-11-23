@@ -3,5 +3,36 @@ title: Migration guide
 description: How to migrate from previous version
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components'
+import { Steps } from '@astrojs/starlight/components'
 
+<Steps>
+
+1. Follow installation steps from [Getting started](/v3/start/getting-started) guide.
+
+2. Replace your configuration with [new](/v3/start/configuration) one.
+3. Import `StyleSheet` from `react-native-unistyles`:
+
+    ```diff lang="tsx"
+    - import { createStyleSheet, useStyles } from 'react-native-unistyles'
+    + import { StyleSheet } from 'react-native-unistyles'
+    ```
+4. Replace `createStyleSheet` with `StyleSheet.create`:
+
+    ```diff lang="tsx"
+    - const stylesheet = createStyleSheet(theme => ({
+    + const stylesheet = StyleSheet.create(theme => ({
+    ```
+5. Remove all occurences of `useStyles` hook:
+
+    ```diff lang="tsx"
+    - const { styles } = useStyles(stylesheet)
+    ```
+6. Rename your `stylesheet` to `styles`:
+
+    ```diff lang="tsx"
+    - const stylesheet = StyleSheet.create(theme => ({
+    + const styles = StyleSheet.create(theme => ({
+    ```
+
+
+</Steps>
