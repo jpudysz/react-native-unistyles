@@ -38,16 +38,16 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ra
                     : () => {}
                 const unistyles = (rawStyle ?? [])
                     .map((style, index) => {
-                        if (fnArgs[index]) {
+                        if (index in fnArgs) {
                             return style
                         }
 
                         return undefined
                     })
-                    .filter(Boolean)
+                    .filter(item => item !== undefined)
 
                 // @ts-expect-error - this is hidden from TS
-                UnistylesShadowRegistry.add(ref, unistyles, variants, [...fnArgs])
+                UnistylesShadowRegistry.add(ref, unistyles, variants, Array.isArray(styleResult) ? fnArgs : [fnArgs])
 
                 return () => {
                     // @ts-expect-error - this is hidden from TS
@@ -73,19 +73,19 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ra
                 const pressId = getId()
                 const unistyles = (rawStyle ?? [])
                     .map((style, index) => {
-                        if (fnArgs[index]) {
+                        if (index in fnArgs) {
                             return style
                         }
 
                         return undefined
                     })
-                    .filter(Boolean)
+                    .filter(item => item !== undefined)
 
                 if (storedRef.current) {
                     // @ts-expect-error - this is hidden from TS
                     UnistylesShadowRegistry.remove(storedRef.current)
                     // @ts-expect-error - this is hidden from TS
-                    UnistylesShadowRegistry.add(storedRef.current, unistyles, variants, [...fnArgs], pressId)
+                    UnistylesShadowRegistry.add(storedRef.current, unistyles, variants, Array.isArray(styleResult) ? fnArgs : [fnArgs], pressId)
                 }
 
                 return typeof styleResult === 'function'
