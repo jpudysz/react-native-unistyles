@@ -9,9 +9,11 @@ type WebPressableState = {
     focused: boolean
 }
 
+type WebPressableStyle = ((state: WebPressableState) => ViewStyle) | ViewStyle
+
 type PressableProps = Props & {
     variants?: Record<string, string | boolean>
-    style?: ((state: WebPressableState) => ViewStyle) | ViewStyle,
+    style?: WebPressableStyle,
 }
 
 const initialState: WebPressableState = {
@@ -29,8 +31,46 @@ const events = {
     'blur': { focused: false }
 } satisfies Partial<Record<keyof HTMLElementEventMap, Partial<WebPressableState>>>
 
+type UpdateStylesProps = {
+    ref: View | null,
+    style: WebPressableStyle,
+    variants?: Record<string, string | boolean>,
+    state: WebPressableState
+}
+
+const isFunctionWithBoundArgs = (fn: any): fn is Function & { getBoundArgs: Function } => {
+    return typeof fn === 'function' && 'getBoundArgs' in fn
+}
+
+const extractFunctionArgs = (styleResult: any) => {
+    return isFunctionWithBoundArgs(styleResult)
+        ? [styleResult.getBoundArgs()]
+        : Array.isArray(styleResult)
+            ? styleResult.map(style => isFunctionWithBoundArgs(style) ? style.getBoundArgs() : [])
+            : []
+}
+
+const extractStyleResult = (style: any) => {
+    return typeof style === 'function'
+        ? [style()]
+        : Array.isArray(style)
+            ? style.map(style => typeof style === 'function' ? style() : style)
+            : [style]
+}
+
+const updateStyles = ({ ref, style, variants, state }: UpdateStylesProps) => {
+    const styleResult = typeof style === 'function'
+        ? style(state)
+        : style
+    const fnArgs = extractFunctionArgs(styleResult)
+    const extractedResult = extractStyleResult(styleResult)
+
+    // @ts-expect-error - this is hidden from TS
+    UnistylesShadowRegistry.add(ref, extractedResult, variants, fnArgs)
+}
+
 export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ...props }, passedRef) => {
-    const storedRef = useRef<View | null>()
+    const storedRef = useRef<View | null>(null)
     const state = useRef<WebPressableState>(initialState)
     const styleRef = useRef(style)
 
@@ -42,19 +82,12 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
         const handler = (newState: Partial<WebPressableState>) => () => {
             state.current = { ...state.current, ...newState }
 
-            const styleResult = typeof styleRef.current === 'function'
-                ? styleRef.current(state.current)
-                : styleRef.current
-            const fnArgs = typeof styleResult === 'function'
-                // @ts-expect-error - this is hidden from TS
-                ? styleResult.getBoundArgs()
-                : []
-            const extractedResult = typeof styleResult === 'function'
-                ? (styleResult as Function)()
-                : styleResult
-
-            // @ts-expect-error - this is hidden from TS
-            UnistylesShadowRegistry.add(storedRef.current, [extractedResult], variants, [fnArgs])
+            updateStyles({
+                ref: storedRef.current,
+                style: styleRef.current as WebPressableStyle,
+                variants,
+                state: state.current
+            })
         }
 
         if (!storedRef.current) {
@@ -80,23 +113,16 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
             {...props}
             ref={ref => {
                 storedRef.current = ref
-                const styleResult = typeof style === 'function'
-                    ? style(initialState)
-                    : style
-                const fnArgs = typeof styleResult === 'function'
-                    // @ts-expect-error - this is hidden from TS
-                    ? styleResult.getBoundArgs()
-                    : []
-                const extractedResult = typeof styleResult === 'function'
-                    ? (styleResult as Function)()
-                    : styleResult
+                updateStyles({
+                    ref,
+                    style: style as WebPressableStyle,
+                    variants,
+                    state: initialState
+                })
 
                 if (typeof passedRef === 'object' && passedRef !== null) {
                     passedRef.current = ref
                 }
-
-                // @ts-expect-error - this is hidden from TS
-                UnistylesShadowRegistry.add(ref, [extractedResult], variants, [fnArgs])
             }}
         />
     )
