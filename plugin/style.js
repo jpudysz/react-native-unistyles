@@ -149,7 +149,13 @@ function metadataToRawStyle(t, metadata) {
         }
 
         if (meta.logicalExpression) {
-            return expressions.push(meta.logicalExpression)
+            if (t.isIdentifier(meta.logicalExpression.left)) {
+                if (t.isMemberExpression(meta.logicalExpression.right)) {
+                    return expressions.push(meta.logicalExpression.right)
+                }
+
+                expressions.push(meta.logicalExpression.right.callee)
+            }
         }
     })
 
@@ -161,7 +167,136 @@ function metadataToRawStyle(t, metadata) {
     )
 }
 
+function wrapInGetBoundArgs(t, toWrap, extraArgs) {
+    const expression = t.callExpression(
+        t.identifier('getBoundArgs'),
+        [toWrap]
+    )
+
+    return  t.callExpression(
+        t.memberExpression(expression, t.identifier('bind')),
+        [t.identifier('undefined'), ...extraArgs].filter(Boolean)
+    )
+}
+
+function handlePressableFromMemberExpression(t, path, metadata, wrapInArrowFunction) {
+    let expression = undefined
+
+    const members = metadata.at(0).members
+
+    if (members) {
+        expression = members.slice(1).reduce(
+            (acc, property) => t.memberExpression(acc, t.identifier(property)),
+            t.identifier(members[0]))
+    }
+
+    if (t.isMemberExpression(metadata.at(0))) {
+        expression = metadata.at(0)
+    }
+
+    if (!expression) {
+        return
+    }
+
+    const bindCall = wrapInGetBoundArgs(t , expression, wrapInArrowFunction ? [t.identifier("state")] : [])
+
+    if (!wrapInArrowFunction) {
+        return t.conditionalExpression(
+            t.binaryExpression(
+                "===",
+                t.unaryExpression(
+                    "typeof",
+                    expression
+                ),
+                t.stringLiteral("function")
+            ),
+            bindCall,
+            expression
+        )
+    }
+
+    // state => typeof style.pressable === 'function'
+    // ? getBoundArgs(style.pressable).bind(undefined, state)
+    // : style.pressable
+    return t.arrowFunctionExpression(
+        [t.identifier("state")],
+        t.conditionalExpression(
+            t.binaryExpression(
+                "===",
+                t.unaryExpression(
+                    "typeof",
+                    expression
+                ),
+                t.stringLiteral("function")
+            ),
+            bindCall,
+            expression
+        )
+    )
+}
+
+function handlePressableArgs(t, path, styleExpression, metadata, parentWrapper, wrapper, index) {
+    if (t.isObjectExpression(wrapper)) {
+        return
+    }
+
+    if (t.isMemberExpression(wrapper)) {
+        parentWrapper.elements[index] = handlePressableFromMemberExpression(t, path, [metadata[index]])
+
+        return
+    }
+
+    if (t.isLogicalExpression(wrapper)) {
+        if (t.isIdentifier(wrapper.left) && t.isMemberExpression(wrapper.right)) {
+            parentWrapper.elements[index].right = handlePressableFromMemberExpression(t, path, [parentWrapper.elements[index].right])
+
+            return
+        }
+
+        return
+    }
+
+    if (t.isConditionalExpression(wrapper)) {
+        if (t.isMemberExpression(wrapper.alternate)) {
+            parentWrapper.elements[index].alternate = handlePressableFromMemberExpression(t, path, [parentWrapper.elements[index].alternate])
+        }
+
+        if (t.isMemberExpression(wrapper.consequent)) {
+            parentWrapper.elements[index].consequent = handlePressableFromMemberExpression(t, path, [parentWrapper.elements[index].consequent])
+        }
+
+        return
+    }
+
+    const pressableArgs = t.isCallExpression(wrapper)
+        ? wrapper.arguments
+        : wrapper.argument.arguments
+    const callee = t.isCallExpression(wrapper)
+        ? wrapper.callee
+        : wrapper.argument.callee
+
+    const getBoundArgsCall = t.callExpression(
+        t.identifier('getBoundArgs'),
+        [callee]
+    )
+    const bindCall = t.callExpression(
+        t.memberExpression(getBoundArgsCall, t.identifier('bind')),
+        [t.identifier('undefined'), ...pressableArgs]
+    )
+
+    if (t.isCallExpression(wrapper) && t.isArrayExpression(parentWrapper)) {
+        parentWrapper.elements[index] = bindCall
+
+        return
+    }
+
+    if (t.isCallExpression(wrapper)) {
+        styleExpression.body = bindCall
+    }
+}
+
 function handlePressable(t, path, styleAttr, metadata, state) {
+    // add variants
     if (state.file.hasVariants) {
         const variants = t.jsxAttribute(
             t.jsxIdentifier('variants'),
@@ -175,46 +310,10 @@ function handlePressable(t, path, styleAttr, metadata, state) {
     path.node.openingElement.attributes.push(metadataToRawStyle(t, metadata))
 
     const styleExpression = styleAttr.value.expression
+
     // {style.pressable}
     if (t.isMemberExpression(styleExpression)) {
-        // user may care about state, but didn't pass any arguments
-        const members = metadata.at(0).members
-
-        if (members.length === 0) {
-            return
-        }
-
-        const stylePath = members.slice(1).reduce(
-            (acc, property) => t.memberExpression(acc, t.identifier(property)),
-            t.identifier(members[0])
-        )
-        const expression = t.callExpression(
-            t.identifier('getBoundArgs'),
-            [stylePath]
-        )
-        const bindCall = t.callExpression(
-            t.memberExpression(expression, t.identifier('bind')),
-            [t.identifier('undefined'), t.identifier("state")]
-        )
-
-        // state => typeof style.pressable === 'function'
-        // ? getBoundArgs(style.pressable).bind(undefined, state)
-        // : style.pressable
-        styleAttr.value.expression = t.arrowFunctionExpression(
-            [t.identifier("state")],
-            t.conditionalExpression(
-                t.binaryExpression(
-                    "===",
-                    t.unaryExpression(
-                        "typeof",
-                        stylePath
-                    ),
-                    t.stringLiteral("function")
-                ),
-                bindCall,
-                stylePath
-            )
-        )
+        styleAttr.value.expression = handlePressableFromMemberExpression(t, path, metadata, true)
 
         return
     }
@@ -244,20 +343,24 @@ function handlePressable(t, path, styleAttr, metadata, state) {
 
     // {() => style.pressable(1, 2)}
     if (t.isArrowFunctionExpression(styleExpression) && styleExpression.params.length === 0) {
-        const wrapper = t.isBlockStatement(styleExpression.body)
+        const parentWrapper = t.isBlockStatement(styleExpression.body)
             ? styleExpression.body.body.find(node => t.isReturnStatement(node))
             : styleExpression.body
 
-        if (t.isMemberExpression(wrapper)) {
+        if (t.isMemberExpression(parentWrapper)) {
             return
         }
 
-        const pressableArgs = t.isCallExpression(wrapper)
-            ? wrapper.arguments
-            : wrapper.argument.arguments
-        const callee = t.isCallExpression(wrapper)
-            ? wrapper.callee
-            : wrapper.argument.callee
+        if (t.isArrayExpression(parentWrapper)) {
+            return parentWrapper.elements.forEach((wrapper, index) => handlePressableArgs(t, path, styleExpression, metadata, parentWrapper, wrapper, index))
+        }
+
+        const pressableArgs = t.isCallExpression(parentWrapper)
+            ? parentWrapper.arguments
+            : parentWrapper.argument.arguments
+        const callee = t.isCallExpression(parentWrapper)
+            ? parentWrapper.callee
+            : parentWrapper.argument.callee
         const getBoundArgsCall = t.callExpression(
             t.identifier('getBoundArgs'),
             [callee]
@@ -267,14 +370,14 @@ function handlePressable(t, path, styleAttr, metadata, state) {
             [t.identifier('undefined'), ...pressableArgs]
         )
 
-        if (t.isCallExpression(wrapper)) {
+        if (t.isCallExpression(parentWrapper)) {
             styleExpression.body = bindCall
 
             return
         }
 
-        if (wrapper) {
-            wrapper.argument = bindCall
+        if (parentWrapper) {
+            parentWrapper.argument = bindCall
         }
 
         return
@@ -284,47 +387,15 @@ function handlePressable(t, path, styleAttr, metadata, state) {
     if (t.isArrowFunctionExpression(styleExpression) && styleExpression.params.length > 0) {
         // user used state with custom args we need to getBoundArgs
         // detect between arrow function with body and arrow function
-        const wrapper = t.isBlockStatement(styleExpression.body)
+        const parentWrapper = t.isBlockStatement(styleExpression.body)
             ? styleExpression.body.body.find(node => t.isReturnStatement(node))
             : styleExpression.body
 
-        function handlePressableArgs(wrapper) {
-            if (t.isMemberExpression(wrapper) || t.isObjectExpression(wrapper) || t.isLogicalExpression(wrapper)) {
-                return
-            }
-
-            const pressableArgs = t.isCallExpression(wrapper)
-                ? wrapper.arguments
-                : wrapper.argument.arguments
-            const callee = t.isCallExpression(wrapper)
-                ? wrapper.callee
-                : wrapper.argument.callee
-
-            const getBoundArgsCall = t.callExpression(
-                t.identifier('getBoundArgs'),
-                [callee]
-            )
-            const bindCall = t.callExpression(
-                t.memberExpression(getBoundArgsCall, t.identifier('bind')),
-                [t.identifier('undefined'), ...pressableArgs]
-            )
-
-            if (t.isCallExpression(wrapper)) {
-                styleExpression.body = bindCall
-
-                return
-            }
-
-            if (wrapper) {
-                wrapper.argument = bindCall
-            }
+        if (t.isArrayExpression(parentWrapper)) {
+            return parentWrapper.elements.forEach((wrapper, index) =>handlePressableArgs(t, path, styleExpression, metadata, parentWrapper, wrapper, index))
         }
 
-        if (t.isArrayExpression(wrapper)) {
-            return wrapper.elements.forEach(handlePressableArgs)
-        }
-
-        handlePressableArgs(wrapper)
+        handlePressableArgs(t, path, styleExpression, metadata, parentWrapper, parentWrapper)
     }
 }
 
