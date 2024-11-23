@@ -1,5 +1,5 @@
-import type { ReactNativeStyleSheet, StyleSheet } from '../../types'
-import { deepMergeObjects } from '../../utils'
+import type { ReactNativeStyleSheet, StyleSheet } from '../types'
+import { deepMergeObjects } from '../utils'
 
 type StylesWithVariants = {
     variants: Record<string, any>,
