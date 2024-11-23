@@ -70,7 +70,7 @@ export const App = () => {
             {Array.from({ length: 3}).map((_, index) => (
                 <Pressable
                     key={index}
-                    style={event => [styles.pressable(event, 2), { marginRight: 10 * index}]}
+                    style={event => [styles.pressable(event, 1), { marginRight: 10 * index}]}
                     onPress={() => {}}
                 >
                     <Typography value={1.1}>
