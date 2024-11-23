@@ -1,0 +1,10 @@
+---
+title: New features
+description: Whats new in Unistyles 3.0?
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components'
+
+Unistyles is primarily written in C++ with a thin JS layer for both iOS and Android. The key feature of this version is that it doesn’t re-render your components—there are no hooks, no context, just pure JSI bindings managing your `StyleSheet` styles.
+
+Unistyles is integrated with Fabric and the Shadow Tree, updating your views directly from C++. This is why it’s not feasible to backport it to the old architecture.

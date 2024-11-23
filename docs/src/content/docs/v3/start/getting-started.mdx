@@ -1,0 +1,110 @@
+---
+title: Getting started
+description: How to get started with Unistyles
+---
+
+import { Card, CardGrid, Aside, Tabs, TabItem } from '@astrojs/starlight/components'
+
+We put a lot of effort into making Unistyles as easy to use as possible. That's why you no longer need to use `useStyle` hook or wrap your app in any provider. Unistyles works inline with your existing code, so you can use it right away.
+
+### Prerequisites
+
+Unistyles 3.0 is tightly integrated with `Fabric` and most recent version of React Native. That's why you need to use **New Architecture** and at least **React Native 0.76.0**. Additionally Unistyles depends on `react-native-nitro-modules` and `react-native-edge-to-edge`.
+
+<Aside>Learn more on how Unistyles is using Nitro modules and React Native Edge to Edge [here](/todo).</Aside>
+
+
+|  | Version | Note |
+| -------- | ------- | ---- |
+| React Native | 0.76+     |     |
+| New Architecture    | enabled     | no option to opt-out   |
+| Expo SDK    | 52+     | (if you use Expo)    |
+| Xcode    | 16+     | Required by Nitro Modules    |
+
+Due to the fact that Unistyles is using `Fabric`, it's not possible to run it on `Old Architecture` nor older versions of React Native. If you're not able to meet this requirements, you can use Unistyles 2.0+ which is compatible with those versions.
+
+### Installation
+
+```shell title="shell"
+yarn add react-native-unistyles@next
+yarn add react-native-nitro-modules react-native-edge-to-edge
+```
+
+Add babel plugin:
+
+```js title="babel.config.js"
+module.exports = function (api) {
+  api.cache(true)
+
+  return {
+    // other config
+    plugins: [
+        // other plugins
+        ['react-native-unistyles/plugin']
+    ]
+  }
+}
+```
+<Aside>Learn more on how Babel plugin works [here](/todo).</Aside>
+
+Finish installation based on your platform:
+
+<Tabs>
+  <TabItem label="Expo">
+    ```shell
+    yarn expo prebuild --clean
+    ```
+    <Aside type="caution" title="Dev client only">
+      Unistyles includes custom native code, which means it does not support **Expo Go.**
+    </Aside>
+  </TabItem>
+  <TabItem label="React Native">
+    ```shell
+    cd ios && pod install
+    ```
+  </TabItem>
+  <TabItem label="React Native Web">
+    Unistyles offers first-class support for React Native Web. To run the project, we recommend following the guidelines provided by [Expo](https://docs.expo.dev/workflow/web/).
+  </TabItem>
+  <TabItem label="Custom Web">
+      🚧 Work in progress, we will share more details soon.
+    </TabItem>
+  <TabItem label="SSR">
+    🚧 Work in progress, we will share more details soon.
+  </TabItem>
+</Tabs>
+
+### As easy as React Native StyleSheet
+
+Getting started with Unistyles couldn't been easier. All you need to do is to replace React Native `StyleSheet` with `StyleSheet` exported from Unistyles. From now on you're using `StyleSheet` with superpowers 🦸🏼‍♂️.
+
+```diff lang="tsx" title="Example.tsx"
+- import { StyleSheet } from 'react-native'
++ import { StyleSheet } from 'react-native-unistyles'
+
+const MyComponent = () => {
+  return (
+    <View style={styles.container}>
+      <Text>Hello world from Unistyles</Text>
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+   container: {
+     backgroundColor: 'red'
+   }
+})
+```
+
+By replacing StyleSheets you already have some benefits that are not avaiable in React Native StyleSheet:
+
+- [Variants](/todo)
+- [Compound variants](/todo)
+- [Dynamic styles](/todo)
+- [Media queries](/todo)
+- [Horizontal and vertical breakpoints for Native](/todo)
+- [Custom web styles](/todo)
+- [Custom web classes](/todo)
+
+When you're ready to customize your styles and enable more features you can [configure](/) Unistyles.

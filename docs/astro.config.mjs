@@ -36,6 +36,7 @@ const oldPaths = {
         'unistyles-runtime',
         'use-initial-theme',
         'use-styles',
+        'unistyles-provider',
         'variants',
         'web-support'
     ],
@@ -71,8 +72,17 @@ export default defineConfig({
 					label: 'Start here',
 					items: [
 						{ label: 'Introduction', slug: 'v3/start/introduction' },
+                        { label: 'Getting started', slug: 'v3/start/getting-started' },
+                        { label: 'Configuration', slug: 'v3/start/configuration' },
+                        { label: 'New features', slug: 'v3/start/new-features' },
+                        { label: 'Migration guide', slug: 'v3/start/migration-guide' },
+                        { label: 'Look under the hood', slug: 'v3/start/how-unistyles-works' },
 					],
-				}
+				},
+                {
+                    label: 'API reference',
+                    items: []
+                }
 			],
 		}),
         sitemap(),

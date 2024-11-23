@@ -79,3 +79,7 @@ figcaption.header {
 html {
     color-scheme: dark!important;
 }
+
+.sl-markdown-content code > .ec-line {
+    margin-top: 0;
+}
