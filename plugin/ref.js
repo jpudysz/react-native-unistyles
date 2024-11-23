@@ -19,7 +19,7 @@ function arrayExpressionFromMetadata(t, metadata) {
         .map(meta => {
             // possible for inline styles
             if (meta.members.length === 0) {
-                return meta.inlineStyle || meta.conditionalExpression
+                return meta.inlineStyle || meta.conditionalExpression || meta.logicalExpression
             }
 
             const [base, ...members] = meta.members
