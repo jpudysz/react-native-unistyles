@@ -10,7 +10,8 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
                 members: members.filter(Boolean),
                 inlineStyle: undefined,
                 dynamicFunction,
-                conditionalExpression: undefined
+                conditionalExpression: undefined,
+                logicalExpression: undefined
             }
         ]
     }
@@ -36,7 +37,8 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
                         members: [],
                         inlineStyle: t.objectExpression([prop]),
                         dynamicFunction: undefined,
-                        conditionalExpression: undefined
+                        conditionalExpression: undefined,
+                        logicalExpression: undefined
                     }]
                 }
 
@@ -55,7 +57,8 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
             members: [node.name],
             inlineStyle: undefined,
             dynamicFunction: undefined,
-            conditionalExpression: undefined
+            conditionalExpression: undefined,
+            logicalExpression: undefined
         }]
     }
 
@@ -64,12 +67,24 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
             members: [],
             inlineStyle: undefined,
             dynamicFunction: undefined,
-            conditionalExpression: node
+            conditionalExpression: node,
+            logicalExpression: undefined
         }]
     }
 
     if (t.isArrowFunctionExpression(node)) {
         return getStyleMetadata(t, node.body, node)
+    }
+
+    // {condition && styles.container}
+    if (t.isLogicalExpression(node)) {
+        return [{
+            members: [],
+            inlineStyle: undefined,
+            dynamicFunction: undefined,
+            conditionalExpression: undefined,
+            logicalExpression: node
+        }]
     }
 
     return []
@@ -117,6 +132,35 @@ function styleAttributeToArray(t, path) {
     styleAttribute.value.expression = t.arrayExpression([styleAttribute.value.expression])
 }
 
+function metadataToRawStyle(t, metadata) {
+    const expressions = []
+
+    metadata.forEach(meta => {
+        if (meta.inlineStyle) {
+            return meta.inlineStyle.properties.forEach(prop => {
+                if (t.isObjectProperty(prop)) {
+                    expressions.push(t.objectExpression([prop]))
+                }
+            })
+        }
+
+        if (meta.members.length > 0) {
+            return expressions.push(t.memberExpression(...meta.members.map(member => t.identifier(member))))
+        }
+
+        if (meta.logicalExpression) {
+            return expressions.push(meta.logicalExpression)
+        }
+    })
+
+    return t.jsxAttribute(
+        t.jsxIdentifier('rawStyle'),
+        t.jsxExpressionContainer(t.arrayExpression([
+            ...expressions
+        ]))
+    )
+}
+
 function handlePressable(t, path, styleAttr, metadata, state) {
     if (state.file.hasVariants) {
         const variants = t.jsxAttribute(
@@ -128,19 +172,7 @@ function handlePressable(t, path, styleAttr, metadata, state) {
     }
 
     // add raw C++ style as prop to be bound
-    const props = metadata
-        .map(meta => meta.members)
-        .filter(members => members.length > 0)
-        .flatMap(members => t.memberExpression(...members.map(member => t.identifier(member))))
-
-    const rawStyles = t.jsxAttribute(
-        t.jsxIdentifier('rawStyle'),
-        t.jsxExpressionContainer(t.arrayExpression([
-            ...props
-        ]))
-    )
-
-    path.node.openingElement.attributes.push(rawStyles)
+    path.node.openingElement.attributes.push(metadataToRawStyle(t, metadata))
 
     const styleExpression = styleAttr.value.expression
     // {style.pressable}
@@ -256,37 +288,43 @@ function handlePressable(t, path, styleAttr, metadata, state) {
             ? styleExpression.body.body.find(node => t.isReturnStatement(node))
             : styleExpression.body
 
-        if (t.isMemberExpression(wrapper)) {
-            return
+        function handlePressableArgs(wrapper) {
+            if (t.isMemberExpression(wrapper) || t.isObjectExpression(wrapper) || t.isLogicalExpression(wrapper)) {
+                return
+            }
+
+            const pressableArgs = t.isCallExpression(wrapper)
+                ? wrapper.arguments
+                : wrapper.argument.arguments
+            const callee = t.isCallExpression(wrapper)
+                ? wrapper.callee
+                : wrapper.argument.callee
+
+            const getBoundArgsCall = t.callExpression(
+                t.identifier('getBoundArgs'),
+                [callee]
+            )
+            const bindCall = t.callExpression(
+                t.memberExpression(getBoundArgsCall, t.identifier('bind')),
+                [t.identifier('undefined'), ...pressableArgs]
+            )
+
+            if (t.isCallExpression(wrapper)) {
+                styleExpression.body = bindCall
+
+                return
+            }
+
+            if (wrapper) {
+                wrapper.argument = bindCall
+            }
         }
 
-        const pressableArgs = t.isCallExpression(wrapper)
-            ? wrapper.arguments
-            : wrapper.argument.arguments
-        const callee = t.isCallExpression(wrapper)
-            ? wrapper.callee
-            : wrapper.argument.callee
-
-        const getBoundArgsCall = t.callExpression(
-            t.identifier('getBoundArgs'),
-            [callee]
-        )
-        const bindCall = t.callExpression(
-            t.memberExpression(getBoundArgsCall, t.identifier('bind')),
-            [t.identifier('undefined'), ...pressableArgs]
-        )
-
-        // arrow function
-        if (t.isCallExpression(wrapper)) {
-            styleExpression.body = bindCall
-
-            return
+        if (t.isArrayExpression(wrapper)) {
+            return wrapper.elements.forEach(handlePressableArgs)
         }
 
-        // arrow function with body
-        if (wrapper) {
-            wrapper.argument = bindCall
-        }
+        handlePressableArgs(wrapper)
     }
 }
 

@@ -1109,5 +1109,144 @@ pluginTester({
                 }, 793953373)
             `
         },
+        {
+            title: 'Should handle pressable with arrow function and array of styles',
+            code: `
+                import { View, Pressable, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ height }) => {
+                    return (
+                        <View style={styles.container}>
+                            <Pressable style={({ pressed }) => [styles.sectionItem, { height }, pressed && styles.pressed]}>
+                                <Text>Hello world</Text>
+                            </Pressable>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => ({
+                    sectionItem: {
+                        width: 100,
+                        height: 100,
+                        theme: theme.colors.red
+                    },
+                    pressed: {
+                        marginBottom: rt.insets.bottom
+                    }
+                }))
+            `,
+            output: `
+                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ height }) => {
+                    return (
+                        <View
+                            style={[styles.container]}
+                            ref={ref => {
+                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
+                                return () => UnistylesShadowRegistry.remove(ref)
+                            }}
+                        >
+                            <Pressable
+                                style={({ pressed }) => [styles.sectionItem, { height }, pressed && styles.pressed]}
+                                rawStyle={[styles.sectionItem, { height }, pressed && styles.pressed]}
+                            >
+                                <Text>Hello world</Text>
+                            </Pressable>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    (theme, rt) => ({
+                        sectionItem: {
+                            width: 100,
+                            height: 100,
+                            theme: theme.colors.red,
+                            uni__dependencies: [0]
+                        },
+                        pressed: {
+                            marginBottom: rt.insets.bottom,
+                            uni__dependencies: [9]
+                        }
+                    }),
+                    793953373
+                )
+            `
+        },
+        {
+            title: 'Should handle all the weird syntaxes',
+            code: `
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ height }) => {
+                    return (
+                        <View style={styles.container}>
+                            <View style={[styles.sectionItem, { height }, pressed && styles.pressed]}>
+                                <Text>Hello world</Text>
+                            </View>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => ({
+                    sectionItem: {
+                        width: 100,
+                        height: 100,
+                        theme: theme.colors.red
+                    },
+                    pressed: {
+                        marginBottom: rt.insets.bottom
+                    }
+                }))
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ height }) => {
+                    return (
+                        <View
+                            style={[styles.container]}
+                            ref={ref => {
+                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
+                                return () => UnistylesShadowRegistry.remove(ref)
+                            }}
+                        >
+                            <View
+                                style={[styles.sectionItem, { height }, pressed && styles.pressed]}
+                                ref={ref => {
+                                    UnistylesShadowRegistry.add(ref, [styles.sectionItem, { height }, pressed && styles.pressed], undefined, [[], [], []])
+                                    return () => UnistylesShadowRegistry.remove(ref)
+                                }}
+                            >
+                                <Text>Hello world</Text>
+                            </View>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    (theme, rt) => ({
+                        sectionItem: {
+                            width: 100,
+                            height: 100,
+                            theme: theme.colors.red,
+                            uni__dependencies: [0]
+                        },
+                        pressed: {
+                            marginBottom: rt.insets.bottom,
+                            uni__dependencies: [9]
+                        }
+                    }),
+                    793953373
+                )
+            `
+        },
     ]
 })
