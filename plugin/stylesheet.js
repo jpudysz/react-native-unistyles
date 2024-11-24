@@ -44,7 +44,7 @@ function isUnistylesStyleSheet(t, path, state) {
 
 function addStyleSheetTag(t, path, state) {
     const callee = path.get('callee')
-    const uniqueId = stringToUniqueId(state.filename) + ++state.file.tagNumber
+    const uniqueId = stringToUniqueId(state.filename.replace(state.cwd, '')) + ++state.file.tagNumber
 
     callee.container.arguments.push(t.numericLiteral(uniqueId))
 }
