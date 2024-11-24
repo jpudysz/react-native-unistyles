@@ -81,7 +81,16 @@ export default defineConfig({
 				},
                 {
                     label: 'API reference',
-                    items: []
+                    items: [
+                        { label: 'StyleSheet', slug: 'v3/references/stylesheet' },
+                    ]
+                },
+                {
+                    label: 'Other',
+                    items: [
+                        { label: 'Babel plugin', slug: 'v3/other/babel-plugin' },
+                        { label: 'Dependencies', slug: 'v3/other/dependencies' },
+                    ]
                 }
 			],
 		}),
