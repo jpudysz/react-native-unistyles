@@ -141,7 +141,7 @@ function styleAttributeToArray(t, path) {
     styleAttribute.value.expression = t.arrayExpression([styleAttribute.value.expression])
 }
 
-function metadataToRawStyle(t, metadata) {
+function metadataToRawStyle(t, metadata, styleExpression) {
     const expressions = []
 
     metadata.forEach(meta => {
@@ -158,48 +158,42 @@ function metadataToRawStyle(t, metadata) {
         }
 
         if (meta.logicalExpression) {
-            if (t.isIdentifier(meta.logicalExpression.left)) {
-                if (t.isMemberExpression(meta.logicalExpression.right)) {
-                    return expressions.push(meta.logicalExpression.right)
+            const expression = t.cloneNode(meta.logicalExpression)
+
+            if (t.isIdentifier(expression.left)) {
+                if (t.isCallExpression(expression.right)) {
+                    expression.right = expression.right.callee
                 }
 
-                expressions.push(meta.logicalExpression.right.callee)
+                expressions.push(expression)
             }
         }
 
         if (meta.conditionalExpression) {
-            let hasLeft = false
-            let hasRight = false
+            const expression = t.cloneNode(meta.conditionalExpression)
 
-            if (t.isCallExpression(meta.conditionalExpression.consequent)) {
-                expressions.push(meta.conditionalExpression.consequent.callee)
-                hasLeft = true
+            if (t.isCallExpression(expression.alternate)) {
+                expression.alternate = expression.alternate.callee
             }
 
-            if (t.isMemberExpression(meta.conditionalExpression.consequent)) {
-                expressions.push(meta.conditionalExpression.consequent)
-                hasLeft = true
+            if (t.isCallExpression(expression.consequent)) {
+                expression.consequent = expression.consequent.callee
             }
 
-            if (!hasLeft) {
-                expressions.push(meta.conditionalExpression.consequent)
-            }
-
-            if (t.isCallExpression(meta.conditionalExpression.alternate)) {
-                expressions.push(meta.conditionalExpression.alternate.callee)
-                hasRight = true
-            }
-
-            if (t.isMemberExpression(meta.conditionalExpression.alternate)) {
-                expressions.push(meta.conditionalExpression.alternate)
-                hasRight = true
-            }
-
-            if (!hasRight) {
-                expressions.push(meta.conditionalExpression.alternate)
-            }
+            expressions.push(expression)
         }
     })
+
+    if (t.isArrowFunctionExpression(styleExpression) && styleExpression.params.length === 1) {
+        return t.jsxAttribute(
+            t.jsxIdentifier('rawStyle'),
+            t.jsxExpressionContainer(
+                t.arrowFunctionExpression(styleExpression.params, t.arrayExpression([
+                ...expressions
+                ])
+            ))
+        )
+    }
 
     return t.jsxAttribute(
         t.jsxIdentifier('rawStyle'),
@@ -377,7 +371,7 @@ function handlePressable(t, path, styleAttr, metadata, state) {
     }
 
     // add raw C++ style as prop to be bound
-    path.node.openingElement.attributes.push(metadataToRawStyle(t, metadata))
+    path.node.openingElement.attributes.push(metadataToRawStyle(t, metadata, styleAttr.value.expression))
 
     const styleExpression = styleAttr.value.expression
 
