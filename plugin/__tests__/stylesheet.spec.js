@@ -741,7 +741,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state)} rawStyle={[styles.pressable]}>
+                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state)} rawStyle={state => [styles.pressable]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -806,7 +806,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state, 1)} rawStyle={[styles.pressable]}>
+                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state, 1)} rawStyle={state => [styles.pressable]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -940,7 +940,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state.pressed, 1)} rawStyle={[styles.pressable]}>
+                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state.pressed, 1)} rawStyle={state => [styles.pressable]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -1016,7 +1016,7 @@ pluginTester({
                             <Pressable
                                 style={state => getBoundArgs(styles.pressable).bind(undefined, state.pressed, 1)}
                                 variants={__uni__variants}
-                                rawStyle={[styles.pressable]}
+                                rawStyle={state => [styles.pressable]}
                             >
                                 <Text>Hello world</Text>
                             </Pressable>
@@ -1157,7 +1157,7 @@ pluginTester({
                                     { height },
                                     pressed && (typeof styles.pressed === 'function' ? getBoundArgs(styles.pressed).bind(undefined) : styles.pressed)
                                 ]}
-                                rawStyle={[styles.sectionItem, styles.other, { height }, styles.pressed]}
+                                rawStyle={({ pressed }) => [styles.sectionItem, styles.other, { height }, pressed && styles.pressed]}
                             >
                                 <Text>Hello world</Text>
                             </Pressable>
@@ -1236,7 +1236,7 @@ pluginTester({
                                         ? getBoundArgs(styles.notPressed).bind(undefined)
                                         : styles.notPressed
                                 ]}
-                                rawStyle={[styles.sectionItem, { height }, styles.pressed, styles.pressed, styles.notPressed]}
+                                rawStyle={({ pressed }) => [styles.sectionItem, { height }, pressed && styles.pressed, pressed ? styles.pressed : styles.notPressed]}
                             >
                                 <Text>Hello world</Text>
                             </Pressable>
@@ -1319,7 +1319,7 @@ pluginTester({
                                         ? getBoundArgs(styles.notPressed).bind(undefined)
                                         : styles.notPressed
                                 ]}
-                                rawStyle={[styles.sectionItem, { height }, styles.pressed, styles.pressed, styles.notPressed]}
+                                rawStyle={[styles.sectionItem, { height }, pressed && styles.pressed, pressed ? styles.pressed : styles.notPressed]}
                             >
                                 <Text>Hello world</Text>
                             </Pressable>
@@ -1466,7 +1466,7 @@ pluginTester({
                                             : styles.pressed
                                         : { height: 20 }
                                 }
-                                rawStyle={[styles.pressed, { height: 20 }]}
+                                rawStyle={state => [state.pressed ? styles.pressed : { height: 20 }]}
                             />
                             <Pressable
                                 style={() => {
@@ -1478,11 +1478,11 @@ pluginTester({
                                 style={state => {
                                     return style.pressed
                                 }}
-                                rawStyle={[style.pressed]}
+                                rawStyle={state => [style.pressed]}
                             />
                             <Pressable
                                 style={state => (state.pressed ? { height: 20 } : getBoundArgs(styles.pressedFn).bind(undefined, 1, 2))}
-                                rawStyle={[{ height: 20 }, styles.pressedFn]}
+                                rawStyle={state => [state.pressed ? { height: 20 } : styles.pressedFn]}
                             />
                         </View>
                     )
