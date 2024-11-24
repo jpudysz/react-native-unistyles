@@ -58,7 +58,7 @@ pluginTester({
                             backgroundColor: 'red'
                         }
                     },
-                    793953373
+                    798826616
                 )
             `
         },
@@ -108,7 +108,7 @@ pluginTester({
                             uni__dependencies: [0]
                         }
                     }),
-                    793953373
+                    798826616
                 )
             `
         },
@@ -158,7 +158,7 @@ pluginTester({
                             uni__dependencies: [0]
                         }
                     }),
-                    793953373
+                    798826616
                 )
             `
         },
@@ -210,7 +210,7 @@ pluginTester({
                             uni__dependencies: [4]
                         }
                     },
-                    793953373
+                    798826616
                 )
             `
         },
@@ -262,7 +262,7 @@ pluginTester({
                             uni__dependencies: [4]
                         })
                     },
-                    793953373
+                    798826616
                 )
             `
         },
@@ -316,7 +316,7 @@ pluginTester({
                             uni__dependencies: [4, 9]
                         })
                     }),
-                    793953373
+                    798826616
                 )
             `
         },
@@ -370,7 +370,7 @@ pluginTester({
                             uni__dependencies: [0, 4, 5]
                         })
                     }),
-                    793953373
+                    798826616
                 )
             `
         },
@@ -426,7 +426,7 @@ pluginTester({
                             uni__dependencies: [0, 4, 9]
                         })
                     }
-                }, 793953373)
+                }, 798826616)
             `
         },
         {
@@ -490,7 +490,7 @@ pluginTester({
                             uni__dependencies: [0, 4, 9]
                         })
                     }
-                }, 793953373)
+                }, 798826616)
                 const styles2 = StyleSheet.create((theme, rt) => {
                     return {
                         container: () => ({
@@ -500,7 +500,7 @@ pluginTester({
                             uni__dependencies: [0, 4, 9]
                         })
                     }
-                }, 793953374)
+                }, 798826617)
             `
         },
         {
@@ -565,7 +565,7 @@ pluginTester({
                             marginRight: arg1 + arg2
                         })
                     }
-                }, 793953373)
+                }, 798826616)
             `
         },
         {
@@ -630,7 +630,7 @@ pluginTester({
                             marginRight: arg1 + arg2
                         })
                     }
-                }, 793953373)
+                }, 798826616)
             `
         },
         {
@@ -695,7 +695,7 @@ pluginTester({
                             marginRight: arg1 + arg2
                         }
                     }
-                }, 793953373)
+                }, 798826616)
             `
         },
         {
@@ -760,7 +760,7 @@ pluginTester({
                             marginRight: state.pressed ? 10 : 20
                         })
                     }
-                }, 793953373)
+                }, 798826616)
             `
         },
         {
@@ -825,7 +825,7 @@ pluginTester({
                             marginRight: state.pressed ? 10 : 20 * times
                         })
                     }
-                }, 793953373)
+                }, 798826616)
             `
         },
         {
@@ -893,7 +893,7 @@ pluginTester({
                             marginRight: 20
                         }
                     }
-                }, 793953373)
+                }, 798826616)
             `
         },
         {
@@ -961,7 +961,7 @@ pluginTester({
                             uni__dependencies: [0]
                         })
                     }
-                }, 793953373)
+                }, 798826616)
             `
         },
         {
@@ -1038,7 +1038,7 @@ pluginTester({
                             uni__dependencies: [0]
                         })
                     }
-                }, 793953373)
+                }, 798826616)
             `
         },
         {
@@ -1106,7 +1106,7 @@ pluginTester({
                             uni__dependencies: [0]
                         })
                     }
-                }, 793953373)
+                }, 798826616)
             `
         },
         {
@@ -1178,7 +1178,7 @@ pluginTester({
                             uni__dependencies: [9]
                         }
                     }),
-                    793953373
+                    798826616
                 )
             `
         },
@@ -1236,7 +1236,7 @@ pluginTester({
                                         ? getBoundArgs(styles.notPressed).bind(undefined)
                                         : styles.notPressed
                                 ]}
-                                rawStyle={[styles.sectionItem, { height }, styles.pressed]}
+                                rawStyle={[styles.sectionItem, { height }, styles.pressed, styles.pressed, styles.notPressed]}
                             >
                                 <Text>Hello world</Text>
                             </Pressable>
@@ -1257,7 +1257,7 @@ pluginTester({
                             uni__dependencies: [9]
                         })
                     }),
-                    793953373
+                    798826616
                 )
             `
         },
@@ -1319,7 +1319,7 @@ pluginTester({
                                         ? getBoundArgs(styles.notPressed).bind(undefined)
                                         : styles.notPressed
                                 ]}
-                                rawStyle={[styles.sectionItem, { height }, styles.pressed]}
+                                rawStyle={[styles.sectionItem, { height }, styles.pressed, styles.pressed, styles.notPressed]}
                             >
                                 <Text>Hello world</Text>
                             </Pressable>
@@ -1340,7 +1340,7 @@ pluginTester({
                             uni__dependencies: [9]
                         })
                     }),
-                    793953373
+                    798826616
                 )
             `
         },
@@ -1416,9 +1416,91 @@ pluginTester({
                             uni__dependencies: [9]
                         }
                     }),
-                    793953373
+                    798826616
                 )
             `
         },
+        {
+            title: 'Should handle other pressable cases',
+            code: `
+                import { View, Pressable } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View>
+                            <Pressable style={state => state.pressed ? styles.pressed : { height: 20 }} />
+                            <Pressable style={() => {
+                                return style.pressed
+                            }} />
+                            <Pressable style={state => {
+                                return style.pressed
+                            }} />
+                            <Pressable style={state => state.pressed ? { height: 20 }: styles.pressedFn(1, 2)} />
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => ({
+                    pressed: {
+                        width: 100,
+                        height: 100
+                    },
+                    pressedFn: (a, b) => ({
+                        marginBottom: a + b
+                    })
+                }))
+            `,
+            output: `
+                import { View, Pressable } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View>
+                            <Pressable
+                                style={state =>
+                                    state.pressed
+                                        ? typeof styles.pressed === 'function'
+                                            ? getBoundArgs(styles.pressed).bind(undefined)
+                                            : styles.pressed
+                                        : { height: 20 }
+                                }
+                                rawStyle={[styles.pressed, { height: 20 }]}
+                            />
+                            <Pressable
+                                style={() => {
+                                    return style.pressed
+                                }}
+                                rawStyle={[style.pressed]}
+                            />
+                            <Pressable
+                                style={state => {
+                                    return style.pressed
+                                }}
+                                rawStyle={[style.pressed]}
+                            />
+                            <Pressable
+                                style={state => (state.pressed ? { height: 20 } : getBoundArgs(styles.pressedFn).bind(undefined, 1, 2))}
+                                rawStyle={[{ height: 20 }, styles.pressedFn]}
+                            />
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    (theme, rt) => ({
+                        pressed: {
+                            width: 100,
+                            height: 100
+                        },
+                        pressedFn: (a, b) => ({
+                            marginBottom: a + b
+                        })
+                    }),
+                    798826616
+                )
+            `
+        }
     ]
 })

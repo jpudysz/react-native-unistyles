@@ -87,6 +87,15 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
         }]
     }
 
+    // pressable
+    if (t.isBlockStatement(node)) {
+        const returnStatement = node.body.find(t.isReturnStatement)
+
+        return returnStatement
+            ? getStyleMetadata(t, returnStatement.argument, null)
+            : []
+    }
+
     return []
 }
 
@@ -157,6 +166,39 @@ function metadataToRawStyle(t, metadata) {
                 expressions.push(meta.logicalExpression.right.callee)
             }
         }
+
+        if (meta.conditionalExpression) {
+            let hasLeft = false
+            let hasRight = false
+
+            if (t.isCallExpression(meta.conditionalExpression.consequent)) {
+                expressions.push(meta.conditionalExpression.consequent.callee)
+                hasLeft = true
+            }
+
+            if (t.isMemberExpression(meta.conditionalExpression.consequent)) {
+                expressions.push(meta.conditionalExpression.consequent)
+                hasLeft = true
+            }
+
+            if (!hasLeft) {
+                expressions.push(meta.conditionalExpression.consequent)
+            }
+
+            if (t.isCallExpression(meta.conditionalExpression.alternate)) {
+                expressions.push(meta.conditionalExpression.alternate.callee)
+                hasRight = true
+            }
+
+            if (t.isMemberExpression(meta.conditionalExpression.alternate)) {
+                expressions.push(meta.conditionalExpression.alternate)
+                hasRight = true
+            }
+
+            if (!hasRight) {
+                expressions.push(meta.conditionalExpression.alternate)
+            }
+        }
     })
 
     return t.jsxAttribute(
@@ -181,6 +223,7 @@ function wrapInGetBoundArgs(t, toWrap, extraArgs) {
 
 function handlePressableFromMemberExpression(t, path, metadata, wrapInArrowFunction) {
     let expression = undefined
+    let args = []
 
     const members = metadata.at(0).members
 
@@ -194,11 +237,20 @@ function handlePressableFromMemberExpression(t, path, metadata, wrapInArrowFunct
         expression = metadata.at(0)
     }
 
+    if (t.isCallExpression(metadata.at(0))) {
+        expression = metadata.at(0).callee
+        args = metadata.at(0).arguments
+    }
+
     if (!expression) {
         return
     }
 
-    const bindCall = wrapInGetBoundArgs(t , expression, wrapInArrowFunction ? [t.identifier("state")] : [])
+    const bindCall = wrapInGetBoundArgs(t , expression, wrapInArrowFunction ? [t.identifier("state")] : args)
+
+    if (t.isCallExpression(metadata.at(0))) {
+        return bindCall
+    }
 
     if (!wrapInArrowFunction) {
         return t.conditionalExpression(
@@ -240,8 +292,14 @@ function handlePressableArgs(t, path, styleExpression, metadata, parentWrapper, 
         return
     }
 
-    if (t.isMemberExpression(wrapper)) {
+    if (t.isMemberExpression(wrapper) && t.isArrayExpression(parentWrapper)) {
         parentWrapper.elements[index] = handlePressableFromMemberExpression(t, path, [metadata[index]])
+
+        return
+    }
+
+    if (t.isMemberExpression(wrapper) && !t.isArrayExpression(parentWrapper)) {
+        parentWrapper = handlePressableFromMemberExpression(t, path, metadata)
 
         return
     }
@@ -256,13 +314,25 @@ function handlePressableArgs(t, path, styleExpression, metadata, parentWrapper, 
         return
     }
 
-    if (t.isConditionalExpression(wrapper)) {
-        if (t.isMemberExpression(wrapper.alternate)) {
+    if (t.isConditionalExpression(wrapper) && t.isArrayExpression(parentWrapper)) {
+        if (t.isMemberExpression(wrapper.alternate) || t.isCallExpression(wrapper.alternate)) {
             parentWrapper.elements[index].alternate = handlePressableFromMemberExpression(t, path, [parentWrapper.elements[index].alternate])
         }
 
-        if (t.isMemberExpression(wrapper.consequent)) {
+        if (t.isMemberExpression(wrapper.consequent) || t.isCallExpression(wrapper.consequent)) {
             parentWrapper.elements[index].consequent = handlePressableFromMemberExpression(t, path, [parentWrapper.elements[index].consequent])
+        }
+
+        return
+    }
+
+    if (t.isConditionalExpression(wrapper) && !t.isArrayExpression(parentWrapper)) {
+        if (t.isMemberExpression(wrapper.alternate) || t.isCallExpression(wrapper.alternate)) {
+            parentWrapper.alternate = handlePressableFromMemberExpression(t, path, [parentWrapper.alternate])
+        }
+
+        if (t.isMemberExpression(wrapper.consequent) || t.isCallExpression(wrapper.consequent)) {
+            parentWrapper.consequent = handlePressableFromMemberExpression(t, path, [parentWrapper.consequent])
         }
 
         return
@@ -343,7 +413,7 @@ function handlePressable(t, path, styleAttr, metadata, state) {
 
     // {() => style.pressable(1, 2)}
     if (t.isArrowFunctionExpression(styleExpression) && styleExpression.params.length === 0) {
-        const parentWrapper = t.isBlockStatement(styleExpression.body)
+        let parentWrapper = t.isBlockStatement(styleExpression.body)
             ? styleExpression.body.body.find(node => t.isReturnStatement(node))
             : styleExpression.body
 
@@ -353,6 +423,12 @@ function handlePressable(t, path, styleAttr, metadata, state) {
 
         if (t.isArrayExpression(parentWrapper)) {
             return parentWrapper.elements.forEach((wrapper, index) => handlePressableArgs(t, path, styleExpression, metadata, parentWrapper, wrapper, index))
+        }
+
+        if (t.isReturnStatement(parentWrapper)) {
+            parentWrapper = parentWrapper.argument
+
+            return handlePressableArgs(t, path, styleExpression, metadata, parentWrapper, parentWrapper)
         }
 
         const pressableArgs = t.isCallExpression(parentWrapper)
@@ -387,12 +463,16 @@ function handlePressable(t, path, styleAttr, metadata, state) {
     if (t.isArrowFunctionExpression(styleExpression) && styleExpression.params.length > 0) {
         // user used state with custom args we need to getBoundArgs
         // detect between arrow function with body and arrow function
-        const parentWrapper = t.isBlockStatement(styleExpression.body)
+        let parentWrapper = t.isBlockStatement(styleExpression.body)
             ? styleExpression.body.body.find(node => t.isReturnStatement(node))
             : styleExpression.body
 
         if (t.isArrayExpression(parentWrapper)) {
-            return parentWrapper.elements.forEach((wrapper, index) =>handlePressableArgs(t, path, styleExpression, metadata, parentWrapper, wrapper, index))
+            return parentWrapper.elements.forEach((wrapper, index) => handlePressableArgs(t, path, styleExpression, metadata, parentWrapper, wrapper, index))
+        }
+
+        if (t.isReturnStatement(parentWrapper)) {
+            parentWrapper = parentWrapper.argument
         }
 
         handlePressableArgs(t, path, styleExpression, metadata, parentWrapper, parentWrapper)
