@@ -131,7 +131,7 @@ module.exports = function ({ types: t }) {
                     return
                 }
 
-                const metadata = getStyleMetadata(t, styleAttr.value.expression)
+                const metadata = getStyleMetadata(t, styleAttr.value.expression, null, state)
 
                 if (openingElementName === 'Pressable') {
                     return handlePressable(t, path, styleAttr, metadata, state)
