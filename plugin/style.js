@@ -1,4 +1,4 @@
-function getStyleMetadata(t, node, dynamicFunction = null) {
+function getStyleMetadata(t, node, dynamicFunction = null, state) {
     // {styles.container}
     if (t.isMemberExpression(node)) {
         const members = t.isMemberExpression(node.object)
@@ -18,12 +18,12 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
 
     // [styles.container]
     if (t.isArrayExpression(node)) {
-        return node.elements.flatMap(element => getStyleMetadata(t, element))
+        return node.elements.flatMap(element => getStyleMetadata(t, element, null, state))
     }
 
     // [...styles.container]
     if (t.isSpreadElement(node)) {
-        return getStyleMetadata(t, node.argument)
+        return getStyleMetadata(t, node.argument, null, state)
     }
 
     // {{ ...styles.container }}
@@ -42,14 +42,14 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
                     }]
                 }
 
-                return getStyleMetadata(t, prop.argument)
+                return getStyleMetadata(t, prop.argument, null, state)
             })
             .filter(Boolean)
     }
 
     // {styles.container(arg1, arg2)}
     if (t.isCallExpression(node)) {
-        return getStyleMetadata(t, node.callee, node)
+        return getStyleMetadata(t, node.callee, node, state)
     }
 
     if (t.isIdentifier(node)) {
@@ -73,7 +73,7 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
     }
 
     if (t.isArrowFunctionExpression(node)) {
-        return getStyleMetadata(t, node.body, node)
+        return getStyleMetadata(t, node.body, node, state)
     }
 
     // {condition && styles.container}
@@ -87,12 +87,12 @@ function getStyleMetadata(t, node, dynamicFunction = null) {
         }]
     }
 
-    // pressable
-    if (t.isBlockStatement(node)) {
+    // only when pressable is used
+    if (t.isBlockStatement(node) && state.file.shouldIncludePressable) {
         const returnStatement = node.body.find(t.isReturnStatement)
 
         return returnStatement
-            ? getStyleMetadata(t, returnStatement.argument, null)
+            ? getStyleMetadata(t, returnStatement.argument, null, state)
             : []
     }
 
