@@ -21,6 +21,7 @@ body {
     background-color: var(--background);
     color: #fff;
     font-family: 'Nunito Variable', sans-serif;
+    overflow: hidden;
 }
 
 a {

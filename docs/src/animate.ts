@@ -81,4 +81,31 @@ const animate = () => {
     requestAnimationFrame(animate)
 }
 
-requestAnimationFrame(animate)
+const createAnimation = (updateFn: (progress: number) => void, duration: number) => {
+    let startTime: number | null = null
+
+    const animate = (currentTime: number) => {
+        if (startTime === null) startTime = currentTime
+        const elapsedTime = currentTime - startTime
+        const progress = Math.min(elapsedTime / duration, 1)
+
+        updateFn(progress)
+
+        if (progress < 1) {
+            requestAnimationFrame(animate)
+        }
+    }
+
+    requestAnimationFrame(animate)
+}
+
+const beamA = document.getElementById('beam-a')
+const beamB = document.getElementById('beam-b')
+
+requestAnimationFrame(() => {
+    createAnimation(progress => {
+        beamA?.setAttribute('offset', String(progress * 0.9))
+        beamB?.setAttribute('offset', String(progress * 0.8))
+    }, 500)
+    animate()
+})

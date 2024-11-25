@@ -1,7 +1,7 @@
 ---
 import '@fontsource-variable/nunito'
 import '../styles/home.css'
-import { Button } from '../components'
+import { Beam, Button } from '../components'
 import { SEO } from 'astro-seo'
 ---
 
@@ -31,6 +31,7 @@ import { SEO } from 'astro-seo'
         <main>
             <div class="content-container">
                 <div class="content">
+                    <Beam />
                     <h1>
                         Welcome to&nbsp;<b>Unistyles&nbsp;<span class="version">3.0</span></b>
                     </h1>
@@ -75,7 +76,6 @@ import { SEO } from 'astro-seo'
         justify-content: space-around;
         align-items: center;
         gap: 100px;
-        overflow: hidden;
 
         @media (max-width: 991px) {
             flex-direction: column-reverse;
@@ -92,6 +92,8 @@ import { SEO } from 'astro-seo'
         font-weight: 500;
         margin-bottom: 8px;
         line-height: 1.1em;
+        z-index: 10;
+        position: relative;
 
         @media (max-width: 991px) {
             margin-bottom: 20px;
@@ -102,6 +104,8 @@ import { SEO } from 'astro-seo'
         font-size: clamp(20px, 2vw, 28px);
         font-weight: 600;
         margin-bottom: 42px;
+        z-index: 10;
+        position: relative;
 
         @media (max-width: 991px) {
             margin-bottom: 32px;
@@ -131,6 +135,7 @@ import { SEO } from 'astro-seo'
         width: 50%;
         z-index: 20;
         padding-left: 32px;
+        position: relative;
 
         @media (max-width: 991px) {
             height: auto;
