@@ -3,10 +3,7 @@ title: Introduction
 description: Welcome to Unistyles!
 ---
 
-import { LinkCard, CardGrid } from '@astrojs/starlight/components'
-
-
-**Welcome to Unistyles 3.0!**
+import { Card } from '@astrojs/starlight/components'
 
 Unistyles is a cross-platform library that enables you to share up to 100% of your styles across all platforms.
 It combines the simplicity of `StyleSheet` with the performance of `C++`.
@@ -14,17 +11,11 @@ It combines the simplicity of `StyleSheet` with the performance of `C++`.
 **`Unistyles` is a superset of `StyleSheet`** similar to how `TypeScript` is a superset of `JavaScript`.
 If you're familiar with styling in React Native, then you already know how to use `Unistyles`.
 
-<CardGrid>
-    <LinkCard title="Getting started" href="/v3/start/getting-started">
-        How to get started with Unistyles
-    </LinkCard>
-    <LinkCard title="New features" href="/v3/start/new-features">
-        Whats new in Unistyles 3.0?
-    </LinkCard>
-    <LinkCard title="Migration from 2.0" href="/v3/start/migration-guide">
-        Step by step guide on how to migrate from previous version
-    </LinkCard>
-    <LinkCard title="Look under the hood" href="/v3/start/how-unistyles-works">
-        How Unistyles 3.0 works?
-    </LinkCard>
-</CardGrid>
+<Card title="Why should you use Unistyles?">
+- it guarantees no re-renders across entire app (there are no hooks, no context, just pure JSI bindings)
+- it doesn't pollute your native view hierarchy (Unistyles has no component wrappers)
+- it has cross-platform parser written in C++, so you can expect same output on all platforms
+- it uses [Nitro Modules](https://nitro.margelo.com/) under the hood (everything is strongly typed!)
+- transforms your `StyleSheets` into `StyleSheets` with superpowers 🦸🏼‍♂ that can access themes, platform specific values and more!️
+- loved by developers from all over the world, 1.1M+ downloads and more than 1.5K+ stars on GitHub
+</Card>
