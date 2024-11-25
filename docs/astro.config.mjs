@@ -80,9 +80,23 @@ export default defineConfig({
 					],
 				},
                 {
+                    label: 'Guides',
+                    items: [
+                        { label: 'Theming', slug: 'v3/guides/theming' },
+                    ]
+                },
+                {
                     label: 'API reference',
                     items: [
                         { label: 'StyleSheet', slug: 'v3/references/stylesheet' },
+                        { label: 'Unistyles Runtime', slug: 'v3/references/unistyles-runtime' },
+                        { label: 'Dynamic Functions', slug: 'v3/references/dynamic-functions' },
+                        { label: 'Breakpoints', slug: 'v3/references/breakpoints' },
+                        { label: 'Media Queries', slug: 'v3/references/media-queries' },
+                        { label: 'Variants', slug: 'v3/references/variants' },
+                        { label: 'Compound Variants', slug: 'v3/references/compound-variants' },
+                        { label: 'Web styles', slug: 'v3/references/web-styles' },
+                        { label: 'Web classes', slug: 'v3/references/web-classes' },
                     ]
                 },
                 {

@@ -41,7 +41,7 @@ const appThemes = {
 ```
 
 <Aside>
-Unistyles supports any dynamic theme and doesn't enforce any specific structure. To prevent TypeScript issues make sure that every theme has the same structure (type).
+Unistyles supports any dynamic theme and doesn't enforce any specific structure. To prevent TypeScript issues make sure that every theme has the same type.
 </Aside>
 
 ### Breakpoints (optional)
@@ -50,7 +50,7 @@ Unistyles supports any dynamic theme and doesn't enforce any specific structure.
 
 ```tsx title="unistyles.ts"
 const breakpoints = {
-    xs: 0, // <-- make sure to register at least one breakpoint with value 0
+    xs: 0, // <-- make sure to register one breakpoint with value 0
     sm: 300,
     md: 500,
     lg: 800,
@@ -61,7 +61,7 @@ const breakpoints = {
 
 ### Settings (optional)
 
-`Settings` object was simplified at in the most recent version supports only two properties:
+`Settings` object was simplified and in the most recent version it supports only two properties:
 
 - `adaptiveThemes` - boolean, enables or disables adaptive themes [learn more](/todo)
 - `initialTheme` - string, or synchronous function that sets initial theme
