@@ -29,8 +29,10 @@ class UnistylesShadowRegistryBuilder {
 
         // Ref is unmounted, remove style tags from the document
         if (ref === null) {
-            extractSecrets(styles).forEach(({ __uni__refs }) => {
-                __uni__refs.forEach(ref => {
+            const secrets = extractSecrets(styles)
+
+            if (secrets) {
+                secrets.__uni__refs.forEach(ref => {
                     if (isInDocument(ref)) {
                         return
                     }
@@ -43,7 +45,7 @@ class UnistylesShadowRegistryBuilder {
                         UnistylesRegistry.remove(oldResult)
                     }
                 })
-            })
+            }
 
             return
         }
@@ -53,16 +55,19 @@ class UnistylesShadowRegistryBuilder {
             return
         }
 
-        const parsedStyles = styles.flatMap((style, styleIndex) => {
-            const secrets = extractSecrets(style)
-
-            // Regular style
-            if (secrets.length === 0) {
-                return style as UnistylesValues
+        const parsedStyles = styles.flat().flatMap((unistyleStyle, styleIndex) => {
+            if (!unistyleStyle) {
+                return []
             }
 
-            return secrets.map(secret => {
-                const { __uni__key, __uni__stylesheet, __uni__variants, __uni__args = [], __uni__refs } = secret
+            const secrets = extractSecrets(unistyleStyle)
+
+            // Regular style
+            if (!secrets) {
+                return unistyleStyle as UnistylesValues
+            }
+
+            const { __uni__key, __uni__stylesheet, __uni__variants, __uni__args = [], __uni__refs } = secrets
                 const newComputedStylesheet = UnistylesRegistry.getComputedStylesheet(__uni__stylesheet)
                 const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
                 const variants = _variants && Object.keys(_variants).length > 0 ? _variants : __uni__variants
@@ -73,7 +78,7 @@ class UnistylesShadowRegistryBuilder {
                 const { variantsResult } = Object.fromEntries(getVariants({ variantsResult: result }, variants))
                 const resultWithVariants = deepMergeObjects(result, variantsResult ?? {})
                 const dependencies = extractUnistyleDependencies(resultWithVariants)
-    
+
                 if (typeof __uni__stylesheet === 'function') {
                     // Add dependencies from dynamic styles to stylesheet
                     UnistylesRegistry.addDependenciesToStylesheet(__uni__stylesheet, dependencies)
@@ -103,7 +108,6 @@ class UnistylesShadowRegistryBuilder {
                 })
 
                 return resultWithVariants as UnistylesValues
-            })
         })
         const combinedStyles = deepMergeObjects(...parsedStyles)
         const oldStyles = this.resultsMap.get(ref)
