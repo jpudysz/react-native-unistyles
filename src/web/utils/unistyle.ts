@@ -25,21 +25,13 @@ export type UnistyleSecrets = {
 
 export const assignSecrets = <T>(object: T, secrets: UnistyleSecrets) => {
     // @ts-expect-error - assign secrets to object
-    object[`__uni__secrets__${Math.random().toString(16).slice(2)}`] = secrets
+    object.__uni__secrets__ = secrets
 
     return object
 }
 
 export const extractSecrets = (object: any) => {
-    const secrets = Object.entries(object).reduce((acc, [key, value]) => {
-        if (key.startsWith('__uni__secrets__')) {
-            acc.push(value as UnistyleSecrets)
-        }
-
-        return acc
-    }, [] as Array<UnistyleSecrets>)
-
-    return secrets
+    return keyInObject(object, '__uni__secrets__') ? object.__uni__secrets__ as UnistyleSecrets : undefined
 }
 
 export const getStyles = (values: UnistylesValues) => {
