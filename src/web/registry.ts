@@ -39,9 +39,13 @@ class UnistylesRegistryBuilder {
         return tag
     }
 
-    getComputedStylesheet = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
+    getComputedStylesheet = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, scopedTheme?: UnistylesTheme) => {
         if (typeof stylesheet !== 'function') {
             return stylesheet
+        }
+
+        if (scopedTheme) {
+            return stylesheet(UnistylesRuntime.getTheme(scopedTheme), UnistylesRuntime.miniRuntime)
         }
 
         const computedStylesheet = this.stylesheets.get(stylesheet)

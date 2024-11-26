@@ -1,4 +1,4 @@
-import type { UnistylesValues } from '../types'
+import type { UnistylesTheme, UnistylesValues } from '../types'
 import { convertUnistyles } from './convert'
 import { UnistylesListener } from './listener'
 import { UnistylesRegistry } from './registry'
@@ -20,6 +20,7 @@ class UnistylesShadowRegistryBuilder {
     private resultsMap = new Map<HTMLElement, UnistylesValues>()
     private hashMap = new Map<HTMLElement, string>()
     private classNamesMap = new Map<HTMLElement, Array<string>>()
+    private scopedTheme: UnistylesTheme | undefined = undefined
 
     add = (ref: any, styles: Array<Style>, _variants: Record<string, any> | undefined, _args: Array<Array<any>>) => {
         // Styles are not provided
@@ -68,7 +69,9 @@ class UnistylesShadowRegistryBuilder {
             }
 
             const { __uni__key, __uni__stylesheet, __uni__variants, __uni__args = [], __uni__refs } = secrets
-                const newComputedStylesheet = UnistylesRegistry.getComputedStylesheet(__uni__stylesheet)
+                // Copy scoped theme to not use referenced value from class
+                const scopedTheme = this.scopedTheme
+                const newComputedStylesheet = UnistylesRegistry.getComputedStylesheet(__uni__stylesheet, scopedTheme)
                 const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
                 const variants = _variants && Object.keys(_variants).length > 0 ? _variants : __uni__variants
                 const args = _args[styleIndex] && _args[styleIndex].length > 0 ? _args[styleIndex] : __uni__args
@@ -96,7 +99,7 @@ class UnistylesShadowRegistryBuilder {
                         return
                     }
 
-                    const newComputedStyleSheet = UnistylesRegistry.getComputedStylesheet(__uni__stylesheet)
+                    const newComputedStyleSheet = UnistylesRegistry.getComputedStylesheet(__uni__stylesheet, scopedTheme)
                     const newValue = newComputedStyleSheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
                     const result = typeof newValue === 'function'
                         ? newValue(...args)
@@ -144,6 +147,10 @@ class UnistylesShadowRegistryBuilder {
     }
 
     remove = () => {}
+
+    setScopedTheme = (theme?: UnistylesTheme) => {
+        this.scopedTheme = theme
+    }
 }
 
 export const UnistylesShadowRegistry = new UnistylesShadowRegistryBuilder()
