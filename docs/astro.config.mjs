@@ -96,7 +96,7 @@ export default defineConfig({
                         { label: 'Variants', slug: 'v3/references/variants' },
                         { label: 'Compound Variants', slug: 'v3/references/compound-variants' },
                         { label: 'Web styles', slug: 'v3/references/web-styles' },
-                        { label: 'Web classes', slug: 'v3/references/web-classes' },
+                        { label: 'Web Only Features', slug: 'v3/references/web-only' },
                     ]
                 },
                 {

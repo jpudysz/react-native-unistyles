@@ -3,4 +3,100 @@ title: Web styles
 description: Learn about web styles in Unistyles 3.0
 ---
 
-import { Card } from '@astrojs/starlight/components'
+We've made Unistyles web completely undependent from React Native Web by creating our custom web parser which generates CSS from your StyleSheet's.
+
+## How it works
+
+The web parser generates classNames based on your config and assigns them to the given DOM element. This results in zero redundant styles!
+
+In addition we're generating media queries based on provided `breakpoints` instead of recalculating them on every app's resize.
+
+```ts
+const styles = StyleSheet.create({
+   container: {
+    flex: 1,
+   },
+   text: {
+    fontSize: {
+        xs: 28,
+        lg: 40
+    },
+   },
+   parentContainer: {
+    flex: 1,
+   }
+})
+```
+
+```css
+.unistyles-1u0egm6 {
+  flex: 1;
+}
+
+@media (min-width: 0px) {
+  .unistyles-kaoph5 {
+    font-size: 32px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .unistyles-kaoph5 {
+    font-size: 40px;
+  }
+}
+```
+
+## Updating styles
+
+When your changing your app's theme Unistyles will simply update your CSS without any rerender, the same goes for dynamic functions & variants.
+
+```ts
+const styles = StyleSheet.create(theme => ({
+    container: {
+        flex: 1,
+        backgroundColor: theme.colors.background
+    }
+}))
+```
+
+```css
+.unistyles-1u0egm6 {
+  flex: 1;
+  background-color: #000;
+}
+```
+
+Now let's update theme to a light one:
+
+```ts
+UnistylesRuntime.setTheme('light')
+```
+
+And voila, the CSS will is now updated:
+
+```css
+.unistyles-1u0egm6 {
+  flex: 1;
+  background-color: #fff;
+}
+```
+
+## Limitations
+
+Because we're using the custom parser we can't return your styles directly since React Native Web will parse them in that case.
+Keep that in mind when using `StyleSheet.create` in your web app.
+
+```ts
+const styles = StyleSheet.create({
+    container: {
+        flex: 1
+    }
+})
+
+// Will result in an empty object
+console.log(styles) // {}
+```
+
+## Web Only Features
+
+Unistyles also provides you with some web only features, read more about them [here](/v3/references/web-only).
