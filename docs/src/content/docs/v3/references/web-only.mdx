@@ -1,0 +1,122 @@
+---
+title: Web Only Features
+description: Learn about web only features in Unistyles 3.0
+---
+
+Unistyles comes with some web only features which are not available in React Native side.
+
+- [Web only styles](#web-styles)
+- [Pseudo selectors and elements](#pseudo-elements)
+- [Injecting custom classNames](#injecting-custom-classnames)
+
+## Web Styles
+
+In Unistyles you can use web specific styles for your web app under `_web` key.
+
+```ts
+const styles = StyleSheet.create({
+   container: {
+    flex: 1,
+    // Web only styles:
+    _web: {
+      display: 'grid',
+    }
+   }
+})
+```
+
+Under `_web` key you can pass any valid CSS Property and value that matches `CSSProperties` type from React.
+
+Keep in mind that under `_web` you can't use React Native specific styles.
+
+```ts
+const styles = StyleSheet.create({
+   container: {
+    flex: 1,
+    _web: {
+      display: 'grid',
+      // Error:
+      transform: [{ translateX: 10 }],
+   }
+})
+```
+
+`transform` property on the web should be string:
+
+```diff lang="ts"
+const styles = StyleSheet.create({
+   container: {
+    flex: 1,
+    _web: {
+      display: 'grid',
+      // Error:
+-      transform: [{ translateX: 10 }],
++      transform: 'translateX(10px)',
+   }
+})
+```
+
+You can also use variants, breakpoints and other Unistyles features under the `_web` key!
+
+## Pseudo elements
+
+Unistyles also introduces you with a way to use pseudo elements and selectors in your web styles.
+
+```ts
+const styles = StyleSheet.create(theme => ({
+   button: {
+    backgroundColor: theme.colors.button,
+    _web: {
+      _hover: {
+        backgroundColor: theme.colors.hovered,
+      },
+      _before: {
+        content: '"🦄"',
+      }
+    }
+   },
+}))
+```
+
+Every pseudo element and selector is included under the `_web` key. As you can see `:` & `::` were replaced with `_` for easier usage.
+
+## Injecting custom classNames
+
+If you want to write some part of your app with plain CSS you can add custom classNames to your styles.
+
+```ts
+const styles = StyleSheet.create({
+   container: {
+    flex: 1,
+    _web: {
+      _classNames: 'my-custom-class',
+    }
+   }
+})
+```
+
+`_classNames` key under the `_web` key will be injected to the DOM element as a className. You can pass string or array of strings into it.
+
+```diff lang="ts"
+const styles = StyleSheet.create({
+   container: {
+    flex: 1,
+    _web: {
+-      _classNames: 'my-custom-class',
++      _classNames: ['my-custom-class', 'my-other-class'],
+    }
+   }
+})
+```
+
+Or pass them conditionally with dynamic functions:
+
+```ts
+const styles = StyleSheet.create({
+   button: (isPrimary: boolean) => ({
+    _web: {
+        _classNames: isPrimary ? 'primary-button' : 'secondary-button',
+    }
+   })
+})
+```
