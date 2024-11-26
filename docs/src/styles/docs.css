@@ -25,11 +25,11 @@
     color: var(--white);
 }
 
-a[aria-current="page"] {
+a[aria-current="page"], a[aria-current="page"]:hover {
     background-color: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
-    color: var(--sl-color-accent);
+    color: var(--sl-color-accent)!important;
 }
 
 a[aria-current="page"]:hover {
@@ -68,7 +68,7 @@ figcaption.header {
     border-bottom: 1px solid var(--border)!important;
 }
 
-.top-level > li > details > ul > li {
+.top-level > li > details > ul > li:nth-child(1) {
     padding-top: 16px;
 }
 
