@@ -5,4 +5,31 @@ description: Learn about Unistyles dependencies
 
 import { Card, CardGrid, Aside, Tabs, TabItem } from '@astrojs/starlight/components'
 
-🚧 Work is progress. Guide will be released soon.
+Unistyles 3.0 minimizes dependencies to keep your app as lightweight as possible.
+In the latest version, we’ve opted to include only two essential dependencies that are shaping the future of the React Native ecosystem.
+
+### Nitro Modules
+
+Developed by: [Marc Rousavy](https://github.com/mrousavy)
+
+[Nitro modules](https://nitro.margelo.com/) help Unistyles speed up development time by offering remarkable solutions:
+- Type-safe interfaces across multiple languages (`TypeScript`, `C++`, `Swift`, and `Kotlin`)
+- Generating bindings from a single source of truth (specification files)
+- A thin layer that accelerates calls from `JavaScript` to `C++`, `Swift`, or `Kotlin`
+- The ability to convert repository from Objective-C to Swift
+- Support for calling Swift code directly, without routing it through Objective-C++
+
+We highly encourage you to give Nitro a start ⭐ or support Marc through sponsorship.
+
+### React Native Edge to Edge
+
+Developed by: [Mathieu Acthernoene](https://github.com/zoontek)
+
+[React Native Edge to Edge](https://github.com/zoontek/react-native-edge-to-edge) is a library aimed at unifying the handling of edge-to-edge layouts on Android.
+We fully support this initiative and have made it a dependency for Unistyles.
+
+You likely won’t notice any changes, as Unistyles has enforced edge-to-edge layouts since version 2.8.0. However, other libraries that detect `react-native-edge-to-edge` can now reliably assume that this mode is enabled.
+Additionally, Mathieu's initiative is supported by [Expo](https://expo.dev/), which suggests it may become a standard in the future.
+
+If you use any of Mathieu's libraries, such as `react-native-permissions` or `react-native-bootsplash`, we encourage you to give them a star ⭐ and support him through sponsorship.
+
