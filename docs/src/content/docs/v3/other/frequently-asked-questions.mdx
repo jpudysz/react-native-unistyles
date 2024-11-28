@@ -5,4 +5,35 @@ description: Frequently asked questions about Unistyles 3.0
 
 import { Card } from '@astrojs/starlight/components'
 
-🚧 Work is progress. Guide will be released soon.
+### Can I run Unistyles on Expo Go?
+
+No, Unistyles includes custom native code, which means it does not support Expo Go.
+
+### What happened to `macOS`, `windows`, `visionOS`, `tvOS` support?
+
+For now they're not available. We're seeking sponsors to help us add support, as they are rarely used by our customers.
+
+### Can I run Unistyles on `Old Architecture`?
+
+No, Unistyles is tightly integrated with `Fabric`. There are no plans to support `Old Architecture`.
+
+### Can I run Unistyles on React Native lower than 0.76.0?
+
+Technically, yes - the minimum supported version is `0.75.0`. However, for Android, you must modify Unistyles' `CMakeLists.txt` to include all required headers.
+Versions lower than `0.75.0` are not supported, as Unistyles depends on `Nitro Modules` and the latest React Native APIs. We have no plans to support older versions.
+
+### We are not ready to upgrade. What will happen with version `2.0`?
+
+We understand that some apps require more time to migrate to the `New Architecture`. We plan to support Unistyles 2.0 for a few more months or stable React Native versions.
+
+### Adaptive mode doesn’t work for me
+
+To enable adaptive mode, you need to register two themes named `light` and `dark` and set the `adaptiveThemes` flag to true within `StyleSheet.configure`.
+
+If your app still doesn’t automatically switch themes, ensure that:
+
+- For Expo your `app.json` contains a `userInterfaceStyle` key with the value automatic
+- For bare React Native, your `Info.plist` does not have the `UIUserInterfaceStyle` key set to a hardcoded value
+- `Appearance` from `react-native` is set to null
+- You have phone with iOS 15+ or Android 10+
+- Your device supports dark mode
