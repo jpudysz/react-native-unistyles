@@ -5,4 +5,112 @@ description: Learn about compound variants in Unistyles 3.0
 
 import { Card } from '@astrojs/starlight/components'
 
-🚧 Work is progress. Guide will be released soon.
+You can extend your `StyleSheets` even more by using `compound variants`.
+
+Compound variants are a way of applying additional styles when certain conditions are met.
+This approach simplifies the management of complex styling by reducing redundancy and increasing flexibility of your `StyleSheets`.
+
+### Basic usage
+
+Let's say you created a base `Typography` component with following variants:
+
+```tsx /variants/
+const styles = StyleSheet.create(theme => ({
+    baseText: {
+        fontFamily: theme.fonts.base,
+        fontWeight: 'normal'
+    },
+    themedText: {
+        variants: {
+            size: {
+                small: {
+                    fontSize: 12
+                },
+                medium: {
+                    fontSize: 16
+                },
+                large: {
+                    fontSize: 20
+                }
+            },
+            isBold: {
+                true: {
+                    fontWeight: 'bold'
+                }
+            },
+            color: {
+                primary: {
+                    color: theme.colors.primary
+                },
+                secondary: {
+                    color: theme.colors.secondary
+                },
+                link: {
+                    color: theme.colors.link
+                }
+            }
+        }
+    }
+}
+```
+
+What if you've received a new requirement where the text should be underlined when `isBold` is `true` and `color` is `link`?
+This task could be challenging while using features like [dynamic functions](/v3/references/dynamic-functions/) as you would need to use ifs in your `StyleSheet`.
+
+### Usage with Compound variants
+
+With compound variants it can be achieved in a more concise way:
+
+```tsx /compoundVariants/
+const styles = StyleSheet.create(theme => ({
+    baseText: {
+        fontFamily: theme.fonts.base,
+        fontWeight: 'normal'
+    },
+    themedText: {
+        variants: {
+            size: {
+                small: {
+                    fontSize: 12
+                },
+                medium: {
+                    fontSize: 16
+                },
+                large: {
+                    fontSize: 20
+                }
+            },
+            isBold: {
+                true: {
+                    fontWeight: 'bold'
+                }
+            },
+            color: {
+                primary: {
+                    color: theme.colors.primary
+                },
+                secondary: {
+                    color: theme.colors.secondary
+                },
+                link: {
+                    color: theme.colors.link
+                }
+            }
+        },
+        compoundVariants: [
+            {
+                isBold: true, // when isBold is true
+                color: 'link', // and color is link
+                // apply following styles
+                styles: {
+                    textDecorationLine: 'underline'
+                    // and more styles
+                }
+            }
+        ]
+    }
+}
+```
+
+Styles from the `compoundVariants` array will take precedence over the styles defined in the `variants` object.
+You can define multiple `compoundVariants` in the array to handle different combinations of style properties. This allows for more granular control and customization of your component's appearance.

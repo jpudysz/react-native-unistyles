@@ -84,8 +84,8 @@ export default defineConfig({
                     items: [
                         { label: 'Theming', slug: 'v3/guides/theming' },
                         { label: 'Expo Router', slug: 'v3/guides/expo-router' },
-                        { label: 'Custom web', slug: 'v3/guides/custom-web' },
-                        { label: 'Server side rendering', slug: 'v3/guides/server-side-rendering' },
+                        { label: 'Custom web', slug: 'v3/guides/custom-web', badge: 'WIP' },
+                        { label: 'Server side rendering', slug: 'v3/guides/server-side-rendering', badge: 'WIP' },
                     ]
                 },
                 {
@@ -100,9 +100,10 @@ export default defineConfig({
                         { label: 'Compound Variants', slug: 'v3/references/compound-variants' },
                         { label: 'Web styles', slug: 'v3/references/web-styles' },
                         { label: 'Web Only Features', slug: 'v3/references/web-only' },
-                        { label: 'Scoped theme', slug: 'v3/references/scoped-theme' },
+                        { label: 'Scoped theme', slug: 'v3/references/scoped-theme', badge: 'WIP' },
                         { label: 'createUnistylesComponent', slug: 'v3/references/create-unistyles-component' },
-                        { label: 'Pressable', slug: 'v3/references/pressable' },
+                        { label: 'Display and Hide', slug: 'v3/references/display-hide' },
+                        { label: 'Edge to edge', slug: 'v3/references/edge-to-edge' },
                     ]
                 },
                 {
