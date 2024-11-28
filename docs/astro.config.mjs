@@ -5,6 +5,9 @@ import expressiveCode from 'astro-expressive-code'
 
 // https://astro.build/config
 export default defineConfig({
+    redirects: {
+        '/': '/start/introduction/'
+    },
     integrations: [
         expressiveCode({
             theme: 'github-dark-dimmed',
