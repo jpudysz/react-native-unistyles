@@ -3,8 +3,51 @@ title: New features
 description: Whats new in Unistyles 3.0?
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components'
+import { Steps } from '@astrojs/starlight/components'
 
-Unistyles is primarily written in C++ with a thin JS layer for both iOS and Android. The key feature of this version is that it doesn’t re-render your components—there are no hooks, no context, just pure JSI bindings managing your `StyleSheet` styles.
+Unistyles comes packed with many exciting new features. If you're upgrading from Unistyles 2.0, here’s a quick summary of what’s new:
 
-Unistyles is integrated with Fabric and the Shadow Tree, updating your views directly from C++. This is why it’s not feasible to backport it to the old architecture.
+<Steps>
+1. No re-renders
+
+    Unistyles is primarily written in `C++` with a thin `JS` layer for both iOS and Android. The key feature of this version is that it doesn’t trigger re-renders—there are no hooks, no context, just pure `JSI` bindings managing your `StyleSheet` styles. Unistyles is integrated with Fabric and the Shadow Tree, directly updating your views from C++.
+
+2. Selective updates
+
+    Unistyles includes a special algorithm that only recalculates styles dependent on the change. For example, if the app user switches to a dark color scheme, Unistyles will only re-calculate and update the styles affected by the change.
+
+3. Compound variants
+
+    Unistyles extends the `variants` feature by allowing you to define `compound variants`. These are additional styles that are applied when certain conditions are met. For instance, you can define a compound variant to change the text color when the text is bold and uses the primary color.
+
+4. Scoped themes
+
+    You can now limit the scope of your theme to specific components, allowing different themes for different screens. For example, you can enforce a dark theme only on the login screen.
+
+5. Custom web parser
+
+    We’ve moved away from relying on `react-native-web` and implemented a custom parser that translates your styles into CSS classes. This parser is tailored to Unistyles syntax, including `mq`, `breakpoints`, `variants`, and `compoundVariants`. Importantly, it remains backwards compatible with React Native Web!
+
+6. Custom CSS classes binded to styles
+
+    For cross-platform apps, styling components like `tr` or `td` — which aren’t available in React Native can be challenging. Unistyles 3.0 allows you to define custom CSS classes that bind directly to your styles, so you can apply extra CSS styles as needed. This also means that you can use `Tailwind` implementation for your web app!
+
+7. Pseudo-classes
+
+    Unistyles 3.0 now supports all available CSS pseudo-classes! Easily add hover, focus, and active effects to your components.
+
+8. Custom web styles
+
+    If you need to style a component with web-only properties, it’s now possible. Add any CSS web property directly to your `StyleSheet` styles, such as web-based animations.
+
+9. 1:1 parity with React Native StyleSheet
+
+    You can now mix Unistyles with React Native StyleSheet and enable superpowers 🦸🏼‍♂️ on selected screens without additional configuration. If Unistyles doesn’t suit your needs, you can easily revert to React Native StyleSheet.
+
+10. Support for any color format
+
+    Unistyles now supports any color format that React Native can handle, including HEX, RGB, HSL, and more. We’ll also auto-convert your colors in any call to UnistylesRuntime.
+
+</Steps>
+
+And much more! Unistyles 3.0 is loaded with new features, so we encourage you to explore the docs and dive into the library!
