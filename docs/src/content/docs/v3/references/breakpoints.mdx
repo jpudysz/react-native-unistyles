@@ -4,3 +4,173 @@ description: Learn about breakpoints in Unistyles 3.0
 ---
 
 import { Card } from '@astrojs/starlight/components'
+
+Breakpoints are user-defined key/value pairs that describe the boundaries of screen sizes.
+There's no limit to the number of breakpoints; you can define as many as you want.
+
+### Register breakpoints
+
+To register your breakpoints, create an object with **any** keys:
+
+```tsx
+// unistyles.ts
+const breakpoints = {
+    xs: 0,
+    sm: 576,
+    md: 768,
+    lg: 992,
+    xl: 1200,
+    superLarge: 2000,
+    tvLike: 4000
+} as const
+```
+
+The first breakpoint **must** start with `0`. This is required to simulate CSS cascading, e.g., everything below 576px (`sm` breakoint)
+will resolve to `xs` breakpoint.
+
+If you use TypeScript you need to override the library's type:
+
+```tsx /name/
+type AppBreakpoints = typeof breakpoints
+
+declare module 'react-native-unistyles' {
+  export interface UnistylesBreakpoints extends AppBreakpoints {}
+}
+```
+
+Finally, to register the breakpoints, call `StyleSheet.configure`:
+
+```tsx /addBreakpoints/
+import { UnistylesRegistry } from 'react-native-unistyles'
+
+StyleSheet.configure({
+    breakpoints
+})
+```
+
+To learn more follow configuration [guide](/v3/start/configuration).
+
+### How to use breakpoints?
+
+Any style can change based on breakpoints. To do this, change a `value` to an `object`:
+
+```diff lang="tsx" /xs/ /sm/ del="backgroundColor: theme.colors.background" ins="backgroundColor: {"
+const styles = StyleSheet.create(theme => ({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: theme.colors.background,
+        backgroundColor: {
++            // your breakpoints
++            xs: theme.colors.background,
++            sm: theme.colors.barbie
++        }
+    },
+    text: {
+        color: theme.colors.typography
+    }
+}))
+```
+
+You can even use it with nested objects like `transform`,  `shadowOffset` or `filters`:
+
+```ts /xs/ /sm/ /xl/
+const styles = StyleSheet.create(theme => ({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: {
+            xs: theme.colors.background,
+            sm: theme.colors.barbie
+        },
+        transform: [
+            {
+                translateX: 100
+            },
+            {
+                scale: {
+                    xs: 1.5,
+                    xl: 0.9
+                }
+            }
+        ]
+    }
+}))
+```
+
+Breakpoints are also available with [variants](/v3/references/variants/) and [compound variants](/v3/references/compound-variants/).
+
+
+### Built-in breakpoints `landscape` and `portrait`
+
+Even if you don't use custom breakpoints, you can still utilize Unistyles' predefined breakpoints available on mobile devices: `portrait` and `landscape`.
+
+- `portrait` will resolve to your device's width in portrait mode
+- `landscape` will resolve to your device's width in landscape mode
+
+:::tip
+These breakpoints are only available on mobile unless you register your own.
+:::
+
+```ts /landscape/ /portrait/
+const styles = StyleSheet.create(theme => ({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: {
+            landscape: theme.colors.background,
+            portrait: theme.colors.barbie
+        }
+    }
+}))
+```
+
+### Show/Hide your components based on breakpoints
+
+In order to show or hide your components based on the screen size, you can leverage the `mq` utility and one of the two built-in components: `Display` and `Hide`.
+
+```tsx
+import { Display, Hide, mq } from 'react-native-unistyles'
+
+const MyComponent = () => {
+    return (
+        <Display mq={mq.width(0, 400)}>
+            <Text>This text is visible on small devices</Text>
+        </Display>
+        <Hide mq={mq.width(400)}>
+            <Text>This text is hidden on big devices</Text>
+        </Hide>
+    )
+}
+```
+
+You can also access your current breakpoint with `UnistylesRuntime`:
+
+```tsx /UnistylesRuntime.breakpoint/
+import { UnistylesRuntime } from 'react-native-unistyles'
+
+// check the current breakpoint
+export const CurrentBreakpoint = () => (
+    <Text>
+        Current breakpoint is {UnistylesRuntime.breakpoint}
+    </Text>
+)
+```
+
+### Get registered breakpoints
+
+Access your registered breakpoints object with `UnsitylesRuntime`:
+
+```tsx /UnistylesRuntime.breakpoints/
+import { UnistylesRuntime } from 'react-native-unistyles'
+
+// check the registered breakpoints
+export const RegisteredBreakpoints = () => (
+    <Text>
+        My registered breakpoint are {JSON.stringify(UnistylesRuntime.breakpoints)}
+    </Text>
+)
+```

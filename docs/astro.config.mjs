@@ -98,14 +98,39 @@ export default defineConfig({
                         { label: 'Compound Variants', slug: 'v3/references/compound-variants' },
                         { label: 'Web styles', slug: 'v3/references/web-styles' },
                         { label: 'Web Only Features', slug: 'v3/references/web-only' },
+                        { label: 'Scoped theme', slug: 'v3/references/scoped-theme' },
                     ]
                 },
                 {
                     label: 'Other',
                     items: [
+                        { label: 'How to report a bug?', slug: 'v3/other/how-to-report-bug' },
                         { label: 'Babel plugin', slug: 'v3/other/babel-plugin' },
                         { label: 'Dependencies', slug: 'v3/other/dependencies' },
+                        { label: 'For library authors', slug: 'v3/other/for-library-authors' },
+                        { label: 'For sponsors', slug: 'v3/other/for-sponsors' },
+                        { label: 'FAQ', slug: 'v3/other/frequently-asked-questions' },
                     ]
+                },
+                {
+                    label: 'Examples',
+                    items: [
+                        { label: 'All examples', slug: 'v3/examples/examples' },
+                    ]
+                },
+                {
+                    label: 'Unistyles 2.0 documentation', link: 'https://v2.unistyl.es'
+                },
+                {
+                    label: 'React Native Crossroads', link: 'https://reactnativecrossroads.com'
+                },
+                {
+                    label: 'Codemask', link: 'https://codemask.com'
+                },
+                {
+                    label: 'Hire us!',
+                    badge: 'Hot!',
+                    link: 'https://x.com/messages/compose?recipient_id=769868612198887425'
                 }
 			],
 		}),
