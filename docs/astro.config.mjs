@@ -75,14 +75,15 @@ export default defineConfig({
                         { label: 'Getting started', slug: 'v3/start/getting-started' },
                         { label: 'Configuration', slug: 'v3/start/configuration' },
                         { label: 'New features', slug: 'v3/start/new-features' },
-                        { label: 'Migration guide', slug: 'v3/start/migration-guide' },
                         { label: 'Look under the hood', slug: 'v3/start/how-unistyles-works' },
+                        { label: 'Migration guide', slug: 'v3/start/migration-guide' }
 					],
 				},
                 {
                     label: 'Guides',
                     items: [
                         { label: 'Theming', slug: 'v3/guides/theming' },
+                        { label: 'Expo Router', slug: 'v3/guides/expo-router' },
                     ]
                 },
                 {

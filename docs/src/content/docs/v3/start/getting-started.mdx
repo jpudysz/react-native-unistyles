@@ -5,15 +5,15 @@ description: How to get started with Unistyles
 
 import { Card, CardGrid, Aside, Tabs, TabItem } from '@astrojs/starlight/components'
 
-We put a lot of effort into making Unistyles as easy to use as possible. That's why you no longer need to use `useStyle` hook or wrap your app in any provider. Unistyles works inline with your existing code, so you can use it right away.
+We put a lot of effort into making Unistyles as easy to use as possible. You no longer need the `useStyle` hook or wrap your app in provider. Unistyles integrates seamlessly with your existing code, so you can start using it immediately.
 
 ### Prerequisites
 
-Unistyles 3.0 is tightly integrated with `Fabric` and most recent version of React Native. That's why you need to use **New Architecture** and at least **React Native 0.76.0**. Additionally Unistyles depends on `react-native-nitro-modules` and `react-native-edge-to-edge`.
+Unistyles 3.0 is tightly integrated with `Fabric` and the latest version of React Native. Therefore, you must use the **New Architecture** and at least **React Native 0.76.0**. Additionally, Unistyles relies on `react-native-nitro-modules` and `react-native-edge-to-edge`.
 
-<Aside>Learn more on how Unistyles is using Nitro Modules and React Native Edge to Edge [here](/v3/other/dependencies).</Aside>
+<Aside>Learn more about how Unistyles leverages Nitro Modules and React Native Edge to Edge [here](/v3/other/dependencies).</Aside>
 
-
+**Table of requirements:**
 |  | Required | Note |
 | -------- | ------- | ---- |
 | React Native | 0.76+     |     |
@@ -21,11 +21,11 @@ Unistyles 3.0 is tightly integrated with `Fabric` and most recent version of Rea
 | Expo SDK    | 52+     | (if you use Expo)    |
 | Xcode    | 16+     | Required by Nitro Modules    |
 
-Due to the fact that Unistyles is using `Fabric`, it's not possible to run it on `Old Architecture` nor older versions of React Native. If you're not able to meet this requirements, you can use Unistyles 2.0+ which is compatible with those versions.
+Since Unistyles relies on `Fabric`, it cannot run on the `Old Architecture` or older versions of React Native. If you can’t meet these requirements, you can use Unistyles 2.0+, which is compatible with those versions.
 
 ### Installation
 
-```shell title="shell"
+```shell title="Install Unistyles and its dependencies"
 yarn add react-native-unistyles@next
 yarn add react-native-nitro-modules react-native-edge-to-edge
 ```
@@ -45,7 +45,7 @@ module.exports = function (api) {
   }
 }
 ```
-<Aside>Learn more on how Babel plugin works [here](/v3/other/babel-plugin).</Aside>
+<Aside>Learn more on how the Babel plugin works [here](/v3/other/babel-plugin).</Aside>
 
 Finish installation based on your platform:
 
@@ -76,7 +76,7 @@ Finish installation based on your platform:
 
 ### As easy as React Native StyleSheet
 
-Getting started with Unistyles couldn't been easier. All you need to do is to replace React Native `StyleSheet` with `StyleSheet` exported from Unistyles. From now on you're using `StyleSheet` with superpowers 🦸🏼‍♂️.
+Getting started with Unistyles couldn’t be easier. Simply replace React Native’s `StyleSheet` with the `StyleSheet` exported from Unistyles. From that moment, you’ll be using a `StyleSheet` with superpowers 🦸🏼‍♂️.
 
 ```diff lang="tsx" title="Example.tsx"
 - import { StyleSheet } from 'react-native'
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
 })
 ```
 
-By replacing StyleSheets you already have some benefits that are not avaiable in React Native StyleSheet:
+By replacing `StyleSheet`, you immediately gain several benefits that aren’t available in React Native’s `StyleSheet`:
 
 - [Variants](/v3/references/variants)
 - [Compound variants](/v3/references/compound-variants)
@@ -105,6 +105,6 @@ By replacing StyleSheets you already have some benefits that are not avaiable in
 - [Media queries](/v3/references/media-queries)
 - [Horizontal and vertical breakpoints for Native](/v3/references/breakpoints#horizontal-and-vertical-breakpoints-for-native)
 - [Custom web styles](/v3/references/web-styles)
-- [Custom web classes](/v3/references/web-classes)
+- [Web only features](/v3/references/web-only)
 
-When you're ready to customize your styles and enable more features you can [configure](/v3/start/configuration) Unistyles.
+When you're ready to customize your styles and unlock additional features you can [configure](/v3/start/configuration) Unistyles.

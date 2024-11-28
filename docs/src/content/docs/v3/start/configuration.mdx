@@ -5,15 +5,19 @@ description: How configure Unistyles
 
 import { Card, CardGrid, Aside, Tabs, TabItem } from '@astrojs/starlight/components'
 
-In order to use more features and tailor Unistyles to your needs, you need to configure it. Unistyles config has been divided into three parts:
+To unlock more features and tailor Unistyles to your needs, you can configure it. The Unistyles configuration is divided into three parts:
 
-1. Themes
-2. Breakpoints
-3. Settings
+1. **Themes**
+2. **Breakpoints**
+3. **Settings**
 
-### Themes (optional)
+<Aside>
+Each configuration is optional but enables advanced features, which are explained in the guide [How Unistyles Works?](/v3/start/how-unistyles-works)
+</Aside>
 
-`Themes` is a JavaScript object where keys are unique theme names and values are actual themes. To learn more about themes, check out [theming](/todo) guide.
+### Themes (Optional)
+
+`Themes` is a JavaScript object where the keys represent unique theme names, and the values are the corresponding theme definitions. For more details, refer to the [theming](/v3/guides/theming) guide.
 
 ```tsx title="unistyles.ts"
 const lightTheme = {
@@ -41,12 +45,12 @@ const appThemes = {
 ```
 
 <Aside>
-Unistyles supports any dynamic theme and doesn't enforce any specific structure. To prevent TypeScript issues make sure that every theme has the same type.
+Unistyles supports any dynamic theme and doesn’t enforce a specific structure. To avoid TypeScript issues, ensure that all themes share the same type.
 </Aside>
 
-### Breakpoints (optional)
+### Breakpoints (Optional)
 
-`Breakpoints` is also a JavaScript object where keys are unique breakpoint names and values are actual breakpoints values (numbers). You should make sure that you register at least one breakpoint with value 0 as it's necessary to simulate CSS media queries cascading.
+`Breakpoints` is a JavaScript object where the keys are unique breakpoint names and the values are the corresponding breakpoint values (numbers). Be sure to register at least one breakpoint with a value of 0, as it’s required to simulate the cascading behavior of CSS media queries.
 
 ```tsx title="unistyles.ts"
 const breakpoints = {
@@ -59,23 +63,40 @@ const breakpoints = {
 }
 ```
 
-### Settings (optional)
+### Settings (Optional)
 
-`Settings` object was simplified and in the most recent version it supports only two properties:
+The `Settings` object has been simplified, and in the most recent version, it supports only two properties:
 
-- `adaptiveThemes` - boolean, enables or disables adaptive themes [learn more](/todo)
-- `initialTheme` - string, or synchronous function that sets initial theme
+- **`adaptiveThemes`** – a boolean that enables or disables adaptive themes [learn more](/v3/guides/theming#adaptive-themes)
+- **`initialTheme`** – a string or a synchronous function that sets the initial theme.
 
 ```tsx title="unistyles.ts"
 const settings = {
-    adaptiveThemes: true,
     initialTheme: 'light'
+}
+
+// or with a synchronous function
+const settings = {
+    initialTheme: () => {
+        // get preferred theme from user's preferences/MMKV/SQL etc.
+
+        return storage.getString('preferredTheme') ?? 'light'
+    }
+}
+
+// or with adaptive themes
+const settings = {
+    adaptiveThemes: true
 }
 ```
 
-### TypeScript (optional)
+<Aside>
+In the Unistyles 3.0 setting both `initialTheme` and `adaptiveThemes` will cause an error. These options are mutually exclusive.
+</Aside>
 
-If your repository is using TypeScript is highly recommended to override library types to get perfect autocomplete and type safety about your themes and breakpoints:
+### TypeScript Types (Optional)
+
+If your repository is using TypeScript, it is highly recommended to override the library types for optimal autocomplete and type safety regarding your themes and breakpoints:
 
 ```tsx title="unistyles.ts"
 type AppThemes = typeof appThemes
@@ -90,7 +111,7 @@ declare module 'react-native-unistyles' {
 
 ### Set configuration
 
-The final piece of configuration is to set all the configs by calling `StyleSheet.configure` function:
+The final step in the configuration is to set all the options by calling the `StyleSheet.configure` function:
 
 ```tsx title="unistyles.ts"
 import { StyleSheet } from 'react-native-unistyles'
@@ -103,7 +124,7 @@ StyleSheet.configure({
 
 ```
 
-That's it! Now you can use Unistyles in your project!
+That’s it! You can now use all the features of Unistyles in your project!
 
 ### Full example
 
@@ -152,14 +173,13 @@ StyleSheet.configure({
         initialTheme: 'light',
     },
     breakpoints,
-    themes: {
-        light: lightTheme,
-        other: otherTheme
-    }
+    themes: appThemes
 })
 
 ```
 
 <Aside>
 Don't forget to import this config somewhere in your project, for example in `index.ts` file.
+
+For expo router users, please refer to the [Expo Router guide](/v3/guides/expo-router).
 </Aside>
