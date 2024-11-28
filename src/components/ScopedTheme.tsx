@@ -7,11 +7,9 @@ type ThemeProps = {
 }
 
 const Apply = ({ name }: { name?: keyof UnistylesThemes }) => {
-    // @ts-expect-error this is hidden from TS
     UnistylesShadowRegistry.setScopedTheme(name)
 
     useLayoutEffect(() => {
-        // @ts-expect-error this is hidden from TS
         UnistylesShadowRegistry.setScopedTheme(name)
     })
 
@@ -19,11 +17,15 @@ const Apply = ({ name }: { name?: keyof UnistylesThemes }) => {
 }
 
 export const ScopedTheme: React.FunctionComponent<React.PropsWithChildren<ThemeProps>> = ({ name, children}) => {
-    const childrens = [
+    const scopedChildren = [
         <Apply key={name} name={name} />,
         children,
         <Apply key='dispose' />
     ]
 
-    return <React.Fragment>{childrens}</React.Fragment>
+    return (
+        <React.Fragment>
+            {scopedChildren}
+        </React.Fragment>
+    )
 }

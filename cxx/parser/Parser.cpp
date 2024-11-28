@@ -66,6 +66,56 @@ jsi::Object parser::Parser::unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<S
         .asObject(rt);
 }
 
+// parse unistyle based on scoped theme
+void parser::Parser::rebuildUnistyleWithScopedTheme(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, std::shared_ptr<UnistyleData> unistyleData) {
+    // for static stylesheet we don't need to do anything
+    if (styleSheet->type == StyleSheetType::Static) {
+        return;
+    }
+    
+    auto& state = core::UnistylesRegistry::get().getState(rt);
+    auto scopedTheme = state.getJSThemeByName(unistyleData->scopedTheme.value());
+    
+    if (styleSheet->type == StyleSheetType::Themable) {
+        auto parsedStyleSheet = styleSheet->rawValue
+            .asFunction(rt)
+            .call(rt, std::move(scopedTheme))
+            .asObject(rt);
+        auto targetStyle = parsedStyleSheet.getProperty(rt, unistyleData->unistyle->styleKey.c_str()).asObject(rt);
+        
+        // for dynamic function we just want to update unprocessedValue
+        if (targetStyle.isFunction(rt)) {
+            auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyleData->unistyle);
+            
+            unistyleFn->unprocessedValue = std::move(targetStyle);
+            
+            return;
+        }
+            
+        unistyleData->parsedStyle = std::move(targetStyle);
+        
+        return;
+    }
+    
+    auto miniRuntime = this->_unistylesRuntime->getMiniRuntimeAsValue(rt, std::nullopt);
+    auto parsedStyleSheet = styleSheet->rawValue
+        .asFunction(rt)
+        .call(rt, std::move(scopedTheme), std::move(miniRuntime))
+        .asObject(rt);
+    auto targetStyle = parsedStyleSheet.getProperty(rt, unistyleData->unistyle->styleKey.c_str()).asObject(rt);
+    
+    // for dynamic function we just want to update unprocessedValue
+    if (targetStyle.isFunction(rt)) {
+        auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyleData->unistyle);
+        
+        unistyleFn->unprocessedValue = std::move(targetStyle);
+        
+        return;
+    }
+    
+    unistyleData->parsedStyle = std::move(targetStyle);
+}
+
 // parses all unistyles in StyleSheet
 void parser::Parser::parseUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet) {
     for (const auto& [_, unistyle] : styleSheet->unistyles) {

@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import { Button, Pressable, PressableStateCallbackType, ScrollView, Text, TextInput, View } from 'react-native'
 import { Blurhash } from 'react-native-blurhash'
-import { createUnistylesComponent, StyleSheet, Display, Hide, mq } from 'react-native-unistyles'
+import { createUnistylesComponent, StyleSheet, Display, Hide, mq, ScopedTheme } from 'react-native-unistyles'
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
@@ -78,7 +78,14 @@ export const App = () => {
                     </Typography>
                 </Pressable>
             ))}
-            <TextInput style={styles.input} />
+            <ScopedTheme name='premium'>
+                <Text style={styles.scoped()}>
+                    I'm scoped to premium
+                </Text>
+            </ScopedTheme>
+            <ScopedTheme name='premium'>
+                <TextInput style={styles.input} />
+            </ScopedTheme>
         </View>
     )
 }
@@ -97,9 +104,10 @@ const styles = StyleSheet.create((theme, rt) => ({
             }
         ]
     },
-    secondProp: {
+    scoped: () => ({
+        color: theme.colors.accent,
         backgroundColor: theme.colors.backgroundColor
-    },
+    }),
     thirdProp: {
         backgroundColor: rt.isPortrait ? 'blue' : 'green'
     },

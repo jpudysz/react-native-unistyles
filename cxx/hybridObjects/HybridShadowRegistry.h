@@ -9,13 +9,18 @@
 namespace margelo::nitro::unistyles {
 
 struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
-    HybridShadowRegistry(): HybridObject(TAG) {}
-    
+    HybridShadowRegistry(std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime)
+        : HybridObject(TAG), _unistylesRuntime{unistylesRuntime} {}
+
     jsi::Value link(jsi::Runtime& rt,
                             const jsi::Value& thisValue,
                             const jsi::Value* args,
                             size_t count);
     jsi::Value unlink(jsi::Runtime& rt,
+                            const jsi::Value& thisValue,
+                            const jsi::Value* args,
+                            size_t count);
+    jsi::Value setScopedTheme(jsi::Runtime& rt,
                             const jsi::Value& thisValue,
                             const jsi::Value* args,
                             size_t count);
@@ -26,8 +31,13 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
         registerHybrids(this, [](Prototype& prototype) {
             prototype.registerRawHybridMethod("link", 2, &HybridShadowRegistry::link);
             prototype.registerRawHybridMethod("unlink", 2, &HybridShadowRegistry::unlink);
+            prototype.registerRawHybridMethod("setScopedTheme", 1, &HybridShadowRegistry::setScopedTheme);
         });
     };
+
+private:
+    std::optional<std::string> _scopedTheme;
+    std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
 };
 
 }

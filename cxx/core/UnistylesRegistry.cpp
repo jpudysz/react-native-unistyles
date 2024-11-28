@@ -74,27 +74,22 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
     std::vector<core::Unistyle::Shared>& unistyles,
     Variants& variants,
     std::vector<std::vector<folly::dynamic>>& arguments,
-    std::optional<std::string> uniquePressableId
+    std::optional<std::string> scopedTheme,
+    std::optional<std::string> uniquePressableId,
+    std::function<folly::dynamic(std::shared_ptr<UnistyleData>)> onRegister
 ) {
-    auto parser = parser::Parser(nullptr);
     shadow::ShadowLeafUpdates updates;
     
     for (size_t index = 0; index < unistyles.size(); index++) {
         Unistyle::Shared unistyle = unistyles[index];
+        auto unistyleData = std::make_shared<UnistyleData>(unistyle, variants, arguments[index], scopedTheme, uniquePressableId);
 
-        this->_shadowRegistry[&rt][shadowNodeFamily]
-            .emplace_back(std::make_shared<UnistyleData>(unistyle, variants, arguments[index], uniquePressableId));
-
-        // add or update node for shadow leaf updates
-        // dynamic functions are parsed later
-        if (unistyle->type == UnistyleType::Object) {
-            for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
-                for (const auto& unistyleData : unistyles) {
-                    if (unistyleData->unistyle == unistyle && family == shadowNodeFamily) {
-                        updates[family] = parser.parseStylesToShadowTreeStyles(rt, {unistyleData});
-                    }
-                }
-            }
+        this->_shadowRegistry[&rt][shadowNodeFamily].emplace_back(unistyleData);
+        
+        auto shadowUpdate = onRegister(unistyleData);
+        
+        if (shadowUpdate != nullptr) {
+            updates[shadowNodeFamily] = shadowUpdate;
         }
     }
 
