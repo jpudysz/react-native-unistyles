@@ -124,7 +124,7 @@ export default defineConfig({
                 {
                     label: 'Examples',
                     items: [
-                        { label: 'All examples', slug: 'v3/examples/examples' },
+                        { label: 'All examples', slug: 'v3/examples/examples', badge: 'WIP' },
                     ]
                 },
                 {
