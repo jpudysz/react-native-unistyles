@@ -83,6 +83,7 @@ export default defineConfig({
                     label: 'Guides',
                     items: [
                         { label: 'Theming', slug: 'v3/guides/theming' },
+                        { label: 'Avoiding Keyboard', slug: 'v3/guides/avoiding-keyboard' },
                         { label: 'Expo Router', slug: 'v3/guides/expo-router' },
                         { label: 'Custom web', slug: 'v3/guides/custom-web', badge: 'WIP' },
                         { label: 'Server side rendering', slug: 'v3/guides/server-side-rendering', badge: 'WIP' },
@@ -93,6 +94,7 @@ export default defineConfig({
                     items: [
                         { label: 'StyleSheet', slug: 'v3/references/stylesheet' },
                         { label: 'Unistyles Runtime', slug: 'v3/references/unistyles-runtime' },
+                        { label: 'Mini Runtime', slug: 'v3/references/mini-runtime' },
                         { label: 'Dynamic Functions', slug: 'v3/references/dynamic-functions' },
                         { label: 'Breakpoints', slug: 'v3/references/breakpoints' },
                         { label: 'Media Queries', slug: 'v3/references/media-queries' },
@@ -104,6 +106,8 @@ export default defineConfig({
                         { label: 'createUnistylesComponent', slug: 'v3/references/create-unistyles-component' },
                         { label: 'Display and Hide', slug: 'v3/references/display-hide' },
                         { label: 'Edge to edge', slug: 'v3/references/edge-to-edge' },
+                        { label: 'Dimensions', slug: 'v3/references/dimensions' },
+                        { label: 'Content size category', slug: 'v3/references/content-size-category' },
                     ]
                 },
                 {
