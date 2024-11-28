@@ -1,0 +1,90 @@
+---
+title: Unistyles Registry
+---
+
+import Seo from '../../../../components/Seo.astro'
+import Badge from '../../../../components/Badge.astro'
+
+<Seo
+    seo={{
+        title: 'UnistylesRegistry',
+        description: 'How to use UnistylesRegistry in react-native-unistyles'
+    }}
+>
+
+<Badge label="All platforms" />
+<Badge label="2.0.0" />
+
+UnistylesRegistry is a singleton that allows you to register `themes`, `breakpoints` and pass additional `config`.
+
+:::tip
+You should call `UnistylesRegistry` only once in your application. If you want to interact with `Unistyles` during runtime use [UnistylesRuntime](/reference/unistyles-runtime/) instead.
+:::
+
+There is no required timing for when you should call it. It can be done, for example, in your `App.tsx` file or somewhere deeper.
+
+### Register themes
+
+```tsx
+import { UnistylesRegistry } from 'react-native-unistyles'
+import { lightTheme, darkTheme } from './themes'
+
+UnistylesRegistry
+    .addThemes({
+        light: lightTheme,
+        dark: darkTheme,
+    })
+```
+
+### Register breakpoints
+
+```tsx
+import { UnistylesRegistry } from 'react-native-unistyles'
+import { breakpoints } from './breakpoints'
+
+UnistylesRegistry
+    .addBreakpoints(breakpoints)
+```
+
+### Add config
+
+```tsx
+import { UnistylesRegistry } from 'react-native-unistyles'
+
+UnistylesRegistry
+    .addConfig({
+        adaptiveThemes: true
+    })
+```
+
+Available config options:
+
+| Key   |      Description      |  Default value | More info |
+|----------|:-------------:|------:|------:|
+| adaptiveThemes | Enable Unistyles to automatically switch between `dark` and `light` themes based on the device settings. | false | [link](/reference/theming/#adaptive-themes) |
+| initialTheme | If you have registered more than one theme and know the initial theme upfront, you can pass the theme name here. | undefined | [link](/reference/theming/#select-theme) |
+| plugins | A list of plugins that Unistyles will call after resolving the StyleSheet. |   [] | [link](/reference/plugins/) |
+| experimentalCSSMediaQueries |  Web only: Inject CSS media queries instead of inline styles. |   false | [link](/reference/web-support/) |
+| <Badge label="Web" /> <Badge label="2.8.1"/> windowResizeDebounceTimeMs | Time in ms Unistyles will report a window resize event, e.g., when the user drags the browser window. |   100 | - |
+| <Badge label="Android" /> <Badge label="2.9.2"/> disableAnimatedInsets | Disable animating value of bottom inset while toggling keyboard |   false | - |
+
+### Full example
+
+```tsx
+UnistylesRegistry
+    .addBreakpoints(breakpoints)
+    .addThemes({
+        light: lightTheme,
+        dark: darkTheme,
+    })
+    .addConfig({
+        adaptiveThemes: true,
+        experimentalCSSMediaQueries: true
+    })
+```
+
+:::tip
+If you use TypeScript, remember to override library types. [Read more](/start/setup/#33-configure-typescript)
+:::
+
+</Seo>

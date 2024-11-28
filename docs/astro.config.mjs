@@ -28,27 +28,27 @@ export default defineConfig({
                     items: [
                         {
                             label: 'Introduction',
-                            link: '/start/introduction/'
+                            link: '/v2/start/introduction/'
                         },
                         {
                             label: 'Setup',
-                            link: '/start/setup/'
+                            link: '/v2/start/setup/'
                         },
                         {
                             label: 'Migration from 1.x',
-                            link: '/start/migration-from-1/'
+                            link: '/v2/start/migration-from-1/'
                         },
                         {
                             label: 'Basic Usage',
-                            link: '/start/basic-usage/'
+                            link: '/v2/start/basic-usage/'
                         },
                         {
                             label: 'Migration from StyleSheet',
-                            link: '/start/migration-from-stylesheet/'
+                            link: '/v2/start/migration-from-stylesheet/'
                         },
                         {
                             label: 'Benchmarks',
-                            link: '/start/benchmarks/'
+                            link: '/v2/start/benchmarks/'
                         }
                     ]
                 },
@@ -57,92 +57,92 @@ export default defineConfig({
                     items: [
                         {
                             label: 'createStyleSheet',
-                            link: '/reference/create-stylesheet/'
+                            link: '/v2/reference/create-stylesheet/'
                         },
                         {
                             label: 'useStyles',
-                            link: '/reference/use-styles/'
+                            link: '/v2/reference/use-styles/'
                         },
                         {
                             label: 'UnistylesProvider',
-                            link: '/reference/unistyles-provider/',
+                            link: '/v2/reference/unistyles-provider/',
                             badge: 'New'
                         },
                         {
                             label: 'Dynamic functions',
-                            link: '/reference/dynamic-functions/'
+                            link: '/v2/reference/dynamic-functions/'
                         },
                         {
                             label: 'Theming',
-                            link: '/reference/theming/'
+                            link: '/v2/reference/theming/'
                         },
                         {
                             label: 'Edge to edge layout',
-                            link: '/reference/edge-to-edge/'
+                            link: '/v2/reference/edge-to-edge/'
                         },
                         {
                             label: 'useInitialTheme',
-                            link: '/reference/use-initial-theme/'
+                            link: '/v2/reference/use-initial-theme/'
                         },
                         {
                             label: 'Breakpoints',
-                            link: '/reference/breakpoints/'
+                            link: '/v2/reference/breakpoints/'
                         },
                         {
                             label: 'Media queries',
-                            link: '/reference/media-queries/'
+                            link: '/v2/reference/media-queries/'
                         },
                         {
                             label: 'Variants',
-                            link: '/reference/variants/'
+                            link: '/v2/reference/variants/'
                         },
                         {
                             label: 'Compound variants',
-                            link: '/reference/compound-variants/'
+                            link: '/v2/reference/compound-variants/'
                         },
                         {
                             label: 'Dimensions',
-                            link: '/reference/dimensions/'
+                            link: '/v2/reference/dimensions/'
                         },
                         {
                             label: 'Unistyles Registry',
-                            link: '/reference/unistyles-registry/'
+                            link: '/v2/reference/unistyles-registry/'
                         },
                         {
                             label: 'Unistyles Runtime',
-                            link: '/reference/unistyles-runtime/'
+                            link: '/v2/reference/unistyles-runtime/'
                         },
                         {
                             label: 'Content size category',
-                            link: '/reference/content-size-category/'
+                            link: '/v2/reference/content-size-category/'
                         },
                         {
                             label: 'Plugins',
-                            link: '/reference/plugins/'
+                            link: '/v2/reference/plugins/'
                         },
                         {
                             label: 'Web support',
-                            link: '/reference/web-support/'
+                            link: '/v2/reference/web-support/'
                         },
                         {
                             label: 'Server side rendering',
-                            link: '/reference/server-side-rendering/'
+                            link: '/v2/reference/server-side-rendering/'
                         },
                         {
                             label: 'Debugging',
-                            link: '/reference/debugging/'
+                            link: '/v2/reference/debugging/'
                         },
                         {
                             label: 'Testing',
-                            link: '/reference/testing/'
+                            link: '/v2/reference/testing/'
                         },
                         {
                             label: 'Errors',
-                            link: '/reference/errors/'
+                            link: '/v2/reference/errors/'
                         },
                         {
                             label: 'FAQ',
-                            link: '/reference/faq/'
+                            link: '/v2/reference/faq/'
                         }
                     ]
                 },
@@ -151,7 +151,7 @@ export default defineConfig({
                     items: [
                         {
                             label: 'All examples',
-                            link: '/examples/all'
+                            link: '/v2/examples/all'
                         }
                     ]
                 },
@@ -160,11 +160,11 @@ export default defineConfig({
                     items: [
                         {
                             label: 'For library authors',
-                            link: '/other/for-library-authors/'
+                            link: '/v2/other/for-library-authors/'
                         },
                         {
                             label: 'For Sponsors',
-                            link: 'other/for-sponsors/'
+                            link: '/v2/other/for-sponsors/'
                         }
                     ]
                 },

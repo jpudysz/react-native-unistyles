@@ -136,226 +136,226 @@ declare module 'astro:content' {
 
 	type ContentEntryMap = {
 		"docs": {
-"examples/all.mdx": {
-	id: "examples/all.mdx";
-  slug: "examples/all";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"other/for-library-authors.mdx": {
-	id: "other/for-library-authors.mdx";
-  slug: "other/for-library-authors";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"other/for-sponsors.mdx": {
-	id: "other/for-sponsors.mdx";
-  slug: "other/for-sponsors";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/breakpoints.mdx": {
-	id: "reference/breakpoints.mdx";
-  slug: "reference/breakpoints";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/compound-variants.mdx": {
-	id: "reference/compound-variants.mdx";
-  slug: "reference/compound-variants";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/content-size-category.mdx": {
-	id: "reference/content-size-category.mdx";
-  slug: "reference/content-size-category";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/create-stylesheet.mdx": {
-	id: "reference/create-stylesheet.mdx";
-  slug: "reference/create-stylesheet";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/debugging.mdx": {
-	id: "reference/debugging.mdx";
-  slug: "reference/debugging";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/dimensions.mdx": {
-	id: "reference/dimensions.mdx";
-  slug: "reference/dimensions";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/dynamic-functions.mdx": {
-	id: "reference/dynamic-functions.mdx";
-  slug: "reference/dynamic-functions";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/edge-to-edge.mdx": {
-	id: "reference/edge-to-edge.mdx";
-  slug: "reference/edge-to-edge";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/errors.mdx": {
-	id: "reference/errors.mdx";
-  slug: "reference/errors";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/faq.mdx": {
-	id: "reference/faq.mdx";
-  slug: "reference/faq";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/media-queries.mdx": {
-	id: "reference/media-queries.mdx";
-  slug: "reference/media-queries";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/plugins.mdx": {
-	id: "reference/plugins.mdx";
-  slug: "reference/plugins";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/server-side-rendering.mdx": {
-	id: "reference/server-side-rendering.mdx";
-  slug: "reference/server-side-rendering";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/testing.mdx": {
-	id: "reference/testing.mdx";
-  slug: "reference/testing";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/theming.mdx": {
-	id: "reference/theming.mdx";
-  slug: "reference/theming";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/unistyles-provider.mdx": {
-	id: "reference/unistyles-provider.mdx";
-  slug: "reference/unistyles-provider";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/unistyles-registry.mdx": {
-	id: "reference/unistyles-registry.mdx";
-  slug: "reference/unistyles-registry";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/unistyles-runtime.mdx": {
-	id: "reference/unistyles-runtime.mdx";
-  slug: "reference/unistyles-runtime";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/use-initial-theme.mdx": {
-	id: "reference/use-initial-theme.mdx";
-  slug: "reference/use-initial-theme";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/use-styles.mdx": {
-	id: "reference/use-styles.mdx";
-  slug: "reference/use-styles";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/variants.mdx": {
-	id: "reference/variants.mdx";
-  slug: "reference/variants";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"reference/web-support.mdx": {
-	id: "reference/web-support.mdx";
-  slug: "reference/web-support";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"start/basic-usage.mdx": {
-	id: "start/basic-usage.mdx";
-  slug: "start/basic-usage";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"start/benchmarks.mdx": {
-	id: "start/benchmarks.mdx";
-  slug: "start/benchmarks";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"start/introduction.mdx": {
-	id: "start/introduction.mdx";
-  slug: "start/introduction";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"start/migration-from-1.mdx": {
-	id: "start/migration-from-1.mdx";
-  slug: "start/migration-from-1";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"start/migration-from-stylesheet.mdx": {
-	id: "start/migration-from-stylesheet.mdx";
-  slug: "start/migration-from-stylesheet";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
-"start/setup.mdx": {
-	id: "start/setup.mdx";
-  slug: "start/setup";
-  body: string;
-  collection: "docs";
-  data: InferEntrySchema<"docs">
-} & { render(): Render[".mdx"] };
 "v1/docs/start/setup.mdx": {
 	id: "v1/docs/start/setup.mdx";
   slug: "v1/docs/start/setup";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/examples/all.mdx": {
+	id: "v2/examples/all.mdx";
+  slug: "v2/examples/all";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/other/for-library-authors.mdx": {
+	id: "v2/other/for-library-authors.mdx";
+  slug: "v2/other/for-library-authors";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/other/for-sponsors.mdx": {
+	id: "v2/other/for-sponsors.mdx";
+  slug: "v2/other/for-sponsors";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/breakpoints.mdx": {
+	id: "v2/reference/breakpoints.mdx";
+  slug: "v2/reference/breakpoints";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/compound-variants.mdx": {
+	id: "v2/reference/compound-variants.mdx";
+  slug: "v2/reference/compound-variants";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/content-size-category.mdx": {
+	id: "v2/reference/content-size-category.mdx";
+  slug: "v2/reference/content-size-category";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/create-stylesheet.mdx": {
+	id: "v2/reference/create-stylesheet.mdx";
+  slug: "v2/reference/create-stylesheet";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/debugging.mdx": {
+	id: "v2/reference/debugging.mdx";
+  slug: "v2/reference/debugging";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/dimensions.mdx": {
+	id: "v2/reference/dimensions.mdx";
+  slug: "v2/reference/dimensions";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/dynamic-functions.mdx": {
+	id: "v2/reference/dynamic-functions.mdx";
+  slug: "v2/reference/dynamic-functions";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/edge-to-edge.mdx": {
+	id: "v2/reference/edge-to-edge.mdx";
+  slug: "v2/reference/edge-to-edge";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/errors.mdx": {
+	id: "v2/reference/errors.mdx";
+  slug: "v2/reference/errors";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/faq.mdx": {
+	id: "v2/reference/faq.mdx";
+  slug: "v2/reference/faq";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/media-queries.mdx": {
+	id: "v2/reference/media-queries.mdx";
+  slug: "v2/reference/media-queries";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/plugins.mdx": {
+	id: "v2/reference/plugins.mdx";
+  slug: "v2/reference/plugins";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/server-side-rendering.mdx": {
+	id: "v2/reference/server-side-rendering.mdx";
+  slug: "v2/reference/server-side-rendering";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/testing.mdx": {
+	id: "v2/reference/testing.mdx";
+  slug: "v2/reference/testing";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/theming.mdx": {
+	id: "v2/reference/theming.mdx";
+  slug: "v2/reference/theming";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/unistyles-provider.mdx": {
+	id: "v2/reference/unistyles-provider.mdx";
+  slug: "v2/reference/unistyles-provider";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/unistyles-registry.mdx": {
+	id: "v2/reference/unistyles-registry.mdx";
+  slug: "v2/reference/unistyles-registry";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/unistyles-runtime.mdx": {
+	id: "v2/reference/unistyles-runtime.mdx";
+  slug: "v2/reference/unistyles-runtime";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/use-initial-theme.mdx": {
+	id: "v2/reference/use-initial-theme.mdx";
+  slug: "v2/reference/use-initial-theme";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/use-styles.mdx": {
+	id: "v2/reference/use-styles.mdx";
+  slug: "v2/reference/use-styles";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/variants.mdx": {
+	id: "v2/reference/variants.mdx";
+  slug: "v2/reference/variants";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/reference/web-support.mdx": {
+	id: "v2/reference/web-support.mdx";
+  slug: "v2/reference/web-support";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/start/basic-usage.mdx": {
+	id: "v2/start/basic-usage.mdx";
+  slug: "v2/start/basic-usage";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/start/benchmarks.mdx": {
+	id: "v2/start/benchmarks.mdx";
+  slug: "v2/start/benchmarks";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/start/introduction.mdx": {
+	id: "v2/start/introduction.mdx";
+  slug: "v2/start/introduction";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/start/migration-from-1.mdx": {
+	id: "v2/start/migration-from-1.mdx";
+  slug: "v2/start/migration-from-1";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/start/migration-from-stylesheet.mdx": {
+	id: "v2/start/migration-from-stylesheet.mdx";
+  slug: "v2/start/migration-from-stylesheet";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"v2/start/setup.mdx": {
+	id: "v2/start/setup.mdx";
+  slug: "v2/start/setup";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">
