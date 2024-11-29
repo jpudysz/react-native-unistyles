@@ -1,0 +1,196 @@
+---
+title: StyleSheet
+description: Learn about StyleSheet in Unistyles 3.0
+---
+
+import { Aside } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'StyleSheet',
+        description: 'Learn about StyleSheet with superpowers'
+    }}
+/>
+
+`StyleSheet` replaces the old `createStyleSheet` function and aims for 1:1 parity with the React Native API.
+When we say that Unistyles is a superset of StyleSheet, we mean it! That's why we are taking it one step further!
+
+### create
+
+The `create` function supports all styles that React Native's StyleSheet does, and it also enables some superpowers 🦸🏼‍♂️.
+It can parse your `variants`, `compoundVariants` or `dynamic functions` (even if you haven’t configured Unistyles yet!).
+
+Once you register your `themes` and `breakpoints`, it unlocks even more features, like injecting the current `theme` or `miniRuntime` into your stylesheet.
+It also assists you with TypeScript autocompletion for your styles.
+
+Example usage:
+
+```tsx /create/
+import { StyleSheet } from 'react-native-unistyles'
+
+const styles = StyleSheet.create((theme, rt) => ({
+    container: {
+        backgroundColor: theme.colors.background,
+        variants: {
+            size: {
+                small: {
+                    width: 100,
+                    height: 100
+                },
+                medium: {
+                    width: 200,
+                    height: 200
+                },
+                large: {
+                    width: 300,
+                    height: 300
+                }
+            },
+            isPrimary: {
+                true: {
+                    color: theme.colors.primary
+                },
+                default: {
+                    color: theme.colors.secondary
+                },
+                special: {
+                    color: theme.colors.special
+                }
+            }
+        }
+    },
+    text: {
+        fontSize: rt.fontScale * 20,
+        color: {
+            sm: theme.colors.text,
+            md: theme.colors.textSecondary
+        }
+    })
+}))
+```
+
+Will be eg. parsed to:
+
+```ts
+{
+    container: {
+        backgroundColor: '#000',
+        width: 200,
+        height: 200,
+        color: '#ff33aa'
+    },
+    text: {
+        fontSize: 32,
+        color: 'gold'
+    }
+}
+```
+
+Unistyles StyleSheet will automatically react and re-calculate your styles if any of your dependencies change. Learn more about it [here](/v3/start/how-unistyles-works).
+
+`StyleSheet.create` supports 3 ways of defining your stylesheets:
+
+#### Static StyleSheet
+
+```tsx /create/
+import { StyleSheet } from 'react-native-unistyles'
+
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: 'red'
+    }
+})
+```
+
+#### Themable StyleSheet
+
+```tsx /create/
+import { StyleSheet } from 'react-native-unistyles'
+
+const styles = StyleSheet.create(theme => ({
+    container: {
+        backgroundColor: theme.colors.background
+    }
+}))
+
+```
+
+#### Themable StyleSheet with `miniRuntime`
+
+```tsx /create/
+import { StyleSheet } from 'react-native-unistyles'
+
+const styles = StyleSheet.create((theme, rt) => ({
+    container: {
+        backgroundColor: theme.colors.background,
+        paddingTop: rt.insets.top
+    }
+}))
+```
+
+Learn more about `miniRuntime` [here](/v3/references/mini-runtime/).
+
+### configure
+
+`StyleSheet.configure` is used to configure Unistyles. It accepts an object with the following properties:
+
+- `themes` your apps themes
+- `breakpoints` your apps breakpoints
+- `settings` additional settings
+
+This config is scoped across the whole app, unless your limit it with a [scoped themes](/v3/references/scoped-theme/).
+
+The `configure` function should be called before you import any component that uses Unistyles StyleSheet.
+
+You can learn more about how to configure Unistyles [here](/v3/start/configuration).
+
+### hairlineWidth
+
+`StyleSheet.hairlineWidth` is a static value representing the smallest value that can be drawn on your device. It’s helpful for borders or dividers.
+
+```tsx /hairlineWidth/
+import { StyleSheet } from 'react-native-unistyles'
+
+const styles = StyleSheet.create(theme => ({
+    container: {
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderColor: theme.colors.accent
+    }
+}))
+```
+
+### compose
+
+Maps to React Native's [compose function](https://reactnative.dev/docs/stylesheet#compose).
+
+### flatten
+
+Maps to React Native's [flatten function](https://reactnative.dev/docs/stylesheet#flatten).
+
+### absoluteFillObject
+
+Returns following object:
+
+```ts
+{
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0
+}
+```
+
+### absoluteFill
+
+Returns following object:
+
+```ts
+{
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0
+}

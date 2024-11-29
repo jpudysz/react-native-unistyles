@@ -1,0 +1,42 @@
+---
+title: Mini Runtime
+description: Learn about mini runtime in Unistyles 3.0
+---
+
+import { Card } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'MiniRuntime',
+        description: 'Learn about mini runtime in Unistyles 3.0'
+    }}
+/>
+
+Mini runtime was introduced in Unistyles `2.8.0` as a subset of `UnistylesRuntime` containing only the properties that are useful in your `StyleSheet`.
+
+It doesn’t include any functions, as they aren’t necessary when you’re referencing your platform values.
+
+Mini runtime returns following object:
+
+```tsx
+type MiniRuntime = {
+    readonly themeName?: string, // eg. light or undefined if you haven't registered any themes
+    readonly breakpoint?: string, // eg. sm or undefined if you haven't registered any breakpoints
+    readonly hasAdaptiveThemes: boolean, //  true if you have enabled adaptive themes
+    readonly colorScheme: ColorScheme, // eg. light or dark or unspecified
+    readonly screen: Dimensions, // eg. {width: 1024, height: 768}
+    readonly contentSizeCategory: string, // eg. Large
+    readonly insets: Insets, // eg. { top: 28, bottom: 40, left: 0, right: 0 , ime: 0 }
+    readonly pixelRatio: number, // eg. 3.0
+    readonly fontScale: number, // eg. 1.5
+    readonly rtl: boolean // true if your user prefers RTL
+    readonly statusBar: Dimensions, // eg. { width: 240, height: 20,  }
+    readonly navigationBar: Dimensions // eg. { width: 240, height: 44,  }
+    readonly isPortrait: boolean, // true if your device is in portrait mode
+    readonly isLandscape: boolean // true if your device is in landscape mode
+}
+```
+
+Mini runtime is automatically injected when Unistyles resolves a `StyleSheet` that depends on it.
+

@@ -1,0 +1,118 @@
+---
+title: Getting started
+description: How to get started with Unistyles
+---
+
+import { Card, CardGrid, Aside, Tabs, TabItem } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Getting started',
+        description: 'Learn how to get started with Unistyles'
+    }}
+/>
+
+We put a lot of effort into making Unistyles as easy to use as possible. You no longer need the `useStyle` hook or wrap your app in provider. Unistyles integrates seamlessly with your existing code, so you can start using it immediately.
+
+### Prerequisites
+
+Unistyles 3.0 is tightly integrated with `Fabric` and the latest version of React Native. Therefore, you must use the **New Architecture** and at least **React Native 0.76.0**. Additionally, Unistyles relies on `react-native-nitro-modules` and `react-native-edge-to-edge`.
+
+<Aside>Learn more about how Unistyles leverages Nitro Modules and React Native Edge to Edge [here](/v3/other/dependencies).</Aside>
+
+**Table of requirements:**
+|  | Required | Note |
+| -------- | ------- | ---- |
+| React Native | 0.76+     |     |
+| New Architecture    | enabled     | no option to opt-out   |
+| Expo SDK    | 52+     | (if you use Expo)    |
+| Xcode    | 16+     | Required by Nitro Modules    |
+
+Since Unistyles relies on `Fabric`, it cannot run on the `Old Architecture` or older versions of React Native. If you can’t meet these requirements, you can use Unistyles 2.0+, which is compatible with those versions.
+
+### Installation
+
+```shell title="Install Unistyles and its dependencies"
+yarn add react-native-unistyles@beta
+yarn add react-native-nitro-modules react-native-edge-to-edge
+```
+
+Add babel plugin:
+
+```js title="babel.config.js"
+module.exports = function (api) {
+  api.cache(true)
+
+  return {
+    // other config
+    plugins: [
+        // other plugins
+        ['react-native-unistyles/plugin']
+    ]
+  }
+}
+```
+<Aside>Learn more on how the Babel plugin works [here](/v3/other/babel-plugin).</Aside>
+
+Finish installation based on your platform:
+
+<Tabs>
+  <TabItem label="Expo">
+    ```shell
+    yarn expo prebuild --clean
+    ```
+    <Aside type="caution" title="Dev client only">
+      Unistyles includes custom native code, which means it does not support **Expo Go.**
+    </Aside>
+  </TabItem>
+  <TabItem label="React Native">
+    ```shell
+    cd ios && pod install
+    ```
+  </TabItem>
+  <TabItem label="React Native Web">
+    Unistyles offers first-class support for React Native Web. To run the project, we recommend following the guidelines provided by [Expo](https://docs.expo.dev/workflow/web/).
+  </TabItem>
+  <TabItem label="Custom Web">
+      🚧 Work in progress, we will share more details soon.
+    </TabItem>
+  <TabItem label="SSR">
+    🚧 Work in progress, we will share more details soon.
+  </TabItem>
+</Tabs>
+
+### As easy as React Native StyleSheet
+
+Getting started with Unistyles couldn’t be easier. Simply replace React Native’s `StyleSheet` with the `StyleSheet` exported from Unistyles. From that moment, you’ll be using a `StyleSheet` with superpowers 🦸🏼‍♂️.
+
+```diff lang="tsx" title="Example.tsx"
+- import { StyleSheet } from 'react-native'
++ import { StyleSheet } from 'react-native-unistyles'
+
+const MyComponent = () => {
+  return (
+    <View style={styles.container}>
+      <Text>Hello world from Unistyles</Text>
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+   container: {
+     backgroundColor: 'red'
+   }
+})
+```
+
+By replacing `StyleSheet`, you immediately gain several benefits that aren’t available in React Native’s `StyleSheet`:
+
+- [Variants](/v3/references/variants)
+- [Compound variants](/v3/references/compound-variants)
+- [Dynamic functions](/v3/references/dynamic-functions)
+- [Media queries](/v3/references/media-queries)
+- [Horizontal and vertical breakpoints for Native](/v3/references/breakpoints#built-in-breakpoints-landscape-and-portrait)
+- [Custom web styles](/v3/references/web-styles)
+- [Web only features](/v3/references/web-only)
+
+When you're ready to customize your styles and unlock additional features you can [configure](/v3/start/configuration) Unistyles.

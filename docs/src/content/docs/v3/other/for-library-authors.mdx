@@ -1,0 +1,64 @@
+---
+title: For library authors
+description: How to use Unistyles 3.0 in your library
+---
+
+import { Card } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Build your own UI kit with Unistyles',
+        description: 'How to use Unistyles 3.0 in your library'
+    }}
+/>
+
+Unistyles is highly extensible and can be used to build UI kits and various other projects. We maintain the core, so you can create any abstraction on top of it.
+
+## Using Unistyles in your library
+
+`StyleSheet.configure` should be invoked as soon as possible, before the metro bundler references any `StyleSheet` from your library.
+
+You can then call `StyleSheet.configure` multiple times to override configurations.
+However, keep in mind that `StyleSheet.configure` makes a roundtrip to C++, which can add a few `ms` to your app's startup time.
+
+To manipulate your config without replacing it, use [UnistylesRuntime](/v3/references/unistyles-runtime/).
+
+## Unistyles never re-renders
+
+Unistyles' C++ core ensures that your components never re-render. Instead, they are updated directly from C++ and `Shadow Tree`.
+
+## No React Context - no additional setup
+
+Unistyles does not use the React Context API. This means that users do not need to wrap their app with a `Provider`,
+reducing boilerplate code and making your library more user-friendly.
+
+## New architecture only
+
+Unistyles does not export any code that re-renders your components. While it requires enabling the New Architecture, we believe this trade-off is worthwhile, as more apps are expected to transition to the New Architecture in the coming months.
+
+## Minimum requirements
+
+Unistyles is compatible with:
+- React Native version >=0.76
+- TypeScript >5.0
+- iOS 15.0+
+- Android 7+
+
+## Out of the box support for Web
+
+Building a UI kit for both React Native and Web couldn’t be easier. Unistyles automatically manages your styles and converts them into CSS classes.
+
+## Why to choose Unistyles?
+
+Unistyles offers a unique architecture unavailable in any other library. Fully compatible with the React Native StyleSheet API, it is easy to use and extend.
+
+By avoiding component abstraction, Unistyles gives you the freedom to create your own. It supports various platforms and is designed to be easily extendable.
+
+:::tip
+If you need any cool feature to support your UI Kit, please open a [discussion](https://github.com/jpudysz/react-native-unistyles/discussions).
+
+I'm happy to help you with your use case!
+:::
+
+Do you have any questions? Feel free to ask in our [Discord](https://discord.gg/akGHf27P4C).

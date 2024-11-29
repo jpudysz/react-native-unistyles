@@ -7,13 +7,14 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.3.1")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.22")
+        classpath("com.android.tools.build:gradle:8.2.1")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.10")
     }
 }
 
 apply plugin: 'com.android.library'
 apply plugin: 'org.jetbrains.kotlin.android'
+apply from: '../nitrogen/generated/android/unistyles+autolinking.gradle'
 
 def resolveBuildType() {
     Gradle gradle = getGradle()
@@ -31,12 +32,12 @@ if (isNewArchitectureEnabled()) {
 }
 
 android {
-    compileSdkVersion safeExtGet('compileSdkVersion', 33)
+    compileSdkVersion safeExtGet('compileSdkVersion', 35)
     namespace "com.unistyles"
 
     defaultConfig {
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
-        minSdkVersion safeExtGet('minSdkVersion', 21)
+        minSdkVersion safeExtGet('minSdkVersion', 24)
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_STL=c++_shared"
@@ -76,4 +77,15 @@ repositories {
 
 dependencies {
     implementation 'com.facebook.react:react-native'
+    implementation project(":react-native-nitro-modules")
 }
+
+tasks.register("checkNativeTurboUnistylesSpec") {
+    doLast {
+        if (!isNewArchitectureEnabled()) {
+            throw new GradleException("Unistyles 3.0 requires your project to have New Architecture enabled.")
+        }
+    }
+}
+
+preBuild.dependsOn checkNativeTurboUnistylesSpec

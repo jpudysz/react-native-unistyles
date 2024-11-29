@@ -25,10 +25,13 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
+    "noEmit": true,
     "target": "esnext",
     "verbatimModuleSyntax": true
   },
   "exclude": [
-    "examples/vision/visionos"
+    "example",
+    "expo-example",
+    "docs"
   ]
 }

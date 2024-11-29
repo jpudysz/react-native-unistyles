@@ -1,7 +1,4 @@
-export * from './normalizer'
-export * from './unistyles'
-export * from './color'
-export type { Optional, Nullable } from './common'
+export type { Optional, Nullable, UnionToIntersection } from './common'
 export type {
     NestedStylePairs,
     UnistylesTheme,
@@ -11,7 +8,7 @@ export type {
     RNStyle
 } from './core'
 export type {
-    StyleSheetWithSuperPowers,
+    CreateUnistylesStyleSheet,
     StyleSheet,
     AllAvailableKeys,
     UnistylesValues,
@@ -20,5 +17,5 @@ export type {
     UnistyleImage
 } from './stylesheet'
 export type { ReactNativeStyleSheet } from './breakpoints'
-export type { ExtractVariantNames } from './variants'
-export type { UnistylesPlugin } from './plugin'
+export type { ExtractVariantNames, UnistylesVariants } from './variants'
+export { AndroidContentSizeCategory, IOSContentSizeCategory, WebContentSizeCategory } from './accessibility'

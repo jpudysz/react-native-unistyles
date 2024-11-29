@@ -1,0 +1,88 @@
+---
+title: Unistyles Runtime
+description: Learn about Unistyles Runtime in Unistyles 3.0
+---
+
+import { Card } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'UnistylesRuntime',
+        description: 'Learn about Unistyles Runtime in Unistyles 3.0'
+    }}
+/>
+
+Unistyles Runtime is a powerful feature that allows you to access platform specific values directly from `JavaScript`.
+It allows you to skip many dependencies and keep a lot of functionality under one object.
+
+### Usage
+
+You can import `UnistylesRuntime` from `react-native-unistyles`:
+
+```tsx /UnistylesRuntime/
+import { UnistylesRuntime } from 'react-native-unistyles'
+```
+
+and use it anywhere in your code, even outside a React component.
+
+### Available getters
+
+| Name | Type | Description |
+| ----| ---- | ----------- |
+| colorScheme | string | Get your device's color scheme. Available options `dark`, `light` or `unspecified` |
+| hasAdaptiveThemes | boolean | Indicates if you have enabled [adaptive themes](/v3/guides/theming#adaptive-themes) |
+| themeName | string? | Name of the selected theme or `undefined` if you haven't register any theme |
+| breakpoint | string? | Current breakpoint or undefined if you haven't registered any |
+| breakpoints | Object | Your registered breakpoints |
+| screen | \{width: number, height: number\} | Screen dimensions |
+| isPortrait | boolean | Indicates if your device is in portrait mode |
+| isLandscape | boolean | Indicates if your device is in landscape mode |
+| contentSizeCategory | IOSContentSizeCategory or AndroidContentSizeCategory | Your device's [content size category](/v3/references/content-size-category/) |
+| insets | \{ top: number, bottom: number, left: number, right: number, ime: number \} | Device insets which are safe to put content into |
+| statusBar | \{width: number, height: number\} | Status bar dimensions |
+| navigationBar | \{width: number, height: number\} | Navigation bar dimensions (Android) |
+| pixelRatio | number | Pixel density of the device |
+| fontScale | number | Font scale of the device |
+| rtl | boolean | Indicates if the device is in RTL mode |
+| getTheme | (themeName?: string) => Theme | Get theme by name or current theme if not specified |
+
+## Setters
+
+| Name | Type | Description |
+| ----| ---- | ----------- |
+| setTheme | (themeName: string) => void | Change the current theme |
+| setAdaptiveThemes | (enabled: boolean) => void | Toggle [adaptive themes](/v3/guides/theming#adaptive-themes) |
+| updateTheme | (themeName: string, updater: (currentTheme: Theme) => Theme) => void | Update the [theme](/v3/guides/theming/#update-theme-during-runtime) at runtime |
+| statusBar.setHidden | (hidden: boolean) => void | Show/hide status bar at runtime |
+| navigationBar.setHidden | (hidden: boolean) => void | Show/hide navigation bar at runtime |
+| setImmersiveMode | (enabled: boolean) => void | Enable/disable immersive mode (hiding both status and navigation bars) |
+| setRootViewBackgroundColor | (color: string) => void | set root view background color |
+
+### Why `UnistylesRuntime` doesn't re-render my component?
+
+You should think of `UnistylesRuntime` as a JavaScript object.
+It's not a React hook, so it doesn't re-render your component when eg. screen size or breakpoint changes.
+Instead it will return up to date value whenever you access it.
+
+### How to re-render my stylesheets based on `UnistylesRuntime`?
+
+You can do that while accessing [miniRuntime](/v3/references/mini-runtime/) in your `StyleSheet`:
+
+One example could be reading device width and height:
+
+```tsx /runtime/
+import { StyleSheet } from 'react-native-unistyles'
+
+// your component
+
+const style = StyleSheet.create((theme, rt) => ({
+    container: {
+        backgroundColor: theme.colors.background,
+        width: rt.screen.width,
+        height: rt.screen.height
+    }
+}))
+```
+
+Learn more on how Unistyles [re-calculates your styles](/v3/start/how-unistyles-works).

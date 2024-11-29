@@ -1,0 +1,119 @@
+---
+title: Web styles
+description: Learn about web styles in Unistyles 3.0
+---
+
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Web styles',
+        description: 'Learn about web styles in Unistyles 3.0'
+    }}
+/>
+
+Unistyles web is fully independent from React Native Web, thanks to our custom web parser that generates CSS directly from your `StyleSheet` definitions.
+
+### How it works?
+
+The web parser generates unique `classNames` based on your configuration and assigns them to the corresponding DOM elements, ensuring no redundant styles are applied.
+
+Additionally, we generate media queries based on the provided `breakpoints`, so the app doesn't need to recalculate them on every resize event.
+
+```ts
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: 'red',
+        fontSize: 32,
+    },
+    text: {
+        fontSize: {
+            xs: 28,
+            lg: 40
+        },
+    },
+    parentContainer: {
+        flex: 1,
+    }
+})
+```
+
+This results in the following CSS output:
+
+```css
+.unistyles-1u0egm6 {
+  flex: 1;
+}
+
+@media (min-width: 0px) {
+  .unistyles-kaoph5 {
+    font-size: 32px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .unistyles-kaoph5 {
+    font-size: 40px;
+  }
+}
+```
+
+### Updating styles
+
+When you change the theme of your app, Unistyles will update your CSS without triggering any re-renders. This also applies to dynamic functions and variants.
+
+For example, if you define styles like this:
+
+```ts
+const styles = StyleSheet.create(theme => ({
+    container: {
+        flex: 1,
+        backgroundColor: theme.colors.background
+    }
+}))
+```
+
+The generated CSS might look like:
+
+```css
+.unistyles-1u0egm6 {
+  flex: 1;
+  background-color: #000;
+}
+```
+
+When you switch the theme:
+
+```ts
+UnistylesRuntime.setTheme('light')
+```
+
+The CSS will automatically update to:
+
+```css
+.unistyles-1u0egm6 {
+  flex: 1;
+  background-color: #fff;
+}
+```
+
+### Limitations
+
+Since we are using a custom parser, we can't return your styles directly as React Native Web would do, because it would parse them differently.
+Therefore, when using `StyleSheet.create` on the web, you won't be able to access the styles directly.
+
+```ts
+const styles = StyleSheet.create({
+    container: {
+        flex: 1
+    }
+})
+
+// Will result in an empty object because we build classes instead of inline styles
+console.log(styles) // {}
+```
+
+### Web Only Features
+
+Unistyles also includes web-specific features. You can learn more about them [here](/v3/references/web-only).

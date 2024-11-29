@@ -1,9 +1,9 @@
-export type ExtractVariantNames<T> = T extends (...args: any) => infer R
-    ? ExtractVariantKeys<R>
-    : ExtractVariantKeys<T>
+import type { SafeReturnType } from './common'
+
+export type ExtractVariantNames<T> = ExtractVariantKeys<SafeReturnType<T>>
 
 type ExtractVariantKeys<T> = T extends object
-    ? ExtractVariant<T[keyof T]>
+    ? ExtractVariant<SafeReturnType<T[keyof T]>>
     : never
 
 type HasBooleanVariants<T> = T extends Record<'true', any>
@@ -18,10 +18,12 @@ type ExtractSubVariantKeys<T> = T extends object
         : keyof Omit<T, 'default'> | undefined
     : never
 
-type ExtractVariant<T> = T extends (...args: any) => infer R
-    ? R extends { variants: infer V }
-        ? { [key in keyof V]?: ExtractSubVariantKeys<V[key]> }
+type ExtractVariant<T> = T extends { variants: infer V }
+    ? { [key in keyof V]?: ExtractSubVariantKeys<V[key]> }
+    : never
+
+export type UnistylesVariants<ST> = ST extends { useVariants: infer V }
+    ? V extends (variants: infer T) => void
+        ? T
         : never
-    : T extends { variants: infer V }
-        ? { [key in keyof V]?: ExtractSubVariantKeys<V[key]> }
-        : never
+    : never
