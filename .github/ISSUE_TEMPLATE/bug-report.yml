@@ -6,6 +6,7 @@ body:
     attributes:
       value: |
         Before submitting a new bug or issue, please check the following links to see if a solution or similar question already exists:
+        - [How to report a bug](https://www.unistyl.es/v3/other/how-to-report-bug)
         - [Issues tab](https://github.com/jpudysz/react-native-unistyles/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc)
         - [Closed issues tab](https://github.com/jpudysz/react-native-unistyles/issues?q=is%3Aissue+is%3Aclosed)
         - [Discussions tab](https://github.com/jpudysz/react-native-unistyles/discussions)
@@ -79,5 +80,5 @@ body:
       label: Expo
       description: Are you using Expo?
       options:
-        - "Yes"
-        - "No"
+        - 'Yes'
+        - 'No'
