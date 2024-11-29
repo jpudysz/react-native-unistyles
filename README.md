@@ -1,4 +1,4 @@
-[<img alt="react-native-unistyles" src="assets/banner.png">](https://unistyl.es/)
+[<img alt="react-native-unistyles" src="assets/banner3.png">](https://unistyl.es/)
 
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/jpudysz/react-native-unistyles?style=for-the-badge)
 [![npm downloads](https://img.shields.io/npm/dm/react-native-unistyles?style=for-the-badge)](https://www.npmjs.com/package/react-native-unistyles)
