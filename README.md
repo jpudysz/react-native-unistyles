@@ -1,4 +1,4 @@
-[<img alt="react-native-unistyles" src="assets/banner.png">](https://react-native-unistyles-docs-q2ek4dspb-jacek-s-team.vercel.app/)
+[<img alt="react-native-unistyles" src="assets/banner.png">](https://unistyl.es/)
 
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/jpudysz/react-native-unistyles?style=for-the-badge)
 [![npm downloads](https://img.shields.io/npm/dm/react-native-unistyles?style=for-the-badge)](https://www.npmjs.com/package/react-native-unistyles)
@@ -15,17 +15,17 @@
 ## Installation
 
 ```shell
-yarn add react-native-unistyles@next
+yarn add react-native-unistyles@beta
 ```
 
-Then follow [installation guides](https://react-native-unistyles-docs-q2ek4dspb-jacek-s-team.vercel.app/v3/start/getting-started) for your platform.
+Then follow [installation guides](https://unistyl.es/v3/start/getting-started) for your platform.
 
-## [Documentation](https://react-native-unistyles-docs-q2ek4dspb-jacek-s-team.vercel.app/)
-- [Start here](https://react-native-unistyles-docs-q2ek4dspb-jacek-s-team.vercel.app/v3/start/introduction)
-- [Migration from Unistyles 2.0](https://react-native-unistyles-docs-q2ek4dspb-jacek-s-team.vercel.app/v3/start/migration-guide)
-- [Learn how Unistyles 3.0 works](https://react-native-unistyles-docs-q2ek4dspb-jacek-s-team.vercel.app/v3/start/how-unistyles-works)
-- [API](https://react-native-unistyles-docs-q2ek4dspb-jacek-s-team.vercel.app/v3/references/stylesheet)
-- [Examples](https://react-native-unistyles-docs-q2ek4dspb-jacek-s-team.vercel.app/v3/examples/examples)
+## [Documentation](https://unistyl.es/)
+- [Start here](https://unistyl.es/v3/start/introduction)
+- [Migration from Unistyles 2.0](https://unistyl.es/v3/start/migration-guide)
+- [Learn how Unistyles 3.0 works](https://unistyl.es/v3/start/how-unistyles-works)
+- [API](https://unistyl.es/v3/references/stylesheet)
+- [Examples](https://unistyl.es/v3/examples/examples)
 
 ## Features
 - 🚀 Shared core with C++ and JSI bindings
@@ -37,7 +37,7 @@ Then follow [installation guides](https://react-native-unistyles-docs-q2ek4dspb-
 - 🎳 Share up to 100% of your styles across platforms in monorepo
 - 🎯 Doesn't introduce new components, your view hierarchy is always clean
 - 🎨 Register multiple themes and change them with single function call
-- and [much much more](https://react-native-unistyles-docs-q2ek4dspb-jacek-s-team.vercel.app/v3/start/new-features)!
+- and [much much more](https://unistyl.es/v3/start/new-features)!
 
 ## Sponsors
 
@@ -89,7 +89,7 @@ Then follow [installation guides](https://react-native-unistyles-docs-q2ek4dspb-
 
 ## Sponsor my work
 
-[How to become a sponsor?](https://react-native-unistyles-docs-q2ek4dspb-jacek-s-team.vercel.app/v3/other/for-sponsors)
+[How to become a sponsor?](https://unistyl.es/v3/other/for-sponsors)
 
 If you found the `react-native-unistyles` time-saving and valuable, please consider sponsoring my work. Your support enables me to continue creating libraries with a fresh approach.
 

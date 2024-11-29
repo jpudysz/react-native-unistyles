@@ -27,7 +27,7 @@ body:
       label: Steps to reproduce
       description: |
         Provide a detailed list of steps that reproduce the issue.
-        Learn more about how to diagnose Unistyles problem: https://react-native-unistyles-docs-q2ek4dspb-jacek-s-team.vercel.app/v3/other/how-to-report-bug
+        Learn more about how to diagnose Unistyles problem: https://unistyl.es/v3/other/how-to-report-bug
       placeholder: |
         1.
         2.
