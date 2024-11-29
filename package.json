@@ -43,7 +43,8 @@
     "ios",
     "android",
     "react-native-web",
-    "expo"
+    "expo",
+    "fabric"
   ],
   "repository": "https://github.com/jpudysz/react-native-unistyles",
   "author": "Jacek Pudysz <jacekpudysz@gmail.com> (https://github.com/jpudysz)",
