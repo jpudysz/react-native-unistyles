@@ -19,6 +19,13 @@
     --ec-brdCol: var(--border)!important;
     --ec-frm-edTabBarBrdCol: var(--border)!important;
     --ec-frm-edActTabBg: rgba(255, 255, 255, 0.1)!important;
+    --sl-color-orange: hsl(var(--sl-hue-orange), 82%, 63%)!important;
+    --sl-color-orange-high: hsl(var(--sl-hue-orange), 82%, 87%)!important;
+    --sl-color-orange-low: hsl(var(--sl-hue-orange), 39%, 22%)!important;
+    --sl-badge-default-bg: var(--sl-color-accent-low)!important;
+    --sl-color-blue-high: hsl(var(--sl-hue-blue), 100%, 87%)!important;
+    --sl-color-blue: hsl(var(--sl-hue-blue), 100%, 60%)!important;
+    --sl-color-blue-low: hsl(var(--sl-hue-blue), 54%, 20%)!important;
 }
 
 .site-title {
@@ -82,4 +89,14 @@ html {
 
 .sl-markdown-content code > .ec-line {
     margin-top: 0;
+}
+
+.starlight-aside--caution {
+    --sl-color-asides-text-accent: var(--sl-color-orange-high);
+    --sl-color-asides-border: var(--sl-color-orange);
+    background-color: (--sl-color-orange-low);
+}
+
+.sl-badge {
+    background-color: hsl(224, 54%, 20%)!important;
 }
