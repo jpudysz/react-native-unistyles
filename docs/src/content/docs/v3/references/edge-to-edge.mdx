@@ -1,0 +1,47 @@
+---
+title: Edge to edge layout with Unistyles
+description: Learn how Unistyles leverages edge to edge layout
+---
+
+import { Aside } from '@astrojs/starlight/components'
+
+Unistyles uses `WindowsInsetsCompat` API to handle insets on Android. This API requires your app to have edge to edge layout enabled.
+In other words, it means that your `StatusBar` is always `translucent` and the app can draw below the `NavigationBar`. A translucent status bar is also the default when you build your app with Expo. To leverage `WindowInsetsCompat`, Unistyles enables `edgeToEdge` layout by default.
+
+As a result you need to use paddings to draw your app content above system bars. To learn more about `edgeToEdge` layout please check [Window insets in Compose](https://developer.android.com/develop/ui/compose/layouts/insets).
+
+```tsx /rt.insets.*/
+import { StyleSheet } from 'react-native-unistyles'
+
+const App = () => (
+    <View style={styles.container}>
+        <Text style={styles.text}>
+            Correct insets
+        </Text>
+    </View>
+)
+
+const styles = StyleSheet.create((theme, rt) => ({
+    container: {
+        backgroundColor: theme.colors.background,
+        flex: 1,
+        // apply insets to the container,
+        // so it will add required paddings
+        paddingTop: rt.insets.top,
+        paddingBottom: rt.insets.bottom,
+        paddingLeft: rt.insets.left,
+        paddingRight: rt.insets.right
+    },
+})
+```
+
+<Aside title="Edge-to-edge enforcement">
+Apps are edge-to-edge by default on devices running Android 15 if the app is targeting Android 15 (API level 35).
+
+[Learn more](https://developer.android.com/about/versions/15/behavior-changes-15)
+</Aside>
+
+<Aside type="caution">
+Unistyles enables `edgeToEdge` by default, but sometimes other libraries might interfere with it.
+We decided to depend on `react-native-edge-to-edge` package, to help reduce these issues. Learn more [here](/v3/other/dependencies#react-native-edge-to-edge).
+</Aside>

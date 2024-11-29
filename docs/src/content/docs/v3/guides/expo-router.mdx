@@ -4,3 +4,41 @@ description: Integrate Expo Router with Unistyles
 ---
 
 import { Card } from '@astrojs/starlight/components'
+
+[Expo Router](https://docs.expo.dev/router/introduction/) is a popular routing library from Expo that is built on top of React Navigation. When using Unistyles with Expo Router, it's necessary to configure it properly.
+
+### Modify main entry
+
+Expo Router resolves routes differently that expected. Also, Unistyles 3.0 is parsing your `StyleSheets` as soon as you import file containing it.
+This combination may cause some issues. To prevent that you need to modify your main entry file:
+
+```diff lang="json" title="package.json"
+{
+-   "main": "expo-router/entry"
++   "main": "index.js"
+}
+```
+
+Then, create `index.js` file with following content:
+
+```js title="index.js"
+import 'expo-router/entry'
+import './unistyles' // <-- file that initializes Unistyles
+```
+
+With this setup, we will ensure that Unistyles is initialized before any other component.
+
+### Static rendering
+
+If you're using Expo Router with static rendering for the web, you also need to import the Unistyles initialization file in the `+html.tsx` file:
+
+```diff lang="tsx" title="+html.tsx"
+import React from 'react'
+import { ScrollViewStyleReset } from 'expo-router/html'
+import { type PropsWithChildren } from 'react'
++ import '../unistyles' // <-- file that initializes Unistyles
+
+export default function Root({ children }: PropsWithChildren) {}
+```
+
+It ensures that initialization of Unistyles is called whenever Expo Router tries to render next static page.

@@ -1,17 +1,15 @@
 ---
-title: Web Only Features
+title: Web only features
 description: Learn about web only features in Unistyles 3.0
 ---
 
-Unistyles comes with some web only features which are not available on React Native side.
+import { Aside } from '@astrojs/starlight/components'
 
-- [Web only styles](#web-styles)
-- [Pseudo selectors and elements](#pseudo-elements)
-- [Injecting custom classNames](#injecting-custom-classnames)
+Unistyles comes with some web-only features that are not available on the React Native side.
 
-## Web Styles
+### Web only styles
 
-In Unistyles you can use web specific styles for your web app under `_web` key.
+In Unistyles, you can use web-specific styles for your web app under the `_web` key.
 
 ```ts
 const styles = StyleSheet.create({
@@ -25,9 +23,11 @@ const styles = StyleSheet.create({
 })
 ```
 
-Under `_web` key you can pass any valid CSS Property and value that matches `CSSProperties` type from React.
+<Aside>
+The `_web` styles are ignored for Android and iOS.
+</Aside>
 
-Keep in mind that under `_web` you can't use React Native specific styles.
+The `_web` key supports **any** CSS property and value that matches the `CSSProperties` type from React.
 
 ```ts
 const styles = StyleSheet.create({
@@ -35,13 +35,17 @@ const styles = StyleSheet.create({
     flex: 1,
     _web: {
       display: 'grid',
-      // Error:
+      // 💥 Error! This is React Native specific style
       transform: [{ translateX: 10 }],
    }
 })
 ```
 
-`transform` property on the web should be a string:
+<Aside>
+The `_web` doesn't support React Native specific styles. To use them, you can move them up to the `style` level.
+</Aside>
+
+The `transform` property on the web should be a string:
 
 ```diff lang="ts"
 const styles = StyleSheet.create({
@@ -49,18 +53,32 @@ const styles = StyleSheet.create({
     flex: 1,
     _web: {
       display: 'grid',
-      // Error:
 -      transform: [{ translateX: 10 }],
 +      transform: 'translateX(10px)',
    }
 })
 ```
 
-You can also use variants, breakpoints and other Unistyles features under the `_web` key!
+Or can be lifted  to the `style` level:
 
-## Pseudo elements
+```diff lang="ts"
+const styles = StyleSheet.create({
+   container: {
+    flex: 1,
+    // ✅ This is React Native specific style, and will be parsed correctly for web
+    transform: [{ translateX: 10 }],
+    _web: {
+      display: 'grid',
+-     transform: [{ translateX: 10 }],
+   }
+})
+```
 
-Unistyles also introduces you with a way to use pseudo elements and selectors in your web styles.
+You can also use variants, breakpoints, and other Unistyles features under the `_web` key!
+
+### Pseudo elements
+
+Unistyles also introduces a way to use **any** pseudo-elements and selectors in your web styles.
 
 ```ts
 const styles = StyleSheet.create(theme => ({
@@ -78,11 +96,11 @@ const styles = StyleSheet.create(theme => ({
 }))
 ```
 
-Every pseudo element and selector is included under the `_web` key. As you can see `:` & `::` were replaced with `_` for easier usage.
+As you can see, `:` and `::` have been replaced with `_` for easier usage.
 
-## Injecting custom classNames
+### Injecting custom classNames
 
-If you want to write some part of your app with plain CSS you can add custom classNames to your styles.
+If you want to write some part of your app with plain CSS, you can add custom `classNames` to your styles:
 
 ```ts
 const styles = StyleSheet.create({
@@ -95,7 +113,7 @@ const styles = StyleSheet.create({
 })
 ```
 
-`_classNames` key under the `_web` key will be injected to the DOM element as a className. You can pass string or array of strings into it.
+The `_classNames` key under the `_web` key will be injected into the DOM element as a `className`. You can pass a string or an array of strings into it:
 
 ```diff lang="ts"
 const styles = StyleSheet.create({
@@ -109,7 +127,7 @@ const styles = StyleSheet.create({
 })
 ```
 
-Or pass them conditionally with dynamic functions:
+You can also use some conditions while resolving your classes:
 
 ```ts
 const styles = StyleSheet.create({

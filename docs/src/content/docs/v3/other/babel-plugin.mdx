@@ -3,4 +3,216 @@ title: Babel plugin
 description: How Unistyles babel plugin works?
 ---
 
-import { Card, CardGrid, Aside, Tabs, TabItem } from '@astrojs/starlight/components'
+import { Card } from '@astrojs/starlight/components'
+
+Unistyles 3.0 relies heavily on the Babel plugin, which helps convert your code in a way that allows binding the `ShadowNode` with `Unistyle`. Before reading this guide, make sure to check the [Look under the hood](/v3/start/how-unistyles-works) guide.
+
+Our golden rule is to never introduce any component that could pollute your native view hierarchy. In other words, if you use a `View`, we will never replace it or wrap it in any other component. There is one special case, documented below, concerning the `Pressable` component.
+
+Let's discuss the responsibilities of the Babel plugin:
+
+### 1. Detecting StyleSheet dependencies
+
+Each `StyleSheet` is different. One might rely on a `theme`, another on `miniRuntime`, and so on.
+The same applies to `styles`. Each style depends on different things. For example, you can wrap your app in a `View` that safeguards your app from rendering behind the notch or navigation bar.
+Another style might be used in your `Typography` component and provides text color based on the apps' theme.
+
+Should the `Typography` style re-calculate on an `insets` change? Or should the `View` that relies on insets re-render on a theme change?
+
+We don't think that's a good idea. The first responsibility of the Babel plugin is to detect all dependencies in your `StyleSheet`. This ensures that only the relevant styles are recalculated when necessary.
+
+```ts
+// Babel: depends on theme
+const stylesheet = StyleSheet.create(theme => ({
+    container: {
+        // Babel: depends on theme
+        backgroundColor: theme.colors.background
+    },
+    text: {
+        // Babel: static (no dependencies)
+        fontSize: 12
+    }
+}))
+```
+
+```ts
+// Babel: depends on theme and miniRuntime
+const stylesheet = StyleSheet.create((theme, rt) => ({
+    container: {
+        // Babel: depends on theme and insets
+        paddingTop: rt.insets.top,
+        paddingBottom: rt.insets.bottom,
+        backgroundColor: theme.colors.background
+    },
+    text: (fontSize: number) => ({
+        // Babel: depends on theme
+        color: theme.colors.text,
+        // Babel: depends on fontScale
+        fontSize: rt.fontScale >= 3
+            ? fontSize * 1.5
+            : fontSize * 0.8
+    })
+}))
+```
+
+
+### 2. Attaching unique id to each StyleSheet
+
+This helps us identify your `StyleSheet` while you're developing your app and trigger multiple `hot-reloads`. Such identification is required to swap your `StyleSheet` with another one, ensuring that you get up-to-date values during reloads.
+This feature does not affect your app in production, as the bundle never reloads in that environment.
+
+### 3. Modifying your component `style` prop
+
+Each `Unistyle` (C++ HybridObject) has an attached `C++` state. This state can be lost when using the spread operator, which is why Unistyles safeguards against that.
+
+If we try to read the style on C++ side without its associated state, an error will be thrown: `Unistyle is not bound!`.
+
+However, this doesn't mean you can't copy or spread your styles. It is still possible to do so, but it requires the Babel plugin, which converts your styles into an array format.
+
+```ts
+// 😩 ouch, you just removed C++ state
+const mergedStyles = {
+    ...styles.container,
+    ...styles.text
+}
+
+// 💥 Unistyle is not bound!
+<View style={mergedStyles} />
+```
+
+```ts
+// 😎 you're safe
+const mergedStyles = [
+    styles.container,
+    styles.text
+]
+
+// 😇 we can read the state
+<View style={mergedStyles} />
+```
+
+Or with babel plugin:
+
+```ts
+<View style={{...styles.container, ...styles.text}} />
+
+// 😇 will be replaced with
+<View style={[styles.container, styles.text]} />
+```
+
+### 4. Modifying your component `ref` prop
+
+This is the most crucial part, and without it, Unistyles won't be able to update your views from C++.
+
+To simplify the explanation, we override your `ref` prop to connect a `ShadowNode` to the attached `Unistyle(s)`.
+
+Don't worry—through Babel transformation, we recreate whatever you were doing! So, if you called any function or assigned it to `useRef`, it will still be called as expected.
+
+We’re also React 19 ready, and we will call your ref cleanup function if it's present.
+
+Let’s go through some examples so you can better understand how this works:
+
+```ts title="Your code"
+const ref = useRef()
+
+<View ref={ref} />
+```
+
+```ts title="Babel transform"
+const ref = useRef()
+
+<View
+    ref={_ref => {
+       ref.current = _ref
+
+       // some Unistyles magic 🪄
+    }
+/>
+```
+
+We also support custom ref functions:
+
+```ts title="Your code"
+<View
+    ref={ref => {
+        doSomething(ref)
+    }}
+/>
+```
+
+```ts title="Babel transform"
+<View
+    ref={ref => {
+       doSomething(ref)
+
+       // some Unistyles magic 🪄
+    }
+/>
+```
+
+### 5. Replacing `Pressable` implementation
+
+Last but not least, we had to make a few adjustments to the `Pressable` implementation. `Pressable` is a special component that can:
+
+- Pass you a state with a `pressed` boolean
+- Accept multiple styles syntax, such as `() => [styles.style1, styles.style2]` or `() => style.pressable`
+
+To make this feasible, we built a thin abstraction that allows us to handle the `pressed` event and manage any transformations within the styles function.
+
+You shouldn’t notice any difference, but you should now be able to detect the `pressed` event within your `StyleSheet`:
+
+```ts title="Your code"
+import { Pressable } from 'react-native'
+
+<Pressable style={styles.button} />
+
+const styles = StyleSheet.create({
+    button: {
+        backgroundColor: 'red'
+    }
+})
+```
+
+```ts title="Babel transform"
+import { Pressable } from 'react-native-unistyles'
+
+<Pressable style={event => typeof styles.button === 'function' ? styles.button(event) : styles.button} />
+
+const styles = StyleSheet.create({
+    // button is an object, so we will return `backgroundColor`: `red`
+    button: {
+        backgroundColor: 'red'
+    }
+})
+```
+
+Or for functions:
+
+```ts title="Your code"
+import { Pressable } from 'react-native'
+
+<Pressable style={styles.button} />
+
+const styles = StyleSheet.create({
+    button: ({ pressed }) => ({
+        backgroundColor: pressed ? 'red' : 'blue'
+    })
+})
+```
+
+```ts title="Babel transform"
+import { Pressable } from 'react-native-unistyles'
+
+<Pressable style={event => typeof styles.button === 'function' ? styles.button(event) : styles.button} />
+
+const styles = StyleSheet.create({
+    // button is function, so we will return it with most recent event
+    button: ({ pressed }) => ({
+        backgroundColor: pressed ? 'red' : 'blue'
+    })
+})
+```
+
+### Summary
+
+That's it! We hope you enjoy the DX of Unistyles 3.0 with the help of the Babel plugin. If you encounter any Babel issues, we're ready to tackle them and resolve them with priority!
