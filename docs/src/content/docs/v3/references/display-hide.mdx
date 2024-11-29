@@ -1,0 +1,88 @@
+---
+title: Display and Hide components
+description: Learn about Display and Hide components
+---
+
+import { Card, Aside } from '@astrojs/starlight/components'
+
+In Unistyles 2.0, developers could retrieve the `breakpoint` value from the `useStyles` hook.
+This was helpful for hiding certain JSX components based on specific screen sizes.
+
+However, this pattern was a bit tedious, as it required writing custom logic to determine whether a component should be visible or not.
+
+With Unistyles 3.0, we’ve removed the `useStyles` hook, so there is no direct way to listen for breakpoint changes.
+But don’t worry — it’s still possible to hide or show components!
+
+### Display
+
+The Display component helps you show  its children based on `breakpoints` or `media queries`.
+
+```tsx /Display/
+import React from 'react'
+import { View } from 'react-native'
+import { Display, mq } from 'react-native-unistyles'
+
+const Component = () => {
+    return (
+        <View style={styles.container}>
+            <Display mq={mq.only.width('sm')}>
+                <View style={styles.text}>
+                    I will be visible from 'sm' breakpoint and up
+                </View>
+            </Display>
+        </View>
+    )
+}
+```
+
+You can also use pixel-based values:
+
+```tsx /Display/
+import React from 'react'
+import { View } from 'react-native'
+import { Display, mq } from 'react-native-unistyles'
+
+const Component = () => {
+    return (
+        <View style={styles.container}>
+            <Display mq={mq.only.width(0, 500)}>
+                <View style={styles.text}>
+                    I will be visible from 0 to 500px
+                </View>
+            </Display>
+        </View>
+    )
+}
+```
+
+### Hide
+
+On the opposite side, the `Hide` component helps you hide its children based on `breakpoints` or `media queries`.
+It works exactly the same way as the Display component.
+
+```tsx /Hide/
+import React from 'react'
+import { View } from 'react-native'
+import { Hide, mq } from 'react-native-unistyles'
+
+const Component = () => {
+    return (
+        <View style={styles.container}>
+            <Hide mq={mq.only.width('sm', 'lg')}>
+                <View style={styles.text}>
+                    I will be hidden from 'sm' breakpoint to 'lg' breakpoint
+                </View>
+            </Hide>
+        </View>
+    )
+}
+
+```
+
+<Aside type="caution">
+Does it mean that Unistyles introduced a new components?
+
+Well, no! These components are simple if-else statements used to conditionally render your JSX. We won’t wrap your components in any additional layers.
+
+We believe this saves you a lot of time and effort, eliminating the need to implement the logic yourself or causing re-renders by listening to any hooks.
+</Aside>

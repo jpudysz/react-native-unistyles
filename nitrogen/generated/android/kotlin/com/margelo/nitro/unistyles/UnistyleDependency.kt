@@ -30,5 +30,9 @@ enum class UnistyleDependency {
   FONTSCALE,
   STATUSBAR,
   NAVIGATIONBAR,
-  IME
+  IME;
+
+  @DoNotStrip
+  @Keep
+  private val _ordinal = ordinal
 }

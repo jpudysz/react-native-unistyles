@@ -4,3 +4,401 @@ description: Learn about variants in Unistyles 3.0
 ---
 
 import { Card } from '@astrojs/starlight/components'
+
+Variants helps you to create a more flexible and reusable stylesheet eg. for your base components.
+You can mix them with other Unistyles features like [media queries](/v3/references/media-queries/) and [breakpoints](/v3/references/breakpoints/).
+
+### Basic usage
+
+Variants are objects that can be nested in any style object:
+
+```tsx /variants:/
+const styles = StyleSheet.create(theme => ({
+    container: {
+        backgroundColor: theme.colors.background,
+        variants: {
+            // here you can define your variants
+        }
+    },
+    text: {
+        color: theme.colors.text,
+        variants: {
+            // here you can define other variants!
+        }
+    }
+}))
+```
+
+Variants contain `groups` of atomic variants.
+
+To define a group, first you need to name it and then define variants within it:
+
+```tsx /color/ /size/ /otherGroupName/
+const styles = StyleSheet.create(theme => ({
+    container: {
+        flex: 1,
+        variants: {
+            color: {},
+            size: {},
+            otherGroupName: {}
+        }
+    }
+}
+```
+
+These groups will later be used to select your variants, so remember to name them appropriately.
+
+With the given structure, you can now define your variants that can contain any number of styles. You can also use
+`breakpoints`, `media queries` or styles like `transform`:
+
+```tsx /color:/ /size:/ /otherGroupName:/
+const styles = StyleSheet.create(theme => ({
+    container: {
+        flex: 1,
+        variants: {
+            color: {
+                primary: {
+                    backgroundColor: theme.colors.primary
+                },
+                secondary: {
+                    backgroundColor: theme.colors.secondary
+                }
+            },
+            size: {
+                small: {
+                    width: 100,
+                    height: 100
+                },
+                medium: {
+                    width: 200,
+                    height: 200
+                },
+                large: {
+                    width: 300,
+                    height: 300
+                }
+            },
+            otherGroupName: {
+                // other variants
+            }
+        }
+    }
+}
+```
+
+### Selecting variants
+
+With your named groups, you can now select any variant from your stylesheet using the `useVariants`:
+
+```tsx /useStyles/ /color/ /size/
+import { useStyles } from 'react-native-unistyles'
+
+const Component = () => {
+    styles.useVariants({
+        color: 'primary',
+        size: 'small'
+    })
+
+    return (
+        <View style={styles.container} />
+    )
+}
+
+const styles = ...
+```
+
+TypeScript will provide perfect autocompletion for your variants, ensuring accuracy!
+
+### Selecting variants with boolean values
+
+
+You can also use boolean values to select variants:
+
+```tsx /isDisabled/ /isPrimary/ /true/ /false/
+import { StyleSheet } from 'react-native-unistyles'
+
+const Component = ({ isPrimary, isDisabled }) => {
+    styles.useVariants({
+        color: !isDisabled,
+        borderColor: isPrimary
+        // you can also use strings
+        // color: "true" | "false"
+    })
+
+    return (
+        <View style={styles.container} />
+    )
+}
+
+const styles = StyleSheet.create(theme => ({
+    container: {
+        // otter styles
+        variants: {
+            color: {
+                true: {
+                    backgroundColor: theme.colors.primary
+                },
+                false: {
+                    backgroundColor: theme.colors.disabled
+                },
+                // you can still specify a default variant
+                default: {
+                    backgroundColor: theme.colors.barbie
+                }
+                // or other variants
+                special: {
+                    backgroundColor: theme.colors.special
+                }
+            },
+            borderColor: {
+                true: {
+                    borderColor: theme.colors.primary
+                }
+                // you can also skip "false" here
+            }
+        }
+    }
+})
+```
+
+If you specify a boolean variants like "true", there is no requirement to specify a "false" variant (and vice versa).
+You can mix boolean variants with other variants as well.
+
+:::caution
+Boolean variants respects other rules, eg. `false` is not equal to `default`. To select `false` variant you need to pass `false` as a value,
+to fallback to `default` variant you need to pass `undefined`.
+:::
+
+### Default variant
+
+You can define a `default` variant that will be used when you don't pass any variant to the `useStyles` hook:
+
+```tsx /default/
+const styles = StyleSheet.create(theme => ({
+    container: {
+        flex: 1,
+        variants: {
+            color: {
+                primary: {
+                    backgroundColor: theme.colors.primary
+                },
+                secondary: {
+                    backgroundColor: theme.colors.secondary
+                },
+                default: {
+                    backgroundColor: theme.colors.barbie
+                }
+            }
+        }
+    }
+}
+```
+
+### Options to select the variant
+
+If you pass `undefined` or `empty object` Unsityles will try to find the `default` variant in your stylesheet:
+
+```tsx /undefined/ /{}/
+styles.useVariants(undefined) // will use default variant (if any)
+styles.useVariants({}) // will use default variant (if any)
+```
+
+Passing an object with named keys and `undefined` will work the same way dafaulting to the `default` option:
+
+```tsx /undefined/
+styles.useVariants({
+    color: undefined // will use default variant (if any)
+})
+```
+
+Lastly, you can pass the correct variant name for a variant group:
+
+```tsx /secondary/
+styles.useVariants({
+    color: 'secondary' // will use secondary variant
+})
+```
+
+### Pass variants as component props
+
+Variants were designed to be used as component props:
+
+```tsx /color/ /size/
+import React from 'react'
+import { StyleSheet } from 'react-native-unistyles'
+
+type ComponentProps = {
+    color: 'primary' | 'secondary'
+    size: 'small' | 'medium' | 'large'
+}
+
+const Component: React.FunctionComponent = ({ color, size }) => {
+    styles.useVariants({
+        color,
+        size
+    })
+
+    return (
+        <View style={styles.container} />
+    )
+}
+```
+
+### Infer TypeScript type for your variants
+
+Instead of using `enum` or `strings` with `|` , you can use `UnistylesVariants` to infer the type of your variants:
+
+```tsx /UnistylesVariants/
+import React from 'react'
+import { StyleSheet, UnistylesVariants } from 'react-native-unistyles'
+
+type ComponentProps = UnistylesVariants<typeof styles>
+
+const Component: React.FunctionComponent = ({ color, size }) => {
+    styles.useVariants({
+        color,
+        size
+    })
+
+    return (
+        <View style={styles.container} />
+    )
+}
+
+// infers type of your variants from the stylesheet below
+const styles = ...
+```
+
+### Defining the same variant across multiple styles
+
+It's possible to define the same variant group across multiple styles:
+
+```tsx /size:/
+const styles = StyleSheet.create(theme => ({
+    container: {
+        flex: 1,
+        variants: {
+            size: {
+                small: {
+                    width: 100,
+                    height: 100
+                },
+                medium: {
+                    width: 200,
+                    height: 200
+                },
+                large: {
+                    width: 300,
+                    height: 300
+                }
+            }
+        }
+    },
+    text: {
+        fontWeight: 'bold',
+        variants: {
+            size: {
+                small: {
+                    fontSize: 12
+                },
+                medium: {
+                    fontSize: 16
+                },
+                large: {
+                    fontSize: 20
+                }
+            }
+        }
+    }
+}
+```
+
+:::caution
+Unistyles will work as intended, selecting the correct variant for each style.
+However, you need to repeat all your options like `small`, `medium`, and `large` in each style to avoid TypeScript errors.
+:::
+
+```tsx /size:/ /missing medium and large variants!/
+const styles = StyleSheet.create(theme => ({
+    container: {
+        flex: 1,
+        variants: {
+            size: {
+                small: {
+                    width: 100,
+                    height: 100
+                },
+                medium: {
+                    width: 200,
+                    height: 200
+                },
+                large: {
+                    width: 300,
+                    height: 300
+                }
+            }
+        }
+    },
+    text: {
+        fontWeight: 'bold',
+        variants: {
+            size: {
+                small: {
+                    fontSize: 12
+                },
+                // missing medium and large variants!
+            }
+        }
+    }
+}
+```
+
+In this case, the generated TypeScript type will be:
+
+```
+size: ('small' | 'medium' | 'large') | ('small')
+```
+
+If you don't need all variants and want the correct type, please add empty variants:
+
+```tsx /size:/
+const styles = StyleSheet.create(theme => ({
+    container: {
+        flex: 1,
+        variants: {
+            size: {
+                small: {
+                    width: 100,
+                    height: 100
+                },
+                medium: {
+                    width: 200,
+                    height: 200
+                },
+                large: {
+                    width: 300,
+                    height: 300
+                }
+            }
+        }
+    },
+    text: {
+        fontWeight: 'bold',
+        variants: {
+            size: {
+                small: {
+                    fontSize: 12
+                },
+                medium: {},
+                large: {}
+            }
+        }
+    }
+}
+```
+
+The generated TypeScript type will then be:
+
+```
+size: ('small' | 'medium' | 'large')
+```

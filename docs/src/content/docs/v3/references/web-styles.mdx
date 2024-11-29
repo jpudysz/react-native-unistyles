@@ -3,13 +3,14 @@ title: Web styles
 description: Learn about web styles in Unistyles 3.0
 ---
 
-We've made Unistyles web completely undependent from React Native Web by creating our custom web parser which generates CSS from your StyleSheet's.
 
-## How it works
+Unistyles web is fully independent from React Native Web, thanks to our custom web parser that generates CSS directly from your `StyleSheet` definitions.
 
-The web parser generates classNames based on your config and assigns them to the given DOM element. This results in zero redundant styles!
+### How it works?
 
-In addition we're generating media queries based on provided `breakpoints` instead of recalculating them on every app's resize.
+The web parser generates unique `classNames` based on your configuration and assigns them to the corresponding DOM elements, ensuring no redundant styles are applied.
+
+Additionally, we generate media queries based on the provided `breakpoints`, so the app doesn't need to recalculate them on every resize event.
 
 ```ts
 const styles = StyleSheet.create({
@@ -27,6 +28,8 @@ const styles = StyleSheet.create({
    }
 })
 ```
+
+This results in the following CSS output:
 
 ```css
 .unistyles-1u0egm6 {
@@ -46,9 +49,11 @@ const styles = StyleSheet.create({
 }
 ```
 
-## Updating styles
+### Updating styles
 
-When your changing your app's theme Unistyles will simply update your CSS without any re-render, the same goes for dynamic functions & variants.
+When you change the theme of your app, Unistyles will update your CSS without triggering any re-renders. This also applies to dynamic functions and variants.
+
+For example, if you define styles like this:
 
 ```ts
 const styles = StyleSheet.create(theme => ({
@@ -59,6 +64,8 @@ const styles = StyleSheet.create(theme => ({
 }))
 ```
 
+The generated CSS might look like:
+
 ```css
 .unistyles-1u0egm6 {
   flex: 1;
@@ -66,13 +73,13 @@ const styles = StyleSheet.create(theme => ({
 }
 ```
 
-Now let's update theme to a light one:
+When you switch the theme:
 
 ```ts
 UnistylesRuntime.setTheme('light')
 ```
 
-And voila, the CSS is now updated:
+The CSS will automatically update to:
 
 ```css
 .unistyles-1u0egm6 {
@@ -81,10 +88,10 @@ And voila, the CSS is now updated:
 }
 ```
 
-## Limitations
+### Limitations
 
-Because we're using the custom parser we can't return your styles directly since React Native Web will parse them in that case.
-Keep that in mind when using `StyleSheet.create` in your web app.
+Since we are using a custom parser, we can't return your styles directly as React Native Web would do, because it would parse them differently.
+Therefore, when using `StyleSheet.create` on the web, you won't be able to access the styles directly.
 
 ```ts
 const styles = StyleSheet.create({
@@ -93,10 +100,10 @@ const styles = StyleSheet.create({
     }
 })
 
-// Will result in an empty object, because we build classes instead of inline styles
+// Will result in an empty object because we build classes instead of inline styles
 console.log(styles) // {}
 ```
 
-## Web Only Features
+### Web Only Features
 
-Unistyles also provides you with some web only features, read more about them [here](/v3/references/web-only).
+Unistyles also includes web-specific features. You can learn more about them [here](/v3/references/web-only).
