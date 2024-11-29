@@ -5,6 +5,7 @@ title: Introduction
 import { Card, Tabs, TabItem, CardGrid, Icon, Steps } from '@astrojs/starlight/components'
 import Seo from '../../../components/Seo.astro'
 import Logo from '../../../assets/logo.svg'
+import V3 from '../../../assets/v3-banner.png'
 
 <Seo
     seo={{
@@ -13,12 +14,12 @@ import Logo from '../../../assets/logo.svg'
     }}
 >
 
-<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;">
+<a href='https://unistyl.es'>
     <img
-        src={Logo.src}
-        style="height: 240px;width:240px;margin-bottom:20px;"
+        src={V3.src}
+        style="margin-bottom:20px;"
     />
-</div>
+</a>
 
 Unistyles is a cross-platform library that enables you to share up to 100% of your styles across all platforms.
 It combines the simplicity of `StyleSheet` with the performance of `C++`.
