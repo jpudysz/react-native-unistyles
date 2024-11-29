@@ -79,5 +79,5 @@ body:
       label: Expo
       description: Are you using Expo?
       options:
-        - Yes
-        - No
+        - "Yes"
+        - "No"
