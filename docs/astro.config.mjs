@@ -115,7 +115,7 @@ export default defineConfig({
         return subPaths.map(subPath => {
             const path = `/${parentpath}/${subPath}`
 
-            return [path, `/v2${path}`]
+            return [path, `v2.unistyl.es/${path}`]
         })
     }))
 });
