@@ -13,31 +13,32 @@ In Unistyles, you can use web-specific styles for your web app under the `_web` 
 
 ```ts
 const styles = StyleSheet.create({
-   container: {
-    flex: 1,
-    // Web only styles:
-    _web: {
-      display: 'grid',
+    container: {
+        flex: 1,
+        // Web only styles:
+        _web: {
+            display: 'grid',
+        }
     }
-   }
 })
 ```
 
 <Aside>
-The `_web` styles are ignored for Android and iOS.
+The `_web` styles are ignored on Android and iOS.
 </Aside>
 
 The `_web` key supports **any** CSS property and value that matches the `CSSProperties` type from React.
 
 ```ts
 const styles = StyleSheet.create({
-   container: {
-    flex: 1,
-    _web: {
-      display: 'grid',
-      // 💥 Error! This is React Native specific style
-      transform: [{ translateX: 10 }],
-   }
+    container: {
+        flex: 1,
+        _web: {
+          display: 'grid',
+          // 💥 Error! This is React Native specific style
+          transform: [{ translateX: 10 }],
+        }
+    }
 })
 ```
 
@@ -49,13 +50,14 @@ The `transform` property on the web should be a string:
 
 ```diff lang="ts"
 const styles = StyleSheet.create({
-   container: {
-    flex: 1,
-    _web: {
-      display: 'grid',
--      transform: [{ translateX: 10 }],
-+      transform: 'translateX(10px)',
-   }
+    container: {
+        flex: 1,
+        _web: {
+            display: 'grid',
+-           transform: [{ translateX: 10 }],
++           transform: 'translateX(10px)',
+        }
+     }
 })
 ```
 
@@ -63,14 +65,15 @@ Or can be lifted  to the `style` level:
 
 ```diff lang="ts"
 const styles = StyleSheet.create({
-   container: {
-    flex: 1,
-    // ✅ This is React Native specific style, and will be parsed correctly for web
-    transform: [{ translateX: 10 }],
-    _web: {
-      display: 'grid',
--     transform: [{ translateX: 10 }],
-   }
+    container: {
+        flex: 1,
+        // ✅ This is React Native specific style, and will be parsed correctly for web
++        transform: [{ translateX: 10 }],
+        _web: {
+            display: 'grid',
+-           transform: [{ translateX: 10 }],
+        }
+    }
 })
 ```
 
@@ -82,17 +85,17 @@ Unistyles also introduces a way to use **any** pseudo-elements and selectors in 
 
 ```ts
 const styles = StyleSheet.create(theme => ({
-   button: {
-    backgroundColor: theme.colors.button,
-    _web: {
-      _hover: {
-        backgroundColor: theme.colors.hovered,
-      },
-      _before: {
-        content: '"🦄"',
-      }
-    }
-   },
+    button: {
+        backgroundColor: theme.colors.button,
+        _web: {
+            _hover: {
+                backgroundColor: theme.colors.hovered,
+            },
+            _before: {
+                content: '"🦄"',
+            }
+        }
+    },
 }))
 ```
 
@@ -104,12 +107,12 @@ If you want to write some part of your app with plain CSS, you can add custom `c
 
 ```ts
 const styles = StyleSheet.create({
-   container: {
-    flex: 1,
-    _web: {
-      _classNames: 'my-custom-class',
+    container: {
+        flex: 1,
+        _web: {
+            _classNames: 'my-custom-class',
+        }
     }
-   }
 })
 ```
 
@@ -117,13 +120,13 @@ The `_classNames` key under the `_web` key will be injected into the DOM element
 
 ```diff lang="ts"
 const styles = StyleSheet.create({
-   container: {
-    flex: 1,
-    _web: {
--      _classNames: 'my-custom-class',
-+      _classNames: ['my-custom-class', 'my-other-class'],
+    container: {
+        flex: 1,
+        _web: {
+-           _classNames: 'my-custom-class',
++           _classNames: ['my-custom-class', 'my-other-class'],
+        }
     }
-   }
 })
 ```
 
@@ -131,10 +134,10 @@ You can also use some conditions while resolving your classes:
 
 ```ts
 const styles = StyleSheet.create({
-   button: (isPrimary: boolean) => ({
-    _web: {
-        _classNames: isPrimary ? 'primary-button' : 'secondary-button',
-    }
-   })
+    button: (isPrimary: boolean) => ({
+        _web: {
+            _classNames: isPrimary ? 'primary-button' : 'secondary-button',
+        }
+    })
 })
 ```
