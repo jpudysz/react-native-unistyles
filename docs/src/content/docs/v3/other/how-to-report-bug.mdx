@@ -1,0 +1,69 @@
+---
+title: How to report a bug
+description: Learn how to report a bug in Unistyles 3.0
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'How to report a bug',
+        description: 'Learn how to report a bug in Unistyles 3.0'
+    }}
+/>
+
+While developing with Unistyles, you might encounter one of several bug types. Before submitting a bug report, please ensure that you include the required information listed below.
+
+<Aside type="caution" title="Before submitting a bug report">
+We highly encourage you to create a small reproduction of the bug. Without it, we might not be able to assist, and the issue could become stale.
+</Aside>
+
+<Steps>
+1. Crashes (eg. BAD ACCESS)
+
+    Unistyles relies heavily on C++ code, which may throw exceptions. If you encounter a crash, please attach a log that points to the exact line of code where the crash occurred. Use Logcat in Android Studio or Xcode logs to capture this information. Additionally, providing code snippets or a reproduction of the bug is highly helpful.
+
+2. View is not updating
+
+    This issue could be caused by:
+     - A bug in the `C++` parser
+     - A bug in the Babel plugin
+
+     To isolate the issue, update your `babel.config.js` file and enable `debug` mode:
+
+      ```js title="babel.config.js"
+      module.exports = function (api) {
+        api.cache(true)
+
+        return {
+          plugins: [
+              ['react-native-unistyles/plugin', {
+                  debug: true
+              }]
+          ]
+        }
+      }
+      ```
+
+      Then, run your app with a cleared cache:
+
+      ```shell
+      yarn start --reset-cache
+      ```
+
+     In the console, verify if the component reports the correct dependencies for the style associated with the component that isn’t updating.
+
+     - If dependencies are correct, use `console.log` to inspect the style and attempt to re-render the component (e.g., via reloading or a state update)
+     - If the logged style is correct (even after re-render), the issue is likely in the C++ core. Please provide as many details as possible for further assistance
+
+3. Immediate crash before rendering a view with cryptic errors like `path[0] is not defined`
+
+    This is likely a Babel plugin issue. Isolate the StyleSheet or style syntax causing the problem and share it with us. We will prioritize patching it.
+
+
+4. Discrepancies between iOS, Android and Web parser
+
+   The web uses a custom parser that may produce different results compared to iOS and Android. We're exploring the use of `WebAssembly` to share C++ parser across platforms.
+
+</Steps>

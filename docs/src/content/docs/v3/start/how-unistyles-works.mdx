@@ -1,0 +1,168 @@
+---
+title: How Unistyles works?
+description: Understanding how Unistyles 3.0 works
+---
+
+import { Aside, Card } from '@astrojs/starlight/components'
+import How1 from '../../../../assets/how-1.png'
+import How2 from '../../../../assets/how-2.png'
+import How3 from '../../../../assets/how-3.png'
+import How4 from '../../../../assets/how-4.png'
+import How5 from '../../../../assets/how-5.png'
+import How6 from '../../../../assets/how-6.png'
+import How7 from '../../../../assets/how-7.png'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'How Unistyles works?',
+        description: 'Understanding how Unistyles 3.0 works'
+    }}
+/>
+
+
+To get the most out of Unistyles, it’s important to understand how it works and how it updates your styles.
+
+### 1. StyleSheets
+
+A typical app consist of many `StyleSheets`. A `StyleSheet` is a JavaScript object that holds one or many styles. Each style is associated with native view.
+What’s more important is that each `StyleSheet` is unique, tailored to the needs of the view it’s associated with, or to a shared component.
+
+<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;">
+    <img
+        src={How1.src}
+        style="margin-bottom:40px;margin-top:20px;"
+    />
+    <span style="font-size:13px;">
+        Your app's StyleSheets
+    </span>
+</div>
+
+### 2. Babel plugin: dependencies
+
+Unistyles needs to understand your `StyleSheet` dependencies in order to update them only when necessary. This process begins when Babel transforms your app’s code. At this stage, the Unistyles Babel plugin scans your `StyleSheets` and determines the dependencies for each style:
+
+```ts
+const styles = StyleSheet.create((theme, rt) => ({
+  // static: no dependencies
+  container: {
+    backgroundColor: 'red',
+  },
+  // depends on theme and font scale
+  text: {
+    color: theme.colors.text,
+    fontSize: rt.fontScale * 16
+  },
+  dynamic: (isOdd: boolean) => ({
+    // depends on theme
+    color: isOdd ? theme.colors.primary : theme.colors.secondary,
+  })
+})
+```
+
+### 3. Babel plugin: bindings
+
+As you already know, Unistyles has no components. This means your native view hierarchy remains exactly the same as your original code. The Babel plugin does not swap imports to use our custom components, instead, it transforms your `refs` to bind the `ShadowNode` with `Unistyle`.
+
+You might be wondering, what is `Unistyle`? We refer to it as your `StyleSheet` style that have been parsed by the Unistyles compiler, and with the attached `C++` state.
+
+<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;">
+    <img
+        src={How2.src}
+        style="margin-bottom:40px;margin-top:20px;"
+    />
+    <span style="font-size:13px;">
+        Your styles are transformed into Unistyles
+    </span>
+</div>
+
+<Aside>Learn more on how the Babel plugin works [here](/v3/other/babel-plugin).</Aside>
+
+### 4. StyleSheet registry
+
+We don’t just extract metadata from your styles. We do the same for your `StyleSheet`. On the C++ side, we know exactly which `StyleSheet` is static, which depends on a `theme`, and which `Unistyles` it contains. At this point, your app’s `StyleSheets` are reconstructed on the C++ side and stored in native C++ `StyleSheets`, which contain the parsed `Unistyles`.
+
+<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;">
+    <img
+        src={How3.src}
+        style="margin-bottom:40px;margin-top:20px;"
+    />
+    <span style="font-size:13px;">
+        C++ StyleSheets that contains parsed styles (Unistyles)
+    </span>
+</div>
+
+To make this process easier to visualize, imagine that the Unistyles engine is a production line. It takes your raw `StyleSheets`, parses them, and produces their C++ representation with `Unistyles`:
+
+<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;">
+    <img
+        src={How4.src}
+        style="margin-bottom:40px;margin-top:20px;"
+    />
+    <span style="font-size:13px;">
+        Unistyles workflow
+    </span>
+</div>
+
+### 5. Reacting to events
+
+When you access your `StyleSheet` styles in your component, you’ll get a regular JS object as expected. If your component re-renders, we simply return the same `Unistyle` that’s already parsed and stored in the cache.
+
+To visualize the true power of `Unistyles`, imagine that some event occurs, such as:
+
+- A theme change triggered by the user clicking a button
+- A phone color scheme change
+- A phone orientation change
+- Accessibility settings being updated
+- and much more! Unistyles is able to update your styles based on 14 events
+
+At this point, the Unistyles algorithm scans the `StyleSheetRegistry` and looks for styles that depend on this event:
+
+
+<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;">
+    <img
+        src={How5.src}
+        style="margin-bottom:40px;margin-top:20px;"
+    />
+    <span style="font-size:13px;">
+        Finding affected styles
+    </span>
+</div>
+
+Affected styles are then re-computed to reflect the new state of your app.
+
+### 6. Shadow Tree updates
+
+With the list of affected styles, we can now browse the `ShadowRegistry`, where we keep the bindings between `ShadowNode` and `Unistyles`. In other words, we know which `component` relies on which `style`.
+With all this information, we can translate the update into atomic `ShadowTree` instructions.
+
+With Unistyles 2.0 or any other library, we would need to re-render your entire app to reflect the changes:
+
+<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;">
+    <img
+        src={How6.src}
+        style="margin-bottom:40px;margin-top:20px;"
+    />
+    <span style="font-size:13px;">
+        Regular flow: your app is re-rendered
+    </span>
+</div>
+
+Instead, with all the optimizations and features that Unistyles 3.0 brings, we can update your `ShadowTree` directly from C++:
+
+<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;">
+    <img
+        src={How7.src}
+        style="margin-bottom:40px;margin-top:20px;"
+    />
+    <span style="font-size:13px;margin-bottom:50px;">
+        Unistyles 3.0 updates only selected ShadowNodes from C++
+    </span>
+</div>
+
+
+<Card>
+*Engineering is the closest thing to magic that exists in the world.*
+
+~Elon Musk
+</Card>

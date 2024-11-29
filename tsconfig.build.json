@@ -1,5 +1,8 @@
 
 {
   "extends": "./tsconfig",
-  "exclude": ["examples", "src/__tests__", "docs"]
+  "compilerOptions": {
+    "noEmit": false
+  },
+  "exclude": ["example", "expo-example", "plugin/__tests__", "docs"]
 }

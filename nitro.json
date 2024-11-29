@@ -1,0 +1,11 @@
+{
+  "cxxNamespace": ["unistyles"],
+  "ios": {
+    "iosModuleName": "Unistyles"
+  },
+  "android": {
+    "androidNamespace": ["unistyles"],
+    "androidCxxLibName": "unistyles"
+  },
+  "autolinking": {}
+}

@@ -1,187 +1,155 @@
 import { defineConfig } from 'astro/config'
 import starlight from '@astrojs/starlight'
 import sitemap from '@astrojs/sitemap'
-import expressiveCode from 'astro-expressive-code'
+import expressiveCode, { ExpressiveCodeTheme } from 'astro-expressive-code'
+import fs from 'node:fs'
 
-// https://astro.build/config
+const themeJson = fs.readFileSync(new URL(`./theme.json`, import.meta.url), 'utf8')
+const customTheme = ExpressiveCodeTheme.fromJSONString(themeJson)
+
+const oldPaths = {
+    'start': [
+        'basic-usage',
+        'benchmarks',
+        'introduction',
+        'migration-from-1',
+        'migration-from-stylesheet',
+        'setup',
+    ],
+    'reference': [
+        'breakpoints',
+        'compound-variants',
+        'content-size-category',
+        'create-stylesheet',
+        'debugging',
+        'dimensions',
+        'dynamic-functions',
+        'edge-to-edge',
+        'errors',
+        'faq',
+        'media-queries',
+        'plugins',
+        'server-side-rendering',
+        'testing',
+        'theming',
+        'unistyles-registry',
+        'unistyles-runtime',
+        'use-initial-theme',
+        'use-styles',
+        'unistyles-provider',
+        'variants',
+        'web-support'
+    ],
+    'other': [
+        'for-library-authors',
+        'for-sponsors',
+    ],
+    'examples': [
+        'all'
+    ]
+}
+
 export default defineConfig({
-    integrations: [
+	integrations: [
         expressiveCode({
-            theme: 'github-dark-dimmed',
+            themes: [customTheme],
             languages: ['typescript', 'tsx']
         }),
-        starlight({
-            title: 'Unistyles',
-            description: 'React Native StyleSheet 2.0',
-            customCss: ['./src/styles/custom.css'],
+		starlight({
+			title: 'react-native-unistyles',
+            description: 'React Native StyleSheet 3.0',
+            customCss: ['./src/styles/docs.css'],
             logo: {
-                src: './src/assets/logo.svg'
+                src: './public/favicon.svg'
             },
             social: {
                 github: 'https://github.com/jpudysz/react-native-unistyles',
                 'x.com': 'https://x.com/jpudysz',
                 discord: 'https://discord.gg/akGHf27P4C'
             },
-            sidebar: [
+			sidebar: [
+				{
+					label: 'Start here',
+					items: [
+						{ label: 'Introduction', slug: 'v3/start/introduction' },
+                        { label: 'Getting started', slug: 'v3/start/getting-started' },
+                        { label: 'Configuration', slug: 'v3/start/configuration' },
+                        { label: 'New features', slug: 'v3/start/new-features' },
+                        { label: 'Look under the hood', slug: 'v3/start/how-unistyles-works' },
+                        { label: 'Migration guide', slug: 'v3/start/migration-guide' }
+					],
+				},
                 {
-                    label: 'Start here',
+                    label: 'Guides',
                     items: [
-                        {
-                            label: 'Introduction',
-                            link: '/start/introduction/'
-                        },
-                        {
-                            label: 'Setup',
-                            link: '/start/setup/'
-                        },
-                        {
-                            label: 'Migration from 1.x',
-                            link: '/start/migration-from-1/'
-                        },
-                        {
-                            label: 'Basic Usage',
-                            link: '/start/basic-usage/'
-                        },
-                        {
-                            label: 'Migration from StyleSheet',
-                            link: '/start/migration-from-stylesheet/'
-                        },
-                        {
-                            label: 'Benchmarks',
-                            link: '/start/benchmarks/'
-                        }
+                        { label: 'Theming', slug: 'v3/guides/theming' },
+                        { label: 'Avoiding Keyboard', slug: 'v3/guides/avoiding-keyboard' },
+                        { label: 'Expo Router', slug: 'v3/guides/expo-router' },
+                        { label: 'Custom web', slug: 'v3/guides/custom-web', badge: 'WIP' },
+                        { label: 'Server side rendering', slug: 'v3/guides/server-side-rendering', badge: 'WIP' },
                     ]
                 },
                 {
-                    label: 'Reference',
+                    label: 'API reference',
                     items: [
-                        {
-                            label: 'createStyleSheet',
-                            link: '/reference/create-stylesheet/'
-                        },
-                        {
-                            label: 'useStyles',
-                            link: '/reference/use-styles/'
-                        },
-                        {
-                            label: 'UnistylesProvider',
-                            link: '/reference/unistyles-provider/',
-                            badge: 'New'
-                        },
-                        {
-                            label: 'Dynamic functions',
-                            link: '/reference/dynamic-functions/'
-                        },
-                        {
-                            label: 'Theming',
-                            link: '/reference/theming/'
-                        },
-                        {
-                            label: 'Edge to edge layout',
-                            link: '/reference/edge-to-edge/'
-                        },
-                        {
-                            label: 'useInitialTheme',
-                            link: '/reference/use-initial-theme/'
-                        },
-                        {
-                            label: 'Breakpoints',
-                            link: '/reference/breakpoints/'
-                        },
-                        {
-                            label: 'Media queries',
-                            link: '/reference/media-queries/'
-                        },
-                        {
-                            label: 'Variants',
-                            link: '/reference/variants/'
-                        },
-                        {
-                            label: 'Compound variants',
-                            link: '/reference/compound-variants/'
-                        },
-                        {
-                            label: 'Dimensions',
-                            link: '/reference/dimensions/'
-                        },
-                        {
-                            label: 'Unistyles Registry',
-                            link: '/reference/unistyles-registry/'
-                        },
-                        {
-                            label: 'Unistyles Runtime',
-                            link: '/reference/unistyles-runtime/'
-                        },
-                        {
-                            label: 'Content size category',
-                            link: '/reference/content-size-category/'
-                        },
-                        {
-                            label: 'Plugins',
-                            link: '/reference/plugins/'
-                        },
-                        {
-                            label: 'Web support',
-                            link: '/reference/web-support/'
-                        },
-                        {
-                            label: 'Server side rendering',
-                            link: '/reference/server-side-rendering/'
-                        },
-                        {
-                            label: 'Debugging',
-                            link: '/reference/debugging/'
-                        },
-                        {
-                            label: 'Testing',
-                            link: '/reference/testing/'
-                        },
-                        {
-                            label: 'Errors',
-                            link: '/reference/errors/'
-                        },
-                        {
-                            label: 'FAQ',
-                            link: '/reference/faq/'
-                        }
-                    ]
-                },
-                {
-                    label: 'Examples',
-                    items: [
-                        {
-                            label: 'All examples',
-                            link: '/examples/all'
-                        }
+                        { label: 'StyleSheet', slug: 'v3/references/stylesheet' },
+                        { label: 'Unistyles Runtime', slug: 'v3/references/unistyles-runtime' },
+                        { label: 'Mini Runtime', slug: 'v3/references/mini-runtime' },
+                        { label: 'Dynamic Functions', slug: 'v3/references/dynamic-functions' },
+                        { label: 'Breakpoints', slug: 'v3/references/breakpoints' },
+                        { label: 'Media Queries', slug: 'v3/references/media-queries' },
+                        { label: 'Variants', slug: 'v3/references/variants' },
+                        { label: 'Compound Variants', slug: 'v3/references/compound-variants' },
+                        { label: 'Web styles', slug: 'v3/references/web-styles' },
+                        { label: 'Web Only Features', slug: 'v3/references/web-only' },
+                        { label: 'Scoped theme', slug: 'v3/references/scoped-theme', badge: 'WIP' },
+                        { label: 'createUnistylesComponent', slug: 'v3/references/create-unistyles-component' },
+                        { label: 'Display and Hide', slug: 'v3/references/display-hide' },
+                        { label: 'Edge to edge', slug: 'v3/references/edge-to-edge' },
+                        { label: 'Dimensions', slug: 'v3/references/dimensions' },
+                        { label: 'Content size category', slug: 'v3/references/content-size-category' },
                     ]
                 },
                 {
                     label: 'Other',
                     items: [
-                        {
-                            label: 'For library authors',
-                            link: '/other/for-library-authors/'
-                        },
-                        {
-                            label: 'For Sponsors',
-                            link: 'other/for-sponsors/'
-                        }
+                        { label: 'How to report a bug?', slug: 'v3/other/how-to-report-bug' },
+                        { label: 'Babel plugin', slug: 'v3/other/babel-plugin' },
+                        { label: 'Dependencies', slug: 'v3/other/dependencies' },
+                        { label: 'For library authors', slug: 'v3/other/for-library-authors' },
+                        { label: 'For sponsors', slug: 'v3/other/for-sponsors' },
+                        { label: 'FAQ', slug: 'v3/other/frequently-asked-questions' },
                     ]
                 },
                 {
-                    label: 'Unistyles 1.x Documentation',
-                    link: '/v1/docs/start/setup'
+                    label: 'Examples',
+                    items: [
+                        { label: 'All examples', slug: 'v3/examples/examples', badge: 'WIP' },
+                    ]
                 },
                 {
-                    label: 'React Native Crossroads',
-                    link: 'https://reactnativecrossroads.com/'
+                    label: 'Unistyles 2.0 documentation', link: 'https://v2.unistyl.es'
                 },
                 {
-                    label: 'Codemask',
-                    link: 'https://codemask.com/'
+                    label: 'React Native Crossroads', link: 'https://reactnativecrossroads.com'
+                },
+                {
+                    label: 'Codemask', link: 'https://codemask.com'
+                },
+                {
+                    label: 'Hire us!',
+                    badge: 'Hot!',
+                    link: 'https://x.com/messages/compose?recipient_id=769868612198887425'
                 }
-            ]
-        }),
-        sitemap()
-    ]
-})
+			],
+		}),
+        sitemap(),
+	],
+    redirects: Object.fromEntries(Object.entries(oldPaths).flatMap(([parentpath, subPaths]) => {
+        return subPaths.map(subPath => {
+            const path = `/${parentpath}/${subPath}`
+
+            return [path, `v2.unistyl.es/${path}`]
+        })
+    }))
+});

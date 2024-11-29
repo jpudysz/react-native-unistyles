@@ -1,0 +1,56 @@
+---
+title: Avoiding keyboard
+description: Learn how to avoid keyboard with Unistyles
+---
+
+import { Card } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Keyboard insets (IME)',
+        description: 'Learn how to avoid keyboard with Unistyles'
+    }}
+/>
+
+Unistyles 3.0 introduces a new `inset` called `ime`, which is automatically animated when the keyboard appears or disappears.
+Using this inset in your style will automatically register it for future updates.
+
+Unistyles dynamically re-calculates your styles based on their dependencies. To learn more about how Unistyles re-calculates your styles, please refer to the [guide](/v3/start/how-unistyles-works).
+
+### Usage
+
+```tsx /rt.insets.ime/
+import { TextInput, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+
+const KeyboardAvoidingView = () => {
+    return (
+        <View style={styles.container}>
+            <TextInput style={styles.input} />
+        </View>
+    )
+}
+
+const styles = StyleSheet.create(theme => ({
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        backgroundColor: theme.colors.backgroundColor,
+        paddingHorizontal: theme.gap(2),
+        paddingTop: rt.insets.top,
+        transform: [
+            {
+                translateY: rt.insets.ime * -1
+            }
+        ]
+    },
+    input: {
+        width: '100%',
+    }
+}))
+```
+
+In this example, the `container` will automatically adjust to avoid the keyboard, ensuring the `input` remains visible at all times.
+

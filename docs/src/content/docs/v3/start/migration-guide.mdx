@@ -1,0 +1,216 @@
+---
+title: Migration guide
+description: How to migrate from previous version
+---
+
+import { Steps } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'How to migrate from Unistyles 2.0',
+        description: 'How to migrate from previous version'
+    }}
+/>
+
+The migration process is quite simple, but it can be tedious since you'll need to remove a lot of the existing code.
+
+<Steps>
+
+1. Follow installation steps from [Getting started](/v3/start/getting-started) guide.
+
+2. Replace your configuration with [new](/v3/start/configuration) one.
+
+    `UnistylesRegistry` can be easily replaced with `StyleSheet.configure` as it follows the same syntax.
+    `Themes` and `Breakpoints` work exactly the same.
+    For `Settings` we removed 4 out of 6 options:
+
+   ```diff lang="tsx"
+   -   import { UnistylesRegistry } from 'react-native-unistyles'
+   +   import { StyleSheet } from 'react-native-unistyles'
+
+   -    UnistylesRegistry.addConfig({
+   -       adaptiveThemes: false,
+   -       initialTheme: 'dark',
+   -       plugins: [...],
+   -       experimentalCSSMediaQueries: true,
+   -       windowResizeDebounceTimeMs: 100,
+   -       disableAnimatedInsets: true
+   -    })
+
+   +    StyleSheet.configure({
+   +         settings: {
+   +             adaptiveThemes: false, // works exactly the same like in 2.0
+   +             initialTheme: 'dark', // works exactly the same like in 2.0
+                 // plugins are removed, instead transform your styles with static functions
+                 // experimentalCSSMediaQueries: these options is also removed, and enabled by default with custom parser
+                 // windowResizeDebounceTimeMs: removed, there is no debouncing anymore. Styles are updated with CSS media queries
+                 // disableAnimatedInsets: removed, insets won't re-render your views
+   +        }
+   +    })
+   ```
+
+3. Import `StyleSheet` from `react-native-unistyles`:
+
+    ```diff lang="tsx"
+    - import { createStyleSheet, useStyles } from 'react-native-unistyles'
+    + import { StyleSheet } from 'react-native-unistyles'
+    ```
+4. Replace `createStyleSheet` with `StyleSheet.create`:
+
+    ```diff lang="tsx"
+    - const stylesheet = createStyleSheet(theme => ({
+    + const stylesheet = StyleSheet.create(theme => ({
+    ```
+5. Remove all occurrences of `useStyles` hook:
+
+    ```diff lang="tsx"
+    - const { styles } = useStyles(stylesheet)
+    ```
+6. Rename your `stylesheet` to `styles`:
+
+    ```diff lang="tsx"
+    - const stylesheet = StyleSheet.create(theme => ({
+    + const styles = StyleSheet.create(theme => ({
+    ```
+7. If you used `useInitialTheme`, remove it and set initial theme in `StyleSheet.configure`:
+
+    ```tsx
+    import { StyleSheet } from 'react-native-unistyles'
+
+    StyleSheet.configure({
+        themes,
+        breakpoints,
+        settings: {
+            initialTheme: () => {
+                // get preferred theme from user's preferences/MMKV/SQL etc.
+                // must be synchronous
+                return storage.getString('preferredTheme') ?? 'light'
+            }
+        }
+    })
+    ```
+
+8. If you need to access your `theme` in component, refactor it to use `createUnistylesComponent`:
+
+    ```diff lang="tsx"
+    import { Button } from 'react-native'
+    -import { useStyles } from 'react-native-unistyles'
+    +import { createUnistylesComponent } from 'react-native-unistyles'
+
+    +const UniButton = createUnistylesComponent(Button, theme => ({
+    +    color: theme.colors.primary
+    +}))
+
+    const MyButton = () => {
+        return <UniButton />
+    }
+
+    const MyButton = () => {
+    -    const { theme } = useStyles(stylesheet)
+
+    -     return <Button color={theme.colors.primary} />
+    +    return <UniButton />
+    }
+    ```
+
+9. If you need to access `breakpoint` to show/hide your components use `Display` and `Hide` components instead:
+
+    ```tsx
+    import { Text } from 'react-native'
+    import { Display, Hide, mq } from 'react-native-unistyles'
+
+    const MyText = () => {
+        return (
+            <Display mq={mq.width(0, 400)}>
+                <Text>This text is visible on small devices</Text>
+            </Display>
+            <Hide mq={mq.width(400)}>
+                <Text>This text is hidden on big devices</Text>
+            </Hide>
+        )
+    }
+    ```
+
+10. If you used `UnistylesProvider`, remove it as it has no effect anymore:
+
+    ```diff lang="tsx"
+    -import { UnistylesProvider } from 'react-native-unistyles'
+
+    -<UnistylesProvider>
+         <App />
+    -</UnistylesProvider>
+    ```
+
+11. If you want to move your component based on keyboard position, use `ime` inset:
+
+    ```diff lang="tsx"
+    const style = StyleSheet.create({
+        container: {
+    -      paddingBottom: rt.insets.bottom // bottom is no longer dynamic
+    +      paddingBottom: rt.insets.ime
+        }
+    })
+    ```
+12. Some `UnistylesRuntime` methods have been renamed. Follow TypeScript types to use new names.
+13. Some `UnistylesRuntime` methods have been removed:
+
+    ```diff lang="tsx"
+    - UnistylesRuntime.addPlugin(plugin) // Unistyles has no plugins anymore
+    - UnistylesRuntime.removePlugin(plugin) // Unistyles has no plugins anymore
+    - UnistylesRuntime.statusBar.setColor(color) // removed due to Android 15 deprecation
+    - UnistylesRuntime.navigationBar.setColor(color) // removed due to Android 15 deprecation
+    ```
+
+14. `UnistylesRuntime` methods that accepted `color` and `alpha` have been changed to accept `color` only. Each method supports **any** color that is respected by React Native:
+
+    ```diff lang="tsx"
+    - UnistylesRuntime.setRootViewBackgroundColor(color, alpha) // no need for separate alpha
+    + UnistylesRuntime.setRootViewBackgroundColor(color) // accepts any color
+    ```
+
+15. `hairlineWidth` has been moved from `UnistylesRuntime` to `StyleSheet`. Use `StyleSheet.hairlineWidth` instead:
+
+    ```diff lang="tsx"
+    - UnistylesRuntime.hairlineWidth // no longer available
+    + StyleSheet.hairlineWidth // matches StyleSheet API
+    ```
+
+16. If your app used variants, move config to `styles.useVariants` instead:
+
+    ```diff lang="tsx"
+    - import { useStyles } from 'react-native-unistyles'
+    + import { StyleSheet } from 'react-native-unistyles'
+
+    const MyComponent = () => {
+    -   const { styles } = useStyles(stylesheet, {
+    -       variant1: 'primary',
+    -       variant2: 'secondary'
+    -   })
+    +   styles.useVariants({
+    +       variant1: 'primary',
+    +       variant2: 'secondary'
+    +   })
+
+        return <View style={styles.container} />
+    }
+    ```
+
+17. `Style is not bound!` error
+
+    If you encountered this error, it means that you're spreading styles out of the style tag. This is not possible in Unistyles anymore as spreading will remove `C++` state:
+
+    ```tsx
+    // not ok
+    const styles = {...style1, ...style2}
+
+    <View style={styles} />
+
+    // ok
+    <View style={{...style1, ...style2}} />
+
+    // ok
+    <View style={[style1, style2]} />
+    ```
+
+</Steps>

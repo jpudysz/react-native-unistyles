@@ -1,0 +1,78 @@
+---
+title: Content size category
+description: Learn about content size category in Unistyles 3.0
+---
+
+import { Card } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Content size category',
+        description: 'Learn about content size category in Unistyles 3.0'
+    }}
+/>
+
+Content size category is a user preference used to adjust text size and control content magnification in your app. This feature is especially useful for users with visual impairments or limited vision.
+
+It's also possible to use these values to build responsive layouts based on native settings rather than screen size.
+
+
+### iOS
+
+Unistyles implementation is based on [Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/typography#Specifications)
+and the available values are:
+
+`xSmall`, `Small`, `Medium`, `Large`, `xLarge`, `xxLarge`, `xxxLarge`, `unspecified`
+
+In addition to above categories, you can also use the [Accessibility sizes](https://developer.apple.com/documentation/uikit/uicontentsizecategory#2901207), available values are:
+
+`accessibilityMedium`, `accessibilityLarge`, `accessibilityExtraLarge`, `accessibilityExtraExtraLarge`, `accessibilityExtraExtraExtraLarge`
+
+### Android
+
+There is no direct equivalent to the iOS content size category on Android. The implementation is based on [Font Scale](https://developer.android.com/reference/android/content/res/Configuration#fontScale)
+and the available values are:
+
+`Small`, `Default`, `Large`, `ExtraLarge`, `Huge`
+
+Mapping is based on the following table:
+
+| Value | Font Scale |
+| ----- | ----- |
+| Small | \<= 0.85       |
+| Default | \<= 1.0       |
+| Large | \<= 1.15       |
+| ExtraLarge | \<= 1.3    |
+| Huge | \<=1.5      |
+| ExtraHuge | \<=1.8      |
+| ExtraExtraHuge | >1.8      |
+
+
+### Web
+
+There is no support for the content size category on the web.
+Reading the value will always resolve to `unspecified`.
+
+### Usage
+
+To get the current `contentSizeCategory` you need to use `UnistylesRuntime`:
+
+```tsx /contentSizeCategory/
+import { UnistylesRuntime } from 'react-native-unistyles'
+
+// check the current content size category
+export const ContentSizeCategory = () => (
+    <Text>
+        My device is using the {UnistylesRuntime.contentSizeCategory} size.
+    </Text>
+)
+```
+
+For convenience, library exposes two enums to map the values mentioned above:
+
+```tsx /AndroidContentSizeCategory/ /IOSContentSizeCategory/
+import { AndroidContentSizeCategory, IOSContentSizeCategory } from 'react-native-unistyles'
+
+// compare the current content size category based on platform
+```

@@ -1,0 +1,43 @@
+---
+title: Introduction
+description: Welcome to Unistyles!
+---
+
+import { Card, Aside } from '@astrojs/starlight/components'
+import Block from '../../../../assets/uni2.png'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Welcome to Unistyles 3.0!',
+        description: 'Welcome to Unistyles!'
+    }}
+/>
+
+
+<Aside type="caution" title="Beta">
+Unistyles 3.0 is still in beta. We're waiting for the community feedback before promoting it to the stable.
+</Aside>
+
+
+<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;">
+    <img
+        src={Block.src}
+        style="margin-bottom:20px;"
+    />
+</div>
+
+Unistyles is a cross-platform library that enables you to share up to 100% of your styles across all platforms.
+It combines the simplicity of `StyleSheet` with the performance of `C++`.
+
+**`Unistyles` is a superset of `StyleSheet`** similar to how `TypeScript` is a superset of `JavaScript`.
+If you're familiar with styling in React Native, then you already know how to use `Unistyles`.
+
+### Why should you use Unistyles?
+
+- Guarantees no re-renders across the entire app (no hooks, no context—just pure JSI bindings)
+- Doesn't pollute your native view hierarchy (Unistyles has no component wrappers)
+- Includes a cross-platform parser written in C++, ensuring consistent output across all platforms
+- Leverages [Nitro Modules](https://nitro.margelo.com/) under the hood (everything is strongly typed!)
+- Transforms your `StyleSheets` into enhanced `StyleSheets` with superpowers 🦸🏼‍♂️ that can access themes, platform-specific values, and more!
+- Loved by developers worldwide: 1.1M+ downloads and over 1.5K stars on GitHub

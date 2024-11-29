@@ -1,9 +1,0 @@
-{
-  "skipLibCheck": true,
-  "extends": "expo/tsconfig.base",
-  "references": [
-    {
-      "path": "../../"
-    }
-  ]
-}

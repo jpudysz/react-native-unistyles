@@ -1,0 +1,151 @@
+---
+title: Web only features
+description: Learn about web only features in Unistyles 3.0
+---
+
+import { Aside } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Web only features',
+        description: 'Learn about web only features in Unistyles 3.0'
+    }}
+/>
+
+Unistyles comes with some web-only features that are not available on the React Native side.
+
+### Web only styles
+
+In Unistyles, you can use web-specific styles for your web app under the `_web` key.
+
+```ts
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        // Web only styles:
+        _web: {
+            display: 'grid',
+        }
+    }
+})
+```
+
+<Aside>
+The `_web` styles are ignored on Android and iOS.
+</Aside>
+
+The `_web` key supports **any** CSS property and value that matches the `CSSProperties` type from React.
+
+```ts
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        _web: {
+          display: 'grid',
+          // 💥 Error! This is React Native specific style
+          transform: [{ translateX: 10 }],
+        }
+    }
+})
+```
+
+<Aside>
+The `_web` doesn't support React Native specific styles. To use them, you can move them up to the `style` level.
+</Aside>
+
+The `transform` property on the web should be a string:
+
+```diff lang="ts"
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        _web: {
+            display: 'grid',
+-           transform: [{ translateX: 10 }],
++           transform: 'translateX(10px)',
+        }
+     }
+})
+```
+
+Or can be lifted  to the `style` level:
+
+```diff lang="ts"
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        // ✅ This is React Native specific style, and will be parsed correctly for web
++        transform: [{ translateX: 10 }],
+        _web: {
+            display: 'grid',
+-           transform: [{ translateX: 10 }],
+        }
+    }
+})
+```
+
+You can also use variants, breakpoints, and other Unistyles features under the `_web` key!
+
+### Pseudo elements
+
+Unistyles also introduces a way to use **any** pseudo-elements and selectors in your web styles.
+
+```ts
+const styles = StyleSheet.create(theme => ({
+    button: {
+        backgroundColor: theme.colors.button,
+        _web: {
+            _hover: {
+                backgroundColor: theme.colors.hovered,
+            },
+            _before: {
+                content: '"🦄"',
+            }
+        }
+    },
+}))
+```
+
+As you can see, `:` and `::` have been replaced with `_` for easier usage.
+
+### Injecting custom classNames
+
+If you want to write some part of your app with plain CSS, you can add custom `classNames` to your styles:
+
+```ts
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        _web: {
+            _classNames: 'my-custom-class',
+        }
+    }
+})
+```
+
+The `_classNames` key under the `_web` key will be injected into the DOM element as a `className`. You can pass a string or an array of strings into it:
+
+```diff lang="ts"
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        _web: {
+-           _classNames: 'my-custom-class',
++           _classNames: ['my-custom-class', 'my-other-class'],
+        }
+    }
+})
+```
+
+You can also use some conditions while resolving your classes:
+
+```ts
+const styles = StyleSheet.create({
+    button: (isPrimary: boolean) => ({
+        _web: {
+            _classNames: isPrimary ? 'primary-button' : 'secondary-button',
+        }
+    })
+})
+```
