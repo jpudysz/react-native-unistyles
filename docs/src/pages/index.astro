@@ -3,6 +3,16 @@ import '@fontsource-variable/nunito'
 import '../styles/home.css'
 import { Beam, Button } from '../components'
 import { SEO } from 'astro-seo'
+
+const DEFAULT_URL_SITE = 'https://unistyl.es'
+const openGraph = {
+    title: 'Welcome to Unistyles 3.0',
+    type: 'image/png',
+    image: 'https://unistyl.es/opengraph-image3.png',
+    alt: 'Unistyles',
+    url: DEFAULT_URL_SITE,
+    description: 'Level up your React Native StyleSheet!'
+}
 ---
 
 <!doctype html>
@@ -12,6 +22,22 @@ import { SEO } from 'astro-seo'
             charset="UTF-8"
             title="Unistyles 3.0"
             description="Level up your React Native StyleSheet"
+            openGraph={{
+                basic: {
+                    title: openGraph.title,
+                    type: openGraph.type,
+                    image: openGraph.image
+                },
+                image: {
+                    alt: openGraph.alt
+                },
+                optional: {
+                    description: openGraph.description
+                }
+            }}
+            twitter={{
+                creator: '@jpudysz'
+            }}
             extend={{
                 link: [
                     { rel: 'icon', href: './favicon.png' }
@@ -21,7 +47,12 @@ import { SEO } from 'astro-seo'
                     { name: 'generator', content: Astro.generator },
                     { name: 'keywords', content: 'unistyles react-native react-native-web expo ios android codemask' },
                     { name: 'msapplication-TileColor', content: '#171928' },
-                    { name: 'theme-color', content: '#171928' }
+                    { name: 'theme-color', content: '#171928' },
+                    { name: 'twitter:image', content: openGraph.image },
+                    { name: 'twitter:card', content: 'summary_large_image' },
+                    { name: 'twitter:title', content: openGraph.title },
+                    { name: 'twitter:description', content: openGraph.description },
+                    { name: 'twitter:site', content: '@jpudysz' }
                 ]
             }}
         />
