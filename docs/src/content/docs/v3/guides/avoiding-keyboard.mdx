@@ -1,9 +1,17 @@
 ---
 title: Avoiding keyboard
-description: Learn how to avoid keyboard in Unistyles
+description: Learn how to avoid keyboard with Unistyles
 ---
 
 import { Card } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Keyboard insets (IME)',
+        description: 'Learn how to avoid keyboard with Unistyles'
+    }}
+/>
 
 Unistyles 3.0 introduces a new `inset` called `ime`, which is automatically animated when the keyboard appears or disappears.
 Using this inset in your style will automatically register it for future updates.

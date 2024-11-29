@@ -4,6 +4,14 @@ description: Learn about Display and Hide components
 ---
 
 import { Card, Aside } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Display and Hide components',
+        description: 'Learn about Display and Hide components'
+    }}
+/>
 
 In Unistyles 2.0, developers could retrieve the `breakpoint` value from the `useStyles` hook.
 This was helpful for hiding certain JSX components based on specific screen sizes.
