@@ -25,9 +25,7 @@ body:
     id: steps-to-reproduce
     attributes:
       label: Steps to reproduce
-      description: |
-        Provide a detailed list of steps that reproduce the issue.
-        Learn more about how to diagnose Unistyles problem: https://unistyl.es/v3/other/how-to-report-bug
+      description: Provide a detailed list of steps that reproduce the issue.
       placeholder: |
         1.
         2.
