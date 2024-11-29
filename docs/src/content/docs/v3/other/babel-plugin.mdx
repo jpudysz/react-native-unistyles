@@ -70,7 +70,7 @@ If we try to read the style on C++ side without its associated state, an error w
 However, this doesn't mean you can't copy or spread your styles. It is still possible to do so, but it requires the Babel plugin, which converts your styles into an array format.
 
 ```ts
-// 😩 ouch, you just removed C++ state
+// 😩 ouch, you have just removed C++ state
 const mergedStyles = {
     ...styles.container,
     ...styles.text
@@ -125,7 +125,7 @@ const ref = useRef()
     ref={_ref => {
        ref.current = _ref
 
-       // some Unistyles magic 🪄
+       // some Unistyles magic ✨
     }
 />
 ```
@@ -145,7 +145,7 @@ We also support custom ref functions:
     ref={ref => {
        doSomething(ref)
 
-       // some Unistyles magic 🪄
+       // some Unistyles magic ✨
     }
 />
 ```
@@ -154,7 +154,7 @@ We also support custom ref functions:
 
 Last but not least, we had to make a few adjustments to the `Pressable` implementation. `Pressable` is a special component that can:
 
-- Pass you a state with a `pressed` boolean
+- be a function and pass you a state with a `pressed` boolean
 - Accept multiple styles syntax, such as `() => [styles.style1, styles.style2]` or `() => style.pressable`
 
 To make this feasible, we built a thin abstraction that allows us to handle the `pressed` event and manage any transformations within the styles function.

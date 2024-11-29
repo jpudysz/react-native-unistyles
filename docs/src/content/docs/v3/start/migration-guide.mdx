@@ -35,7 +35,7 @@ The migration process is quite simple, but it can be tedious since you'll need t
    +             adaptiveThemes: false, // works exactly the same like in 2.0
    +             initialTheme: 'dark', // works exactly the same like in 2.0
                  // plugins are removed, instead transform your styles with static functions
-                 // experimentalCSSMediaQueries: this options is also removed, and enabled by default with custom parser
+                 // experimentalCSSMediaQueries: these options is also removed, and enabled by default with custom parser
                  // windowResizeDebounceTimeMs: removed, there is no debouncing anymore. Styles are updated with CSS media queries
                  // disableAnimatedInsets: removed, insets won't re-render your views
    +        }
@@ -150,8 +150,8 @@ The migration process is quite simple, but it can be tedious since you'll need t
     ```diff lang="tsx"
     - UnistylesRuntime.addPlugin(plugin) // Unistyles has no plugins anymore
     - UnistylesRuntime.removePlugin(plugin) // Unistyles has no plugins anymore
-    - UnistylesRuntime.statusBar.setColor(color) // remove due to Android 15 deprecation
-    - UnistylesRuntime.navigationBar.setColor(color) // remove due to Android 15 deprecation
+    - UnistylesRuntime.statusBar.setColor(color) // removed due to Android 15 deprecation
+    - UnistylesRuntime.navigationBar.setColor(color) // removed due to Android 15 deprecation
     ```
 
 14. `UnistylesRuntime` methods that accepted `color` and `alpha` have been changed to accept `color` only. Each method supports **any** color that is respected by React Native:

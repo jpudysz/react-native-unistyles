@@ -25,6 +25,7 @@ const KeyboardAvoidingView = () => {
 }
 
 const styles = StyleSheet.create(theme => ({
+    container: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'flex-end',
@@ -36,6 +37,10 @@ const styles = StyleSheet.create(theme => ({
                 translateY: rt.insets.ime * -1
             }
         ]
+    },
+    input: {
+        width: '100%',
+    }
 }))
 ```
 

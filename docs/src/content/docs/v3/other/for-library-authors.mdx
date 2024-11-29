@@ -9,10 +9,10 @@ Unistyles is highly extensible and can be used to build UI kits and various othe
 
 ## Using Unistyles in your library
 
-`StyleSheet.create` should be invoked as soon as possible, before the metro bundler references any `StyleSheet` from your library.
+`StyleSheet.configure` should be invoked as soon as possible, before the metro bundler references any `StyleSheet` from your library.
 
-You can then call `StyleSheet.create` multiple times to override configurations.
-However, keep in mind that `StyleSheet.create` makes a roundtrip to C++, which can add a few `ms` to your app's startup time.
+You can then call `StyleSheet.configure` multiple times to override configurations.
+However, keep in mind that `StyleSheet.configure` makes a roundtrip to C++, which can add a few `ms` to your app's startup time.
 
 To manipulate your config without replacing it, use [UnistylesRuntime](/v3/references/unistyles-runtime/).
 
