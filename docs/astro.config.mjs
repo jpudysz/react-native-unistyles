@@ -5,6 +5,9 @@ import expressiveCode from 'astro-expressive-code'
 
 // https://astro.build/config
 export default defineConfig({
+    redirects: {
+        '/': '/start/introduction/'
+    },
     integrations: [
         expressiveCode({
             theme: 'github-dark-dimmed',
@@ -28,27 +31,27 @@ export default defineConfig({
                     items: [
                         {
                             label: 'Introduction',
-                            link: '/v2/start/introduction/'
+                            link: '/start/introduction/'
                         },
                         {
                             label: 'Setup',
-                            link: '/v2/start/setup/'
+                            link: '/start/setup/'
                         },
                         {
                             label: 'Migration from 1.x',
-                            link: '/v2/start/migration-from-1/'
+                            link: '/start/migration-from-1/'
                         },
                         {
                             label: 'Basic Usage',
-                            link: '/v2/start/basic-usage/'
+                            link: '/start/basic-usage/'
                         },
                         {
                             label: 'Migration from StyleSheet',
-                            link: '/v2/start/migration-from-stylesheet/'
+                            link: '/start/migration-from-stylesheet/'
                         },
                         {
                             label: 'Benchmarks',
-                            link: '/v2/start/benchmarks/'
+                            link: '/start/benchmarks/'
                         }
                     ]
                 },
@@ -57,92 +60,92 @@ export default defineConfig({
                     items: [
                         {
                             label: 'createStyleSheet',
-                            link: '/v2/reference/create-stylesheet/'
+                            link: '/reference/create-stylesheet/'
                         },
                         {
                             label: 'useStyles',
-                            link: '/v2/reference/use-styles/'
+                            link: '/reference/use-styles/'
                         },
                         {
                             label: 'UnistylesProvider',
-                            link: '/v2/reference/unistyles-provider/',
+                            link: '/reference/unistyles-provider/',
                             badge: 'New'
                         },
                         {
                             label: 'Dynamic functions',
-                            link: '/v2/reference/dynamic-functions/'
+                            link: '/reference/dynamic-functions/'
                         },
                         {
                             label: 'Theming',
-                            link: '/v2/reference/theming/'
+                            link: '/reference/theming/'
                         },
                         {
                             label: 'Edge to edge layout',
-                            link: '/v2/reference/edge-to-edge/'
+                            link: '/reference/edge-to-edge/'
                         },
                         {
                             label: 'useInitialTheme',
-                            link: '/v2/reference/use-initial-theme/'
+                            link: '/reference/use-initial-theme/'
                         },
                         {
                             label: 'Breakpoints',
-                            link: '/v2/reference/breakpoints/'
+                            link: '/reference/breakpoints/'
                         },
                         {
                             label: 'Media queries',
-                            link: '/v2/reference/media-queries/'
+                            link: '/reference/media-queries/'
                         },
                         {
                             label: 'Variants',
-                            link: '/v2/reference/variants/'
+                            link: '/reference/variants/'
                         },
                         {
                             label: 'Compound variants',
-                            link: '/v2/reference/compound-variants/'
+                            link: '/reference/compound-variants/'
                         },
                         {
                             label: 'Dimensions',
-                            link: '/v2/reference/dimensions/'
+                            link: '/reference/dimensions/'
                         },
                         {
                             label: 'Unistyles Registry',
-                            link: '/v2/reference/unistyles-registry/'
+                            link: '/reference/unistyles-registry/'
                         },
                         {
                             label: 'Unistyles Runtime',
-                            link: '/v2/reference/unistyles-runtime/'
+                            link: '/reference/unistyles-runtime/'
                         },
                         {
                             label: 'Content size category',
-                            link: '/v2/reference/content-size-category/'
+                            link: '/reference/content-size-category/'
                         },
                         {
                             label: 'Plugins',
-                            link: '/v2/reference/plugins/'
+                            link: '/reference/plugins/'
                         },
                         {
                             label: 'Web support',
-                            link: '/v2/reference/web-support/'
+                            link: '/reference/web-support/'
                         },
                         {
                             label: 'Server side rendering',
-                            link: '/v2/reference/server-side-rendering/'
+                            link: '/reference/server-side-rendering/'
                         },
                         {
                             label: 'Debugging',
-                            link: '/v2/reference/debugging/'
+                            link: '/reference/debugging/'
                         },
                         {
                             label: 'Testing',
-                            link: '/v2/reference/testing/'
+                            link: '/reference/testing/'
                         },
                         {
                             label: 'Errors',
-                            link: '/v2/reference/errors/'
+                            link: '/reference/errors/'
                         },
                         {
                             label: 'FAQ',
-                            link: '/v2/reference/faq/'
+                            link: '/reference/faq/'
                         }
                     ]
                 },
@@ -151,7 +154,7 @@ export default defineConfig({
                     items: [
                         {
                             label: 'All examples',
-                            link: '/v2/examples/all'
+                            link: '/examples/all'
                         }
                     ]
                 },
@@ -160,11 +163,11 @@ export default defineConfig({
                     items: [
                         {
                             label: 'For library authors',
-                            link: '/v2/other/for-library-authors/'
+                            link: '/other/for-library-authors/'
                         },
                         {
                             label: 'For Sponsors',
-                            link: '/v2/other/for-sponsors/'
+                            link: 'other/for-sponsors/'
                         }
                     ]
                 },
