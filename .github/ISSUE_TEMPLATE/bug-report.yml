@@ -25,7 +25,9 @@ body:
     id: steps-to-reproduce
     attributes:
       label: Steps to reproduce
-      description: Provide a detailed list of steps that reproduce the issue.
+      description: |
+        Provide a detailed list of steps that reproduce the issue.
+        Learn more about how to diagnose Unistyles problem: https://react-native-unistyles-docs-q2ek4dspb-jacek-s-team.vercel.app/v3/other/how-to-report-bug
       placeholder: |
         1.
         2.
@@ -39,7 +41,6 @@ body:
       label: Snack or a link to a repository (optional)
       description: |
         Provide a link to the repository on GitHub that reproduces the issue.
-        Here are some tips for providing a minimal example: https://stackoverflow.com/help/mcve
       placeholder: Issues without a reproduction are likely to stale
 
   - type: input

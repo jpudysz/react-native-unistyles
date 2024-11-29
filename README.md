@@ -15,7 +15,7 @@
 ## Installation
 
 ```shell
-yarn install react-native-unistyles@next
+yarn add react-native-unistyles@next
 ```
 
 Then follow [installation guides](https://react-native-unistyles-docs-q2ek4dspb-jacek-s-team.vercel.app/v3/start/getting-started) for your platform.
@@ -40,8 +40,6 @@ Then follow [installation guides](https://react-native-unistyles-docs-q2ek4dspb-
 - and [much much more](https://react-native-unistyles-docs-q2ek4dspb-jacek-s-team.vercel.app/v3/start/new-features)!
 
 ## Sponsors
-
-[How to become a sponsor?](https://react-native-unistyles-docs-q2ek4dspb-jacek-s-team.vercel.app/v3/other/for-sponsors)
 
 <a href="https://codemask.com">
     <img src="https://avatars.githubusercontent.com/u/51229884?s=200&v=4" height="70px" width="70px" alt="codemask" />
@@ -90,6 +88,8 @@ Then follow [installation guides](https://react-native-unistyles-docs-q2ek4dspb-
 </a>
 
 ## Sponsor my work
+
+[How to become a sponsor?](https://react-native-unistyles-docs-q2ek4dspb-jacek-s-team.vercel.app/v3/other/for-sponsors)
 
 If you found the `react-native-unistyles` time-saving and valuable, please consider sponsoring my work. Your support enables me to continue creating libraries with a fresh approach.
 
