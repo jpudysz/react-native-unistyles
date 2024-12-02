@@ -153,7 +153,13 @@ function metadataToRawStyle(t, metadata, styleExpression) {
             })
         }
 
-        if (meta.members.length > 0) {
+        // this is identifier
+        if (meta.members.length === 1) {
+            return expressions.push(t.identifier(meta.members[0]))
+        }
+
+        // this is member expression
+        if (meta.members.length >= 2) {
             return expressions.push(t.memberExpression(...meta.members.map(member => t.identifier(member))))
         }
 
@@ -372,6 +378,9 @@ function handlePressable(t, path, styleAttr, metadata, state) {
 
     // add raw C++ style as prop to be bound
     path.node.openingElement.attributes.push(metadataToRawStyle(t, metadata, styleAttr.value.expression))
+
+    // to add import
+    state.file.hasAnyUnistyle = true
 
     const styleExpression = styleAttr.value.expression
 
