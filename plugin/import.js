@@ -13,11 +13,16 @@ module.exports = function addUnistylesImport(t, path, state) {
     )
 
     if (state.file.shouldIncludePressable) {
-        const rnImport = path.node.body.find(node => t.isImportDeclaration(node) && node.source.value === 'react-native')
+        path.node.body.forEach(node => {
+            // user might have multiple imports like import type, import
+            if (t.isImportDeclaration(node) && node.source.value === 'react-native') {
+                node.specifiers = node.specifiers.filter(specifier => specifier.local.name !== 'Pressable')
 
-        if (rnImport) {
-            rnImport.specifiers = rnImport.specifiers.filter(specifier => specifier.local.name !== 'Pressable')
-        }
+                if (node.specifiers.length === 0) {
+                    path.node.body.splice(path.node.body.indexOf(node), 1)
+                }
+            }
+        })
 
         const rnWebImport = path.node.body.find(node => t.isImportDeclaration(node) && node.source.value === 'react-native-web/dist/exports/Pressable')
         const unistylesImport = path.node.body.find(node => t.isImportDeclaration(node) && node.source.value === 'react-native-unistyles')
