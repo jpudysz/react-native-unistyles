@@ -16,8 +16,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup
-        run: ../actions/setup
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
 
       - name: Lint files
         run: yarn lint
