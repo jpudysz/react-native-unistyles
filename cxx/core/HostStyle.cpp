@@ -48,10 +48,12 @@ jsi::Function HostStyle::createAddVariantsProxyFunction(jsi::Runtime& rt) {
         auto parser = parser::Parser(this->_unistylesRuntime);
         auto pairs = helpers::variantsToPairs(rt, arguments[0].asObject(rt));
 
-        if (pairs == this->_variants) {
+        if (this->hasVariantsSet && pairs == this->_variants) {
             return jsi::Value::undefined();
         }
 
+        // new variants or empty variants
+        this->hasVariantsSet = true;
         this->_variants = pairs;
 
         parser.rebuildUnistylesWithVariants(rt, this->_styleSheet, this->_variants);
