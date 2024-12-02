@@ -1452,7 +1452,8 @@ pluginTester({
                 }))
             `,
             output: `
-                import { View, Pressable } from 'react-native'
+                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { View } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -1498,6 +1499,51 @@ pluginTester({
                             marginBottom: a + b
                         })
                     }),
+                    798826616
+                )
+            `
+        },
+        {
+            title: 'Should handle pressable with identifiers',
+            code: `
+                import { View, Pressable } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ containerStyles }) => {
+                    const onPressInternal = () => {}
+                    return (
+                        <View>
+                            <Pressable style={[styles.inputContainer, containerStyles]} onPress={onPressInternal} />
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    inputContainer: {}
+                })
+            `,
+            output: `
+                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { View } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ containerStyles }) => {
+                    const onPressInternal = () => {}
+                    return (
+                        <View>
+                            <Pressable
+                                style={[styles.inputContainer, containerStyles]}
+                                onPress={onPressInternal}
+                                rawStyle={[styles.inputContainer, containerStyles]}
+                            />
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    {
+                        inputContainer: {}
+                    },
                     798826616
                 )
             `
