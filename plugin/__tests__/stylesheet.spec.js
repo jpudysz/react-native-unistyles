@@ -1547,6 +1547,53 @@ pluginTester({
                     798826616
                 )
             `
+        },
+        {
+            title: 'Should swap Pressable implementation even if user has two react-native imports',
+            code: `
+                import { View } from 'react-native'
+                import { Pressable } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ containerStyles }) => {
+                    const onPressInternal = () => {}
+                    return (
+                        <View>
+                            <Pressable style={[styles.inputContainer, containerStyles]} onPress={onPressInternal} />
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    inputContainer: {}
+                })
+            `,
+            output: `
+                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { View } from 'react-native'
+
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ containerStyles }) => {
+                    const onPressInternal = () => {}
+                    return (
+                        <View>
+                            <Pressable
+                                style={[styles.inputContainer, containerStyles]}
+                                onPress={onPressInternal}
+                                rawStyle={[styles.inputContainer, containerStyles]}
+                            />
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    {
+                        inputContainer: {}
+                    },
+                    798826616
+                )
+            `
         }
     ]
 })
