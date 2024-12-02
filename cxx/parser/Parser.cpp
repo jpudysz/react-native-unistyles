@@ -317,7 +317,7 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared u
         parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), this->parseSecondLevel(rt, unistyle, valueFromBreakpoint));
     });
 
-    if (shouldParseVariants && variants.has_value() && !variants.value().empty()) {
+    if (shouldParseVariants && variants.has_value()) {
         auto propertyValueObject = style.getProperty(rt, "variants").asObject(rt);
         auto parsedVariant = this->parseVariants(rt, unistyle, propertyValueObject, variants.value());
 
