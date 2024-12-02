@@ -1,6 +1,6 @@
-import React, { useEffect, useState, type ComponentType, forwardRef, useRef, useMemo } from 'react'
+import React, { useEffect, useState, type ComponentType, forwardRef, useRef, useMemo, useReducer } from 'react'
 import type { UnistylesTheme } from '../types'
-import { UnistylesRuntime } from '../specs'
+import { UnistylesRuntime, type UnistylesMiniRuntime } from '../specs'
 import { UnistyleDependency } from '../specs/NativePlatform'
 import type { PartialBy } from '../types/common'
 import { UnistylesListener } from '../web/listener'
@@ -10,6 +10,11 @@ import { deepMergeObjects } from '../utils'
 
 const SUPPORTED_STYLE_PROPS = ['style', 'contentContainerStyle'] as const
 const ALL_DEPENDENCIES = Object.values(UnistyleDependency).filter((dependency): dependency is UnistyleDependency => typeof dependency === 'number')
+
+const getMiniRuntime = (): UnistylesMiniRuntime => {
+    // @ts-expect-error - this is hidden from TS
+    return UnistylesRuntime.miniRuntime
+}
 
 type SupportedStyleProps = typeof SUPPORTED_STYLE_PROPS[number]
 
@@ -42,10 +47,10 @@ const useShadowRegistry = (style?: Record<string, any>) => {
     return classNames
 }
 
-export const createUnistylesComponent = <TProps extends Record<string, any>, TMappings extends Partial<Omit<TProps, SupportedStyleProps>>>(Component: ComponentType<TProps>, mappings?: (theme: UnistylesTheme) => TMappings) => {
+export const createUnistylesComponent = <TProps extends Record<string, any>, TMappings extends Partial<Omit<TProps, SupportedStyleProps>>>(Component: ComponentType<TProps>, mappings?: (theme: UnistylesTheme, rt: UnistylesMiniRuntime, props: PartialBy<TProps, keyof TMappings | SupportedStyleProps>) => TMappings) => {
     return forwardRef<unknown, PartialBy<TProps, keyof TMappings | SupportedStyleProps>>((props, ref) => {
         const narrowedProps = props as PartialBy<TProps, keyof TMappings | SupportedStyleProps>
-        const [mappingsProps, setMappingsProps] = useState(mappings?.(UnistylesRuntime.getTheme()))
+        const [_, forceUpdate] = useReducer(() => ({}), {})
         const styleClassNames = useShadowRegistry(narrowedProps.style)
         const contentContainerStyleClassNames = useShadowRegistry(narrowedProps.contentContainerStyle)
 
@@ -57,14 +62,15 @@ export const createUnistylesComponent = <TProps extends Record<string, any>, TMa
                     return
                 }
 
-                return setMappingsProps(mappings(UnistylesRuntime.getTheme()))
+                forceUpdate()
             })
 
             return () => disposeMappings()
-        }, [mappingsProps, narrowedProps.style])
+        }, [narrowedProps.style])
 
+        const mappingsProps = mappings?.(UnistylesRuntime.getTheme(), getMiniRuntime(), narrowedProps) ?? {}
         const combinedProps = {
-            ...deepMergeObjects(props, (mappingsProps ?? {}) as object),
+            ...deepMergeObjects(props, mappingsProps),
             ...narrowedProps.style ? {
                 style: {
                     $$css: true,
