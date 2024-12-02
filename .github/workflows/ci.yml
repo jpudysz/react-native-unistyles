@@ -15,16 +15,15 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: oven-sh/setup-bun@v1
 
-      - name: Install
-        run: bun install
+      - name: Setup
+        run: ./.github/actions/setup
 
       - name: Lint files
-        run: bun run lint
+        run: yarn lint
 
       - name: Type check files
-        run: bun run tsc
+        run: yarn tsc
 
       - name: Run tests
-        run: bun run test
+        run: yarn test
