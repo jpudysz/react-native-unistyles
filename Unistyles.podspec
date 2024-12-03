@@ -26,7 +26,13 @@ Pod::Spec.new do |s|
     "ios/Unistyles.h"
   ]
 
-  load 'nitrogen/generated/ios/Unistyles+autolinking.rb'
+  if ENV["USE_FRAMEWORKS"]
+    s.dependency "React-Core"
+    add_dependency(s, "React-jsinspector", :framework_name => "jsinspector_modern")
+    add_dependency(s, "React-rendererconsistency", :framework_name => "React_rendererconsistency")
+  end
+
+  load "nitrogen/generated/ios/Unistyles+autolinking.rb"
   add_nitrogen_files(s)
 
   install_modules_dependencies(s)
