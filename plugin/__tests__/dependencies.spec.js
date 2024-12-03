@@ -606,5 +606,100 @@ pluginTester({
                 )
             `
         },
+        {
+            title: 'Should correctly detect dependencies from if else statements',
+            code: `
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View style={styles.container(5)}>
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: someRandomInt => {
+                        if (someRandomInt === 5) {
+                            return {
+                                backgroundColor: theme.colors.background
+                            }
+                        }
+
+                        if (someRandomInt === 10) {
+                            return {
+                                backgroundColor: theme.colors.barbie,
+                                paddingBottom: rt.insets.bottom
+                            }
+                        }
+
+                        if (someRandomInt === 15) {
+                            return {
+                                fontSize: rt.fontScale * 10
+                            }
+                        } else {
+                            return {
+                                backgroundColor: theme.colors.blood
+                            }
+                        }
+                    }
+                }))
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View
+                            style={[styles.container(5)]}
+                            ref={ref => {
+                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[5]])
+                                return () => UnistylesShadowRegistry.remove(ref)
+                            }}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    (theme, rt) => ({
+                        container: someRandomInt => {
+                            if (someRandomInt === 5) {
+                                return {
+                                    backgroundColor: theme.colors.background,
+                                    uni__dependencies: [0]
+                                }
+                            }
+
+                            if (someRandomInt === 10) {
+                                return {
+                                    backgroundColor: theme.colors.barbie,
+                                    paddingBottom: rt.insets.bottom,
+                                    uni__dependencies: [0, 9]
+                                }
+                            }
+
+                            if (someRandomInt === 15) {
+                                return {
+                                    fontSize: rt.fontScale * 10,
+                                    uni__dependencies: [11]
+                                }
+                            } else {
+                                return {
+                                    backgroundColor: theme.colors.blood,
+                                    uni__dependencies: [0]
+                                }
+                            }
+                        }
+                    }),
+                    664955283
+                )
+            `
+        },
     ]
 })

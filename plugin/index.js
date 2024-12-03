@@ -1,7 +1,7 @@
 const addUnistylesImport = require('./import')
 const { getStyleMetadata, getStyleAttribute, styleAttributeToArray, handlePressable } = require('./style')
 const { getRefProp, addRef, overrideRef, hasStringRef } = require('./ref')
-const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyle } = require('./stylesheet')
+const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyles } = require('./stylesheet')
 const { isUsingVariants, extractVariants } = require('./variants')
 
 const reactNativeComponentNames = [
@@ -174,13 +174,11 @@ module.exports = function ({ types: t }) {
                 if (t.isObjectExpression(arg)) {
                     arg.properties.forEach(property => {
                         if (t.isObjectProperty(property)) {
-                            const propertyValue = getUnistyle(t, property)
+                            const propertyValues = getUnistyles(t, property)
 
-                            if (!propertyValue) {
-                                return
-                            }
-
-                            analyzeDependencies(t, state, property.key.name, propertyValue)
+                            propertyValues.forEach(propertyValue => {
+                                analyzeDependencies(t, state, property.key.name, propertyValue)
+                            })
                         }
                     })
                 }
@@ -204,13 +202,11 @@ module.exports = function ({ types: t }) {
                     if (t.isObjectExpression(body)) {
                         body.properties.forEach(property => {
                             if (t.isObjectProperty(property)) {
-                                const propertyValue = getUnistyle(t, property)
+                                const propertyValues = getUnistyles(t, property)
 
-                                if (!propertyValue) {
-                                    return
-                                }
-
-                                analyzeDependencies(t, state, property.key.name, propertyValue, themeLocalName, miniRuntimeLocalName)
+                                propertyValues.forEach(propertyValue => {
+                                    analyzeDependencies(t, state, property.key.name, propertyValue, themeLocalName, miniRuntimeLocalName)
+                                })
                             }
                         })
                     }
