@@ -701,5 +701,62 @@ pluginTester({
                 )
             `
         },
+        {
+            title: 'Should correctly detect dependency in square brackets',
+            code: `
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View style={styles.container}>
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: {
+                        backgroundColor: theme.palette.purple[500]
+                    },
+                    container2: {
+                        paddingBottom: theme.spacing[rt.breakpoint]
+                    }
+                }))
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View
+                            style={[styles.container]}
+                            ref={ref => {
+                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
+                                return () => UnistylesShadowRegistry.remove(ref)
+                            }}
+                        >
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    (theme, rt) => ({
+                        container: {
+                            backgroundColor: theme.palette.purple[500],
+                            uni__dependencies: [0]
+                        },
+                        container2: {
+                            paddingBottom: theme.spacing[rt.breakpoint],
+                            uni__dependencies: [0, 3]
+                        }
+                    }),
+                    664955283
+                )
+            `
+        },
     ]
 })
