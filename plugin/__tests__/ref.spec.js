@@ -1520,6 +1520,63 @@ pluginTester({
                     92366683
                 )
             `
+        },
+        {
+            title: 'Should pass identifiers to ShadowRegistry',
+            code: `
+                import { useRef } from 'react'
+                import { View } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ extraStyle }) => {
+                    const ref = useRef()
+                    return (
+                        <View ref={ref} style={[styles.container, extraStyle]} />
+                    )
+                }
+
+                const styles = StyleSheet.create(theme => ({
+                    container: {
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: theme.colors.backgroundColor
+                    }
+                }))
+            `,
+            output: `
+                import { UnistylesShadowRegistry } from 'react-native-unistyles'
+                import { useRef } from 'react'
+                import { View } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ extraStyle }) => {
+                    const ref = useRef()
+                    return (
+                        <View
+                            ref={_ref => {
+                                ref.current = _ref
+                                UnistylesShadowRegistry.add(_ref, [styles.container, extraStyle], undefined, [[], []])
+                                return () => UnistylesShadowRegistry.remove(_ref)
+                            }}
+                            style={[styles.container, extraStyle]}
+                        />
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    theme => ({
+                        container: {
+                            flex: 1,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: theme.colors.backgroundColor,
+                            uni__dependencies: [0]
+                        }
+                    }),
+                    92366683
+                )
+            `
         }
     ]
 })
