@@ -168,30 +168,45 @@ function analyzeDependencies(t, state, name, unistyleObj, themeName, rtName) {
     }
 }
 
-function getUnistyle(t, property) {
+function getUnistyles(t, property) {
     const propertyValue = t.isArrowFunctionExpression(property.value)
         ? property.value.body
         : property.value
 
     if (t.isObjectExpression(propertyValue)) {
-        return propertyValue
+        return [propertyValue]
     }
 
     if (t.isBlockStatement(propertyValue)) {
-        const returnStatement = propertyValue.body
-            .find(value => t.isReturnStatement(value))
+        // here we might have single return statement
+        // or if-else statements with return statements
+        return propertyValue.body
+            .flatMap(value => {
+                if (t.isReturnStatement(value)) {
+                    return [value]
+                }
 
-        return returnStatement
-            ? returnStatement.argument
-            : null
+                if (!t.isIfStatement(value)) {
+                    return []
+                }
+
+                return [value.consequent, value.alternate]
+                    .filter(Boolean)
+                    .flatMap(value => {
+                        if (t.isBlockStatement(value)) {
+                            return value.body.filter(t.isReturnStatement)
+                        }
+                    })
+            })
+            .map(value => value.argument)
     }
 
-    return null
+    return []
 }
 
 module.exports = {
     isUnistylesStyleSheet,
     analyzeDependencies,
     addStyleSheetTag,
-    getUnistyle
+    getUnistyles
 }
