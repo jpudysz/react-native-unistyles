@@ -1,7 +1,10 @@
 function getIdentifierNameFromExpression(t, memberExpression) {
     if (t.isMemberExpression(memberExpression)) {
         if (memberExpression.computed) {
-            return getIdentifierNameFromExpression(t, memberExpression.property).flat()
+            return [
+                getIdentifierNameFromExpression(t, memberExpression.property),
+                getIdentifierNameFromExpression(t, memberExpression.object)
+            ].flat()
         }
 
         const object = memberExpression.object
@@ -14,11 +17,6 @@ function getIdentifierNameFromExpression(t, memberExpression) {
         // If the object is another MemberExpression, recursively get the identifier
         if (t.isMemberExpression(object)) {
             return getIdentifierNameFromExpression(t, object).flat()
-        }
-
-        // If the object is a computed property, it may also be an Identifier
-        if (t.isMemberExpression(object) && t.isIdentifier(object.property)) {
-            return [object.object.name]
         }
     }
 
