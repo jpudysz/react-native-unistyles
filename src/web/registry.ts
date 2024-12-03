@@ -85,7 +85,7 @@ class UnistylesRegistryBuilder {
 
             counter.add(value)
             this.stylesCounter.set(hash, counter)
-            this.applyStyles(hash, convertUnistyles(value))
+            this.applyStyles(hash, value)
 
             return { hash, existingHash: false }
         }
@@ -96,7 +96,7 @@ class UnistylesRegistryBuilder {
     }
 
     applyStyles = (hash: string, styles: Record<string, any>) => {
-        Object.entries(styles).forEach(([key, value]) => {
+        Object.entries(convertUnistyles(styles)).forEach(([key, value]) => {
             if (!this.styleTag.sheet) {
                 return
             }
