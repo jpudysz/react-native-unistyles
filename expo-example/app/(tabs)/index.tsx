@@ -1,17 +1,36 @@
 import React from 'react'
-import { StyleSheet } from 'react-native-unistyles'
-import { PressableStateCallbackType, Text, View, Pressable } from 'react-native'
+import { Text, View } from 'react-native'
+import { Variants, StyleSheet, createUnistylesElement } from 'react-native-unistyles'
+
+const UniView = createUnistylesElement(View)
+
+// Before
+// export default function HomeScreen() {
+//     styles.useVariants({
+//         variant: 'blue'
+//     })
+//     return (
+        // <View style={styles.container}>
+        //     <UniView style={styles.test}>
+        //         <Text>
+        //             Hello world
+        //         </Text>
+        //     </UniView>
+        // </View>
+//     )
+// }
 
 export default function HomeScreen() {
-    const height = 75
     return (
-        <View style={styles.container}>
-            <Pressable style={({ pressed }) => [styles.other, { height }, pressed && styles.pressable(pressed)]}>
-                <Text style={styles.text}>
-                    HomeScreen
-                </Text>
-            </Pressable>
-        </View>
+        <Variants variants={{ variant: 'blue' }}>
+            <UniView style={styles.container}>
+                <UniView style={styles.test}>
+                    <Text>
+                        Hello world
+                    </Text>
+                </UniView>
+            </UniView>
+        </Variants>
     )
 }
 
@@ -22,17 +41,19 @@ const styles = StyleSheet.create(theme => ({
         alignItems: 'center',
         backgroundColor: theme.colors.backgroundColor
     },
-    text: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: theme.colors.typography
-    },
-    other: {
-        height: 100,
+    test: {
         width: 100,
-        backgroundColor: theme.colors.aloes
-    },
-    pressable: (pressed: boolean) => ({
-        backgroundColor: pressed ? 'red' : 'blue'
-    })
-}))
+        height: 100,
+        variants: {
+            variant: {
+                red: {
+                    backgroundColor: 'red'
+                },
+                blue: {
+                    backgroundColor: 'blue'
+                }
+            }
+        }
+    }
+// @ts-ignore
+}), 100)

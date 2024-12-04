@@ -18,8 +18,6 @@ export const schemeToTheme = (scheme: ColorScheme) => {
 export type UnistyleSecrets = {
     __uni__stylesheet: StyleSheetWithSuperPowers<StyleSheet>,
     __uni__key: string,
-    __uni__refs: Set<HTMLElement>
-    __uni__variants: Record<string, any>
     __uni__args?: Array<any>
 }
 
