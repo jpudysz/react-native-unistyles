@@ -83,7 +83,7 @@ function overrideRef(t, path, refProp, metadata, state) {
     const binding = path.scope.getBinding(refProp.value.expression.name)
 
     // ref={ref}
-    if (isIdentifier && binding && t.isCallExpression(binding.path.node.init)) {
+    if (isIdentifier && binding && (t.isIdentifier(binding.path.node) || t.isCallExpression(binding.path.node.init))) {
         const userVariableName = refProp.value.expression.name
         const newRefFunction = t.arrowFunctionExpression(
             [t.identifier(uniqueRefName)],
