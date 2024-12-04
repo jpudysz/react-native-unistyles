@@ -24,4 +24,4 @@ const styles = StyleSheet.create(theme => ({
         fontWeight: 'bold',
         color: theme.colors.typography
     }
-}))
+}), 123)
