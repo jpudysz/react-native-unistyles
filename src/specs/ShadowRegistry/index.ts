@@ -6,10 +6,10 @@ type Variants = Record<string, string | boolean | undefined>
 
 interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     // Babel API
-    add(handle?: ViewHandle, styles?: Array<Unistyle>, args?: Array<Array<any>>, id?: string): void,
+    add(handle?: ViewHandle, styles?: Array<Unistyle>): void,
     remove(handle?: ViewHandle): void,
     // JSI
-    link(node: ShadowNode, styles?: Array<Unistyle>, args?: Array<Array<any>>, id?: string): void,
+    link(node: ShadowNode, styles?: Array<Unistyle>): void,
     unlink(node: ShadowNode): void,
     selectVariants(variants?: Variants): void
 }
@@ -28,7 +28,7 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
     return node
 }
 
-HybridShadowRegistry.add = (handle, styles, args, id) => {
+HybridShadowRegistry.add = (handle, styles) => {
     // virtualized nodes can be null
     if (!handle || !styles || !Array.isArray(styles)) {
         return
@@ -39,7 +39,7 @@ HybridShadowRegistry.add = (handle, styles, args, id) => {
         .filter(style => !style?.initial?.updater)
         .filter(Boolean)
 
-    HybridShadowRegistry.link(findShadowNodeForHandle(handle), filteredStyles, args ?? [], id)
+    HybridShadowRegistry.link(findShadowNodeForHandle(handle), filteredStyles)
 }
 
 HybridShadowRegistry.remove = handle => {
