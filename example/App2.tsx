@@ -1,5 +1,5 @@
 import React from "react"
-import { StyleSheet, createUnistylesElement, Variants } from 'react-native-unistyles'
+import { StyleSheet, createUnistylesElement, Variants, Pressable, getBoundArgs } from 'react-native-unistyles'
 import { Text, View } from 'react-native'
 import './unistyles'
 
@@ -17,19 +17,43 @@ export const App = () => {
             <UniView style={styles.container}>
                 <UniView style={styles.test(1)}>
                     <Text>
-                        Hello world
+                        Hello world 1
                     </Text>
                 </UniView>
                 <UniView style={styles.test(2)}>
                     <Text>
-                        Hello world
+                        Hello world 2
                     </Text>
                 </UniView>
                 <UniView style={styles.test(3)}>
                     <Text>
-                        Hello world
+                        Hello world 3
                     </Text>
                 </UniView>
+                <Pressable
+                    onPress={() => {}}
+                    style={state => getBoundArgs(styles.pressable).bind(undefined, state.pressed)}
+                >
+                    <Text>
+                        Pressable 1
+                    </Text>
+                </Pressable>
+                <Pressable
+                    onPress={() => {}}
+                    style={state => getBoundArgs(styles.pressable).bind(undefined, state.pressed)}
+                >
+                    <Text>
+                        Pressable 2
+                    </Text>
+                </Pressable>
+                <Pressable
+                    onPress={() => {}}
+                    style={state => getBoundArgs(styles.pressable).bind(undefined, state.pressed)}
+                >
+                    <Text>
+                        Pressable 3
+                    </Text>
+                </Pressable>
             </UniView>
         </Variants>
     )
@@ -63,5 +87,11 @@ const styles = StyleSheet.create(theme => ({
         paddingHorizontal: 10 * num,
         backgroundColor: theme.colors.accent,
         uni__dependencies: [0],
+    }),
+    pressable: (pressed: boolean) => ({
+        backgroundColor: pressed ? 'red' : 'blue',
+        borderWidth: 3,
+        borderColor: theme.colors.accent,
+        uni__dependencies: [1]
     })
 }), 12)

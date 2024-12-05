@@ -1,15 +1,13 @@
 import React, { forwardRef, useRef } from 'react'
-import { Pressable as NativePressableReactNative, type PressableStateCallbackType } from 'react-native'
+import { Pressable as NativePressableReactNative } from 'react-native'
 import type { PressableProps as Props, View } from 'react-native'
 import { UnistylesShadowRegistry } from '../specs'
-import { getId } from '../core'
 
 type PressableProps = Props & {
-    rawStyle?: Array<any> | ((event: PressableStateCallbackType) => Array<any>)
     variants?: Record<string, string | boolean>
 }
 
-export const Pressable = forwardRef<View, PressableProps>(({ variants, style, rawStyle, ...props }, passedRef) => {
+export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ...props }, passedRef) => {
     const storedRef = useRef<View | null>()
 
     return (
@@ -17,17 +15,6 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ra
             {...props}
             ref={ref => {
                 storedRef.current = ref
-                const styleResult = typeof style === 'function'
-                    ? style({ pressed: false })
-                    : style
-                const fnArgs = typeof styleResult === 'function'
-                    // @ts-expect-error - this is hidden from TS
-                    ? styleResult.getBoundArgs()
-                    : Array.isArray(styleResult)
-                        ? styleResult
-                            // @ts-expect-error - this is hidden from TS
-                            .map(style => typeof style === 'function' ? style.getBoundArgs() : [])
-                        : []
 
                 if (typeof passedRef === 'object' && passedRef !== null) {
                     passedRef.current = ref
@@ -36,12 +23,14 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ra
                 const returnFn = typeof passedRef === 'function'
                     ? passedRef(ref)
                     : () => {}
-                const unistyles = typeof rawStyle === 'function'
-                    ? rawStyle({ pressed: false })
-                    : (rawStyle ?? [])
+
+                const unistyles = typeof style === 'function'
+                    // @ts-expect-error - this is hidden from TS
+                    ? style({ pressed: false })()
+                    : style
 
                 // @ts-expect-error - this is hidden from TS
-                UnistylesShadowRegistry.add(ref, unistyles, variants, Array.isArray(styleResult) ? fnArgs : [fnArgs])
+                UnistylesShadowRegistry.add(ref, [unistyles])
 
                 return () => {
                     // @ts-expect-error - this is hidden from TS
@@ -53,36 +42,21 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ra
                 }
             }}
             style={state => {
-                const styleResult = typeof style === 'function'
-                    ? style(state)
-                    : style
-                const fnArgs = typeof styleResult === 'function'
+                const unistyles = typeof style === 'function'
                     // @ts-expect-error - this is hidden from TS
-                    ? styleResult.getBoundArgs()
-                    : Array.isArray(styleResult)
-                        ? styleResult
-                            // @ts-expect-error - this is hidden from TS
-                            .map(style => typeof style === 'function' ? style.getBoundArgs() : [])
-                        : []
-                const pressId = getId()
-                const unistyles = typeof rawStyle === 'function'
-                    ? rawStyle(state)
-                    : (rawStyle ?? [])
+                    ? style(state)()
+                    : style
 
                 if (storedRef.current) {
                     // @ts-expect-error - this is hidden from TS
                     UnistylesShadowRegistry.remove(storedRef.current)
                     // @ts-expect-error - this is hidden from TS
-                    UnistylesShadowRegistry.add(storedRef.current, unistyles, variants, Array.isArray(styleResult) ? fnArgs : [fnArgs], pressId)
+                    UnistylesShadowRegistry.add(storedRef.current, [unistyles])
                 }
 
-                return typeof styleResult === 'function'
-                    // @ts-expect-error - this is hidden from TS
-                    ? styleResult(pressId)
-                    : Array.isArray(styleResult)
-                        // @ts-expect-error - this is hidden from TS
-                        ? styleResult.map(style => typeof style === 'function' ? style(pressId) : style)
-                        : styleResult
+                return Array.isArray(unistyles)
+                    ? unistyles.map(style => typeof style === 'function' ? style() : style)
+                    : unistyles
             }}
         />
     )
