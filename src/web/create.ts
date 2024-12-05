@@ -22,7 +22,6 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, id?: s
         get: (target, key) => {
             if (key === 'useVariants') {
                 return (variants: Record<string, string | boolean>) => {
-                    // @ts-expect-error - This is hidden from TS
                     UnistylesShadowRegistry.selectVariants(variants)
                 }
             }

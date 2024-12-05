@@ -2,13 +2,16 @@ import { NitroModules } from 'react-native-nitro-modules'
 import type { UnistylesShadowRegistry as UnistylesShadowRegistrySpec } from './ShadowRegistry.nitro'
 import type { ShadowNode, Unistyle, ViewHandle } from './types'
 
+type Variants = Record<string, string | boolean | undefined>
+
 interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     // Babel API
-    add(handle?: ViewHandle, styles?: Array<Unistyle>, variants?: Record<string, string | boolean>, args?: Array<Array<any>>, id?: string): void,
+    add(handle?: ViewHandle, styles?: Array<Unistyle>, args?: Array<Array<any>>, id?: string): void,
     remove(handle?: ViewHandle): void,
     // JSI
-    link(node: ShadowNode, styles?: Array<Unistyle>, variants?: Record<string, string | boolean>, args?: Array<Array<any>>, id?: string): void,
-    unlink(node: ShadowNode): void
+    link(node: ShadowNode, styles?: Array<Unistyle>, args?: Array<Array<any>>, id?: string): void,
+    unlink(node: ShadowNode): void,
+    selectVariants(variants?: Variants): void
 }
 
 const HybridShadowRegistry = NitroModules.createHybridObject<ShadowRegistry>('UnistylesShadowRegistry')
@@ -25,7 +28,7 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
     return node
 }
 
-HybridShadowRegistry.add = (handle, styles, variants, args, id) => {
+HybridShadowRegistry.add = (handle, styles, args, id) => {
     // virtualized nodes can be null
     if (!handle || !styles || !Array.isArray(styles)) {
         return
@@ -36,7 +39,7 @@ HybridShadowRegistry.add = (handle, styles, variants, args, id) => {
         .filter(style => !style?.initial?.updater)
         .filter(Boolean)
 
-    HybridShadowRegistry.link(findShadowNodeForHandle(handle), filteredStyles, variants ?? {}, args ?? [], id)
+    HybridShadowRegistry.link(findShadowNodeForHandle(handle), filteredStyles, args ?? [], id)
 }
 
 HybridShadowRegistry.remove = handle => {
