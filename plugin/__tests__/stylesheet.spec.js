@@ -34,19 +34,12 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -83,19 +76,12 @@ pluginTester({
                 }))
             `,
             output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -133,19 +119,12 @@ pluginTester({
                 }))
             `,
             output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet as ST } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -184,19 +163,12 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -236,19 +208,12 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -289,19 +254,12 @@ pluginTester({
                 }))
             `,
             output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -343,19 +301,12 @@ pluginTester({
                 }))
             `,
             output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -399,19 +350,12 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -463,19 +407,12 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -533,19 +470,13 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
+                import { Pressable } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
+                        <View style={[styles.container]}>
                             <Pressable style={() => styles.pressable}>
                                 <Text>Hello world</Text>
                             </Pressable>
@@ -598,19 +529,13 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
+                import { Pressable } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
+                        <View style={[styles.container]}>
                             <Pressable style={state => (typeof styles.pressable === 'function' ? styles.pressable(state) : styles.pressable)}>
                                 <Text>Hello world</Text>
                             </Pressable>
@@ -664,19 +589,13 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
+                import { Pressable } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
+                        <View style={[styles.container]}>
                             <Pressable style={state => styles.pressable(state.pressed, 1)}>
                                 <Text>Hello world</Text>
                             </Pressable>
@@ -734,7 +653,7 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
+                import { Pressable } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -743,13 +662,7 @@ pluginTester({
                     styles.useVariants(__uni__variants)
 
                     return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], __uni__variants, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
+                        <View style={[styles.container]}>
                             <Pressable style={state => styles.pressable(state.pressed, 1)} variants={__uni__variants}>
                                 <Text>Hello world</Text>
                             </Pressable>
@@ -805,19 +718,13 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
+                import { Pressable } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
                     return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
+                        <View style={[styles.container]}>
                             <Pressable style={[styles.pressable, styles.container]}>
                                 <Text>Hello world</Text>
                             </Pressable>
@@ -870,19 +777,13 @@ pluginTester({
                 }))
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
+                import { Pressable } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = ({ height }) => {
                     return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
+                        <View style={[styles.container]}>
                             <Pressable
                                 style={({ pressed }) => [
                                     typeof styles.sectionItem === 'function' ? styles.sectionItem() : styles.sectionItem,
@@ -942,19 +843,13 @@ pluginTester({
                 }))
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
+                import { Pressable } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = ({ height }) => {
                     return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
+                        <View style={[styles.container]}>
                             <Pressable
                                 style={({ pressed }) => [
                                     typeof styles.sectionItem === 'function' ? styles.sectionItem() : styles.sectionItem,
@@ -1022,7 +917,7 @@ pluginTester({
                 }))
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
+                import { Pressable } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -1030,13 +925,7 @@ pluginTester({
                     const pressed = true
 
                     return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
+                        <View style={[styles.container]}>
                             <Pressable
                                 style={() => [
                                     typeof styles.sectionItem === 'function' ? styles.sectionItem() : styles.sectionItem,
@@ -1102,31 +991,13 @@ pluginTester({
                 }))
             `,
             output: `
-                import { UnistylesShadowRegistry } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = ({ height }) => {
                     return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
-                            <View
-                                style={[styles.sectionItem, { height }, pressed && styles.pressed, pressed ? styles.pressed : styles.notPressed]}
-                                ref={ref => {
-                                    UnistylesShadowRegistry.add(
-                                        ref,
-                                        [styles.sectionItem, { height }, pressed && styles.pressed, pressed ? styles.pressed : styles.notPressed],
-                                        undefined,
-                                        [[], [], [], []]
-                                    )
-                                    return () => UnistylesShadowRegistry.remove(ref)
-                                }}
-                            >
+                        <View style={[styles.container]}>
+                            <View style={[styles.sectionItem, { height }, pressed && styles.pressed, pressed ? styles.pressed : styles.notPressed]}>
                                 <Text>Hello world</Text>
                             </View>
                         </View>
@@ -1182,7 +1053,7 @@ pluginTester({
                 }))
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
+                import { Pressable } from 'react-native-unistyles'
                 import { View } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -1241,7 +1112,7 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
+                import { Pressable } from 'react-native-unistyles'
                 import { View } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -1283,7 +1154,7 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
+                import { Pressable } from 'react-native-unistyles'
                 import { View } from 'react-native'
 
                 import { StyleSheet } from 'react-native-unistyles'
