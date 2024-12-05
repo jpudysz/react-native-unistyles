@@ -4,8 +4,7 @@ module.exports = function addUnistylesImport(t, path, state) {
             t.importSpecifier(t.identifier('UnistylesShadowRegistry'), t.identifier('UnistylesShadowRegistry')),
             ...state.file.shouldIncludePressable
                 ? [
-                    t.importSpecifier(t.identifier('Pressable'), t.identifier('Pressable')),
-                    t.importSpecifier(t.identifier('getBoundArgs'), t.identifier('getBoundArgs'))
+                    t.importSpecifier(t.identifier('Pressable'), t.identifier('Pressable'))
                 ]
                 : []
         ].filter(Boolean),

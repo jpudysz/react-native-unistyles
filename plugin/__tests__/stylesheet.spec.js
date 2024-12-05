@@ -504,136 +504,6 @@ pluginTester({
             `
         },
         {
-            title: 'Should wrap pressable with getBoundArgs if dynamic function is already called',
-            code: `
-                import { View, Pressable, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View style={styles.container}>
-                            <Pressable style={styles.pressable(1, 2)}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top
-                        }),
-                        pressable: (arg1, arg2) => ({
-                            marginRight: arg1 + arg2
-                        })
-                    }
-                })
-            `,
-            output: `
-                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
-                import { View, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
-                            <Pressable style={() => getBoundArgs(styles.pressable).bind(undefined, 1, 2)} rawStyle={[styles.pressable]}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top,
-                            uni__dependencies: [0, 4, 9]
-                        }),
-                        pressable: (arg1, arg2) => ({
-                            marginRight: arg1 + arg2
-                        })
-                    }
-                }, 798826616)
-            `
-        },
-        {
-            title: 'Should wrap pressable with getBoundArgs if style is dynamic function wrapper in arrow function',
-            code: `
-                import { View, Pressable, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View style={styles.container}>
-                            <Pressable style={() => styles.pressable(1, 2)}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top
-                        }),
-                        pressable: (arg1, arg2) => ({
-                            marginRight: arg1 + arg2
-                        })
-                    }
-                })
-            `,
-            output: `
-                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
-                import { View, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
-                            <Pressable style={() => getBoundArgs(styles.pressable).bind(undefined, 1, 2)} rawStyle={[styles.pressable]}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top,
-                            uni__dependencies: [0, 4, 9]
-                        }),
-                        pressable: (arg1, arg2) => ({
-                            marginRight: arg1 + arg2
-                        })
-                    }
-                }, 798826616)
-            `
-        },
-        {
             title: 'Should do nothing if pressable is parameterless arrow function and style is an object',
             code: `
                 import { View, Pressable, Text } from 'react-native'
@@ -663,7 +533,7 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -676,7 +546,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable style={() => styles.pressable} rawStyle={[styles.pressable]}>
+                            <Pressable style={() => styles.pressable}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -694,136 +564,6 @@ pluginTester({
                         pressable: {
                             marginRight: arg1 + arg2
                         }
-                    }
-                }, 798826616)
-            `
-        },
-        {
-            title: 'Should pass pressable state to dynamic function and be wrapper in getBoundArgs',
-            code: `
-                import { View, Pressable, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View style={styles.container}>
-                            <Pressable style={state => styles.pressable(state)}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top
-                        }),
-                        pressable: state => ({
-                            marginRight: state.pressed ? 10 : 20
-                        })
-                    }
-                })
-            `,
-            output: `
-                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
-                import { View, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
-                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state)} rawStyle={state => [styles.pressable]}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top,
-                            uni__dependencies: [0, 4, 9]
-                        }),
-                        pressable: state => ({
-                            marginRight: state.pressed ? 10 : 20
-                        })
-                    }
-                }, 798826616)
-            `
-        },
-        {
-            title: 'Should pass all arguments to dynamic function and be wrapper in getBoundArgs',
-            code: `
-                import { View, Pressable, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View style={styles.container}>
-                            <Pressable style={state => styles.pressable(state, 1)}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top
-                        }),
-                        pressable: (state, times) => ({
-                            marginRight: state.pressed ? 10 : 20 * times
-                        })
-                    }
-                })
-            `,
-            output: `
-                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
-                import { View, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View
-                            style={[styles.container]}
-                            ref={ref => {
-                                UnistylesShadowRegistry.add(ref, [styles.container], undefined, [[]])
-                                return () => UnistylesShadowRegistry.remove(ref)
-                            }}
-                        >
-                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state, 1)} rawStyle={state => [styles.pressable]}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top,
-                            uni__dependencies: [0, 4, 9]
-                        }),
-                        pressable: (state, times) => ({
-                            marginRight: state.pressed ? 10 : 20 * times
-                        })
                     }
                 }, 798826616)
             `
@@ -858,7 +598,7 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -871,10 +611,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable
-                                style={state => (typeof styles.pressable === 'function' ? getBoundArgs(styles.pressable).bind(undefined, state) : styles.pressable)}
-                                rawStyle={[styles.pressable]}
-                            >
+                            <Pressable style={state => (typeof styles.pressable === 'function' ? styles.pressable(state) : styles.pressable)}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -927,7 +664,7 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -940,7 +677,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable style={state => getBoundArgs(styles.pressable).bind(undefined, state.pressed, 1)} rawStyle={state => [styles.pressable]}>
+                            <Pressable style={state => styles.pressable(state.pressed, 1)}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -997,7 +734,7 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -1013,11 +750,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable
-                                style={state => getBoundArgs(styles.pressable).bind(undefined, state.pressed, 1)}
-                                variants={__uni__variants}
-                                rawStyle={state => [styles.pressable]}
-                            >
+                            <Pressable style={state => styles.pressable(state.pressed, 1)} variants={__uni__variants}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -1072,7 +805,7 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -1085,7 +818,7 @@ pluginTester({
                                 return () => UnistylesShadowRegistry.remove(ref)
                             }}
                         >
-                            <Pressable style={[styles.pressable, styles.container]} rawStyle={[styles.pressable, styles.container]}>
+                            <Pressable style={[styles.pressable, styles.container]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -1137,7 +870,7 @@ pluginTester({
                 }))
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -1152,12 +885,11 @@ pluginTester({
                         >
                             <Pressable
                                 style={({ pressed }) => [
-                                    typeof styles.sectionItem === 'function' ? getBoundArgs(styles.sectionItem).bind(undefined) : styles.sectionItem,
-                                    getBoundArgs(styles.other).bind(undefined, 1),
+                                    typeof styles.sectionItem === 'function' ? styles.sectionItem() : styles.sectionItem,
+                                    styles.other(1),
                                     { height },
-                                    pressed && (typeof styles.pressed === 'function' ? getBoundArgs(styles.pressed).bind(undefined) : styles.pressed)
+                                    pressed && (typeof styles.pressed === 'function' ? styles.pressed() : styles.pressed)
                                 ]}
-                                rawStyle={({ pressed }) => [styles.sectionItem, styles.other, { height }, pressed && styles.pressed]}
                             >
                                 <Text>Hello world</Text>
                             </Pressable>
@@ -1183,7 +915,7 @@ pluginTester({
             `
         },
         {
-            title: 'Should handle nested function with getBoundArgs',
+            title: 'Should handle nested functions',
             code: `
                 import { View, Pressable, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
@@ -1210,7 +942,7 @@ pluginTester({
                 }))
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -1225,18 +957,17 @@ pluginTester({
                         >
                             <Pressable
                                 style={({ pressed }) => [
-                                    typeof styles.sectionItem === 'function' ? getBoundArgs(styles.sectionItem).bind(undefined) : styles.sectionItem,
+                                    typeof styles.sectionItem === 'function' ? styles.sectionItem() : styles.sectionItem,
                                     { height },
                                     pressed && styles.pressed(pressed),
                                     pressed
                                         ? typeof styles.pressed === 'function'
-                                            ? getBoundArgs(styles.pressed).bind(undefined)
+                                            ? styles.pressed()
                                             : styles.pressed
                                         : typeof styles.notPressed === 'function'
-                                        ? getBoundArgs(styles.notPressed).bind(undefined)
+                                        ? styles.notPressed()
                                         : styles.notPressed
                                 ]}
-                                rawStyle={({ pressed }) => [styles.sectionItem, { height }, pressed && styles.pressed, pressed ? styles.pressed : styles.notPressed]}
                             >
                                 <Text>Hello world</Text>
                             </Pressable>
@@ -1262,7 +993,7 @@ pluginTester({
             `
         },
         {
-            title: 'Should handle nested function with getBoundArgs with no arg',
+            title: 'Should handle nested function with no arg',
             code: `
                 import { View, Pressable, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
@@ -1291,7 +1022,7 @@ pluginTester({
                 }))
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -1308,18 +1039,17 @@ pluginTester({
                         >
                             <Pressable
                                 style={() => [
-                                    typeof styles.sectionItem === 'function' ? getBoundArgs(styles.sectionItem).bind(undefined) : styles.sectionItem,
+                                    typeof styles.sectionItem === 'function' ? styles.sectionItem() : styles.sectionItem,
                                     { height },
                                     pressed && styles.pressed(pressed),
                                     pressed
                                         ? typeof styles.pressed === 'function'
-                                            ? getBoundArgs(styles.pressed).bind(undefined)
+                                            ? styles.pressed()
                                             : styles.pressed
                                         : typeof styles.notPressed === 'function'
-                                        ? getBoundArgs(styles.notPressed).bind(undefined)
+                                        ? styles.notPressed()
                                         : styles.notPressed
                                 ]}
-                                rawStyle={[styles.sectionItem, { height }, pressed && styles.pressed, pressed ? styles.pressed : styles.notPressed]}
                             >
                                 <Text>Hello world</Text>
                             </Pressable>
@@ -1452,7 +1182,7 @@ pluginTester({
                 }))
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
                 import { View } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -1460,31 +1190,19 @@ pluginTester({
                     return (
                         <View>
                             <Pressable
-                                style={state =>
-                                    state.pressed
-                                        ? typeof styles.pressed === 'function'
-                                            ? getBoundArgs(styles.pressed).bind(undefined)
-                                            : styles.pressed
-                                        : { height: 20 }
-                                }
-                                rawStyle={state => [state.pressed ? styles.pressed : { height: 20 }]}
+                                style={state => (state.pressed ? (typeof styles.pressed === 'function' ? styles.pressed() : styles.pressed) : { height: 20 })}
                             />
                             <Pressable
                                 style={() => {
                                     return style.pressed
                                 }}
-                                rawStyle={[style.pressed]}
                             />
                             <Pressable
                                 style={state => {
                                     return style.pressed
                                 }}
-                                rawStyle={state => [style.pressed]}
                             />
-                            <Pressable
-                                style={state => (state.pressed ? { height: 20 } : getBoundArgs(styles.pressedFn).bind(undefined, 1, 2))}
-                                rawStyle={state => [state.pressed ? { height: 20 } : styles.pressedFn]}
-                            />
+                            <Pressable style={state => (state.pressed ? { height: 20 } : styles.pressedFn(1, 2))} />
                         </View>
                     )
                 }
@@ -1523,7 +1241,7 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
                 import { View } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -1531,11 +1249,7 @@ pluginTester({
                     const onPressInternal = () => {}
                     return (
                         <View>
-                            <Pressable
-                                style={[styles.inputContainer, containerStyles]}
-                                onPress={onPressInternal}
-                                rawStyle={[styles.inputContainer, containerStyles]}
-                            />
+                            <Pressable style={[styles.inputContainer, containerStyles]} onPress={onPressInternal} />
                         </View>
                     )
                 }
@@ -1569,7 +1283,7 @@ pluginTester({
                 })
             `,
             output: `
-                import { UnistylesShadowRegistry, Pressable, getBoundArgs } from 'react-native-unistyles'
+                import { UnistylesShadowRegistry, Pressable } from 'react-native-unistyles'
                 import { View } from 'react-native'
 
                 import { StyleSheet } from 'react-native-unistyles'
@@ -1578,11 +1292,7 @@ pluginTester({
                     const onPressInternal = () => {}
                     return (
                         <View>
-                            <Pressable
-                                style={[styles.inputContainer, containerStyles]}
-                                onPress={onPressInternal}
-                                rawStyle={[styles.inputContainer, containerStyles]}
-                            />
+                            <Pressable style={[styles.inputContainer, containerStyles]} onPress={onPressInternal} />
                         </View>
                     )
                 }
