@@ -1,6 +1,6 @@
 const addUnistylesImport = require('./import')
 const { getStyleMetadata, getStyleAttribute, styleAttributeToArray, handlePressable } = require('./style')
-const { getRefProp, addRef, overrideRef, hasStringRef } = require('./ref')
+const { hasStringRef } = require('./ref')
 const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyles } = require('./stylesheet')
 const { isUsingVariants, extractVariants } = require('./variants')
 
@@ -147,15 +147,9 @@ module.exports = function ({ types: t }) {
                 // to add import
                 state.file.hasAnyUnistyle = true
 
-                const refProp = getRefProp(t, path)
-
-                if (!refProp && hasStringRef(t, path)) {
+                if (hasStringRef(t, path)) {
                     throw new Error("Detected string based ref which is not supported by Unistyles.")
                 }
-
-                refProp
-                    ? overrideRef(t, path, refProp, metadata, state)
-                    : addRef(t, path, metadata, state)
             },
             CallExpression(path, state) {
                 if (isUsingVariants(t, path)) {

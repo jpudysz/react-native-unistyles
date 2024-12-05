@@ -1,15 +1,11 @@
 module.exports = function addUnistylesImport(t, path, state) {
-    const newImport = t.importDeclaration(
-        [
-            t.importSpecifier(t.identifier('UnistylesShadowRegistry'), t.identifier('UnistylesShadowRegistry')),
-            ...state.file.shouldIncludePressable
-                ? [
-                    t.importSpecifier(t.identifier('Pressable'), t.identifier('Pressable'))
-                ]
-                : []
-        ].filter(Boolean),
-        t.stringLiteral('react-native-unistyles')
-    )
+    const thingsToImport =  [
+        ...state.file.shouldIncludePressable
+            ? [
+                t.importSpecifier(t.identifier('Pressable'), t.identifier('Pressable'))
+            ]
+            : []
+    ].filter(Boolean)
 
     if (state.file.shouldIncludePressable) {
         path.node.body.forEach(node => {
@@ -33,6 +29,15 @@ module.exports = function addUnistylesImport(t, path, state) {
             rnWebImport.specifiers = []
         }
     }
+
+    if (thingsToImport.length === 0) {
+        return
+    }
+
+    const newImport = t.importDeclaration(
+        thingsToImport,
+        t.stringLiteral('react-native-unistyles')
+    )
 
     path.node.body.unshift(newImport)
 }
