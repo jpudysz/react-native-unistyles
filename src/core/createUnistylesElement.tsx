@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, type ViewProps } from 'react-native'
+import type { ViewProps, View } from 'react-native'
 import { UnistylesShadowRegistry } from '../specs'
 
 export const createUnistylesElement = (Component: typeof View) => React.forwardRef<View, ViewProps>((props, forwardedRef) => {
@@ -21,7 +21,7 @@ export const createUnistylesElement = (Component: typeof View) => React.forwardR
                 const forwardedRefReturnFn = passForwardedRef()
 
                 // @ts-expect-error - This is hidden from TS
-                UnistylesShadowRegistry.add(ref, [props.style])
+                UnistylesShadowRegistry.add(ref, [props.style], [[]])
 
                 return () => {
                     // @ts-expect-error - This is hidden from TS
