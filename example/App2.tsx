@@ -7,15 +7,25 @@ const UniView = createUnistylesElement(View)
 
 export const App = () => {
     styles.useVariants({
-        size: 'small'
+        size: 'medium'
     })
 
     return (
         <Variants variants={{
-            size: 'small'
+            size: 'medium'
         }}>
             <UniView style={styles.container}>
-                <UniView style={styles.test}>
+                <UniView style={styles.test(1)}>
+                    <Text>
+                        Hello world
+                    </Text>
+                </UniView>
+                <UniView style={styles.test(2)}>
+                    <Text>
+                        Hello world
+                    </Text>
+                </UniView>
+                <UniView style={styles.test(3)}>
                     <Text>
                         Hello world
                     </Text>
@@ -49,7 +59,9 @@ const styles = StyleSheet.create(theme => ({
         },
         uni__dependencies: [0, 4],
     },
-    test: {
-        backgroundColor: 'red'
-    }
+    test: (num: number) => ({
+        paddingHorizontal: 10 * num,
+        backgroundColor: theme.colors.accent,
+        uni__dependencies: [0],
+    })
 }), 12)

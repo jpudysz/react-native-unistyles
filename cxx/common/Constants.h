@@ -9,5 +9,7 @@ static const std::string STYLE_VARIANTS = "uni__variants";
 static const std::string WEB_STYLE_KEY = "_web";
 static const std::string EXOTIC_STYLE_KEY = "_exotic";
 static const std::string NAME_STYLE_KEY = "__unistyles_name";
+static const std::string SECRETS = "__uni__secrets";
+static const std::string ARGUMENTS = "__uni__args";
 
 }
