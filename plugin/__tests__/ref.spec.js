@@ -70,7 +70,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
 
                 export const Example = () => {
                     return (
@@ -111,7 +112,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { View } from 'react-native'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { Text } from 'custom-lib'
 
                 export const Example = () => {
@@ -159,8 +161,10 @@ pluginTester({
                 })
             `,
             output: `
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
                 import React from 'react'
-                import { View, Text } from 'react-native'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -213,8 +217,10 @@ pluginTester({
                 })
             `,
             output: `
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
                 import { useRef } from 'react'
-                import { View, Text } from 'react-native'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -277,8 +283,10 @@ pluginTester({
                 })
             `,
             output: `
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
                 import React from 'react'
-                import { View, Text } from 'react-native'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -346,8 +354,10 @@ pluginTester({
                 })
             `,
             output: `
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
                 import React from 'react'
-                import { View, Text } from 'react-native'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -413,8 +423,10 @@ pluginTester({
                 })
             `,
             output: `
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
                 import React from 'react'
-                import { View, Text } from 'react-native'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -474,7 +486,8 @@ pluginTester({
                 }))
             `,
             output: `
-                import { View } from 'react-native'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -525,7 +538,8 @@ pluginTester({
                 }))
             `,
             output: `
-                import { View } from 'react-native'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = ({ styles }) => {
@@ -568,7 +582,8 @@ pluginTester({
                 }))
             `,
             output: `
-                import { View } from 'react-native'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = ({ condition }) => {

@@ -16,7 +16,7 @@ pluginTester({
         {
             title: 'Should not add dependencies to StyleSheet if user is not using theme or miniRuntime',
             code: `
-            import { View, Text } from 'react-native'
+                import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -34,7 +34,9 @@ pluginTester({
                 })
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -76,7 +78,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -119,7 +123,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet as ST } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -163,7 +169,9 @@ pluginTester({
                 })
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -208,7 +216,9 @@ pluginTester({
                 })
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -254,7 +264,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -301,7 +313,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -350,7 +364,9 @@ pluginTester({
                 })
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -407,7 +423,9 @@ pluginTester({
                 })
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -470,8 +488,10 @@ pluginTester({
                 })
             `,
             output: `
-                import { Pressable } from 'react-native-unistyles'
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { Pressable } from 'react-native-unistyles/components/Pressable'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -529,8 +549,10 @@ pluginTester({
                 })
             `,
             output: `
-                import { Pressable } from 'react-native-unistyles'
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { Pressable } from 'react-native-unistyles/components/Pressable'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -589,8 +611,10 @@ pluginTester({
                 })
             `,
             output: `
-                import { Pressable } from 'react-native-unistyles'
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { Pressable } from 'react-native-unistyles/components/Pressable'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -653,8 +677,10 @@ pluginTester({
                 })
             `,
             output: `
-                import { Pressable } from 'react-native-unistyles'
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { Pressable } from 'react-native-unistyles/components/Pressable'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -718,8 +744,10 @@ pluginTester({
                 })
             `,
             output: `
-                import { Pressable } from 'react-native-unistyles'
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { Pressable } from 'react-native-unistyles/components/Pressable'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -777,8 +805,10 @@ pluginTester({
                 }))
             `,
             output: `
-                import { Pressable } from 'react-native-unistyles'
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { Pressable } from 'react-native-unistyles/components/Pressable'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = ({ height }) => {
@@ -843,8 +873,10 @@ pluginTester({
                 }))
             `,
             output: `
-                import { Pressable } from 'react-native-unistyles'
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { Pressable } from 'react-native-unistyles/components/Pressable'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = ({ height }) => {
@@ -917,8 +949,10 @@ pluginTester({
                 }))
             `,
             output: `
-                import { Pressable } from 'react-native-unistyles'
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { Pressable } from 'react-native-unistyles/components/Pressable'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = ({ height }) => {
@@ -991,7 +1025,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = ({ height }) => {
@@ -1053,8 +1089,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { Pressable } from 'react-native-unistyles'
-                import { View } from 'react-native'
+                import { Pressable } from 'react-native-unistyles/components/Pressable'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -1112,8 +1149,9 @@ pluginTester({
                 })
             `,
             output: `
-                import { Pressable } from 'react-native-unistyles'
-                import { View } from 'react-native'
+                import { Pressable } from 'react-native-unistyles/components/Pressable'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = ({ containerStyles }) => {
@@ -1154,8 +1192,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { Pressable } from 'react-native-unistyles'
-                import { View } from 'react-native'
+                import { Pressable } from 'react-native-unistyles/components/Pressable'
+                import { View } from 'react-native-unistyles/components/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -1165,6 +1203,53 @@ pluginTester({
                         <View>
                             <Pressable style={[styles.inputContainer, containerStyles]} onPress={onPressInternal} />
                         </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    {
+                        inputContainer: {}
+                    },
+                    798826616
+                )
+            `
+        },
+        {
+            title: 'Should use same local name as user name while replacing imports',
+            code: `
+                import { View as RNView } from 'react-native'
+                import { Pressable } from 'react-native'
+                import { Text as SuperText } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    const onPressInternal = () => {}
+                    return (
+                        <RNView>
+                            <Pressable style={[styles.inputContainer]} onPress={onPressInternal} />
+                            <SuperText>Hello world</SuperText>
+                        </RNView>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    inputContainer: {}
+                })
+            `,
+            output: `
+                import { Text as SuperText } from 'react-native-unistyles/components/Text'
+                import { Pressable } from 'react-native-unistyles/components/Pressable'
+                import { View as RNView } from 'react-native-unistyles/components/View'
+
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    const onPressInternal = () => {}
+                    return (
+                        <RNView>
+                            <Pressable style={[styles.inputContainer]} onPress={onPressInternal} />
+                            <SuperText>Hello world</SuperText>
+                        </RNView>
                     )
                 }
 

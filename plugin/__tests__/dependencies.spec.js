@@ -44,7 +44,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -100,7 +102,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -150,7 +154,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -258,7 +264,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -378,7 +386,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -431,7 +441,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -476,7 +488,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -524,7 +538,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -592,7 +608,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
@@ -662,7 +680,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { View, Text } from 'react-native'
+                import { Text } from 'react-native-unistyles/components/Text'
+                import { View } from 'react-native-unistyles/components/View'
+
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
