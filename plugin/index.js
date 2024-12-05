@@ -2,7 +2,7 @@ const addUnistylesImport = require('./import')
 const { getStyleMetadata, getStyleAttribute, styleAttributeToArray, handlePressable } = require('./style')
 const { hasStringRef } = require('./ref')
 const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyles } = require('./stylesheet')
-const { isUsingVariants, extractVariants } = require('./variants')
+const { isUsingVariants, extractVariants, addJSXVariants } = require('./variants')
 
 const reactNativeComponentNames = [
     'View',
@@ -204,6 +204,11 @@ module.exports = function ({ types: t }) {
                             }
                         })
                     }
+                }
+            },
+            ReturnStatement(path, state) {
+                if (state.file.hasVariants) {
+                    addJSXVariants(t, path)
                 }
             }
         }

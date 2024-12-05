@@ -681,18 +681,20 @@ pluginTester({
                 import { Pressable } from 'react-native-unistyles/components/Pressable'
                 import { View } from 'react-native-unistyles/components/View'
 
-                import { StyleSheet } from 'react-native-unistyles'
+                import { StyleSheet, Variants } from 'react-native-unistyles'
 
                 export const Example = () => {
                     const __uni__variants = {}
                     styles.useVariants(__uni__variants)
 
                     return (
-                        <View style={[styles.container]}>
-                            <Pressable style={state => styles.pressable(state.pressed, 1)} variants={__uni__variants}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
+                        <Variants variants={__uni__variants}>
+                            <View style={[styles.container]}>
+                                <Pressable style={state => styles.pressable(state.pressed, 1)} variants={__uni__variants}>
+                                    <Text>Hello world</Text>
+                                </Pressable>
+                            </View>
+                        </Variants>
                     )
                 }
 
