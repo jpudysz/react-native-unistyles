@@ -97,7 +97,7 @@ module.exports = function ({ types: t }) {
                         }
 
                         if (specifier.imported && reactNativeComponentNames.includes(specifier.imported.name)) {
-                            state.reactNativeImports[specifier.local.name] = true
+                            state.reactNativeImports[specifier.local.name] = specifier.imported.name
                         }
                     })
                 }
