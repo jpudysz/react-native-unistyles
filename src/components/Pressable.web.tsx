@@ -38,16 +38,15 @@ type UpdateStylesProps = {
     state: WebPressableState
 }
 
-const isFunctionWithBoundArgs = (fn: any): fn is Function & { getBoundArgs: Function } => {
-    return typeof fn === 'function' && 'getBoundArgs' in fn
-}
+const extractFunctionArgs = () => {
+    // todo refactor me, getBoundArgs is not available anymore
+    // return isFunctionWithBoundArgs(styleResult)
+    //     ? [styleResult.getBoundArgs()]
+    //     : Array.isArray(styleResult)
+    //         ? styleResult.map(style => isFunctionWithBoundArgs(style) ? style.getBoundArgs() : [])
+    //         : []
 
-const extractFunctionArgs = (styleResult: any) => {
-    return isFunctionWithBoundArgs(styleResult)
-        ? [styleResult.getBoundArgs()]
-        : Array.isArray(styleResult)
-            ? styleResult.map(style => isFunctionWithBoundArgs(style) ? style.getBoundArgs() : [])
-            : []
+    return []
 }
 
 const extractStyleResult = (style: any) => {
@@ -62,7 +61,7 @@ const updateStyles = ({ ref, style, variants, state }: UpdateStylesProps) => {
     const styleResult = typeof style === 'function'
         ? style(state)
         : style
-    const fnArgs = extractFunctionArgs(styleResult)
+    const fnArgs = extractFunctionArgs()
     const extractedResult = extractStyleResult(styleResult)
 
     // @ts-expect-error - this is hidden from TS

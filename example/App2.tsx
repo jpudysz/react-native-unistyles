@@ -1,5 +1,5 @@
 import React from "react"
-import { StyleSheet, createUnistylesElement, Variants, Pressable, getBoundArgs } from 'react-native-unistyles'
+import { StyleSheet, createUnistylesElement, Variants, Pressable } from 'react-native-unistyles'
 import { Text, View } from 'react-native'
 import './unistyles'
 
@@ -32,7 +32,10 @@ export const App = () => {
                 </UniView>
                 <Pressable
                     onPress={() => {}}
-                    style={state => getBoundArgs(styles.pressable).bind(undefined, state.pressed)}
+                    variants={{
+                        size: 'medium'
+                    }}
+                    style={state => [styles.pressable(state.pressed)]}
                 >
                     <Text>
                         Pressable 1
@@ -40,7 +43,10 @@ export const App = () => {
                 </Pressable>
                 <Pressable
                     onPress={() => {}}
-                    style={state => getBoundArgs(styles.pressable).bind(undefined, state.pressed)}
+                    variants={{
+                        size: 'medium'
+                    }}
+                    style={state => styles.pressable(state.pressed)}
                 >
                     <Text>
                         Pressable 2
@@ -48,7 +54,10 @@ export const App = () => {
                 </Pressable>
                 <Pressable
                     onPress={() => {}}
-                    style={state => getBoundArgs(styles.pressable).bind(undefined, state.pressed)}
+                    variants={{
+                        size: 'medium'
+                    }}
+                    style={state => styles.pressable(state.pressed)}
                 >
                     <Text>
                         Pressable 3
@@ -92,6 +101,22 @@ const styles = StyleSheet.create(theme => ({
         backgroundColor: pressed ? 'red' : 'blue',
         borderWidth: 3,
         borderColor: theme.colors.accent,
-        uni__dependencies: [1]
+        variants: {
+            size: {
+                small: {
+                    width: 100,
+                    height: 100
+                },
+                medium: {
+                    width: 200,
+                    height: 200
+                },
+                large: {
+                    width: 300,
+                    height: 300
+                }
+            }
+        },
+        uni__dependencies: [1, 4]
     })
 }), 12)

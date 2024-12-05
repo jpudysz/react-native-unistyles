@@ -372,13 +372,13 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
             style.setProperty(rt, "__proto__", generateUnistylesPrototype(rt, unistylesRuntime, unistyle, variants, helpers::functionArgumentsToArray(rt, args, count)));
 
             jsi::Object secrets = jsi::Object(rt);
-            
+
             secrets.setProperty(rt, helpers::ARGUMENTS.c_str(), helpers::functionArgumentsToArray(rt, args, count));
-            
+
             helpers::defineHiddenProperty(rt, style, helpers::SECRETS.c_str(), secrets);
-            
+
             auto wrappedUnistyle = std::make_shared<UnistyleWrapper>(unistyle);
-            
+
             style.setNativeState(rt, std::move(wrappedUnistyle));
 
             return style;
