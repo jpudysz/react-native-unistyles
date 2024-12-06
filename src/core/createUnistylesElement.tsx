@@ -21,7 +21,7 @@ export const createUnistylesElement = (Component: typeof View) => React.forwardR
                 const forwardedRefReturnFn = passForwardedRef()
 
                 // @ts-expect-error - This is hidden from TS
-                UnistylesShadowRegistry.add(ref, [props.style])
+                UnistylesShadowRegistry.add(ref, props.style)
 
                 return () => {
                     // @ts-expect-error - This is hidden from TS
