@@ -6,7 +6,7 @@ import { passForwardedRef } from './passForwardRef'
 export const createUnistylesImageBackground = (Component: typeof ImageBackground) => React.forwardRef<ImageBackground, ImageBackgroundProps>((props, forwardedRef) => (
     <Component
         {...props}
-        ref={ref => passForwardedRef(ref, forwardedRef)}
+        ref={ref => passForwardedRef(props, ref, forwardedRef)}
         imageRef={ref => {
             const style = Array.isArray(props.imageStyle)
                 ? props.imageStyle
