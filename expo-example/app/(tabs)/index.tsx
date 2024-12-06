@@ -1,36 +1,20 @@
 import React from 'react'
 import { Text, View } from 'react-native'
-import { Variants, StyleSheet, createUnistylesElement } from 'react-native-unistyles'
-
-const UniView = createUnistylesElement(View)
-
-// Before
-// export default function HomeScreen() {
-//     styles.useVariants({
-//         variant: 'blue'
-//     })
-//     return (
-        // <View style={styles.container}>
-        //     <UniView style={styles.test}>
-        //         <Text>
-        //             Hello world
-        //         </Text>
-        //     </UniView>
-        // </View>
-//     )
-// }
+import { StyleSheet } from 'react-native-unistyles'
 
 export default function HomeScreen() {
+    styles.useVariants({
+        variant: 'blue'
+    })
+
     return (
-        <Variants variants={{ variant: 'blue' }}>
-            <UniView style={styles.container}>
-                <UniView style={styles.test}>
-                    <Text>
-                        Hello world
-                    </Text>
-                </UniView>
-            </UniView>
-        </Variants>
+        <View style={styles.container}>
+            <View style={styles.test}>
+                <Text>
+                    Hello world
+                </Text>
+            </View>
+        </View>
     )
 }
 
@@ -55,5 +39,4 @@ const styles = StyleSheet.create(theme => ({
             }
         }
     }
-// @ts-ignore
-}), 100)
+}))
