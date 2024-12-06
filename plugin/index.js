@@ -5,6 +5,7 @@ const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyl
 const { isUsingVariants, extractVariants, addJSXVariants } = require('./variants')
 
 const reactNativeComponentNames = [
+    'ActivityIndicator',
     'View',
     'Text',
     'Image',
@@ -18,6 +19,7 @@ const reactNativeComponentNames = [
     'Switch',
     'Text',
     'TextInput',
+    'RefreshControl',
     'TouchableHighlight',
     'TouchableOpacity',
     'TouchableWithoutFeedback',
