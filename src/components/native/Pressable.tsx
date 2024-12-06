@@ -1,7 +1,7 @@
 import React, { forwardRef, useRef } from 'react'
 import { Pressable as NativePressableReactNative } from 'react-native'
 import type { PressableProps as Props, View } from 'react-native'
-import { UnistylesShadowRegistry } from '../specs'
+import { UnistylesShadowRegistry } from '../../specs'
 
 type PressableProps = Props & {
     variants?: Record<string, string | boolean>
