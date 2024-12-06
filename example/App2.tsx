@@ -1,9 +1,7 @@
 import React from "react"
-import { StyleSheet, createUnistylesElement, Variants, Pressable } from 'react-native-unistyles'
-import { Text, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import { Text, View, Pressable } from 'react-native'
 import './unistyles'
-
-const UniView = createUnistylesElement(View)
 
 export const App = () => {
     styles.useVariants({
@@ -11,60 +9,47 @@ export const App = () => {
     })
 
     return (
-        <Variants variants={{
-            size: 'medium'
-        }}>
-            <UniView style={styles.container}>
-                <UniView style={styles.test(1)}>
-                    <Text>
-                        Hello world 1
-                    </Text>
-                </UniView>
-                <UniView style={styles.test(2)}>
-                    <Text>
-                        Hello world 2
-                    </Text>
-                </UniView>
-                <UniView style={styles.test(3)}>
-                    <Text>
-                        Hello world 3
-                    </Text>
-                </UniView>
-                <Pressable
-                    onPress={() => {}}
-                    variants={{
-                        size: 'medium'
-                    }}
-                    style={state => [styles.pressable(state.pressed)]}
-                >
-                    <Text>
-                        Pressable 1
-                    </Text>
-                </Pressable>
-                <Pressable
-                    onPress={() => {}}
-                    variants={{
-                        size: 'medium'
-                    }}
-                    style={state => styles.pressable(state.pressed)}
-                >
-                    <Text>
-                        Pressable 2
-                    </Text>
-                </Pressable>
-                <Pressable
-                    onPress={() => {}}
-                    variants={{
-                        size: 'medium'
-                    }}
-                    style={state => styles.pressable(state.pressed)}
-                >
-                    <Text>
-                        Pressable 3
-                    </Text>
-                </Pressable>
-            </UniView>
-        </Variants>
+        <View style={styles.container}>
+            <View style={styles.test(1)}>
+                <Text>
+                    Hello world 1
+                </Text>
+            </View>
+            <View style={styles.test(2)}>
+                <Text>
+                    Hello world 2
+                </Text>
+            </View>
+            <View style={styles.test(3)}>
+                <Text>
+                    Hello world 3
+                </Text>
+            </View>
+            <Pressable
+                onPress={() => {}}
+                style={state => [styles.pressable(state.pressed)]}
+            >
+                <Text>
+                    Pressable 1
+                </Text>
+            </Pressable>
+            <Pressable
+                onPress={() => {}}
+                style={state => styles.pressable(state.pressed)}
+            >
+                <Text>
+                    Pressable 2
+                </Text>
+            </Pressable>
+            <Pressable
+                onPress={() => {}}
+                style={state => styles.pressable(state.pressed)}
+            >
+                <Text>
+                    Pressable 3
+                </Text>
+            </Pressable>
+        </View>
     )
 }
 
@@ -74,28 +59,10 @@ const styles = StyleSheet.create(theme => ({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: theme.colors.backgroundColor,
-        variants: {
-            size: {
-                small: {
-                    width: 100,
-                    height: 100
-                },
-                medium: {
-                    width: 200,
-                    height: 200
-                },
-                large: {
-                    width: 300,
-                    height: 300
-                }
-            }
-        },
-        uni__dependencies: [0, 4],
     },
     test: (num: number) => ({
         paddingHorizontal: 10 * num,
-        backgroundColor: theme.colors.accent,
-        uni__dependencies: [0],
+        backgroundColor: theme.colors.accent
     }),
     pressable: (pressed: boolean) => ({
         backgroundColor: pressed ? 'red' : 'blue',
@@ -116,7 +83,6 @@ const styles = StyleSheet.create(theme => ({
                     height: 300
                 }
             }
-        },
-        uni__dependencies: [1, 4]
+        }
     })
-}), 12)
+}))

@@ -1,2 +1,2 @@
 export { createUnistylesComponent } from './createUnistylesComponent'
-export * from './createUnistylesElement'
+export { createUnistylesElement } from './createUnistylesElement'
