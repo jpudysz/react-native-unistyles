@@ -22,7 +22,12 @@ export type ViewHandle = {
         __internalInstanceHandle?: {
             stateNode?: StateNode
         }
-    })
+    }),
+    _viewRef?: {
+        __internalInstanceHandle?: {
+            stateNode?: StateNode
+        }
+    }
 }
 
 export type Unistyle = {
