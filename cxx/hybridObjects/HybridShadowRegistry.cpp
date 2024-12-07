@@ -33,14 +33,21 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     
     // before linking we need to check if given unistyle is affected by scoped theme
     auto parser = parser::Parser(this->_unistylesRuntime);
+    auto parsedStyleSheet = jsi::Value::undefined();
     
     if (this->_scopedTheme.has_value()) {
         for (size_t i = 0; i < unistyleWrappers.size(); i++) {
             core::Unistyle::Shared& unistyle = unistyleWrappers[i];
             
+            // add small cache to not parse same stylesheet multiple times
+            if (parsedStyleSheet.isUndefined()) {
+                parsedStyleSheet = parser.getParsedStyleSheetForScopedTheme(rt, unistyle, this->_scopedTheme.value());
+            }
+            
             // if so we need to force update
             parser.rebuildUnistyleWithScopedTheme(
                 rt,
+                parsedStyleSheet,
                 unistyle,
                 this->_scopedVariants,
                 arguments[i],

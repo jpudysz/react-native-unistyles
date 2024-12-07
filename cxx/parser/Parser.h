@@ -28,7 +28,8 @@ struct Parser {
     void rebuildShadowLeafUpdates(jsi::Runtime& rt, core::DependencyMap& dependencyMap);
     folly::dynamic parseStylesToShadowTreeStyles(jsi::Runtime& rt, const std::vector<std::shared_ptr<UnistyleData>>& unistyles);
     void rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, Unistyle::Shared unistyle, const Variants& variants, std::optional<std::vector<folly::dynamic>>);
-    void rebuildUnistyleWithScopedTheme(jsi::Runtime& rt, core::Unistyle::Shared unistyle, Variants& variants, std::vector<folly::dynamic> arguments, std::string scopedTheme);
+    void rebuildUnistyleWithScopedTheme(jsi::Runtime& rt, jsi::Value& jsScopedTheme, core::Unistyle::Shared unistyle, Variants& variants, std::vector<folly::dynamic> arguments, std::string& scopedTheme);
+    jsi::Value getParsedStyleSheetForScopedTheme(jsi::Runtime& rt, core::Unistyle::Shared unistyle, std::string& scopedTheme);
 
 private:
     jsi::Object unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, std::optional<UnistylesNativeMiniRuntime>);
