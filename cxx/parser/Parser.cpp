@@ -36,6 +36,72 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
     });
 }
 
+void parser::Parser::rebuildUnistyleWithScopedTheme(jsi::Runtime& rt, core::Unistyle::Shared unistyle, Variants& variants, std::vector<folly::dynamic> arguments, std::string scopedTheme) {
+    // for static stylesheet we don't need to do anything
+    if (unistyle->parent->type == StyleSheetType::Static) {
+        return;
+    }
+    
+    auto& state = core::UnistylesRegistry::get().getState(rt);
+    auto jsTheme = state.getJSThemeByName(scopedTheme);
+
+    jsi::Object parsedStyleSheet = jsi::Object(rt);
+    
+    if (unistyle->parent->type == StyleSheetType::Themable) {
+        parsedStyleSheet = unistyle->parent->rawValue
+            .asFunction(rt)
+            .call(rt, std::move(jsTheme))
+            .asObject(rt);
+    }
+    
+    if (unistyle->parent->type == StyleSheetType::ThemableWithMiniRuntime) {
+        auto miniRuntime = this->_unistylesRuntime->getMiniRuntimeAsValue(rt, std::nullopt);
+        
+        parsedStyleSheet = unistyle->parent->rawValue
+            .asFunction(rt)
+            .call(rt, std::move(jsTheme), std::move(miniRuntime))
+            .asObject(rt);
+    }
+    
+    // get target style
+    auto targetStyle = parsedStyleSheet.getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
+    
+    // override new rawValue
+    unistyle->rawValue = std::move(targetStyle);
+
+    // for object we just need to parse it
+    if (!unistyle->rawValue.isFunction(rt)) {
+        unistyle->parsedStyle = this->parseFirstLevel(rt, unistyle, variants);
+        
+        return;
+    }
+    
+    // for function we need to update unprocessedValue and call it with memoized arguments
+    auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyle);
+    
+    // convert arguments to jsi::Value
+    std::vector<jsi::Value> args{};
+
+    args.reserve(arguments.size());
+
+    for (int i = 0; i < arguments.size(); i++) {
+        folly::dynamic& arg = arguments.at(i);
+
+        args.emplace_back(jsi::valueFromDynamic(rt, arg));
+    }
+
+    const jsi::Value *argStart = args.data();
+
+    // call cached function with memoized arguments
+    auto functionResult = unistyleFn->rawValue
+        .asFunction(rt)
+        .call(rt, argStart, arguments.size())
+        .asObject(rt);
+
+    unistyleFn->unprocessedValue = std::move(functionResult);
+    unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
+}
+
 jsi::Object parser::Parser::unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, std::optional<UnistylesNativeMiniRuntime> maybeMiniRuntime) {
     // firstly we need to get object representation of user's StyleSheet
     // StyleSheet can be a function or an object

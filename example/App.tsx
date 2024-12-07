@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import { Button, Pressable, PressableStateCallbackType, ScrollView, Text, TextInput, View } from 'react-native'
 import { Blurhash } from 'react-native-blurhash'
-import { createUnistylesComponent, StyleSheet, Display, Hide, mq } from 'react-native-unistyles'
+import { createUnistylesComponent, StyleSheet, Display, Hide, mq, ScopedTheme } from 'react-native-unistyles'
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
@@ -35,49 +35,59 @@ export const App = () => {
 
     return (
         <View style={styles.container}>
-            <Animated.View style={[styles.animated, animatedStyle]} />
-            <Typography isBold isPrimary size="large" isCentered value={1.5}>
-                Keyboard insets
-            </Typography>
-            <Display mq={mq.width(0, 400).and.height(700, 1000)}>
-                <Text style={styles.text}>
-                    👋🏼D
+            {/* <Animated.View style={[styles.animated, animatedStyle]} /> */}
+            {/* <Typography isBold isPrimary size="large" isCentered value={1.5}> */}
+            {/*     Keyboard insets */}
+            {/* </Typography> */}
+            {/* <Display mq={mq.width(0, 400).and.height(700, 1000)}> */}
+            {/*     <Text style={styles.text}> */}
+            {/*         👋🏼D */}
+            {/*     </Text> */}
+            {/* </Display> */}
+            {/* <Hide mq={mq.only.width('sm', 500)}> */}
+            {/*     <Text style={styles.text}> */}
+            {/*         👋🏼H */}
+            {/*     </Text> */}
+            {/* </Hide> */}
+            {/* <Typography isBold={false} size="small" value={2.22}> */}
+            {/*     Re-render count: {countRef.current++} */}
+            {/* </Typography> */}
+            {/* <UniScrollView */}
+            {/*     style={styles.scrollView} */}
+            {/*     contentContainerStyle={styles.contentContainerStyle} */}
+            {/* > */}
+            {/*     {Array.from({ length: 20 }).map((_, index) => ( */}
+            {/*         <View key={index}> */}
+            {/*             <Text style={{ ...index % 2 === 0 ? styles.text : {} }}>{index + 1}</Text> */}
+            {/*         </View> */}
+            {/*     ))} */}
+            {/* </UniScrollView> */}
+            {/* <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6." style={styles.blurhash}  /> */}
+            {/* <UniButton */}
+            {/*     title="Force re-render" */}
+            {/*     onPress={() => setCount(prevState =>  prevState + 1)} */}
+            {/* /> */}
+            {/* {Array.from({ length: 3}).map((_, index) => ( */}
+            {/*     <Pressable */}
+            {/*         key={index} */}
+            {/*         style={event => [styles.pressable(event, 1), { marginRight: 10 * index}]} */}
+            {/*         onPress={() => {}} */}
+            {/*     > */}
+            {/*         <Typography value={1.1}> */}
+            {/*             Pressable test {index + 1} */}
+            {/*         </Typography> */}
+            {/*     </Pressable> */}
+            {/* ))} */}
+            <ScopedTheme name='premium'>
+                <Text style={styles.scoped}>
+                    I'm scoped to premium
                 </Text>
-            </Display>
-            <Hide mq={mq.only.width('sm', 500)}>
-                <Text style={styles.text}>
-                    👋🏼H
+            </ScopedTheme>
+            <ScopedTheme name='light'>
+                <Text style={styles.scoped}>
+                    I'm scoped to light
                 </Text>
-            </Hide>
-            <Typography isBold={false} size="small" value={2.22}>
-                Re-render count: {countRef.current++}
-            </Typography>
-            <UniScrollView
-                style={styles.scrollView}
-                contentContainerStyle={styles.contentContainerStyle}
-            >
-                {Array.from({ length: 20 }).map((_, index) => (
-                    <View key={index}>
-                        <Text style={{ ...index % 2 === 0 ? styles.text : {} }}>{index + 1}</Text>
-                    </View>
-                ))}
-            </UniScrollView>
-            <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6." style={styles.blurhash}  />
-            <UniButton
-                title="Force re-render"
-                onPress={() => setCount(prevState =>  prevState + 1)}
-            />
-            {Array.from({ length: 3}).map((_, index) => (
-                <Pressable
-                    key={index}
-                    style={event => [styles.pressable(event, 1), { marginRight: 10 * index}]}
-                    onPress={() => {}}
-                >
-                    <Typography value={1.1}>
-                        Pressable test {index + 1}
-                    </Typography>
-                </Pressable>
-            ))}
+            </ScopedTheme>
             <TextInput style={styles.input} />
         </View>
     )
@@ -152,5 +162,9 @@ const styles = StyleSheet.create((theme, rt) => ({
     pressable: (event: PressableStateCallbackType, times: number) => ({
         backgroundColor: !event.pressed ? theme.colors.accent : theme.colors.backgroundColor,
         marginBottom: rt.insets.bottom * times
-    })
+    }),
+    scoped: {
+        color: theme.colors.accent,
+        backgroundColor: theme.colors.backgroundColor
+    }
 }))

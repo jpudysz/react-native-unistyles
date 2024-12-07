@@ -11,7 +11,8 @@ interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     // JSI
     link(node: ShadowNode, styles?: Array<Unistyle>): void,
     unlink(node: ShadowNode): void,
-    selectVariants(variants?: Variants): void
+    selectVariants(variants?: Variants): void,
+    setScopedTheme(themeName?: string): void,
 }
 
 const HybridShadowRegistry = NitroModules.createHybridObject<ShadowRegistry>('UnistylesShadowRegistry')

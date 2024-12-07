@@ -73,16 +73,22 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
     const ShadowNodeFamily* shadowNodeFamily,
     std::vector<core::Unistyle::Shared>& unistyles,
     Variants& variants,
-    std::vector<std::vector<folly::dynamic>>& arguments
+    std::vector<std::vector<folly::dynamic>>& arguments,
+    std::optional<std::string> scopedTheme
 ) {
     auto parser = parser::Parser(nullptr);
     shadow::ShadowLeafUpdates updates;
     
     for (size_t index = 0; index < unistyles.size(); index++) {
         Unistyle::Shared unistyle = unistyles[index];
-        std::shared_ptr<UnistyleData> unistyleData = std::make_shared<UnistyleData>(unistyle, variants, arguments[index]);
+        std::shared_ptr<UnistyleData> unistyleData = std::make_shared<UnistyleData>(unistyle, variants, arguments[index], scopedTheme);
 
         this->_shadowRegistry[&rt][shadowNodeFamily].emplace_back(unistyleData);
+        
+        // for scoped theme we should override shadow styles to take precedence over user styles
+        if (unistyle->parsedStyle.has_value()) {
+            unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
+        }
         
         updates[shadowNodeFamily] = parser.parseStylesToShadowTreeStyles(rt, {unistyleData});
     }
