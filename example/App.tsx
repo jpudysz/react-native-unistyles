@@ -35,56 +35,56 @@ export const App = () => {
 
     return (
         <View style={styles.container}>
-            {/* <Animated.View style={[styles.animated, animatedStyle]} /> */}
-            {/* <Typography isBold isPrimary size="large" isCentered value={1.5}> */}
-            {/*     Keyboard insets */}
-            {/* </Typography> */}
-            {/* <Display mq={mq.width(0, 400).and.height(700, 1000)}> */}
-            {/*     <Text style={styles.text}> */}
-            {/*         👋🏼D */}
-            {/*     </Text> */}
-            {/* </Display> */}
-            {/* <Hide mq={mq.only.width('sm', 500)}> */}
-            {/*     <Text style={styles.text}> */}
-            {/*         👋🏼H */}
-            {/*     </Text> */}
-            {/* </Hide> */}
-            {/* <Typography isBold={false} size="small" value={2.22}> */}
-            {/*     Re-render count: {countRef.current++} */}
-            {/* </Typography> */}
-            {/* <UniScrollView */}
-            {/*     style={styles.scrollView} */}
-            {/*     contentContainerStyle={styles.contentContainerStyle} */}
-            {/* > */}
-            {/*     {Array.from({ length: 20 }).map((_, index) => ( */}
-            {/*         <View key={index}> */}
-            {/*             <Text style={{ ...index % 2 === 0 ? styles.text : {} }}>{index + 1}</Text> */}
-            {/*         </View> */}
-            {/*     ))} */}
-            {/* </UniScrollView> */}
-            {/* <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6." style={styles.blurhash}  /> */}
-            {/* <UniButton */}
-            {/*     title="Force re-render" */}
-            {/*     onPress={() => setCount(prevState =>  prevState + 1)} */}
-            {/* /> */}
-            {/* {Array.from({ length: 3}).map((_, index) => ( */}
-            {/*     <Pressable */}
-            {/*         key={index} */}
-            {/*         style={event => [styles.pressable(event, 1), { marginRight: 10 * index}]} */}
-            {/*         onPress={() => {}} */}
-            {/*     > */}
-            {/*         <Typography value={1.1}> */}
-            {/*             Pressable test {index + 1} */}
-            {/*         </Typography> */}
-            {/*     </Pressable> */}
-            {/* ))} */}
+            <Animated.View style={[styles.animated, animatedStyle]} />
+            <Typography isBold isPrimary size="large" isCentered value={1.5}>
+                Keyboard insets
+            </Typography>
+            <Display mq={mq.width(0, 400).and.height(700, 1000)}>
+                <Text style={styles.text}>
+                    👋🏼D
+                </Text>
+            </Display>
+            <Hide mq={mq.only.width('sm', 500)}>
+                <Text style={styles.text}>
+                    👋🏼H
+                </Text>
+            </Hide>
+            <Typography isBold={false} size="small" value={2.22}>
+                Re-render count: {countRef.current++}
+            </Typography>
+            <UniScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.contentContainerStyle}
+            >
+                {Array.from({ length: 20 }).map((_, index) => (
+                    <View key={index}>
+                        <Text style={{ ...index % 2 === 0 ? styles.text : {} }}>{index + 1}</Text>
+                    </View>
+                ))}
+            </UniScrollView>
+            <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6." style={styles.blurhash}  />
+            <UniButton
+                title="Force re-render"
+                onPress={() => setCount(prevState =>  prevState + 1)}
+            />
+            {Array.from({ length: 3}).map((_, index) => (
+                <Pressable
+                    key={index}
+                    style={event => [styles.pressable(event, 1), { marginRight: 10 * index}]}
+                    onPress={() => {}}
+                >
+                    <Typography value={1.1}>
+                        Pressable test {index + 1}
+                    </Typography>
+                </Pressable>
+            ))}
             <ScopedTheme name='premium'>
                 <Text style={styles.scoped}>
                     I'm scoped to premium
                 </Text>
             </ScopedTheme>
             <ScopedTheme name='light'>
-                <Text style={styles.scoped}>
+                <Text style={styles.scopedFn()}>
                     I'm scoped to light
                 </Text>
             </ScopedTheme>
@@ -166,5 +166,9 @@ const styles = StyleSheet.create((theme, rt) => ({
     scoped: {
         color: theme.colors.accent,
         backgroundColor: theme.colors.backgroundColor
-    }
+    },
+    scopedFn: () => ({
+        color: theme.colors.accent,
+        backgroundColor: theme.colors.backgroundColor
+    })
 }))

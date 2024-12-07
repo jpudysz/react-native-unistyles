@@ -36,32 +36,34 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
     });
 }
 
-void parser::Parser::rebuildUnistyleWithScopedTheme(jsi::Runtime& rt, core::Unistyle::Shared unistyle, Variants& variants, std::vector<folly::dynamic> arguments, std::string scopedTheme) {
+jsi::Value parser::Parser::getParsedStyleSheetForScopedTheme(jsi::Runtime& rt, core::Unistyle::Shared unistyle, std::string& scopedTheme) {
     // for static stylesheet we don't need to do anything
     if (unistyle->parent->type == StyleSheetType::Static) {
-        return;
+        return jsi::Value::undefined();
     }
     
     auto& state = core::UnistylesRegistry::get().getState(rt);
     auto jsTheme = state.getJSThemeByName(scopedTheme);
 
-    jsi::Object parsedStyleSheet = jsi::Object(rt);
-    
     if (unistyle->parent->type == StyleSheetType::Themable) {
-        parsedStyleSheet = unistyle->parent->rawValue
+        return unistyle->parent->rawValue
             .asFunction(rt)
             .call(rt, std::move(jsTheme))
             .asObject(rt);
     }
     
-    if (unistyle->parent->type == StyleSheetType::ThemableWithMiniRuntime) {
-        auto miniRuntime = this->_unistylesRuntime->getMiniRuntimeAsValue(rt, std::nullopt);
-        
-        parsedStyleSheet = unistyle->parent->rawValue
-            .asFunction(rt)
-            .call(rt, std::move(jsTheme), std::move(miniRuntime))
-            .asObject(rt);
-    }
+    auto miniRuntime = this->_unistylesRuntime->getMiniRuntimeAsValue(rt, std::nullopt);
+    
+    return unistyle->parent->rawValue
+        .asFunction(rt)
+        .call(rt, std::move(jsTheme), std::move(miniRuntime))
+        .asObject(rt);
+}
+
+void parser::Parser::rebuildUnistyleWithScopedTheme(jsi::Runtime& rt, jsi::Value& jsScopedTheme, core::Unistyle::Shared unistyle, Variants& variants, std::vector<folly::dynamic> arguments, std::string& scopedTheme) {
+    auto parsedStyleSheet = jsScopedTheme.isUndefined()
+        ? this->getParsedStyleSheetForScopedTheme(rt, unistyle, scopedTheme).asObject(rt)
+        : jsScopedTheme.asObject(rt);
     
     // get target style
     auto targetStyle = parsedStyleSheet.getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
@@ -165,12 +167,13 @@ void parser::Parser::rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_
 
 // rebuild all unistyles that are affected by platform event
 void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, DependencyMap& dependencyMap, std::vector<std::shared_ptr<core::StyleSheet>>& styleSheets, std::optional<UnistylesNativeMiniRuntime> maybeMiniRuntime) {
-    std::unordered_map<std::shared_ptr<StyleSheet>, jsi::Value> parsedStyleSheets{};
+    std::unordered_map<std::shared_ptr<StyleSheet>, jsi::Value> parsedStyleSheetsWithDefaultTheme{};
+    std::unordered_map<std::string, std::unordered_map<std::shared_ptr<StyleSheet>, jsi::Value>> parsedStyleSheetsWithScopedTheme{};
     std::unordered_map<std::shared_ptr<core::Unistyle>, bool> parsedUnistyles{};
 
     // parse all stylesheets that depends on changes
     for (auto styleSheet : styleSheets) {
-        parsedStyleSheets.emplace(styleSheet, this->unwrapStyleSheet(rt, styleSheet, maybeMiniRuntime));
+        parsedStyleSheetsWithDefaultTheme.emplace(styleSheet, this->unwrapStyleSheet(rt, styleSheet, maybeMiniRuntime));
     }
 
     // then parse all visible Unistyles managed by Unistyle
@@ -178,8 +181,8 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
         auto styleSheet = unistyles.begin()->get()->unistyle->parent;
 
         // stylesheet may be optional for exotic unistyles
-        if (styleSheet != nullptr && !parsedStyleSheets.contains(styleSheet)) {
-            parsedStyleSheets.emplace(styleSheet, this->unwrapStyleSheet(rt, styleSheet, maybeMiniRuntime));
+        if (styleSheet != nullptr && !parsedStyleSheetsWithDefaultTheme.contains(styleSheet)) {
+            parsedStyleSheetsWithDefaultTheme.emplace(styleSheet, this->unwrapStyleSheet(rt, styleSheet, maybeMiniRuntime));
         }
 
         for (auto& unistyleData : unistyles) {
@@ -202,18 +205,63 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
             auto unistyleStyleSheet = unistyle->parent;
 
             // we may hit now other StyleSheets that are referenced from affected nodes
-            if (unistyleStyleSheet != nullptr && !parsedStyleSheets.contains(unistyleStyleSheet)) {
-                parsedStyleSheets.emplace(unistyleStyleSheet, this->unwrapStyleSheet(rt, unistyleStyleSheet, maybeMiniRuntime));
+            if (unistyleStyleSheet != nullptr && !parsedStyleSheetsWithDefaultTheme.contains(unistyleStyleSheet)) {
+                parsedStyleSheetsWithDefaultTheme.emplace(unistyleStyleSheet, this->unwrapStyleSheet(rt, unistyleStyleSheet, maybeMiniRuntime));
             }
 
             // StyleSheet might have styles that are not affected
-            if (!parsedStyleSheets[unistyleStyleSheet].asObject(rt).hasProperty(rt, unistyle->styleKey.c_str())) {
+            if (!parsedStyleSheetsWithDefaultTheme[unistyleStyleSheet].asObject(rt).hasProperty(rt, unistyle->styleKey.c_str())) {
                 continue;
             }
+            
+            // for scoped themes we need to parse unistyle exclusively
+            if (unistyleData->scopedTheme.has_value()) {
+                std::vector<folly::dynamic> arguments = {};
+                
+                if (unistyleData->dynamicFunctionMetadata.has_value()) {
+                    arguments = unistyleData->dynamicFunctionMetadata.value();
+                }
+                
+                auto parsedStyleSheet = jsi::Value::undefined();
+                auto scopedThemeName = unistyleData->scopedTheme.value();
+                
+                // check if we have theme in cache
+                if (parsedStyleSheetsWithScopedTheme.contains(scopedThemeName)) {
+                    if (parsedStyleSheetsWithScopedTheme[scopedThemeName].contains(unistyle->parent)) {
+                        parsedStyleSheet = jsi::Value(rt, parsedStyleSheetsWithScopedTheme[scopedThemeName][unistyle->parent]);
+                    }
+                }
+                
+                // if not, let's build it
+                if (parsedStyleSheet.isUndefined()) {
+                    parsedStyleSheet = this->getParsedStyleSheetForScopedTheme(rt, unistyle, unistyleData->scopedTheme.value());
+                    
+                    if (!parsedStyleSheetsWithScopedTheme.contains(scopedThemeName)) {
+                        parsedStyleSheetsWithScopedTheme.emplace(
+                            scopedThemeName,
+                            std::unordered_map<std::shared_ptr<StyleSheet>, jsi::Value>{}
+                        );
+                    }
 
-            unistyle->rawValue = parsedStyleSheets[unistyleStyleSheet].asObject(rt).getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
-            this->rebuildUnistyle(rt, unistyleStyleSheet, unistyle, unistyleData->variants, unistyleData->dynamicFunctionMetadata);
-            unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
+                    parsedStyleSheetsWithScopedTheme[scopedThemeName].emplace(
+                        unistyle->parent,
+                        jsi::Value(rt, parsedStyleSheet)
+                    );
+                }
+                
+                this->rebuildUnistyleWithScopedTheme(
+                    rt,
+                    parsedStyleSheet,
+                    unistyle,
+                    unistyleData->variants,
+                    arguments,
+                    unistyleData->scopedTheme.value()
+                );
+            } else {
+                unistyle->rawValue = parsedStyleSheetsWithDefaultTheme[unistyleStyleSheet].asObject(rt).getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
+                this->rebuildUnistyle(rt, unistyleStyleSheet, unistyle, unistyleData->variants, unistyleData->dynamicFunctionMetadata);
+                unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
+            }
 
             if (!parsedUnistyles.contains(unistyle)) {
                 parsedUnistyles.emplace(unistyle, true);
@@ -226,7 +274,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
     for (auto styleSheet : styleSheets) {
         for (auto& [_, unistyle] : styleSheet->unistyles) {
             if (!parsedUnistyles.contains(unistyle)) {
-                unistyle->rawValue = parsedStyleSheets[styleSheet].asObject(rt).getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
+                unistyle->rawValue = parsedStyleSheetsWithDefaultTheme[styleSheet].asObject(rt).getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
             }
         }
     }
