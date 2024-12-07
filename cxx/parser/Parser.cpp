@@ -60,29 +60,32 @@ jsi::Value parser::Parser::getParsedStyleSheetForScopedTheme(jsi::Runtime& rt, c
         .asObject(rt);
 }
 
-void parser::Parser::rebuildUnistyleWithScopedTheme(jsi::Runtime& rt, jsi::Value& jsScopedTheme, core::Unistyle::Shared unistyle, Variants& variants, std::vector<folly::dynamic> arguments, std::string& scopedTheme) {
+void parser::Parser::rebuildUnistyleWithScopedTheme(jsi::Runtime& rt, jsi::Value& jsScopedTheme, std::shared_ptr<core::UnistyleData> unistyleData) {
     auto parsedStyleSheet = jsScopedTheme.isUndefined()
-        ? this->getParsedStyleSheetForScopedTheme(rt, unistyle, scopedTheme).asObject(rt)
+        ? this->getParsedStyleSheetForScopedTheme(rt, unistyleData->unistyle, unistyleData->scopedTheme.value()).asObject(rt)
         : jsScopedTheme.asObject(rt);
     
     // get target style
-    auto targetStyle = parsedStyleSheet.getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
-    
-    // override new rawValue
-    unistyle->rawValue = std::move(targetStyle);
+    auto targetStyle = parsedStyleSheet.getProperty(rt, unistyleData->unistyle->styleKey.c_str()).asObject(rt);
 
     // for object we just need to parse it
-    if (!unistyle->rawValue.isFunction(rt)) {
-        unistyle->parsedStyle = this->parseFirstLevel(rt, unistyle, variants);
+    if (unistyleData->unistyle->type == UnistyleType::Object) {
+        // we need to temporarly swap rawValue to enforce correct parings
+        auto sharedRawValue = std::move(unistyleData->unistyle->rawValue);
+    
+        unistyleData->unistyle->rawValue = std::move(targetStyle);
+        unistyleData->parsedStyle = this->parseFirstLevel(rt, unistyleData->unistyle, unistyleData->variants);
+        unistyleData->unistyle->rawValue = std::move(sharedRawValue);
         
         return;
     }
     
-    // for function we need to update unprocessedValue and call it with memoized arguments
-    auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyle);
+    // for functions we need to call them with memoized arguments
+    auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyleData->unistyle);
     
     // convert arguments to jsi::Value
     std::vector<jsi::Value> args{};
+    auto arguments = unistyleData->dynamicFunctionMetadata.value();
 
     args.reserve(arguments.size());
 
@@ -93,15 +96,19 @@ void parser::Parser::rebuildUnistyleWithScopedTheme(jsi::Runtime& rt, jsi::Value
     }
 
     const jsi::Value *argStart = args.data();
+    
+    // we need to temporarly swap unprocessed value to enforce correct parings
+    auto sharedUnprocessedValue = std::move(unistyleFn->unprocessedValue);
 
     // call cached function with memoized arguments
-    auto functionResult = unistyleFn->rawValue
+    auto functionResult = targetStyle
         .asFunction(rt)
         .call(rt, argStart, arguments.size())
         .asObject(rt);
 
     unistyleFn->unprocessedValue = std::move(functionResult);
-    unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
+    unistyleData->parsedStyle = this->parseFirstLevel(rt, unistyleFn, unistyleData->variants);
+    unistyleFn->unprocessedValue = std::move(sharedUnprocessedValue);
 }
 
 jsi::Object parser::Parser::unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, std::optional<UnistylesNativeMiniRuntime> maybeMiniRuntime) {
@@ -252,10 +259,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
                 this->rebuildUnistyleWithScopedTheme(
                     rt,
                     parsedStyleSheet,
-                    unistyle,
-                    unistyleData->variants,
-                    arguments,
-                    unistyleData->scopedTheme.value()
+                    unistyleData
                 );
             } else {
                 unistyle->rawValue = parsedStyleSheetsWithDefaultTheme[unistyleStyleSheet].asObject(rt).getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);

@@ -31,15 +31,29 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
         arguments.push_back({});
     }
     
-    // before linking we need to check if given unistyle is affected by scoped theme
+    // check if scope theme exists
+    if (this->_scopedTheme.has_value()) {
+        auto themeName = this->_scopedTheme.value();
+        
+        helpers::assertThat(rt, registry.getState(rt).hasTheme(themeName), "Unistyles: You're trying to use scoped theme '" + themeName + "' but it wasn't registered.");
+    }
+    
     auto parser = parser::Parser(this->_unistylesRuntime);
     auto parsedStyleSheet = jsi::Value::undefined();
+    std::vector<std::shared_ptr<core::UnistyleData>> unistylesData{};
     
-    if (this->_scopedTheme.has_value()) {
-        for (size_t i = 0; i < unistyleWrappers.size(); i++) {
-            core::Unistyle::Shared& unistyle = unistyleWrappers[i];
-            
-            // add small cache to not parse same stylesheet multiple times
+    // create unistyleData based on wrappers
+    for (size_t i = 0; i < unistyleWrappers.size(); i++) {
+        core::Unistyle::Shared& unistyle = unistyleWrappers[i];
+        std::shared_ptr<core::UnistyleData> unistyleData = std::make_shared<core::UnistyleData>(
+            unistyle,
+            this->_scopedVariants,
+            arguments[i],
+            this->_scopedTheme
+        );
+        
+        // before linking we need to check if given unistyle is affected by scoped theme
+        if (this->_scopedTheme.has_value()) {
             if (parsedStyleSheet.isUndefined()) {
                 parsedStyleSheet = parser.getParsedStyleSheetForScopedTheme(rt, unistyle, this->_scopedTheme.value());
             }
@@ -48,23 +62,19 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
             parser.rebuildUnistyleWithScopedTheme(
                 rt,
                 parsedStyleSheet,
-                unistyle,
-                this->_scopedVariants,
-                arguments[i],
-                this->_scopedTheme.value()
+                unistyleData
             );
         }
+        
+        unistylesData.emplace_back(unistyleData);
     }
-
+    
     registry.linkShadowNodeWithUnistyle(
         rt,
         &shadowNodeWrapper->getFamily(),
-        unistyleWrappers,
-        this->_scopedVariants,
-        arguments,
-        this->_scopedTheme
+        unistylesData
     );
-
+    
     return jsi::Value::undefined();
 }
 

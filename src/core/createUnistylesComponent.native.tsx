@@ -7,6 +7,7 @@ import { deepMergeObjects } from '../utils'
 const SUPPORTED_STYLE_PROPS = ['style', 'contentContainerStyle'] as const
 type SupportedStyleProps = typeof SUPPORTED_STYLE_PROPS[number]
 
+// add support for scoped variants and themes
 export const createUnistylesComponent = <TProps extends Record<string, any>, TMappings extends Partial<Omit<TProps, SupportedStyleProps>>>(Component: ComponentType<TProps>, mappings?: (theme: UnistylesTheme) => TMappings) => {
     return forwardRef<unknown, PartialBy<TProps, keyof TMappings | SupportedStyleProps>>((props, ref) => {
         const narrowedProps = props as PartialBy<TProps, keyof TMappings | SupportedStyleProps>
