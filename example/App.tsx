@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import { Button, Pressable, PressableStateCallbackType, ScrollView, Text, TextInput, View } from 'react-native'
 import { Blurhash } from 'react-native-blurhash'
-import { createUnistylesComponent, StyleSheet, Display, Hide, mq } from 'react-native-unistyles'
+import { createUnistylesComponent, StyleSheet, Display, Hide, mq, ScopedTheme } from 'react-native-unistyles'
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
@@ -78,6 +78,16 @@ export const App = () => {
                     </Typography>
                 </Pressable>
             ))}
+            <ScopedTheme name='premium'>
+                <Text style={styles.scoped}>
+                    I'm scoped to premium
+                </Text>
+            </ScopedTheme>
+            <ScopedTheme name='light'>
+                <Text style={styles.scopedFn()}>
+                    I'm scoped to light
+                </Text>
+            </ScopedTheme>
             <TextInput style={styles.input} />
         </View>
     )
@@ -152,5 +162,13 @@ const styles = StyleSheet.create((theme, rt) => ({
     pressable: (event: PressableStateCallbackType, times: number) => ({
         backgroundColor: !event.pressed ? theme.colors.accent : theme.colors.backgroundColor,
         marginBottom: rt.insets.bottom * times
+    }),
+    scoped: {
+        color: theme.colors.accent,
+        backgroundColor: theme.colors.backgroundColor
+    },
+    scopedFn: () => ({
+        color: theme.colors.accent,
+        backgroundColor: theme.colors.backgroundColor
     })
 }))

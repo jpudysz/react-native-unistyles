@@ -64,8 +64,8 @@ jni::local_ref<BindingsInstallerHolder::javaobject> UnistylesModule::getBindings
         HybridObjectRegistry::registerHybridObjectConstructor("UnistylesStyleSheet", [styleSheet]() -> std::shared_ptr<HybridObject>{
             return styleSheet;
         });
-        HybridObjectRegistry::registerHybridObjectConstructor("UnistylesShadowRegistry", []() -> std::shared_ptr<HybridObject>{
-            return std::make_shared<HybridShadowRegistry>();
+        HybridObjectRegistry::registerHybridObjectConstructor("UnistylesShadowRegistry", [unistylesRuntime]() -> std::shared_ptr<HybridObject>{
+            return std::make_shared<HybridShadowRegistry>(unistylesRuntime);
         });
     });
 }
