@@ -27,6 +27,18 @@ export type ViewHandle = {
         __internalInstanceHandle?: {
             stateNode?: StateNode
         }
+    },
+    viewRef?: {
+        current?: {
+            __internalInstanceHandle?: {
+                stateNode?: StateNode
+            }
+        }
+    },
+    _nativeRef?: {
+        __internalInstanceHandle?: {
+            stateNode?: StateNode
+        }
     }
 }
 

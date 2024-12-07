@@ -21,6 +21,8 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
         ?? handle?.getScrollResponder?.()?.getNativeScrollRef?.()?.__internalInstanceHandle?.stateNode?.node
         ?? handle?.getNativeScrollRef?.()?.__internalInstanceHandle?.stateNode?.node
         ?? handle?._viewRef?.__internalInstanceHandle?.stateNode?.node
+        ?? handle?.viewRef?.current?.__internalInstanceHandle?.stateNode?.node
+        ?? handle?._nativeRef?.__internalInstanceHandle?.stateNode?.node
 
     if (!node) {
         throw new Error(`Unistyles: Could not find shadow node for one of your components of type ${handle?.__internalInstanceHandle?.elementType ?? 'unknown'}`)
