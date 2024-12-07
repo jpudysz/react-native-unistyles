@@ -12,6 +12,11 @@ buildscript {
     }
 }
 
+def reactNativeArchitectures() {
+    def value = rootProject.getProperties().get("reactNativeArchitectures")
+    return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
+}
+
 apply plugin: 'com.android.library'
 apply plugin: 'org.jetbrains.kotlin.android'
 apply from: '../nitrogen/generated/android/unistyles+autolinking.gradle'
@@ -41,6 +46,7 @@ android {
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_STL=c++_shared"
+                abiFilters (*reactNativeArchitectures())
             }
         }
     }
