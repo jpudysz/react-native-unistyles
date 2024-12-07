@@ -21,7 +21,7 @@ const useShadowRegistry = (style?: Record<string, any>) => {
             return []
         }
 
-        const newClassNames = UnistylesShadowRegistry.add(ref, [style], undefined, []) ?? []
+        const newClassNames = UnistylesShadowRegistry.add(ref, [style]) ?? []
 
         if (equal(oldClassNames.current, newClassNames)) {
             return oldClassNames.current
@@ -35,7 +35,7 @@ const useShadowRegistry = (style?: Record<string, any>) => {
     useEffect(() => () => {
         // Remove styles on unmount
         if (style) {
-            UnistylesShadowRegistry.add(null, [style], undefined, [])
+            UnistylesShadowRegistry.add(null, [style])
         }
     })
 

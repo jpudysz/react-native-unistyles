@@ -19,6 +19,10 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
                             const jsi::Value& thisValue,
                             const jsi::Value* args,
                             size_t count);
+    jsi::Value selectVariants(jsi::Runtime& rt,
+                            const jsi::Value& thisValue,
+                            const jsi::Value* args,
+                            size_t count);
 
     void loadHybridMethods() override {
         HybridUnistylesShadowRegistrySpec::loadHybridMethods();
@@ -26,8 +30,12 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
         registerHybrids(this, [](Prototype& prototype) {
             prototype.registerRawHybridMethod("link", 2, &HybridShadowRegistry::link);
             prototype.registerRawHybridMethod("unlink", 2, &HybridShadowRegistry::unlink);
+            prototype.registerRawHybridMethod("selectVariants", 2, &HybridShadowRegistry::selectVariants);
         });
     };
+    
+private:
+    core::Variants _scopedVariants{};
 };
 
 }

@@ -2,7 +2,7 @@ import type { UnistylesValues } from '../types'
 import { UnistylesListener } from './listener'
 import { UnistylesRegistry } from './registry'
 import { deepMergeObjects } from '../utils'
-import { equal, extractSecrets, extractUnistyleDependencies, isInDocument, keyInObject } from './utils'
+import { equal, extractSecrets, extractUnistyleDependencies, keyInObject } from './utils'
 import { getVariants } from './variants'
 
 type Style = UnistylesValues | ((...args: Array<any>) => UnistylesValues)
@@ -19,8 +19,9 @@ class UnistylesShadowRegistryBuilder {
     private resultsMap = new Map<HTMLElement, UnistylesValues>()
     private hashMap = new Map<HTMLElement, string>()
     private classNamesMap = new Map<HTMLElement, Array<string>>()
+    private selectedVariants = new Map<string, string | boolean>()
 
-    add = (ref: any, styles: Array<Style>, _variants: Record<string, any> | undefined, _args: Array<Array<any>>) => {
+    add = (ref: any, styles: Array<Style>) => {
         // Styles are not provided
         if (!styles) {
             return
@@ -28,24 +29,6 @@ class UnistylesShadowRegistryBuilder {
 
         // Ref is unmounted, remove style tags from the document
         if (ref === null) {
-            const secrets = extractSecrets(styles)
-
-            if (secrets) {
-                secrets.__uni__refs.forEach(ref => {
-                    if (isInDocument(ref)) {
-                        return
-                    }
-
-                    const oldResult = this.resultsMap.get(ref)
-                    this.resultsMap.delete(ref)
-                    this.classNamesMap.delete(ref)
-
-                    if (oldResult) {
-                        UnistylesRegistry.remove(oldResult)
-                    }
-                })
-            }
-
             return
         }
 
@@ -55,7 +38,7 @@ class UnistylesShadowRegistryBuilder {
         }
 
         const getParsedStyles = () => {
-            return styles.flat().flatMap((unistyleStyle, styleIndex) => {
+            return styles.flat().flatMap(unistyleStyle => {
                 if (!unistyleStyle) {
                     return []
                 }
@@ -74,11 +57,11 @@ class UnistylesShadowRegistryBuilder {
                     return unistyleStyle as UnistylesValues
                 }
 
-                const { __uni__key, __uni__stylesheet, __uni__variants, __uni__args = [], __uni__refs } = secrets
+                const { __uni__key, __uni__stylesheet, __uni__args = [] } = secrets
                     const newComputedStylesheet = UnistylesRegistry.getComputedStylesheet(__uni__stylesheet)
                     const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
-                    const variants = _variants && Object.keys(_variants).length > 0 ? _variants : __uni__variants
-                    const args = _args[styleIndex] && _args[styleIndex].length > 0 ? _args[styleIndex] : __uni__args
+                    const variants = Object.fromEntries(this.selectedVariants.entries())
+                    const args = __uni__args
                     const result = typeof style === 'function'
                         ? style(...args)
                         : style
@@ -90,8 +73,6 @@ class UnistylesShadowRegistryBuilder {
                         // Add dependencies from dynamic styles to stylesheet
                         UnistylesRegistry.addDependenciesToStylesheet(__uni__stylesheet, dependencies)
                     }
-
-                    __uni__refs.add(ref)
 
                     return resultWithVariants as UnistylesValues
             })
@@ -145,6 +126,18 @@ class UnistylesShadowRegistryBuilder {
         }
 
         return newClassNames
+    }
+
+    selectVariants = (variants?: Record<string, string | boolean>) => {
+        if (!variants) {
+            this.selectedVariants.clear()
+
+            return
+        }
+
+        Object.entries(variants).forEach(([key, value]) => {
+            this.selectedVariants.set(key, value)
+        })
     }
 
     remove = () => {}

@@ -73,29 +73,18 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
     const ShadowNodeFamily* shadowNodeFamily,
     std::vector<core::Unistyle::Shared>& unistyles,
     Variants& variants,
-    std::vector<std::vector<folly::dynamic>>& arguments,
-    std::optional<std::string> uniquePressableId
+    std::vector<std::vector<folly::dynamic>>& arguments
 ) {
     auto parser = parser::Parser(nullptr);
     shadow::ShadowLeafUpdates updates;
     
     for (size_t index = 0; index < unistyles.size(); index++) {
         Unistyle::Shared unistyle = unistyles[index];
+        std::shared_ptr<UnistyleData> unistyleData = std::make_shared<UnistyleData>(unistyle, variants, arguments[index]);
 
-        this->_shadowRegistry[&rt][shadowNodeFamily]
-            .emplace_back(std::make_shared<UnistyleData>(unistyle, variants, arguments[index], uniquePressableId));
-
-        // add or update node for shadow leaf updates
-        // dynamic functions are parsed later
-        if (unistyle->type == UnistyleType::Object) {
-            for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
-                for (const auto& unistyleData : unistyles) {
-                    if (unistyleData->unistyle == unistyle && family == shadowNodeFamily) {
-                        updates[family] = parser.parseStylesToShadowTreeStyles(rt, {unistyleData});
-                    }
-                }
-            }
-        }
+        this->_shadowRegistry[&rt][shadowNodeFamily].emplace_back(unistyleData);
+        
+        updates[shadowNodeFamily] = parser.parseStylesToShadowTreeStyles(rt, {unistyleData});
     }
 
     this->trafficController.setUpdates(updates);
@@ -160,13 +149,6 @@ void core::UnistylesRegistry::shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Uni
     for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
         for (const auto& unistyleData : unistyles) {
             if (unistyleData->unistyle == unistyle) {
-                // special case for pressable
-                if (pressableId.has_value() && unistyleData->pressableId.has_value()) {
-                    if (pressableId.value() == unistyleData->pressableId.value()) {
-                        unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
-                    }
-                }
-                
                 updates[family] = parser.parseStylesToShadowTreeStyles(rt, { unistyleData });
             }
         }

@@ -1,3 +1,3 @@
 export { createUnistylesComponent } from './createUnistylesComponent'
-export { getBoundArgs } from './getBoundArgs'
-export { getId } from './getId'
+export { createUnistylesElement } from './createUnistylesElement'
+export { createUnistylesImageBackground } from './createUnistylesImageBackground'

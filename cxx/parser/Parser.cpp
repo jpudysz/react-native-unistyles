@@ -371,13 +371,15 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
             // include dependencies for createUnistylesComponent
             style.setProperty(rt, "__proto__", generateUnistylesPrototype(rt, unistylesRuntime, unistyle, variants, helpers::functionArgumentsToArray(rt, args, count)));
 
-            // update shadow leaf updates to indicate newest changes
-            auto& registry = core::UnistylesRegistry::get();
-            auto lastArg = count == 0
-                ? jsi::Value::undefined()
-                : jsi::Value(rt, args[count - 1]);
+            jsi::Object secrets = jsi::Object(rt);
 
-            registry.shadowLeafUpdateFromUnistyle(rt, unistyle, lastArg);
+            secrets.setProperty(rt, helpers::ARGUMENTS.c_str(), helpers::functionArgumentsToArray(rt, args, count));
+
+            helpers::defineHiddenProperty(rt, style, helpers::SECRETS.c_str(), secrets);
+
+            auto wrappedUnistyle = std::make_shared<UnistyleWrapper>(unistyle);
+
+            style.setNativeState(rt, std::move(wrappedUnistyle));
 
             return style;
     });

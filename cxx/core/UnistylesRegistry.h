@@ -37,7 +37,7 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     UnistylesState& getState(jsi::Runtime& rt);
     void createState(jsi::Runtime& rt);
     std::vector<std::shared_ptr<core::StyleSheet>> getStyleSheetsToRefresh(jsi::Runtime& rt, std::vector<UnistyleDependency>& unistylesDependencies);
-    void linkShadowNodeWithUnistyle(jsi::Runtime& rt, const ShadowNodeFamily*, std::vector<core::Unistyle::Shared>& unistyles, Variants& variants, std::vector<std::vector<folly::dynamic>>&, std::optional<std::string> uniquePressableId);
+    void linkShadowNodeWithUnistyle(jsi::Runtime& rt, const ShadowNodeFamily*, std::vector<core::Unistyle::Shared>& unistyles, Variants& variants, std::vector<std::vector<folly::dynamic>>&);
     void unlinkShadowNodeWithUnistyles(jsi::Runtime& rt, const ShadowNodeFamily*);
     std::shared_ptr<core::StyleSheet> addStyleSheet(jsi::Runtime& rt, int tag, core::StyleSheetType type, jsi::Object&& rawValue);
     DependencyMap buildDependencyMap(jsi::Runtime& rt, std::vector<UnistyleDependency>& deps);
