@@ -1,4 +1,4 @@
-const addUnistylesImport = require('./import')
+const { addUnistylesImport, isInsideNodeModules } = require('./import')
 const { getStyleMetadata, getStyleAttribute, styleAttributeToArray, handlePressable } = require('./style')
 const { hasStringRef } = require('./ref')
 const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyles } = require('./stylesheet')
@@ -32,6 +32,10 @@ module.exports = function ({ types: t }) {
         visitor: {
             Program: {
                 enter(path, state) {
+                    if (isInsideNodeModules(state)) {
+                        return
+                    }
+
                     state.file.hasAnyUnistyle = false
                     state.file.hasUnistylesImport = false
                     state.file.shouldIncludePressable = false
@@ -67,6 +71,10 @@ module.exports = function ({ types: t }) {
                 }
             },
             VariableDeclaration(path, state) {
+                if (isInsideNodeModules(state)) {
+                    return
+                }
+
                 path.node.declarations.forEach((declaration) => {
                     if (t.isArrowFunctionExpression(declaration.init) || t.isFunctionExpression(declaration.init)) {
                         const componentName = declaration.id
@@ -80,6 +88,10 @@ module.exports = function ({ types: t }) {
                 })
             },
             ImportDeclaration(path, state) {
+                if (isInsideNodeModules(state)) {
+                    return
+                }
+
                 const importSource = path.node.source.value
 
                 if (importSource.includes('react-native-unistyles')) {
@@ -109,6 +121,10 @@ module.exports = function ({ types: t }) {
                 }
             },
             JSXElement(path, state) {
+                if (isInsideNodeModules(state)) {
+                    return
+                }
+
                 if (state.file.isClassComponent) {
                     return
                 }
@@ -154,6 +170,10 @@ module.exports = function ({ types: t }) {
                 }
             },
             CallExpression(path, state) {
+                if (isInsideNodeModules(state)) {
+                    return
+                }
+
                 if (isUsingVariants(t, path)) {
                     extractVariants(t, path, state)
                 }
