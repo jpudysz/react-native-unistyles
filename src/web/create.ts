@@ -1,7 +1,11 @@
 import type { StyleSheetWithSuperPowers, StyleSheet } from '../types/stylesheet'
-import { assignSecrets, error, keyInObject } from './utils'
+import { assignSecrets, error, removeInlineStyles } from './utils'
 import { UnistylesRuntime } from './runtime'
 import { UnistylesShadowRegistry } from '../specs'
+
+const useVariants = ['useVariants', (variants: Record<string, string | boolean>) => {
+    UnistylesShadowRegistry.selectVariants(variants)
+}]
 
 export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, id?: string) => {
     if (!id) {
@@ -16,35 +20,20 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, id?: s
         __uni__key: key,
         __uni__stylesheet: stylesheet,
         __uni__args: args,
+        __uni__refs: new Set()
     })
 
-    return new Proxy(computedStylesheet, {
-        get: (target, key) => {
-            if (key === 'useVariants') {
-                return (variants: Record<string, string | boolean>) => {
-                    UnistylesShadowRegistry.selectVariants(variants)
-                }
-            }
+    const styleSheetStyles = Object.entries(computedStylesheet).map(([key, value]) => {
+        if (typeof value === 'function') {
+            return [key, (...args: Array<any>) => {
+                const result = removeInlineStyles(value(...args))
 
-            if (!keyInObject(target, key)) {
-                return undefined
-            }
-
-            const value = target[key]
-
-            if (typeof value === 'function') {
-                const dynamicStyle = (...args: Array<any>) => {
-                    const result = value(...args)
-
-                    return addSecrets(result, key, args)
-                }
-
-                return dynamicStyle
-            }
-
-            const clonedValue = { ...value }
-
-            return addSecrets(clonedValue, key)
+                return addSecrets(result, key, args)
+            }]
         }
+
+        return [key, addSecrets(removeInlineStyles(value), key)]
     })
+
+    return Object.fromEntries(styleSheetStyles.concat([useVariants]))
 }
