@@ -1,4 +1,4 @@
-module.exports = function addUnistylesImport(t, path, state) {
+function addUnistylesImport(t, path, state) {
     const localNames = Object.keys(state.reactNativeImports)
     const names = Object.values(state.reactNativeImports)
     const pairs = Object.entries(state.reactNativeImports)
@@ -58,4 +58,11 @@ module.exports = function addUnistylesImport(t, path, state) {
 
     // cleanup
     nodesToRemove.forEach(node => path.node.body.splice(path.node.body.indexOf(node), 1))
+}
+
+const isInsideNodeModules = state => state.file.opts.filename.includes('node_modules')
+
+module.exports = {
+    isInsideNodeModules,
+    addUnistylesImport
 }
