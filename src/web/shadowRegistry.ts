@@ -1,8 +1,8 @@
-import type { UnistylesValues } from '../types'
+import type { UnistylesTheme, UnistylesValues } from '../types'
 import { UnistylesListener } from './listener'
 import { UnistylesRegistry } from './registry'
 import { deepMergeObjects } from '../utils'
-import { equal, extractSecrets, extractUnistyleDependencies, keyInObject } from './utils'
+import { equal, extractSecrets, extractUnistyleDependencies, isInDocument, keyInObject } from './utils'
 import { getVariants } from './variants'
 
 type Style = UnistylesValues | ((...args: Array<any>) => UnistylesValues)
@@ -20,6 +20,7 @@ class UnistylesShadowRegistryBuilder {
     private hashMap = new Map<HTMLElement, string>()
     private classNamesMap = new Map<HTMLElement, Array<string>>()
     private selectedVariants = new Map<string, string | boolean>()
+    private scopedTheme: UnistylesTheme | undefined = undefined
 
     add = (ref: any, styles: Array<Style>) => {
         // Styles are not provided
@@ -27,8 +28,25 @@ class UnistylesShadowRegistryBuilder {
             return
         }
 
-        // Ref is unmounted, remove style tags from the document
+        // Ref is unmounted
         if (ref === null) {
+            styles.flat().forEach(style => {
+                extractSecrets(style)?.__uni__refs.forEach(ref => {
+                    if (isInDocument(ref)) {
+                        return
+                    }
+
+                    const oldResult = this.resultsMap.get(ref)
+
+                    this.resultsMap.delete(ref)
+                    this.classNamesMap.delete(ref)
+
+                    if (oldResult) {
+                        UnistylesRegistry.remove(oldResult)
+                    }
+                })
+            })
+
             return
         }
 
@@ -57,8 +75,8 @@ class UnistylesShadowRegistryBuilder {
                     return unistyleStyle as UnistylesValues
                 }
 
-                const { __uni__key, __uni__stylesheet, __uni__args = [] } = secrets
-                    const newComputedStylesheet = UnistylesRegistry.getComputedStylesheet(__uni__stylesheet)
+                const { __uni__key, __uni__stylesheet, __uni__args = [], __uni__refs } = secrets
+                    const newComputedStylesheet = UnistylesRegistry.getComputedStylesheet(__uni__stylesheet, scopedTheme)
                     const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
                     const variants = Object.fromEntries(this.selectedVariants.entries())
                     const args = __uni__args
@@ -74,9 +92,14 @@ class UnistylesShadowRegistryBuilder {
                         UnistylesRegistry.addDependenciesToStylesheet(__uni__stylesheet, dependencies)
                     }
 
+                    __uni__refs.add(ref)
+
                     return resultWithVariants as UnistylesValues
             })
         }
+
+        // Copy scoped theme to not use referenced value
+        const scopedTheme = this.scopedTheme
         const parsedStyles = getParsedStyles()
         const combinedStyles = deepMergeObjects(...parsedStyles)
         const oldStyles = this.resultsMap.get(ref)
@@ -139,6 +162,14 @@ class UnistylesShadowRegistryBuilder {
             this.selectedVariants.set(key, value)
         })
     }
+
+    setScopedTheme = (theme?: UnistylesTheme) => {
+        this.scopedTheme = theme
+    }
+
+    getScopedTheme = () => this.scopedTheme
+
+    getVariants = () => this.selectedVariants
 
     remove = () => {}
 }
