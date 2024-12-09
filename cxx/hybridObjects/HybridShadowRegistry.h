@@ -28,6 +28,10 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
                             const jsi::Value& thisValue,
                             const jsi::Value* args,
                             size_t count);
+    jsi::Value getScopedTheme(jsi::Runtime& rt,
+                            const jsi::Value& thisValue,
+                            const jsi::Value* args,
+                            size_t count);
 
     void loadHybridMethods() override {
         HybridUnistylesShadowRegistrySpec::loadHybridMethods();
@@ -37,6 +41,7 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
             prototype.registerRawHybridMethod("unlink", 2, &HybridShadowRegistry::unlink);
             prototype.registerRawHybridMethod("selectVariants", 2, &HybridShadowRegistry::selectVariants);
             prototype.registerRawHybridMethod("setScopedTheme", 2, &HybridShadowRegistry::setScopedTheme);
+            prototype.registerRawHybridMethod("getScopedTheme", 2, &HybridShadowRegistry::getScopedTheme);
         });
     };
 

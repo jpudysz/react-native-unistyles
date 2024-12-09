@@ -37,8 +37,8 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
 }
 
 jsi::Value parser::Parser::getParsedStyleSheetForScopedTheme(jsi::Runtime& rt, core::Unistyle::Shared unistyle, std::string& scopedTheme) {
-    // for static stylesheet we don't need to do anything
-    if (unistyle->parent->type == StyleSheetType::Static) {
+    // for static stylesheets and exotic styles we don't need to do anything
+    if (unistyle->parent == nullptr || unistyle->parent->type == StyleSheetType::Static) {
         return jsi::Value::undefined();
     }
     
@@ -62,11 +62,15 @@ jsi::Value parser::Parser::getParsedStyleSheetForScopedTheme(jsi::Runtime& rt, c
 
 void parser::Parser::rebuildUnistyleWithScopedTheme(jsi::Runtime& rt, jsi::Value& jsScopedTheme, std::shared_ptr<core::UnistyleData> unistyleData) {
     auto parsedStyleSheet = jsScopedTheme.isUndefined()
-        ? this->getParsedStyleSheetForScopedTheme(rt, unistyleData->unistyle, unistyleData->scopedTheme.value()).asObject(rt)
+        ? this->getParsedStyleSheetForScopedTheme(rt, unistyleData->unistyle, unistyleData->scopedTheme.value())
         : jsScopedTheme.asObject(rt);
     
+    if (parsedStyleSheet.isUndefined()) {
+        return;
+    }
+    
     // get target style
-    auto targetStyle = parsedStyleSheet.getProperty(rt, unistyleData->unistyle->styleKey.c_str()).asObject(rt);
+    auto targetStyle = parsedStyleSheet.asObject(rt).getProperty(rt, unistyleData->unistyle->styleKey.c_str()).asObject(rt);
 
     // for object we just need to parse it
     if (unistyleData->unistyle->type == UnistyleType::Object) {
