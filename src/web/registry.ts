@@ -1,7 +1,7 @@
 import type { UnistylesTheme, UnistylesValues } from '../types'
 import type { StyleSheet, StyleSheetWithSuperPowers } from '../types/stylesheet'
 import { UnistylesRuntime } from './runtime'
-import { extractMediaQueryValue, keyInObject, getMediaQuery, generateHash, extractUnistyleDependencies } from './utils'
+import { extractMediaQueryValue, keyInObject, getMediaQuery, generateHash, extractUnistyleDependencies, error } from './utils'
 import { UnistylesListener } from './listener'
 import { convertUnistyles } from './convert'
 import type { UnistyleDependency } from '../specs/NativePlatform'
@@ -39,9 +39,19 @@ class UnistylesRegistryBuilder {
         return tag
     }
 
-    getComputedStylesheet = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
+    getComputedStylesheet = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, scopedThemeName?: UnistylesTheme) => {
         if (typeof stylesheet !== 'function') {
             return stylesheet
+        }
+
+        if (scopedThemeName) {
+            const scopedTheme = UnistylesRuntime.getTheme(scopedThemeName)
+
+            if (!scopedTheme) {
+                throw error(`Unistyles: You're trying to use scoped theme '${scopedThemeName}' but it wasn't registered.`)
+            }
+
+            return stylesheet(scopedTheme, UnistylesRuntime.miniRuntime)
         }
 
         const computedStylesheet = this.stylesheets.get(stylesheet)

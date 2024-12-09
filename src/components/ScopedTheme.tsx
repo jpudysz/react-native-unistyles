@@ -6,7 +6,7 @@ type ThemeProps = {
     name: keyof UnistylesThemes
 }
 
-const Apply = ({ name }: { name?: keyof UnistylesThemes }) => {
+const Apply = ({ name }: { name?: string }) => {
     UnistylesShadowRegistry.setScopedTheme(name)
 
     useLayoutEffect(() => {
@@ -17,10 +17,11 @@ const Apply = ({ name }: { name?: keyof UnistylesThemes }) => {
 }
 
 export const ScopedTheme: React.FunctionComponent<React.PropsWithChildren<ThemeProps>> = ({ name, children }) => {
+    const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
     const mappedChildren = [
         <Apply key={name} name={name} />,
         children,
-        <Apply key='dispose' />
+        <Apply key='dispose' name={previousScopedTheme} />
     ]
 
     return (
