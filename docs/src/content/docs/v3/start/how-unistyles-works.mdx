@@ -60,9 +60,9 @@ const styles = StyleSheet.create((theme, rt) => ({
 })
 ```
 
-### 3. Babel plugin: bindings
+### 3. Babel plugin: component factory
 
-As you already know, Unistyles has no components. This means your native view hierarchy remains exactly the same as your original code. The Babel plugin does not swap imports to use our custom components, instead, it transforms your `refs` to bind the `ShadowNode` with `Unistyle`.
+As you already know, Unistyles has no components. This means your native view hierarchy remains exactly the same as in your original code. The Babel plugin processes your components through our component factory to borrow `refs` and bind the `ShadowNode` with `Unistyle`.
 
 You might be wondering, what is `Unistyle`? We refer to it as your `StyleSheet` style that have been parsed by the Unistyles compiler, and with the attached `C++` state.
 
@@ -160,6 +160,7 @@ Instead, with all the optimizations and features that Unistyles 3.0 brings, we c
     </span>
 </div>
 
+With this architecture and the power of selective updates through `ShadowTree`, your components are never re-rendered.
 
 <Card>
 *Engineering is the closest thing to magic that exists in the world.*
