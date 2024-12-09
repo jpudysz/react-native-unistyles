@@ -2,13 +2,16 @@ import { NitroModules } from 'react-native-nitro-modules'
 import type { UnistylesShadowRegistry as UnistylesShadowRegistrySpec } from './ShadowRegistry.nitro'
 import type { ShadowNode, Unistyle, ViewHandle } from './types'
 
+type Variants = Record<string, string | boolean | undefined>
+
 interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     // Babel API
-    add(handle?: ViewHandle, styles?: Array<Unistyle>, variants?: Record<string, string | boolean>, args?: Array<Array<any>>, id?: string): void,
+    add(handle?: ViewHandle, styles?: Array<Unistyle>): void,
     remove(handle?: ViewHandle): void,
     // JSI
-    link(node: ShadowNode, styles?: Array<Unistyle>, variants?: Record<string, string | boolean>, args?: Array<Array<any>>, id?: string): void,
-    unlink(node: ShadowNode): void
+    link(node: ShadowNode, styles?: Array<Unistyle>): void,
+    unlink(node: ShadowNode): void,
+    selectVariants(variants?: Variants): void
 }
 
 const HybridShadowRegistry = NitroModules.createHybridObject<ShadowRegistry>('UnistylesShadowRegistry')
@@ -17,6 +20,9 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
     const node = handle?.__internalInstanceHandle?.stateNode?.node
         ?? handle?.getScrollResponder?.()?.getNativeScrollRef?.()?.__internalInstanceHandle?.stateNode?.node
         ?? handle?.getNativeScrollRef?.()?.__internalInstanceHandle?.stateNode?.node
+        ?? handle?._viewRef?.__internalInstanceHandle?.stateNode?.node
+        ?? handle?.viewRef?.current?.__internalInstanceHandle?.stateNode?.node
+        ?? handle?._nativeRef?.__internalInstanceHandle?.stateNode?.node
 
     if (!node) {
         throw new Error(`Unistyles: Could not find shadow node for one of your components of type ${handle?.__internalInstanceHandle?.elementType ?? 'unknown'}`)
@@ -25,7 +31,7 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
     return node
 }
 
-HybridShadowRegistry.add = (handle, styles, variants, args, id) => {
+HybridShadowRegistry.add = (handle, styles) => {
     // virtualized nodes can be null
     if (!handle || !styles || !Array.isArray(styles)) {
         return
@@ -36,7 +42,7 @@ HybridShadowRegistry.add = (handle, styles, variants, args, id) => {
         .filter(style => !style?.initial?.updater)
         .filter(Boolean)
 
-    HybridShadowRegistry.link(findShadowNodeForHandle(handle), filteredStyles, variants ?? {}, args ?? [], id)
+    HybridShadowRegistry.link(findShadowNodeForHandle(handle), filteredStyles)
 }
 
 HybridShadowRegistry.remove = handle => {
