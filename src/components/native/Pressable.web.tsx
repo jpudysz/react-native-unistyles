@@ -34,19 +34,9 @@ const events = {
 type UpdateStylesProps = {
     ref: View | null,
     style: WebPressableStyle,
-    variants?: Record<string, string | boolean>,
+    variants?: Record<string, string | boolean | undefined>,
     state: WebPressableState
-}
-
-const extractFunctionArgs = () => {
-    // todo refactor me, getBoundArgs is not available anymore
-    // return isFunctionWithBoundArgs(styleResult)
-    //     ? [styleResult.getBoundArgs()]
-    //     : Array.isArray(styleResult)
-    //         ? styleResult.map(style => isFunctionWithBoundArgs(style) ? style.getBoundArgs() : [])
-    //         : []
-
-    return []
+    scopedTheme?: string
 }
 
 const extractStyleResult = (style: any) => {
@@ -57,21 +47,30 @@ const extractStyleResult = (style: any) => {
             : [style]
 }
 
-const updateStyles = ({ ref, style, variants, state }: UpdateStylesProps) => {
+const updateStyles = ({ ref, style, state, scopedTheme, variants }: UpdateStylesProps) => {
     const styleResult = typeof style === 'function'
         ? style(state)
         : style
-    const fnArgs = extractFunctionArgs()
     const extractedResult = extractStyleResult(styleResult)
+    const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
+    const previousVariants = UnistylesShadowRegistry.getVariants()
+
+    UnistylesShadowRegistry.selectVariants(variants)
+    UnistylesShadowRegistry.setScopedTheme(scopedTheme)
 
     // @ts-expect-error - this is hidden from TS
-    UnistylesShadowRegistry.add(ref, extractedResult, variants, fnArgs)
+    UnistylesShadowRegistry.add(ref, extractedResult)
+
+    UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
+    UnistylesShadowRegistry.selectVariants(previousVariants)
 }
 
-export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ...props }, passedRef) => {
+export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, passedRef) => {
     const storedRef = useRef<View | null>(null)
     const state = useRef<WebPressableState>(initialState)
     const styleRef = useRef(style)
+    const scopedTheme = UnistylesShadowRegistry.getScopedTheme()
+    const variants = UnistylesShadowRegistry.getVariants()
 
     useEffect(() => {
         styleRef.current = style
@@ -85,6 +84,7 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                 ref: storedRef.current,
                 style: styleRef.current as WebPressableStyle,
                 variants,
+                scopedTheme,
                 state: state.current
             })
         }
@@ -116,6 +116,7 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                     ref,
                     style: style as WebPressableStyle,
                     variants,
+                    scopedTheme,
                     state: initialState
                 })
 

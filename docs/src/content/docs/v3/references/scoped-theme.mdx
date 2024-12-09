@@ -13,6 +13,55 @@ import Seo from '../../../../components/Seo.astro'
     }}
 >
 
-🚧 Work is progress. This feature will be released soon.
+There are cases where you may want to render specific components or screens with a fixed theme. For instance, a `Camera` view might require a dark background for better contrast, even if the user has selected light mode for the app. Other examples include modals, dialogs, or enabling users to preview the app in different themes to choose their preferred one.
+
+To address this, Unistyles 3.0 introduces the concept of a `Scoped Theme`, which allows you to assign a fixed theme to a specific component or screen.
+
+### Usage
+
+To use scoped theme, you need to import `ScopedTheme` component from `react-native-unistyles`:
+
+```ts
+import { ScopedTheme } from 'react-native-unistyles'
+```
+
+Scoped theme accepts one of your registered theme names as a prop:
+
+```tsx
+<ScopedTheme name="dark">
+    // components here will be fixed to dark theme
+    <View style={styles.container}>
+        <Text style={styles.text}>
+            Hello world
+        </Text>
+    </View>
+</ScopedTheme>
+```
+
+You can also nest `ScopedTheme` components:
+```tsx
+<ScopedTheme name="dark">
+    // I will be dark!
+    <View style={styles.container}>
+        <Text style={styles.text}>
+            Dark
+        </Text>
+    </View>
+    <ScopedTheme name="light">
+        // I will be light!
+        <View style={styles.container}>
+            <Text style={styles.text}>
+                Light
+            </Text>
+        </View>
+    </ScopedTheme>
+    // I will be dark again!
+    <View style={styles.container}>
+        <Text style={styles.text}>
+            Dark
+        </Text>
+    </View>
+</ScopedTheme>
+```
 
 </Seo>

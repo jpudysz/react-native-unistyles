@@ -18,6 +18,7 @@ export const schemeToTheme = (scheme: ColorScheme) => {
 export type UnistyleSecrets = {
     __uni__stylesheet: StyleSheetWithSuperPowers<StyleSheet>,
     __uni__key: string,
+    __uni__refs: Set<HTMLElement>
     __uni__args?: Array<any>
 }
 
@@ -32,7 +33,7 @@ export const extractSecrets = (object: any) => {
     return keyInObject(object, '__uni__secrets__') ? object.__uni__secrets__ as UnistyleSecrets : undefined
 }
 
-export const getStyles = (values: UnistylesValues) => {
+export const removeInlineStyles = (values: UnistylesValues) => {
     const returnValue = {}
 
     Object.defineProperties(returnValue, reduceObject(values, value => ({

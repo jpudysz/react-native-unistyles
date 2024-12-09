@@ -71,21 +71,16 @@ void core::UnistylesRegistry::updateTheme(jsi::Runtime& rt, std::string& themeNa
 void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
     jsi::Runtime& rt,
     const ShadowNodeFamily* shadowNodeFamily,
-    std::vector<core::Unistyle::Shared>& unistyles,
-    Variants& variants,
-    std::vector<std::vector<folly::dynamic>>& arguments
+    std::vector<std::shared_ptr<UnistyleData>>& unistylesData
 ) {
-    auto parser = parser::Parser(nullptr);
     shadow::ShadowLeafUpdates updates;
+    auto parser = parser::Parser(nullptr);
     
-    for (size_t index = 0; index < unistyles.size(); index++) {
-        Unistyle::Shared unistyle = unistyles[index];
-        std::shared_ptr<UnistyleData> unistyleData = std::make_shared<UnistyleData>(unistyle, variants, arguments[index]);
-
+    std::for_each(unistylesData.begin(), unistylesData.end(), [this, &rt, shadowNodeFamily](std::shared_ptr<UnistyleData> unistyleData){
         this->_shadowRegistry[&rt][shadowNodeFamily].emplace_back(unistyleData);
-        
-        updates[shadowNodeFamily] = parser.parseStylesToShadowTreeStyles(rt, {unistyleData});
-    }
+    });
+
+    updates[shadowNodeFamily] = parser.parseStylesToShadowTreeStyles(rt, unistylesData);
 
     this->trafficController.setUpdates(updates);
     this->trafficController.resumeUnistylesTraffic();
