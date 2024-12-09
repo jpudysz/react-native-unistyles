@@ -102,7 +102,7 @@ export default defineConfig({
                         { label: 'Compound Variants', slug: 'v3/references/compound-variants' },
                         { label: 'Web styles', slug: 'v3/references/web-styles' },
                         { label: 'Web Only Features', slug: 'v3/references/web-only' },
-                        { label: 'Scoped theme', slug: 'v3/references/scoped-theme', badge: 'WIP' },
+                        { label: 'Scoped theme', slug: 'v3/references/scoped-theme' },
                         { label: 'createUnistylesComponent', slug: 'v3/references/create-unistyles-component' },
                         { label: 'Display and Hide', slug: 'v3/references/display-hide' },
                         { label: 'Edge to edge', slug: 'v3/references/edge-to-edge' },
