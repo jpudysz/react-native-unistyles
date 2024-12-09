@@ -11,20 +11,20 @@ const reactNativeComponentNames = [
     'Image',
     'ImageBackground',
     'KeyboardAvoidingView',
-    'Modal',
     'Pressable',
     'ScrollView',
     'FlatList',
     'SectionList',
     'Switch',
-    'Text',
     'TextInput',
     'RefreshControl',
     'TouchableHighlight',
     'TouchableOpacity',
-    'TouchableWithoutFeedback',
     'VirtualizedList'
 ]
+
+// Modal - there is no exposed native handle
+// TouchableWithoutFeedback - can't accept a ref
 
 module.exports = function ({ types: t }) {
     return {

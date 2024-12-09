@@ -3,7 +3,7 @@ title: Babel plugin
 description: How Unistyles babel plugin works?
 ---
 
-import { Card } from '@astrojs/starlight/components'
+import { Card, Aside } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
 
 <Seo
@@ -16,7 +16,7 @@ import Seo from '../../../../components/Seo.astro'
 
 Unistyles 3.0 relies heavily on the Babel plugin, which helps convert your code in a way that allows binding the `ShadowNode` with `Unistyle`. Before reading this guide, make sure to check the [Look under the hood](/v3/start/how-unistyles-works) guide.
 
-Our golden rule is to never introduce any component that could pollute your native view hierarchy. In other words, if you use a `View`, we will never replace it or wrap it in any other component. There is one special case, documented below, concerning the `Pressable` component.
+Our golden rule is to never introduce any component that could pollute your native view hierarchy. In other words, if you use a `View`, it will be rendered as-is in the native view hierarchy.
 
 Let's discuss the responsibilities of the Babel plugin:
 
@@ -109,118 +109,77 @@ Or with babel plugin:
 <View style={[styles.container, styles.text]} />
 ```
 
-### 4. Modifying your component `ref` prop
+### 4. Component factory
 
-This is the most crucial part, and without it, Unistyles won't be able to update your views from C++.
+This is the most crucial part—without it, Unistyles won’t be able to update your views from C++.
+In the early versions of Unistyles 3.0, we tried solving this problem by using the `ref` prop, but it wasn’t reliable enough.
+Many developers use different style syntaxes, making it impossible to support all of them.
 
-To simplify the explanation, we override your `ref` prop to connect a `ShadowNode` to the attached `Unistyle(s)`.
+Instead, we decided to leave the user’s `ref` as is and transfer the implementation from Babel to our component factory.
+This way we have more control and we have an unified way of registering your `ShadowNodes`.
 
-Don't worry—through Babel transformation, we recreate whatever you were doing! So, if you called any function or assigned it to `useRef`, it will still be called as expected.
+The component factory is a function that takes your component and renders it with an overridden `ref` prop:
 
-We’re also React 19 ready, and we will call your ref cleanup function if it's present.
+```ts
+const factory = Component => <Component ref={someMagic✨} {...props} />;
+```
+
+<Aside>
+We override your `ref` prop to connect a `ShadowNode` to the attached Unistyle(s).
+From the runtime perspective, your component will render the same way as before!
+We only borrow your `ref` momentarily to update the ShadowRegistry.
+
+We’re also React 19–ready and will call your `ref` cleanup function if it’s present.
+</Aside>
+
 
 Let’s go through some examples so you can better understand how this works:
 
 ```ts title="Your code"
+import { View } from 'react-native'
+
 const ref = useRef()
 
 <View ref={ref} />
 ```
 
 ```ts title="Babel transform"
+import { View } from 'react-native-unistyles/components/native/View'
+
 const ref = useRef()
 
-<View
-    ref={_ref => {
-       ref.current = _ref
-
-       // some Unistyles magic ✨
-    }
-/>
+// no changes
+<View ref={ref} />
 ```
 
-We also support custom ref functions:
+We also support other components to extract `ShadowNode` from them:
 
 ```ts title="Your code"
-<View
+import { Pressable, Image } from 'react-native'
+
+<Pressable
     ref={ref => {
         doSomething(ref)
     }}
+    onPress={() => {}}
 />
+<Image source={require('./image.png')} style={styles.image} ref={ref2} />
 ```
 
 ```ts title="Babel transform"
-<View
+import { Pressable } from 'react-native-unistyles/components/native/Pressable'
+import { Image } from 'react-native-unistyles/components/native/Image'
+
+// no changes
+<Pressable
     ref={ref => {
-       doSomething(ref)
-
-       // some Unistyles magic ✨
-    }
+        doSomething(ref)
+    }}
+    onPress={() => {}}
 />
+<Image source={require('./image.png')} style={styles.image} ref={ref2} />
 ```
 
-### 5. Replacing `Pressable` implementation
-
-Last but not least, we had to make a few adjustments to the `Pressable` implementation. `Pressable` is a special component that can:
-
-- be a function and pass you a state with a `pressed` boolean
-- Accept multiple styles syntax, such as `() => [styles.style1, styles.style2]` or `() => style.pressable`
-
-To make this feasible, we built a thin abstraction that allows us to handle the `pressed` event and manage any transformations within the styles function.
-
-You shouldn’t notice any difference, but you should now be able to detect the `pressed` event within your `StyleSheet`:
-
-```ts title="Your code"
-import { Pressable } from 'react-native'
-
-<Pressable style={styles.button} />
-
-const styles = StyleSheet.create({
-    button: {
-        backgroundColor: 'red'
-    }
-})
-```
-
-```ts title="Babel transform"
-import { Pressable } from 'react-native-unistyles'
-
-<Pressable style={event => typeof styles.button === 'function' ? styles.button(event) : styles.button} />
-
-const styles = StyleSheet.create({
-    // button is an object, so we will return `backgroundColor`: `red`
-    button: {
-        backgroundColor: 'red'
-    }
-})
-```
-
-Or for functions:
-
-```ts title="Your code"
-import { Pressable } from 'react-native'
-
-<Pressable style={styles.button} />
-
-const styles = StyleSheet.create({
-    button: ({ pressed }) => ({
-        backgroundColor: pressed ? 'red' : 'blue'
-    })
-})
-```
-
-```ts title="Babel transform"
-import { Pressable } from 'react-native-unistyles'
-
-<Pressable style={event => typeof styles.button === 'function' ? styles.button(event) : styles.button} />
-
-const styles = StyleSheet.create({
-    // button is function, so we will return it with most recent event
-    button: ({ pressed }) => ({
-        backgroundColor: pressed ? 'red' : 'blue'
-    })
-})
-```
 
 ### Summary
 

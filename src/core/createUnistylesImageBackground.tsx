@@ -8,7 +8,6 @@ export const createUnistylesImageBackground = (Component: typeof ImageBackground
         {...props}
         ref={ref => passForwardedRef(props, ref, forwardedRef)}
         imageRef={ref => {
-            // todo, add first class support for image styles
             const style = Array.isArray(props.imageStyle)
                 ? props.imageStyle
                 : [props.imageStyle]
