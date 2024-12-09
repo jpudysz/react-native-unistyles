@@ -1,28 +1,30 @@
 const addUnistylesImport = require('./import')
 const { getStyleMetadata, getStyleAttribute, styleAttributeToArray, handlePressable } = require('./style')
-const { getRefProp, addRef, overrideRef, hasStringRef } = require('./ref')
+const { hasStringRef } = require('./ref')
 const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyles } = require('./stylesheet')
-const { isUsingVariants, extractVariants } = require('./variants')
+const { isUsingVariants, extractVariants, addJSXVariants } = require('./variants')
 
 const reactNativeComponentNames = [
+    'ActivityIndicator',
     'View',
     'Text',
     'Image',
     'ImageBackground',
     'KeyboardAvoidingView',
-    'Modal',
     'Pressable',
     'ScrollView',
     'FlatList',
     'SectionList',
     'Switch',
-    'Text',
     'TextInput',
+    'RefreshControl',
     'TouchableHighlight',
     'TouchableOpacity',
-    'TouchableWithoutFeedback',
     'VirtualizedList'
 ]
+
+// Modal - there is no exposed native handle
+// TouchableWithoutFeedback - can't accept a ref
 
 module.exports = function ({ types: t }) {
     return {
@@ -97,7 +99,7 @@ module.exports = function ({ types: t }) {
                         }
 
                         if (specifier.imported && reactNativeComponentNames.includes(specifier.imported.name)) {
-                            state.reactNativeImports[specifier.local.name] = true
+                            state.reactNativeImports[specifier.local.name] = specifier.imported.name
                         }
                     })
                 }
@@ -147,15 +149,9 @@ module.exports = function ({ types: t }) {
                 // to add import
                 state.file.hasAnyUnistyle = true
 
-                const refProp = getRefProp(t, path)
-
-                if (!refProp && hasStringRef(t, path)) {
+                if (hasStringRef(t, path)) {
                     throw new Error("Detected string based ref which is not supported by Unistyles.")
                 }
-
-                refProp
-                    ? overrideRef(t, path, refProp, metadata, state)
-                    : addRef(t, path, metadata, state)
             },
             CallExpression(path, state) {
                 if (isUsingVariants(t, path)) {
@@ -210,6 +206,11 @@ module.exports = function ({ types: t }) {
                             }
                         })
                     }
+                }
+            },
+            ReturnStatement(path, state) {
+                if (state.file.hasVariants) {
+                    addJSXVariants(t, path)
                 }
             }
         }
