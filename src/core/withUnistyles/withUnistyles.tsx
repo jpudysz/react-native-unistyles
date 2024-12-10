@@ -1,13 +1,12 @@
 import React, { useEffect, useState, type ComponentType, forwardRef, useRef, useMemo } from 'react'
-import { UnistyleDependency } from '../../specs/NativePlatform'
 import type { PartialBy } from '../../types/common'
 import { UnistylesListener } from '../../web/listener'
-import { UnistylesShadowRegistry, UnistylesRuntime } from '../../web'
+import { UnistylesShadowRegistry } from '../../web'
 import { equal } from '../../web/utils'
 import { deepMergeObjects } from '../../utils'
 import type { Mappings, SupportedStyleProps } from './types'
-
-const ALL_DEPENDENCIES = Object.values(UnistyleDependency).filter((dependency): dependency is UnistyleDependency => typeof dependency === 'number')
+import { useDependencies } from './useDependencies'
+import { UnistyleDependency } from '../../specs/NativePlatform'
 
 const useShadowRegistry = (style?: Record<string, any>) => {
     const [ref] = useState(document.createElement('div'))
@@ -45,25 +44,19 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
 
     return forwardRef<unknown, PropsWithUnistyles>((props, ref) => {
         const narrowedProps = props as PropsWithUnistyles
-        const [mappingsProps, setMappingsProps] = useState(mappings?.(UnistylesRuntime.getTheme(), UnistylesRuntime.miniRuntime) ?? {})
         const styleClassNames = useShadowRegistry(narrowedProps.style)
         const contentContainerStyleClassNames = useShadowRegistry(narrowedProps.contentContainerStyle)
+        const { mappingsCallback } = useDependencies(({ dependencies, updateTheme, updateRuntime }) => {
+            const disposeTheme = UnistylesListener.addListeners(dependencies.filter(dependency => dependency === UnistyleDependency.Theme), updateTheme)
+            const disposeRuntime = UnistylesListener.addListeners(dependencies.filter(dependency => dependency !== UnistyleDependency.Theme), updateRuntime)
 
-        useEffect(() => {
-            const disposeMappings = UnistylesListener.addListeners(ALL_DEPENDENCIES, () => {
-                if (!mappings) {
-                    disposeMappings()
-
-                    return
-                }
-
-                return setMappingsProps(mappings(UnistylesRuntime.getTheme(), UnistylesRuntime.miniRuntime))
-            })
-
-            return () => disposeMappings()
-        }, [mappingsProps, narrowedProps.style])
-
-        const unistyleProps = narrowedProps.uniProps?.(UnistylesRuntime.getTheme(), UnistylesRuntime.miniRuntime) ?? {}
+            return () => {
+                disposeTheme()
+                disposeRuntime()
+            }
+        })
+        const mappingsProps = mappings ? mappingsCallback(mappings) : {}
+        const unistyleProps = narrowedProps.uniProps ? mappingsCallback(narrowedProps.uniProps) : {}
 
         const combinedProps = {
             ...deepMergeObjects(mappingsProps, unistyleProps, props),

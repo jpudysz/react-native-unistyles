@@ -130,6 +130,10 @@ jsi::Value HybridUnistylesRuntime::getTheme(jsi::Runtime &rt, const jsi::Value &
     auto& state = core::UnistylesRegistry::get().getState(*_rt);
 
     if (count == 1) {
+        if (args[0].isUndefined()) {
+            return state.getCurrentJSTheme();
+        }
+        
         helpers::assertThat(rt, args[0].isString(), "UnistylesRuntime.getTheme expected to be called with string.");
 
         auto themeName = args[0].asString(rt).utf8(rt);
