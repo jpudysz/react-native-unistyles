@@ -491,7 +491,7 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
             jsi::Object style = jsi::Value(rt, unistyleFn->parsedStyle.value()).asObject(rt);
 
             // include dependencies for createUnistylesComponent
-            style.setProperty(rt, "__proto__", generateUnistylesPrototype(rt, unistyle));
+            style.setProperty(rt, "__proto__", generateUnistylesPrototype(rt, unistylesRuntime, unistyle, variants, helpers::functionArgumentsToArray(rt, args, count)));
 
             jsi::Object secrets = jsi::Object(rt);
 
