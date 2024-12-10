@@ -229,8 +229,11 @@ module.exports = function ({ types: t }) {
                 }
             },
             ReturnStatement(path, state) {
-                if (state.file.hasVariants) {
-                    addJSXVariants(t, path)
+                // ignore nested returns in JSX elements
+                const hasJSXParent = path.findParent(p => p.isJSXElement())
+
+                if (!hasJSXParent && state.file.hasVariants) {
+                    addJSXVariants(t, path, state)
                 }
             }
         }
