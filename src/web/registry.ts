@@ -4,8 +4,7 @@ import { UnistylesRuntime } from './runtime'
 import { extractMediaQueryValue, keyInObject, getMediaQuery, generateHash, extractUnistyleDependencies, error } from './utils'
 import { UnistylesListener } from './listener'
 import { convertUnistyles } from './convert'
-import type { UnistyleDependency } from '../specs/NativePlatform'
-import type { UnistylesMiniRuntime } from '../specs'
+import type { UnistylesMiniRuntime, UnistyleDependency } from '../specs'
 
 type ApplyRuleProps = {
     hash: string,

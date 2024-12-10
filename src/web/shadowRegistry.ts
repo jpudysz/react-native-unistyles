@@ -19,7 +19,7 @@ class UnistylesShadowRegistryBuilder {
     private resultsMap = new Map<HTMLElement, UnistylesValues>()
     private hashMap = new Map<HTMLElement, string>()
     private classNamesMap = new Map<HTMLElement, Array<string>>()
-    private selectedVariants = new Map<string, string | boolean>()
+    private selectedVariants = new Map<string, string | boolean | undefined>()
     private scopedTheme: UnistylesTheme | undefined = undefined
 
     add = (ref: any, styles: Array<Style>) => {
@@ -151,7 +151,7 @@ class UnistylesShadowRegistryBuilder {
         return newClassNames
     }
 
-    selectVariants = (variants?: Record<string, string | boolean>) => {
+    selectVariants = (variants?: Record<string, string | boolean | undefined>) => {
         if (!variants) {
             this.selectedVariants.clear()
 
