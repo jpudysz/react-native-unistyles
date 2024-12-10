@@ -1,9 +1,9 @@
-import { useEffect, useLayoutEffect, useState } from 'react'
-import { StyleSheet, UnistyleDependency, UnistylesRuntime, type UnistylesStyleSheet } from '../specs'
-import { isValidMq, parseMq, isUnistylesMq } from '../mq'
+import { useEffect, useRef, useState } from 'react'
+import { isUnistylesMq, isValidMq, parseMq } from '../mq'
 
 export const useMedia = (config: { mq: symbol }) => {
-    const computeIsVisible = (): boolean => {
+    const disposeRef = useRef(() => {})
+    const [isVisible, setIsVisible] = useState(() => {
         const maybeMq = config.mq as unknown as string
 
         if (!isUnistylesMq(maybeMq)) {
@@ -20,43 +20,26 @@ export const useMedia = (config: { mq: symbol }) => {
             return false
         }
 
-        const { width, height } = UnistylesRuntime.screen
+        const { minWidth, maxWidth, minHeight, maxHeight } = parsedMq
 
-        if (parsedMq.minWidth !== undefined && width < parsedMq.minWidth) {
-            return false
-        }
+        const mediaQuery = [
+            minWidth !== undefined ? `(min-width: ${minWidth}px)` : undefined,
+            maxWidth !== undefined ? `(max-width: ${maxWidth}px)` : undefined,
+            minHeight !== undefined ? `(min-height: ${minHeight}px)` : undefined,
+            maxHeight !== undefined ? `(max-height: ${maxHeight}px)` : undefined
+        ].filter(Boolean).join(' and ')
 
-        if (parsedMq.maxWidth !== undefined && width > parsedMq.maxWidth) {
-            return false
-        }
+        const media = window.matchMedia(mediaQuery)
+        const handler = (event: MediaQueryListEvent) => setIsVisible(event.matches)
 
-        if (parsedMq.minHeight !== undefined && height < parsedMq.minHeight) {
-            return false
-        }
+        media.addEventListener('change', handler)
+        disposeRef.current = () => media.removeEventListener('change', handler)
 
-        if (parsedMq.maxHeight !== undefined && height > parsedMq.maxHeight) {
-            return false
-        }
+        return media.matches
+    })
 
-        return true
-    }
-    const [isVisible, setIsVisible] = useState<boolean | null>(computeIsVisible())
-
-    useEffect(() => {
-        setIsVisible(computeIsVisible())
-    }, [config.mq])
-
-    useLayoutEffect(() => {
-        const removeChangeListener = (StyleSheet as UnistylesStyleSheet).addChangeListener(dependencies => {
-            if (dependencies.includes(UnistyleDependency.Breakpoints)) {
-                setIsVisible(computeIsVisible())
-            }
-        })
-
-        return () => {
-            removeChangeListener()
-        }
-    }, [config.mq])
+    // Unmount
+    useEffect(() => () => disposeRef.current(), [])
 
     return {
         isVisible
