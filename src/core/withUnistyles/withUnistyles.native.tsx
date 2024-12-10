@@ -23,6 +23,11 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
                         console.error(`🦄 Unistyles: createUnistylesComponent requires ${propName} to be an object. Please check props for component: ${Component.displayName}`)
                     }
 
+                    // @ts-expect-error - this is hidden from TS
+                    if (props[propName].__unistyles_name && !props[propName].__proto__?.getStyle) {
+                        console.error(`🦄 Unistyles: createUnistylesComponent received style that is not bound. You likely used the spread operator on a Unistyle style. Please check props for component: ${Component.displayName}`)
+                    }
+
                     stylesRef.current = {
                         ...stylesRef.current,
                         [propName]: narrowedProps[propName]
@@ -41,7 +46,7 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
                             stylesRef.current = {
                                 ...stylesRef.current,
                                 // @ts-expect-error - this is hidden from TS
-                                [propName]: props[propName]
+                                [propName]: props[propName].__proto__?.getStyle?.() || props[propName]
                             }
                         }
                     })
@@ -55,7 +60,7 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
             })
 
             return () => dispose()
-        })
+        }, narrowedProps.style?.__proto__.uni__dependencies)
 
         const mappingProps = mappings ? mappingsCallback(mappings) : {}
         const unistyleProps = narrowedProps.uniProps ? mappingsCallback(narrowedProps.uniProps) : {}
