@@ -29,7 +29,7 @@ function addUnistylesImport(t, path, state) {
     pairs.forEach(([localName, name]) => {
         const newImport = t.importDeclaration(
             [t.importSpecifier(t.identifier(localName), t.identifier(name))],
-            t.stringLiteral(`react-native-unistyles/components/native/${name}`)
+            t.stringLiteral(`react-native-unistyles/src/components/native/${name}`)
         )
 
         path.node.body.unshift(newImport)

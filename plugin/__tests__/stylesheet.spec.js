@@ -34,8 +34,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Text } from 'react-native-unistyles/src/components/native/Text'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -78,8 +78,8 @@ pluginTester({
                 }))
             `,
             output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Text } from 'react-native-unistyles/src/components/native/Text'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -123,8 +123,8 @@ pluginTester({
                 }))
             `,
             output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Text } from 'react-native-unistyles/src/components/native/Text'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet as ST } from 'react-native-unistyles'
 
@@ -169,8 +169,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Text } from 'react-native-unistyles/src/components/native/Text'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -216,8 +216,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Text } from 'react-native-unistyles/src/components/native/Text'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -264,8 +264,8 @@ pluginTester({
                 }))
             `,
             output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Text } from 'react-native-unistyles/src/components/native/Text'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -313,8 +313,8 @@ pluginTester({
                 }))
             `,
             output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Text } from 'react-native-unistyles/src/components/native/Text'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -364,8 +364,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Text } from 'react-native-unistyles/src/components/native/Text'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -423,8 +423,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Text } from 'react-native-unistyles/src/components/native/Text'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -488,9 +488,9 @@ pluginTester({
                 })
             `,
             output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/components/native/Pressable'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Text } from 'react-native-unistyles/src/components/native/Text'
+                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -549,9 +549,9 @@ pluginTester({
                 })
             `,
             output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/components/native/Pressable'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Text } from 'react-native-unistyles/src/components/native/Text'
+                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -611,9 +611,9 @@ pluginTester({
                 })
             `,
             output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/components/native/Pressable'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Text } from 'react-native-unistyles/src/components/native/Text'
+                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -677,9 +677,9 @@ pluginTester({
                 })
             `,
             output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/components/native/Pressable'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Text } from 'react-native-unistyles/src/components/native/Text'
+                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet, Variants } from 'react-native-unistyles'
 
@@ -746,9 +746,9 @@ pluginTester({
                 })
             `,
             output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/components/native/Pressable'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Text } from 'react-native-unistyles/src/components/native/Text'
+                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -807,9 +807,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/components/native/Pressable'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Text } from 'react-native-unistyles/src/components/native/Text'
+                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -875,9 +875,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/components/native/Pressable'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Text } from 'react-native-unistyles/src/components/native/Text'
+                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -951,9 +951,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/components/native/Pressable'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Text } from 'react-native-unistyles/src/components/native/Text'
+                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -1027,8 +1027,8 @@ pluginTester({
                 }))
             `,
             output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Text } from 'react-native-unistyles/src/components/native/Text'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -1091,8 +1091,8 @@ pluginTester({
                 }))
             `,
             output: `
-                import { Pressable } from 'react-native-unistyles/components/native/Pressable'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -1151,8 +1151,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { Pressable } from 'react-native-unistyles/components/native/Pressable'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -1194,8 +1194,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { Pressable } from 'react-native-unistyles/components/native/Pressable'
-                import { View } from 'react-native-unistyles/components/native/View'
+                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
+                import { View } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -1239,9 +1239,9 @@ pluginTester({
                 })
             `,
             output: `
-                import { Text as SuperText } from 'react-native-unistyles/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/components/native/Pressable'
-                import { View as RNView } from 'react-native-unistyles/components/native/View'
+                import { Text as SuperText } from 'react-native-unistyles/src/components/native/Text'
+                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
+                import { View as RNView } from 'react-native-unistyles/src/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
