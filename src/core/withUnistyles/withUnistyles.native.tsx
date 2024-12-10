@@ -1,16 +1,18 @@
 import React, { type ComponentType, forwardRef, useEffect, useRef, useState } from 'react'
-import type { UnistylesTheme } from '../types'
-import { StyleSheet, UnistyleDependency, UnistylesRuntime, type UnistylesStyleSheet } from '../specs'
-import type { PartialBy } from '../types/common'
-import { deepMergeObjects } from '../utils'
+import type { UnistylesTheme } from '../../types'
+import { StyleSheet, UnistyleDependency, UnistylesRuntime, type UnistylesMiniRuntime, type UnistylesStyleSheet } from '../../specs'
+import type { PartialBy } from '../../types/common'
+import { deepMergeObjects } from '../../utils'
+import { SUPPORTED_STYLE_PROPS } from './types'
+import type { Mappings, SupportedStyleProps } from './types'
 
-const SUPPORTED_STYLE_PROPS = ['style', 'contentContainerStyle'] as const
-type SupportedStyleProps = typeof SUPPORTED_STYLE_PROPS[number]
+export const withUnistyles = <TProps extends Record<string, any>, TMappings extends TProps>(Component: ComponentType<TProps>, mappings?: Mappings<TMappings>) => {
+    type PropsWithUnistyles = PartialBy<TProps, keyof TMappings | SupportedStyleProps> & {
+        uniProps?: Mappings<TProps>
+    }
 
-// add support for scoped variants and themes
-export const createUnistylesComponent = <TProps extends Record<string, any>, TMappings extends Partial<Omit<TProps, SupportedStyleProps>>>(Component: ComponentType<TProps>, mappings?: (theme: UnistylesTheme) => TMappings) => {
-    return forwardRef<unknown, PartialBy<TProps, keyof TMappings | SupportedStyleProps>>((props, ref) => {
-        const narrowedProps = props as PartialBy<TProps, keyof TMappings | SupportedStyleProps>
+    return forwardRef<unknown, PropsWithUnistyles>((props, ref) => {
+        const narrowedProps = props as PropsWithUnistyles
         const [theme, setTheme] = useState<UnistylesTheme>(UnistylesRuntime.getTheme())
         const [, setRt] = useState(0)
         const stylesRef = useRef<Record<string, any>>({})
@@ -38,7 +40,7 @@ export const createUnistylesComponent = <TProps extends Record<string, any>, TMa
 
         useEffect(() => {
             const removeChangeListener = (StyleSheet as UnistylesStyleSheet).addChangeListener(dependencies => {
-                const componentDependencies = (narrowedProps.style?.__proto__.uni__dependencies || mappings?.(theme).style?.__proto__.uni__dependencies) as Array<UnistyleDependency>
+                const componentDependencies = (narrowedProps.style?.__proto__.uni__dependencies || mappings?.(theme, {} as UnistylesMiniRuntime).style?.__proto__.uni__dependencies) as Array<UnistyleDependency>
 
                 if (dependencies.includes(UnistyleDependency.Theme) && (!componentDependencies ||componentDependencies.includes(UnistyleDependency.Theme))) {
                     setTheme(UnistylesRuntime.getTheme())
@@ -67,8 +69,9 @@ export const createUnistylesComponent = <TProps extends Record<string, any>, TMa
             }
         }, [])
 
-        const mergedProps = mappings?.(theme) as Record<string, any> ?? {}
-        const finalProps = deepMergeObjects(mergedProps, props)
+        const mappingProps = mappings?.(theme, UnistylesRuntime as unknown as UnistylesMiniRuntime) ?? {}
+        const unistyleProps = narrowedProps.uniProps?.(theme, UnistylesRuntime as unknown as UnistylesMiniRuntime) ?? {}
+        const finalProps = deepMergeObjects<Record<string, any>>(mappingProps, unistyleProps, props)
 
         // override with Unistyles styles
         SUPPORTED_STYLE_PROPS.forEach(propName => {
