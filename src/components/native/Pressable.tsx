@@ -3,6 +3,7 @@ import { Pressable as NativePressableReactNative } from 'react-native'
 import type { PressableProps as Props, View, ViewStyle } from 'react-native'
 import { UnistylesShadowRegistry } from '../../specs'
 
+type Variants = Record<string, string | boolean | undefined>
 type WebPressableState = {
     pressed: boolean,
     hovered: boolean,
@@ -12,7 +13,7 @@ type WebPressableState = {
 type WebPressableStyle = ((state: WebPressableState) => ViewStyle) | ViewStyle
 
 type PressableProps = Props & {
-    variants?: Record<string, string | boolean>
+    variants?: Variants
     style?: WebPressableStyle,
 }
 
@@ -34,7 +35,7 @@ const events = {
 type UpdateStylesProps = {
     ref: View | null,
     style: WebPressableStyle,
-    variants?: Record<string, string | boolean | undefined>,
+    variants?: Variants,
     state: WebPressableState
     scopedTheme?: string
 }
@@ -55,14 +56,13 @@ const updateStyles = ({ ref, style, state, scopedTheme, variants }: UpdateStyles
     const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
     const previousVariants = UnistylesShadowRegistry.getVariants()
 
-    UnistylesShadowRegistry.selectVariants(variants)
-    UnistylesShadowRegistry.setScopedTheme(scopedTheme)
+    UnistylesShadowRegistry.selectVariants(variants as unknown as Variants)
+    UnistylesShadowRegistry.setScopedTheme(scopedTheme as any)
 
-    // @ts-expect-error - this is hidden from TS
     UnistylesShadowRegistry.add(ref, extractedResult)
 
     UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
-    UnistylesShadowRegistry.selectVariants(previousVariants)
+    UnistylesShadowRegistry.selectVariants(previousVariants as unknown as Variants)
 }
 
 export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, passedRef) => {
@@ -83,7 +83,7 @@ export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, 
             updateStyles({
                 ref: storedRef.current,
                 style: styleRef.current as WebPressableStyle,
-                variants,
+                variants: variants as unknown as Variants,
                 scopedTheme,
                 state: state.current
             })
@@ -115,7 +115,7 @@ export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, 
                 updateStyles({
                     ref,
                     style: style as WebPressableStyle,
-                    variants,
+                    variants: variants as unknown as Variants,
                     scopedTheme,
                     state: initialState
                 })

@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useState } from 'react'
-import { StyleSheet, UnistyleDependency, UnistylesRuntime, type UnistylesStyleSheet } from '../specs'
+import { StyleSheet, UnistyleDependency, UnistylesRuntime } from '../specs'
 import { isValidMq, parseMq, isUnistylesMq } from '../mq'
 
 export const useMedia = (config: { mq: symbol }) => {
@@ -47,7 +47,8 @@ export const useMedia = (config: { mq: symbol }) => {
     }, [config.mq])
 
     useLayoutEffect(() => {
-        const removeChangeListener = (StyleSheet as UnistylesStyleSheet).addChangeListener(dependencies => {
+        // @ts-expect-error - this is hidden from TS
+        const removeChangeListener = StyleSheet.addChangeListener((dependencies: Array<UnistyleDependency>) => {
             if (dependencies.includes(UnistyleDependency.Breakpoints)) {
                 setIsVisible(computeIsVisible())
             }
