@@ -647,5 +647,120 @@ pluginTester({
                 )
             `
         },
+        {
+            title: 'Should ignore nested return statements',
+            code: `
+                import React from 'react'
+                import { Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ condition }) => {
+                    styles.useVariants({
+                        size: 'small'
+                    })
+
+                    if (condition) {
+                        return (
+                            <>
+                                <Text style={styles.container}>Hello world</Text>
+                            </>
+                        )
+                    }
+
+                    return (
+                        <>
+                            {Array.from({ length: 20 }).map((_, index) => {
+                                return (
+                                    <View key={index}>
+                                        <Text style={{ ...index % 2 === 0 ? styles.text : {} }}>{index + 1}</Text>
+                                    </View>
+                                )
+                            })}
+                        </>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: {
+                        backgroundColor: theme.colors.background,
+                        variants: {
+                            size: {
+                                small: {
+                                    width: 100,
+                                    height: 100
+                                },
+                                medium: {
+                                    width: 200,
+                                    height: 200
+                                },
+                                large: {
+                                    width: 300,
+                                    height: 300
+                                }
+                            }
+                        }
+                    }
+                }))
+            `,
+            output: `
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import React from 'react'
+
+                import { StyleSheet, Variants } from 'react-native-unistyles'
+
+                export const Example = ({ condition }) => {
+                    const __uni__variants = {
+                        size: 'small'
+                    }
+                    styles.useVariants(__uni__variants)
+
+                    if (condition) {
+                        return (
+                            <Variants variants={__uni__variants}>
+                                <Text style={[styles.container]}>Hello world</Text>
+                            </Variants>
+                        )
+                    }
+
+                    return (
+                        <Variants variants={__uni__variants}>
+                            {Array.from({ length: 20 }).map((_, index) => {
+                                return (
+                                    <View key={index}>
+                                        <Text style={[index % 2 === 0 ? styles.text : {}]}>{index + 1}</Text>
+                                    </View>
+                                )
+                            })}
+                        </Variants>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    (theme, rt) => ({
+                        container: {
+                            backgroundColor: theme.colors.background,
+                            variants: {
+                                size: {
+                                    small: {
+                                        width: 100,
+                                        height: 100
+                                    },
+                                    medium: {
+                                        width: 200,
+                                        height: 200
+                                    },
+                                    large: {
+                                        width: 300,
+                                        height: 300
+                                    }
+                                }
+                            },
+                            uni__dependencies: [0, 4]
+                        }
+                    }),
+                    895830154
+                )
+            `
+        }
     ]
 })

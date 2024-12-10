@@ -127,16 +127,6 @@ inline Variants variantsToPairs(jsi::Runtime& rt, jsi::Object&& variants) {
     return pairs;
 }
 
-inline jsi::Object pairsToVariantsValue(jsi::Runtime& rt, Variants& pairs) {
-    auto variantsValue = jsi::Object(rt);
-
-    std::for_each(pairs.begin(), pairs.end(), [&rt, &variantsValue](std::pair<std::string, std::string>& pair){
-        variantsValue.setProperty(rt, jsi::PropNameID::forUtf8(rt, pair.first), jsi::String::createFromUtf8(rt, pair.second));
-    });
-
-    return variantsValue;
-}
-
 inline jsi::Object variantsToValue(jsi::Runtime& rt, Variants& variants) {
     jsi::Object rawVariants = jsi::Object(rt);
 

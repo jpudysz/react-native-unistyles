@@ -1,10 +1,14 @@
-import React, { type ComponentType, forwardRef, useEffect, useRef, useState } from 'react'
-import type { UnistylesTheme } from '../../types'
-import { StyleSheet, UnistyleDependency, UnistylesRuntime, type UnistylesMiniRuntime, type UnistylesStyleSheet } from '../../specs'
+import React, { type ComponentType, forwardRef, useRef } from 'react'
+import {
+    StyleSheet,
+    UnistyleDependency,
+    type UnistylesStyleSheet,
+} from '../../specs'
 import type { PartialBy } from '../../types/common'
 import { deepMergeObjects } from '../../utils'
 import { SUPPORTED_STYLE_PROPS } from './types'
 import type { Mappings, SupportedStyleProps } from './types'
+import { useDependencies } from './useDependencies'
 
 export const withUnistyles = <TProps extends Record<string, any>, TMappings extends TProps>(Component: ComponentType<TProps>, mappings?: Mappings<TMappings>) => {
     type PropsWithUnistyles = PartialBy<TProps, keyof TMappings | SupportedStyleProps> & {
@@ -13,8 +17,6 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
 
     return forwardRef<unknown, PropsWithUnistyles>((props, ref) => {
         const narrowedProps = props as PropsWithUnistyles
-        const [theme, setTheme] = useState<UnistylesTheme>(UnistylesRuntime.getTheme())
-        const [, setRt] = useState(0)
         const stylesRef = useRef<Record<string, any>>({})
         const isForcedRef = useRef(false)
 
@@ -25,11 +27,6 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
                         console.error(`🦄 Unistyles: createUnistylesComponent requires ${propName} to be an object. Please check props for component: ${Component.displayName}`)
                     }
 
-                    // @ts-expect-error - this is hidden from TS
-                    if (props[propName].__unistyles_name && !props[propName].__proto__?.getStyle) {
-                        console.error(`🦄 Unistyles: createUnistylesComponent received style that is not bound. You likely used the spread operator on a Unistyle style. Please check props for component: ${Component.displayName}`)
-                    }
-
                     stylesRef.current = {
                         ...stylesRef.current,
                         [propName]: narrowedProps[propName]
@@ -38,39 +35,33 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
             })
         }
 
-        useEffect(() => {
-            const removeChangeListener = (StyleSheet as UnistylesStyleSheet).addChangeListener(dependencies => {
-                const componentDependencies = (narrowedProps.style?.__proto__.uni__dependencies || mappings?.(theme, {} as UnistylesMiniRuntime).style?.__proto__.uni__dependencies) as Array<UnistyleDependency>
-
-                if (dependencies.includes(UnistyleDependency.Theme) && (!componentDependencies ||componentDependencies.includes(UnistyleDependency.Theme))) {
-                    setTheme(UnistylesRuntime.getTheme())
-
-                    // override with Unistyles styles
+        const { mappingsCallback } = useDependencies(({ dependencies, updateTheme, updateRuntime }) => {
+            const listensToTheme = dependencies.includes(UnistyleDependency.Theme)
+            const dispose = (StyleSheet as UnistylesStyleSheet).addChangeListener(changedDependencies => {
+                if (listensToTheme && changedDependencies.includes(UnistyleDependency.Theme)) {
                     SUPPORTED_STYLE_PROPS.forEach(propName => {
                         if (narrowedProps?.[propName]) {
                             stylesRef.current = {
                                 ...stylesRef.current,
                                 // @ts-expect-error - this is hidden from TS
-                                [propName]: props[propName].__proto__?.getStyle?.() || props[propName]
+                                [propName]: props[propName]
                             }
                         }
                     })
 
-                    isForcedRef.current = true
+                    updateTheme()
                 }
 
-                if (dependencies.some(dependency => dependency >= 2) && (!componentDependencies || componentDependencies.some(dependency => dependency >= 2))) {
-                    setRt(prevState => prevState + 1)
+                if (changedDependencies.some(dependency => dependencies.includes(dependency))) {
+                    updateRuntime()
                 }
             })
 
-            return () => {
-                removeChangeListener()
-            }
-        }, [])
+            return () => dispose()
+        })
 
-        const mappingProps = mappings?.(theme, UnistylesRuntime as unknown as UnistylesMiniRuntime) ?? {}
-        const unistyleProps = narrowedProps.uniProps?.(theme, UnistylesRuntime as unknown as UnistylesMiniRuntime) ?? {}
+        const mappingProps = mappings ? mappingsCallback(mappings) : {}
+        const unistyleProps = narrowedProps.uniProps ? mappingsCallback(narrowedProps.uniProps) : {}
         const finalProps = deepMergeObjects<Record<string, any>>(mappingProps, unistyleProps, props)
 
         // override with Unistyles styles
