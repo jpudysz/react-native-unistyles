@@ -6,7 +6,6 @@ import type { UnistylesTheme } from '../../types'
 import type { Mappings } from './types'
 
 const getMiniRuntime = (): UnistylesMiniRuntime => {
-    // @ts-expect-error - This is hidden from TS
     return UnistylesRuntime.miniRuntime
 }
 

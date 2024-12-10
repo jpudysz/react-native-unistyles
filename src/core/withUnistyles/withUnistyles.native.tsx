@@ -1,9 +1,5 @@
 import React, { type ComponentType, forwardRef, useRef } from 'react'
-import {
-    StyleSheet,
-    UnistyleDependency,
-    type UnistylesStyleSheet,
-} from '../../specs'
+import { StyleSheet, UnistyleDependency } from '../../specs'
 import type { PartialBy } from '../../types/common'
 import { deepMergeObjects } from '../../utils'
 import { SUPPORTED_STYLE_PROPS } from './types'
@@ -37,7 +33,8 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
 
         const { mappingsCallback } = useDependencies(({ dependencies, updateTheme, updateRuntime }) => {
             const listensToTheme = dependencies.includes(UnistyleDependency.Theme)
-            const dispose = (StyleSheet as UnistylesStyleSheet).addChangeListener(changedDependencies => {
+            // @ts-expect-error - this is hidden from TS
+            const dispose = StyleSheet.addChangeListener(changedDependencies => {
                 if (listensToTheme && changedDependencies.includes(UnistyleDependency.Theme)) {
                     SUPPORTED_STYLE_PROPS.forEach(propName => {
                         if (narrowedProps?.[propName]) {
@@ -52,7 +49,7 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
                     updateTheme()
                 }
 
-                if (changedDependencies.some(dependency => dependencies.includes(dependency))) {
+                if (changedDependencies.some((dependency: UnistyleDependency) => dependencies.includes(dependency))) {
                     updateRuntime()
                 }
             })
