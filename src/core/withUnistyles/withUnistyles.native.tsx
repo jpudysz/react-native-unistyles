@@ -3,9 +3,9 @@ import type { UnistylesTheme } from '../../types'
 import { StyleSheet, UnistyleDependency, UnistylesRuntime, type UnistylesMiniRuntime, type UnistylesStyleSheet } from '../../specs'
 import type { PartialBy } from '../../types/common'
 import { deepMergeObjects } from '../../utils'
-import { SUPPORTED_STYLE_PROPS, type Mappings, type SupportedStyleProps } from './types'
+import { SUPPORTED_STYLE_PROPS } from './types'
+import type { Mappings, SupportedStyleProps } from './types'
 
-// add support for scoped variants and themes
 export const withUnistyles = <TProps extends Record<string, any>, TMappings extends TProps>(Component: ComponentType<TProps>, mappings?: Mappings<TMappings>) => {
     type PropsWithUnistyles = PartialBy<TProps, keyof TMappings | SupportedStyleProps> & {
         uniProps?: Mappings<TProps>
@@ -69,8 +69,8 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
             }
         }, [])
 
-        const mappingProps = mappings?.(theme, {} as UnistylesMiniRuntime) ?? {}
-        const unistyleProps = narrowedProps.uniProps?.(theme, {} as UnistylesMiniRuntime) ?? {}
+        const mappingProps = mappings?.(theme, UnistylesRuntime as unknown as UnistylesMiniRuntime) ?? {}
+        const unistyleProps = narrowedProps.uniProps?.(theme, UnistylesRuntime as unknown as UnistylesMiniRuntime) ?? {}
         const finalProps = deepMergeObjects<Record<string, any>>(mappingProps, unistyleProps, props)
 
         // override with Unistyles styles
