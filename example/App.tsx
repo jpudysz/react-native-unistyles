@@ -1,7 +1,14 @@
 import React, { useRef } from 'react'
 import { Button, Pressable, PressableStateCallbackType, ScrollView, Text, TextInput, View } from 'react-native'
 import { Blurhash } from 'react-native-blurhash'
-import { createUnistylesComponent, StyleSheet, Display, Hide, mq, ScopedTheme } from 'react-native-unistyles'
+import {
+    StyleSheet,
+    Display,
+    Hide,
+    mq,
+    ScopedTheme,
+    withUnistyles
+} from 'react-native-unistyles'
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
@@ -12,12 +19,12 @@ import Animated, {
 import './unistyles'
 import { Typography } from './Typography'
 
-const UniButton = createUnistylesComponent(Button, (theme) => ({
+const UniButton = withUnistyles(Button, (theme) => ({
     color: theme.colors.test
 }))
 
-const UniBlurhash = createUnistylesComponent(Blurhash)
-const UniScrollView = createUnistylesComponent(ScrollView)
+const UniBlurhash = withUnistyles(Blurhash)
+const UniScrollView = withUnistyles(ScrollView)
 
 export const App = () => {
     const [, setCount] = React.useState(0)
