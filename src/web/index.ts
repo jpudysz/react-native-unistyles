@@ -1,10 +1,11 @@
 import { create } from './create'
 import { UnistylesState } from './state'
 import { deepMergeObjects } from '../utils'
+import type { CreateUnistylesStyleSheet } from '../types'
 
 export const StyleSheet = {
     configure: UnistylesState.init,
-    create,
+    create: create as CreateUnistylesStyleSheet,
     absoluteFill: {
         position: 'absolute',
         left: 0,
@@ -21,7 +22,7 @@ export const StyleSheet = {
     },
     compose: (a: object, b: object) => deepMergeObjects(a, b),
     flatten: (...styles: Array<object>) => deepMergeObjects(...styles),
-    hairlineWidth: 1
+    hairlineWidth: 1 as number
 }
 
 export { UnistylesRuntime } from './runtime'

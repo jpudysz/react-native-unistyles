@@ -6,7 +6,7 @@ type ThemeProps = {
     name: keyof UnistylesThemes
 }
 
-const Apply = ({ name }: { name?: string }) => {
+const Apply = ({ name }: { name?: keyof UnistylesThemes }) => {
     UnistylesShadowRegistry.setScopedTheme(name)
 
     useLayoutEffect(() => {
