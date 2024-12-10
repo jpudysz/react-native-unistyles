@@ -1,6 +1,13 @@
 import React, { type ComponentType, forwardRef, useEffect, useRef, useState } from 'react'
 import type { UnistylesTheme } from '../../types'
-import { StyleSheet, UnistyleDependency, UnistylesRuntime, type UnistylesMiniRuntime, type UnistylesStyleSheet } from '../../specs'
+import {
+    StyleSheet,
+    UnistyleDependency,
+    UnistylesRuntime,
+    type UnistylesMiniRuntime,
+    type UnistylesStyleSheet,
+    UnistylesShadowRegistry
+} from '../../specs'
 import type { PartialBy } from '../../types/common'
 import { deepMergeObjects } from '../../utils'
 import { SUPPORTED_STYLE_PROPS } from './types'
@@ -13,7 +20,8 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
 
     return forwardRef<unknown, PropsWithUnistyles>((props, ref) => {
         const narrowedProps = props as PropsWithUnistyles
-        const [theme, setTheme] = useState<UnistylesTheme>(UnistylesRuntime.getTheme())
+        const scopedTheme = UnistylesShadowRegistry.getScopedTheme() as never
+        const [theme, setTheme] = useState<UnistylesTheme>(UnistylesRuntime.getTheme(scopedTheme))
         const [, setRt] = useState(0)
         const stylesRef = useRef<Record<string, any>>({})
         const isForcedRef = useRef(false)
@@ -23,11 +31,6 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
                 if (narrowedProps?.[propName]) {
                     if (Array.isArray(narrowedProps[propName])) {
                         console.error(`🦄 Unistyles: createUnistylesComponent requires ${propName} to be an object. Please check props for component: ${Component.displayName}`)
-                    }
-
-                    // @ts-expect-error - this is hidden from TS
-                    if (props[propName].__unistyles_name && !props[propName].__proto__?.getStyle) {
-                        console.error(`🦄 Unistyles: createUnistylesComponent received style that is not bound. You likely used the spread operator on a Unistyle style. Please check props for component: ${Component.displayName}`)
                     }
 
                     stylesRef.current = {
@@ -40,9 +43,9 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
 
         useEffect(() => {
             const removeChangeListener = (StyleSheet as UnistylesStyleSheet).addChangeListener(dependencies => {
-                const componentDependencies = (narrowedProps.style?.__proto__.uni__dependencies || mappings?.(theme, {} as UnistylesMiniRuntime).style?.__proto__.uni__dependencies) as Array<UnistyleDependency>
+                const componentDependencies = narrowedProps.style?.__proto__.uni__dependencies as Array<UnistyleDependency>
 
-                if (dependencies.includes(UnistyleDependency.Theme) && (!componentDependencies ||componentDependencies.includes(UnistyleDependency.Theme))) {
+                if (dependencies.includes(UnistyleDependency.Theme) && (!componentDependencies ||componentDependencies.includes(UnistyleDependency.Theme)) && !scopedTheme) {
                     setTheme(UnistylesRuntime.getTheme())
 
                     // override with Unistyles styles
@@ -51,7 +54,7 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
                             stylesRef.current = {
                                 ...stylesRef.current,
                                 // @ts-expect-error - this is hidden from TS
-                                [propName]: props[propName].__proto__?.getStyle?.() || props[propName]
+                                [propName]: props[propName]
                             }
                         }
                     })

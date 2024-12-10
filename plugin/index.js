@@ -46,7 +46,7 @@ module.exports = function ({ types: t }) {
                     state.reactNativeImports = {}
                 },
                 exit(path, state) {
-                    if (state.file.hasAnyUnistyle) {
+                    if (state.file.hasAnyUnistyle || state.file.hasVariants) {
                         addUnistylesImport(t, path, state)
                     }
                 }

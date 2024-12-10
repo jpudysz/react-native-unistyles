@@ -14,7 +14,7 @@ const Apply: React.FunctionComponent<VariantProps> = ({ variants }) => {
 
     return null
 }
-export const Variants: React.FunctionComponent<React.PropsWithChildren<VariantProps>> = ({ variants, children}) => {
+export const Variants: React.FunctionComponent<React.PropsWithChildren<VariantProps>> = ({ variants, children }) => {
     const mappedChildren = [
         <Apply key='add' variants={variants} />,
         children,

@@ -58,27 +58,10 @@ customStyleProp={[styles.container, styles.otherProp]}
 Copying a Unistyle style outside of a JSX element will remove its internal C++ state, leading to unexpected behavior.)");
 }
 
-inline static jsi::Object generateUnistylesPrototype(
-    jsi::Runtime& rt,
-    std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime,
-    Unistyle::Shared unistyle,
-    std::optional<Variants> variants,
-    std::optional<jsi::Array> arguments
-) {
+inline static jsi::Object generateUnistylesPrototype(jsi::Runtime& rt, Unistyle::Shared unistyle) {
     // add prototype metadata for createUnistylesComponent
     auto proto = jsi::Object(rt);
-    auto hostFn = jsi::Function::createFromHostFunction(rt, jsi::PropNameID::forUtf8(rt, "getStyle"), 0, [unistyle, unistylesRuntime](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count){
-        auto variants = helpers::variantsToPairs(rt, thisValue.asObject(rt).getProperty(rt, "variants").asObject(rt));
-        auto arguments = helpers::parseDynamicFunctionArguments(rt, thisValue.asObject(rt).getProperty(rt, "arguments").asObject(rt).asArray(rt));
 
-        parser::Parser(unistylesRuntime).rebuildUnistyle(rt, unistyle->parent, unistyle, variants, std::make_optional<std::vector<folly::dynamic>>(arguments));
-
-        return jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
-    });
-
-    proto.setProperty(rt, "getStyle", std::move(hostFn));
-    proto.setProperty(rt, "arguments", arguments.has_value() ? std::move(arguments.value()) : jsi::Array(rt, 0));
-    proto.setProperty(rt, "variants", variants.has_value() ? helpers::pairsToVariantsValue(rt, variants.value()) : jsi::Object(rt));
     proto.setProperty(rt, helpers::STYLE_DEPENDENCIES.c_str(), helpers::dependenciesToJSIArray(rt, unistyle->dependencies));
 
     return proto;
@@ -128,7 +111,7 @@ inline static jsi::Value valueFromUnistyle(jsi::Runtime& rt, std::shared_ptr<Hyb
         helpers::defineHiddenProperty(rt, obj, helpers::STYLE_DEPENDENCIES.c_str(), helpers::dependenciesToJSIArray(rt, unistyle->dependencies));
         helpers::mergeJSIObjects(rt, obj, unistyle->parsedStyle.value());
 
-        obj.setProperty(rt, "__proto__", generateUnistylesPrototype(rt, unistylesRuntime, unistyle, std::nullopt, std::nullopt));
+        obj.setProperty(rt, "__proto__", generateUnistylesPrototype(rt, unistyle));
 
         return obj;
     }

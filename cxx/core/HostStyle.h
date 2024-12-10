@@ -21,10 +21,6 @@ struct JSI_EXPORT HostStyle : public jsi::HostObject {
     jsi::Function createAddVariantsProxyFunction(jsi::Runtime& rt);
 
 private:
-    // to additionally distinguish between empty variants
-    // that are set at the beginning
-    bool hasVariantsSet = false;
-    
     std::shared_ptr<StyleSheet> _styleSheet;
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
     std::vector<std::pair<std::string, std::string>> _variants{};
