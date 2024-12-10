@@ -8,7 +8,8 @@ module.exports = function (api) {
         presets: ['babel-preset-expo'],
         plugins: [
             [path.join(__dirname, '../plugin'), {
-                debug: true
+                debug: true,
+                isLocal: true
             }],
             [
                 'module-resolver',
