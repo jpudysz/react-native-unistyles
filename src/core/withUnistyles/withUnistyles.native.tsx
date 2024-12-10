@@ -1,17 +1,14 @@
-import React, { type ComponentType, forwardRef, useEffect, useRef, useState } from 'react'
-import type { UnistylesTheme } from '../../types'
+import React, { type ComponentType, forwardRef, useRef } from 'react'
 import {
     StyleSheet,
     UnistyleDependency,
-    UnistylesRuntime,
-    type UnistylesMiniRuntime,
     type UnistylesStyleSheet,
-    UnistylesShadowRegistry
 } from '../../specs'
 import type { PartialBy } from '../../types/common'
 import { deepMergeObjects } from '../../utils'
 import { SUPPORTED_STYLE_PROPS } from './types'
 import type { Mappings, SupportedStyleProps } from './types'
+import { useDependencies } from './useDependencies'
 
 export const withUnistyles = <TProps extends Record<string, any>, TMappings extends TProps>(Component: ComponentType<TProps>, mappings?: Mappings<TMappings>) => {
     type PropsWithUnistyles = PartialBy<TProps, keyof TMappings | SupportedStyleProps> & {
@@ -20,9 +17,6 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
 
     return forwardRef<unknown, PropsWithUnistyles>((props, ref) => {
         const narrowedProps = props as PropsWithUnistyles
-        const scopedTheme = UnistylesShadowRegistry.getScopedTheme() as never
-        const [theme, setTheme] = useState<UnistylesTheme>(UnistylesRuntime.getTheme(scopedTheme))
-        const [, setRt] = useState(0)
         const stylesRef = useRef<Record<string, any>>({})
         const isForcedRef = useRef(false)
 
@@ -41,14 +35,10 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
             })
         }
 
-        useEffect(() => {
-            const removeChangeListener = (StyleSheet as UnistylesStyleSheet).addChangeListener(dependencies => {
-                const componentDependencies = narrowedProps.style?.__proto__.uni__dependencies as Array<UnistyleDependency>
-
-                if (dependencies.includes(UnistyleDependency.Theme) && (!componentDependencies ||componentDependencies.includes(UnistyleDependency.Theme)) && !scopedTheme) {
-                    setTheme(UnistylesRuntime.getTheme())
-
-                    // override with Unistyles styles
+        const { mappingsCallback } = useDependencies(({ dependencies, updateTheme, updateRuntime }) => {
+            const listensToTheme = dependencies.includes(UnistyleDependency.Theme)
+            const dispose = (StyleSheet as UnistylesStyleSheet).addChangeListener(changedDependencies => {
+                if (listensToTheme && changedDependencies.includes(UnistyleDependency.Theme)) {
                     SUPPORTED_STYLE_PROPS.forEach(propName => {
                         if (narrowedProps?.[propName]) {
                             stylesRef.current = {
@@ -59,21 +49,19 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
                         }
                     })
 
-                    isForcedRef.current = true
+                    updateTheme()
                 }
 
-                if (dependencies.some(dependency => dependency >= 2) && (!componentDependencies || componentDependencies.some(dependency => dependency >= 2))) {
-                    setRt(prevState => prevState + 1)
+                if (changedDependencies.some(dependency => dependencies.includes(dependency))) {
+                    updateRuntime()
                 }
             })
 
-            return () => {
-                removeChangeListener()
-            }
-        }, [])
+            return () => dispose()
+        })
 
-        const mappingProps = mappings?.(theme, UnistylesRuntime as unknown as UnistylesMiniRuntime) ?? {}
-        const unistyleProps = narrowedProps.uniProps?.(theme, UnistylesRuntime as unknown as UnistylesMiniRuntime) ?? {}
+        const mappingProps = mappings ? mappingsCallback(mappings) : {}
+        const unistyleProps = narrowedProps.uniProps ? mappingsCallback(narrowedProps.uniProps) : {}
         const finalProps = deepMergeObjects<Record<string, any>>(mappingProps, unistyleProps, props)
 
         // override with Unistyles styles
