@@ -5,7 +5,7 @@ import { UnistylesListener } from '../../web/listener'
 import { UnistylesShadowRegistry, UnistylesRuntime } from '../../web'
 import { equal } from '../../web/utils'
 import { deepMergeObjects } from '../../utils'
-import { type Mappings, type SupportedStyleProps } from './types'
+import type { Mappings, SupportedStyleProps } from './types'
 
 const ALL_DEPENDENCIES = Object.values(UnistyleDependency).filter((dependency): dependency is UnistyleDependency => typeof dependency === 'number')
 

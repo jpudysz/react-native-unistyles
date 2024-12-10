@@ -1,4 +1,4 @@
-import { type ComponentType } from 'react'
+import type { ComponentType } from 'react'
 import type { UnistylesTheme } from '../types'
 import { withUnistyles } from './withUnistyles'
 
