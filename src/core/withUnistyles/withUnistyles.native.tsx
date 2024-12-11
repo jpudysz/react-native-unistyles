@@ -48,6 +48,8 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
                                 // @ts-expect-error - this is hidden from TS
                                 [propName]: props[propName].__proto__?.getStyle?.() || props[propName]
                             }
+
+                            isForcedRef.current = true
                         }
                     })
 
@@ -60,7 +62,7 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
             })
 
             return () => dispose()
-        }, narrowedProps.style?.__proto__.uni__dependencies)
+        })
 
         useEffect(() => {
             const styleDependencies = narrowedProps.style?.__proto__.uni__dependencies ?? [] as Array<UnistyleDependency>
