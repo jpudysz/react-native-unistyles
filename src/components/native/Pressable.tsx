@@ -1,7 +1,8 @@
 import React, { forwardRef, useEffect, useRef } from 'react'
 import { Pressable as NativePressableReactNative } from 'react-native'
-import type { PressableProps as Props, View, ViewStyle } from 'react-native'
+import type { PressableProps as Props, View } from 'react-native'
 import { UnistylesShadowRegistry } from '../../specs'
+import type { UnistylesValues } from '../../types'
 
 type Variants = Record<string, string | boolean | undefined>
 type WebPressableState = {
@@ -10,7 +11,7 @@ type WebPressableState = {
     focused: boolean
 }
 
-type WebPressableStyle = ((state: WebPressableState) => ViewStyle) | ViewStyle
+type WebPressableStyle = ((state: WebPressableState) => UnistylesValues) | UnistylesValues
 
 type PressableProps = Props & {
     variants?: Variants
@@ -40,26 +41,23 @@ type UpdateStylesProps = {
     scopedTheme?: string
 }
 
-const extractStyleResult = (style: any) => {
-    return typeof style === 'function'
-        ? [style()]
-        : Array.isArray(style)
-            ? style.map(style => typeof style === 'function' ? style() : style)
-            : [style]
-}
-
 const updateStyles = ({ ref, style, state, scopedTheme, variants }: UpdateStylesProps) => {
     const styleResult = typeof style === 'function'
         ? style(state)
         : style
-    const extractedResult = extractStyleResult(styleResult)
     const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
     const previousVariants = UnistylesShadowRegistry.getVariants()
 
     UnistylesShadowRegistry.selectVariants(variants as unknown as Variants)
     UnistylesShadowRegistry.setScopedTheme(scopedTheme as any)
 
-    UnistylesShadowRegistry.add(ref, extractedResult)
+    const { hash, injectedClassName } = UnistylesShadowRegistry.addStyles(styleResult)
+
+    const pressableRef = (ref as HTMLDivElement | null)
+
+    pressableRef?.classList.remove(...Array.from(pressableRef.classList))
+    pressableRef?.classList.add(hash)
+    pressableRef?.classList.add(injectedClassName)
 
     UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
     UnistylesShadowRegistry.selectVariants(previousVariants as unknown as Variants)

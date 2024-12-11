@@ -12,11 +12,9 @@ export const createUnistylesImageBackground = (Component: typeof ImageBackground
                 ? props.imageStyle
                 : [props.imageStyle]
 
-            // @ts-expect-error - This is hidden from TS
             UnistylesShadowRegistry.add(ref, style)
 
             return () => {
-                // @ts-expect-error - This is hidden from TS
                 UnistylesShadowRegistry.remove(ref)
             }
         }}

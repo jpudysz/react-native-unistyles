@@ -22,7 +22,6 @@ export const passForwardedRef = <T>(
     UnistylesShadowRegistry.add(ref, props.style)
 
     return () => {
-        // @ts-expect-error - This is hidden from TS
         UnistylesShadowRegistry.remove(ref)
         forwardedRefReturnFn?.()
     }

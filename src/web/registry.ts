@@ -1,41 +1,27 @@
 import type { UnistylesTheme, UnistylesValues } from '../types'
 import type { StyleSheet, StyleSheetWithSuperPowers } from '../types/stylesheet'
 import { UnistylesRuntime } from './runtime'
-import { extractMediaQueryValue, keyInObject, getMediaQuery, generateHash, extractUnistyleDependencies, error } from './utils'
+import { generateHash, extractUnistyleDependencies, error, isServer } from './utils'
 import { UnistylesListener } from './listener'
-import { convertUnistyles } from './convert'
 import type { UnistylesMiniRuntime, UnistyleDependency } from '../specs'
-
-type ApplyRuleProps = {
-    hash: string,
-    key: string,
-    value: any,
-    sheet: CSSStyleSheet | CSSMediaRule
-}
-
-type RemoveReadonlyStyleKeys<T extends string> = T extends 'length' | 'parentRule' ? never : T
+import { CSSState } from './css'
 
 class UnistylesRegistryBuilder {
     private readonly stylesheets = new Map<StyleSheetWithSuperPowers<StyleSheet>, StyleSheet>()
-    private readonly stylesCounter = new Map<string, Set<UnistylesValues>>()
-    #styleTag: HTMLStyleElement | null = null
+    private readonly stylesCounter = new Map<string, number>()
     private readonly disposeListenersMap = new Map<object, VoidFunction>()
     private readonly dependenciesMap = new Map<StyleSheetWithSuperPowers<StyleSheet>, Set<UnistyleDependency>>()
+    readonly css = new CSSState()
+    private styleTag: HTMLStyleElement | null = null
 
-    private get styleTag() {
-        const tag = this.#styleTag
-
-        if (!tag) {
-            const newTag = document.createElement('style')
-
-            newTag.id = 'unistyles-web'
-            this.#styleTag = newTag
-            document.head.appendChild(newTag)
-
-            return newTag
+    constructor() {
+        if (isServer()) {
+            return
         }
 
-        return tag
+        this.styleTag = document.createElement('style')
+        this.styleTag.id = 'unistyles-web'
+        document.head.appendChild(this.styleTag)
     }
 
     getComputedStylesheet = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, scopedThemeName?: UnistylesTheme) => {
@@ -89,136 +75,37 @@ class UnistylesRegistryBuilder {
         const hash = generateHash(value)
         const existingCounter = this.stylesCounter.get(hash)
 
-        if (!existingCounter || existingCounter.size === 0) {
-            const counter = new Set<UnistylesValues>()
-
-            counter.add(value)
-            this.stylesCounter.set(hash, counter)
+        if (existingCounter === undefined) {
             this.applyStyles(hash, value)
+            this.stylesCounter.set(hash, 1)
 
             return { hash, existingHash: false }
         }
 
-        existingCounter.add(value)
+        this.stylesCounter.set(hash, existingCounter + 1)
 
         return { hash, existingHash: true }
     }
 
-    applyStyles = (hash: string, styles: Record<string, any>) => {
-        Object.entries(convertUnistyles(styles)).forEach(([key, value]) => {
-            if (!this.styleTag.sheet) {
-                return
-            }
-
-            if (typeof value === 'object' && !key.startsWith('_')) {
-                const mediaQuery = getMediaQuery(key)
-                const cssRules = Array.from(this.styleTag.sheet.cssRules)
-                let queryRule = cssRules.find(rule => {
-                    if (!(rule instanceof CSSMediaRule)) {
-                        return false
-                    }
-
-                    return rule.media.item(0)?.includes(mediaQuery)
-                }) ?? null
-
-                if (!queryRule) {
-                    const mediaQueryValue = extractMediaQueryValue(mediaQuery)
-                    const ruleIndex = mediaQueryValue
-                        ? cssRules.reduce<number | undefined>((acc, rule, ruleIndex) => {
-                            if (!(rule instanceof CSSMediaRule)) {
-                                return acc
-                            }
-
-                            const ruleMediaQueryValue = extractMediaQueryValue(rule.conditionText)
-
-                            if (ruleMediaQueryValue === undefined) {
-                                return
-                            }
-
-                            return ruleMediaQueryValue > mediaQueryValue ? ruleIndex : acc
-                        }, cssRules.length)
-                        : undefined
-                    queryRule = this.styleTag.sheet.cssRules.item(this.styleTag.sheet.insertRule(`@media ${mediaQuery} {.${hash} {}}`, ruleIndex))
-                }
-
-                if (queryRule instanceof CSSMediaRule) {
-                    Object.entries(value).forEach(([mqKey, mqValue]) => {
-                        this.applyRule({
-                            hash,
-                            key: mqKey,
-                            value: mqValue,
-                            sheet: queryRule
-                        })
-                    })
-                }
-
-                return
-            }
-
-            // Pseudo
-            if (typeof value === 'object') {
-                Object.entries(value).forEach(([pseudoKey, pseudoValue]) => {
-                    this.applyRule({
-                        hash: `${hash}${key.replace('_', ':')}`,
-                        key: pseudoKey,
-                        value: pseudoValue,
-                        sheet: this.styleTag.sheet as CSSStyleSheet
-                    })
-                })
-
-                return
-            }
-
-            this.applyRule({
-                hash,
-                key,
-                value,
-                sheet: this.styleTag.sheet
-            })
-        })
+    remove = (hash: string) => {
+        hash
     }
 
-    private applyRule = ({ hash, key, value, sheet }: ApplyRuleProps) => {
-        let rule = Array.from(sheet.cssRules).find(rule => {
-            if (!(rule instanceof CSSStyleRule)) {
-                return false
-            }
+    applyStyles = (hash: string, value: UnistylesValues) => {
+        this.css.add(hash, value)
 
-            // In unistyles pseudos are prefixed with ':' but in css some of them are prefixed with '::'
-            return rule.selectorText.replace('::', ':').includes(hash)
-        }) ?? null
-
-        if (!rule) {
-            rule = sheet.cssRules.item(sheet.insertRule(`.${hash} {}`))
-        }
-
-        if (!(rule instanceof CSSStyleRule) || !keyInObject(rule.style, key)) {
-            return
-        }
-
-        rule.style[key as RemoveReadonlyStyleKeys<typeof key>] = value
-    }
-
-    remove = (value: UnistylesValues) => {
-        const hash = generateHash(value)
-        const existingStyles = this.stylesCounter.get(hash)
-
-        if (!existingStyles) {
-            return
-        }
-
-        existingStyles.delete(value)
-
-        if (existingStyles.size === 0) {
-            const ruleIndex = Array.from(this.styleTag.sheet?.cssRules ?? []).findIndex(rule => rule.cssText.includes(`.${hash}`))
-
-            if (ruleIndex === -1) {
-                return
-            }
-
-            this.styleTag.sheet?.deleteRule(ruleIndex)
+        if (this.styleTag) {
+            this.styleTag.innerHTML = this.css.getStyles()
         }
     }
 }
 
-export const UnistylesRegistry = new UnistylesRegistryBuilder()
+declare global {
+    var __unistyles__: UnistylesRegistryBuilder
+}
+
+if (isServer() && !globalThis.__unistyles__) {
+    globalThis.__unistyles__ = new UnistylesRegistryBuilder()
+}
+
+export const UnistylesRegistry = isServer() ? globalThis.__unistyles__ : new UnistylesRegistryBuilder()

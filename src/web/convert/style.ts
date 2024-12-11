@@ -1,15 +1,15 @@
 import { keyInObject } from '../utils'
 
-const SKIP_STYLES = [
+const SKIP_STYLES = new Set([
     'borderCurve',
     'elevation',
     'textAlignVertical',
     'includeFontPadding',
     'overlayColor',
     'tintColor'
-]
+])
 
-const CSS_NUMBER_KEYS = [
+const CSS_NUMBER_KEYS = new Set([
     'animationIterationCount',
     'borderImageOutset',
     'borderImageSlice',
@@ -54,7 +54,7 @@ const CSS_NUMBER_KEYS = [
     'strokeMiterlimit',
     'strokeOpacity',
     'strokeWidth'
-]
+])
 
 const convertMap = {
     marginHorizontal: (value: number) => ({
@@ -124,14 +124,14 @@ const convertMap = {
 
 const convertNumber = (key: string, value: any) => {
     if (typeof value === 'number') {
-        return CSS_NUMBER_KEYS.includes(key, value) ? value : `${value}px`
+        return CSS_NUMBER_KEYS.has(key) ? value : `${value}px`
     }
 
     return value
 }
 
 export const getStyle = (key: string, value: any) => {
-    if (SKIP_STYLES.includes(key)) {
+    if (SKIP_STYLES.has(key)) {
         return {}
     }
 

@@ -28,11 +28,9 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                     ? style({ pressed: false })
                     : style
 
-                // @ts-expect-error - this is hidden from TS
                 UnistylesShadowRegistry.add(ref, [unistyles])
 
                 return () => {
-                    // @ts-expect-error - this is hidden from TS
                     UnistylesShadowRegistry.remove(ref)
 
                     if (typeof returnFn === 'function') {
@@ -49,10 +47,8 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                     : [unistyles]
 
                 if (storedRef.current) {
-                    // @ts-expect-error - this is hidden from TS
                     UnistylesShadowRegistry.remove(storedRef.current)
                     UnistylesShadowRegistry.selectVariants(variants)
-                    // @ts-expect-error - this is hidden from TS
                     UnistylesShadowRegistry.add(storedRef.current, styles)
                     UnistylesShadowRegistry.selectVariants(undefined)
                 }
