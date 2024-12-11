@@ -27,12 +27,9 @@ type ListenerProps = {
     dependencies: Array<UnistyleDependency>
 }
 
-export const useDependencies = (
-    listener: (props: ListenerProps) => VoidFunction,
-    stylesDependencies: Array<UnistyleDependency> = []
-) => {
+export const useDependencies = (listener: (props: ListenerProps) => VoidFunction) => {
     const scopedTheme = UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme
-    const [dependencies] = useState(() => new Set<number>(stylesDependencies))
+    const [dependencies] = useState(() => new Set<number>())
     const [theme, setTheme] = useState(UnistylesRuntime.getTheme(scopedTheme))
     const [_, runtimeChanged] = useReducer(() => ({}), {})
     const disposeRef = useRef<VoidFunction>()
