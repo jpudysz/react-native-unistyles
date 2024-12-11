@@ -24,7 +24,7 @@ class UnistylesShadowRegistryBuilder {
 
     add = (ref: any, styles: Array<Style>) => {
         // Styles are not provided
-        if (!styles) {
+        if (!styles || !Array.isArray(styles)) {
             return
         }
 

@@ -1,13 +1,9 @@
-import { useEffect, useReducer, useState } from 'react'
+import { useEffect, useReducer, useRef, useState } from 'react'
 import { UnistylesRuntime, UnistylesShadowRegistry, type UnistylesMiniRuntime } from '../../specs'
 // It's imported that way because of circular dependency
 import { UnistyleDependency } from '../../specs/NativePlatform'
 import type { UnistylesTheme } from '../../types'
 import type { Mappings } from './types'
-
-const getMiniRuntime = (): UnistylesMiniRuntime => {
-    return UnistylesRuntime.miniRuntime
-}
 
 const RTDependencyMap = {
     breakpoint: UnistyleDependency.Breakpoints,
@@ -39,9 +35,11 @@ export const useDependencies = (
     const [dependencies] = useState(() => new Set<number>(stylesDependencies))
     const [theme, setTheme] = useState(UnistylesRuntime.getTheme(scopedTheme))
     const [_, runtimeChanged] = useReducer(() => ({}), {})
+    const disposeRef = useRef<VoidFunction>()
 
-    useEffect(() => {
-        const dispose = listener({
+    const reinitListener = () => {
+        disposeRef.current?.()
+        disposeRef.current = listener({
             dependencies: Array.from(dependencies),
             updateTheme: () => {
                 if (scopedTheme) {
@@ -52,8 +50,12 @@ export const useDependencies = (
             },
             updateRuntime: () => runtimeChanged()
         })
+    }
 
-        return () => dispose()
+    useEffect(() => {
+        reinitListener()
+
+        return () => disposeRef.current?.()
     }, [dependencies.size])
 
     return {
@@ -65,7 +67,7 @@ export const useDependencies = (
                     return target[prop]
                 }
             })
-            const proxifiedRuntime = new Proxy(getMiniRuntime(), {
+            const proxifiedRuntime = new Proxy(UnistylesRuntime.miniRuntime, {
                 get: (target, prop) => {
                     if (prop in RTDependencyMap) {
                         dependencies.add(RTDependencyMap[prop as keyof typeof RTDependencyMap])
@@ -76,6 +78,19 @@ export const useDependencies = (
             })
 
             return callback(proxifiedTheme, proxifiedRuntime)
+        },
+        addDependencies: (newDependencies: Array<UnistyleDependency>) => {
+            const dependenciesSize = dependencies.size
+
+            newDependencies.forEach(dependency => {
+                dependencies.add(dependency)
+            })
+
+            if (dependenciesSize === dependencies.size) {
+                return
+            }
+
+            reinitListener()
         }
     }
 }
