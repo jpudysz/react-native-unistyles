@@ -10,5 +10,5 @@ type SupportedStyleProps = typeof SUPPORTED_STYLE_PROPS[number]
  * @deprecated Use withUnistyles instead
  */
 export const createUnistylesComponent = <TProps extends Record<string, any>, TMappings extends Partial<Omit<TProps, SupportedStyleProps>>>(Component: ComponentType<TProps>, mappings?: (theme: UnistylesTheme) => TMappings) => {
-    return withUnistyles(Component, mappings as any)
+    return withUnistyles(Component as any, mappings as any)
 }
