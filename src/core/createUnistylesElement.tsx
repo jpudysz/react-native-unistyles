@@ -1,24 +1,18 @@
 import React from 'react'
 import type { UnistylesValues } from '../types'
-import { UnistylesShadowRegistry } from '../web'
-import { deepMergeObjects } from '../utils'
+import { useClassname } from '../hooks'
 
 type ComponentProps = {
     style?: UnistylesValues | Array<UnistylesValues>
 }
 
 export const createUnistylesElement = (Component: any) => React.forwardRef<unknown, ComponentProps>((props, forwardedRef) => {
-    const style = Array.isArray(props.style)
-        ? deepMergeObjects(...props.style)
-        : props.style
-    const { hash, injectedClassName } = style
-        ? UnistylesShadowRegistry.addStyles(style)
-        : {}
+    const classNames = useClassname(props.style)
 
     return (
         <Component
             {...props}
-            style={hash ? { $$css: true, hash, injectedClassName } : undefined}
+            style={classNames}
             ref={forwardedRef}
         />
     )
