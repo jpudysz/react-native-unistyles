@@ -72,7 +72,7 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
                     'unistyles': contentContainerStyleClassNames.join(' ')
                 },
             } : {},
-        } as unknown as TProps
+        } as TProps
 
         return <Component {...combinedProps} ref={ref} />
     })
