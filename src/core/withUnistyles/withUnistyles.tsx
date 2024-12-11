@@ -1,4 +1,4 @@
-import React, { useEffect, useState, type ComponentType, forwardRef, useRef, useMemo } from 'react'
+import React, { useEffect, useState, type ComponentType, forwardRef, useRef, useMemo, type ComponentProps, type ComponentRef } from 'react'
 import type { PartialBy } from '../../types/common'
 import { UnistylesListener } from '../../web/listener'
 import { UnistylesShadowRegistry } from '../../web'
@@ -7,6 +7,7 @@ import { deepMergeObjects } from '../../utils'
 import type { Mappings, SupportedStyleProps } from './types'
 import { useDependencies } from './useDependencies'
 import { UnistyleDependency } from '../../specs/NativePlatform'
+import type { UnistylesValues } from '../../types'
 
 const useShadowRegistry = (style?: Record<string, any>) => {
     const [ref] = useState(document.createElement('div'))
@@ -37,12 +38,20 @@ const useShadowRegistry = (style?: Record<string, any>) => {
     return classNames
 }
 
-export const withUnistyles = <TProps extends Record<string, any>, TMappings extends TProps>(Component: ComponentType<TProps>, mappings?: Mappings<TMappings>) => {
+// @ts-expect-error
+type GenericComponentProps<T> = ComponentProps<T>
+// @ts-expect-error
+type GenericComponentRef<T> = ComponentRef<T>
+
+export const withUnistyles = <TComponent, TMappings extends GenericComponentProps<TComponent>>(Component: TComponent, mappings?: Mappings<TMappings>) => {
+    type TProps = GenericComponentProps<TComponent>
     type PropsWithUnistyles = PartialBy<TProps, keyof TMappings | SupportedStyleProps> & {
         uniProps?: Mappings<TProps>
+        style?: UnistylesValues,
+        contentContainerStyle?: UnistylesValues
     }
 
-    return forwardRef<unknown, PropsWithUnistyles>((props, ref) => {
+    return forwardRef<GenericComponentRef<TComponent>, PropsWithUnistyles>((props, ref) => {
         const narrowedProps = props as PropsWithUnistyles
         const styleClassNames = useShadowRegistry(narrowedProps.style)
         const contentContainerStyleClassNames = useShadowRegistry(narrowedProps.contentContainerStyle)
@@ -72,9 +81,9 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
                     'unistyles': contentContainerStyleClassNames.join(' ')
                 },
             } : {},
-        } as TProps
+        } as any
 
-        const NativeComponent = Component as ComponentType<TProps>
+        const NativeComponent = Component as ComponentType
 
         return <NativeComponent {...combinedProps} ref={ref} />
     })
