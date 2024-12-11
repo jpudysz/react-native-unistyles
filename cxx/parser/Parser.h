@@ -23,6 +23,7 @@ struct Parser {
 
     void buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
     void parseUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet);
+    void rebuildUnistyleWithVariants(jsi::Runtime& rt, std::shared_ptr<UnistyleData> unistyleData);
     void rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, Variants& variants);
     void rebuildUnistylesInDependencyMap(jsi::Runtime& rt, core::DependencyMap& dependencyMap, std::vector<std::shared_ptr<core::StyleSheet>>& styleSheets, std::optional<UnistylesNativeMiniRuntime> maybeMiniRuntime);
     void rebuildShadowLeafUpdates(jsi::Runtime& rt, core::DependencyMap& dependencyMap);

@@ -64,6 +64,15 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
                 parsedStyleSheet,
                 unistyleData
             );
+            
+            unistylesData.emplace_back(unistyleData);
+            
+            continue;
+        }
+        
+        // rebuild unistyles if variants have been applied
+        if (this->_scopedVariants.size() > 0) {
+            parser.rebuildUnistyleWithVariants(rt, unistyleData);
         }
 
         unistylesData.emplace_back(unistyleData);

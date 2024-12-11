@@ -116,7 +116,7 @@ inline static std::vector<Unistyle::Shared> unistyleFromValue(jsi::Runtime& rt, 
     return unistyles;
 }
 
-inline static jsi::Value valueFromUnistyle(jsi::Runtime& rt, std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime, Unistyle::Shared unistyle, int tag) {
+inline static jsi::Value valueFromUnistyle(jsi::Runtime& rt, std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime, Unistyle::Shared unistyle) {
     auto wrappedUnistyle = std::make_shared<UnistyleWrapper>(unistyle);
 
     if (unistyle->type == UnistyleType::Object) {
