@@ -1,4 +1,4 @@
-import React, { type ComponentType, forwardRef, useRef } from 'react'
+import React, { type ComponentType, forwardRef, useEffect, useRef } from 'react'
 import { StyleSheet, UnistyleDependency } from '../../specs'
 import type { PartialBy } from '../../types/common'
 import { deepMergeObjects } from '../../utils'
@@ -36,7 +36,7 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
             })
         }
 
-        const { mappingsCallback } = useDependencies(({ dependencies, updateTheme, updateRuntime }) => {
+        const { mappingsCallback, addDependencies } = useDependencies(({ dependencies, updateTheme, updateRuntime }) => {
             const listensToTheme = dependencies.includes(UnistyleDependency.Theme)
             // @ts-expect-error - this is hidden from TS
             const dispose = StyleSheet.addChangeListener(changedDependencies => {
@@ -61,6 +61,13 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
 
             return () => dispose()
         }, narrowedProps.style?.__proto__.uni__dependencies)
+
+        useEffect(() => {
+            const styleDependencies = narrowedProps.style?.__proto__.uni__dependencies ?? [] as Array<UnistyleDependency>
+            const contentContainerStyleDependencies = narrowedProps.contentContainerStyle?.__proto__.uni__dependencies ?? [] as Array<UnistyleDependency>
+
+            addDependencies([...styleDependencies, ...contentContainerStyleDependencies])
+        }, [narrowedProps.style, narrowedProps.contentContainerStyle])
 
         const mappingProps = mappings ? mappingsCallback(mappings) : {}
         const unistyleProps = narrowedProps.uniProps ? mappingsCallback(narrowedProps.uniProps) : {}
