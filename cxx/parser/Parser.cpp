@@ -36,14 +36,6 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
     });
 }
 
-void parser::Parser::rebuildUnistyleWithVariants(jsi::Runtime& rt, std::shared_ptr<UnistyleData> unistyleData) {
-    if (unistyleData->unistyle->parent == nullptr || unistyleData->unistyle->parent->type == StyleSheetType::Static) {
-        return;
-    }
-
-    unistyleData->parsedStyle = this->parseFirstLevel(rt, unistyleData->unistyle, unistyleData->variants);
-}
-
 jsi::Value parser::Parser::getParsedStyleSheetForScopedTheme(jsi::Runtime& rt, core::Unistyle::Shared unistyle, std::string& scopedTheme) {
     // for static stylesheets and exotic styles we don't need to do anything
     if (unistyle->parent == nullptr || unistyle->parent->type == StyleSheetType::Static) {
@@ -493,9 +485,10 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
                 ? std::nullopt
                 : std::optional<Variants>(helpers::variantsToPairs(rt, rawVariants.asObject(rt)));
 
-            jsi::Object style = jsi::Value(rt, this->parseFirstLevel(rt, unistyleFn, variants)).asObject(rt);
-
+            unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
             unistyleFn->seal();
+
+            jsi::Object style = jsi::Value(rt, unistyleFn->parsedStyle.value()).asObject(rt);
 
             // include dependencies for createUnistylesComponent
             style.setProperty(rt, "__proto__", generateUnistylesPrototype(rt, unistylesRuntime, unistyle, variants, helpers::functionArgumentsToArray(rt, args, count)));

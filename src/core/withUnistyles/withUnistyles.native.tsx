@@ -55,6 +55,8 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
                                 // @ts-expect-error - this is hidden from TS
                                 [propName]: props[propName].__proto__?.getStyle?.() || props[propName]
                             }
+
+                            isForcedRef.current = true
                         }
                     })
 
@@ -67,7 +69,7 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
             })
 
             return () => dispose()
-        }, narrowedProps.style?.__proto__.uni__dependencies)
+        })
 
         useEffect(() => {
             const styleDependencies = narrowedProps.style?.__proto__.uni__dependencies ?? [] as Array<UnistyleDependency>
