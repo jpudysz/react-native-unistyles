@@ -2,7 +2,7 @@ import React, { forwardRef, useEffect, useRef } from 'react'
 import { Pressable as NativePressableReactNative } from 'react-native'
 import type { PressableProps as Props, View } from 'react-native'
 import { UnistylesShadowRegistry } from '../../specs'
-import type { UnistylesValues } from '../../types'
+import type { UnistylesTheme, UnistylesValues } from '../../types'
 
 type Variants = Record<string, string | boolean | undefined>
 type WebPressableState = {
@@ -38,7 +38,7 @@ type UpdateStylesProps = {
     style: WebPressableStyle,
     variants?: Variants,
     state: WebPressableState
-    scopedTheme?: string
+    scopedTheme?: UnistylesTheme
 }
 
 const updateStyles = ({ ref, style, state, scopedTheme, variants }: UpdateStylesProps) => {
@@ -48,16 +48,18 @@ const updateStyles = ({ ref, style, state, scopedTheme, variants }: UpdateStyles
     const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
     const previousVariants = UnistylesShadowRegistry.getVariants()
 
-    UnistylesShadowRegistry.selectVariants(variants as unknown as Variants)
-    UnistylesShadowRegistry.setScopedTheme(scopedTheme as any)
+    UnistylesShadowRegistry.selectVariants(variants)
+    UnistylesShadowRegistry.setScopedTheme(scopedTheme)
 
     const { hash, injectedClassName } = UnistylesShadowRegistry.addStyles(styleResult)
-
     const pressableRef = (ref as HTMLDivElement | null)
 
     pressableRef?.classList.remove(...Array.from(pressableRef.classList))
     pressableRef?.classList.add(hash)
-    pressableRef?.classList.add(injectedClassName)
+
+    if (injectedClassName) {
+        pressableRef?.classList.add(injectedClassName)
+    }
 
     UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
     UnistylesShadowRegistry.selectVariants(previousVariants as unknown as Variants)
