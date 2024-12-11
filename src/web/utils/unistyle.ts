@@ -2,8 +2,9 @@ import type { UnistyleDependency } from '../../specs/NativePlatform'
 import { ColorScheme, Orientation } from '../../specs/types'
 import type { StyleSheet, StyleSheetWithSuperPowers, UnistylesValues } from '../../types/stylesheet'
 import { isUnistylesMq, parseMq } from '../../mq'
-import { UnistylesState } from '../state'
 import { keyInObject, reduceObject } from './common'
+import { UnistylesRuntime } from '../runtime'
+import type { UnistylesBreakpoints } from '../../global'
 
 export const schemeToTheme = (scheme: ColorScheme) => {
     switch (scheme) {
@@ -47,21 +48,7 @@ export const removeInlineStyles = (values: UnistylesValues) => {
 
 export const isInDocument = (element: HTMLElement) => document.body.contains(element)
 
-export const extractMediaQueryValue = (query: string) => {
-    const [_, px] = query.match(/(\d+)px/) ?? []
-
-    if (!px) {
-        return undefined
-    }
-
-    const value = Number(px)
-
-    return Number.isNaN(value)
-        ? undefined
-        : value
-}
-
-export const getMediaQuery = (query: string) => {
+export const getMediaQuery = (query: string, allBreakpoints: Array<string>) => {
     if (Object.values(Orientation).includes(query as Orientation)) {
         return `(orientation: ${query})`
     }
@@ -77,9 +64,18 @@ export const getMediaQuery = (query: string) => {
         ].filter(Boolean).join(' and ')
     }
 
-    const minWidth = UnistylesState.breakpoints && keyInObject(UnistylesState.breakpoints, query) ? UnistylesState.breakpoints[query] : undefined
+    const breakpointValue = UnistylesRuntime.breakpoints[query as keyof UnistylesBreakpoints] ?? 0
+    const nextBreakpoint = allBreakpoints
+            .filter((b): b is keyof UnistylesBreakpoints => b in UnistylesRuntime.breakpoints)
+            .map(b => UnistylesRuntime.breakpoints[b] ?? 1)
+            .sort((a, b) => a - b)
+            .find(b => b > breakpointValue)
+        const queries = [
+            `(min-width: ${breakpointValue}px)`,
+            nextBreakpoint ? `(max-width: ${nextBreakpoint - 1}px)` : undefined,
+        ].filter(Boolean).join(' and ')
 
-    return `(min-width: ${minWidth ?? 0}px)`
+        return `@media ${queries}`
 }
 
 export const extractUnistyleDependencies = (value: any) => {

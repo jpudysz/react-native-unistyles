@@ -32,14 +32,38 @@ export const equal = <T>(a: T, b: T) => {
     return keysA.every(key => Object.is(a[key], b[key]) && Object.prototype.hasOwnProperty.call(b, key))
 }
 
-export const generateHash = (value: any) => {
-    const str = JSON.stringify(value)
-    let hasher = 5381
-    let length = str.length
+export const hyphenate = (propertyName: string) => propertyName.replace(/[A-Z]/g, (m: string) => `-${m.toLowerCase()}`)
 
-    while (length--) hasher = (hasher * 33) ^ str.charCodeAt(length)
+export const serialize = (obj: string | number | object): string => {
+    if (typeof obj !== 'object') {
+        return String(obj)
+    }
 
-    return `unistyles-${(hasher >>> 0).toString(36)}`
+    const sortedKeys = Object.keys(obj).sort()
+    const sortedKeyValuePairs = sortedKeys.map(key => `${key}:${serialize(obj[key as keyof typeof obj])}`)
+
+    return `{${sortedKeyValuePairs.join(',')}}`
 }
 
-export const hyphenate = (propertyName: string) => propertyName.replace(/[A-Z]/g, (m: string) => `-${m.toLowerCase()}`)
+// Based on https://github.com/bryc/code/blob/master/jshash/experimental/cyrb53.js
+const cyrb53 = (data: string, seed = 0) => {
+    let h1 = 0xdeadbeef ^ seed
+    let h2 = 0x41c6ce57 ^ seed
+
+    for (let i = 0, ch: number; i < data.length; i++) {
+        ch = data.charCodeAt(i)
+        h1 = Math.imul(h1 ^ ch, 2654435761)
+        h2 = Math.imul(h2 ^ ch, 1597334677)
+    }
+
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909)
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909)
+
+    return 4294967296 * (2097151 & h2) + (h1 >>> 0)
+}
+
+export const generateHash = (value: any) => {
+    const serialized = serialize(value)
+
+    return `unistyles-${cyrb53(serialized).toString(36)}`
+}

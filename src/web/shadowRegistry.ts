@@ -2,10 +2,8 @@ import type { UnistylesTheme, UnistylesValues } from '../types'
 import { UnistylesListener } from './listener'
 import { UnistylesRegistry } from './registry'
 import { deepMergeObjects } from '../utils'
-import { equal, extractSecrets, extractUnistyleDependencies, isInDocument, keyInObject } from './utils'
+import { extractSecrets, extractUnistyleDependencies } from './utils'
 import { getVariants } from './variants'
-
-type Style = UnistylesValues | ((...args: Array<any>) => UnistylesValues)
 
 class UnistylesShadowRegistryBuilder {
     // MOCKS
@@ -16,139 +14,57 @@ class UnistylesShadowRegistryBuilder {
     dispose = () => {}
     // END MOCKS
 
-    private resultsMap = new Map<HTMLElement, UnistylesValues>()
-    private hashMap = new Map<HTMLElement, string>()
-    private classNamesMap = new Map<HTMLElement, Array<string>>()
     private selectedVariants = new Map<string, string | boolean | undefined>()
     private scopedTheme: UnistylesTheme | undefined = undefined
 
-    add = (ref: any, styles: Array<Style>) => {
-        // Styles are not provided
-        if (!styles || !Array.isArray(styles)) {
-            return
-        }
+    add = (_ref: any, _styles: any) => {}
 
-        // Ref is unmounted
-        if (ref === null) {
-            styles.flat().forEach(style => {
-                extractSecrets(style)?.__uni__refs.forEach(ref => {
-                    if (isInDocument(ref)) {
-                        return
-                    }
-
-                    const oldResult = this.resultsMap.get(ref)
-
-                    this.resultsMap.delete(ref)
-                    this.classNamesMap.delete(ref)
-
-                    if (oldResult) {
-                        UnistylesRegistry.remove(oldResult)
-                    }
-                })
-            })
-
-            return
-        }
-
-        // Ref is not an HTMLElement
-        if (!(ref instanceof HTMLElement)) {
-            return
-        }
-
+    addStyles = (unistyle: UnistylesValues) => {
         const getParsedStyles = () => {
-            return styles.flat().flatMap(unistyleStyle => {
-                if (!unistyleStyle) {
-                    return []
-                }
+            const secrets = extractSecrets(unistyle)
 
-                const secrets = extractSecrets(unistyleStyle)
+            // Regular style
+            if (!secrets) {
+                return unistyle
+            }
 
-                // Regular style
-                if (!secrets) {
-                    Object.keys(unistyleStyle).forEach(key => {
-                        if (keyInObject(ref.style, key)) {
-                            // @ts-expect-error - Styles won't have read only properties
-                            ref.style[key] = ''
-                        }
-                    })
+            const { __uni__key, __uni__stylesheet, __uni__args = [] } = secrets
+            const newComputedStylesheet = UnistylesRegistry.getComputedStylesheet(__uni__stylesheet, scopedTheme)
+            const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
+            const variants = Object.fromEntries(this.selectedVariants.entries())
+            const result = typeof style === 'function'
+                ? style(...__uni__args)
+                : style
+            const { variantsResult } = Object.fromEntries(getVariants({ variantsResult: result }, variants))
+            const resultWithVariants = deepMergeObjects(result, variantsResult ?? {})
+            const dependencies = extractUnistyleDependencies(resultWithVariants)
 
-                    return unistyleStyle as UnistylesValues
-                }
+            if (typeof __uni__stylesheet === 'function') {
+                // Add dependencies from dynamic styles to stylesheet
+                UnistylesRegistry.addDependenciesToStylesheet(__uni__stylesheet, dependencies)
+            }
 
-                const { __uni__key, __uni__stylesheet, __uni__args = [], __uni__refs } = secrets
-                    const newComputedStylesheet = UnistylesRegistry.getComputedStylesheet(__uni__stylesheet, scopedTheme)
-                    const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
-                    const variants = Object.fromEntries(this.selectedVariants.entries())
-                    const args = __uni__args
-                    const result = typeof style === 'function'
-                        ? style(...args)
-                        : style
-                    const { variantsResult } = Object.fromEntries(getVariants({ variantsResult: result }, variants))
-                    const resultWithVariants = deepMergeObjects(result, variantsResult ?? {})
-                    const dependencies = extractUnistyleDependencies(resultWithVariants)
-
-                    if (typeof __uni__stylesheet === 'function') {
-                        // Add dependencies from dynamic styles to stylesheet
-                        UnistylesRegistry.addDependenciesToStylesheet(__uni__stylesheet, dependencies)
-                    }
-
-                    __uni__refs.add(ref)
-
-                    return resultWithVariants as UnistylesValues
-            })
+            return resultWithVariants as UnistylesValues
         }
 
         // Copy scoped theme to not use referenced value
         const scopedTheme = this.scopedTheme
         const parsedStyles = getParsedStyles()
-        const combinedStyles = deepMergeObjects(...parsedStyles)
-        const oldStyles = this.resultsMap.get(ref)
-
-        if (equal(combinedStyles, oldStyles)) {
-            return
-        }
-
-        const oldClassNames = this.classNamesMap.get(ref)
-
-        // Remove old styles
-        if (oldStyles) {
-            UnistylesRegistry.remove(oldStyles)
-        }
-
-        // Remove old classnames from the ref
-        oldClassNames?.forEach(className => ref.classList.remove(className))
-        this.resultsMap.set(ref, combinedStyles)
-
-        const { hash, existingHash } = UnistylesRegistry.add(combinedStyles)
-        const injectedClassNames = combinedStyles?._web?._classNames ?? []
-        const newClassNames = (Array.isArray(injectedClassNames) ? injectedClassNames : [injectedClassNames]).concat(hash)
-        const dependencies = Array.from(new Set(parsedStyles.flatMap(style => extractUnistyleDependencies(style))))
+        const { hash, existingHash } = UnistylesRegistry.add(parsedStyles)
+        const injectedClassNames = parsedStyles?._web?._classNames ?? []
+        const injectedClassName = Array.isArray(injectedClassNames) ? injectedClassNames.join(' ') : injectedClassNames
+        const dependencies = extractUnistyleDependencies(parsedStyles)
 
         if (!existingHash) {
             const dispose = UnistylesListener.addListeners(dependencies, () => {
-                const hash = this.hashMap.get(ref)
-
-                // Dispose listener if there is no hash
-                if (!hash) {
-                    dispose()
-
-                    return
-                }
-
-                UnistylesRegistry.applyStyles(hash, deepMergeObjects(...getParsedStyles()))
+                UnistylesRegistry.applyStyles(hash, getParsedStyles())
             })
+
+            // Dispose somewhere?
+            dispose
         }
 
-        this.classNamesMap.set(ref, newClassNames)
-        // Add new classnames to the ref
-        ref.classList.add(...newClassNames)
-
-        // If it is new hash add it to the map to use for the listener
-        if (!existingHash) {
-            this.hashMap.set(ref, hash)
-        }
-
-        return newClassNames
+        return { injectedClassName, hash }
     }
 
     selectVariants = (variants?: Record<string, string | boolean | undefined>) => {
@@ -171,7 +87,7 @@ class UnistylesShadowRegistryBuilder {
 
     getVariants = () => this.selectedVariants
 
-    remove = () => {}
+    remove = (_ref: any) => {}
 }
 
 export const UnistylesShadowRegistry = new UnistylesShadowRegistryBuilder()
