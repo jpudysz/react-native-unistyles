@@ -1,4 +1,4 @@
-import React, { type ComponentType, forwardRef, useEffect, useRef } from 'react'
+import React, { forwardRef, useEffect, useRef, type ComponentType } from 'react'
 import { StyleSheet, UnistyleDependency } from '../../specs'
 import type { PartialBy } from '../../types/common'
 import { deepMergeObjects } from '../../utils'
@@ -6,26 +6,33 @@ import { SUPPORTED_STYLE_PROPS } from './types'
 import type { Mappings, SupportedStyleProps } from './types'
 import { useDependencies } from './useDependencies'
 
-export const withUnistyles = <TProps extends Record<string, any>, TMappings extends TProps>(Component: ComponentType<TProps>, mappings?: Mappings<TMappings>) => {
+// @ts-expect-error
+type GenericComponentProps<P> = ComponentProps<P>
+// @ts-expect-error
+type GenericComponentRef<T> = ComponentRef<T>
+
+export const withUnistyles = <TComponent, TMappings extends GenericComponentProps<TComponent>>(Component: TComponent, mappings?: Mappings<TMappings>) => {
+    type TProps = GenericComponentProps<TComponent>
     type PropsWithUnistyles = PartialBy<TProps, keyof TMappings | SupportedStyleProps> & {
         uniProps?: Mappings<TProps>
     }
 
-    return forwardRef<unknown, PropsWithUnistyles>((props, ref) => {
+    return forwardRef<GenericComponentRef<TComponent>, PropsWithUnistyles>((props, ref) => {
         const narrowedProps = props as PropsWithUnistyles
         const stylesRef = useRef<Record<string, any>>({})
         const isForcedRef = useRef(false)
+        const NativeComponent = Component as ComponentType
 
         if (!isForcedRef.current) {
             SUPPORTED_STYLE_PROPS.forEach(propName => {
                 if (narrowedProps?.[propName]) {
                     if (Array.isArray(narrowedProps[propName])) {
-                        console.error(`🦄 Unistyles: createUnistylesComponent requires ${propName} to be an object. Please check props for component: ${Component.displayName}`)
+                        console.error(`🦄 Unistyles: createUnistylesComponent requires ${propName} to be an object. Please check props for component: ${NativeComponent.displayName}`)
                     }
 
                     // @ts-expect-error - this is hidden from TS
                     if (props[propName].__unistyles_name && !props[propName].__proto__?.getStyle) {
-                        console.error(`🦄 Unistyles: createUnistylesComponent received style that is not bound. You likely used the spread operator on a Unistyle style. Please check props for component: ${Component.displayName}`)
+                        console.error(`🦄 Unistyles: createUnistylesComponent received style that is not bound. You likely used the spread operator on a Unistyle style. Please check props for component: ${NativeComponent.displayName}`)
                     }
 
                     stylesRef.current = {
@@ -48,6 +55,8 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
                                 // @ts-expect-error - this is hidden from TS
                                 [propName]: props[propName].__proto__?.getStyle?.() || props[propName]
                             }
+
+                            isForcedRef.current = true
                         }
                     })
 
@@ -60,7 +69,7 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
             })
 
             return () => dispose()
-        }, narrowedProps.style?.__proto__.uni__dependencies)
+        })
 
         useEffect(() => {
             const styleDependencies = narrowedProps.style?.__proto__.uni__dependencies ?? [] as Array<UnistyleDependency>
@@ -82,6 +91,6 @@ export const withUnistyles = <TProps extends Record<string, any>, TMappings exte
 
         isForcedRef.current = false
 
-        return <Component {...finalProps as TProps} ref={ref} />
+        return <NativeComponent {...finalProps as TProps} ref={ref} />
     })
 }

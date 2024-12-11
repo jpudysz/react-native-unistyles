@@ -57,13 +57,9 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
             if (parsedStyleSheet.isUndefined()) {
                 parsedStyleSheet = parser.getParsedStyleSheetForScopedTheme(rt, unistyle, this->_scopedTheme.value());
             }
-
+            
             // if so we need to force update
-            parser.rebuildUnistyleWithScopedTheme(
-                rt,
-                parsedStyleSheet,
-                unistyleData
-            );
+            parser.rebuildUnistyleWithScopedTheme(rt, parsedStyleSheet, unistyleData);
         }
 
         unistylesData.emplace_back(unistyleData);
