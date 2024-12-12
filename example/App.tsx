@@ -1,5 +1,14 @@
 import React, { useRef } from 'react'
-import { Button, Pressable, PressableStateCallbackType, ScrollView, Text, TextInput, View } from 'react-native'
+import {
+    Button,
+    ImageBackground,
+    Pressable,
+    PressableStateCallbackType,
+    ScrollView,
+    Text,
+    TextInput,
+    View
+} from 'react-native'
 import { Blurhash } from 'react-native-blurhash'
 import {
     StyleSheet,
@@ -69,7 +78,14 @@ export const App = () => {
                     </View>
                 ))}
             </UniScrollView>
-            <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6." style={styles.blurhash}  />
+            <View style={styles.row}>
+                <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6." style={styles.blurhash}  />
+                <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6." style={styles.blurhashWithColor({ light: '#A1CEDC', dark: '#1D3D47' })}  />
+            </View>
+            <ImageBackground
+                source={{ uri: 'https://images.unsplash.com/photo-1674448417387-345997fcd888?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY0NjY2ODk0NQ&ixlib=rb-1.2.1&q=80&w=1080' }}
+                style={styles.imageBackground({ light: 'black', dark: 'white' })}
+            />
             <UniButton
                 title="Force re-render"
                 onPress={() => setCount(prevState =>  prevState + 1)}
@@ -144,9 +160,24 @@ const styles = StyleSheet.create((theme, rt) => ({
         borderWidth: 5,
         borderColor: theme.colors.test
     },
+    blurhashWithColor: (color: Record<string, string>) => ({
+        height: 100,
+        width: 100,
+        borderWidth: 5,
+        borderColor: rt.colorScheme === 'dark' ? color.dark : color.light
+    }),
+    imageBackground: (color: Record<string, string>) => ({
+        height: 100,
+        width: 100,
+        borderWidth: 5,
+        borderColor: rt.colorScheme === 'dark' ? color.dark : color.light
+    }),
     scrollView: {
         width: '100%',
         backgroundColor: theme.colors.accent
+    },
+    row: {
+        flexDirection: 'row',
     },
     contentContainerStyle: {
         transform: [{
