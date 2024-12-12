@@ -30,10 +30,12 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
 
         arguments.push_back({});
     }
+    
+    auto scopedTheme = registry.getScopedTheme();
 
     // check if scope theme exists
-    if (this->_scopedTheme.has_value()) {
-        auto themeName = this->_scopedTheme.value();
+    if (scopedTheme.has_value()) {
+        auto themeName = scopedTheme.value();
 
         helpers::assertThat(rt, registry.getState(rt).hasTheme(themeName), "Unistyles: You're trying to use scoped theme '" + themeName + "' but it wasn't registered.");
     }
@@ -47,15 +49,15 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
         core::Unistyle::Shared& unistyle = unistyleWrappers[i];
         std::shared_ptr<core::UnistyleData> unistyleData = std::make_shared<core::UnistyleData>(
             unistyle,
-            this->_scopedVariants,
+            registry.getScopedVariants(),
             arguments[i],
-            this->_scopedTheme
+            scopedTheme
         );
 
         // before linking we need to check if given unistyle is affected by scoped theme
-        if (this->_scopedTheme.has_value()) {
+        if (scopedTheme.has_value()) {
             if (parsedStyleSheet.isUndefined()) {
-                parsedStyleSheet = parser.getParsedStyleSheetForScopedTheme(rt, unistyle, this->_scopedTheme.value());
+                parsedStyleSheet = parser.getParsedStyleSheetForScopedTheme(rt, unistyle, scopedTheme.value());
             }
 
             // if so we need to force update
@@ -91,13 +93,15 @@ jsi::Value HybridShadowRegistry::unlink(jsi::Runtime &rt, const jsi::Value &this
 
 jsi::Value HybridShadowRegistry::selectVariants(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count == 1, "Unistyles: Invalid babel transform 'ShadowRegistry selectVariants' expected 1 arguments.");
+    
+    auto& registry = core::UnistylesRegistry::get();
 
     if (args[0].isUndefined()) {
-        this->_scopedVariants = {};
+        registry.setScopedVariants({});
     }
 
     if (args[0].isObject()) {
-        this->_scopedVariants = helpers::variantsToPairs(rt, args[0].asObject(rt));
+        registry.setScopedVariants(helpers::variantsToPairs(rt, args[0].asObject(rt)));
     }
 
     return jsi::Value::undefined();
@@ -105,20 +109,26 @@ jsi::Value HybridShadowRegistry::selectVariants(jsi::Runtime &rt, const jsi::Val
 
 jsi::Value HybridShadowRegistry::setScopedTheme(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count == 1, "Unistyles: setScopedTheme expected 1 argument.");
+    
+    auto& registry = core::UnistylesRegistry::get();
 
     if (args[0].isUndefined()) {
-        this->_scopedTheme = std::nullopt;
+
+        registry.setScopedTheme(std::nullopt);
     }
 
     if (args[0].isString()) {
-        this->_scopedTheme = args[0].asString(rt).utf8(rt);
+        registry.setScopedTheme(args[0].asString(rt).utf8(rt));
     }
 
     return jsi::Value::undefined();
 }
 
 jsi::Value HybridShadowRegistry::getScopedTheme(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
-    return this->_scopedTheme.has_value()
-        ? jsi::String::createFromUtf8(rt, this->_scopedTheme.value())
+    auto& registry = core::UnistylesRegistry::get();
+    auto maybeScopedTheme = registry.getScopedTheme();
+    
+    return maybeScopedTheme.has_value()
+        ? jsi::String::createFromUtf8(rt, maybeScopedTheme.value())
         : jsi::Value::undefined();
 }
