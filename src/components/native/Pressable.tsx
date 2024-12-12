@@ -83,7 +83,7 @@ export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, 
             updateStyles({
                 ref: storedRef.current,
                 style: styleRef.current as WebPressableStyle,
-                variants: variants as unknown as Variants,
+                variants,
                 scopedTheme,
                 state: state.current
             })
@@ -115,7 +115,7 @@ export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, 
                 updateStyles({
                     ref,
                     style: style as WebPressableStyle,
-                    variants: variants as unknown as Variants,
+                    variants,
                     scopedTheme,
                     state: initialState
                 })
