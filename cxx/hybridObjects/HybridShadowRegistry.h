@@ -46,8 +46,6 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
     };
 
 private:
-    core::Variants _scopedVariants{};
-    std::optional<std::string> _scopedTheme{};
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
 };
 

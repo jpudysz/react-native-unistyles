@@ -30,6 +30,8 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                 return passForwardedRef(props, ref, forwardedRef)
             }}
             style={state => {
+                UnistylesShadowRegistry.selectVariants(variants)
+
                 const unistyles = typeof style === 'function'
                     ? style(state)
                     : style
@@ -40,11 +42,11 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                 if (storedRef.current) {
                     // @ts-expect-error - this is hidden from TS
                     UnistylesShadowRegistry.remove(storedRef.current)
-                    UnistylesShadowRegistry.selectVariants(variants)
                     // @ts-expect-error - this is hidden from TS
                     UnistylesShadowRegistry.add(storedRef.current, styles)
-                    UnistylesShadowRegistry.selectVariants(undefined)
                 }
+
+                UnistylesShadowRegistry.selectVariants(undefined)
 
                 return unistyles
             }}
