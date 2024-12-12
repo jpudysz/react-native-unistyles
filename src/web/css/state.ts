@@ -36,7 +36,7 @@ export class CSSState {
             return
         }
 
-        this.styleTag = document.createElement('style')
+        this.styleTag = (document.getElementById('unistyles-web') ?? document.createElement('style')) as HTMLStyleElement
         this.styleTag.id = 'unistyles-web'
         document.head.appendChild(this.styleTag)
     }

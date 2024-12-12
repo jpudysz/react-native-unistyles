@@ -4,6 +4,7 @@ import type { UnistylesMiniRuntime } from '../specs/UnistylesRuntime'
 import { WebContentSizeCategory } from '../types'
 import { UnistylesListener } from './listener'
 import { NavigationBar, StatusBar } from './mock'
+import { UnistylesRegistry } from './registry'
 import { UnistylesState } from './state'
 import { error, isServer, schemeToTheme } from './utils'
 
@@ -204,6 +205,8 @@ class UnistylesRuntimeBuilder {
 
         return theme
     }
+
+    getCSS = () => UnistylesRegistry.css.getStyles()
 }
 
 export const UnistylesRuntime = new UnistylesRuntimeBuilder()
