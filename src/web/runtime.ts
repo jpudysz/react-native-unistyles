@@ -4,8 +4,10 @@ import type { UnistylesMiniRuntime } from '../specs/UnistylesRuntime'
 import { WebContentSizeCategory } from '../types'
 import { UnistylesListener } from './listener'
 import { NavigationBar, StatusBar } from './mock'
-import { UnistylesState } from './state'
 import { error, isServer, schemeToTheme } from './utils'
+
+// Keep this import here, otherwise circular dependency will occur and break the build
+import { UnistylesState } from './state'
 
 class UnistylesRuntimeBuilder {
     lightMedia = this.getLightMedia()
