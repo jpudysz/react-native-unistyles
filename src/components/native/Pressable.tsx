@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef } from 'react'
+import React, { forwardRef, useRef } from 'react'
 import { Pressable as NativePressableReactNative } from 'react-native'
 import type { PressableProps as Props, View } from 'react-native'
 import { UnistylesShadowRegistry } from '../../specs'
@@ -23,15 +23,6 @@ const initialState: WebPressableState = {
     hovered: false,
     focused: false
 }
-
-const events = {
-    'pointerdown': { pressed: true },
-    'pointerup': { pressed: false },
-    'pointerenter': { hovered: true },
-    'pointerleave': { hovered: false },
-    'focus': { focused: true },
-    'blur': { focused: false }
-} satisfies Partial<Record<keyof HTMLElementEventMap, Partial<WebPressableState>>>
 
 type UpdateStylesProps = {
     ref: View | null,
@@ -67,55 +58,33 @@ const updateStyles = ({ ref, style, state, scopedTheme, variants }: UpdateStyles
 
 export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, passedRef) => {
     const storedRef = useRef<View | null>(null)
-    const state = useRef<WebPressableState>(initialState)
-    const styleRef = useRef(style)
     const scopedTheme = UnistylesShadowRegistry.getScopedTheme()
     const variants = UnistylesShadowRegistry.getVariants()
-
-    useEffect(() => {
-        styleRef.current = style
-    }, [style])
-
-    useEffect(() => {
-        const handler = (newState: Partial<WebPressableState>) => () => {
-            state.current = { ...state.current, ...newState }
-
-            updateStyles({
-                ref: storedRef.current,
-                style: styleRef.current as WebPressableStyle,
-                variants: variants as unknown as Variants,
-                scopedTheme,
-                state: state.current
-            })
-        }
-
-        if (!storedRef.current) {
-            return
-        }
-
-        // ref on the web is dom element
-        const ref = storedRef.current as unknown as HTMLDivElement
-
-        Object.entries(events).forEach(([event, state]) => {
-            ref.addEventListener(event, handler(state))
-        })
-
-        return () => {
-            Object.entries(events).forEach(([event, state]) => {
-                ref.removeEventListener(event, handler(state))
-            })
-        }
-    }, [])
 
     return (
         <NativePressableReactNative
             {...props}
+            style={state => {
+                if (!storedRef.current) {
+                    return {}
+                }
+
+                updateStyles({
+                    ref: storedRef.current,
+                    style: style as WebPressableStyle,
+                    variants,
+                    scopedTheme,
+                    state: state as WebPressableState
+                })
+
+                return {}
+            }}
             ref={ref => {
                 storedRef.current = ref
                 updateStyles({
                     ref,
                     style: style as WebPressableStyle,
-                    variants: variants as unknown as Variants,
+                    variants,
                     scopedTheme,
                     state: initialState
                 })

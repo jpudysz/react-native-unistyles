@@ -31,7 +31,6 @@ class UnistylesShadowRegistryBuilder {
             const { __uni__key, __uni__stylesheet, __uni__args = [] } = secrets
             const newComputedStylesheet = UnistylesRegistry.getComputedStylesheet(__uni__stylesheet, scopedTheme)
             const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
-            const variants = Object.fromEntries(this.selectedVariants.entries())
             const result = typeof style === 'function'
                 ? style(...__uni__args)
                 : style
@@ -48,6 +47,7 @@ class UnistylesShadowRegistryBuilder {
         }
 
         // Copy scoped theme to not use referenced value
+        const variants = this.getVariants()
         const scopedTheme = this.scopedTheme
         const parsedStyles = getParsedStyles()
         const { hash, existingHash } = UnistylesRegistry.add(parsedStyles)
@@ -85,7 +85,7 @@ class UnistylesShadowRegistryBuilder {
 
     getScopedTheme = () => this.scopedTheme
 
-    getVariants = () => this.selectedVariants
+    getVariants = () => Object.fromEntries(this.selectedVariants.entries())
 
     remove = (_ref: any) => {}
 }
