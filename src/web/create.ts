@@ -16,8 +16,7 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, id?: s
     const addSecrets = (value: any, key: string, args?: Array<any>) => assignSecrets(value, {
         __uni__key: key,
         __uni__stylesheet: stylesheet,
-        __uni__args: args,
-        __uni__refs: new Set()
+        __uni__args: args
     })
 
     const styleSheetStyles = Object.entries(computedStylesheet).map(([key, value]) => {

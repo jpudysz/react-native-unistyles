@@ -22,6 +22,7 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                     ? unistyles
                     : [unistyles]
 
+                // @ts-expect-error web types are not compatible with RN styles
                 UnistylesShadowRegistry.add(ref, styles)
                 storedRef.current = ref
 
@@ -38,6 +39,7 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                 if (storedRef.current) {
                     UnistylesShadowRegistry.remove(storedRef.current)
                     UnistylesShadowRegistry.selectVariants(variants)
+                    // @ts-expect-error web types are not compatible with RN styles
                     UnistylesShadowRegistry.add(storedRef.current, styles)
                     UnistylesShadowRegistry.selectVariants(undefined)
                 }

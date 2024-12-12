@@ -16,8 +16,15 @@ class UnistylesShadowRegistryBuilder {
 
     private selectedVariants = new Map<string, string | boolean | undefined>()
     private scopedTheme: UnistylesTheme | undefined = undefined
+    private disposeMap = new Map<string, VoidFunction>()
 
-    add = (_ref: any, _styles: any) => {}
+    add = (ref: any, hash?: string) => {
+        if (!(ref instanceof HTMLElement) || !hash) {
+            return
+        }
+
+        UnistylesRegistry.connect(ref, hash)
+    }
 
     addStyles = (unistyle: UnistylesValues) => {
         const getParsedStyles = () => {
@@ -56,12 +63,9 @@ class UnistylesShadowRegistryBuilder {
         const dependencies = extractUnistyleDependencies(parsedStyles)
 
         if (!existingHash) {
-            const dispose = UnistylesListener.addListeners(dependencies, () => {
+            this.disposeMap.set(hash, UnistylesListener.addListeners(dependencies, () => {
                 UnistylesRegistry.applyStyles(hash, getParsedStyles())
-            })
-
-            // Dispose somewhere?
-            dispose
+            }))
         }
 
         return { injectedClassName, hash }
@@ -87,7 +91,13 @@ class UnistylesShadowRegistryBuilder {
 
     getVariants = () => Object.fromEntries(this.selectedVariants.entries())
 
-    remove = (_ref: any) => {}
+    remove = (ref: any, hash?: string) => {
+        if (!(ref instanceof HTMLElement) || !hash) {
+            return
+        }
+
+        UnistylesRegistry.remove(ref, hash)
+    }
 }
 
 export const UnistylesShadowRegistry = new UnistylesShadowRegistryBuilder()

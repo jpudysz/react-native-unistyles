@@ -2,7 +2,7 @@ import type { UnistylesValues } from '../types';
 import { deepMergeObjects } from '../utils';
 import { UnistylesShadowRegistry } from '../web';
 
-export const useClassname = (unistyle: UnistylesValues | undefined | Array<UnistylesValues>) => {
+export const getClassName = (unistyle: UnistylesValues | undefined | Array<UnistylesValues>) => {
     if (!unistyle) {
         return undefined
     }
