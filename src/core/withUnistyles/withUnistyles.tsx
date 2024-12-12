@@ -6,7 +6,7 @@ import type { Mappings, SupportedStyleProps } from './types'
 import { useDependencies } from './useDependencies'
 import { UnistyleDependency } from '../../specs/NativePlatform'
 import type { UnistylesValues } from '../../types'
-import { useClassname } from '../../hooks'
+import { getClassName } from '../getClassname'
 
 // @ts-expect-error
 type GenericComponentProps<T> = ComponentProps<T>
@@ -23,8 +23,8 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
 
     return forwardRef<GenericComponentRef<TComponent>, PropsWithUnistyles>((props, ref) => {
         const narrowedProps = props as PropsWithUnistyles
-        const styleClassNames = useClassname(narrowedProps.style)
-        const contentContainerStyleClassNames = useClassname(narrowedProps.contentContainerStyle)
+        const styleClassNames = getClassName(narrowedProps.style)
+        const contentContainerStyleClassNames = getClassName(narrowedProps.contentContainerStyle)
         const { mappingsCallback } = useDependencies(({ dependencies, updateTheme, updateRuntime }) => {
             const disposeTheme = UnistylesListener.addListeners(dependencies.filter(dependency => dependency === UnistyleDependency.Theme), updateTheme)
             const disposeRuntime = UnistylesListener.addListeners(dependencies.filter(dependency => dependency !== UnistyleDependency.Theme), updateRuntime)

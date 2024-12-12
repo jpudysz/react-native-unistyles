@@ -1,8 +1,10 @@
-import React, { forwardRef, useRef } from 'react'
+import React, { forwardRef } from 'react'
 import { Pressable as NativePressableReactNative } from 'react-native'
 import type { PressableProps as Props, View } from 'react-native'
 import { UnistylesShadowRegistry } from '../../specs'
-import type { UnistylesTheme, UnistylesValues } from '../../types'
+import type { UnistylesValues } from '../../types'
+import { getClassName } from '../../core'
+import { isServer } from '../../web/utils'
 
 type Variants = Record<string, string | boolean | undefined>
 type WebPressableState = {
@@ -18,80 +20,45 @@ type PressableProps = Props & {
     style?: WebPressableStyle,
 }
 
-const initialState: WebPressableState = {
-    pressed: false,
-    hovered: false,
-    focused: false
-}
-
-type UpdateStylesProps = {
-    ref: View | null,
-    style: WebPressableStyle,
-    variants?: Variants,
-    state: WebPressableState
-    scopedTheme?: UnistylesTheme
-}
-
-const updateStyles = ({ ref, style, state, scopedTheme, variants }: UpdateStylesProps) => {
-    const styleResult = typeof style === 'function'
-        ? style(state)
-        : style
-    const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
-    const previousVariants = UnistylesShadowRegistry.getVariants()
-
-    UnistylesShadowRegistry.selectVariants(variants)
-    UnistylesShadowRegistry.setScopedTheme(scopedTheme)
-
-    const { hash, injectedClassName } = UnistylesShadowRegistry.addStyles(styleResult)
-    const pressableRef = (ref as HTMLDivElement | null)
-
-    pressableRef?.classList.remove(...Array.from(pressableRef.classList))
-    pressableRef?.classList.add(hash)
-
-    if (injectedClassName) {
-        pressableRef?.classList.add(injectedClassName)
-    }
-
-    UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
-    UnistylesShadowRegistry.selectVariants(previousVariants as unknown as Variants)
-}
-
-export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, passedRef) => {
-    const storedRef = useRef<View | null>(null)
+export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, forwardedRef) => {
     const scopedTheme = UnistylesShadowRegistry.getScopedTheme()
     const variants = UnistylesShadowRegistry.getVariants()
+    let storedRef: HTMLElement | null = null
+    let classNames: ReturnType<typeof getClassName> | undefined = undefined
 
     return (
         <NativePressableReactNative
             {...props}
-            style={state => {
-                if (!storedRef.current) {
-                    return {}
+            ref={isServer() ? undefined : ref => {
+                storedRef = ref as unknown as HTMLElement
+                UnistylesShadowRegistry.add(storedRef, classNames?.hash)
+
+                if (typeof forwardedRef === 'function') {
+                    return forwardedRef(ref)
                 }
 
-                updateStyles({
-                    ref: storedRef.current,
-                    style: style as WebPressableStyle,
-                    variants,
-                    scopedTheme,
-                    state: state as WebPressableState
-                })
-
-                return {}
+                if (forwardedRef) {
+                    forwardedRef.current = ref
+                }
             }}
-            ref={ref => {
-                storedRef.current = ref
-                updateStyles({
-                    ref,
-                    style: style as WebPressableStyle,
-                    variants,
-                    scopedTheme,
-                    state: initialState
-                })
+            style={state => {
+                const styleResult = typeof style === 'function'
+                    ? style(state as WebPressableState)
+                    : style
+                const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
+                const previousVariants = UnistylesShadowRegistry.getVariants()
 
-                if (typeof passedRef === 'object' && passedRef !== null) {
-                    passedRef.current = ref
-                }
+                UnistylesShadowRegistry.selectVariants(variants)
+                UnistylesShadowRegistry.setScopedTheme(scopedTheme)
+
+                UnistylesShadowRegistry.remove(storedRef, classNames?.hash)
+                classNames = getClassName(styleResult as UnistylesValues)
+                UnistylesShadowRegistry.add(storedRef, classNames?.hash)
+
+                UnistylesShadowRegistry.selectVariants(previousVariants)
+                UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
+
+                return classNames as any
             }}
         />
     )

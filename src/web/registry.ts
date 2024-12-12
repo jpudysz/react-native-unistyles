@@ -8,21 +8,11 @@ import { CSSState } from './css'
 
 class UnistylesRegistryBuilder {
     private readonly stylesheets = new Map<StyleSheetWithSuperPowers<StyleSheet>, StyleSheet>()
-    private readonly stylesCounter = new Map<string, number>()
+    private readonly stylesCache = new Set<string>()
+    private readonly stylesCounter = new Map<string, Set<HTMLElement>>()
     private readonly disposeListenersMap = new Map<object, VoidFunction>()
     private readonly dependenciesMap = new Map<StyleSheetWithSuperPowers<StyleSheet>, Set<UnistyleDependency>>()
     readonly css = new CSSState()
-    private styleTag: HTMLStyleElement | null = null
-
-    constructor() {
-        if (isServer()) {
-            return
-        }
-
-        this.styleTag = document.createElement('style')
-        this.styleTag.id = 'unistyles-web'
-        document.head.appendChild(this.styleTag)
-    }
 
     getComputedStylesheet = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, scopedThemeName?: UnistylesTheme) => {
         if (typeof stylesheet !== 'function') {
@@ -71,32 +61,39 @@ class UnistylesRegistryBuilder {
         this.disposeListenersMap.set(stylesheet, dispose)
     }
 
+    connect = (ref: HTMLElement, hash: string) => {
+        const stylesCounter = this.stylesCounter.get(hash) ?? new Set()
+
+        stylesCounter.add(ref)
+        this.stylesCounter.set(hash, stylesCounter)
+    }
+
+    remove = (ref: HTMLElement, hash: string) => {
+        const stylesCounter = this.stylesCounter.get(hash) ?? new Set()
+
+        stylesCounter.delete(ref)
+
+        if (stylesCounter.size === 0 && !document.querySelector(hash)) {
+            this.css.remove(hash)
+            this.stylesCache.delete(hash)
+        }
+    }
+
     add = (value: UnistylesValues) => {
         const hash = generateHash(value)
-        const existingCounter = this.stylesCounter.get(hash)
 
-        if (existingCounter === undefined) {
+        if (!this.stylesCache.has(hash)) {
             this.applyStyles(hash, value)
-            this.stylesCounter.set(hash, 1)
+            this.stylesCache.add(hash)
 
             return { hash, existingHash: false }
         }
 
-        this.stylesCounter.set(hash, existingCounter + 1)
-
         return { hash, existingHash: true }
-    }
-
-    remove = (hash: string) => {
-        hash
     }
 
     applyStyles = (hash: string, value: UnistylesValues) => {
         this.css.add(hash, value)
-
-        if (this.styleTag) {
-            this.styleTag.innerHTML = this.css.getStyles()
-        }
     }
 }
 

@@ -1,6 +1,6 @@
 import type { UnistylesValues } from '../../types'
 import { convertUnistyles } from '../convert'
-import { hyphenate } from '../utils'
+import { hyphenate, isServer } from '../utils'
 import { convertToCSS } from './core'
 
 type MapType = Map<string, Map<string, Map<string, any>>>
@@ -29,6 +29,17 @@ const safeGetMap = (map: Map<string, Map<string, any>>, key: string) => {
 export class CSSState {
     mainMap: MapType = new Map()
     mqMap: MapType = new Map()
+    private styleTag: HTMLStyleElement | null = null
+
+    constructor() {
+        if (isServer()) {
+            return
+        }
+
+        this.styleTag = document.createElement('style')
+        this.styleTag.id = 'unistyles-web'
+        document.head.appendChild(this.styleTag)
+    }
 
     set = ({ className, propertyKey, value, mediaQuery = '', isMq }: SetthisProps) => {
         const firstLevelMap = isMq ? this.mqMap : this.mainMap
@@ -40,6 +51,20 @@ export class CSSState {
 
     add = (hash: string, values: UnistylesValues) => {
         convertToCSS(hash, convertUnistyles(values), this)
+
+        if (this.styleTag) {
+            this.styleTag.innerText = this.getStyles()
+        }
+    }
+
+    remove = (hash: string) => {
+        this.mainMap.forEach(styles => {
+            styles.delete(hash)
+        })
+
+        if (this.styleTag) {
+            this.styleTag.innerText = this.getStyles()
+        }
     }
 
     getStyles = () => {
