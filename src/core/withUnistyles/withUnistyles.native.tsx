@@ -48,6 +48,10 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
             // @ts-expect-error - this is hidden from TS
             const dispose = StyleSheet.addChangeListener(changedDependencies => {
                 if (listensToTheme && changedDependencies.includes(UnistyleDependency.Theme)) {
+                    updateTheme()
+                }
+
+                if (changedDependencies.some((dependency: UnistyleDependency) => dependencies.includes(dependency))) {
                     SUPPORTED_STYLE_PROPS.forEach(propName => {
                         if (narrowedProps?.[propName]) {
                             stylesRef.current = {
@@ -60,10 +64,6 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
                         }
                     })
 
-                    updateTheme()
-                }
-
-                if (changedDependencies.some((dependency: UnistyleDependency) => dependencies.includes(dependency))) {
                     updateRuntime()
                 }
             })
