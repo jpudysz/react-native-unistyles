@@ -18,9 +18,12 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                 const unistyles = typeof style === 'function'
                     ? style({ pressed: false })
                     : style
+                const styles = Array.isArray(unistyles)
+                    ? unistyles
+                    : [unistyles]
 
                 // @ts-expect-error - this is hidden from TS
-                UnistylesShadowRegistry.add(ref, unistyles)
+                UnistylesShadowRegistry.add(ref, styles)
 
                 storedRef.current = ref
 
