@@ -21,6 +21,7 @@ class UnistylesShadowRegistryBuilder {
     private classNamesMap = new Map<HTMLElement, Array<string>>()
     private selectedVariants = new Map<string, string | boolean | undefined>()
     private scopedTheme: UnistylesTheme | undefined = undefined
+    private disposeMap = new Map<HTMLElement, VoidFunction>()
 
     add = (ref: any, styles: Array<Style>) => {
         // Styles are not provided
@@ -40,6 +41,8 @@ class UnistylesShadowRegistryBuilder {
 
                     this.resultsMap.delete(ref)
                     this.classNamesMap.delete(ref)
+                    this.hashMap.delete(ref)
+                    this.disposeMap.get(ref)?.()
 
                     if (oldResult) {
                         UnistylesRegistry.remove(oldResult)
@@ -78,7 +81,6 @@ class UnistylesShadowRegistryBuilder {
                 const { __uni__key, __uni__stylesheet, __uni__args = [], __uni__refs } = secrets
                     const newComputedStylesheet = UnistylesRegistry.getComputedStylesheet(__uni__stylesheet, scopedTheme)
                     const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
-                    const variants = Object.fromEntries(this.selectedVariants.entries())
                     const args = __uni__args
                     const result = typeof style === 'function'
                         ? style(...args)
@@ -99,6 +101,7 @@ class UnistylesShadowRegistryBuilder {
         }
 
         // Copy scoped theme to not use referenced value
+        const variants = this.getVariants()
         const scopedTheme = this.scopedTheme
         const parsedStyles = getParsedStyles()
         const combinedStyles = deepMergeObjects(...parsedStyles)
@@ -125,6 +128,8 @@ class UnistylesShadowRegistryBuilder {
         const dependencies = Array.from(new Set(parsedStyles.flatMap(style => extractUnistyleDependencies(style))))
 
         if (!existingHash) {
+            this.disposeMap.get(ref)?.()
+
             const dispose = UnistylesListener.addListeners(dependencies, () => {
                 const hash = this.hashMap.get(ref)
 
@@ -137,6 +142,8 @@ class UnistylesShadowRegistryBuilder {
 
                 UnistylesRegistry.applyStyles(hash, deepMergeObjects(...getParsedStyles()))
             })
+
+            this.disposeMap.set(ref, dispose)
         }
 
         this.classNamesMap.set(ref, newClassNames)
@@ -169,7 +176,7 @@ class UnistylesShadowRegistryBuilder {
 
     getScopedTheme = () => this.scopedTheme
 
-    getVariants = () => this.selectedVariants
+    getVariants = () => Object.fromEntries(this.selectedVariants.entries())
 
     remove = () => {}
 }
