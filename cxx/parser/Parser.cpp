@@ -166,14 +166,46 @@ void parser::Parser::parseUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
 }
 
 // rebuild all unistyles in StyleSheet that depends on variants
-void parser::Parser::rebuildUnistylesWithVariants(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, Variants& variants) {
-    for (const auto& [_, unistyle] : styleSheet->unistyles) {
-        if (!unistyle->dependsOn(UnistyleDependency::VARIANTS)) {
-            continue;
-        }
-
-        this->rebuildUnistyle(rt, styleSheet, unistyle, variants, std::nullopt);
+void parser::Parser::rebuildUnistyleWithVariants(jsi::Runtime& rt, std::shared_ptr<core::UnistyleData> unistyleData) {
+    if (unistyleData->unistyle->styleKey == helpers::EXOTIC_STYLE_KEY) {
+        return;
     }
+    
+    if (unistyleData->unistyle->type == UnistyleType::Object) {
+        unistyleData->parsedStyle = this->parseFirstLevel(rt, unistyleData->unistyle, unistyleData->variants);
+        
+        return;
+    }
+    
+    // for functions we need to call them with memoized arguments
+    auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyleData->unistyle);
+
+    // convert arguments to jsi::Value
+    std::vector<jsi::Value> args{};
+    auto arguments = unistyleData->dynamicFunctionMetadata.value();
+
+    args.reserve(arguments.size());
+
+    for (int i = 0; i < arguments.size(); i++) {
+        folly::dynamic& arg = arguments.at(i);
+
+        args.emplace_back(jsi::valueFromDynamic(rt, arg));
+    }
+
+    const jsi::Value *argStart = args.data();
+
+    // we need to temporarly swap unprocessed value to enforce correct parings
+    auto sharedUnprocessedValue = std::move(unistyleFn->unprocessedValue);
+
+    // call cached function with memoized arguments
+    auto functionResult = unistyleFn->rawValue
+        .asFunction(rt)
+        .call(rt, argStart, arguments.size())
+        .asObject(rt);
+
+    unistyleFn->unprocessedValue = std::move(functionResult);
+    unistyleData->parsedStyle = this->parseFirstLevel(rt, unistyleFn, unistyleData->variants);
+    unistyleFn->unprocessedValue = std::move(sharedUnprocessedValue);
 }
 
 // rebuild all unistyles that are affected by platform event

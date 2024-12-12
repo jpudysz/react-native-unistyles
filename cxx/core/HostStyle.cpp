@@ -28,7 +28,13 @@ jsi::Value HostStyle::get(jsi::Runtime& rt, const jsi::PropNameID& propNameId) {
     }
 
     if (this->_styleSheet->unistyles.contains(propertyName)) {
-        return valueFromUnistyle(rt, this->_unistylesRuntime, this->_styleSheet->unistyles[propertyName]);
+        if (this->_styleCache.contains(propertyName)) {
+            return jsi::Value(rt, this->_styleCache[propertyName]);
+        }
+        
+        this->_styleCache[propertyName] = valueFromUnistyle(rt, this->_unistylesRuntime, this->_styleSheet->unistyles[propertyName]);
+        
+        return jsi::Value(rt, this->_styleCache[propertyName]);
     }
 
     if (propertyName == helpers::STYLE_VARIANTS) {
@@ -45,7 +51,6 @@ jsi::Function HostStyle::createAddVariantsProxyFunction(jsi::Runtime& rt) {
         helpers::assertThat(rt, count == 1, "Unistyles: useVariants expected to be called with one argument.");
         helpers::assertThat(rt, arguments[0].isObject(), "Unistyles: useVariants expected to be called with object.");
 
-        auto parser = parser::Parser(this->_unistylesRuntime);
         auto pairs = helpers::variantsToPairs(rt, arguments[0].asObject(rt));
 
         if (this->hasVariantsSet && pairs == this->_variants) {
@@ -55,8 +60,6 @@ jsi::Function HostStyle::createAddVariantsProxyFunction(jsi::Runtime& rt) {
         // new variants or empty variants
         this->hasVariantsSet = true;
         this->_variants = pairs;
-
-        parser.rebuildUnistylesWithVariants(rt, this->_styleSheet, this->_variants);
 
         return jsi::Value::undefined();
     });
