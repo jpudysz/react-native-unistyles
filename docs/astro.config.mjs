@@ -103,7 +103,7 @@ export default defineConfig({
                         { label: 'Web styles', slug: 'v3/references/web-styles' },
                         { label: 'Web Only Features', slug: 'v3/references/web-only' },
                         { label: 'Scoped theme', slug: 'v3/references/scoped-theme' },
-                        { label: 'createUnistylesComponent', slug: 'v3/references/create-unistyles-component' },
+                        { label: 'withUnistyles', slug: 'v3/references/with-unistyles' },
                         { label: 'Display and Hide', slug: 'v3/references/display-hide' },
                         { label: 'Edge to edge', slug: 'v3/references/edge-to-edge' },
                         { label: 'Dimensions', slug: 'v3/references/dimensions' },
