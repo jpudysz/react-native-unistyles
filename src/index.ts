@@ -1,4 +1,4 @@
-export * from './specs'
+export { StyleSheet, UnistylesRuntime, StatusBar, NavigationBar } from './specs'
 export { mq } from './mq'
 export type { UnistylesThemes, UnistylesBreakpoints } from './global'
 export { createUnistylesComponent, withUnistyles } from './core'
