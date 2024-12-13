@@ -5,6 +5,11 @@ import { UnistyleDependency } from '../../specs/NativePlatform'
 import type { UnistylesTheme } from '../../types'
 import type { Mappings } from './types'
 
+const getMiniRuntime = (): UnistylesMiniRuntime => {
+    // @ts-expect-error This is hidden from TS
+    return UnistylesRuntime.miniRuntime
+}
+
 const RTDependencyMap = {
     breakpoint: UnistyleDependency.Breakpoints,
     colorScheme: UnistyleDependency.ColorScheme,
@@ -64,7 +69,7 @@ export const useDependencies = (listener: (props: ListenerProps) => VoidFunction
                     return target[prop]
                 }
             })
-            const proxifiedRuntime = new Proxy(UnistylesRuntime.miniRuntime, {
+            const proxifiedRuntime = new Proxy(getMiniRuntime(), {
                 get: (target, prop) => {
                     if (prop in RTDependencyMap) {
                         dependencies.add(RTDependencyMap[prop as keyof typeof RTDependencyMap])
