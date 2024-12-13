@@ -29,6 +29,8 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                 return passForwardedRef(props, ref, forwardedRef)
             }}
             style={state => {
+                UnistylesShadowRegistry.selectVariants(variants)
+
                 const unistyles = typeof style === 'function'
                     ? style(state)
                     : style
@@ -41,8 +43,9 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                     UnistylesShadowRegistry.selectVariants(variants)
                     // @ts-expect-error web types are not compatible with RN styles
                     UnistylesShadowRegistry.add(storedRef.current, styles)
-                    UnistylesShadowRegistry.selectVariants(undefined)
                 }
+
+                UnistylesShadowRegistry.selectVariants(undefined)
 
                 return unistyles
             }}

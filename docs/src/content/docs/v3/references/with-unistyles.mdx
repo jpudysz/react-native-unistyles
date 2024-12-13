@@ -1,0 +1,235 @@
+---
+title: withUnistyles
+description: Learn about how it integrate 3rd party libraries with Unistyles engine
+---
+
+import { Card, Aside } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'withUnistyles',
+        description: 'Learn about how it integrate 3rd party libraries with Unistyles engine'
+    }}
+>
+
+
+Before reading this guide, make sure that you understand [How Unistyles works](/v3/start/how-unistyles-works) and how [Babel plugin](/v3/other/babel-plugin)
+manipulates your code.
+
+### Why do you need it?
+
+- Unistyles cannot retrieve `ShadowNode` from third-party components because they might not expose a native view via the ref prop
+
+```ts
+import { Blurhash } from 'react-native-blurhash'
+
+const MyComponent = () => {
+    return
+        <Blurhash
+            blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6."
+            // 💥 Oops! Blurhash is 3rd party view, that might not expose the `ref` prop
+            // it will never update when theme changes
+            style={styles.container}
+        />
+    }
+}
+
+const styles = StyleSheet.create(theme => ({
+    container: {
+        borderWidth: 1,
+        borderColor: theme.colors.primary
+    }
+}))
+```
+
+- Another use case is when you use components that do not expect a `style` prop but require, for example, a `color` prop.
+
+```ts
+import { Button } from 'react-native'
+
+const MyComponent = () => {
+    return (
+        <Button
+            // 💥 Oops! Button is React Native component, so it has a ref, but it doesn't expect `style` prop
+            // it will never update when theme changes
+            // Also, from where will we get `theme` value?
+            color={theme.colors.primary}
+        />
+    )
+}
+```
+
+That’s why we created a way to subscribe such component to Unistyles updates.
+
+<Aside>
+This pattern is only recommended when you need an escape hatch to use Unistyles with third-party components.
+If you don't rely on styles in these components, you should not wrap your component with `withUnistyles`.
+</Aside>
+
+<Aside type="caution">
+`withUnistyles` detects automatically your component dependencies and re-renders it only when they change.
+</Aside>
+
+### Auto mapping for `style` and `contentContainerStyle` props
+
+If your component expects the `style` or `contentContainerStyle` prop, Unistyles will automatically handle the mapping under the hood.
+You just need to wrap your custom view in `withUnistyles`. We will also respect your style dependencies, so, for example, the `Blurhash` component will only re-render when the theme changes.
+
+
+```ts
+import { Blurhash } from 'react-native-blurhash'
+import { withUnistyles } from 'react-native-unistyles'
+
+// ✨ Magic auto mapping
+const UniBlurHash = withUnistyles(Blurhash)
+
+const MyComponent = () => {
+    return (
+        <UniBlurHash
+            blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6."
+            // now Blurhash will re-render when theme changes
+            style={styles.container}
+        />
+    )
+}
+
+const styles = StyleSheet.create(theme => ({
+    container: {
+        borderWidth: 1,
+        // blurhash depends on theme
+        borderColor: theme.colors.primary
+    }
+}))
+```
+
+### Mapping custom props to Unistyles styles
+
+If you need to ensure your component updates but it doesn’t use `style` or `contentContainerStyle` props, you can use `mappings`:
+
+```ts
+import { Button } from 'react-native'
+import { withUnistyles } from 'react-native-unistyles'
+
+// ✨ Some magic happens under the hood
+const UniButton = withUnistyles(Button, (theme, rt) => ({
+    // map `primary` color to `color` prop
+    color: theme.colors.primary
+    // any other props that Button supports
+}))
+
+const MyComponent = () => {
+    return (
+        // you don't need to specify color props here
+        <UniButton />
+    )
+}
+```
+
+TypeScript will autocomplete all your props, so there is no need to specify type manually.
+
+### Custom mappings for external props
+
+Sometimes, you might want to map your props based on a function or value that is only accessible within the component.
+For example, if you are using `FlashList` and want to modify the `numColumns` prop based on a condition. Using `mappings` in `withUnistyles` is not an option because it doesn't allow referencing other props.
+
+```tsx /getNumColumns/
+import { withUnistyles } from 'react-native-unistyles'
+import { FlashList } from 'react-native-flash-list'
+
+const MyFlashList = withUnistyles(FlashList, (theme, rt) => ({
+    numColumns: 💥 Oops! getNumColumns function is not available here
+}))
+
+const MyComponent = () => {
+    const getNumColumns = () => {
+        // your logic
+    }
+
+    return (
+        <MyFlashList />
+    )
+}
+```
+
+Another example is React Native's `Switch` component:
+
+```tsx /isDisabled/
+import { Switch } from 'react-native'
+import { withUnistyles } from 'react-native-unistyles'
+
+const MySwitch = withUnistyles(Switch, (theme, rt) => ({
+    trackColor: 💥 Opps! isDisabled prop is not available here
+}))
+
+const MyComponent = ({ isDisabled }) => {
+    return (
+        <MySwitch />
+    )
+}
+```
+
+For such dynamic mappings, we provide a prop called `uniProps` that allows you to pass any props to the component.
+From there, you can access any function or variable or map the prop to any value based on your state and needs.
+
+```tsx /(theme, rt)/
+import { Switch } from 'react-native'
+import { withUnistyles } from 'react-native-unistyles'
+
+// leave it empty here
+const MySwitch = withUnistyles(Switch)
+
+const MyComponent = ({ isDisabled }) => {
+    return (
+        <MySwitch
+            uniProps={(theme, rt) => ({
+                trackColor: isDisabled
+                    ? theme.colors.disabled
+                    : theme.colors.primary
+            })}
+        />
+    )
+}
+```
+
+`uniProps` is a function that receives `theme` and `rt` as arguments. These values will be always up-to-date, so you can use them to map colors or value to new props.
+
+<Aside>
+Components that use `uniProps` are also aware of your dependencies. In the example above, `MySwitch` will re-render only when `theme` changes.
+</Aside>
+
+### Props resolution priority
+
+We will respect your order of prop resolution, applying them with the following priority:
+
+1. Global mappings
+2. `uniProps`
+3. Inline props
+
+**Example: Modifying a Button**
+
+```ts
+// By default, Button is red
+const UniButton = withUnistyles(Button, theme => ({
+    color: theme.colors.red
+}))
+
+// `uniProps` have higher priority,
+// so the button is orange
+<UniButton
+    uniProps={theme => ({
+       color: theme.colors.orange
+    })}
+/>
+
+// Inline props have the highest priority,
+// so Button is pink
+<UniButton
+    color="pink"
+    uniProps={theme => ({
+       color: theme.colors.orange
+    })}
+/>
+```
+
+</Seo>

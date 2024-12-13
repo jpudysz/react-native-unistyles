@@ -34,8 +34,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { Text } from 'react-native-unistyles/src/components/native/Text'
-                import { View } from 'react-native-unistyles/src/components/native/View'
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import { View } from 'react-native-unistyles/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -78,8 +78,8 @@ pluginTester({
                 }))
             `,
             output: `
-                import { Text } from 'react-native-unistyles/src/components/native/Text'
-                import { View } from 'react-native-unistyles/src/components/native/View'
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import { View } from 'react-native-unistyles/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -123,8 +123,8 @@ pluginTester({
                 }))
             `,
             output: `
-                import { Text } from 'react-native-unistyles/src/components/native/Text'
-                import { View } from 'react-native-unistyles/src/components/native/View'
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import { View } from 'react-native-unistyles/components/native/View'
 
                 import { StyleSheet as ST } from 'react-native-unistyles'
 
@@ -169,8 +169,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { Text } from 'react-native-unistyles/src/components/native/Text'
-                import { View } from 'react-native-unistyles/src/components/native/View'
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import { View } from 'react-native-unistyles/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -216,8 +216,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { Text } from 'react-native-unistyles/src/components/native/Text'
-                import { View } from 'react-native-unistyles/src/components/native/View'
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import { View } from 'react-native-unistyles/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -264,8 +264,8 @@ pluginTester({
                 }))
             `,
             output: `
-                import { Text } from 'react-native-unistyles/src/components/native/Text'
-                import { View } from 'react-native-unistyles/src/components/native/View'
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import { View } from 'react-native-unistyles/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -313,8 +313,8 @@ pluginTester({
                 }))
             `,
             output: `
-                import { Text } from 'react-native-unistyles/src/components/native/Text'
-                import { View } from 'react-native-unistyles/src/components/native/View'
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import { View } from 'react-native-unistyles/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -364,8 +364,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { Text } from 'react-native-unistyles/src/components/native/Text'
-                import { View } from 'react-native-unistyles/src/components/native/View'
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import { View } from 'react-native-unistyles/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -423,8 +423,8 @@ pluginTester({
                 })
             `,
             output: `
-                import { Text } from 'react-native-unistyles/src/components/native/Text'
-                import { View } from 'react-native-unistyles/src/components/native/View'
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import { View } from 'react-native-unistyles/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -488,9 +488,9 @@ pluginTester({
                 })
             `,
             output: `
-                import { Text } from 'react-native-unistyles/src/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
-                import { View } from 'react-native-unistyles/src/components/native/View'
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import { Pressable } from 'react-native-unistyles/components/native/Pressable'
+                import { View } from 'react-native-unistyles/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -515,266 +515,6 @@ pluginTester({
                         pressable: {
                             marginRight: arg1 + arg2
                         }
-                    }
-                }, 798826616)
-            `
-        },
-        {
-            title: 'Should check if pressable takes dynamic function and do nothing if its object',
-            code: `
-                import { View, Pressable, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View style={styles.container}>
-                            <Pressable style={styles.pressable}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top
-                        }),
-                        pressable: {
-                            marginRight: 20
-                        }
-                    }
-                })
-            `,
-            output: `
-                import { Text } from 'react-native-unistyles/src/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
-                import { View } from 'react-native-unistyles/src/components/native/View'
-
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View style={[styles.container]}>
-                            <Pressable style={state => (typeof styles.pressable === 'function' ? styles.pressable(state) : styles.pressable)}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top,
-                            uni__dependencies: [0, 4, 9]
-                        }),
-                        pressable: {
-                            marginRight: 20
-                        }
-                    }
-                }, 798826616)
-            `
-        },
-        {
-            title: 'Should pass pressable with dependencies',
-            code: `
-                import { View, Pressable, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View style={styles.container}>
-                            <Pressable style={state => styles.pressable(state.pressed, 1)}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top
-                        }),
-                        pressable: (state, times) => ({
-                            marginRight: state.pressed ? 10 : 20 * times,
-                            backgroundColor: state.pressed ? theme.colors.barbie : theme.colors.background
-                        })
-                    }
-                })
-            `,
-            output: `
-                import { Text } from 'react-native-unistyles/src/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
-                import { View } from 'react-native-unistyles/src/components/native/View'
-
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View style={[styles.container]}>
-                            <Pressable style={state => styles.pressable(state.pressed, 1)}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top,
-                            uni__dependencies: [0, 4, 9]
-                        }),
-                        pressable: (state, times) => ({
-                            marginRight: state.pressed ? 10 : 20 * times,
-                            backgroundColor: state.pressed ? theme.colors.barbie : theme.colors.background,
-                            uni__dependencies: [0]
-                        })
-                    }
-                }, 798826616)
-            `
-        },
-        {
-            title: 'Should pass variants to pressable',
-            code: `
-                import { View, Pressable, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    styles.useVariants({})
-
-                    return (
-                        <View style={styles.container}>
-                            <Pressable style={state => styles.pressable(state.pressed, 1)}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top
-                        }),
-                        pressable: (state, times) => ({
-                            marginRight: state.pressed ? 10 : 20 * times,
-                            backgroundColor: state.pressed ? theme.colors.barbie : theme.colors.background
-                        })
-                    }
-                })
-            `,
-            output: `
-                import { Text } from 'react-native-unistyles/src/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
-                import { View } from 'react-native-unistyles/src/components/native/View'
-
-                import { StyleSheet, Variants } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    const __uni__variants = {}
-                    styles.useVariants(__uni__variants)
-
-                    return (
-                        <Variants variants={__uni__variants}>
-                            <View style={[styles.container]}>
-                                <Pressable style={state => styles.pressable(state.pressed, 1)} variants={__uni__variants}>
-                                    <Text>Hello world</Text>
-                                </Pressable>
-                            </View>
-                        </Variants>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top,
-                            uni__dependencies: [0, 4, 9]
-                        }),
-                        pressable: (state, times) => ({
-                            marginRight: state.pressed ? 10 : 20 * times,
-                            backgroundColor: state.pressed ? theme.colors.barbie : theme.colors.background,
-                            uni__dependencies: [0]
-                        })
-                    }
-                }, 798826616)
-            `
-        },
-        {
-            title: 'Should pass more raw styles to pressable',
-            code: `
-                import { View, Pressable, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View style={styles.container}>
-                            <Pressable style={[styles.pressable, styles.container]}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top
-                        }),
-                        pressable: (state, times) => ({
-                            marginRight: state.pressed ? 10 : 20 * times,
-                            backgroundColor: state.pressed ? theme.colors.barbie : theme.colors.background
-                        })
-                    }
-                })
-            `,
-            output: `
-                import { Text } from 'react-native-unistyles/src/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
-                import { View } from 'react-native-unistyles/src/components/native/View'
-
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View style={[styles.container]}>
-                            <Pressable style={[styles.pressable, styles.container]}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top,
-                            uni__dependencies: [0, 4, 9]
-                        }),
-                        pressable: (state, times) => ({
-                            marginRight: state.pressed ? 10 : 20 * times,
-                            backgroundColor: state.pressed ? theme.colors.barbie : theme.colors.background,
-                            uni__dependencies: [0]
-                        })
                     }
                 }, 798826616)
             `
@@ -807,23 +547,16 @@ pluginTester({
                 }))
             `,
             output: `
-                import { Text } from 'react-native-unistyles/src/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
-                import { View } from 'react-native-unistyles/src/components/native/View'
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import { Pressable } from 'react-native-unistyles/components/native/Pressable'
+                import { View } from 'react-native-unistyles/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = ({ height }) => {
                     return (
                         <View style={[styles.container]}>
-                            <Pressable
-                                style={({ pressed }) => [
-                                    typeof styles.sectionItem === 'function' ? styles.sectionItem() : styles.sectionItem,
-                                    styles.other(1),
-                                    { height },
-                                    pressed && (typeof styles.pressed === 'function' ? styles.pressed() : styles.pressed)
-                                ]}
-                            >
+                            <Pressable style={({ pressed }) => [styles.sectionItem, styles.other(1), { height }, pressed && styles.pressed]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -875,9 +608,9 @@ pluginTester({
                 }))
             `,
             output: `
-                import { Text } from 'react-native-unistyles/src/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
-                import { View } from 'react-native-unistyles/src/components/native/View'
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import { Pressable } from 'react-native-unistyles/components/native/Pressable'
+                import { View } from 'react-native-unistyles/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 
@@ -886,16 +619,10 @@ pluginTester({
                         <View style={[styles.container]}>
                             <Pressable
                                 style={({ pressed }) => [
-                                    typeof styles.sectionItem === 'function' ? styles.sectionItem() : styles.sectionItem,
+                                    styles.sectionItem,
                                     { height },
                                     pressed && styles.pressed(pressed),
-                                    pressed
-                                        ? typeof styles.pressed === 'function'
-                                            ? styles.pressed()
-                                            : styles.pressed
-                                        : typeof styles.notPressed === 'function'
-                                        ? styles.notPressed()
-                                        : styles.notPressed
+                                    pressed ? styles.pressed : styles.notPressed
                                 ]}
                             >
                                 <Text>Hello world</Text>
@@ -917,301 +644,6 @@ pluginTester({
                             uni__dependencies: [9]
                         })
                     }),
-                    798826616
-                )
-            `
-        },
-        {
-            title: 'Should handle nested function with no arg',
-            code: `
-                import { View, Pressable, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = ({ height }) => {
-                    const pressed = true
-
-                    return (
-                        <View style={styles.container}>
-                            <Pressable style={() => [styles.sectionItem, { height }, pressed && styles.pressed(pressed), pressed ? styles.pressed : styles.notPressed]}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => ({
-                    sectionItem: {
-                        width: 100,
-                        height: 100,
-                        theme: theme.colors.red
-                    },
-                    pressed: pressed => ({
-                        marginBottom: rt.insets.bottom
-                    })
-                }))
-            `,
-            output: `
-                import { Text } from 'react-native-unistyles/src/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
-                import { View } from 'react-native-unistyles/src/components/native/View'
-
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = ({ height }) => {
-                    const pressed = true
-
-                    return (
-                        <View style={[styles.container]}>
-                            <Pressable
-                                style={() => [
-                                    typeof styles.sectionItem === 'function' ? styles.sectionItem() : styles.sectionItem,
-                                    { height },
-                                    pressed && styles.pressed(pressed),
-                                    pressed
-                                        ? typeof styles.pressed === 'function'
-                                            ? styles.pressed()
-                                            : styles.pressed
-                                        : typeof styles.notPressed === 'function'
-                                        ? styles.notPressed()
-                                        : styles.notPressed
-                                ]}
-                            >
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create(
-                    (theme, rt) => ({
-                        sectionItem: {
-                            width: 100,
-                            height: 100,
-                            theme: theme.colors.red,
-                            uni__dependencies: [0]
-                        },
-                        pressed: pressed => ({
-                            marginBottom: rt.insets.bottom,
-                            uni__dependencies: [9]
-                        })
-                    }),
-                    798826616
-                )
-            `
-        },
-        {
-            title: 'Should handle all the weird syntaxes',
-            code: `
-                import { View, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = ({ height }) => {
-                    return (
-                        <View style={styles.container}>
-                            <View style={[styles.sectionItem, { height }, pressed && styles.pressed, pressed ? styles.pressed : styles.notPressed]}>
-                                <Text>Hello world</Text>
-                            </View>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => ({
-                    sectionItem: {
-                        width: 100,
-                        height: 100,
-                        theme: theme.colors.red
-                    },
-                    pressed: {
-                        marginBottom: rt.insets.bottom
-                    }
-                }))
-            `,
-            output: `
-                import { Text } from 'react-native-unistyles/src/components/native/Text'
-                import { View } from 'react-native-unistyles/src/components/native/View'
-
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = ({ height }) => {
-                    return (
-                        <View style={[styles.container]}>
-                            <View style={[styles.sectionItem, { height }, pressed && styles.pressed, pressed ? styles.pressed : styles.notPressed]}>
-                                <Text>Hello world</Text>
-                            </View>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create(
-                    (theme, rt) => ({
-                        sectionItem: {
-                            width: 100,
-                            height: 100,
-                            theme: theme.colors.red,
-                            uni__dependencies: [0]
-                        },
-                        pressed: {
-                            marginBottom: rt.insets.bottom,
-                            uni__dependencies: [9]
-                        }
-                    }),
-                    798826616
-                )
-            `
-        },
-        {
-            title: 'Should handle other pressable cases',
-            code: `
-                import { View, Pressable } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View>
-                            <Pressable style={state => state.pressed ? styles.pressed : { height: 20 }} />
-                            <Pressable style={() => {
-                                return style.pressed
-                            }} />
-                            <Pressable style={state => {
-                                return style.pressed
-                            }} />
-                            <Pressable style={state => state.pressed ? { height: 20 }: styles.pressedFn(1, 2)} />
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => ({
-                    pressed: {
-                        width: 100,
-                        height: 100
-                    },
-                    pressedFn: (a, b) => ({
-                        marginBottom: a + b
-                    })
-                }))
-            `,
-            output: `
-                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
-                import { View } from 'react-native-unistyles/src/components/native/View'
-
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View>
-                            <Pressable
-                                style={state => (state.pressed ? (typeof styles.pressed === 'function' ? styles.pressed() : styles.pressed) : { height: 20 })}
-                            />
-                            <Pressable
-                                style={() => {
-                                    return style.pressed
-                                }}
-                            />
-                            <Pressable
-                                style={state => {
-                                    return style.pressed
-                                }}
-                            />
-                            <Pressable style={state => (state.pressed ? { height: 20 } : styles.pressedFn(1, 2))} />
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create(
-                    (theme, rt) => ({
-                        pressed: {
-                            width: 100,
-                            height: 100
-                        },
-                        pressedFn: (a, b) => ({
-                            marginBottom: a + b
-                        })
-                    }),
-                    798826616
-                )
-            `
-        },
-        {
-            title: 'Should handle pressable with identifiers',
-            code: `
-                import { View, Pressable } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = ({ containerStyles }) => {
-                    const onPressInternal = () => {}
-                    return (
-                        <View>
-                            <Pressable style={[styles.inputContainer, containerStyles]} onPress={onPressInternal} />
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create({
-                    inputContainer: {}
-                })
-            `,
-            output: `
-                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
-                import { View } from 'react-native-unistyles/src/components/native/View'
-
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = ({ containerStyles }) => {
-                    const onPressInternal = () => {}
-                    return (
-                        <View>
-                            <Pressable style={[styles.inputContainer, containerStyles]} onPress={onPressInternal} />
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create(
-                    {
-                        inputContainer: {}
-                    },
-                    798826616
-                )
-            `
-        },
-        {
-            title: 'Should swap Pressable implementation even if user has two react-native imports',
-            code: `
-                import { View } from 'react-native'
-                import { Pressable } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = ({ containerStyles }) => {
-                    const onPressInternal = () => {}
-                    return (
-                        <View>
-                            <Pressable style={[styles.inputContainer, containerStyles]} onPress={onPressInternal} />
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create({
-                    inputContainer: {}
-                })
-            `,
-            output: `
-                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
-                import { View } from 'react-native-unistyles/src/components/native/View'
-
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = ({ containerStyles }) => {
-                    const onPressInternal = () => {}
-                    return (
-                        <View>
-                            <Pressable style={[styles.inputContainer, containerStyles]} onPress={onPressInternal} />
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create(
-                    {
-                        inputContainer: {}
-                    },
                     798826616
                 )
             `
@@ -1239,9 +671,9 @@ pluginTester({
                 })
             `,
             output: `
-                import { Text as SuperText } from 'react-native-unistyles/src/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/src/components/native/Pressable'
-                import { View as RNView } from 'react-native-unistyles/src/components/native/View'
+                import { Text as SuperText } from 'react-native-unistyles/components/native/Text'
+                import { Pressable } from 'react-native-unistyles/components/native/Pressable'
+                import { View as RNView } from 'react-native-unistyles/components/native/View'
 
                 import { StyleSheet } from 'react-native-unistyles'
 

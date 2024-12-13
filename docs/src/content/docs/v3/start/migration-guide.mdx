@@ -91,14 +91,14 @@ The migration process is quite simple, but it can be tedious since you'll need t
     })
     ```
 
-8. If you need to access your `theme` in component, refactor it to use `createUnistylesComponent`:
+8. If you need to access your `theme` in component, refactor it to use `withUnistyles`:
 
     ```diff lang="tsx"
     import { Button } from 'react-native'
     -import { useStyles } from 'react-native-unistyles'
-    +import { createUnistylesComponent } from 'react-native-unistyles'
+    +import { withUnistyles } from 'react-native-unistyles'
 
-    +const UniButton = createUnistylesComponent(Button, theme => ({
+    +const UniButton = withUnistyles(Button, theme => ({
     +    color: theme.colors.primary
     +}))
 
