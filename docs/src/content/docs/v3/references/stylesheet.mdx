@@ -24,6 +24,8 @@ It can parse your `variants`, `compoundVariants` or `dynamic functions` (even if
 Once you register your `themes` and `breakpoints`, it unlocks even more features, like injecting the current `theme` or `miniRuntime` into your stylesheet.
 It also assists you with TypeScript autocompletion for your styles.
 
+<Aside type="caution" title="Injected `theme` and `rt`">You explicity need to use `theme` and `rt` to detect dependencies, they cannot be destructured. This is a limitation of the babel plugin.</Aside>
+
 Example usage:
 
 ```tsx /create/
