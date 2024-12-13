@@ -27,12 +27,12 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
             SUPPORTED_STYLE_PROPS.forEach(propName => {
                 if (narrowedProps?.[propName]) {
                     if (Array.isArray(narrowedProps[propName])) {
-                        console.error(`🦄 Unistyles: createUnistylesComponent requires ${propName} to be an object. Please check props for component: ${NativeComponent.displayName}`)
+                        console.error(`🦄 Unistyles: withUnistyles requires ${propName} to be an object. Please check props for component: ${NativeComponent.displayName}`)
                     }
 
                     // @ts-expect-error - this is hidden from TS
                     if (props[propName].__unistyles_name && !props[propName].__proto__?.getStyle) {
-                        console.error(`🦄 Unistyles: createUnistylesComponent received style that is not bound. You likely used the spread operator on a Unistyle style. Please check props for component: ${NativeComponent.displayName}`)
+                        console.error(`🦄 Unistyles: withUnistyles received style that is not bound. You likely used the spread operator on a Unistyle style. Please check props for component: ${NativeComponent.displayName}`)
                     }
 
                     stylesRef.current = {
@@ -48,6 +48,10 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
             // @ts-expect-error - this is hidden from TS
             const dispose = StyleSheet.addChangeListener(changedDependencies => {
                 if (listensToTheme && changedDependencies.includes(UnistyleDependency.Theme)) {
+                    updateTheme()
+                }
+
+                if (changedDependencies.some((dependency: UnistyleDependency) => dependencies.includes(dependency))) {
                     SUPPORTED_STYLE_PROPS.forEach(propName => {
                         if (narrowedProps?.[propName]) {
                             stylesRef.current = {
@@ -60,10 +64,6 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
                         }
                     })
 
-                    updateTheme()
-                }
-
-                if (changedDependencies.some((dependency: UnistyleDependency) => dependencies.includes(dependency))) {
                     updateRuntime()
                 }
             })

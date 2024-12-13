@@ -1,4 +1,4 @@
-import { Pressable, PressableProps, Text } from "react-native";
+import { Pressable, PressableProps, Text } from 'react-native'
 import { StyleSheet, UnistylesVariants } from 'react-native-unistyles'
 
 type ButtonProps = PressableProps & UnistylesVariants<typeof styles> & {
@@ -19,7 +19,7 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
     });
 
     return (
-        <Pressable style={() => styles.button} {...props}>
+        <Pressable style={styles.button} {...props}>
             <Text style={styles.text}>{children}</Text>
         </Pressable>
     );
