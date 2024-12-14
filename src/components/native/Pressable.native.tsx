@@ -22,16 +22,16 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                     ? unistyles
                     : [unistyles]
 
+                UnistylesShadowRegistry.selectVariants(variants)
                 // @ts-expect-error - this is hidden from TS
                 UnistylesShadowRegistry.add(ref, styles)
+                UnistylesShadowRegistry.selectVariants(undefined)
 
                 storedRef.current = ref
 
                 return passForwardedRef(props, ref, forwardedRef)
             }}
             style={state => {
-                UnistylesShadowRegistry.selectVariants(variants)
-
                 const unistyles = typeof style === 'function'
                     ? style(state)
                     : style
@@ -39,14 +39,18 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                     ? unistyles
                     : [unistyles]
 
-                if (storedRef.current) {
-                    // @ts-expect-error - this is hidden from TS
-                    UnistylesShadowRegistry.remove(storedRef.current)
-                    // @ts-expect-error - this is hidden from TS
-                    UnistylesShadowRegistry.add(storedRef.current, styles)
+                if (!storedRef.current) {
+                    return unistyles
                 }
 
-                UnistylesShadowRegistry.selectVariants(undefined)
+                if (state.pressed) {
+                    UnistylesShadowRegistry.selectVariants(variants)
+                }
+
+                // @ts-expect-error - this is hidden from TS
+                UnistylesShadowRegistry.remove(storedRef.current)
+                // @ts-expect-error - this is hidden from TS
+                UnistylesShadowRegistry.add(storedRef.current, styles)
 
                 return unistyles
             }}
