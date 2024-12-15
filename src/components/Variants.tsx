@@ -15,10 +15,11 @@ const Apply: React.FunctionComponent<VariantProps> = ({ variants }) => {
     return null
 }
 export const Variants: React.FunctionComponent<React.PropsWithChildren<VariantProps>> = ({ variants, children }) => {
+    const previousScopedVariants = UnistylesShadowRegistry.getVariants()
     const mappedChildren = [
         <Apply key='add' variants={variants} />,
         children,
-        <Apply key='remove' />
+        <Apply key='remove' variants={previousScopedVariants} />
     ]
 
     return (
