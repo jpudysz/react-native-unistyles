@@ -40,18 +40,19 @@ function wrapVariants(t, path) {
             false
         ),
         t.jsxClosingElement(t.jsxIdentifier('Variants')),
-        [path]
+        []
     )
 
-    if (t.isJSXFragment(path)) {
-        wrapperElement.children = path.children
-    }
-
-    // other case for React.Fragment
     const element = path.openingElement && path.openingElement.name
+    const isWrappedInRegularFragment = t.isJSXFragment(path)
+    const isWrappedInFragment = (t.isJSXMemberExpression(element) && element.object.name === 'React' && element.property.name === 'Fragment') || (t.isJSXIdentifier(element) && element.name === 'Fragment')
 
-    if (t.isJSXMemberExpression(element) && element.object.name === 'React' && element.property.name === 'Fragment') {
-        wrapperElement.children = path.children
+    wrapperElement.children = (isWrappedInRegularFragment || isWrappedInFragment)
+        ? path.children
+        : [path]
+
+    // copy Fragment props like key
+    if (isWrappedInFragment) {
         wrapperElement.openingElement.attributes.push(...path.openingElement.attributes)
     }
 
