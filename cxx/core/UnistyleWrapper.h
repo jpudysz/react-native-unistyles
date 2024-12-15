@@ -116,7 +116,7 @@ inline static std::vector<Unistyle::Shared> unistyleFromValue(jsi::Runtime& rt, 
     return unistyles;
 }
 
-inline static jsi::Value valueFromUnistyle(jsi::Runtime& rt, std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime, Unistyle::Shared unistyle) {
+inline static jsi::Value valueFromUnistyle(jsi::Runtime& rt, std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime, Unistyle::Shared unistyle, Variants& variants) {
     auto wrappedUnistyle = std::make_shared<UnistyleWrapper>(unistyle);
 
     if (unistyle->type == UnistyleType::Object) {
@@ -128,7 +128,7 @@ inline static jsi::Value valueFromUnistyle(jsi::Runtime& rt, std::shared_ptr<Hyb
         helpers::defineHiddenProperty(rt, obj, helpers::STYLE_DEPENDENCIES.c_str(), helpers::dependenciesToJSIArray(rt, unistyle->dependencies));
         helpers::mergeJSIObjects(rt, obj, unistyle->parsedStyle.value());
 
-        obj.setProperty(rt, "__proto__", generateUnistylesPrototype(rt, unistylesRuntime, unistyle, std::nullopt, std::nullopt));
+        obj.setProperty(rt, "__proto__", generateUnistylesPrototype(rt, unistylesRuntime, unistyle, variants, std::nullopt));
 
         return obj;
     }

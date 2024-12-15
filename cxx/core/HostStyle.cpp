@@ -32,7 +32,12 @@ jsi::Value HostStyle::get(jsi::Runtime& rt, const jsi::PropNameID& propNameId) {
             return jsi::Value(rt, this->_styleCache[propertyName]);
         }
         
-        this->_styleCache[propertyName] = valueFromUnistyle(rt, this->_unistylesRuntime, this->_styleSheet->unistyles[propertyName]);
+        this->_styleCache[propertyName] = valueFromUnistyle(
+            rt,
+            this->_unistylesRuntime,
+            this->_styleSheet->unistyles[propertyName],
+            this->_variants
+        );
         
         return jsi::Value(rt, this->_styleCache[propertyName]);
     }
