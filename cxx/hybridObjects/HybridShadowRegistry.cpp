@@ -132,3 +132,12 @@ jsi::Value HybridShadowRegistry::getScopedTheme(jsi::Runtime &rt, const jsi::Val
         ? jsi::String::createFromUtf8(rt, maybeScopedTheme.value())
         : jsi::Value::undefined();
 }
+
+jsi::Value HybridShadowRegistry::getVariants(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    auto& registry = core::UnistylesRegistry::get();
+    auto maybeScopedVariants = registry.getScopedVariants();
+    
+    return maybeScopedVariants.size() > 0
+        ? helpers::variantsToValue(rt, maybeScopedVariants)
+        : jsi::Value::undefined();
+}
