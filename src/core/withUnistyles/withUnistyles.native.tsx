@@ -37,7 +37,8 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
 
                     stylesRef.current = {
                         ...stylesRef.current,
-                        [propName]: narrowedProps[propName]
+                        // @ts-expect-error - this is hidden from TS
+                        [propName]: props[propName].__proto__?.getStyle?.() || props[propName]
                     }
                 }
             })
