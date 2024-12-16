@@ -14,22 +14,24 @@
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/src/index.d.ts",
-  "react-native": "src/index",
   "source": "src/index",
   "exports": {
     ".": {
       "types": "./lib/typescript/src/index.d.ts",
       "module": "./lib/module/index",
-      "default": "./lib/commonjs/index"
+      "default": "./lib/commonjs/index",
+      "react-native": "./src/index"
     },
     "./components/native/*": {
       "module": "./lib/module/components/native/*",
-      "default": "./lib/commonjs/components/native/*"
+      "default": "./lib/commonjs/components/native/*",
+      "react-native": "./src/components/native/*"
     },
     "./plugin": {
       "module": "./plugin/index.js",
       "default": "./plugin/index.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "src",
