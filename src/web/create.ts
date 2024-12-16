@@ -1,11 +1,8 @@
 import type { StyleSheetWithSuperPowers, StyleSheet } from '../types/stylesheet'
 import { assignSecrets, error, removeInlineStyles } from './utils'
 import { UnistylesRuntime } from './runtime'
-import { UnistylesShadowRegistry } from '../specs'
 
-const useVariants = ['useVariants', (variants: Record<string, string | boolean>) => {
-    UnistylesShadowRegistry.selectVariants(variants)
-}]
+const useVariants = ['useVariants', () => {}]
 
 export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, id?: string) => {
     if (!id) {
