@@ -2,7 +2,7 @@ import type { UnistylesTheme, UnistylesValues } from '../types'
 import { UnistylesListener } from './listener'
 import { UnistylesRegistry } from './registry'
 import { deepMergeObjects } from '../utils'
-import { equal, extractSecrets, extractUnistyleDependencies, isInDocument, keyInObject } from './utils'
+import { equal, extractSecrets, extractUnistyleDependencies, isInDocument } from './utils'
 import { getVariants } from './variants'
 
 type Style = UnistylesValues | ((...args: Array<any>) => UnistylesValues)
@@ -67,13 +67,6 @@ class UnistylesShadowRegistryBuilder {
 
                 // Regular style
                 if (!secrets) {
-                    Object.keys(unistyleStyle).forEach(key => {
-                        if (keyInObject(ref.style, key)) {
-                            // @ts-expect-error - Styles won't have read only properties
-                            ref.style[key] = ''
-                        }
-                    })
-
                     return unistyleStyle as UnistylesValues
                 }
 
@@ -133,6 +126,7 @@ class UnistylesShadowRegistryBuilder {
         this.classNamesMap.set(ref, newClassNames)
         // Add new classnames to the ref
         ref.classList.add(...newClassNames)
+        ref.removeAttribute('styles')
 
         return newClassNames
     }
