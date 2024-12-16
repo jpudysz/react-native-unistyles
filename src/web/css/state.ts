@@ -104,4 +104,9 @@ export class CSSState {
 
         return styles
     }
+
+    reset = () => {
+        this.mqMap.clear()
+        this.mainMap.clear()
+    }
 }

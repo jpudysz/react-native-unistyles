@@ -95,14 +95,18 @@ class UnistylesRegistryBuilder {
     applyStyles = (hash: string, value: UnistylesValues) => {
         this.css.add(hash, value)
     }
+
+    reset = () => {
+        this.css.reset()
+    }
 }
 
 declare global {
-    var __unistyles__: UnistylesRegistryBuilder
+    var __unistyles_registry__: UnistylesRegistryBuilder
 }
 
-if (isServer() && !globalThis.__unistyles__) {
-    globalThis.__unistyles__ = new UnistylesRegistryBuilder()
+if (isServer() && !globalThis.__unistyles_registry__) {
+    globalThis.__unistyles_registry__ = new UnistylesRegistryBuilder()
 }
 
-export const UnistylesRegistry = isServer() ? globalThis.__unistyles__ : new UnistylesRegistryBuilder()
+export const UnistylesRegistry = isServer() ? globalThis.__unistyles_registry__ : new UnistylesRegistryBuilder()
