@@ -505,16 +505,19 @@ pluginTester({
                         size: 'small'
                     }
                     styles.useVariants(__uni__variants)
-
-                    return condition ? (
-                        <Variants variants={__uni__variants}>
-                            <Text style={[styles.container]}>Hello world</Text>
-                        </Variants>
-                    ) : (
-                        <Variants variants={__uni__variants}>
-                            <Text style={[styles.container]}>Hello world</Text>
-                        </Variants>
-                    )
+                    if (condition) {
+                        return (
+                            <Variants variants={__uni__variants}>
+                                <Text style={[styles.container]}>Hello world</Text>
+                            </Variants>
+                        )
+                    } else {
+                        return (
+                            <Variants variants={__uni__variants}>
+                                <Text style={[styles.container]}>Hello world</Text>
+                            </Variants>
+                        )
+                    }
                 }
 
                 const styles = StyleSheet.create(
@@ -798,20 +801,23 @@ pluginTester({
                         error: !!error
                     }
                     styles.useVariants(__uni__variants)
-
-                    return children ? (
-                        <Variants variants={__uni__variants}>
-                            <Text ref={ref} style={[styles.label]} {...props}>
-                                {children}
-                            </Text>
-                        </Variants>
-                    ) : (
-                        <Variants variants={__uni__variants}>
-                            <Text ref={ref} style={[styles.label]} {...props}>
-                                {name}
-                            </Text>
-                        </Variants>
-                    )
+                    if (children) {
+                        return (
+                            <Variants variants={__uni__variants}>
+                                <Text ref={ref} style={[styles.label]} {...props}>
+                                    {children}
+                                </Text>
+                            </Variants>
+                        )
+                    } else {
+                        return (
+                            <Variants variants={__uni__variants}>
+                                <Text ref={ref} style={[styles.label]} {...props}>
+                                    {name}
+                                </Text>
+                            </Variants>
+                        )
+                    }
                 }
 
                 const styles = StyleSheet.create(theme => ({}), 895830154)

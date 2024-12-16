@@ -67,8 +67,13 @@ function addJSXVariants(t, path) {
     const jsxElement = path.node.argument
 
     if (t.isConditionalExpression(jsxElement)) {
-        jsxElement.alternate = wrapVariants(t, jsxElement.alternate)
-        jsxElement.consequent = wrapVariants(t, jsxElement.consequent)
+        const ifStatement = t.ifStatement(
+            jsxElement.test,
+            t.blockStatement([t.returnStatement(jsxElement.consequent)]),
+            t.blockStatement([t.returnStatement(jsxElement.alternate)])
+        )
+
+        path.replaceWith(ifStatement)
 
         return
     }
