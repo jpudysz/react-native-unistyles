@@ -1,3 +1,4 @@
 {
-  "main": "../../../lib/commonjs/components/native/Switch.js"
+  "main": "../../../lib/commonjs/components/native/Switch.js",
+  "module": "../../../lib/module/components/native/Switch.js"
 }
