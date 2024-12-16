@@ -40,6 +40,7 @@
     "nitrogen",
     "plugin",
     "web",
+    "components",
     "react-native.config.js",
     "Unistyles.podspec",
     "!plugin/__tests__",
