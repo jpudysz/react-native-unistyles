@@ -159,7 +159,7 @@ class UnistylesRuntimeBuilder {
             throw error(`You're trying to set theme to: '${themeName}', but adaptiveThemes are enabled.`)
         }
 
-        if (themeName === UnistylesRuntime.themeName) {
+        if (themeName === this.themeName) {
             return
         }
 
@@ -175,7 +175,7 @@ class UnistylesRuntimeBuilder {
             return
         }
 
-        this.setTheme(schemeToTheme(UnistylesRuntime.colorScheme) as AppThemeName)
+        this.setTheme(schemeToTheme(this.colorScheme) as AppThemeName)
     }
 
     setRootViewBackgroundColor = (color: string) => {
@@ -208,7 +208,13 @@ class UnistylesRuntimeBuilder {
         return theme
     }
 
-    getCSS = () => UnistylesRegistry.css.getStyles()
+    getCSS = () => {
+        const css = UnistylesRegistry.css.getStyles()
+
+        UnistylesRegistry.css.reset()
+
+        return css
+    }
 }
 
 export const UnistylesRuntime = new UnistylesRuntimeBuilder()
