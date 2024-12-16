@@ -1,3 +1,4 @@
 {
-  "main": "../../../lib/commonjs/components/native/KeyboardAvoidingView.js"
+  "main": "../../../lib/commonjs/components/native/KeyboardAvoidingView.js",
+  "module": "../../../lib/module/components/native/KeyboardAvoidingView.js"
 }
