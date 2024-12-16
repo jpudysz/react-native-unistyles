@@ -1,3 +1,4 @@
 {
-  "main": "../../../lib/commonjs/components/native/ActivityIndicator.js"
+  "main": "../../../lib/commonjs/components/native/ActivityIndicator.js",
+  "module": "../../../lib/module/components/native/ActivityIndicator.js"
 }

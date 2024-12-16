@@ -1,3 +1,4 @@
 {
-  "main": "../../../lib/commonjs/components/native/VirtualizedList.js"
+  "main": "../../../lib/commonjs/components/native/VirtualizedList.js",
+  "module": "../../../lib/module/components/native/VirtualizedList.js"
 }

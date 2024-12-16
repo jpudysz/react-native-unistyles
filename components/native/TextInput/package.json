@@ -1,3 +1,4 @@
 {
-  "main": "../../../lib/commonjs/components/native/TextInput.js"
+  "main": "../../../lib/commonjs/components/native/TextInput.js",
+  "module": "../../../lib/module/components/native/TextInput.js"
 }
