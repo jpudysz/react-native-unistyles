@@ -1,3 +1,4 @@
 {
-  "main": "../../../lib/commonjs/components/native/ScrollView.js"
+  "main": "../../../lib/commonjs/components/native/ScrollView.js",
+  "module": "../../../lib/module/components/native/ScrollView.js"
 }
