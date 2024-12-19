@@ -11,6 +11,7 @@ type SetthisProps = {
     propertyKey: string
     value: any
 }
+type HydrateState = Array<[ string, Array<[ string, Array<[ string, any ]> ]> ]>
 
 const safeGetMap = (map: Map<string, Map<string, any>>, key: string) => {
     const nextLevelMap = map.get(key)
@@ -113,34 +114,47 @@ export class CSSState {
     }
 
     getState = () => {
-        return Array.from(this.mainMap.entries()).map(([mediaQuery, classNames]) => {
-            return [
-                mediaQuery,
-                Array.from(classNames.entries()).map(([className, style]) => {
-                    return [
-                        className,
-                        Array.from(style.entries()).map(([property, value]) => {
-                            return [property, value]
-                        })
-                    ]
-                })
-            ]
-        }) as Array<[ string, Array<[ string, Array<[ string, any ]> ]> ]>
+        const getState = (map: MapType) => {
+            return Array.from(map).map(([mediaQuery, classNames]) => {
+                return [
+                    mediaQuery,
+                    Array.from(classNames.entries()).map(([className, style]) => {
+                        return [
+                            className,
+                            Array.from(style.entries()).map(([property, value]) => {
+                                return [property, value]
+                            })
+                        ]
+                    })
+                ]
+            }) as HydrateState
+        }
+
+        const mainState = getState(this.mainMap)
+        const mqState = getState(this.mqMap)
+
+        return { mainState, mqState }
     }
 
-    hydrate = (state: ReturnType<typeof this.getState>) => {
-        state.forEach(([mediaQuery, classNames]) => {
-            classNames.forEach(([className, style]) => {
-                style.forEach(([propertyKey, value]) => {
-                    this.set({
-                        className,
-                        propertyKey,
-                        value,
-                        mediaQuery
+    hydrate = ({ mainState, mqState }: ReturnType<typeof this.getState>) => {
+        const hydrateState = (map: HydrateState, isMq = false) => {
+            map.forEach(([mediaQuery, classNames]) => {
+                classNames.forEach(([className, style]) => {
+                    style.forEach(([propertyKey, value]) => {
+                        this.set({
+                            className,
+                            propertyKey,
+                            value,
+                            mediaQuery,
+                            isMq
+                        })
                     })
                 })
             })
-        })
+        }
+
+        hydrateState(mainState)
+        hydrateState(mqState, true)
     }
 
     reset = () => {
