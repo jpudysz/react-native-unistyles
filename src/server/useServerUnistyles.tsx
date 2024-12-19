@@ -17,7 +17,7 @@ export const useServerUnistyles = () => {
 
             const css = UnistylesWeb.registry.css.getStyles()
             const state = UnistylesWeb.registry.css.getState()
-            UnistylesWeb.registry.css.reset()
+            UnistylesWeb.registry.reset()
 
             return (
                 <>
