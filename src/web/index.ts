@@ -7,14 +7,16 @@ import { UnistylesServices } from './services'
 import { isServer } from './utils'
 
 declare global {
+    // @ts-ignore
     var __unistyles__: UnistylesServices
 }
 
 if (isServer() && !globalThis.__unistyles__) {
+    // @ts-ignore
     globalThis.__unistyles__ = new UnistylesServices()
 }
 
-export const UnistylesWeb = isServer() ? globalThis.__unistyles_web__ : new UnistylesServices()
+export const UnistylesWeb = isServer() ? globalThis.__unistyles__ : new UnistylesServices()
 export const StyleSheet = {
     configure: UnistylesWeb.state.init,
     create: create,
