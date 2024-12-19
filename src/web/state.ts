@@ -2,15 +2,14 @@ import type { UnistylesTheme } from '../types'
 import type { UnistylesConfig } from '../specs/StyleSheet'
 import type { AppBreakpoint, AppTheme, AppThemeName } from '../specs/types'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
-import { UnistylesRuntime } from './runtime'
 import { error, isServer, schemeToTheme } from './utils'
-import { UnistylesListener } from './listener'
 import { UnistyleDependency } from '../specs/NativePlatform'
 import type { UnionToIntersection } from '../types'
+import type { UnistylesServices } from './types'
 
 type UnistylesSettings = Partial<UnionToIntersection<Required<UnistylesConfig>['settings']>>
 
-class UnistylesStateBuilder {
+export class UnistylesState {
     themes = new Map<string, UnistylesTheme>()
     themeName?: AppThemeName
 
@@ -28,6 +27,8 @@ class UnistylesStateBuilder {
 
     hasAdaptiveThemes = false
 
+    constructor(private services: UnistylesServices) {}
+
     init = (config: UnistylesConfig) => {
         this.initThemes(config.themes)
         this.initBreakpoints(config.breakpoints)
@@ -40,7 +41,7 @@ class UnistylesStateBuilder {
             return
         }
 
-        UnistylesListener.initListeners()
+        this.services.listener.initListeners()
     }
 
     private initThemes = (themes = {} as UnistylesThemes) => {
@@ -62,7 +63,7 @@ class UnistylesStateBuilder {
                 throw error(`You're trying to enable adaptiveThemes, but you didn't register both 'light' and 'dark' themes.`)
             }
 
-            this.themeName = schemeToTheme(UnistylesRuntime.colorScheme) as AppThemeName
+            this.themeName = schemeToTheme(this.services.runtime.colorScheme) as AppThemeName
 
             return
         }
@@ -104,10 +105,8 @@ class UnistylesStateBuilder {
 
                 mediaQuery.addEventListener('change', event => {
                     this.matchingBreakpoints.set(breakpoint, event.matches)
-                    UnistylesListener.emitChange(UnistyleDependency.Breakpoints)
+                    this.services.listener.emitChange(UnistyleDependency.Breakpoints)
                 })
             })
     }
 }
-
-export const UnistylesState = new UnistylesStateBuilder()

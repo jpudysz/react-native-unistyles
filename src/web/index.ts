@@ -1,12 +1,12 @@
 import { create } from './create'
-import { UnistylesState } from './state'
 import { deepMergeObjects } from '../utils'
 import type { StyleSheet as NativeStyleSheet } from '../specs/StyleSheet'
-import { UnistylesRuntime as UnistylesRuntimeWeb } from './runtime'
 import type { Runtime as NativeUnistylesRuntime } from '../specs/UnistylesRuntime'
+import type { UnistylesShadowRegistry as NativeUnistylesShadowRegistry } from '../specs/ShadowRegistry'
+import { UnistylesWeb } from './services'
 
 export const StyleSheet = {
-    configure: UnistylesState.init,
+    configure: UnistylesWeb.state.init,
     create: create,
     absoluteFill: {
         position: 'absolute',
@@ -27,7 +27,8 @@ export const StyleSheet = {
     hairlineWidth: 1
 } as unknown as typeof NativeStyleSheet
 
-export const UnistylesRuntime = UnistylesRuntimeWeb as unknown as typeof NativeUnistylesRuntime
+export const UnistylesRuntime = UnistylesWeb.runtime as unknown as typeof NativeUnistylesRuntime
+export const UnistylesShadowRegistry = UnistylesWeb.shadowRegistry as unknown as typeof NativeUnistylesShadowRegistry
 
 export * from './mock'
-export * from './shadowRegistry'
+

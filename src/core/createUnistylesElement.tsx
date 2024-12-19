@@ -18,10 +18,12 @@ export const createUnistylesElement = (Component: any) => React.forwardRef<unkno
             style={classNames}
             ref={isServer() ? undefined : (ref: HTMLElement | null) => {
                 if (!ref) {
+                    // @ts-expect-error hidden from TS
                     UnistylesShadowRegistry.remove(storedRef, classNames?.hash)
                 }
 
                 storedRef = ref
+                // @ts-expect-error hidden from TS
                 UnistylesShadowRegistry.add(ref, classNames?.hash)
 
                 if (typeof forwardedRef === 'function') {

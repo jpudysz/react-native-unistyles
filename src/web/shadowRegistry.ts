@@ -1,11 +1,10 @@
 import type { UnistylesTheme, UnistylesValues } from '../types'
-import { UnistylesListener } from './listener'
-import { UnistylesRegistry } from './registry'
 import { deepMergeObjects } from '../utils'
 import { extractSecrets, extractUnistyleDependencies } from './utils'
 import { getVariants } from './variants'
+import type { UnistylesServices } from './types'
 
-class UnistylesShadowRegistryBuilder {
+export class UnistylesShadowRegistry {
     // MOCKS
     name = 'UnistylesShadowRegistry'
     __type = 'web'
@@ -18,12 +17,14 @@ class UnistylesShadowRegistryBuilder {
     private scopedTheme: UnistylesTheme | undefined = undefined
     private disposeMap = new Map<string, VoidFunction>()
 
+    constructor(private services: UnistylesServices) {}
+
     add = (ref: any, hash?: string) => {
         if (!(ref instanceof HTMLElement) || !hash) {
             return
         }
 
-        UnistylesRegistry.connect(ref, hash)
+        this.services.registry.connect(ref, hash)
     }
 
     addStyles = (unistyle: UnistylesValues) => {
@@ -36,7 +37,7 @@ class UnistylesShadowRegistryBuilder {
             }
 
             const { __uni__key, __uni__stylesheet, __uni__args = [] } = secrets
-            const newComputedStylesheet = UnistylesRegistry.getComputedStylesheet(__uni__stylesheet, scopedTheme)
+            const newComputedStylesheet = this.services.registry.getComputedStylesheet(__uni__stylesheet, scopedTheme)
             const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
             const result = typeof style === 'function'
                 ? style(...__uni__args)
@@ -47,7 +48,7 @@ class UnistylesShadowRegistryBuilder {
 
             if (typeof __uni__stylesheet === 'function') {
                 // Add dependencies from dynamic styles to stylesheet
-                UnistylesRegistry.addDependenciesToStylesheet(__uni__stylesheet, dependencies)
+                this.services.registry.addDependenciesToStylesheet(__uni__stylesheet, dependencies)
             }
 
             return resultWithVariants as UnistylesValues
@@ -57,14 +58,14 @@ class UnistylesShadowRegistryBuilder {
         const variants = this.getVariants()
         const scopedTheme = this.scopedTheme
         const parsedStyles = getParsedStyles()
-        const { hash, existingHash } = UnistylesRegistry.add(parsedStyles)
+        const { hash, existingHash } = this.services.registry.add(parsedStyles)
         const injectedClassNames = parsedStyles?._web?._classNames ?? []
         const injectedClassName = Array.isArray(injectedClassNames) ? injectedClassNames.join(' ') : injectedClassNames
         const dependencies = extractUnistyleDependencies(parsedStyles)
 
         if (!existingHash) {
-            this.disposeMap.set(hash, UnistylesListener.addListeners(dependencies, () => {
-                UnistylesRegistry.applyStyles(hash, getParsedStyles())
+            this.disposeMap.set(hash, this.services.listener.addListeners(dependencies, () => {
+                this.services.registry.applyStyles(hash, getParsedStyles())
             }))
         }
 
@@ -96,8 +97,6 @@ class UnistylesShadowRegistryBuilder {
             return
         }
 
-        UnistylesRegistry.remove(ref, hash)
+        this.services.registry.remove(ref, hash)
     }
 }
-
-export const UnistylesShadowRegistry = new UnistylesShadowRegistryBuilder()

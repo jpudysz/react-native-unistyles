@@ -1,12 +1,12 @@
 import React, { type ComponentType, forwardRef, type ComponentProps, type ComponentRef } from 'react'
 import type { PartialBy } from '../../types/common'
-import { UnistylesListener } from '../../web/listener'
 import { deepMergeObjects } from '../../utils'
 import type { Mappings, SupportedStyleProps } from './types'
 import { useDependencies } from './useDependencies'
 import { UnistyleDependency } from '../../specs/NativePlatform'
 import type { UnistylesValues } from '../../types'
 import { getClassName } from '../getClassname'
+import { UnistylesWeb } from '../../web/services'
 
 // @ts-expect-error
 type GenericComponentProps<T> = ComponentProps<T>
@@ -26,8 +26,8 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         const styleClassNames = getClassName(narrowedProps.style)
         const contentContainerStyleClassNames = getClassName(narrowedProps.contentContainerStyle)
         const { mappingsCallback } = useDependencies(({ dependencies, updateTheme, updateRuntime }) => {
-            const disposeTheme = UnistylesListener.addListeners(dependencies.filter(dependency => dependency === UnistyleDependency.Theme), updateTheme)
-            const disposeRuntime = UnistylesListener.addListeners(dependencies.filter(dependency => dependency !== UnistyleDependency.Theme), updateRuntime)
+            const disposeTheme = UnistylesWeb.listener.addListeners(dependencies.filter(dependency => dependency === UnistyleDependency.Theme), updateTheme)
+            const disposeRuntime = UnistylesWeb.listener.addListeners(dependencies.filter(dependency => dependency !== UnistyleDependency.Theme), updateRuntime)
 
             return () => {
                 disposeTheme()

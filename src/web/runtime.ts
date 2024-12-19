@@ -2,17 +2,15 @@ import { UnistyleDependency } from '../specs/NativePlatform'
 import { ColorScheme, Orientation, type AppTheme, type AppThemeName } from '../specs/types'
 import type { UnistylesMiniRuntime } from '../specs/UnistylesRuntime'
 import { WebContentSizeCategory } from '../types'
-import { UnistylesListener } from './listener'
 import { NavigationBar, StatusBar } from './mock'
 import { error, isServer, schemeToTheme } from './utils'
-import { UnistylesRegistry } from './registry'
+import type { UnistylesServices } from './types'
 
-// Keep this import here, otherwise circular dependency will occur and break the build
-import { UnistylesState } from './state'
-
-class UnistylesRuntimeBuilder {
+export class UnistylesRuntime {
     lightMedia = this.getLightMedia()
     darkMedia = this.getDarkMedia()
+
+    constructor(private services: UnistylesServices) {}
 
     private getLightMedia(): MediaQueryList | null {
         if (isServer()) {
@@ -50,11 +48,11 @@ class UnistylesRuntimeBuilder {
     }
 
     get themeName() {
-        if (UnistylesState.hasAdaptiveThemes) {
+        if (this.services.state.hasAdaptiveThemes) {
             return schemeToTheme(this.colorScheme) as AppThemeName
         }
 
-        return UnistylesState.themeName
+        return this.services.state.themeName
     }
 
     get contentSizeCategory() {
@@ -62,11 +60,11 @@ class UnistylesRuntimeBuilder {
     }
 
     get breakpoints() {
-        return UnistylesState.breakpoints ?? {}
+        return this.services.state.breakpoints ?? {}
     }
 
     get breakpoint() {
-        return UnistylesState.breakpoint
+        return this.services.state.breakpoint
     }
 
     get orientation() {
@@ -122,7 +120,7 @@ class UnistylesRuntimeBuilder {
     }
 
     get hasAdaptiveThemes() {
-        return UnistylesState.hasAdaptiveThemes
+        return this.services.state.hasAdaptiveThemes
     }
 
     get navigationBar() {
@@ -163,13 +161,13 @@ class UnistylesRuntimeBuilder {
             return
         }
 
-        UnistylesState.themeName = themeName
-        UnistylesListener.emitChange(UnistyleDependency.Theme)
-        UnistylesListener.emitChange(UnistyleDependency.ThemeName)
+        this.services.state.themeName = themeName
+        this.services.listener.emitChange(UnistyleDependency.Theme)
+        this.services.listener.emitChange(UnistyleDependency.ThemeName)
     }
 
     setAdaptiveThemes = (isEnabled: boolean) => {
-        UnistylesState.hasAdaptiveThemes = isEnabled
+        this.services.state.hasAdaptiveThemes = isEnabled
 
         if (!isEnabled) {
             return
@@ -189,17 +187,17 @@ class UnistylesRuntimeBuilder {
     setImmersiveMode = () => {}
 
     updateTheme = (themeName: AppThemeName, updater: (currentTheme: AppTheme) => AppTheme) => {
-        const oldTheme = UnistylesState.themes.get(themeName)
+        const oldTheme = this.services.state.themes.get(themeName)
 
         if (!oldTheme) {
             throw error(`Unistyles: You're trying to update theme "${themeName}" but it wasn't registered.`)
         }
 
-        UnistylesState.themes.set(themeName, updater(oldTheme))
+        this.services.state.themes.set(themeName, updater(oldTheme))
     }
 
     getTheme = (themeName = this.themeName) => {
-        const theme = UnistylesState.themes.get(themeName ?? '')
+        const theme = this.services.state.themes.get(themeName ?? '')
 
         if (!themeName || !theme) {
             throw error(`You're trying to get theme "${themeName}" but it wasn't registered.`)
@@ -209,12 +207,10 @@ class UnistylesRuntimeBuilder {
     }
 
     getCSS = () => {
-        const css = UnistylesRegistry.css.getStyles()
+        const css = this.services.registry.css.getStyles()
 
-        UnistylesRegistry.css.reset()
+        this.services.registry.reset()
 
         return css
     }
 }
-
-export const UnistylesRuntime = new UnistylesRuntimeBuilder()

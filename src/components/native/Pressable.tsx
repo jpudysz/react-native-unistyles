@@ -31,6 +31,7 @@ export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, 
             {...props}
             ref={isServer() ? undefined : ref => {
                 storedRef = ref as unknown as HTMLElement
+                // @ts-expect-error hidden from TS
                 UnistylesShadowRegistry.add(storedRef, classNames?.hash)
 
                 if (typeof forwardedRef === 'function') {
@@ -51,8 +52,10 @@ export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, 
                 UnistylesShadowRegistry.selectVariants(variants)
                 UnistylesShadowRegistry.setScopedTheme(scopedTheme)
 
+                // @ts-expect-error hidden from TS
                 UnistylesShadowRegistry.remove(storedRef, classNames?.hash)
                 classNames = getClassName(styleResult as UnistylesValues)
+                // @ts-expect-error hidden from TS
                 UnistylesShadowRegistry.add(storedRef, classNames?.hash)
 
                 UnistylesShadowRegistry.selectVariants(previousVariants)

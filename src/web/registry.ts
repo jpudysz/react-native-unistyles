@@ -1,12 +1,11 @@
 import type { UnistylesTheme, UnistylesValues } from '../types'
 import type { StyleSheet, StyleSheetWithSuperPowers } from '../types/stylesheet'
-import { UnistylesRuntime } from './runtime'
-import { generateHash, extractUnistyleDependencies, error, isServer } from './utils'
-import { UnistylesListener } from './listener'
+import { generateHash, extractUnistyleDependencies, error } from './utils'
 import type { UnistylesMiniRuntime, UnistyleDependency } from '../specs'
 import { CSSState } from './css'
+import type { UnistylesServices } from './types'
 
-class UnistylesRegistryBuilder {
+export class UnistylesRegistry {
     private readonly stylesheets = new Map<StyleSheetWithSuperPowers<StyleSheet>, StyleSheet>()
     private readonly stylesCache = new Set<string>()
     private readonly stylesCounter = new Map<string, Set<HTMLElement>>()
@@ -14,19 +13,21 @@ class UnistylesRegistryBuilder {
     private readonly dependenciesMap = new Map<StyleSheetWithSuperPowers<StyleSheet>, Set<UnistyleDependency>>()
     readonly css = new CSSState()
 
+    constructor(private services: UnistylesServices) {}
+
     getComputedStylesheet = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, scopedThemeName?: UnistylesTheme) => {
         if (typeof stylesheet !== 'function') {
             return stylesheet
         }
 
         if (scopedThemeName) {
-            const scopedTheme = UnistylesRuntime.getTheme(scopedThemeName)
+            const scopedTheme = this.services.runtime.getTheme(scopedThemeName)
 
             if (!scopedTheme) {
                 throw error(`Unistyles: You're trying to use scoped theme '${scopedThemeName}' but it wasn't registered.`)
             }
 
-            return stylesheet(scopedTheme, UnistylesRuntime.miniRuntime)
+            return stylesheet(scopedTheme, this.services.runtime.miniRuntime)
         }
 
         const computedStylesheet = this.stylesheets.get(stylesheet)
@@ -35,7 +36,7 @@ class UnistylesRegistryBuilder {
             return computedStylesheet
         }
 
-        const createdStylesheet = stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
+        const createdStylesheet = stylesheet(this.services.runtime.theme, this.services.runtime.miniRuntime)
         const dependencies = Object.values(createdStylesheet).flatMap(value => extractUnistyleDependencies(value))
 
         this.addDependenciesToStylesheet(stylesheet, dependencies)
@@ -51,8 +52,8 @@ class UnistylesRegistryBuilder {
 
         dependencies.forEach(dependency => dependenciesMap.add(dependency))
 
-        const dispose = UnistylesListener.addStylesheetListeners(Array.from(dependenciesMap), () => {
-            const newComputedStylesheet = stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
+        const dispose = this.services.listener.addStylesheetListeners(Array.from(dependenciesMap), () => {
+            const newComputedStylesheet = stylesheet(this.services.runtime.theme, this.services.runtime.miniRuntime)
 
             this.stylesheets.set(stylesheet, newComputedStylesheet)
         })
@@ -98,15 +99,6 @@ class UnistylesRegistryBuilder {
 
     reset = () => {
         this.css.reset()
+        this.stylesCache.clear()
     }
 }
-
-declare global {
-    var __unistyles_registry__: UnistylesRegistryBuilder
-}
-
-if (isServer() && !globalThis.__unistyles_registry__) {
-    globalThis.__unistyles_registry__ = new UnistylesRegistryBuilder()
-}
-
-export const UnistylesRegistry = isServer() ? globalThis.__unistyles_registry__ : new UnistylesRegistryBuilder()

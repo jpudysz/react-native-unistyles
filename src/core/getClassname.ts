@@ -10,6 +10,7 @@ export const getClassName = (unistyle: UnistylesValues | undefined | Array<Unist
     const style = Array.isArray(unistyle)
         ? deepMergeObjects(...unistyle)
         : unistyle
+    // @ts-expect-error hidden from TS
     const { hash, injectedClassName } = UnistylesShadowRegistry.addStyles(style)
 
     return hash ? { $$css: true, hash, injectedClassName } : undefined
