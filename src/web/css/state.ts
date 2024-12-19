@@ -112,6 +112,37 @@ export class CSSState {
         return styles
     }
 
+    getState = () => {
+        return Array.from(this.mainMap.entries()).map(([mediaQuery, classNames]) => {
+            return [
+                mediaQuery,
+                Array.from(classNames.entries()).map(([className, style]) => {
+                    return [
+                        className,
+                        Array.from(style.entries()).map(([property, value]) => {
+                            return [property, value]
+                        })
+                    ]
+                })
+            ]
+        }) as Array<[ string, Array<[ string, Array<[ string, any ]> ]> ]>
+    }
+
+    hydrate = (state: ReturnType<typeof this.getState>) => {
+        state.forEach(([mediaQuery, classNames]) => {
+            classNames.forEach(([className, style]) => {
+                style.forEach(([propertyKey, value]) => {
+                    this.set({
+                        className,
+                        propertyKey,
+                        value,
+                        mediaQuery
+                    })
+                })
+            })
+        })
+    }
+
     reset = () => {
         this.mqMap.clear()
         this.mainMap.clear()

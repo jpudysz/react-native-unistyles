@@ -3,8 +3,18 @@ import { deepMergeObjects } from '../utils'
 import type { StyleSheet as NativeStyleSheet } from '../specs/StyleSheet'
 import type { Runtime as NativeUnistylesRuntime } from '../specs/UnistylesRuntime'
 import type { UnistylesShadowRegistry as NativeUnistylesShadowRegistry } from '../specs/ShadowRegistry'
-import { UnistylesWeb } from './services'
+import { UnistylesServices } from './services'
+import { isServer } from './utils'
 
+declare global {
+    var __unistyles__: UnistylesServices
+}
+
+if (isServer() && !globalThis.__unistyles__) {
+    globalThis.__unistyles__ = new UnistylesServices()
+}
+
+export const UnistylesWeb = isServer() ? globalThis.__unistyles_web__ : new UnistylesServices()
 export const StyleSheet = {
     configure: UnistylesWeb.state.init,
     create: create,

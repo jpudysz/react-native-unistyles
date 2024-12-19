@@ -6,7 +6,7 @@ import { useDependencies } from './useDependencies'
 import { UnistyleDependency } from '../../specs/NativePlatform'
 import type { UnistylesValues } from '../../types'
 import { getClassName } from '../getClassname'
-import { UnistylesWeb } from '../../web/services'
+import { UnistylesWeb } from '../../web'
 
 // @ts-expect-error
 type GenericComponentProps<T> = ComponentProps<T>

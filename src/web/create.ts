@@ -1,5 +1,5 @@
 import type { StyleSheetWithSuperPowers, StyleSheet } from '../types/stylesheet'
-import { UnistylesWeb } from './services'
+import { UnistylesWeb } from '.'
 import { assignSecrets, error, removeInlineStyles } from './utils'
 
 const useVariants = ['useVariants', () => {}]
