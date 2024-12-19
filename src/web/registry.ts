@@ -96,9 +96,4 @@ export class UnistylesRegistry {
     applyStyles = (hash: string, value: UnistylesValues) => {
         this.css.add(hash, value)
     }
-
-    reset = () => {
-        this.css.reset()
-        this.stylesCache.clear()
-    }
 }

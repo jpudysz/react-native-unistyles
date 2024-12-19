@@ -205,12 +205,4 @@ export class UnistylesRuntime {
 
         return theme
     }
-
-    getCSS = () => {
-        const css = this.services.registry.css.getStyles()
-
-        this.services.registry.reset()
-
-        return css
-    }
 }

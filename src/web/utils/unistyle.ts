@@ -4,7 +4,7 @@ import type { StyleSheet, StyleSheetWithSuperPowers, UnistylesValues } from '../
 import { isUnistylesMq, parseMq } from '../../mq'
 import { keyInObject, reduceObject } from './common'
 import type { UnistylesBreakpoints } from '../../global'
-import { UnistylesWeb } from '../services'
+import { UnistylesWeb } from '..'
 
 export const schemeToTheme = (scheme: ColorScheme) => {
     switch (scheme) {

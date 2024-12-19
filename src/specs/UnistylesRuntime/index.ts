@@ -24,8 +24,6 @@ export interface UnistylesRuntimePrivate extends Omit<UnistylesRuntimeSpec, 'set
     updateTheme(themeName: AppThemeName, updater: (currentTheme: AppTheme) => AppTheme): void,
     setRootViewBackgroundColor(color?: string): void,
     _setRootViewBackgroundColor(color?: Color): void
-    getCSS(): string,
-    resetStyles(): void
 
     // constructors
     createHybridStatusBar(): UnistylesStatusBar,
