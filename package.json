@@ -1,6 +1,6 @@
 {
   "name": "react-native-unistyles",
-  "version": "3.0.0-beta.2",
+  "version": "3.0.0-beta.4",
   "description": "Level up your React Native StyleSheet",
   "scripts": {
     "test": "jest",
@@ -14,22 +14,24 @@
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/src/index.d.ts",
-  "react-native": "src/index",
   "source": "src/index",
   "exports": {
     ".": {
       "types": "./lib/typescript/src/index.d.ts",
       "module": "./lib/module/index",
-      "default": "./lib/commonjs/index"
+      "default": "./lib/commonjs/index",
+      "react-native": "./src/index"
     },
     "./components/native/*": {
-        "module": "./lib/module/components/native/*",
-        "default": "./lib/commonjs/components/native/*"
+      "module": "./lib/module/components/native/*",
+      "default": "./lib/commonjs/components/native/*",
+      "react-native": "./src/components/native/*"
     },
     "./plugin": {
-        "module": "./plugin/index.js",
-        "default": "./plugin/index.js"
-    }
+      "module": "./plugin/index.js",
+      "default": "./plugin/index.js"
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "src",
@@ -40,6 +42,7 @@
     "nitrogen",
     "plugin",
     "web",
+    "components",
     "react-native.config.js",
     "Unistyles.podspec",
     "!plugin/__tests__",

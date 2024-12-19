@@ -1,3 +1,4 @@
 {
-  "main": "../../../lib/commonjs/components/native/View.js"
+  "main": "../../../lib/commonjs/components/native/View.js",
+  "module": "../../../lib/module/components/native/View.js"
 }

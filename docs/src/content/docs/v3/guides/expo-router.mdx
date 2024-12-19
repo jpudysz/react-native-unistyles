@@ -3,7 +3,7 @@ title: Expo Router
 description: Integrate Expo Router with Unistyles
 ---
 
-import { Card } from '@astrojs/starlight/components'
+import { Card, Aside } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
 
 <Seo
@@ -34,6 +34,10 @@ Then, create `index.js` file with following content:
 import 'expo-router/entry'
 import './unistyles' // <-- file that initializes Unistyles
 ```
+
+<Aside>
+The `unistyles.ts` file is where Unistyles is configured. For more details, refer to the [configuration guide](/v3/start/configuration).
+</Aside>
 
 With this setup, we will ensure that Unistyles is initialized before any other component.
 

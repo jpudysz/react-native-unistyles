@@ -1,3 +1,4 @@
 {
-  "main": "../../../lib/commonjs/components/native/SectionList.js"
+  "main": "../../../lib/commonjs/components/native/SectionList.js",
+  "module": "../../../lib/module/components/native/SectionList.js"
 }
