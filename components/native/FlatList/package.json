@@ -1,3 +1,4 @@
 {
-  "main": "../../../lib/commonjs/components/native/FlatList.js"
+  "main": "../../../lib/commonjs/components/native/FlatList.js",
+  "module": "../../../lib/module/components/native/FlatList.js"
 }

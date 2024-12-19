@@ -30,7 +30,7 @@ export const assignSecrets = <T>(object: T, secrets: UnistyleSecrets) => {
 }
 
 export const extractSecrets = (object: any) => {
-    return keyInObject(object, '__uni__secrets__') ? object.__uni__secrets__ as UnistyleSecrets : undefined
+    return object && keyInObject(object, '__uni__secrets__') ? object.__uni__secrets__ as UnistyleSecrets : undefined
 }
 
 export const removeInlineStyles = (values: UnistylesValues) => {

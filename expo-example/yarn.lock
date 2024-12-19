@@ -4439,7 +4439,7 @@ __metadata:
     react-dom: 18.3.1
     react-native: 0.76.2
     react-native-edge-to-edge: 1.1.2
-    react-native-nitro-modules: 0.18.1
+    react-native-nitro-modules: 0.18.2
     react-native-safe-area-context: 4.14.0
     react-native-screens: 4.1.0
     react-native-web: 0.19.13
@@ -7531,13 +7531,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-nitro-modules@npm:0.18.1":
-  version: 0.18.1
-  resolution: "react-native-nitro-modules@npm:0.18.1"
+"react-native-nitro-modules@npm:0.18.2":
+  version: 0.18.2
+  resolution: "react-native-nitro-modules@npm:0.18.2"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 641dd59674e1b0658ef5e66655f71596053dfe179f437f487ad65e95ce44ef8c70c0fdbe6098cb18c1e1f4eb71ec18bb1b7a59e09adeef9ed42552d3517bbc6c
+  checksum: 2ab3804e5a1129a63afe4a6581d7ca880a8846f7a7ff87a0cd835efad7efbde897dd452aab406074952f7ad7fc1ec0b437105cfef731c40ab158353befc8bfaa
   languageName: node
   linkType: hard
 

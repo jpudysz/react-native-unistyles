@@ -168,15 +168,17 @@ void parser::Parser::parseUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
 // rebuild all unistyles in StyleSheet that depends on variants
 void parser::Parser::rebuildUnistyleWithVariants(jsi::Runtime& rt, std::shared_ptr<core::UnistyleData> unistyleData) {
     if (unistyleData->unistyle->styleKey == helpers::EXOTIC_STYLE_KEY) {
+        unistyleData->parsedStyle = std::move(unistyleData->unistyle->rawValue);
+
         return;
     }
-    
+
     if (unistyleData->unistyle->type == UnistyleType::Object) {
         unistyleData->parsedStyle = this->parseFirstLevel(rt, unistyleData->unistyle, unistyleData->variants);
-        
+
         return;
     }
-    
+
     // for functions we need to call them with memoized arguments
     auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyleData->unistyle);
 

@@ -1,3 +1,4 @@
 {
-  "main": "../../../lib/commonjs/components/native/ImageBackground.js"
+  "main": "../../../lib/commonjs/components/native/ImageBackground.js",
+  "module": "../../../lib/module/components/native/ImageBackground.js"
 }

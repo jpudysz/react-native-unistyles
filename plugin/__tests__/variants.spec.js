@@ -373,9 +373,9 @@ pluginTester({
                     })
 
                     return (
-                        <React.Fragment key="asd">
+                        <Fragment key="asd">
                             <Text style={styles.container}>Hello world</Text>
-                        </React.Fragment>
+                        </Fragment>
                     )
                 }
 
@@ -505,16 +505,19 @@ pluginTester({
                         size: 'small'
                     }
                     styles.useVariants(__uni__variants)
-
-                    return condition ? (
-                        <Variants variants={__uni__variants}>
-                            <Text style={[styles.container]}>Hello world</Text>
-                        </Variants>
-                    ) : (
-                        <Variants variants={__uni__variants}>
-                            <Text style={[styles.container]}>Hello world</Text>
-                        </Variants>
-                    )
+                    if (condition) {
+                        return (
+                            <Variants variants={__uni__variants}>
+                                <Text style={[styles.container]}>Hello world</Text>
+                            </Variants>
+                        )
+                    } else {
+                        return (
+                            <Variants variants={__uni__variants}>
+                                <Text style={[styles.container]}>Hello world</Text>
+                            </Variants>
+                        )
+                    }
                 }
 
                 const styles = StyleSheet.create(
@@ -761,6 +764,64 @@ pluginTester({
                     895830154
                 )
             `
-        }
+        },
+        {
+            title: 'Should correctly handle complex conditions with variants',
+            code: `
+                import React from 'react'
+                import { Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ error, children, name }) => {
+                    styles.useVariants({
+                        error: !!error
+                    });
+
+                    return children ? (
+                        <Text ref={ref} style={styles.label} {...props}>
+                            {children}
+                        </Text>
+                    ) : (
+                        <Text ref={ref} style={styles.label} {...props}>
+                            {name}
+                        </Text>
+                    )
+                }
+
+                const styles = StyleSheet.create(theme => ({}))
+            `,
+            output: `
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import React from 'react'
+
+                import { StyleSheet, Variants } from 'react-native-unistyles'
+
+                export const Example = ({ error, children, name }) => {
+                    const __uni__variants = {
+                        error: !!error
+                    }
+                    styles.useVariants(__uni__variants)
+                    if (children) {
+                        return (
+                            <Variants variants={__uni__variants}>
+                                <Text ref={ref} style={[styles.label]} {...props}>
+                                    {children}
+                                </Text>
+                            </Variants>
+                        )
+                    } else {
+                        return (
+                            <Variants variants={__uni__variants}>
+                                <Text ref={ref} style={[styles.label]} {...props}>
+                                    {name}
+                                </Text>
+                            </Variants>
+                        )
+                    }
+                }
+
+                const styles = StyleSheet.create(theme => ({}), 895830154)
+            `
+        },
     ]
 })

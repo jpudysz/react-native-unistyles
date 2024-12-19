@@ -1,3 +1,4 @@
 {
-  "main": "../../../lib/commonjs/components/native/Text.js"
+  "main": "../../../lib/commonjs/components/native/Text.js",
+  "module": "../../../lib/module/components/native/Text.js"
 }

@@ -1,3 +1,4 @@
 {
-  "main": "../../../lib/commonjs/components/native/RefreshControl.js"
+  "main": "../../../lib/commonjs/components/native/RefreshControl.js",
+  "module": "../../../lib/module/components/native/RefreshControl.js"
 }
