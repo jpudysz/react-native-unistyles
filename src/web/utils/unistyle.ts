@@ -3,8 +3,8 @@ import { ColorScheme, Orientation } from '../../specs/types'
 import type { StyleSheet, StyleSheetWithSuperPowers, UnistylesValues } from '../../types/stylesheet'
 import { isUnistylesMq, parseMq } from '../../mq'
 import { keyInObject, reduceObject } from './common'
-import { UnistylesRuntime } from '../runtime'
 import type { UnistylesBreakpoints } from '../../global'
+import { UnistylesWeb } from '../services'
 
 export const schemeToTheme = (scheme: ColorScheme) => {
     switch (scheme) {
@@ -63,10 +63,10 @@ export const getMediaQuery = (query: string, allBreakpoints: Array<string>) => {
         ].filter(Boolean).join(' and ')
     }
 
-    const breakpointValue = UnistylesRuntime.breakpoints[query as keyof UnistylesBreakpoints] ?? 0
+    const breakpointValue = UnistylesWeb.runtime.breakpoints[query as keyof UnistylesBreakpoints] ?? 0
     const nextBreakpoint = allBreakpoints
-            .filter((b): b is keyof UnistylesBreakpoints => b in UnistylesRuntime.breakpoints)
-            .map(b => UnistylesRuntime.breakpoints[b] ?? 1)
+            .filter((b): b is keyof UnistylesBreakpoints => b in UnistylesWeb.runtime.breakpoints)
+            .map(b => UnistylesWeb.runtime.breakpoints[b] ?? 1)
             .sort((a, b) => a - b)
             .find(b => b > breakpointValue)
         const queries = [

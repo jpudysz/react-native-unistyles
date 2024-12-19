@@ -36,9 +36,16 @@ export class CSSState {
             return
         }
 
-        this.styleTag = (document.getElementById('unistyles-web') ?? document.createElement('style')) as HTMLStyleElement
+        const ssrTag = document.getElementById('unistyles-web')
+
+        if (ssrTag) {
+            this.styleTag = ssrTag as HTMLStyleElement
+
+            return
+        }
+
+        this.styleTag = document.createElement('style')
         this.styleTag.id = 'unistyles-web'
-        document.head.appendChild(this.styleTag)
     }
 
     set = ({ className, propertyKey, value, mediaQuery = '', isMq }: SetthisProps) => {

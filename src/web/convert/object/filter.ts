@@ -3,8 +3,8 @@ import { hyphenate } from '../../utils'
 import type { Filters } from '../types'
 import { getObjectStyle } from './objectStyle'
 import { normalizeColor, normalizeNumericValue } from '../utils'
-import { UnistylesRuntime } from '../../runtime'
 import { isUnistylesMq } from '../../../mq'
+import { UnistylesWeb } from '../../services'
 
 const getDropShadowStyle = (dropShadow: DropShadowValue) => {
     const { offsetX = 0, offsetY = 0, standardDeviation = 0, color = '#000' } = dropShadow
@@ -21,7 +21,7 @@ export const getFilterStyle = (filters: Array<Filters>) => {
             return []
         }
 
-        const breakpoints = Object.keys(dropShadowValue).filter(key => Object.keys(UnistylesRuntime.breakpoints).includes(key) || isUnistylesMq(key))
+        const breakpoints = Object.keys(dropShadowValue).filter(key => Object.keys(UnistylesWeb.runtime.breakpoints).includes(key) || isUnistylesMq(key))
         const breakpointsDropShadow = Object.fromEntries(breakpoints.map(breakpoint => [breakpoint, getDropShadowStyle(dropShadowValue[breakpoint])]))
 
         if (breakpoints.length === 0) {
