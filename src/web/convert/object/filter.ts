@@ -4,7 +4,7 @@ import type { Filters } from '../types'
 import { getObjectStyle } from './objectStyle'
 import { normalizeColor, normalizeNumericValue } from '../utils'
 import { isUnistylesMq } from '../../../mq'
-import { UnistylesWeb } from '../..'
+import { UnistylesWeb } from '../../index'
 
 const getDropShadowStyle = (dropShadow: DropShadowValue) => {
     const { offsetX = 0, offsetY = 0, standardDeviation = 0, color = '#000' } = dropShadow
