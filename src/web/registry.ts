@@ -77,7 +77,11 @@ export class UnistylesRegistry {
         if (stylesCounter.size === 0 && !document.querySelector(hash)) {
             this.css.remove(hash)
             this.stylesCache.delete(hash)
+
+            return true
         }
+
+        return false
     }
 
     add = (value: UnistylesValues) => {

@@ -97,6 +97,11 @@ export class UnistylesShadowRegistry {
             return
         }
 
-        this.services.registry.remove(ref, hash)
+        const removed = this.services.registry.remove(ref, hash)
+
+        if (removed) {
+            this.disposeMap.get(hash)?.()
+            this.disposeMap.delete(hash)
+        }
     }
 }
