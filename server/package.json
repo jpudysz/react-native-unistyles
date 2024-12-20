@@ -1,0 +1,6 @@
+{
+  "main": "../lib/commonjs/server/index",
+  "module": "../lib/module/server/index",
+  "react-native": "../src/server/index",
+  "types": "../lib/typescript/src/server/index"
+}

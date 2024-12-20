@@ -31,7 +31,13 @@
       "module": "./plugin/index.js",
       "default": "./plugin/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./server": {
+      "types": "./lib/typescript/src/server/index.d.ts",
+      "module": "./lib/module/server/index",
+      "default": "./lib/commonjs/server/index",
+      "react-native": "./src/server"
+    }
   },
   "files": [
     "src",
@@ -88,6 +94,7 @@
     "husky": "9.1.7",
     "jest": "29.7.0",
     "metro-react-native-babel-preset": "0.77.0",
+    "next": "15.1.1",
     "nitro-codegen": "0.18.2",
     "react": "18.3.1",
     "react-native": "0.76.3",

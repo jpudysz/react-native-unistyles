@@ -1,6 +1,6 @@
 import type { StyleSheetWithSuperPowers, StyleSheet } from '../types/stylesheet'
+import { UnistylesWeb } from './index'
 import { assignSecrets, error, removeInlineStyles } from './utils'
-import { UnistylesRuntime } from './runtime'
 
 const useVariants = ['useVariants', () => {}]
 
@@ -10,14 +10,13 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, id?: s
     }
 
     const computedStylesheet = typeof stylesheet === 'function'
-        ? stylesheet(UnistylesRuntime.theme, UnistylesRuntime.miniRuntime)
+    ? stylesheet(UnistylesWeb.runtime.theme, UnistylesWeb.runtime.miniRuntime)
         : stylesheet
 
     const addSecrets = (value: any, key: string, args?: Array<any>) => assignSecrets(value, {
         __uni__key: key,
         __uni__stylesheet: stylesheet,
-        __uni__args: args,
-        __uni__refs: new Set()
+        __uni__args: args
     })
 
     const styleSheetStyles = Object.entries(computedStylesheet).map(([key, value]) => {
