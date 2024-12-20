@@ -22,9 +22,8 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                     ? unistyles
                     : [unistyles]
 
-                // @ts-expect-error - this is hidden from TS
+                // @ts-expect-error web types are not compatible with RN styles
                 UnistylesShadowRegistry.add(ref, styles)
-
                 storedRef.current = ref
 
                 return passForwardedRef(props, ref, forwardedRef)
@@ -45,7 +44,7 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                     UnistylesShadowRegistry.selectVariants(variants)
                 }
 
-                // @ts-expect-error - this is hidden from TS
+                // @ts-expect-error hidden from TS
                 UnistylesShadowRegistry.remove(storedRef.current)
                 // @ts-expect-error - this is hidden from TS
                 UnistylesShadowRegistry.add(storedRef.current, styles)
