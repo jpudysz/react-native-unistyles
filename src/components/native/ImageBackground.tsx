@@ -13,6 +13,7 @@ type Props = {
 
 export const ImageBackground = forwardRef<unknown, Props>((props, forwardedRef) => {
     let storedRef: NativeImageBackground | null = null
+    let storedImageRef: NativeImageBackground | null = null
     const styleClassNames = getClassName(props.style)
     const imageClassNames = getClassName(props.imageStyle)
 
@@ -26,15 +27,11 @@ export const ImageBackground = forwardRef<unknown, Props>((props, forwardedRef) 
                 if (!ref) {
                     // @ts-expect-error hidden from TS
                     UnistylesShadowRegistry.remove(storedRef, styleClassNames?.hash)
-                    // @ts-expect-error hidden from TS
-                    UnistylesShadowRegistry.remove(storedRef, imageClassNames?.hash)
                 }
 
                 storedRef = ref
-                    // @ts-expect-error hidden from TS
-                    UnistylesShadowRegistry.add(ref, styleClassNames?.hash)
-                    // @ts-expect-error hidden from TS
-                    UnistylesShadowRegistry.add(ref, imageClassNames?.hash)
+                // @ts-expect-error hidden from TS
+                UnistylesShadowRegistry.add(ref, styleClassNames?.hash)
 
                 if (typeof forwardedRef === 'function') {
                     return forwardedRef(ref)
@@ -43,6 +40,16 @@ export const ImageBackground = forwardRef<unknown, Props>((props, forwardedRef) 
                 if (forwardedRef) {
                     forwardedRef.current = ref
                 }
+            }}
+            imageRef={isServer() ? undefined : ref => {
+                if (!ref) {
+                    // @ts-expect-error hidden from TS
+                    UnistylesShadowRegistry.remove(storedImageRef, imageClassNames?.hash)
+                }
+
+                storedImageRef = ref
+                // @ts-expect-error hidden from TS
+                UnistylesShadowRegistry.add(ref, imageClassNames?.hash)
             }}
         />
     )
