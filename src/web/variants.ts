@@ -1,5 +1,5 @@
 import type { ReactNativeStyleSheet, StyleSheet } from '../types'
-import { deepMergeObjects } from '../utils'
+import { deepMergeObjects, isDefined } from '../utils'
 
 type StylesWithVariants = {
     variants: Record<string, any>,
@@ -7,7 +7,11 @@ type StylesWithVariants = {
         styles: Record<string, any>
     }>
 }
-const hasVariants = <T extends object>(value: [string, T]): value is [string, T & StylesWithVariants] => 'variants' in value[1]
+const hasVariants = <T extends object>(value: [string, T]): value is [string, T & StylesWithVariants] => {
+    const [, styleValue] = value
+
+    return isDefined(styleValue) && 'variants' in styleValue
+}
 
 export const getVariants = (styles: ReactNativeStyleSheet<StyleSheet>, selectedVariants: Record<string, any>) => {
     return Object.entries(styles)
