@@ -21,7 +21,7 @@ export const ScopedTheme: React.FunctionComponent<React.PropsWithChildren<ThemeP
     const mappedChildren = [
         <Apply key={name} name={name} />,
         children,
-        <Apply key='dispose' name={previousScopedTheme} />
+        <Apply key='dispose' name={previousScopedTheme as keyof UnistylesThemes | undefined} />
     ]
 
     return (
