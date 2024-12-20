@@ -74,7 +74,7 @@ export class UnistylesRegistry {
 
         stylesCounter.delete(ref)
 
-        if (stylesCounter.size === 0 && !document.querySelector(hash)) {
+        if (stylesCounter.size === 0 && !document.querySelector(`.${hash}`)) {
             this.css.remove(hash)
             this.stylesCache.delete(hash)
 
