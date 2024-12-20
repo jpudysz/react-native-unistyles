@@ -5,7 +5,7 @@ import { UnistylesWeb } from '../web'
 
 declare global {
     interface Window {
-        UNISTYLES_STATE: any
+        __UNISTYLES_STATE__: ReturnType<typeof UnistylesWeb.registry.css.getState>
     }
 }
 
@@ -26,7 +26,7 @@ export const useServerUnistyles = () => {
                 <>
                     <style id='rnw-style'>{rnwStyle}</style>
                     <style id='unistyles-web'>{css}</style>
-                    <script id='unistyles-script'>{`window.UNISTYLES_STATE = ${JSON.stringify(state)}`}</script>
+                    <script id='unistyles-script'>{`window.__UNISTYLES_STATE__ = ${JSON.stringify(state)}`}</script>
                 </>
             )
         }
@@ -35,6 +35,6 @@ export const useServerUnistyles = () => {
     })
 
     if (typeof window !== 'undefined') {
-        UnistylesWeb.registry.css.hydrate(window.UNISTYLES_STATE)
+        UnistylesWeb.registry.css.hydrate(window.__UNISTYLES_STATE__)
     }
 }
