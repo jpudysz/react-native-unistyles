@@ -514,10 +514,9 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
             jsi::Value rawVariants = thisObject.hasProperty(rt, helpers::STYLE_VARIANTS.c_str())
                 ? thisObject.getProperty(rt, helpers::STYLE_VARIANTS.c_str())
                 : jsi::Value::undefined();
-            
-            Variants fakeVariants{};
+
             std::optional<Variants> variants = rawVariants.isUndefined()
-                ? fakeVariants // todo pass real variants
+                ? std::nullopt
                 : std::optional<Variants>(helpers::variantsToPairs(rt, rawVariants.asObject(rt)));
 
             unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
