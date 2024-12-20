@@ -47,9 +47,10 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     // create unistyleData based on wrappers
     for (size_t i = 0; i < unistyleWrappers.size(); i++) {
         core::Unistyle::Shared& unistyle = unistyleWrappers[i];
+        core::Variants variants{};
         std::shared_ptr<core::UnistyleData> unistyleData = std::make_shared<core::UnistyleData>(
             unistyle,
-            registry.getScopedVariants(),
+            variants, // todo pass real variants
             arguments[i],
             scopedTheme
         );
@@ -91,22 +92,6 @@ jsi::Value HybridShadowRegistry::unlink(jsi::Runtime &rt, const jsi::Value &this
     return jsi::Value::undefined();
 }
 
-jsi::Value HybridShadowRegistry::selectVariants(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
-    helpers::assertThat(rt, count == 1, "Unistyles: Invalid babel transform 'ShadowRegistry selectVariants' expected 1 arguments.");
-    
-    auto& registry = core::UnistylesRegistry::get();
-
-    if (args[0].isUndefined()) {
-        registry.setScopedVariants({});
-    }
-
-    if (args[0].isObject()) {
-        registry.setScopedVariants(helpers::variantsToPairs(rt, args[0].asObject(rt)));
-    }
-
-    return jsi::Value::undefined();
-}
-
 jsi::Value HybridShadowRegistry::setScopedTheme(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count == 1, "Unistyles: setScopedTheme expected 1 argument.");
     
@@ -130,14 +115,5 @@ jsi::Value HybridShadowRegistry::getScopedTheme(jsi::Runtime &rt, const jsi::Val
     
     return maybeScopedTheme.has_value()
         ? jsi::String::createFromUtf8(rt, maybeScopedTheme.value())
-        : jsi::Value::undefined();
-}
-
-jsi::Value HybridShadowRegistry::getVariants(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
-    auto& registry = core::UnistylesRegistry::get();
-    auto maybeScopedVariants = registry.getScopedVariants();
-    
-    return maybeScopedVariants.size() > 0
-        ? helpers::variantsToValue(rt, maybeScopedVariants)
         : jsi::Value::undefined();
 }

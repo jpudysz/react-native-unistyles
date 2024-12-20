@@ -508,15 +508,16 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
 
             // memoize metadata to call it later
             auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyle);
-            auto& registry = core::UnistylesRegistry::get();
 
             unistyleFn->unprocessedValue = jsi::Value(rt, result).asObject(rt);
 
             jsi::Value rawVariants = thisObject.hasProperty(rt, helpers::STYLE_VARIANTS.c_str())
                 ? thisObject.getProperty(rt, helpers::STYLE_VARIANTS.c_str())
                 : jsi::Value::undefined();
+            
+            Variants fakeVariants{};
             std::optional<Variants> variants = rawVariants.isUndefined()
-                ? registry.getScopedVariants()
+                ? fakeVariants // todo pass real variants
                 : std::optional<Variants>(helpers::variantsToPairs(rt, rawVariants.asObject(rt)));
 
             unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);

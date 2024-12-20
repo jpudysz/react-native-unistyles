@@ -43,15 +43,12 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     DependencyMap buildDependencyMap(jsi::Runtime& rt, std::vector<UnistyleDependency>& deps);
     void shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Value& maybePressableId);
     shadow::ShadowTrafficController trafficController{};
-    const core::Variants& getScopedVariants();
     const std::optional<std::string> getScopedTheme();
-    void setScopedVariants(core::Variants&& variants);
     void setScopedTheme(std::optional<std::string> themeName);
 
 private:
     UnistylesRegistry() = default;
-    
-    core::Variants _scopedVariants{};
+
     std::optional<std::string> _scopedTheme{};
     std::unordered_map<jsi::Runtime*, UnistylesState> _states{};
     std::unordered_map<jsi::Runtime*, std::unordered_map<int, std::shared_ptr<core::StyleSheet>>> _styleSheetRegistry{};
