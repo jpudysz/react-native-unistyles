@@ -1,26 +1,30 @@
 function extractVariants(t, path, state) {
-    const maybeVariants = path.node.body.find(node => (
+    const maybeVariants = path.node.body.filter(node => (
         t.isExpressionStatement(node) &&
         t.isCallExpression(node.expression) &&
         t.isMemberExpression(node.expression.callee)
     ))
 
-    if (!maybeVariants) {
+    if (maybeVariants.length === 0) {
         return
     }
 
-    const calleeName = maybeVariants.expression.callee.object.name
-    const isVariant = (
-        t.isIdentifier(maybeVariants.expression.callee.object, { name: calleeName }) &&
-        t.isIdentifier(maybeVariants.expression.callee.property, { name: 'useVariants' }) &&
-        t.isObjectExpression(maybeVariants.expression.arguments[0])
-    )
+    const targetVariant = maybeVariants.find(variant => {
+        const calleeName = variant.expression.callee.object.name
 
-    if (!isVariant) {
+        return (
+            t.isIdentifier(variant.expression.callee.object, { name: calleeName }) &&
+            t.isIdentifier(variant.expression.callee.property, { name: 'useVariants' }) &&
+            t.isObjectExpression(variant.expression.arguments[0])
+        )
+    })
+
+    if (!targetVariant) {
         return
     }
 
-    const node = maybeVariants.expression
+    const calleeName = targetVariant.expression.callee.object.name
+    const node = targetVariant.expression
     const newUniqueName = path.scope.generateUidIdentifier(calleeName)
 
     // Create shadow declaration eg. const _styles = styles
@@ -39,7 +43,7 @@ function extractVariants(t, path, state) {
 
     // Find the current node's index, we will move everything after to new block
     const pathIndex = path.node.body
-        .findIndex(bodyPath => bodyPath === maybeVariants)
+        .findIndex(bodyPath => bodyPath === targetVariant)
     const rest = path.node.body.slice(pathIndex + 1)
 
     // move rest to new block (scope)

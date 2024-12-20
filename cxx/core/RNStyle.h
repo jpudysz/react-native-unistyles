@@ -23,9 +23,10 @@ jsi::Function createAddVariantsProxyFunction(jsi::Runtime& rt, std::shared_ptr<S
 jsi::Object toRNStyle(jsi::Runtime& rt, std::shared_ptr<StyleSheet> stylesheet, std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime, Variants&& variants) {
     jsi::Object rnStyle = jsi::Object(rt);
     
-    rnStyle.setProperty(rt, helpers::UNISTYLES_ID.c_str(), jsi::Value(stylesheet->tag));
+    helpers::defineHiddenProperty(rt, rnStyle, helpers::UNISTYLES_ID.c_str(), jsi::Value(stylesheet->tag));
+    helpers::defineHiddenProperty(rt, rnStyle, helpers::STYLE_VARIANTS.c_str(), helpers::variantsToValue(rt, variants));
+    
     rnStyle.setProperty(rt, helpers::ADD_VARIANTS_FN.c_str(), createAddVariantsProxyFunction(rt, stylesheet, unistylesRuntime));
-    rnStyle.setProperty(rt, helpers::STYLE_VARIANTS.c_str(), helpers::variantsToValue(rt, variants));
 
     for (auto& pair: stylesheet->unistyles) {
         auto [propertyName, unistyle] = pair;
