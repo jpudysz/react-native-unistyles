@@ -198,16 +198,8 @@ std::vector<std::shared_ptr<core::StyleSheet>> core::UnistylesRegistry::getStyle
     return stylesheetsToRefresh;
 }
 
-const core::Variants& core::UnistylesRegistry::getScopedVariants() {
-    return this->_scopedVariants;
-}
-
 const std::optional<std::string> core::UnistylesRegistry::getScopedTheme() {
     return this->_scopedTheme;
-}
-
-void core::UnistylesRegistry::setScopedVariants(core::Variants&& variants) {
-    this->_scopedVariants = std::move(variants);
 }
 
 void core::UnistylesRegistry::setScopedTheme(std::optional<std::string> themeName) {
