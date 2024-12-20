@@ -1,24 +1,59 @@
 import React from 'react'
-import type { ImageBackground, ImageBackgroundProps } from 'react-native'
-import { UnistylesShadowRegistry } from '../specs'
-import { passForwardedRef } from './passForwardRef'
+import { getClassName } from './getClassname'
+import type { UnistylesValues } from '../types'
+import { isServer } from '../web/utils'
 
-export const createUnistylesImageBackground = (Component: typeof ImageBackground) => React.forwardRef<ImageBackground, ImageBackgroundProps>((props, forwardedRef) => (
-    <Component
-        {...props}
-        ref={ref => passForwardedRef(props, ref, forwardedRef)}
-        imageRef={ref => {
-            const style = Array.isArray(props.imageStyle)
-                ? props.imageStyle
-                : [props.imageStyle]
+type ComponentProps = {
+    style?: UnistylesValues | Array<UnistylesValues>
+}
 
-            // @ts-expect-error web types are not compatible with RN styles
-            UnistylesShadowRegistry.add(ref, style)
+export const createUnistylesImageBackground = (Component: any) => React.forwardRef<HTMLElement, ComponentProps>((props, forwardedRef) => {
+    let storedRef: HTMLElement | null = null
+    let storedImageRef: HTMLElement | null = null
+    const classNames = getClassName(props.style)
+    const imageClassNames = getClassName(props.style)
 
-            return () => {
+    return (
+        <Component
+            {...props}
+            style={classNames}
+            imageStyle={imageClassNames}
+            imageRef={isServer() ? undefined : (ref: HTMLElement | null) => {
+                if (!ref) {
+                    // @ts-expect-error hidden from TS
+                    UnistylesShadowRegistry.remove(storedImageRef, imageClassNames?.hash)
+                }
+
+                storedImageRef = ref
                 // @ts-expect-error hidden from TS
-                UnistylesShadowRegistry.remove(ref)
-            }
-        }}
-    />
-))
+                UnistylesShadowRegistry.add(ref, imageClassNames?.hash)
+
+                if (typeof forwardedRef === 'function') {
+                    return forwardedRef(ref)
+                }
+
+                if (forwardedRef) {
+                    forwardedRef.current = ref
+                }
+            }}
+            ref={isServer() ? undefined : (ref: HTMLElement | null) => {
+                if (!ref) {
+                    // @ts-expect-error hidden from TS
+                    UnistylesShadowRegistry.remove(storedRef, classNames?.hash)
+                }
+
+                storedRef = ref
+                // @ts-expect-error hidden from TS
+                UnistylesShadowRegistry.add(ref, classNames?.hash)
+
+                if (typeof forwardedRef === 'function') {
+                    return forwardedRef(ref)
+                }
+
+                if (forwardedRef) {
+                    forwardedRef.current = ref
+                }
+            }}
+        />
+    )
+})
