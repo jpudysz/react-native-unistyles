@@ -4,7 +4,7 @@ import { hyphenate, isServer } from '../utils'
 import { convertToCSS } from './core'
 
 type MapType = Map<string, Map<string, Map<string, any>>>
-type SetthisProps = {
+type SetProps = {
     mediaQuery?: string
     className: string
     isMq?: boolean
@@ -50,7 +50,7 @@ export class CSSState {
         document.head.appendChild(this.styleTag)
     }
 
-    set = ({ className, propertyKey, value, mediaQuery = '', isMq }: SetthisProps) => {
+    set = ({ className, propertyKey, value, mediaQuery = '', isMq }: SetProps) => {
         const firstLevelMap = isMq ? this.mqMap : this.mainMap
         const secondLevelMap = safeGetMap(firstLevelMap, mediaQuery)
         const thirdLevelMap = safeGetMap(secondLevelMap, className)
