@@ -1,4 +1,5 @@
 {
   "main": "../../../lib/commonjs/components/native/ActivityIndicator.js",
-  "module": "../../../lib/module/components/native/ActivityIndicator.js"
+  "module": "../../../lib/module/components/native/ActivityIndicator.js",
+  "react-native": "../../../src/components/native/ActivityIndicator.tsx"
 }

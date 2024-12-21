@@ -1,4 +1,5 @@
 {
   "main": "../../../lib/commonjs/components/native/KeyboardAvoidingView.js",
-  "module": "../../../lib/module/components/native/KeyboardAvoidingView.js"
+  "module": "../../../lib/module/components/native/KeyboardAvoidingView.js",
+  "react-native": "../../../src/components/native/KeyboardAvoidingView.tsx"
 }

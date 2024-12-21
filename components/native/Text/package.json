@@ -1,4 +1,5 @@
 {
   "main": "../../../lib/commonjs/components/native/Text.js",
-  "module": "../../../lib/module/components/native/Text.js"
+  "module": "../../../lib/module/components/native/Text.js",
+  "react-native": "../../../src/components/native/Text.tsx"
 }

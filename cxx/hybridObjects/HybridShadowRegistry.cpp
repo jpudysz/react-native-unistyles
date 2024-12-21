@@ -7,23 +7,26 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     helpers::assertThat(rt, count == 2, "Unistyles: Invalid babel transform 'ShadowRegistry link' expected 2 arguments.");
 
     ShadowNode::Shared shadowNodeWrapper = shadowNodeFromValue(rt, args[0]);
+
     std::vector<core::Unistyle::Shared> unistyleWrappers = core::unistyleFromValue(rt, args[1]);
     std::vector<std::vector<folly::dynamic>> arguments;
     auto& registry = core::UnistylesRegistry::get();
 
     for (size_t i = 0; i < unistyleWrappers.size(); i++) {
         if (unistyleWrappers[i]->type == core::UnistyleType::DynamicFunction) {
-            auto rawStyle = args[1].asObject(rt).asArray(rt).getValueAtIndex(rt, i);
-
-            helpers::assertThat(rt, rawStyle.isObject(), "Unistyles: Dynamic function is not bound!");
-
-            auto maybeSecrets = rawStyle.getObject(rt).getProperty(rt, helpers::SECRETS.c_str());
-
-            helpers::assertThat(rt, maybeSecrets.isObject(), "Unistyles: Dynamic function is not bound!");
-
-            auto secrets = maybeSecrets.asObject(rt).getProperty(rt, helpers::ARGUMENTS.c_str());
-
-            arguments.push_back(helpers::parseDynamicFunctionArguments(rt, secrets.asObject(rt).asArray(rt)));
+            // todo
+//            auto rawStyle = args[1].asObject(rt).asArray(rt).getValueAtIndex(rt, i);
+//
+//            helpers::assertThat(rt, rawStyle.isObject(), "Unistyles: Dynamic function is not bound!");
+//
+//            auto maybeSecrets = rawStyle.getObject(rt).getProperty(rt, helpers::SECRETS.c_str());
+//
+//            helpers::assertThat(rt, maybeSecrets.isObject(), "Unistyles: Dynamic function is not bound!");
+//
+//            auto secrets = maybeSecrets.asObject(rt).getProperty(rt, helpers::ARGUMENTS.c_str());
+//
+//            arguments.push_back(helpers::parseDynamicFunctionArguments(rt, secrets.asObject(rt).asArray(rt)));
+            arguments.push_back({});
 
             continue;
         }
@@ -47,9 +50,10 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     // create unistyleData based on wrappers
     for (size_t i = 0; i < unistyleWrappers.size(); i++) {
         core::Unistyle::Shared& unistyle = unistyleWrappers[i];
+        core::Variants variants{};
         std::shared_ptr<core::UnistyleData> unistyleData = std::make_shared<core::UnistyleData>(
             unistyle,
-            registry.getScopedVariants(),
+            variants, // todo pass real variants
             arguments[i],
             scopedTheme
         );
@@ -64,7 +68,8 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
             parser.rebuildUnistyleWithScopedTheme(rt, parsedStyleSheet, unistyleData);
         } else {
             // for other styles, not scoped to theme we need to compute variants value
-            parser.rebuildUnistyleWithVariants(rt, unistyleData);
+            // todo, do we need it?
+            // parser.rebuildUnistyleWithVariants(rt, unistyleData);
         }
 
         unistylesData.emplace_back(unistyleData);
@@ -87,22 +92,6 @@ jsi::Value HybridShadowRegistry::unlink(jsi::Runtime &rt, const jsi::Value &this
     auto& registry = core::UnistylesRegistry::get();
 
     registry.unlinkShadowNodeWithUnistyles(rt, &shadowNodeWrapper->getFamily());
-
-    return jsi::Value::undefined();
-}
-
-jsi::Value HybridShadowRegistry::selectVariants(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
-    helpers::assertThat(rt, count == 1, "Unistyles: Invalid babel transform 'ShadowRegistry selectVariants' expected 1 arguments.");
-    
-    auto& registry = core::UnistylesRegistry::get();
-
-    if (args[0].isUndefined()) {
-        registry.setScopedVariants({});
-    }
-
-    if (args[0].isObject()) {
-        registry.setScopedVariants(helpers::variantsToPairs(rt, args[0].asObject(rt)));
-    }
 
     return jsi::Value::undefined();
 }
@@ -130,14 +119,5 @@ jsi::Value HybridShadowRegistry::getScopedTheme(jsi::Runtime &rt, const jsi::Val
     
     return maybeScopedTheme.has_value()
         ? jsi::String::createFromUtf8(rt, maybeScopedTheme.value())
-        : jsi::Value::undefined();
-}
-
-jsi::Value HybridShadowRegistry::getVariants(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
-    auto& registry = core::UnistylesRegistry::get();
-    auto maybeScopedVariants = registry.getScopedVariants();
-    
-    return maybeScopedVariants.size() > 0
-        ? helpers::variantsToValue(rt, maybeScopedVariants)
         : jsi::Value::undefined();
 }

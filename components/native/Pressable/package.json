@@ -1,5 +1,5 @@
 {
   "main": "../../../lib/commonjs/components/native/Pressable.js",
   "module": "../../../lib/module/components/native/Pressable.js",
-  "react-native": "../../../lib/commonjs/components/native/Pressable.native.js"
+  "react-native": "../../../src/components/native/Pressable.native.tsx"
 }

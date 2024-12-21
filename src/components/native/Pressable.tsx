@@ -22,7 +22,6 @@ type PressableProps = Props & {
 
 export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, forwardedRef) => {
     const scopedTheme = UnistylesShadowRegistry.getScopedTheme()
-    const variants = UnistylesShadowRegistry.getVariants()
     let storedRef: HTMLElement | null = null
     let classNames: ReturnType<typeof getClassName> | undefined = undefined
 
@@ -47,9 +46,7 @@ export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, 
                     ? style(state as WebPressableState)
                     : style
                 const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
-                const previousVariants = UnistylesShadowRegistry.getVariants()
 
-                UnistylesShadowRegistry.selectVariants(variants)
                 UnistylesShadowRegistry.setScopedTheme(scopedTheme)
 
                 // @ts-expect-error hidden from TS
@@ -58,7 +55,6 @@ export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, 
                 // @ts-expect-error hidden from TS
                 UnistylesShadowRegistry.add(storedRef, classNames?.hash)
 
-                UnistylesShadowRegistry.selectVariants(previousVariants)
                 UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
 
                 return classNames as any

@@ -1,4 +1,5 @@
 {
   "main": "../../../lib/commonjs/components/native/TouchableHighlight.js",
-  "module": "../../../lib/module/components/native/TouchableHighlight.js"
+  "module": "../../../lib/module/components/native/TouchableHighlight.js",
+  "react-native": "../../../src/components/native/TouchableHighlight.tsx"
 }
