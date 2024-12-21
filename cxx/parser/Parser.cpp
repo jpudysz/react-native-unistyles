@@ -10,6 +10,7 @@ using Variants = std::vector<std::pair<std::string, std::string>>;
 // called only once while processing StyleSheet.create
 void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet) {
     jsi::Object unwrappedStyleSheet = this->unwrapStyleSheet(rt, styleSheet, std::nullopt);
+    auto& registry = core::UnistylesRegistry::get();
 
     helpers::enumerateJSIObject(rt, unwrappedStyleSheet, [&](const std::string& styleKey, jsi::Value& propertyValue){
         helpers::assertThat(rt, propertyValue.isObject(), "Unistyles: Style with name '" + styleKey + "' is not a function or object.");
@@ -18,6 +19,7 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
 
         if (styleValue.isFunction(rt)) {
             styleSheet->unistyles[styleKey] = std::make_shared<UnistyleDynamicFunction>(
+                registry.getNextUnistyleId(),
                 UnistyleType::DynamicFunction,
                 styleKey,
                 styleValue,
@@ -28,6 +30,7 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
         }
 
         styleSheet->unistyles[styleKey] = std::make_shared<Unistyle>(
+            registry.getNextUnistyleId(),
             UnistyleType::Object,
             styleKey,
             styleValue,
@@ -511,33 +514,16 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
 
             unistyleFn->unprocessedValue = jsi::Value(rt, result).asObject(rt);
 
-            jsi::Value rawVariants = thisObject.hasProperty(rt, helpers::STYLE_VARIANTS.c_str())
-                ? thisObject.getProperty(rt, helpers::STYLE_VARIANTS.c_str())
-                : jsi::Value::undefined();
+            jsi::Value rawVariants = thisObject.hasProperty(rt, helpers::STYLESHEET_VARIANTS.c_str())
+                ? thisObject.getProperty(rt, helpers::STYLESHEET_VARIANTS.c_str())
+                : jsi::Object(rt);
 
-            std::optional<Variants> variants = rawVariants.isUndefined()
-                ? std::nullopt
-                : std::optional<Variants>(helpers::variantsToPairs(rt, rawVariants.asObject(rt)));
+            Variants variants = helpers::variantsToPairs(rt, rawVariants.asObject(rt));
 
             unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
             unistyleFn->seal();
 
-            jsi::Object style = jsi::Value(rt, unistyleFn->parsedStyle.value()).asObject(rt);
-
-            // include dependencies for createUnistylesComponent
-            style.setProperty(rt, "__proto__", generateUnistylesPrototype(rt, unistylesRuntime, unistyle, variants, helpers::functionArgumentsToArray(rt, args, count)));
-
-            jsi::Object secrets = jsi::Object(rt);
-
-            secrets.setProperty(rt, helpers::ARGUMENTS.c_str(), helpers::functionArgumentsToArray(rt, args, count));
-
-            helpers::defineHiddenProperty(rt, style, helpers::SECRETS.c_str(), secrets);
-
-            auto wrappedUnistyle = std::make_shared<UnistyleWrapper>(unistyle);
-
-            style.setNativeState(rt, std::move(wrappedUnistyle));
-
-            return style;
+            return core::objectFromUnistyle(rt, unistylesRuntime, unistyle, variants);
     });
 }
 
