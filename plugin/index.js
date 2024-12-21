@@ -1,5 +1,4 @@
 const { addUnistylesImport, isInsideNodeModules } = require('./import')
-const { getStyleMetadata, getStyleAttribute, styleAttributeToArray, handlePressable } = require('./style')
 const { hasStringRef } = require('./ref')
 const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyles } = require('./stylesheet')
 const { extractVariants } = require('./variants')
@@ -142,27 +141,6 @@ module.exports = function ({ types: t }) {
                     return
                 }
 
-                const styleAttr = getStyleAttribute(t, path)
-
-                // component has no style prop
-                if (!styleAttr) {
-                    return
-                }
-
-                const metadata = getStyleMetadata(t, styleAttr.value.expression, null, state)
-
-                if (openingElementName === 'Pressable') {
-                    return handlePressable(t, path, styleAttr, metadata, state)
-                }
-
-                // style prop is using unexpected expression
-                if (metadata.length === 0) {
-                    return
-                }
-
-                styleAttributeToArray(t, path)
-
-                // to add import
                 state.file.hasAnyUnistyle = true
 
                 if (hasStringRef(t, path)) {

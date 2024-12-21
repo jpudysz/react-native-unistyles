@@ -75,7 +75,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={[styles.container]}>
+                        <View style={styles.container}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -118,7 +118,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={[styles.container]}>
+                        <View style={styles.container}>
                             <Text style={styles.text}>Hello world</Text>
                         </View>
                     )
@@ -171,7 +171,7 @@ pluginTester({
                     let ref = React.useRef()
 
                     return (
-                        <View ref={ref} style={[styles.container]}>
+                        <View ref={ref} style={styles.container}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -232,7 +232,7 @@ pluginTester({
                                 doSomething(ref)
                                 myRef.current = ref
                             }}
-                            style={[styles.container]}
+                            style={styles.container}
                         >
                             <Text>Hello world</Text>
                         </View>
@@ -302,7 +302,7 @@ pluginTester({
                                     customCleanup()
                                 }
                             }}
-                            style={[styles.container]}
+                            style={styles.container}
                         >
                             <Text>Hello world</Text>
                         </View>
@@ -372,7 +372,7 @@ pluginTester({
                     }
 
                     return (
-                        <View ref={fn} style={[styles.container]}>
+                        <View ref={fn} style={styles.container}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -441,7 +441,7 @@ pluginTester({
                     }
 
                     return (
-                        <View ref={fn} style={[styles.container]}>
+                        <View ref={fn} style={styles.container}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -453,153 +453,6 @@ pluginTester({
                             backgroundColor: 'red'
                         }
                     },
-                    92366683
-                )
-            `
-        },
-        {
-            title: 'Should keep order of spreads',
-            code: `
-                import { View } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View style={{...styles.container, ...styles.secondProp, ...styles.thirdProp}} />
-                    )
-                }
-
-                const styles = StyleSheet.create(theme => ({
-                    container: {
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: theme.colors.backgroundColor
-                    },
-                    secondProp: {
-                        marginHorizontal: theme.gap(10),
-                        backgroundColor: 'red'
-                    },
-                    thirdProp: {
-                        backgroundColor: 'blue'
-                    }
-                }))
-            `,
-            output: `
-                import { View } from 'react-native-unistyles/components/native/View'
-
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return <View style={[styles.container, styles.secondProp, styles.thirdProp]} />
-                }
-
-                const styles = StyleSheet.create(
-                    theme => ({
-                        container: {
-                            flex: 1,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            backgroundColor: theme.colors.backgroundColor,
-                            uni__dependencies: [0]
-                        },
-                        secondProp: {
-                            marginHorizontal: theme.gap(10),
-                            backgroundColor: 'red',
-                            uni__dependencies: [0]
-                        },
-                        thirdProp: {
-                            backgroundColor: 'blue'
-                        }
-                    }),
-                    92366683
-                )
-            `
-        },
-        {
-            title: 'Should support nested styles',
-            code: `
-                import { View } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = ({ styles }) => {
-                    return (
-                        <View style={styles.nested.prop} />
-                    )
-                }
-
-                const styles = StyleSheet.create(theme => ({
-                    container: {
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: theme.colors.backgroundColor
-                    }
-                }))
-            `,
-            output: `
-                import { View } from 'react-native-unistyles/components/native/View'
-
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = ({ styles }) => {
-                    return <View style={[styles.nested.prop]} />
-                }
-
-                const styles = StyleSheet.create(
-                    theme => ({
-                        container: {
-                            flex: 1,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            backgroundColor: theme.colors.backgroundColor,
-                            uni__dependencies: [0]
-                        }
-                    }),
-                    92366683
-                )
-            `
-        },
-        {
-            title: 'Should support conditional styles',
-            code: `
-                import { View } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = ({ condition }) => {
-                    return (
-                        <View style={condition ? styles.container : {}} />
-                    )
-                }
-
-                const styles = StyleSheet.create(theme => ({
-                    container: {
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: theme.colors.backgroundColor
-                    }
-                }))
-            `,
-            output: `
-                import { View } from 'react-native-unistyles/components/native/View'
-
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = ({ condition }) => {
-                    return <View style={[condition ? styles.container : {}]} />
-                }
-
-                const styles = StyleSheet.create(
-                    theme => ({
-                        container: {
-                            flex: 1,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            backgroundColor: theme.colors.backgroundColor,
-                            uni__dependencies: [0]
-                        }
-                    }),
                     92366683
                 )
             `
