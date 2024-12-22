@@ -68,7 +68,7 @@ pluginTester({
                         })
 
                         return (
-                            <View style={styles.container}>
+                            <View style={[styles.container]}>
                                 <Text>Hello world</Text>
                             </View>
                         )
@@ -136,7 +136,7 @@ pluginTester({
                         })
 
                         return (
-                            <View style={s.container}>
+                            <View style={[s.container]}>
                                 <Text>Hello world</Text>
                             </View>
                         )
@@ -197,7 +197,7 @@ pluginTester({
                             })
 
                             return (
-                                <View style={styles.container}>
+                                <View style={[styles.container]}>
                                     <Text>Hello world</Text>
                                     {[1, 2, 3].map((_, index) => {
                                         const _styles3 = styles
@@ -206,7 +206,7 @@ pluginTester({
                                                 size: 'large'
                                             })
 
-                                            return <View style={styles.p} key={index} />
+                                            return <View style={[styles.p]} key={index} />
                                         }
                                     })}
                                 </View>

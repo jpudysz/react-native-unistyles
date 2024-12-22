@@ -32,14 +32,15 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
 
 HybridShadowRegistry.add = (handle, styles) => {
     // virtualized nodes can be null
-    if (!handle || !styles) {
+    if (!handle || !styles || !Array.isArray(styles)) {
         return
     }
 
     // filter Reanimated styles and styles that are undefined
-    const filteredStyles = (Array.isArray(styles) ? styles : [styles])
+    const filteredStyles = styles
         .filter(style => !style?.initial?.updater)
         .filter(Boolean)
+        .flat()
 
     HybridShadowRegistry.link(findShadowNodeForHandle(handle), filteredStyles)
 }

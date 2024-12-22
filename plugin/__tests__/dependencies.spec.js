@@ -51,7 +51,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -109,7 +109,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -161,7 +161,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -271,7 +271,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -393,7 +393,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -448,7 +448,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -495,7 +495,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -545,7 +545,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -615,7 +615,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container(5)}>
+                        <View style={[styles.container(5)]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -687,7 +687,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )

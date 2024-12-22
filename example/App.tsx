@@ -106,11 +106,11 @@ export const App = () => {
                     I'm scoped to premium
                 </Text>
             </ScopedTheme>
-            {/* <ScopedTheme name='light'> */}
-            {/*     <Text style={styles.scopedFn()}> */}
-            {/*         I'm scoped to light */}
-            {/*     </Text> */}
-            {/* </ScopedTheme> */}
+            <ScopedTheme name='light'>
+                <Text style={styles.scopedFn()}>
+                    I'm scoped to light
+                </Text>
+            </ScopedTheme>
             <TextInput style={styles.input} />
         </View>
     )
