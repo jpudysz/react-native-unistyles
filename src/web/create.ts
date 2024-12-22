@@ -2,17 +2,12 @@ import type { StyleSheetWithSuperPowers, StyleSheet } from '../types/stylesheet'
 import { UnistylesWeb } from './index'
 import { assignSecrets, error, removeInlineStyles } from './utils'
 
-const useVariants = ['useVariants', () => {}]
-
 export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, id?: string) => {
     if (!id) {
         throw error('Unistyles is not initialized correctly. Please add babel plugin to your babel config.')
     }
 
-    const computedStylesheet = typeof stylesheet === 'function'
-    ? stylesheet(UnistylesWeb.runtime.theme, UnistylesWeb.runtime.miniRuntime)
-        : stylesheet
-
+    const computedStylesheet = UnistylesWeb.registry.getComputedStylesheet(stylesheet)
     const addSecrets = (value: any, key: string, args?: Array<any>) => assignSecrets(value, {
         __uni__key: key,
         __uni__stylesheet: stylesheet,
@@ -30,6 +25,11 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, id?: s
 
         return [key, addSecrets(removeInlineStyles(value), key)]
     })
+    const emptyVariants = ['__stylesheetVariants', {}]
 
-    return Object.fromEntries(styleSheetStyles.concat([useVariants]))
+    const useVariants = ['useVariants', (variants: Record<string, string | boolean | undefined>) => {
+        return Object.fromEntries(styleSheetStyles.concat([useVariants, ['__stylesheetVariants', variants]]))
+    }]
+
+    return Object.fromEntries(styleSheetStyles.concat([useVariants, emptyVariants]))
 }

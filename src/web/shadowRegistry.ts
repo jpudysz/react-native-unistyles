@@ -1,6 +1,6 @@
 import type { UnistylesTheme, UnistylesValues } from '../types'
 import { deepMergeObjects } from '../utils'
-import { extractSecrets, extractUnistyleDependencies } from './utils'
+import { extractSecrets, extractUnistyleDependencies, keyInObject } from './utils'
 import { getVariants } from './variants'
 import type { UnistylesServices } from './types'
 
@@ -13,7 +13,6 @@ export class UnistylesShadowRegistry {
     dispose = () => {}
     // END MOCKS
 
-    private selectedVariants = new Map<string, string | boolean | undefined>()
     private scopedTheme: UnistylesTheme | undefined = undefined
     private disposeMap = new Map<string, VoidFunction>()
 
@@ -38,6 +37,7 @@ export class UnistylesShadowRegistry {
 
             const { __uni__key, __uni__stylesheet, __uni__args = [] } = secrets
             const newComputedStylesheet = this.services.registry.getComputedStylesheet(__uni__stylesheet, scopedTheme)
+            const variants = (keyInObject(newComputedStylesheet, '__stylesheetVariants') ? newComputedStylesheet.__stylesheetVariants : {}) as Record<string, any>
             const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
             const result = typeof style === 'function'
                 ? style(...__uni__args)
@@ -55,7 +55,6 @@ export class UnistylesShadowRegistry {
         }
 
         // Copy scoped theme to not use referenced value
-        const variants = this.getVariants()
         const scopedTheme = this.scopedTheme
         const parsedStyles = getParsedStyles()
         const { hash, existingHash } = this.services.registry.add(parsedStyles)
@@ -72,25 +71,11 @@ export class UnistylesShadowRegistry {
         return { injectedClassName, hash }
     }
 
-    selectVariants = (variants?: Record<string, string | boolean | undefined>) => {
-        if (!variants) {
-            this.selectedVariants.clear()
-
-            return
-        }
-
-        Object.entries(variants).forEach(([key, value]) => {
-            this.selectedVariants.set(key, value)
-        })
-    }
-
     setScopedTheme = (theme?: UnistylesTheme) => {
         this.scopedTheme = theme
     }
 
     getScopedTheme = () => this.scopedTheme
-
-    getVariants = () => Object.fromEntries(this.selectedVariants.entries())
 
     remove = (ref: any, hash?: string) => {
         if (!(ref instanceof HTMLElement) || !hash) {
