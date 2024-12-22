@@ -41,7 +41,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -85,7 +85,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -130,7 +130,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -176,7 +176,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -223,7 +223,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -271,7 +271,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -320,7 +320,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -371,7 +371,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -430,7 +430,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -496,7 +496,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Pressable style={() => styles.pressable}>
                                 <Text>Hello world</Text>
                             </Pressable>
@@ -528,7 +528,7 @@ pluginTester({
                 export const Example = ({ height }) => {
                     return (
                         <View style={styles.container}>
-                            <Pressable style={(({ pressed }) => styles.sectionItem, styles.other(1), { height }, pressed && styles.pressed)}>
+                            <Pressable style={({ pressed }) => [styles.sectionItem, styles.other(1), { height }, pressed && styles.pressed]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -555,8 +555,8 @@ pluginTester({
 
                 export const Example = ({ height }) => {
                     return (
-                        <View style={styles.container}>
-                            <Pressable style={(({ pressed }) => styles.sectionItem, styles.other(1), { height }, pressed && styles.pressed)}>
+                        <View style={[styles.container]}>
+                            <Pressable style={({ pressed }) => [styles.sectionItem, styles.other(1), { height }, pressed && styles.pressed]}>
                                 <Text>Hello world</Text>
                             </Pressable>
                         </View>
@@ -616,7 +616,7 @@ pluginTester({
 
                 export const Example = ({ height }) => {
                     return (
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Pressable
                                 style={({ pressed }) => [
                                     styles.sectionItem,

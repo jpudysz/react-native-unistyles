@@ -523,7 +523,8 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
             unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
             unistyleFn->seal();
 
-            return core::objectFromUnistyle(rt, unistylesRuntime, unistyle, variants);
+//            return core::objectFromUnistyle(rt, unistylesRuntime, unistyle, variants);
+            return jsi::Object(rt);
     });
 }
 
