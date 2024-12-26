@@ -63,7 +63,19 @@ function addUnistylesImport(t, path, state) {
     nodesToRemove.forEach(node => path.node.body.splice(path.node.body.indexOf(node), 1))
 }
 
-const isInsideNodeModules = state => state.file.opts.filename.includes('node_modules')
+const isInsideNodeModules = (state) => {
+    const isNodeModule = state.file.opts.filename.includes('node_modules');
+  
+    if (Array.isArray(state.opts.includes) && isNodeModule) {
+      const isIncludedNodeModule = state.opts.includes.some((pkg) =>
+        state.file.opts.filename.includes(`node_modules/${pkg}`),
+      );
+  
+      return !isIncludedNodeModule;
+    }
+  
+    return isNodeModule;
+};
 
 module.exports = {
     isInsideNodeModules,
