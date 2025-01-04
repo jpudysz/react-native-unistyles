@@ -31,6 +31,7 @@ export class CSSState {
     mainMap: MapType = new Map()
     mqMap: MapType = new Map()
     private styleTag: HTMLStyleElement | null = null
+    private CSS = ''
 
     constructor() {
         if (isServer()) {
@@ -66,6 +67,28 @@ export class CSSState {
         }
     }
 
+    addTheme = (theme: string, values: Record<string, any>) => {
+        let themeVars = ''
+
+        const convertToCSS = (key: string, value: any, prev = '-') => {
+            if (typeof value === 'object' && value !== null) {
+                Object.entries(value).forEach(([nestedKey, nestedValue]) => convertToCSS(nestedKey, nestedValue, `${prev}-${key}`))
+            }
+
+            if (typeof value === 'string' || typeof value === 'number') {
+                themeVars += `${prev}-${hyphenate(key)}:${value};`
+            }
+        }
+
+        Object.entries(values).forEach(([key, value]) => convertToCSS(key, value))
+
+        if (theme === 'light' || theme === 'dark') {
+            this.CSS += `@media (prefers-color-scheme: ${theme}){:root{${themeVars}}}`
+        }
+
+        this.CSS += `:root.${theme}{${themeVars}}`
+    }
+
     remove = (hash: string) => {
         this.mainMap.forEach(styles => {
             styles.delete(hash)
@@ -77,7 +100,7 @@ export class CSSState {
     }
 
     getStyles = () => {
-        let styles = ''
+        let styles = this.CSS
 
         const generate = (mediaQuery: string, secondLevelMap: Map<string, Map<string, string>>) => {
             if (mediaQuery) {

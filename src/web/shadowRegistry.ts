@@ -3,6 +3,7 @@ import { deepMergeObjects } from '../utils'
 import { extractSecrets, extractUnistyleDependencies } from './utils'
 import { getVariants } from './variants'
 import type { UnistylesServices } from './types'
+import { UnistyleDependency } from '../specs'
 
 export class UnistylesShadowRegistry {
     // MOCKS
@@ -62,9 +63,12 @@ export class UnistylesShadowRegistry {
         const injectedClassNames = parsedStyles?._web?._classNames ?? []
         const injectedClassName = Array.isArray(injectedClassNames) ? injectedClassNames.join(' ') : injectedClassNames
         const dependencies = extractUnistyleDependencies(parsedStyles)
+        const filteredDependencies = this.services.state.CSSVars
+            ? dependencies.filter(dependency => dependency !== UnistyleDependency.Theme)
+            : dependencies
 
         if (!existingHash) {
-            this.disposeMap.set(hash, this.services.listener.addListeners(dependencies, () => {
+            this.disposeMap.set(hash, this.services.listener.addListeners(filteredDependencies, () => {
                 this.services.registry.applyStyles(hash, getParsedStyles())
             }))
         }
