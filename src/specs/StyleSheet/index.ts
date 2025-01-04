@@ -5,10 +5,14 @@ import type { UnistylesStyleSheet as UnistylesStyleSheetSpec } from './Unistyles
 import type { UnistylesBreakpoints, UnistylesThemes } from '../../global'
 import type { CreateUnistylesStyleSheet } from '../../types'
 
-type UnistylesSettings = {
+type UnistylesThemeSettings = {
     initialTheme: (() => keyof UnistylesThemes) | keyof UnistylesThemes
 } | {
     adaptiveThemes: boolean
+}
+
+type UnistylesSettings = UnistylesThemeSettings & {
+    CSSVars?: boolean
 }
 
 export type UnistylesConfig = {
