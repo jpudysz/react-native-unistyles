@@ -21,7 +21,7 @@ export class UnistylesRegistry {
         }
 
         if (scopedThemeName) {
-            const scopedTheme = this.services.runtime.getTheme(scopedThemeName)
+            const scopedTheme = this.services.runtime.getTheme(scopedThemeName, this.services.state.CSSVars)
 
             if (!scopedTheme) {
                 throw error(`Unistyles: You're trying to use scoped theme '${scopedThemeName}' but it wasn't registered.`)
@@ -36,7 +36,8 @@ export class UnistylesRegistry {
             return computedStylesheet
         }
 
-        const createdStylesheet = stylesheet(this.services.runtime.theme, this.services.runtime.miniRuntime)
+        const currentTheme = this.services.runtime.getTheme(this.services.runtime.themeName, this.services.state.CSSVars)
+        const createdStylesheet = stylesheet(currentTheme, this.services.runtime.miniRuntime)
         const dependencies = Object.values(createdStylesheet).flatMap(value => extractUnistyleDependencies(value))
 
         this.addDependenciesToStylesheet(stylesheet, dependencies)

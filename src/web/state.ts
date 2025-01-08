@@ -2,7 +2,7 @@ import type { UnistylesTheme } from '../types'
 import type { UnistylesConfig } from '../specs/StyleSheet'
 import type { AppBreakpoint, AppTheme, AppThemeName } from '../specs/types'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
-import { error, isServer, schemeToTheme } from './utils'
+import { error, hyphenate, isServer, schemeToTheme } from './utils'
 import { UnistyleDependency } from '../specs/NativePlatform'
 import type { UnionToIntersection } from '../types'
 import type { UnistylesServices } from './types'
@@ -11,7 +11,9 @@ type UnistylesSettings = Partial<UnionToIntersection<Required<UnistylesConfig>['
 
 export class UnistylesState {
     themes = new Map<string, UnistylesTheme>()
+    cssThemes = new Map<string, UnistylesTheme>()
     themeName?: AppThemeName
+    CSSVars = true
 
     private matchingBreakpoints = new Map<string, boolean>()
 
@@ -30,7 +32,7 @@ export class UnistylesState {
     constructor(private services: UnistylesServices) {}
 
     init = (config: UnistylesConfig) => {
-        this.initThemes(config.themes)
+        this.initThemes(config.themes, config.settings?.CSSVars)
         this.initBreakpoints(config.breakpoints)
 
         if (config.settings) {
@@ -41,12 +43,38 @@ export class UnistylesState {
             return
         }
 
+        if (!this.hasAdaptiveThemes && this.CSSVars) {
+            document.querySelector(':root')?.classList.add(this.themeName ?? '')
+        }
+
         this.services.listener.initListeners()
     }
 
-    private initThemes = (themes = {} as UnistylesThemes) => {
+    private initThemes = (themes = {} as UnistylesThemes, CSSVars = true) => {
+        this.CSSVars = CSSVars
+
         Object.entries(themes).forEach(([themeName, theme]) => {
             this.themes.set(themeName, theme as AppTheme)
+
+            if (CSSVars) {
+                this.services.registry.css.addTheme(themeName, theme)
+
+                const convertTheme = (key: string, value: any, prev = '-'): [string, any] => {
+                    if (typeof value === 'object' && value !== null) {
+                        return [key, Object.fromEntries(Object.entries(value).map(([nestedKey, nestedValue]) => convertTheme(nestedKey, nestedValue, `${prev}-${key}`)))]
+                    }
+
+                    if (typeof value === 'string') {
+                        return [key, `var(${prev}-${hyphenate(key)})`]
+                    }
+
+                    return [key, value]
+                }
+
+                this.cssThemes.set(themeName, Object.fromEntries(Object.entries(theme).map(([key, value]) => {
+                    return convertTheme(key, value)
+                })) as UnistylesTheme)
+            }
         })
     }
 
