@@ -145,10 +145,10 @@ import { Display, Hide, mq } from 'react-native-unistyles'
 
 const MyComponent = () => {
     return (
-        <Display mq={mq.width(0, 400)}>
+        <Display mq={mq.only.width(0, 400)}>
             <Text>This text is visible on small devices</Text>
         </Display>
-        <Hide mq={mq.width(400)}>
+        <Hide mq={mq.only.width(400)}>
             <Text>This text is hidden on big devices</Text>
         </Hide>
     )
