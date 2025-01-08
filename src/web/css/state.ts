@@ -75,7 +75,7 @@ export class CSSState {
                 Object.entries(value).forEach(([nestedKey, nestedValue]) => convertToCSS(nestedKey, nestedValue, `${prev}-${key}`))
             }
 
-            if (typeof value === 'string' || typeof value === 'number') {
+            if (typeof value === 'string') {
                 themeVars += `${prev}-${hyphenate(key)}:${value};`
             }
         }

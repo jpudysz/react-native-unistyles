@@ -207,8 +207,8 @@ export class UnistylesRuntime {
         this.services.state.themes.set(themeName, updater(oldTheme))
     }
 
-    getTheme = (themeName = this.themeName, CSS = false) => {
-        const theme = CSS
+    getTheme = (themeName = this.themeName, CSSVars = false) => {
+        const theme = CSSVars
             ? this.services.state.cssThemes.get(themeName ?? '')
             : this.services.state.themes.get(themeName ?? '')
 

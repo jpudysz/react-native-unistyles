@@ -64,7 +64,7 @@ export class UnistylesState {
                         return [key, Object.fromEntries(Object.entries(value).map(([nestedKey, nestedValue]) => convertTheme(nestedKey, nestedValue, `${prev}-${key}`)))]
                     }
 
-                    if (typeof value === 'string' || typeof value === 'number') {
+                    if (typeof value === 'string') {
                         return [key, `var(${prev}-${hyphenate(key)})`]
                     }
 
