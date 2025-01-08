@@ -9,6 +9,7 @@ import type { UnistylesServices } from './types'
 export class UnistylesRuntime {
     lightMedia = this.getLightMedia()
     darkMedia = this.getDarkMedia()
+    rootElement = isServer() ? null : document.querySelector(':root')
 
     constructor(private services: UnistylesServices) {}
 
@@ -168,10 +169,8 @@ export class UnistylesRuntime {
         this.services.listener.emitChange(UnistyleDependency.ThemeName)
 
         if (!isServer() && !this.services.state.hasAdaptiveThemes && this.services.state.CSSVars) {
-            const root = document.querySelector(':root')
-
-            root?.classList.remove(oldTheme ?? '')
-            root?.classList.add(themeName ?? '')
+            this.rootElement?.classList.remove(oldTheme ?? '')
+            this.rootElement?.classList.add(themeName ?? '')
         }
     }
 
@@ -179,12 +178,12 @@ export class UnistylesRuntime {
         this.services.state.hasAdaptiveThemes = isEnabled
 
         if (!isEnabled) {
-            document.querySelector(':root')?.classList.add(this.themeName ?? '')
+            this.rootElement?.classList.add(this.themeName ?? '')
 
             return
         }
 
-        document.querySelector(':root')?.classList.remove(this.themeName ?? '')
+        this.rootElement?.classList.remove(this.themeName ?? '')
         this.setTheme(schemeToTheme(this.colorScheme) as AppThemeName)
     }
 
