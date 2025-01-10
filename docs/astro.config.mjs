@@ -86,7 +86,7 @@ export default defineConfig({
                         { label: 'Avoiding Keyboard', slug: 'v3/guides/avoiding-keyboard' },
                         { label: 'Expo Router', slug: 'v3/guides/expo-router' },
                         { label: 'Custom web', slug: 'v3/guides/custom-web', badge: 'WIP' },
-                        { label: 'Server side rendering', slug: 'v3/guides/server-side-rendering', badge: 'WIP' },
+                        { label: 'Server side rendering', slug: 'v3/guides/server-side-rendering', badge: 'New!' },
                     ]
                 },
                 {
@@ -102,8 +102,8 @@ export default defineConfig({
                         { label: 'Compound Variants', slug: 'v3/references/compound-variants' },
                         { label: 'Web styles', slug: 'v3/references/web-styles' },
                         { label: 'Web Only Features', slug: 'v3/references/web-only' },
-                        { label: 'Scoped theme', slug: 'v3/references/scoped-theme', badge: 'New!' },
-                        { label: 'withUnistyles', slug: 'v3/references/with-unistyles',  badge: 'New!' },
+                        { label: 'Scoped theme', slug: 'v3/references/scoped-theme' },
+                        { label: 'withUnistyles', slug: 'v3/references/with-unistyles' },
                         { label: 'Display and Hide', slug: 'v3/references/display-hide' },
                         { label: 'Edge to edge', slug: 'v3/references/edge-to-edge' },
                         { label: 'Dimensions', slug: 'v3/references/dimensions' },
