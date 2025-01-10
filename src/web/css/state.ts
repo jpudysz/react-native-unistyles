@@ -93,6 +93,9 @@ export class CSSState {
         this.mainMap.forEach(styles => {
             styles.delete(hash)
         })
+        this.mqMap.forEach(styles => {
+            styles.delete(hash)
+        })
 
         if (this.styleTag) {
             this.styleTag.innerText = this.getStyles()
