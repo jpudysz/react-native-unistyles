@@ -5,6 +5,7 @@ import { UnistylesWeb } from '../web'
 
 declare global {
     interface Window {
+        // @ts-ignore
         __UNISTYLES_STATE__: ReturnType<typeof UnistylesWeb.registry.css.getState>
     }
 }
@@ -36,5 +37,6 @@ export const useServerUnistyles = () => {
 
     if (typeof window !== 'undefined') {
         UnistylesWeb.registry.css.hydrate(window.__UNISTYLES_STATE__)
+        document.querySelector('#unistyles-script')?.remove()
     }
 }
