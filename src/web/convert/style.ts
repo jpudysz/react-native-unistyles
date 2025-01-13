@@ -53,7 +53,8 @@ const CSS_NUMBER_KEYS = new Set([
     'strokeDashoffset',
     'strokeMiterlimit',
     'strokeOpacity',
-    'strokeWidth'
+    'strokeWidth',
+    'aspectRatio'
 ])
 
 const convertMap = {
