@@ -2,7 +2,6 @@ const { addUnistylesImport, isInsideNodeModules } = require('./import')
 const { hasStringRef } = require('./ref')
 const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyles } = require('./stylesheet')
 const { extractVariants } = require('./variants')
-const { getStyleAttribute, getStyleMetadata, styleAttributeToArray } = require('./style')
 
 const reactNativeComponentNames = [
     'ActivityIndicator',
@@ -124,45 +123,6 @@ module.exports = function ({ types: t }) {
                 if (isInsideNodeModules(state)) {
                     return
                 }
-
-                if (state.file.isClassComponent) {
-                    return
-                }
-
-                const openingElement = path.node.openingElement
-                const openingElementName = openingElement.name.name
-                const isReactNativeComponent = Boolean(state.reactNativeImports[openingElementName])
-                const isAnimatedComponent = (
-                    !isReactNativeComponent &&
-                    openingElement.name.object &&
-                    openingElement.name.object.name === 'Animated'
-                )
-
-                if (!isReactNativeComponent && !isAnimatedComponent) {
-                    return
-                }
-
-                const styleAttr = getStyleAttribute(t, path)
-
-                // component has no style prop
-                if (!styleAttr) {
-                    return
-                }
-
-                const metadata = getStyleMetadata(t, styleAttr.value.expression, null, state)
-
-                if (openingElementName === 'Pressable') {
-                    state.file.hasAnyUnistyle = true
-
-                    return
-                }
-
-                // style prop is using unexpected expression
-                if (metadata.length === 0) {
-                    return
-                }
-
-                styleAttributeToArray(t, path)
 
                 state.file.hasAnyUnistyle = true
 
