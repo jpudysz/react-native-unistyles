@@ -14,7 +14,7 @@ const Text: React.FunctionComponent<TextProps> = ({ value, children, size }) => 
     })
 
     return (
-        <RNText style={styles.text(value)}>
+        <RNText style={[styles.text(value), styles.bg1]}>
             {children}
         </RNText>
     )

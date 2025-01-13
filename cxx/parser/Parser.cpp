@@ -522,6 +522,9 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
             unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
             unistyleFn->seal();
 
+            // for compatibility purpose save last arguments to style instance. It will work ok, if user sees warning about multiple unistyles
+            helpers::defineHiddenProperty(rt, thisObject, helpers::ARGUMENTS.c_str() + std::string("_") + unistyleFn->styleKey, helpers::functionArgumentsToArray(rt, args, count));
+
             return core::objectFromUnistyle(rt, unistylesRuntime, unistyle, variants, std::make_optional<jsi::Array>(helpers::functionArgumentsToArray(rt, args, count))).asObject(rt);
     });
 }
