@@ -21,7 +21,7 @@ struct UnistyleWrapper: public jsi::NativeState {
 
 inline static Unistyle::Shared unistyleFromStaticStyleSheet(jsi::Runtime& rt, jsi::Object& value) {
     auto exoticUnistyle = std::make_shared<Unistyle>(
-        0,
+        helpers::HashGenerator::generateHash(helpers::EXOTIC_STYLE_KEY),
         UnistyleType::Object,
         helpers::EXOTIC_STYLE_KEY,
         value,
@@ -33,56 +33,64 @@ inline static Unistyle::Shared unistyleFromStaticStyleSheet(jsi::Runtime& rt, js
     return exoticUnistyle;
 }
 
-inline static std::optional<unsigned int> extractUnistyleId(const std::string& maybeUnistyleKey) {
-    size_t pos = maybeUnistyleKey.find_last_of('_');
-
-    if (pos == std::string::npos) {
-        return std::nullopt;
+inline static std::vector<std::string> getUnistylesHashKeys(jsi::Runtime& rt, jsi::Object& object) {
+    std::vector<std::string> matchingKeys{};
+    const std::string prefix = "unistyles-";
+    
+    auto propertyNames = object.getPropertyNames(rt);
+    size_t length = propertyNames.length(rt);
+    
+    for (size_t i = 0; i < length; i++) {
+        auto propertyName = propertyNames.getValueAtIndex(rt, i).getString(rt);
+        std::string key = propertyName.utf8(rt);
+        
+        if (key.compare(0, prefix.length(), prefix) == 0) {
+            matchingKeys.push_back(key);
+        }
     }
-
-    // extract the substring after the underscore
-    std::string numberPart = maybeUnistyleKey.substr(pos + 1);
-
-    return static_cast<unsigned int>(std::stoul(numberPart));
+    
+    return matchingKeys;
 }
 
-inline static Unistyle::Shared unistyleFromID(jsi::Runtime& rt, jsi::Object& value) {
-    auto maybeUnistyleKey = value.getProperty(rt, helpers::UNISTYLE_ID.c_str());
-
-    if (!maybeUnistyleKey.isString()) {
-        return nullptr;
-    }
-
-    auto unistyleId = extractUnistyleId(maybeUnistyleKey.asString(rt).utf8(rt));
-
-    // ID: 0 is for exotic styles
-    if (!unistyleId.has_value() || unistyleId == 0) {
-        return nullptr;
-    }
-
+inline static std::vector<Unistyle::Shared> unistylesFromHashKeys(jsi::Runtime& rt, jsi::Object& object, std::vector<std::string> keys) {
+    std::vector<Unistyle::Shared> unistyles{};
     auto& registry = UnistylesRegistry::get();
+    
+    for (auto& key: keys) {
+        unistyles.emplace_back(registry.getUnistyleById(rt, key));
+    }
 
-    return registry.getUnistyleById(rt, unistyleId.value());
+    return unistyles;
 }
 
 inline static std::vector<Unistyle::Shared> unistylesFromNonExistentNativeState(jsi::Runtime& rt, jsi::Object& value) {
-    auto hasUnistyleID = value.hasProperty(rt, helpers::UNISTYLE_ID.c_str());
-
+    auto unistyleHashKeys = getUnistylesHashKeys(rt, value);
+    
     // return wrapped RN/inline style
-    if (!hasUnistyleID) {
+    if (unistyleHashKeys.empty()) {
         return {unistyleFromStaticStyleSheet(rt, value)};
     }
 
-    // last chance to fallback and get unistyle based on ID
-    auto maybeUnistyle = unistyleFromID(rt, value);
+    // last chance to fallback and get unistyle based on hash
+    auto unistyles = unistylesFromHashKeys(rt, value, unistyleHashKeys);
+    auto areValid = std::all_of(unistyles.begin(), unistyles.end(), [](Unistyle::Shared unistyle){
+        return unistyle != nullptr;
+    });
+    
+    if (!areValid) {
+        throw jsi::JSError(rt, R"(Unistyles: Style is not bound!
 
-    if (maybeUnistyle != nullptr) {
-        return {maybeUnistyle};
+You likely altered unistyle hash key and we're not able to recover C++ state attached to this node.)");
+    }
+
+    if (unistyles.size() == 1) {
+        return unistyles;
     }
 
     throw jsi::JSError(rt, R"(Unistyles: Style is not bound!
 
-You likely altered __unistyleID and we're not able to recover C++ state attached to this node.)");
+You likely used the spread operator on a Unistyle style. If you need to merge styles use array syntax:
+style={[styles.container, styles.otherProp]})");
 }
 
 inline static std::vector<Unistyle::Shared> unistyleFromValue(jsi::Runtime& rt, const jsi::Value& value) {
@@ -117,14 +125,21 @@ inline static std::vector<Unistyle::Shared> unistyleFromValue(jsi::Runtime& rt, 
     return unistyles;
 }
 
-inline static jsi::Value objectFromUnistyle(jsi::Runtime& rt, std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime, Unistyle::Shared unistyle, Variants& variants) {
+inline static jsi::Value objectFromUnistyle(jsi::Runtime& rt, std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime, Unistyle::Shared unistyle, Variants& variants, std::optional<jsi::Array> arguments) {
     auto wrappedUnistyle = std::make_shared<UnistyleWrapper>(unistyle);
-    auto unistyleID = jsi::String::createFromUtf8(rt, unistyle->styleKey + "_" + std::to_string(unistyle->unid));
+    auto unistyleID = jsi::PropNameID::forUtf8(rt, unistyle->unid);
 
     jsi::Object obj = jsi::Object(rt);
 
     obj.setNativeState(rt, std::move(wrappedUnistyle));
-    obj.setProperty(rt, helpers::UNISTYLE_ID.c_str(), unistyleID);
+    
+    auto secrets = jsi::Object(rt);
+    
+    if (arguments.has_value()) {
+        secrets.setProperty(rt, helpers::ARGUMENTS.c_str(), arguments.value());
+    }
+    
+    obj.setProperty(rt, unistyleID, secrets);
 
     helpers::mergeJSIObjects(rt, obj, unistyle->parsedStyle.value());
 
@@ -133,17 +148,17 @@ inline static jsi::Value objectFromUnistyle(jsi::Runtime& rt, std::shared_ptr<Hy
 
 inline static jsi::Value valueFromUnistyle(jsi::Runtime& rt, std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime, Unistyle::Shared unistyle, Variants& variants) {
     if (unistyle->type == UnistyleType::Object) {
-        return objectFromUnistyle(rt, unistylesRuntime, unistyle, variants);
+        return objectFromUnistyle(rt, unistylesRuntime, unistyle, variants, std::nullopt);
     }
 
     auto wrappedUnistyle = std::make_shared<UnistyleWrapper>(unistyle);
-    auto unistyleID = jsi::String::createFromUtf8(rt, unistyle->styleKey + "_" + std::to_string(unistyle->unid));
+    auto unistyleID = jsi::PropNameID::forUtf8(rt, unistyle->unid);
 
     auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyle);
     auto hostFn = jsi::Value(rt, unistyleFn->proxiedFunction.value()).asObject(rt).asFunction(rt);
 
     hostFn.setNativeState(rt, std::move(wrappedUnistyle));
-    hostFn.setProperty(rt, helpers::UNISTYLE_ID.c_str(), unistyleID);
+    hostFn.setProperty(rt, unistyleID, jsi::Object(rt));
 
     return std::move(hostFn);
 }
