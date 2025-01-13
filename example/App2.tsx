@@ -1,10 +1,11 @@
 import { Text as RNText, View } from 'react-native'
 import React, { PropsWithChildren } from 'react'
-import { StyleSheet, UnistylesVariants } from 'react-native-unistyles'
+import { st } from './st'
 import './unistyles'
 
-type TextProps = PropsWithChildren & UnistylesVariants<typeof styles> & {
-    value: number
+type TextProps = PropsWithChildren & {
+    value: number,
+    size: 'small' | 'large'
 }
 
 const Text: React.FunctionComponent<TextProps> = ({ value, children, size }) => {
@@ -37,7 +38,7 @@ export const App = () => {
     )
 }
 
-const styles = StyleSheet.create((theme, rt) => ({
+const styles = st.create((theme, rt) => ({
     container: {
         flex: 1,
         alignItems: 'center',
