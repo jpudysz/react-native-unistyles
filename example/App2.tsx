@@ -13,8 +13,6 @@ const Text: React.FunctionComponent<TextProps> = ({ value, children, size }) => 
         size
     })
 
-    console.log(styles.text(value))
-
     return (
         <RNText style={styles.text(value)}>
             {children}
