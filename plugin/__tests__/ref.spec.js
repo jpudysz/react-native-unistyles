@@ -75,7 +75,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={[styles.container]}>
+                        <View style={styles.container}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -106,7 +106,7 @@ pluginTester({
                     container: {
                         backgroundColor: 'red'
                     },
-                   text: {
+                    text: {
                         color: 'blue'
                     }
                 })
@@ -118,7 +118,7 @@ pluginTester({
 
                 export const Example = () => {
                     return (
-                        <View style={[styles.container]}>
+                        <View style={styles.container}>
                             <Text style={styles.text}>Hello world</Text>
                         </View>
                     )
@@ -171,7 +171,7 @@ pluginTester({
                     let ref = React.useRef()
 
                     return (
-                        <View ref={ref} style={[styles.container]}>
+                        <View ref={ref} style={styles.container}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -232,7 +232,7 @@ pluginTester({
                                 doSomething(ref)
                                 myRef.current = ref
                             }}
-                            style={[styles.container]}
+                            style={styles.container}
                         >
                             <Text>Hello world</Text>
                         </View>
@@ -302,7 +302,7 @@ pluginTester({
                                     customCleanup()
                                 }
                             }}
-                            style={[styles.container]}
+                            style={styles.container}
                         >
                             <Text>Hello world</Text>
                         </View>
@@ -372,7 +372,7 @@ pluginTester({
                     }
 
                     return (
-                        <View ref={fn} style={[styles.container]}>
+                        <View ref={fn} style={styles.container}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -441,7 +441,7 @@ pluginTester({
                     }
 
                     return (
-                        <View ref={fn} style={[styles.container]}>
+                        <View ref={fn} style={styles.container}>
                             <Text>Hello world</Text>
                         </View>
                     )
@@ -491,7 +491,7 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = () => {
-                    return <View style={[styles.container, styles.secondProp, styles.thirdProp]} />
+                    return <View style={{ ...styles.container, ...styles.secondProp, ...styles.thirdProp }} />
                 }
 
                 const styles = StyleSheet.create(
@@ -543,7 +543,7 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = ({ styles }) => {
-                    return <View style={[styles.nested.prop]} />
+                    return <View style={styles.nested.prop} />
                 }
 
                 const styles = StyleSheet.create(
@@ -587,7 +587,7 @@ pluginTester({
                 import { StyleSheet } from 'react-native-unistyles'
 
                 export const Example = ({ condition }) => {
-                    return <View style={[condition ? styles.container : {}]} />
+                    return <View style={condition ? styles.container : {}} />
                 }
 
                 const styles = StyleSheet.create(
