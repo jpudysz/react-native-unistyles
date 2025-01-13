@@ -1,19 +1,37 @@
-import React from 'react'
-import { Text, View } from 'react-native'
-import { StyleSheet } from 'react-native-unistyles'
+import { Text as RNText, View } from 'react-native'
+import React, { PropsWithChildren } from 'react'
+import { StyleSheet, UnistylesVariants } from 'react-native-unistyles'
 import './unistyles'
 
-export const App = () => {
+type TextProps = PropsWithChildren & UnistylesVariants<typeof styles> & {
+    value: number
+}
+
+const Text: React.FunctionComponent<TextProps> = ({ value, children, size }) => {
     styles.useVariants({
-        size: 'large'
+        size
     })
 
-    console.log(styles.text(1))
+    console.log(styles.text(value))
 
     return (
+        <RNText style={styles.text(value)}>
+            {children}
+        </RNText>
+    )
+}
+
+export const App = () => {
+    return (
         <View style={styles.container}>
-            <Text style={{...styles.text(1)}}>
-                Hello world
+            <Text value={1.1} size="small">
+                Hello world 1
+            </Text>
+            <Text value={1.5} size="small">
+                Hello world 2
+            </Text>
+            <Text value={1} size="large">
+                Hello world 3
             </Text>
         </View>
     )
