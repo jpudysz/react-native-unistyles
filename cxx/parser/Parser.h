@@ -10,6 +10,7 @@
 #include "HybridUnistylesRuntime.h"
 #include "StyleSheet.h"
 #include "ShadowLeafUpdate.h"
+#include "HashGenerator.h"
 
 namespace margelo::nitro::unistyles::parser {
 

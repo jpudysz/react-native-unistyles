@@ -10,7 +10,6 @@ using Variants = std::vector<std::pair<std::string, std::string>>;
 // called only once while processing StyleSheet.create
 void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet) {
     jsi::Object unwrappedStyleSheet = this->unwrapStyleSheet(rt, styleSheet, std::nullopt);
-    auto& registry = core::UnistylesRegistry::get();
 
     helpers::enumerateJSIObject(rt, unwrappedStyleSheet, [&](const std::string& styleKey, jsi::Value& propertyValue){
         helpers::assertThat(rt, propertyValue.isObject(), "Unistyles: Style with name '" + styleKey + "' is not a function or object.");
@@ -19,7 +18,7 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
 
         if (styleValue.isFunction(rt)) {
             styleSheet->unistyles[styleKey] = std::make_shared<UnistyleDynamicFunction>(
-                registry.getNextUnistyleId(),
+                helpers::HashGenerator::generateHash(styleKey),
                 UnistyleType::DynamicFunction,
                 styleKey,
                 styleValue,
@@ -30,7 +29,7 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
         }
 
         styleSheet->unistyles[styleKey] = std::make_shared<Unistyle>(
-            registry.getNextUnistyleId(),
+            helpers::HashGenerator::generateHash(styleKey),
             UnistyleType::Object,
             styleKey,
             styleValue,
@@ -523,8 +522,7 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
             unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
             unistyleFn->seal();
 
-//            return core::objectFromUnistyle(rt, unistylesRuntime, unistyle, variants);
-            return jsi::Object(rt);
+            return core::objectFromUnistyle(rt, unistylesRuntime, unistyle, variants, std::make_optional<jsi::Array>(helpers::functionArgumentsToArray(rt, args, count))).asObject(rt);
     });
 }
 

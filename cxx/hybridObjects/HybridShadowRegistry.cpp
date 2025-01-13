@@ -14,26 +14,24 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
 
     for (size_t i = 0; i < unistyleWrappers.size(); i++) {
         if (unistyleWrappers[i]->type == core::UnistyleType::DynamicFunction) {
-            // todo
-//            auto rawStyle = args[1].asObject(rt).asArray(rt).getValueAtIndex(rt, i);
-//
-//            helpers::assertThat(rt, rawStyle.isObject(), "Unistyles: Dynamic function is not bound!");
-//
-//            auto maybeSecrets = rawStyle.getObject(rt).getProperty(rt, helpers::SECRETS.c_str());
-//
-//            helpers::assertThat(rt, maybeSecrets.isObject(), "Unistyles: Dynamic function is not bound!");
-//
-//            auto secrets = maybeSecrets.asObject(rt).getProperty(rt, helpers::ARGUMENTS.c_str());
-//
-//            arguments.push_back(helpers::parseDynamicFunctionArguments(rt, secrets.asObject(rt).asArray(rt)));
-            arguments.push_back({});
+            try {
+                auto rawStyle = args[1].asObject(rt).asArray(rt).getValueAtIndex(rt, i);
+                auto rawStyleObj = rawStyle.getObject(rt);
+                auto unistyleHashKeys = core::getUnistylesHashKeys(rt, rawStyleObj);
+                auto secrets = rawStyleObj.getProperty(rt, unistyleHashKeys.at(0).c_str()).asObject(rt);
+                auto secretArguments = secrets.getProperty(rt, helpers::ARGUMENTS.c_str()).asObject(rt);
 
-            continue;
+                arguments.push_back(helpers::parseDynamicFunctionArguments(rt, secretArguments.asArray(rt)));
+
+                continue;
+            } catch (...) {
+                helpers::assertThat(rt, false, "Unistyles: Dynamic function is not bound!");
+            }
         }
 
         arguments.push_back({});
     }
-    
+
     auto scopedTheme = registry.getScopedTheme();
 
     // check if scope theme exists
@@ -98,7 +96,7 @@ jsi::Value HybridShadowRegistry::unlink(jsi::Runtime &rt, const jsi::Value &this
 
 jsi::Value HybridShadowRegistry::setScopedTheme(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count == 1, "Unistyles: setScopedTheme expected 1 argument.");
-    
+
     auto& registry = core::UnistylesRegistry::get();
 
     if (args[0].isUndefined()) {
@@ -116,7 +114,7 @@ jsi::Value HybridShadowRegistry::setScopedTheme(jsi::Runtime &rt, const jsi::Val
 jsi::Value HybridShadowRegistry::getScopedTheme(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     auto& registry = core::UnistylesRegistry::get();
     auto maybeScopedTheme = registry.getScopedTheme();
-    
+
     return maybeScopedTheme.has_value()
         ? jsi::String::createFromUtf8(rt, maybeScopedTheme.value())
         : jsi::Value::undefined();

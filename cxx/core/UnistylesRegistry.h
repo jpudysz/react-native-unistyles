@@ -12,7 +12,6 @@
 #include "Unistyle.h"
 #include "UnistyleData.h"
 #include "ShadowTrafficController.h"
-#include "IDGenerator.h"
 
 namespace margelo::nitro::unistyles::core {
 
@@ -46,13 +45,11 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     shadow::ShadowTrafficController trafficController{};
     const std::optional<std::string> getScopedTheme();
     void setScopedTheme(std::optional<std::string> themeName);
-    unsigned int getNextUnistyleId();
-    core::Unistyle::Shared getUnistyleById(jsi::Runtime& rt, unsigned int unistyleID);
+    core::Unistyle::Shared getUnistyleById(jsi::Runtime& rt, std::string unistyleID);
 
 private:
     UnistylesRegistry() = default;
 
-    helpers::IDGenerator _idGenerator{};
     std::optional<std::string> _scopedTheme{};
     std::unordered_map<jsi::Runtime*, UnistylesState> _states{};
     std::unordered_map<jsi::Runtime*, std::unordered_map<int, std::shared_ptr<core::StyleSheet>>> _styleSheetRegistry{};

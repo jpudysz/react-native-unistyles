@@ -198,7 +198,7 @@ std::vector<std::shared_ptr<core::StyleSheet>> core::UnistylesRegistry::getStyle
     return stylesheetsToRefresh;
 }
 
-core::Unistyle::Shared core::UnistylesRegistry::getUnistyleById(jsi::Runtime& rt, unsigned int unistyleID) {
+core::Unistyle::Shared core::UnistylesRegistry::getUnistyleById(jsi::Runtime& rt, std::string unistyleID) {
     for (auto& pair: this->_styleSheetRegistry[&rt]) {
         auto [_, stylesheet] = pair;
         
@@ -212,10 +212,6 @@ core::Unistyle::Shared core::UnistylesRegistry::getUnistyleById(jsi::Runtime& rt
     }
     
     return nullptr;
-}
-
-unsigned int core::UnistylesRegistry::getNextUnistyleId() {
-    return this->_idGenerator.next();
 }
 
 const std::optional<std::string> core::UnistylesRegistry::getScopedTheme() {

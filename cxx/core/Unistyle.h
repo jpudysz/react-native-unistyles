@@ -19,8 +19,8 @@ enum class UnistyleType {
 struct Unistyle {
     using Shared = std::shared_ptr<Unistyle>;
 
-    Unistyle(unsigned int unid, UnistyleType type, std::string styleKey, jsi::Object& rawObject, std::shared_ptr<StyleSheet> styleSheet)
-        : unid{unid}, styleKey{styleKey}, type{type}, rawValue{std::move(rawObject)}, parent{styleSheet} {}
+    Unistyle(std::string hash, UnistyleType type, std::string styleKey, jsi::Object& rawObject, std::shared_ptr<StyleSheet> styleSheet)
+        : unid{hash}, styleKey{styleKey}, type{type}, rawValue{std::move(rawObject)}, parent{styleSheet} {}
     virtual ~Unistyle() = default;
 
     Unistyle(const Unistyle&) = delete;
@@ -28,7 +28,7 @@ struct Unistyle {
 
     UnistyleType type;
     std::string styleKey;
-    unsigned int unid;
+    std::string unid;
     jsi::Object rawValue;
     std::optional<jsi::Object> parsedStyle;
     std::vector<UnistyleDependency> dependencies{};
@@ -66,8 +66,8 @@ struct UnistyleDynamicFunction: public Unistyle {
     // unprocessedValue <- object generated after calling proxy and user's original function
     // parsedStyle <- parsed with Unistyle's parser
 
-    UnistyleDynamicFunction(unsigned int unid, UnistyleType type, std::string styleKey, jsi::Object& rawObject, std::shared_ptr<StyleSheet> styleSheet)
-        : Unistyle(unid, type, styleKey, rawObject, styleSheet) {}
+    UnistyleDynamicFunction(std::string hash, UnistyleType type, std::string styleKey, jsi::Object& rawObject, std::shared_ptr<StyleSheet> styleSheet)
+        : Unistyle(hash, type, styleKey, rawObject, styleSheet) {}
 
     UnistyleDynamicFunction(const UnistyleDynamicFunction&) = delete;
     UnistyleDynamicFunction(UnistyleDynamicFunction&& other) = delete;
