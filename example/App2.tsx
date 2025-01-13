@@ -1,4 +1,4 @@
-import { Text as RNText, View } from 'react-native'
+import { Text as RNText, View, ViewProps } from 'react-native'
 import React, { PropsWithChildren } from 'react'
 import { st } from './st'
 import './unistyles'
@@ -20,6 +20,18 @@ const Text: React.FunctionComponent<TextProps> = ({ value, children, size }) => 
     )
 }
 
+const ComponentA: React.FunctionComponent<ViewProps>  = ({ style }) => {
+    return (
+        <ComponentB style={[styles.bg1, style]} />
+    )
+}
+
+const ComponentB: React.FunctionComponent<ViewProps>  = ({ style }) => {
+    return (
+        <View style={[style, { height: 100, width: 100 }]} />
+    )
+}
+
 export const App = () => {
     return (
         <View style={styles.container}>
@@ -32,6 +44,7 @@ export const App = () => {
             <Text value={1} size="large">
                 Hello world 3
             </Text>
+            <ComponentA style={[{ borderWidth: 5 }, { borderColor: 'pink'}]} />
         </View>
     )
 }
@@ -56,5 +69,8 @@ const styles = st.create((theme, rt) => ({
                 }
             }
         }
-    })
+    }),
+    bg1: {
+        backgroundColor: 'red'
+    }
 }))

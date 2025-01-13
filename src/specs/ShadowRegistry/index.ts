@@ -37,8 +37,8 @@ HybridShadowRegistry.add = (handle, styles) => {
     }
 
     const stylesArray = Array.isArray(styles)
-        ? styles :
-        [styles]
+        ? styles.flat()
+        : [styles]
 
     // filter Reanimated styles and styles that are undefined
     const filteredStyles = stylesArray
