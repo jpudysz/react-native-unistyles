@@ -1,7 +1,7 @@
 import type { ViewProps } from 'react-native'
 
 export const maybeWarnAboutMultipleUnistyles = (props: ViewProps, displayName = 'Unknown') => {
-    if (__DEV__ && props.style && typeof props.style === 'object') {
+    if (__DEV__ && props.style && !Array.isArray(props.style)) {
         const unistylesKeys = Object
             .keys(props.style)
             .filter(key => key.startsWith('unistyles-'))

@@ -83,14 +83,7 @@ inline static std::vector<Unistyle::Shared> unistylesFromNonExistentNativeState(
 You likely altered unistyle hash key and we're not able to recover C++ state attached to this node.)");
     }
 
-    if (unistyles.size() == 1) {
-        return unistyles;
-    }
-
-    throw jsi::JSError(rt, R"(Unistyles: Style is not bound!
-
-You likely used the spread operator on a Unistyle style. If you need to merge styles use array syntax:
-style={[styles.container, styles.otherProp]})");
+    return unistyles;
 }
 
 inline static std::vector<Unistyle::Shared> unistyleFromValue(jsi::Runtime& rt, const jsi::Value& value) {
@@ -136,7 +129,7 @@ inline static jsi::Value objectFromUnistyle(jsi::Runtime& rt, std::shared_ptr<Hy
     auto secrets = jsi::Object(rt);
     
     if (arguments.has_value()) {
-        secrets.setProperty(rt, helpers::ARGUMENTS.c_str(), arguments.value());
+        helpers::defineHiddenProperty(rt, secrets, helpers::ARGUMENTS.c_str(), arguments.value());
     }
     
     obj.setProperty(rt, unistyleID, secrets);
