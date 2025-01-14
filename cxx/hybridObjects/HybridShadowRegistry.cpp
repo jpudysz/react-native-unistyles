@@ -25,7 +25,7 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
 
                 continue;
             } catch (...) {
-                helpers::assertThat(rt, false, "Unistyles: Dynamic function is not bound!");
+                arguments.push_back({});
             }
         }
 
@@ -48,10 +48,23 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     // create unistyleData based on wrappers
     for (size_t i = 0; i < unistyleWrappers.size(); i++) {
         core::Unistyle::Shared& unistyle = unistyleWrappers[i];
+        auto rawStyle = args[1].asObject(rt).asArray(rt).getValueAtIndex(rt, i);
+        auto rawStyleObj = rawStyle.getObject(rt);
+        auto unistyleHashKeys = core::getUnistylesHashKeys(rt, rawStyleObj);
         core::Variants variants{};
+
+        if (unistyleHashKeys.size() == 1) {
+            auto secrets = rawStyleObj.getProperty(rt, unistyleHashKeys.at(0).c_str()).asObject(rt);
+            auto hasVariants = secrets.hasProperty(rt, helpers::STYLESHEET_VARIANTS.c_str());
+
+            if (hasVariants) {
+                variants = helpers::variantsToPairs(rt, secrets.getProperty(rt, helpers::STYLESHEET_VARIANTS.c_str()).asObject(rt));
+            }
+        }
+
         std::shared_ptr<core::UnistyleData> unistyleData = std::make_shared<core::UnistyleData>(
             unistyle,
-            variants, // todo pass real variants
+            variants,
             arguments[i],
             scopedTheme
         );
@@ -64,10 +77,6 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
 
             // if so we need to force update
             parser.rebuildUnistyleWithScopedTheme(rt, parsedStyleSheet, unistyleData);
-        } else {
-            // for other styles, not scoped to theme we need to compute variants value
-            // todo, do we need it?
-            // parser.rebuildUnistyleWithVariants(rt, unistyleData);
         }
 
         unistylesData.emplace_back(unistyleData);

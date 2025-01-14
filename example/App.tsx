@@ -78,29 +78,29 @@ export const App = () => {
                     </View>
                 ))}
             </UniScrollView>
-            {/* <View style={styles.row}> */}
-            {/*     <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6." style={styles.blurhash}  /> */}
-            {/*     <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6." style={styles.blurhashWithColor({ light: '#A1CEDC', dark: '#1D3D47' })}  /> */}
-            {/* </View> */}
-            {/* <ImageBackground */}
-            {/*     source={{ uri: 'https://images.unsplash.com/photo-1674448417387-345997fcd888?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY0NjY2ODk0NQ&ixlib=rb-1.2.1&q=80&w=1080' }} */}
-            {/*     style={styles.imageBackground({ light: 'black', dark: 'white' })} */}
-            {/* /> */}
+            <View style={styles.row}>
+                <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6." style={styles.blurhash}  />
+                <UniBlurhash blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6." style={styles.blurhashWithColor({ light: '#A1CEDC', dark: '#1D3D47' })}  />
+            </View>
+            <ImageBackground
+                source={{ uri: 'https://images.unsplash.com/photo-1674448417387-345997fcd888?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY0NjY2ODk0NQ&ixlib=rb-1.2.1&q=80&w=1080' }}
+                style={styles.imageBackground({ light: 'black', dark: 'white' })}
+            />
             <UniButton
                 title="Force re-render"
                 onPress={() => setCount(prevState =>  prevState + 1)}
             />
-            {/* {Array.from({ length: 3}).map((_, index) => ( */}
-            {/*     <Pressable */}
-            {/*         key={index} */}
-            {/*         style={event => [styles.pressable(event, 1), { marginRight: 10 * index}]} */}
-            {/*         onPress={() => {}} */}
-            {/*     > */}
-            {/*         <Typography value={1.1}> */}
-            {/*             Pressable test {index + 1} */}
-            {/*         </Typography> */}
-            {/*     </Pressable> */}
-            {/* ))} */}
+            {Array.from({ length: 3}).map((_, index) => (
+                <Pressable
+                    key={index}
+                    style={event => [styles.pressable(event, 1), { marginRight: 10 * index}]}
+                    onPress={() => {}}
+                >
+                    <Typography value={1.1}>
+                        Pressable test {index + 1}
+                    </Typography>
+                </Pressable>
+            ))}
             <ScopedTheme name='premium'>
                 <Text style={styles.scoped}>
                     I'm scoped to premium
