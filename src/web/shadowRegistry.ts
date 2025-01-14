@@ -1,6 +1,6 @@
 import type { UnistylesTheme, UnistylesValues } from '../types'
 import { deepMergeObjects } from '../utils'
-import { extractSecrets, extractUnistyleDependencies, keyInObject } from './utils'
+import { extractSecrets, extractUnistyleDependencies } from './utils'
 import { getVariants } from './variants'
 import type { UnistylesServices } from './types'
 import { UnistyleDependency } from '../specs'
@@ -27,32 +27,35 @@ export class UnistylesShadowRegistry {
         this.services.registry.connect(ref, hash)
     }
 
-    addStyles = (unistyle: UnistylesValues) => {
+    addStyles = (unistyles: Array<UnistylesValues>) => {
         const getParsedStyles = () => {
-            const secrets = extractSecrets(unistyle)
+            const allStyles = unistyles.map(unistyle => {
+                const secrets = extractSecrets(unistyle)
 
-            // Regular style
-            if (!secrets) {
-                return unistyle
-            }
+                // Regular style
+                if (!secrets) {
+                    return unistyle
+                }
 
-            const { __uni__key, __uni__stylesheet, __uni__args = [] } = secrets
-            const newComputedStylesheet = this.services.registry.getComputedStylesheet(__uni__stylesheet, scopedTheme)
-            const variants = (keyInObject(newComputedStylesheet, '__stylesheetVariants') ? newComputedStylesheet.__stylesheetVariants : {}) as Record<string, any>
-            const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
-            const result = typeof style === 'function'
-                ? style(...__uni__args)
-                : style
-            const { variantsResult } = Object.fromEntries(getVariants({ variantsResult: result }, variants))
-            const resultWithVariants = deepMergeObjects(result, variantsResult ?? {})
-            const dependencies = extractUnistyleDependencies(resultWithVariants)
+                const { __uni__key, __uni__stylesheet, __uni__args = [], __uni_variants: variants } = secrets
+                const newComputedStylesheet = this.services.registry.getComputedStylesheet(__uni__stylesheet, scopedTheme)
+                const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
+                const result = typeof style === 'function'
+                    ? style(...__uni__args)
+                    : style
+                const variantsResult = getVariants(result, variants)
+                const resultWithVariants = deepMergeObjects(result, variantsResult)
+                const dependencies = extractUnistyleDependencies(resultWithVariants)
 
-            if (typeof __uni__stylesheet === 'function') {
-                // Add dependencies from dynamic styles to stylesheet
-                this.services.registry.addDependenciesToStylesheet(__uni__stylesheet, dependencies)
-            }
+                if (typeof __uni__stylesheet === 'function') {
+                    // Add dependencies from dynamic styles to stylesheet
+                    this.services.registry.addDependenciesToStylesheet(__uni__stylesheet, dependencies)
+                }
 
-            return resultWithVariants as UnistylesValues
+                return resultWithVariants as UnistylesValues
+            })
+
+            return deepMergeObjects(...allStyles)
         }
 
         // Copy scoped theme to not use referenced value
