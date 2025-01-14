@@ -9,6 +9,7 @@ import type { UnistylesServices } from './types'
 export class UnistylesRuntime {
     lightMedia = this.getLightMedia()
     darkMedia = this.getDarkMedia()
+    rootElement = isServer() ? null : document.querySelector(':root')
 
     constructor(private services: UnistylesServices) {}
 
@@ -161,18 +162,28 @@ export class UnistylesRuntime {
             return
         }
 
+        const oldTheme = this.services.state.themeName
+
         this.services.state.themeName = themeName
         this.services.listener.emitChange(UnistyleDependency.Theme)
         this.services.listener.emitChange(UnistyleDependency.ThemeName)
+
+        if (!isServer() && !this.services.state.hasAdaptiveThemes && this.services.state.CSSVars) {
+            this.rootElement?.classList.remove(oldTheme ?? '')
+            this.rootElement?.classList.add(themeName ?? '')
+        }
     }
 
     setAdaptiveThemes = (isEnabled: boolean) => {
         this.services.state.hasAdaptiveThemes = isEnabled
 
         if (!isEnabled) {
+            this.rootElement?.classList.add(this.themeName ?? '')
+
             return
         }
 
+        this.rootElement?.classList.remove(this.themeName ?? '')
         this.setTheme(schemeToTheme(this.colorScheme) as AppThemeName)
     }
 
@@ -196,8 +207,10 @@ export class UnistylesRuntime {
         this.services.state.themes.set(themeName, updater(oldTheme))
     }
 
-    getTheme = (themeName = this.themeName) => {
-        const theme = this.services.state.themes.get(themeName ?? '')
+    getTheme = (themeName = this.themeName, CSSVars = false) => {
+        const theme = CSSVars
+            ? this.services.state.cssThemes.get(themeName ?? '')
+            : this.services.state.themes.get(themeName ?? '')
 
         if (!themeName || !theme) {
             throw error(`You're trying to get theme "${themeName}" but it wasn't registered.`)
