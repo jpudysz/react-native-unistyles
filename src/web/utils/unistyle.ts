@@ -19,18 +19,27 @@ export const schemeToTheme = (scheme: ColorScheme) => {
 export type UnistyleSecrets = {
     __uni__stylesheet: StyleSheetWithSuperPowers<StyleSheet>,
     __uni__key: string,
-    __uni__args?: Array<any>
+    __uni__args?: Array<any>,
+    __uni_variants: Record<string, string | boolean | undefined>
 }
 
 export const assignSecrets = <T>(object: T, secrets: UnistyleSecrets) => {
+    const secretsId = Math.random().toString(36).slice(8)
+
     // @ts-expect-error - assign secrets to object
-    object.__uni__secrets__ = secrets
+    object[`unistyles-${secretsId}`] = secrets
 
     return object
 }
 
 export const extractSecrets = (object: any) => {
-    return object && keyInObject(object, '__uni__secrets__') ? object.__uni__secrets__ as UnistyleSecrets : undefined
+    if (!object) {
+        return undefined
+    }
+
+    const [, secrets] = Object.entries(object).find(([key]) => key.startsWith('unistyles-')) ?? []
+
+    return secrets as UnistyleSecrets
 }
 
 export const removeInlineStyles = (values: UnistylesValues) => {
