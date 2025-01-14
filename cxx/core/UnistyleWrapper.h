@@ -36,26 +36,26 @@ inline static Unistyle::Shared unistyleFromStaticStyleSheet(jsi::Runtime& rt, js
 inline static std::vector<std::string> getUnistylesHashKeys(jsi::Runtime& rt, jsi::Object& object) {
     std::vector<std::string> matchingKeys{};
     const std::string prefix = "unistyles-";
-    
+
     auto propertyNames = object.getPropertyNames(rt);
     size_t length = propertyNames.length(rt);
-    
+
     for (size_t i = 0; i < length; i++) {
         auto propertyName = propertyNames.getValueAtIndex(rt, i).getString(rt);
         std::string key = propertyName.utf8(rt);
-        
+
         if (key.compare(0, prefix.length(), prefix) == 0) {
             matchingKeys.push_back(key);
         }
     }
-    
+
     return matchingKeys;
 }
 
 inline static std::vector<Unistyle::Shared> unistylesFromHashKeys(jsi::Runtime& rt, jsi::Object& object, std::vector<std::string> keys) {
     std::vector<Unistyle::Shared> unistyles{};
     auto& registry = UnistylesRegistry::get();
-    
+
     for (auto& key: keys) {
         unistyles.emplace_back(registry.getUnistyleById(rt, key));
     }
@@ -65,7 +65,7 @@ inline static std::vector<Unistyle::Shared> unistylesFromHashKeys(jsi::Runtime& 
 
 inline static std::vector<Unistyle::Shared> unistylesFromNonExistentNativeState(jsi::Runtime& rt, jsi::Object& value) {
     auto unistyleHashKeys = getUnistylesHashKeys(rt, value);
-    
+
     // return wrapped RN/inline style
     if (unistyleHashKeys.empty()) {
         return {unistyleFromStaticStyleSheet(rt, value)};
@@ -76,7 +76,7 @@ inline static std::vector<Unistyle::Shared> unistylesFromNonExistentNativeState(
     auto areValid = std::all_of(unistyles.begin(), unistyles.end(), [](Unistyle::Shared unistyle){
         return unistyle != nullptr;
     });
-    
+
     if (!areValid) {
         throw jsi::JSError(rt, R"(Unistyles: Style is not bound!
 
@@ -125,13 +125,20 @@ inline static jsi::Value objectFromUnistyle(jsi::Runtime& rt, std::shared_ptr<Hy
     jsi::Object obj = jsi::Object(rt);
 
     obj.setNativeState(rt, std::move(wrappedUnistyle));
-    
+
     auto secrets = jsi::Object(rt);
-    
+
     if (arguments.has_value()) {
+        // this is required for HybridShadowRegistry::link
         helpers::defineHiddenProperty(rt, secrets, helpers::ARGUMENTS.c_str(), arguments.value());
     }
-    
+
+    // todo do we need it?
+    // helpers::defineHiddenProperty(rt, secrets, helpers::STYLESHEET_VARIANTS.c_str(), helpers::variantsToValue(rt, variants));
+
+    // this is required for withUnistyles
+    helpers::defineHiddenProperty(rt, secrets, helpers::STYLE_DEPENDENCIES.c_str(), helpers::dependenciesToJSIArray(rt, unistyle->dependencies));
+
     obj.setProperty(rt, unistyleID, secrets);
 
     helpers::mergeJSIObjects(rt, obj, unistyle->parsedStyle.value());

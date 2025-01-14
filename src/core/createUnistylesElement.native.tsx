@@ -7,7 +7,8 @@ export const createUnistylesElement = (Component: any) => React.forwardRef((prop
         {...props}
         ref={(ref: unknown) => {
             passForwardedRef(props, ref, forwardedRef)
-            maybeWarnAboutMultipleUnistyles(props, Component.displayName)
+            // @ts-ignore we don't know the type of the component
+            maybeWarnAboutMultipleUnistyles(props.style, Component.displayName)
         }}
     />
 ))

@@ -303,7 +303,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
                 );
             } else {
                 unistyle->rawValue = parsedStyleSheetsWithDefaultTheme[unistyleStyleSheet].asObject(rt).getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
-                this->rebuildUnistyle(rt, unistyleStyleSheet, unistyle, unistyleData->variants, unistyleData->dynamicFunctionMetadata);
+                this->rebuildUnistyle(rt, unistyle, unistyleData->variants, unistyleData->dynamicFunctionMetadata);
                 unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
             }
 
@@ -325,7 +325,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
 }
 
 // rebuild single unistyle
-void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, Unistyle::Shared unistyle, const Variants& variants, std::optional<std::vector<folly::dynamic>> metadata) {
+void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle, const Variants& variants, std::optional<std::vector<folly::dynamic>> metadata) {
     if (unistyle->type == core::UnistyleType::Object) {
         auto result = this->parseFirstLevel(rt, unistyle, variants);
 
