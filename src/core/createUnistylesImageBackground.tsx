@@ -16,7 +16,8 @@ export const createUnistylesImageBackground = (Component: typeof ImageBackground
             // @ts-expect-error web types are not compatible with RN styles
             UnistylesShadowRegistry.add(ref, style)
 
-            maybeWarnAboutMultipleUnistyles(props, 'ImageBackground')
+            // @ts-ignore we don't know the type of the component
+            maybeWarnAboutMultipleUnistyles(props.style, 'ImageBackground')
 
             return () => {
                 // @ts-expect-error hidden from TS

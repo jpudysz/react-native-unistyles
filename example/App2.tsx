@@ -1,5 +1,6 @@
-import { Text as RNText, View, ViewProps } from 'react-native'
-import React, { PropsWithChildren } from 'react'
+import { Button, ScrollView, Text as RNText, View, ViewProps } from 'react-native'
+import { withUnistyles } from 'react-native-unistyles'
+import React, { PropsWithChildren, useState } from 'react'
 import { st } from './st'
 import './unistyles'
 
@@ -32,19 +33,31 @@ const ComponentB: React.FunctionComponent<ViewProps>  = ({ style }) => {
     )
 }
 
+const UniScrollView = withUnistyles(ScrollView)
+
 export const App = () => {
+    const [counter, setCounter] = useState(0)
+
+    console.log(styles.container)
+
     return (
         <View style={styles.container}>
-            <Text value={1.1} size="small">
-                Hello world 1
-            </Text>
-            <Text value={1.5} size="small">
-                Hello world 2
-            </Text>
-            <Text value={1} size="large">
-                Hello world 3
-            </Text>
-            <ComponentA style={[{ borderWidth: 5 }, { borderColor: 'pink'}]} />
+            <UniScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollView}
+            >
+                <Text value={1.1} size="small">
+                    Hello world 1
+                </Text>
+                <Text value={1.5} size="small">
+                    Hello world 2
+                </Text>
+                <Text value={1} size="large">
+                    Hello world 3
+                </Text>
+                <ComponentA style={[{ borderWidth: 5 }, { borderColor: 'pink'}]} />
+                <Button title="Re-render" onPress={() => setCounter(counter + 1)} />
+            </UniScrollView>
         </View>
     )
 }
@@ -72,5 +85,8 @@ const styles = st.create((theme, rt) => ({
     }),
     bg1: {
         backgroundColor: 'red'
+    },
+    scrollView: {
+        backgroundColor: theme.colors.backgroundColor
     }
 }))

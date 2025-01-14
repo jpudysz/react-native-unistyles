@@ -5,6 +5,7 @@ import { deepMergeObjects } from '../../utils'
 import { SUPPORTED_STYLE_PROPS } from './types'
 import type { Mappings, SupportedStyleProps } from './types'
 import { useDependencies } from './useDependencies'
+import { maybeWarnAboutMultipleUnistyles } from '../warn'
 
 // @ts-expect-error
 type GenericComponentProps<P> = ComponentProps<P>
@@ -20,29 +21,7 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
     return forwardRef<GenericComponentRef<TComponent>, PropsWithUnistyles>((props, ref) => {
         const narrowedProps = props as PropsWithUnistyles
         const stylesRef = useRef<Record<string, any>>({})
-        const isForcedRef = useRef(false)
         const NativeComponent = Component as ComponentType
-
-        if (!isForcedRef.current) {
-            SUPPORTED_STYLE_PROPS.forEach(propName => {
-                if (narrowedProps?.[propName]) {
-                    if (Array.isArray(narrowedProps[propName])) {
-                        console.error(`🦄 Unistyles: withUnistyles requires ${propName} to be an object. Please check props for component: ${NativeComponent.displayName}`)
-                    }
-
-                    // @ts-expect-error - this is hidden from TS
-                    if (props[propName].__unistyles_name && !props[propName].__proto__?.getStyle) {
-                        console.error(`🦄 Unistyles: withUnistyles received style that is not bound. You likely used the spread operator on a Unistyle style. Please check props for component: ${NativeComponent.displayName}`)
-                    }
-
-                    stylesRef.current = {
-                        ...stylesRef.current,
-                        // @ts-expect-error - this is hidden from TS
-                        [propName]: props[propName].__proto__?.getStyle?.() || props[propName]
-                    }
-                }
-            })
-        }
 
         const { mappingsCallback, addDependencies } = useDependencies(({ dependencies, updateTheme, updateRuntime }) => {
             const listensToTheme = dependencies.includes(UnistyleDependency.Theme)
@@ -53,18 +32,6 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
                 }
 
                 if (changedDependencies.some((dependency: UnistyleDependency) => dependencies.includes(dependency))) {
-                    SUPPORTED_STYLE_PROPS.forEach(propName => {
-                        if (narrowedProps?.[propName]) {
-                            stylesRef.current = {
-                                ...stylesRef.current,
-                                // @ts-expect-error - this is hidden from TS
-                                [propName]: props[propName].__proto__?.getStyle?.() || props[propName]
-                            }
-
-                            isForcedRef.current = true
-                        }
-                    })
-
                     updateRuntime()
                 }
             })
@@ -73,10 +40,26 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         })
 
         useEffect(() => {
-            const styleDependencies = narrowedProps.style?.__proto__.uni__dependencies ?? [] as Array<UnistyleDependency>
-            const contentContainerStyleDependencies = narrowedProps.contentContainerStyle?.__proto__.uni__dependencies ?? [] as Array<UnistyleDependency>
+            // @ts-ignore
+            maybeWarnAboutMultipleUnistyles(narrowedProps.style, `withUnistyles(${Component.displayName ?? 'Unknown'})`)
+            // @ts-ignore
+            maybeWarnAboutMultipleUnistyles(narrowedProps.contentContainerStyle, `withUnistyles(${Component.displayName ?? 'Unknown'})`)
 
-            addDependencies([...styleDependencies, ...contentContainerStyleDependencies])
+            const unistylesStyleKey = Object
+                .keys(narrowedProps.style ?? {})
+                .find(key => key.startsWith('unistyles-'))
+            const unistylesContentContainerStyleKey = Object
+                .keys(narrowedProps.contentContainerStyle ?? {})
+                .find(key => key.startsWith('unistyles-'))
+
+            const maybeStyleDependencies: Array<UnistyleDependency> = unistylesStyleKey
+                ? narrowedProps.style?.[unistylesStyleKey].uni__dependencies
+                : []
+            const maybeContentContainerStyleDependencies: Array<UnistyleDependency> = unistylesContentContainerStyleKey
+                ? narrowedProps.contentContainerStyle?.[unistylesContentContainerStyleKey].uni__dependencies
+                : []
+
+            addDependencies([...maybeStyleDependencies, ...maybeContentContainerStyleDependencies])
         }, [narrowedProps.style, narrowedProps.contentContainerStyle])
 
         const mappingProps = mappings ? mappingsCallback(mappings) : {}
@@ -89,8 +72,6 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
                 finalProps[propName] = stylesRef.current[propName]
             }
         })
-
-        isForcedRef.current = false
 
         return <NativeComponent {...finalProps as TProps} ref={ref} />
     })
