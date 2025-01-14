@@ -82,7 +82,13 @@ inline static std::vector<Unistyle::Shared> unistylesFromNonExistentNativeState(
 
 You likely altered unistyle hash key and we're not able to recover C++ state attached to this node.)");
     }
-
+    
+    // someone merged unistyles, and will be warned in JS
+    // the best we can do is to return first unistyle
+    if (unistyles.size() > 1) {
+        return {unistyles.at(0)};
+    }
+    
     return unistyles;
 }
 
@@ -133,8 +139,8 @@ inline static jsi::Value objectFromUnistyle(jsi::Runtime& rt, std::shared_ptr<Hy
         helpers::defineHiddenProperty(rt, secrets, helpers::ARGUMENTS.c_str(), arguments.value());
     }
 
-    // todo do we need it?
-    // helpers::defineHiddenProperty(rt, secrets, helpers::STYLESHEET_VARIANTS.c_str(), helpers::variantsToValue(rt, variants));
+    // this is required for HybridShadowRegistry::link
+    helpers::defineHiddenProperty(rt, secrets, helpers::STYLESHEET_VARIANTS.c_str(), helpers::variantsToValue(rt, variants));
 
     // this is required for withUnistyles
     helpers::defineHiddenProperty(rt, secrets, helpers::STYLE_DEPENDENCIES.c_str(), helpers::dependenciesToJSIArray(rt, unistyle->dependencies));
