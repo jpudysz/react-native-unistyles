@@ -55,7 +55,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Run Release it Action
-        uses: codemask-labs/release-it@v1.1.1
+        uses: codemask-labs/release-it@v1.1.2
         with:
           git-user: 'Automation'
           git-email: 'automation@unistyl.es'
