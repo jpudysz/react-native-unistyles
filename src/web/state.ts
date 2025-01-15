@@ -10,6 +10,7 @@ import type { UnistylesServices } from './types'
 type UnistylesSettings = Partial<UnionToIntersection<Required<UnistylesConfig>['settings']>>
 
 export class UnistylesState {
+    isInitialized = false
     themes = new Map<string, UnistylesTheme>()
     cssThemes = new Map<string, UnistylesTheme>()
     themeName?: AppThemeName
@@ -32,6 +33,11 @@ export class UnistylesState {
     constructor(private services: UnistylesServices) {}
 
     init = (config: UnistylesConfig) => {
+        if (this.isInitialized) {
+            return
+        }
+
+        this.isInitialized = true
         this.initThemes(config.themes, config.settings?.CSSVars)
         this.initBreakpoints(config.breakpoints)
 
