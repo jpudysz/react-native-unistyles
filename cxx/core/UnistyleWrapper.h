@@ -134,6 +134,10 @@ inline static jsi::Value objectFromUnistyle(jsi::Runtime& rt, std::shared_ptr<Hy
 
     auto secrets = jsi::Object(rt);
 
+    auto parsedArguments = arguments.has_value()
+        ? helpers::parseDynamicFunctionArguments(rt, arguments.value())
+        : std::optional<std::vector<folly::dynamic>>{};
+    
     if (arguments.has_value()) {
         // this is required for HybridShadowRegistry::link
         helpers::defineHiddenProperty(rt, secrets, helpers::ARGUMENTS.c_str(), arguments.value());
@@ -144,6 +148,20 @@ inline static jsi::Value objectFromUnistyle(jsi::Runtime& rt, std::shared_ptr<Hy
 
     // this is required for withUnistyles
     helpers::defineHiddenProperty(rt, secrets, helpers::STYLE_DEPENDENCIES.c_str(), helpers::dependenciesToJSIArray(rt, unistyle->dependencies));
+    
+    // this is required for withUnistyles
+    auto hostFn = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forUtf8(rt, helpers::GET_STYLES.c_str()),
+        0,
+        [unistyle, unistylesRuntime, variants, parsedArguments](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count
+    ) {
+        parser::Parser(unistylesRuntime).rebuildUnistyle(rt, unistyle, variants, parsedArguments);
+
+        return jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
+    });
+    
+    helpers::defineHiddenProperty(rt, secrets, helpers::GET_STYLES.c_str(), std::move(hostFn));
 
     obj.setProperty(rt, unistyleID, secrets);
 
