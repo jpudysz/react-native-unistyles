@@ -1,5 +1,4 @@
 import type { UnistylesValues } from '../types';
-import { deepMergeObjects } from '../utils';
 import { UnistylesShadowRegistry } from '../web';
 
 export const getClassName = (unistyle: UnistylesValues | undefined | Array<UnistylesValues>) => {
@@ -7,11 +6,8 @@ export const getClassName = (unistyle: UnistylesValues | undefined | Array<Unist
         return undefined
     }
 
-    const style = Array.isArray(unistyle)
-        ? deepMergeObjects(...unistyle)
-        : unistyle
     // @ts-expect-error hidden from TS
-    const { hash, injectedClassName } = UnistylesShadowRegistry.addStyles(style)
+    const { hash, injectedClassName } = UnistylesShadowRegistry.addStyles(Array.isArray(unistyle) ? unistyle : [unistyle])
 
     return hash ? { $$css: true, hash, injectedClassName } : undefined
 }

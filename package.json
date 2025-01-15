@@ -84,26 +84,26 @@
     "@babel/plugin-syntax-jsx": "7.25.9",
     "@biomejs/biome": "1.9.4",
     "@commitlint/config-conventional": "19.6.0",
-    "@react-native/normalize-colors": "0.76.3",
+    "@react-native/normalize-colors": "0.76.6",
     "@release-it/conventional-changelog": "8.0.2",
     "@types/jest": "29.5.14",
     "@types/react": "18.3.12",
     "babel-plugin-tester": "11.0.4",
-    "commitlint": "19.6.0",
-    "concurrently": "9.1.0",
+    "commitlint": "19.6.1",
+    "concurrently": "9.1.2",
     "husky": "9.1.7",
     "jest": "29.7.0",
     "metro-react-native-babel-preset": "0.77.0",
-    "next": "15.1.1",
-    "nitro-codegen": "0.18.2",
+    "next": "15.1.4",
+    "nitro-codegen": "0.21.0",
     "react": "18.3.1",
-    "react-native": "0.76.3",
+    "react-native": "0.76.6",
     "react-native-builder-bob": "0.33.1",
-    "react-native-nitro-modules": "0.18.2",
+    "react-native-nitro-modules": "0.21.0",
     "react-native-web": "0.19.13",
     "react-test-renderer": "18.3.1",
     "release-it": "17.6.0",
-    "typescript": "5.7.2"
+    "typescript": "5.7.3"
   },
   "peerDependencies": {
     "@react-native/normalize-colors": "*",
@@ -114,7 +114,8 @@
   },
   "workspaces": [
     "example",
-    "docs"
+    "docs",
+    "expo-example"
   ],
   "packageManager": "yarn@3.6.1",
   "engines": {

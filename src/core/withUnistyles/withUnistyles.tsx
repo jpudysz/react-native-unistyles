@@ -2,11 +2,10 @@ import React, { type ComponentType, forwardRef, type ComponentProps, type Compon
 import type { PartialBy } from '../../types/common'
 import { deepMergeObjects } from '../../utils'
 import type { Mappings, SupportedStyleProps } from './types'
-import { useDependencies } from './useDependencies'
-import { UnistyleDependency } from '../../specs/NativePlatform'
 import type { UnistylesValues } from '../../types'
 import { getClassName } from '../getClassname'
-import { UnistylesWeb } from '../../web'
+import { maybeWarnAboutMultipleUnistyles } from '../warn'
+import { useProxifiedUnistyles } from '../useProxifiedUnistyles'
 
 // @ts-expect-error
 type GenericComponentProps<T> = ComponentProps<T>
@@ -25,17 +24,10 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         const narrowedProps = props as PropsWithUnistyles
         const styleClassNames = getClassName(narrowedProps.style)
         const contentContainerStyleClassNames = getClassName(narrowedProps.contentContainerStyle)
-        const { mappingsCallback } = useDependencies(({ dependencies, updateTheme, updateRuntime }) => {
-            const disposeTheme = UnistylesWeb.listener.addListeners(dependencies.filter(dependency => dependency === UnistyleDependency.Theme), updateTheme)
-            const disposeRuntime = UnistylesWeb.listener.addListeners(dependencies.filter(dependency => dependency !== UnistyleDependency.Theme), updateRuntime)
+        const { proxifiedRuntime, proxifiedTheme } = useProxifiedUnistyles()
 
-            return () => {
-                disposeTheme()
-                disposeRuntime()
-            }
-        })
-        const mappingsProps = mappings ? mappingsCallback(mappings) : {}
-        const unistyleProps = narrowedProps.uniProps ? mappingsCallback(narrowedProps.uniProps) : {}
+        const mappingsProps = mappings ? mappings(proxifiedTheme, proxifiedRuntime) : {}
+        const unistyleProps = narrowedProps.uniProps ? narrowedProps.uniProps(proxifiedTheme, proxifiedRuntime) : {}
 
         const combinedProps = {
             ...deepMergeObjects(mappingsProps, unistyleProps, props),
@@ -46,6 +38,11 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
                 style: contentContainerStyleClassNames,
             } : {},
         } as any
+
+        // @ts-ignore
+        maybeWarnAboutMultipleUnistyles(narrowedProps.style, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
+        // @ts-ignore
+        maybeWarnAboutMultipleUnistyles(narrowedProps.contentContainerStyle, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
 
         const NativeComponent = Component as ComponentType
 
