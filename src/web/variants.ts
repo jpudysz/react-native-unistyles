@@ -1,46 +1,42 @@
-import type { ReactNativeStyleSheet, StyleSheet } from '../types'
-import { deepMergeObjects, isDefined } from '../utils'
+import type { UnistylesValues } from '../types'
+import { deepMergeObjects } from '../utils'
+import { keyInObject } from './utils'
 
 type StylesWithVariants = {
-    variants: Record<string, any>,
-    compoundVariants?: Array<Record<string, any> & {
+    variants: Record<string, string | boolean | undefined>,
+    compoundVariants?: Array<Record<string, string | boolean | undefined> & {
         styles: Record<string, any>
     }>
 }
-const hasVariants = <T extends object>(value: [string, T]): value is [string, T & StylesWithVariants] => {
-    const [, styleValue] = value
-
-    return isDefined(styleValue) && 'variants' in styleValue
+const hasVariants = (value: any): value is StylesWithVariants => {
+    return keyInObject(value, 'variants')
 }
 
-export const getVariants = (styles: ReactNativeStyleSheet<StyleSheet>, selectedVariants: Record<string, any>) => {
-    return Object.entries(styles)
-        .filter(hasVariants)
-        .filter(([_key, { variants }]) => Object.keys(variants).some(variant => variant in variants))
-        .map(([key, { variants, compoundVariants = [] }]) => {
-            const variantStyles = Object.entries(variants).flatMap(([variant, styles]) => {
-                const selectedVariant = selectedVariants[variant]
-                const selectedVariantStyles = styles[selectedVariant] ?? styles.default
+export const getVariants = (styles: UnistylesValues, selectedVariants: Record<string, any>) => {
+    if (!hasVariants(styles)) {
+        return {}
+    }
 
-                if (!selectedVariantStyles) {
-                    return []
-                }
+    const variantStyles = Object.entries(styles.variants).flatMap(([variant, styles]) => {
+        const selectedVariant = selectedVariants[variant]
+        const selectedVariantStyles = styles[selectedVariant] ?? styles.default
 
-                return selectedVariantStyles
-            })
+        if (!selectedVariantStyles) {
+            return []
+        }
 
-            const compoundVariantStyles = compoundVariants.flatMap(compoundVariant => {
-                const { styles, ...conditions } = compoundVariant
+        return selectedVariantStyles
+    })
 
-                if (Object.entries(conditions).some(([variant, value]) => String(selectedVariants[variant]) !== String(value))) {
-                    return []
-                }
+    const compoundVariantStyles = styles.compoundVariants?.flatMap(compoundVariant => {
+        const { styles, ...conditions } = compoundVariant
 
-                return styles
-            })
+        if (Object.entries(conditions).some(([variant, value]) => String(selectedVariants[variant]) !== String(value))) {
+            return []
+        }
 
-            const mergedVariantStyles = deepMergeObjects(...variantStyles, ...compoundVariantStyles)
+        return styles
+    }) ?? []
 
-            return [key, mergedVariantStyles] as const
-        })
+    return deepMergeObjects(...variantStyles, ...compoundVariantStyles)
 }

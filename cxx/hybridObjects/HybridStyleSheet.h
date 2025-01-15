@@ -4,7 +4,7 @@
 #include <jsi/jsi.h>
 #include "HybridUnistylesRuntime.h"
 #include "HybridUnistylesStyleSheetSpec.hpp"
-#include "HostStyle.h"
+#include "RNStyle.h"
 #include "Helpers.h"
 #include "Constants.h"
 #include "Breakpoints.h"

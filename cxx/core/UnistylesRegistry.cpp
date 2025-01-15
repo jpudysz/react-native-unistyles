@@ -75,7 +75,7 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
 ) {
     shadow::ShadowLeafUpdates updates;
     auto parser = parser::Parser(nullptr);
-    
+
     std::for_each(unistylesData.begin(), unistylesData.end(), [this, &rt, shadowNodeFamily](std::shared_ptr<UnistyleData> unistyleData){
         this->_shadowRegistry[&rt][shadowNodeFamily].emplace_back(unistyleData);
     });
@@ -159,7 +159,7 @@ std::vector<std::shared_ptr<core::StyleSheet>> core::UnistylesRegistry::getStyle
                                       UnistyleDependency::THEME);
     auto themeDidChange = themeDidChangeIt != unistylesDependencies.end();
     auto runtimeDidChange = (themeDidChange && unistylesDependencies.size() > 1) || unistylesDependencies.size() > 0;
-    
+
     // if nothing changed, skip further lookup
     if (!themeDidChange && !runtimeDidChange) {
         return stylesheetsToRefresh;
@@ -173,7 +173,7 @@ std::vector<std::shared_ptr<core::StyleSheet>> core::UnistylesRegistry::getStyle
         if (styleSheet->type == StyleSheetType::ThemableWithMiniRuntime) {
             for (const auto& unistylePair: styleSheet->unistyles) {
                 auto& [_, unistyle] = unistylePair;
-                
+
                 bool hasAnyOfDependencies = std::any_of(
                     unistyle->dependencies.begin(),
                     unistyle->dependencies.end(),
@@ -181,10 +181,10 @@ std::vector<std::shared_ptr<core::StyleSheet>> core::UnistylesRegistry::getStyle
                         return std::find(unistylesDependencies.begin(), unistylesDependencies.end(), dep) != unistylesDependencies.end();
                     }
                 );
-                
+
                 if (hasAnyOfDependencies) {
                     stylesheetsToRefresh.emplace_back(styleSheet);
-                    
+
                     return;
                 }
             }
@@ -198,16 +198,24 @@ std::vector<std::shared_ptr<core::StyleSheet>> core::UnistylesRegistry::getStyle
     return stylesheetsToRefresh;
 }
 
-const core::Variants& core::UnistylesRegistry::getScopedVariants() {
-    return this->_scopedVariants;
+core::Unistyle::Shared core::UnistylesRegistry::getUnistyleById(jsi::Runtime& rt, std::string unistyleID) {
+    for (auto& pair: this->_styleSheetRegistry[&rt]) {
+        auto [_, stylesheet] = pair;
+        
+        for (auto unistylePair: stylesheet->unistyles) {
+            auto [_, unistyle] = unistylePair;
+            
+            if (unistyle->unid == unistyleID) {
+                return unistyle;
+            }
+        }
+    }
+    
+    return nullptr;
 }
 
 const std::optional<std::string> core::UnistylesRegistry::getScopedTheme() {
     return this->_scopedTheme;
-}
-
-void core::UnistylesRegistry::setScopedVariants(core::Variants&& variants) {
-    this->_scopedVariants = std::move(variants);
 }
 
 void core::UnistylesRegistry::setScopedTheme(std::optional<std::string> themeName) {

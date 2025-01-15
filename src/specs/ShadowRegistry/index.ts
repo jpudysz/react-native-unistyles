@@ -2,8 +2,6 @@ import { NitroModules } from 'react-native-nitro-modules'
 import type { UnistylesShadowRegistry as UnistylesShadowRegistrySpec } from './ShadowRegistry.nitro'
 import type { ShadowNode, Unistyle, ViewHandle } from './types'
 
-type Variants = Record<string, string | boolean | undefined>
-
 interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     // Babel API
     add(handle?: ViewHandle, styles?: Array<Unistyle>): void,
@@ -11,10 +9,8 @@ interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     // JSI
     link(node: ShadowNode, styles?: Array<Unistyle>): void,
     unlink(node: ShadowNode): void,
-    selectVariants(variants?: Variants): void,
     setScopedTheme(themeName?: string): void,
-    getScopedTheme(): string | undefined,
-    getVariants(): Record<string, string | boolean | undefined> | undefined,
+    getScopedTheme(): string | undefined
 }
 
 const HybridShadowRegistry = NitroModules.createHybridObject<ShadowRegistry>('UnistylesShadowRegistry')
@@ -36,16 +32,23 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
 
 HybridShadowRegistry.add = (handle, styles) => {
     // virtualized nodes can be null
-    if (!handle || !styles || !Array.isArray(styles)) {
+    if (!handle || !styles) {
         return
     }
 
-    // filter Reanimated styles and styles that are undefined
-    const filteredStyles = styles
-        .filter(style => !style?.initial?.updater)
-        .filter(Boolean)
+    const stylesArray = Array.isArray(styles)
+        ? styles.flat()
+        : [styles]
 
-    HybridShadowRegistry.link(findShadowNodeForHandle(handle), filteredStyles)
+    // filter Reanimated styles and styles that are undefined
+    const filteredStyles = stylesArray
+        .filter(style => !style?.initial?.updater)
+        .filter(style => style && Object.keys(style).length > 0)
+        .flat()
+
+    if (filteredStyles.length > 0) {
+        HybridShadowRegistry.link(findShadowNodeForHandle(handle), filteredStyles)
+    }
 }
 
 HybridShadowRegistry.remove = handle => {

@@ -1,92 +1,66 @@
-function isUsingVariants(t, path) {
-    const callee = path.get('callee')
-
-    return (
-        t.isMemberExpression(callee) &&
-        t.isIdentifier(callee.node.object, { name: 'styles' }) &&
-        t.isIdentifier(callee.node.property, { name: 'useVariants' }) &&
-        t.isObjectExpression(path.node.arguments[0])
-    )
-}
-
 function extractVariants(t, path, state) {
-    const arg = path.node.arguments[0]
+    const maybeVariants = path.node.body.filter(node => (
+        t.isExpressionStatement(node) &&
+        t.isCallExpression(node.expression) &&
+        t.isMemberExpression(node.expression.callee)
+    ))
 
-    const variantDeclaration = t.variableDeclaration('const', [
-        t.variableDeclarator(
-            t.identifier('__uni__variants'),
-            arg
+    if (maybeVariants.length === 0) {
+        return
+    }
+
+    const targetVariant = maybeVariants.find(variant => {
+        const calleeName = variant.expression.callee.object.name
+
+        return (
+            t.isIdentifier(variant.expression.callee.object, { name: calleeName }) &&
+            t.isIdentifier(variant.expression.callee.property, { name: 'useVariants' }) &&
+            t.isObjectExpression(variant.expression.arguments[0])
         )
+    })
+
+    if (!targetVariant) {
+        return
+    }
+
+    const calleeName = targetVariant.expression.callee.object.name
+    const node = targetVariant.expression
+    const newUniqueName = path.scope.generateUidIdentifier(calleeName)
+
+    // Create shadow declaration eg. const _styles = styles
+    const shadowDeclaration = t.variableDeclaration('const', [
+        t.variableDeclarator(newUniqueName, t.identifier(calleeName))
     ])
 
-    // Replace useVariants argument with __uni__variants
-    path.node.arguments[0] = t.identifier('__uni__variants')
+    // Create the new call expression eg. const styles = _styles.useVariants(...)
+    const newCallExpression = t.callExpression(
+        t.memberExpression(t.identifier(newUniqueName.name), t.identifier('useVariants')),
+        node.arguments
+    )
+    const finalDeclaration = t.variableDeclaration('const', [
+        t.variableDeclarator(t.identifier(calleeName), newCallExpression)
+    ])
 
-    path.insertBefore(variantDeclaration)
+    // Find the current node's index, we will move everything after to new block
+    const pathIndex = path.node.body
+        .findIndex(bodyPath => bodyPath === targetVariant)
+    const rest = path.node.body.slice(pathIndex + 1)
+
+    // move rest to new block (scope)
+    const blockStatement = t.blockStatement([
+        finalDeclaration,
+        ...rest
+    ])
+
+    path.node.body = [
+        ...path.node.body.slice(0, pathIndex),
+        shadowDeclaration,
+        blockStatement
+    ]
 
     state.file.hasVariants = true
 }
 
-function wrapVariants(t, path) {
-    const wrapperElement = t.jsxElement(
-        t.jsxOpeningElement(
-            t.jsxIdentifier('Variants'),
-            [
-                t.jsxAttribute(
-                    t.jsxIdentifier('variants'),
-                    t.jsxExpressionContainer(t.identifier('__uni__variants'))
-                ),
-            ],
-            false
-        ),
-        t.jsxClosingElement(t.jsxIdentifier('Variants')),
-        []
-    )
-
-    const element = path.openingElement && path.openingElement.name
-    const isWrappedInRegularFragment = t.isJSXFragment(path)
-    const isWrappedInFragment = (t.isJSXMemberExpression(element) && element.object.name === 'React' && element.property.name === 'Fragment') || (t.isJSXIdentifier(element) && element.name === 'Fragment')
-
-    wrapperElement.children = (isWrappedInRegularFragment || isWrappedInFragment)
-        ? path.children
-        : [path]
-
-    // copy Fragment props like key
-    if (isWrappedInFragment) {
-        wrapperElement.openingElement.attributes.push(...path.openingElement.attributes)
-    }
-
-    return wrapperElement
-}
-
-function addJSXVariants(t, path) {
-    if (!t.isReturnStatement(path.node)) {
-        return
-    }
-
-    const jsxElement = path.node.argument
-
-    if (t.isConditionalExpression(jsxElement)) {
-        const ifStatement = t.ifStatement(
-            jsxElement.test,
-            t.blockStatement([t.returnStatement(jsxElement.consequent)]),
-            t.blockStatement([t.returnStatement(jsxElement.alternate)])
-        )
-
-        path.replaceWith(ifStatement)
-
-        return
-    }
-
-    if (!t.isJSXElement(jsxElement) && !t.isJSXFragment(jsxElement)) {
-        return
-    }
-
-    path.get('argument').replaceWith(wrapVariants(t, jsxElement));
-}
-
 module.exports = {
-    isUsingVariants,
-    extractVariants,
-    addJSXVariants
+    extractVariants
 }

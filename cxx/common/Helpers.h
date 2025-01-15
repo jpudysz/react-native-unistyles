@@ -147,7 +147,7 @@ inline jsi::Object variantsToValue(jsi::Runtime& rt, Variants& variants) {
     return rawVariants;
 }
 
-inline std::vector<folly::dynamic> parseDynamicFunctionArguments(jsi::Runtime& rt, jsi::Array&& arguments) {
+inline std::vector<folly::dynamic> parseDynamicFunctionArguments(jsi::Runtime& rt, jsi::Array& arguments) {
     std::vector<folly::dynamic> parsedArgument{};
     size_t count = arguments.size(rt);
 
