@@ -114,7 +114,8 @@
   },
   "workspaces": [
     "example",
-    "docs"
+    "docs",
+    "expo-example"
   ],
   "packageManager": "yarn@3.6.1",
   "engines": {

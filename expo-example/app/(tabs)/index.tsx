@@ -1,5 +1,6 @@
+import { Link } from 'expo-router'
 import React from 'react'
-import { Text, View } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 
 export default function HomeScreen() {
@@ -13,6 +14,13 @@ export default function HomeScreen() {
                 <Text>
                     Hello world
                 </Text>
+                <Link href="/explore" asChild>
+                    <Pressable style={styles.button}>
+                        <Text>
+                            Explore
+                        </Text>
+                    </Pressable>
+                </Link>
             </View>
         </View>
     )
@@ -26,8 +34,7 @@ const styles = StyleSheet.create(theme => ({
         backgroundColor: theme.colors.backgroundColor
     },
     test: {
-        width: 100,
-        height: 100,
+        width: '100%',
         variants: {
             variant: {
                 red: {
@@ -38,5 +45,14 @@ const styles = StyleSheet.create(theme => ({
                 }
             }
         }
+    },
+    button: {
+        backgroundColor: theme.colors.aloes,
+        padding: 10,
+        borderRadius: 8,
+        height: 60,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%'
     }
 }))

@@ -42,6 +42,20 @@ function isUnistylesStyleSheet(t, path, state) {
     )
 }
 
+function isKindOfStyleSheet(t, path, state) {
+    if (!state.file.forceProcessing) {
+        return false
+    }
+
+    const callee = path.get('callee')
+
+    return (
+        t.isMemberExpression(callee.node) &&
+        callee.node.property.name === 'create' &&
+        t.isIdentifier(callee.node.object)
+    )
+}
+
 function addStyleSheetTag(t, path, state) {
     const callee = path.get('callee')
     const uniqueId = stringToUniqueId(state.filename.replace(state.cwd, '')) + ++state.file.tagNumber
@@ -208,5 +222,6 @@ module.exports = {
     isUnistylesStyleSheet,
     analyzeDependencies,
     addStyleSheetTag,
-    getUnistyles
+    getUnistyles,
+    isKindOfStyleSheet
 }

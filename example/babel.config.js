@@ -9,7 +9,8 @@ module.exports = api => {
         plugins: [
             [path.join(__dirname, '../plugin'), {
                 debug: true,
-                isLocal: true
+                isLocal: true,
+                autoProcessImports: ['@lib/theme', './st'],
             }],
             [
                 'module-resolver',
