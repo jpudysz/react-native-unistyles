@@ -1,10 +1,10 @@
 import React, { forwardRef, useEffect, type ComponentType } from 'react'
-import { StyleSheet, UnistyleDependency } from '../../specs'
+import type { UnistyleDependency } from '../../specs'
 import type { PartialBy } from '../../types/common'
 import { deepMergeObjects } from '../../utils'
 import type { Mappings, SupportedStyleProps } from './types'
-import { useDependencies } from './useDependencies'
 import { maybeWarnAboutMultipleUnistyles } from '../warn'
+import { useProxifiedUnistyles } from '../useProxifiedUnistyles'
 
 // @ts-expect-error
 type GenericComponentProps<P> = ComponentProps<P>
@@ -38,21 +38,7 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         // @ts-ignore we don't know the type of the component
         maybeWarnAboutMultipleUnistyles(narrowedProps.contentContainerStyle, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
 
-        const { mappingsCallback, addDependencies } = useDependencies(({ dependencies, updateTheme, updateRuntime }) => {
-            const listensToTheme = dependencies.includes(UnistyleDependency.Theme)
-            // @ts-expect-error - this is hidden from TS
-            const dispose = StyleSheet.addChangeListener(changedDependencies => {
-                if (listensToTheme && changedDependencies.includes(UnistyleDependency.Theme)) {
-                    updateTheme()
-                }
-
-                if (changedDependencies.some((dependency: UnistyleDependency) => dependencies.includes(dependency))) {
-                    updateRuntime()
-                }
-            })
-
-            return () => dispose()
-        })
+        const { proxifiedRuntime, proxifiedTheme, addDependencies } = useProxifiedUnistyles()
 
         useEffect(() => {
             const styleSecrets = getSecrets(narrowedProps.style)
@@ -61,8 +47,8 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
             addDependencies(Array.from(new Set([...styleSecrets.uni__dependencies, ...contentContainerStyleSecrets.uni__dependencies])))
         }, [narrowedProps.style, narrowedProps.contentContainerStyle])
 
-        const mappingsProps = mappings ? mappingsCallback(mappings) : {}
-        const unistyleProps = narrowedProps.uniProps ? mappingsCallback(narrowedProps.uniProps) : {}
+        const mappingsProps = mappings ? mappings(proxifiedTheme, proxifiedRuntime) : {}
+        const unistyleProps = narrowedProps.uniProps ? narrowedProps.uniProps(proxifiedTheme, proxifiedRuntime) : {}
 
         const styleSecrets = getSecrets(narrowedProps.style)
         const contentContainerStyleSecrets = getSecrets(narrowedProps.contentContainerStyle)
