@@ -33,6 +33,11 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         const narrowedProps = props as PropsWithUnistyles
         const NativeComponent = Component as ComponentType
 
+        // @ts-ignore we don't know the type of the component
+        maybeWarnAboutMultipleUnistyles(narrowedProps.style, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
+        // @ts-ignore we don't know the type of the component
+        maybeWarnAboutMultipleUnistyles(narrowedProps.contentContainerStyle, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
+
         const { mappingsCallback, addDependencies } = useDependencies(({ dependencies, updateTheme, updateRuntime }) => {
             const listensToTheme = dependencies.includes(UnistyleDependency.Theme)
             // @ts-expect-error - this is hidden from TS
@@ -50,11 +55,6 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         })
 
         useEffect(() => {
-            // @ts-ignore
-            maybeWarnAboutMultipleUnistyles(narrowedProps.style, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
-            // @ts-ignore
-            maybeWarnAboutMultipleUnistyles(narrowedProps.contentContainerStyle, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
-
             const styleSecrets = getSecrets(narrowedProps.style)
             const contentContainerStyleSecrets = getSecrets(narrowedProps.contentContainerStyle)
 
