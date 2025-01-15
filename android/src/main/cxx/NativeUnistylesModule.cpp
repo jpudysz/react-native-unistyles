@@ -35,7 +35,7 @@ void UnistylesModule::registerNatives() {
 jni::local_ref<BindingsInstallerHolder::javaobject> UnistylesModule::getBindingsInstaller(jni::alias_ref<UnistylesModule::javaobject> jobj) {
     auto& runtimeExecutor = jobj->cthis()->_runtimeExecutor;
     auto& uiManager = jobj->cthis()->_uiManager;
-    auto& nativePlatform = *jobj->cthis()->_nativePlatform;
+    auto& nativePlatform = jobj->cthis()->_nativePlatform;
 
     return BindingsInstallerHolder::newObjectCxxArgs([&runtimeExecutor, uiManager, nativePlatform](jsi::Runtime& rt) {
         // function is called on: first init and every live reload

@@ -43,7 +43,8 @@ __weak RCTSurfacePresenter* _surfacePresenter;
             objcCallback(rt);
         }];
     });
-    auto nativePlatform = Unistyles::NativePlatform::create();
+
+    auto nativePlatform = Unistyles::NativePlatform::create().getCxxPart();
     auto unistylesRuntime = std::make_shared<HybridUnistylesRuntime>(nativePlatform, rt, runOnJSThread);
     auto uiManager = [_surfacePresenter scheduler].uiManager;
     auto styleSheet = std::make_shared<HybridStyleSheet>(unistylesRuntime, uiManager);
