@@ -51,9 +51,9 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
 
         useEffect(() => {
             // @ts-ignore
-            maybeWarnAboutMultipleUnistyles(narrowedProps.style, `withUnistyles(${Component.displayName ?? 'Unknown'})`)
+            maybeWarnAboutMultipleUnistyles(narrowedProps.style, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
             // @ts-ignore
-            maybeWarnAboutMultipleUnistyles(narrowedProps.contentContainerStyle, `withUnistyles(${Component.displayName ?? 'Unknown'})`)
+            maybeWarnAboutMultipleUnistyles(narrowedProps.contentContainerStyle, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
 
             const styleSecrets = getSecrets(narrowedProps.style)
             const contentContainerStyleSecrets = getSecrets(narrowedProps.contentContainerStyle)
