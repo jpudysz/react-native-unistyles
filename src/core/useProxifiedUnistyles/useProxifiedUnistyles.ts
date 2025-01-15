@@ -3,7 +3,7 @@ import { UnistylesRuntime, UnistylesShadowRegistry, type UnistylesMiniRuntime } 
 // It's imported that way because of circular dependency
 import { UnistyleDependency } from '../../specs/NativePlatform'
 import type { UnistylesTheme } from '../../types'
-import type { Mappings } from './types'
+import { listener } from './listener'
 
 const getMiniRuntime = (): UnistylesMiniRuntime => {
     // @ts-expect-error This is hidden from TS
@@ -26,13 +26,7 @@ const RTDependencyMap = {
     themeName: UnistyleDependency.ThemeName,
 } satisfies Partial<Record<keyof UnistylesMiniRuntime, UnistyleDependency>>
 
-type ListenerProps = {
-    updateTheme: VoidFunction,
-    updateRuntime: VoidFunction,
-    dependencies: Array<UnistyleDependency>
-}
-
-export const useDependencies = (listener: (props: ListenerProps) => VoidFunction) => {
+export const useProxifiedUnistyles = () => {
     const scopedTheme = UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme
     const [dependencies] = useState(() => new Set<number>())
     const [theme, setTheme] = useState(UnistylesRuntime.getTheme(scopedTheme))
@@ -60,27 +54,26 @@ export const useDependencies = (listener: (props: ListenerProps) => VoidFunction
         return () => disposeRef.current?.()
     }, [dependencies.size])
 
+    const proxifiedTheme = new Proxy(theme, {
+        get: (target, prop) => {
+            dependencies.add(UnistyleDependency.Theme)
+
+            return target[prop]
+        }
+    })
+    const proxifiedRuntime = new Proxy(getMiniRuntime(), {
+        get: (target, prop) => {
+            if (prop in RTDependencyMap) {
+                dependencies.add(RTDependencyMap[prop as keyof typeof RTDependencyMap])
+            }
+
+            return target[prop as keyof typeof target]
+        }
+    })
+
     return {
-        mappingsCallback: (callback: Mappings) => {
-            const proxifiedTheme = new Proxy(theme, {
-                get: (target, prop) => {
-                    dependencies.add(UnistyleDependency.Theme)
-
-                    return target[prop]
-                }
-            })
-            const proxifiedRuntime = new Proxy(getMiniRuntime(), {
-                get: (target, prop) => {
-                    if (prop in RTDependencyMap) {
-                        dependencies.add(RTDependencyMap[prop as keyof typeof RTDependencyMap])
-                    }
-
-                    return target[prop as keyof typeof target]
-                }
-            })
-
-            return callback(proxifiedTheme, proxifiedRuntime)
-        },
+        proxifiedTheme,
+        proxifiedRuntime,
         addDependencies: (newDependencies: Array<UnistyleDependency>) => {
             const dependenciesSize = dependencies.size
 
