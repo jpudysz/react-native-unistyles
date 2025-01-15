@@ -51,6 +51,20 @@ jsi::Function HostUnistyle::createAddVariantsProxyFunction(jsi::Runtime& rt) {
 
         Variants variants = helpers::variantsToPairs(rt, arguments[0].asObject(rt));
         
+        helpers::enumerateJSIObject(rt, thisVal.asObject(rt), [this, &parser, &rt, &variants](const std::string& name, jsi::Value& value){
+            auto unistyle = this->_stylesheet->unistyles[name];
+            
+            if (unistyle == nullptr) {
+                return;
+            }
+            
+            if (unistyle->dependsOn(UnistyleDependency::VARIANTS)) {
+                parser.rebuildUnistyle(rt, unistyle, variants, std::nullopt);
+            }
+        });
+        
+        this->_variants = variants;
+        
         auto style = std::make_shared<core::HostUnistyle>(this->_stylesheet, this->_unistylesRuntime, variants);
         auto styleHostObject = jsi::Object::createFromHostObject(rt, style);
         
