@@ -19,6 +19,8 @@ export const createUnistylesImageBackground = (Component: typeof ImageBackground
 
     // @ts-expect-error we don't know the type of the component
     maybeWarnAboutMultipleUnistyles(props.style, 'ImageBackground')
+    // @ts-ignore we don't know the type of the component
+    maybeWarnAboutMultipleUnistyles(props.imageStyle, 'ImageBackground')
 
     return (
         <Component

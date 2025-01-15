@@ -52,11 +52,11 @@ jsi::Function HostUnistyle::createAddVariantsProxyFunction(jsi::Runtime& rt) {
         Variants variants = helpers::variantsToPairs(rt, arguments[0].asObject(rt));
         
         helpers::enumerateJSIObject(rt, thisVal.asObject(rt), [this, &parser, &rt, &variants](const std::string& name, jsi::Value& value){
-            auto unistyle = this->_stylesheet->unistyles[name];
-            
-            if (unistyle == nullptr) {
+            if (name == helpers::ADD_VARIANTS_FN || !this->_stylesheet->unistyles.contains(name)) {
                 return;
             }
+
+            auto unistyle = this->_stylesheet->unistyles[name];
             
             if (unistyle->dependsOn(UnistyleDependency::VARIANTS)) {
                 parser.rebuildUnistyle(rt, unistyle, variants, std::nullopt);
