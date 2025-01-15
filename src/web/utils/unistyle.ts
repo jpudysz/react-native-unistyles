@@ -26,8 +26,14 @@ export type UnistyleSecrets = {
 export const assignSecrets = <T>(object: T, secrets: UnistyleSecrets) => {
     const secretsId = Math.random().toString(36).slice(8)
 
-    // @ts-expect-error - assign secrets to object
-    object[`unistyles-${secretsId}`] = secrets
+    // @ts-expect-error assign hidden secrets
+    object[`unistyles-${secretsId}`] = {}
+    // @ts-expect-error assign hidden secrets
+    Object.defineProperties(object[`unistyles-${secretsId}`], reduceObject(secrets, secret => ({
+        value: secret,
+        enumerable: false,
+        configurable: true
+    })))
 
     return object
 }
@@ -39,7 +45,11 @@ export const extractSecrets = (object: any) => {
 
     const [, secrets] = Object.entries(object).find(([key]) => key.startsWith('unistyles-')) ?? []
 
-    return secrets as UnistyleSecrets
+    if (!secrets) {
+        return undefined
+    }
+
+    return reduceObject(Object.getOwnPropertyDescriptors(secrets), secret => secret.value)
 }
 
 export const removeInlineStyles = (values: UnistylesValues) => {
