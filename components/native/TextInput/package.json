@@ -1,4 +1,5 @@
 {
   "main": "../../../lib/commonjs/components/native/TextInput.js",
-  "module": "../../../lib/module/components/native/TextInput.js"
+  "module": "../../../lib/module/components/native/TextInput.js",
+  "react-native": "../../../src/components/native/TextInput.tsx"
 }
