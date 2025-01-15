@@ -10,10 +10,15 @@ export const createUnistylesImageBackground = (Component: typeof ImageBackground
 
     useEffect(() => {
         return () => {
-            // @ts-ignore
-            UnistylesShadowRegistry.remove(storedRef.current)
-            // @ts-ignore
-            UnistylesShadowRegistry.remove(storedImageRef.current)
+            if (storedRef.current) {
+                // @ts-ignore
+                UnistylesShadowRegistry.remove(storedRef.current)
+            }
+
+            if (!storedImageRef.current) {
+                // @ts-ignore
+                UnistylesShadowRegistry.remove(storedImageRef.current)
+            }
         }
     }, [])
 
@@ -24,17 +29,23 @@ export const createUnistylesImageBackground = (Component: typeof ImageBackground
         <Component
             {...props}
             ref={ref => {
-                storedRef.current = ref
+                if (ref) {
+                    storedRef.current = ref
+                }
+
                 passForwardedRef(props, ref, forwardedRef)
             }}
             imageRef={ref => {
+                if (ref) {
+                    storedImageRef.current = ref
+                }
+
                 const style = Array.isArray(props.imageStyle)
                     ? props.imageStyle
                     : [props.imageStyle]
 
                 // @ts-expect-error web types are not compatible with RN styles
                 UnistylesShadowRegistry.add(ref, style)
-                storedImageRef.current = ref
             }}
         />
     )
