@@ -5,13 +5,13 @@ enum PlatformError: Error {
 }
 
 public class NativePlatform {
-    public static func create() -> HybridNativePlatformSpecCxx {
+    public static func create() -> HybridNativePlatformSpec_cxx {
         #if os(iOS)
         let nativePlatform = NativeIOSPlatform()
         #else
         throw PlatformError.UnsupportedPlatform
         #endif
 
-        return HybridNativePlatformSpecCxx(nativePlatform)
+        return HybridNativePlatformSpec_cxx(nativePlatform);
     }
 }
