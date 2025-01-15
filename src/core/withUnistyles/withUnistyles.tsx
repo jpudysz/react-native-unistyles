@@ -7,6 +7,7 @@ import { UnistyleDependency } from '../../specs/NativePlatform'
 import type { UnistylesValues } from '../../types'
 import { getClassName } from '../getClassname'
 import { UnistylesWeb } from '../../web'
+import { maybeWarnAboutMultipleUnistyles } from '../warn'
 
 // @ts-expect-error
 type GenericComponentProps<T> = ComponentProps<T>
@@ -46,6 +47,11 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
                 style: contentContainerStyleClassNames,
             } : {},
         } as any
+
+        // @ts-ignore
+        maybeWarnAboutMultipleUnistyles(narrowedProps.style, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
+        // @ts-ignore
+        maybeWarnAboutMultipleUnistyles(narrowedProps.contentContainerStyle, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
 
         const NativeComponent = Component as ComponentType
 

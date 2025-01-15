@@ -14,7 +14,6 @@ export class UnistylesShadowRegistry {
     dispose = () => {}
     // END MOCKS
 
-    private selectedVariants = new Map<string, string | boolean | undefined>()
     private scopedTheme: UnistylesTheme | undefined = undefined
     private disposeMap = new Map<string, VoidFunction>()
 
@@ -28,35 +27,38 @@ export class UnistylesShadowRegistry {
         this.services.registry.connect(ref, hash)
     }
 
-    addStyles = (unistyle: UnistylesValues) => {
+    addStyles = (unistyles: Array<UnistylesValues>) => {
         const getParsedStyles = () => {
-            const secrets = extractSecrets(unistyle)
+            const allStyles = unistyles.map(unistyle => {
+                const secrets = extractSecrets(unistyle)
 
-            // Regular style
-            if (!secrets) {
-                return unistyle
-            }
+                // Regular style
+                if (!secrets) {
+                    return unistyle
+                }
 
-            const { __uni__key, __uni__stylesheet, __uni__args = [] } = secrets
-            const newComputedStylesheet = this.services.registry.getComputedStylesheet(__uni__stylesheet, scopedTheme)
-            const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
-            const result = typeof style === 'function'
-                ? style(...__uni__args)
-                : style
-            const { variantsResult } = Object.fromEntries(getVariants({ variantsResult: result }, variants))
-            const resultWithVariants = deepMergeObjects(result, variantsResult ?? {})
-            const dependencies = extractUnistyleDependencies(resultWithVariants)
+                const { __uni__key, __uni__stylesheet, __uni__args = [], __uni_variants: variants } = secrets
+                const newComputedStylesheet = this.services.registry.getComputedStylesheet(__uni__stylesheet, scopedTheme)
+                const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
+                const result = typeof style === 'function'
+                    ? style(...__uni__args)
+                    : style
+                const variantsResult = getVariants(result, variants)
+                const resultWithVariants = deepMergeObjects(result, variantsResult)
+                const dependencies = extractUnistyleDependencies(resultWithVariants)
 
-            if (typeof __uni__stylesheet === 'function') {
-                // Add dependencies from dynamic styles to stylesheet
-                this.services.registry.addDependenciesToStylesheet(__uni__stylesheet, dependencies)
-            }
+                if (typeof __uni__stylesheet === 'function') {
+                    // Add dependencies from dynamic styles to stylesheet
+                    this.services.registry.addDependenciesToStylesheet(__uni__stylesheet, dependencies)
+                }
 
-            return resultWithVariants as UnistylesValues
+                return resultWithVariants as UnistylesValues
+            })
+
+            return deepMergeObjects(...allStyles)
         }
 
         // Copy scoped theme to not use referenced value
-        const variants = this.getVariants()
         const scopedTheme = this.scopedTheme
         const parsedStyles = getParsedStyles()
         const { hash, existingHash } = this.services.registry.add(parsedStyles)
@@ -76,25 +78,11 @@ export class UnistylesShadowRegistry {
         return { injectedClassName, hash }
     }
 
-    selectVariants = (variants?: Record<string, string | boolean | undefined>) => {
-        if (!variants) {
-            this.selectedVariants.clear()
-
-            return
-        }
-
-        Object.entries(variants).forEach(([key, value]) => {
-            this.selectedVariants.set(key, value)
-        })
-    }
-
     setScopedTheme = (theme?: UnistylesTheme) => {
         this.scopedTheme = theme
     }
 
     getScopedTheme = () => this.scopedTheme
-
-    getVariants = () => Object.fromEntries(this.selectedVariants.entries())
 
     remove = (ref: any, hash?: string) => {
         if (!(ref instanceof HTMLElement) || !hash) {

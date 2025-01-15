@@ -18,6 +18,7 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
 
         if (styleValue.isFunction(rt)) {
             styleSheet->unistyles[styleKey] = std::make_shared<UnistyleDynamicFunction>(
+                helpers::HashGenerator::generateHash(styleKey),
                 UnistyleType::DynamicFunction,
                 styleKey,
                 styleValue,
@@ -28,6 +29,7 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
         }
 
         styleSheet->unistyles[styleKey] = std::make_shared<Unistyle>(
+            helpers::HashGenerator::generateHash(styleKey),
             UnistyleType::Object,
             styleKey,
             styleValue,
@@ -301,7 +303,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
                 );
             } else {
                 unistyle->rawValue = parsedStyleSheetsWithDefaultTheme[unistyleStyleSheet].asObject(rt).getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
-                this->rebuildUnistyle(rt, unistyleStyleSheet, unistyle, unistyleData->variants, unistyleData->dynamicFunctionMetadata);
+                this->rebuildUnistyle(rt, unistyle, unistyleData->variants, unistyleData->dynamicFunctionMetadata);
                 unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
             }
 
@@ -323,7 +325,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
 }
 
 // rebuild single unistyle
-void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, Unistyle::Shared unistyle, const Variants& variants, std::optional<std::vector<folly::dynamic>> metadata) {
+void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle, const Variants& variants, std::optional<std::vector<folly::dynamic>> metadata) {
     if (unistyle->type == core::UnistyleType::Object) {
         auto result = this->parseFirstLevel(rt, unistyle, variants);
 
@@ -508,36 +510,22 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
 
             // memoize metadata to call it later
             auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyle);
-            auto& registry = core::UnistylesRegistry::get();
 
             unistyleFn->unprocessedValue = jsi::Value(rt, result).asObject(rt);
 
-            jsi::Value rawVariants = thisObject.hasProperty(rt, helpers::STYLE_VARIANTS.c_str())
-                ? thisObject.getProperty(rt, helpers::STYLE_VARIANTS.c_str())
-                : jsi::Value::undefined();
-            std::optional<Variants> variants = rawVariants.isUndefined()
-                ? registry.getScopedVariants()
-                : std::optional<Variants>(helpers::variantsToPairs(rt, rawVariants.asObject(rt)));
+            jsi::Value rawVariants = thisObject.hasProperty(rt, helpers::STYLESHEET_VARIANTS.c_str())
+                ? thisObject.getProperty(rt, helpers::STYLESHEET_VARIANTS.c_str())
+                : jsi::Object(rt);
+
+            Variants variants = helpers::variantsToPairs(rt, rawVariants.asObject(rt));
 
             unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
             unistyleFn->seal();
 
-            jsi::Object style = jsi::Value(rt, unistyleFn->parsedStyle.value()).asObject(rt);
+            // for compatibility purpose save last arguments to style instance. It will work ok, if user sees warning about multiple unistyles
+            helpers::defineHiddenProperty(rt, thisObject, helpers::ARGUMENTS.c_str() + std::string("_") + unistyleFn->styleKey, helpers::functionArgumentsToArray(rt, args, count));
 
-            // include dependencies for createUnistylesComponent
-            style.setProperty(rt, "__proto__", generateUnistylesPrototype(rt, unistylesRuntime, unistyle, variants, helpers::functionArgumentsToArray(rt, args, count)));
-
-            jsi::Object secrets = jsi::Object(rt);
-
-            secrets.setProperty(rt, helpers::ARGUMENTS.c_str(), helpers::functionArgumentsToArray(rt, args, count));
-
-            helpers::defineHiddenProperty(rt, style, helpers::SECRETS.c_str(), secrets);
-
-            auto wrappedUnistyle = std::make_shared<UnistyleWrapper>(unistyle);
-
-            style.setNativeState(rt, std::move(wrappedUnistyle));
-
-            return style;
+            return core::objectFromUnistyle(rt, unistylesRuntime, unistyle, variants, std::make_optional<jsi::Array>(helpers::functionArgumentsToArray(rt, args, count))).asObject(rt);
     });
 }
 
