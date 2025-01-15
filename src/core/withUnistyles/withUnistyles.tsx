@@ -1,4 +1,4 @@
-import React, { type ComponentType, forwardRef, type ComponentProps, type ComponentRef, useEffect } from 'react'
+import React, { type ComponentType, forwardRef, type ComponentProps, type ComponentRef } from 'react'
 import type { PartialBy } from '../../types/common'
 import { deepMergeObjects } from '../../utils'
 import type { Mappings, SupportedStyleProps } from './types'
@@ -48,12 +48,10 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
             } : {},
         } as any
 
-        useEffect(() => {
-            // @ts-ignore
-            maybeWarnAboutMultipleUnistyles(narrowedProps.style, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
-            // @ts-ignore
-            maybeWarnAboutMultipleUnistyles(narrowedProps.contentContainerStyle, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
-        }, [narrowedProps.style, narrowedProps.contentContainerStyle])
+        // @ts-ignore
+        maybeWarnAboutMultipleUnistyles(narrowedProps.style, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
+        // @ts-ignore
+        maybeWarnAboutMultipleUnistyles(narrowedProps.contentContainerStyle, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
 
         const NativeComponent = Component as ComponentType
 
