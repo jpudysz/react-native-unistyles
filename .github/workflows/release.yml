@@ -1,0 +1,66 @@
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      release-branch:
+        type: choice
+        description: To which channel you want to release
+        default: main
+        options:
+          - main
+          - beta
+          - rc
+      dry-run:
+        type: boolean
+        description: 'Dry run'
+        required: true
+        default: true
+      no-npm:
+        type: boolean
+        description: 'Skip push to npm'
+        required: true
+        default: false
+      manual-version:
+        type: string
+        description: 'Manual version'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    env:
+      HUSKY: 0
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build package
+        run: yarn prepare
+
+      - name: Init NPM configuration
+        run: npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Run Release it Action
+        uses: codemask-labs/release-it@v1.1.1
+        with:
+          git-user: 'Automation'
+          git-email: 'automation@unistyl.es'
+          git-token: '${{ secrets.GITHUB_TOKEN }}'
+          release-branch: ${{ inputs.release-branch }}
+          dry-run: ${{ inputs.dry-run }}
+          no-npm: ${{ inputs.no-npm }}
+          manual-version: ${{ inputs.manual-version }}
