@@ -1,4 +1,5 @@
 {
   "main": "../../../lib/commonjs/components/native/ImageBackground.js",
-  "module": "../../../lib/module/components/native/ImageBackground.js"
+  "module": "../../../lib/module/components/native/ImageBackground.js",
+  "react-native": "../../../src/components/native/ImageBackground.native.tsx"
 }

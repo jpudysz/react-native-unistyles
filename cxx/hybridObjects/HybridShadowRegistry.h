@@ -20,19 +20,11 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
                             const jsi::Value& thisValue,
                             const jsi::Value* args,
                             size_t count);
-    jsi::Value selectVariants(jsi::Runtime& rt,
-                            const jsi::Value& thisValue,
-                            const jsi::Value* args,
-                            size_t count);
     jsi::Value setScopedTheme(jsi::Runtime& rt,
                             const jsi::Value& thisValue,
                             const jsi::Value* args,
                             size_t count);
     jsi::Value getScopedTheme(jsi::Runtime& rt,
-                            const jsi::Value& thisValue,
-                            const jsi::Value* args,
-                            size_t count);
-    jsi::Value getVariants(jsi::Runtime& rt,
                             const jsi::Value& thisValue,
                             const jsi::Value* args,
                             size_t count);
@@ -43,10 +35,8 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
         registerHybrids(this, [](Prototype& prototype) {
             prototype.registerRawHybridMethod("link", 2, &HybridShadowRegistry::link);
             prototype.registerRawHybridMethod("unlink", 1, &HybridShadowRegistry::unlink);
-            prototype.registerRawHybridMethod("selectVariants", 1, &HybridShadowRegistry::selectVariants);
             prototype.registerRawHybridMethod("setScopedTheme", 1, &HybridShadowRegistry::setScopedTheme);
             prototype.registerRawHybridMethod("getScopedTheme", 0, &HybridShadowRegistry::getScopedTheme);
-            prototype.registerRawHybridMethod("getVariants", 0, &HybridShadowRegistry::getVariants);
         });
     };
 

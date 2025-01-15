@@ -1,8 +1,7 @@
 const { addUnistylesImport, isInsideNodeModules } = require('./import')
-const { getStyleMetadata, getStyleAttribute, styleAttributeToArray, handlePressable } = require('./style')
 const { hasStringRef } = require('./ref')
-const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyles } = require('./stylesheet')
-const { isUsingVariants, extractVariants, addJSXVariants } = require('./variants')
+const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyles, isKindOfStyleSheet } = require('./stylesheet')
+const { extractVariants } = require('./variants')
 
 const reactNativeComponentNames = [
     'ActivityIndicator',
@@ -20,12 +19,16 @@ const reactNativeComponentNames = [
     'RefreshControl',
     'TouchableHighlight',
     'TouchableOpacity',
-    'VirtualizedList'
+    'VirtualizedList',
+    // Modal - there is no exposed native handle
+    // TouchableWithoutFeedback - can't accept a ref
 ]
 
-// Modal - there is no exposed native handle
-// TouchableWithoutFeedback - can't accept a ref
-
+// options
+// { debug: boolean, isLocal: boolean, autoProcessImports: Array<string> }
+// debug - logs found dependencies in every StyleSheet
+// isLocal - only applicable for Unistyles monorepo for path resolution, don't use it!
+// autoProcessImports - list of imports that should trigger unistyles babel plugin
 module.exports = function ({ types: t }) {
     return {
         name: 'babel-react-native-unistyles',
@@ -37,21 +40,27 @@ module.exports = function ({ types: t }) {
                     }
 
                     state.file.hasAnyUnistyle = false
-                    state.file.hasUnistylesImport = false
-                    state.file.shouldIncludePressable = false
                     state.file.hasVariants = false
                     state.file.styleSheetLocalName = ''
                     state.file.tagNumber = 0
-                    state.file.isClassComponent = false
                     state.reactNativeImports = {}
+                    state.file.forceProcessing = false
                 },
                 exit(path, state) {
+                    if (isInsideNodeModules(state)) {
+                        return
+                    }
+
                     if (state.file.hasAnyUnistyle || state.file.hasVariants) {
                         addUnistylesImport(t, path, state)
                     }
                 }
             },
             FunctionDeclaration(path, state) {
+                if (isInsideNodeModules(state)) {
+                    return
+                }
+
                 const componentName = path.node.id
                     ? path.node.id.name
                     : null
@@ -61,13 +70,16 @@ module.exports = function ({ types: t }) {
                 }
             },
             ClassDeclaration(path, state) {
+                if (isInsideNodeModules(state)) {
+                    return
+                }
+
                 const componentName = path.node.id
                     ? path.node.id.name
                     : null
 
                 if (componentName) {
                     state.file.hasVariants = false
-                    state.file.isClassComponent = true
                 }
             },
             VariableDeclaration(path, state) {
@@ -95,8 +107,6 @@ module.exports = function ({ types: t }) {
                 const importSource = path.node.source.value
 
                 if (importSource.includes('react-native-unistyles')) {
-                    state.file.hasUnistylesImport = true
-
                     path.node.specifiers.forEach(specifier => {
                         if (specifier.imported && specifier.imported.name === 'StyleSheet') {
                             state.file.styleSheetLocalName = specifier.local.name
@@ -106,18 +116,14 @@ module.exports = function ({ types: t }) {
 
                 if (importSource.includes('react-native')) {
                     path.node.specifiers.forEach(specifier => {
-                        if (specifier.imported && specifier.imported.name === 'Pressable' && specifier.local.name !== 'NativePressableReactNative') {
-                            state.file.shouldIncludePressable = true
-                        }
-
                         if (specifier.imported && reactNativeComponentNames.includes(specifier.imported.name)) {
                             state.reactNativeImports[specifier.local.name] = specifier.imported.name
                         }
                     })
                 }
 
-                if (importSource.includes('react-native-web/dist/exports/Pressable')) {
-                    state.file.shouldIncludePressable = true
+                if (!state.file.forceProcessing && Array.isArray(state.opts.autoProcessImports)) {
+                    state.file.forceProcessing = state.opts.autoProcessImports.includes(importSource)
                 }
             },
             JSXElement(path, state) {
@@ -125,62 +131,27 @@ module.exports = function ({ types: t }) {
                     return
                 }
 
-                if (state.file.isClassComponent) {
-                    return
-                }
-
-                const openingElement = path.node.openingElement
-                const openingElementName = openingElement.name.name
-                const isReactNativeComponent = Boolean(state.reactNativeImports[openingElementName])
-                const isAnimatedComponent = (
-                    !isReactNativeComponent &&
-                    openingElement.name.object &&
-                    openingElement.name.object.name === 'Animated'
-                )
-
-                if (!isReactNativeComponent && !isAnimatedComponent) {
-                    return
-                }
-
-                const styleAttr = getStyleAttribute(t, path)
-
-                // component has no style prop
-                if (!styleAttr) {
-                    return
-                }
-
-                const metadata = getStyleMetadata(t, styleAttr.value.expression, null, state)
-
-                if (openingElementName === 'Pressable') {
-                    return handlePressable(t, path, styleAttr, metadata, state)
-                }
-
-                // style prop is using unexpected expression
-                if (metadata.length === 0) {
-                    return
-                }
-
-                styleAttributeToArray(t, path)
-
-                // to add import
-                state.file.hasAnyUnistyle = true
-
                 if (hasStringRef(t, path)) {
                     throw new Error("Detected string based ref which is not supported by Unistyles.")
                 }
+            },
+            BlockStatement(path, state) {
+                if (isInsideNodeModules(state)) {
+                    return
+                }
+
+                extractVariants(t, path, state)
             },
             CallExpression(path, state) {
                 if (isInsideNodeModules(state)) {
                     return
                 }
 
-                if (isUsingVariants(t, path)) {
-                    extractVariants(t, path, state)
-                }
-
-                if (!isUnistylesStyleSheet(t, path, state)) {
+                if (!isUnistylesStyleSheet(t, path, state) && !isKindOfStyleSheet(t, path, state)) {
                     return
                 }
+
+                state.file.hasAnyUnistyle = true
 
                 addStyleSheetTag(t, path, state)
 
@@ -226,14 +197,6 @@ module.exports = function ({ types: t }) {
                             }
                         })
                     }
-                }
-            },
-            ReturnStatement(path, state) {
-                // ignore nested returns in JSX elements
-                const hasJSXParent = path.findParent(p => p.isJSXElement())
-
-                if (!hasJSXParent && state.file.hasVariants) {
-                    addJSXVariants(t, path, state)
                 }
             }
         }

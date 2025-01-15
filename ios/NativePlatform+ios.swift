@@ -14,10 +14,6 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
 
     var dependencyListeners: Array<CxxDependencyListener> = []
     var imeListeners: Array<CxxImeListener> = []
-    var hybridContext = margelo.nitro.HybridContext()
-    var memorySize: Int {
-        return getSizeOf(self)
-    }
 
     init() {
         self.miniRuntime = self.buildMiniRuntime()
@@ -187,7 +183,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
             return getContentSizeCategoryFn()
         }
     }
-    
+
     func getMainWindow() -> UIWindow? {
         guard let mainWindow = UIApplication.shared.connectedScenes
             .compactMap({ $0 as? UIWindowScene })
@@ -195,7 +191,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
             .first(where: { $0.isKeyWindow }) else {
             return nil
         }
-        
+
         return mainWindow
     }
 
