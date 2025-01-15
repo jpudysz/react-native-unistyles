@@ -7,12 +7,12 @@
 using namespace margelo::nitro::unistyles;
 
 struct HybridStatusBar: public HybridUnistylesStatusBarSpec {
-    HybridStatusBar(Unistyles::HybridNativePlatformSpecCxx nativePlatform): HybridObject(TAG), _nativePlatform{nativePlatform} {}
+    HybridStatusBar(std::shared_ptr<HybridNativePlatformSpec> nativePlatform): HybridObject(TAG), _nativePlatform{nativePlatform} {}
 
     double getWidth() override;
     double getHeight() override;
     void setHidden(bool isHidden) override;
 
 private:
-    Unistyles::HybridNativePlatformSpecCxx _nativePlatform;
+    std::shared_ptr<HybridNativePlatformSpec> _nativePlatform;
 };
