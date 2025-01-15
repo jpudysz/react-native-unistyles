@@ -4,7 +4,7 @@ on:
     inputs:
       release-branch:
         type: choice
-        description: To which branch you want to release
+        description: To which channel you want to release
         default: main
         options:
           - main
