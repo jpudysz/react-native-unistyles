@@ -1,14 +1,26 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
+import { UnistylesShadowRegistry } from '../specs'
 import { passForwardedRef } from './passForwardRef'
 import { maybeWarnAboutMultipleUnistyles } from './warn'
 
-export const createUnistylesElement = (Component: any) => React.forwardRef((props, forwardedRef) => (
-    <Component
-        {...props}
-        ref={(ref: unknown) => {
-            passForwardedRef(props, ref, forwardedRef)
-            // @ts-ignore we don't know the type of the component
-            maybeWarnAboutMultipleUnistyles(props.style, Component.displayName)
-        }}
-    />
-))
+export const createUnistylesElement = (Component: any) => React.forwardRef((props, forwardedRef) => {
+    const storedRef = useRef<unknown>(null)
+
+    useEffect(() => {
+        return () => {
+            // @ts-ignore
+            UnistylesShadowRegistry.remove(storedRef.current)
+        }
+    }, [])
+
+    return (
+        <Component
+            {...props}
+            ref={(ref: unknown) => {
+                storedRef.current = ref
+                passForwardedRef(props, ref, forwardedRef)
+                maybeWarnAboutMultipleUnistyles(props, Component.displayName)
+            }}
+        />
+    )
+})
