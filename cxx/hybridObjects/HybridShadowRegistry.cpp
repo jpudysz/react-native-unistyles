@@ -19,9 +19,9 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
                 auto rawStyleObj = rawStyle.getObject(rt);
                 auto unistyleHashKeys = core::getUnistylesHashKeys(rt, rawStyleObj);
                 auto secrets = rawStyleObj.getProperty(rt, unistyleHashKeys.at(0).c_str()).asObject(rt);
-                auto secretArguments = secrets.getProperty(rt, helpers::ARGUMENTS.c_str()).asObject(rt);
+                auto secretArguments = secrets.getProperty(rt, helpers::ARGUMENTS.c_str()).asObject(rt).asArray(rt);
 
-                arguments.push_back(helpers::parseDynamicFunctionArguments(rt, secretArguments.asArray(rt)));
+                arguments.push_back(helpers::parseDynamicFunctionArguments(rt, secretArguments));
 
                 continue;
             } catch (...) {

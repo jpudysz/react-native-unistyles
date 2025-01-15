@@ -1,8 +1,7 @@
-import React, { forwardRef, useEffect, useRef, type ComponentType } from 'react'
+import React, { forwardRef, useEffect, type ComponentType } from 'react'
 import { StyleSheet, UnistyleDependency } from '../../specs'
 import type { PartialBy } from '../../types/common'
 import { deepMergeObjects } from '../../utils'
-import { SUPPORTED_STYLE_PROPS } from './types'
 import type { Mappings, SupportedStyleProps } from './types'
 import { useDependencies } from './useDependencies'
 import { maybeWarnAboutMultipleUnistyles } from '../warn'
@@ -17,10 +16,21 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
     type PropsWithUnistyles = PartialBy<TProps, keyof TMappings | SupportedStyleProps> & {
         uniProps?: Mappings<TProps>
     }
+    const getSecrets = (styleProps: Record<string, any> = {}): { uni__getStyles(): any, uni__dependencies: Array<UnistyleDependency> } => {
+        const unistyleKey = Object
+            .keys(styleProps)
+            .find(key => key.startsWith('unistyles-'))
+
+        return unistyleKey
+            ? styleProps[unistyleKey]
+            : {
+                uni__getStyles: () => styleProps,
+                uni__dependencies: [],
+            }
+    }
 
     return forwardRef<GenericComponentRef<TComponent>, PropsWithUnistyles>((props, ref) => {
         const narrowedProps = props as PropsWithUnistyles
-        const stylesRef = useRef<Record<string, any>>({})
         const NativeComponent = Component as ComponentType
 
         const { mappingsCallback, addDependencies } = useDependencies(({ dependencies, updateTheme, updateRuntime }) => {
@@ -45,33 +55,27 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
             // @ts-ignore
             maybeWarnAboutMultipleUnistyles(narrowedProps.contentContainerStyle, `withUnistyles(${Component.displayName ?? 'Unknown'})`)
 
-            const unistylesStyleKey = Object
-                .keys(narrowedProps.style ?? {})
-                .find(key => key.startsWith('unistyles-'))
-            const unistylesContentContainerStyleKey = Object
-                .keys(narrowedProps.contentContainerStyle ?? {})
-                .find(key => key.startsWith('unistyles-'))
+            const styleSecrets = getSecrets(narrowedProps.style)
+            const contentContainerStyleSecrets = getSecrets(narrowedProps.contentContainerStyle)
 
-            const maybeStyleDependencies: Array<UnistyleDependency> = unistylesStyleKey
-                ? narrowedProps.style?.[unistylesStyleKey].uni__dependencies
-                : []
-            const maybeContentContainerStyleDependencies: Array<UnistyleDependency> = unistylesContentContainerStyleKey
-                ? narrowedProps.contentContainerStyle?.[unistylesContentContainerStyleKey].uni__dependencies
-                : []
-
-            addDependencies([...maybeStyleDependencies, ...maybeContentContainerStyleDependencies])
+            addDependencies(Array.from(new Set([...styleSecrets.uni__dependencies, ...contentContainerStyleSecrets.uni__dependencies])))
         }, [narrowedProps.style, narrowedProps.contentContainerStyle])
 
-        const mappingProps = mappings ? mappingsCallback(mappings) : {}
+        const mappingsProps = mappings ? mappingsCallback(mappings) : {}
         const unistyleProps = narrowedProps.uniProps ? mappingsCallback(narrowedProps.uniProps) : {}
-        const finalProps = deepMergeObjects<Record<string, any>>(mappingProps, unistyleProps, props)
 
-        // override with Unistyles styles
-        SUPPORTED_STYLE_PROPS.forEach(propName => {
-            if (finalProps[propName]) {
-                finalProps[propName] = stylesRef.current[propName]
-            }
-        })
+        const styleSecrets = getSecrets(narrowedProps.style)
+        const contentContainerStyleSecrets = getSecrets(narrowedProps.contentContainerStyle)
+
+        const finalProps = {
+            ...deepMergeObjects(mappingsProps, unistyleProps, props),
+            ...narrowedProps.style ? {
+                style: styleSecrets.uni__getStyles(),
+            } : {},
+            ...narrowedProps.contentContainerStyle ? {
+                contentContainerStyle: contentContainerStyleSecrets.uni__getStyles(),
+            } : {},
+        } as any
 
         return <NativeComponent {...finalProps as TProps} ref={ref} />
     })
