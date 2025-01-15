@@ -8,8 +8,10 @@ export const createUnistylesElement = (Component: any) => React.forwardRef((prop
 
     useEffect(() => {
         return () => {
-            // @ts-ignore
-            UnistylesShadowRegistry.remove(storedRef.current)
+            if (storedRef.current) {
+                // @ts-ignore
+                UnistylesShadowRegistry.remove(storedRef.current)
+            }
         }
     }, [])
 
@@ -17,7 +19,10 @@ export const createUnistylesElement = (Component: any) => React.forwardRef((prop
         <Component
             {...props}
             ref={(ref: unknown) => {
-                storedRef.current = ref
+                if (ref) {
+                    storedRef.current = ref
+                }
+
                 passForwardedRef(props, ref, forwardedRef)
                 maybeWarnAboutMultipleUnistyles(props, Component.displayName)
             }}
