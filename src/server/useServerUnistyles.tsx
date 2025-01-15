@@ -37,5 +37,6 @@ export const useServerUnistyles = () => {
 
     if (typeof window !== 'undefined') {
         UnistylesWeb.registry.css.hydrate(window.__UNISTYLES_STATE__)
+        document.querySelector('#unistyles-script')?.remove()
     }
 }

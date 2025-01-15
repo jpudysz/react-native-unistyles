@@ -75,9 +75,16 @@ export class UnistylesRegistry {
 
         stylesCounter.delete(ref)
 
-        if (stylesCounter.size === 0 && !document.querySelector(`.${hash}`)) {
-            this.css.remove(hash)
-            this.stylesCache.delete(hash)
+        if (stylesCounter.size === 0) {
+            // Move this to the end of the event loop so the element is removed from the DOM
+            Promise.resolve().then(() => {
+                if (document.querySelector(`.${hash}`)) {
+                    return
+                }
+
+                this.css.remove(hash)
+                this.stylesCache.delete(hash)
+            })
 
             return true
         }
