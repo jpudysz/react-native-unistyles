@@ -247,8 +247,6 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
 
     if (dependencyMap.empty()) {
         this->notifyJSListeners(dependencies);
-
-        return;
     }
 
     // in a later step, we will rebuild only Unistyles with mounted StyleSheets
@@ -257,6 +255,13 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
     auto dependentStyleSheets = registry.getStyleSheetsToRefresh(rt, dependencies);
 
     parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets, std::nullopt);
+    
+    // we need to stop here if there is nothing to update at the moment,
+    // but we need to compute dependentStyleSheets
+    if (dependencyMap.empty()) {
+        return;
+    }
+    
     parser.rebuildShadowLeafUpdates(rt, dependencyMap);
 
     this->notifyJSListeners(dependencies);
@@ -293,8 +298,6 @@ void HybridStyleSheet::onPlatformNativeDependenciesChange(std::vector<UnistyleDe
 
         if (dependencyMap.empty()) {
             this->notifyJSListeners(unistyleDependencies);
-
-            return;
         }
 
         // in a later step, we will rebuild only Unistyles with mounted StyleSheets
@@ -303,6 +306,13 @@ void HybridStyleSheet::onPlatformNativeDependenciesChange(std::vector<UnistyleDe
         auto dependentStyleSheets = registry.getStyleSheetsToRefresh(rt, unistyleDependencies);
 
         parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets, miniRuntime);
+        
+        // we need to stop here if there is nothing to update at the moment,
+        // but we need to compute dependentStyleSheets
+        if (dependencyMap.empty()) {
+            return;
+        }
+        
         parser.rebuildShadowLeafUpdates(rt, dependencyMap);
 
         this->notifyJSListeners(unistyleDependencies);
