@@ -319,6 +319,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
         for (auto& [_, unistyle] : styleSheet->unistyles) {
             if (!parsedUnistyles.contains(unistyle)) {
                 unistyle->rawValue = parsedStyleSheetsWithDefaultTheme[styleSheet].asObject(rt).getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
+                unistyle->isDirty = true;
             }
         }
     }
@@ -359,6 +360,10 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle
 
         unistyleFn->unprocessedValue = std::move(functionResult);
         unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
+    }
+    
+    if (unistyle->isDirty) {
+        unistyle->isDirty = false;
     }
 }
 
