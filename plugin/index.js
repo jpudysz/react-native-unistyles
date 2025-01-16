@@ -24,6 +24,17 @@ const reactNativeComponentNames = [
     // TouchableWithoutFeedback - can't accept a ref
 ]
 
+// auto replace RN imports to Unistyles imports under these paths
+// our implementation simply borrows 'ref' to register it in ShadowRegistry
+// so we won't affect anyone's implementation
+const ANIMATED_PATHS = [
+    'react-native-reanimated/src/component',
+
+    // todo, uncomment it when we will support custom RN Views paths
+    // as RN Animated internally uses relative imports
+    // 'react-native/Libraries/Animated/components'
+]
+
 // options
 // { debug: boolean, isLocal: boolean, autoProcessImports: Array<string> }
 // debug - logs found dependencies in every StyleSheet
@@ -35,10 +46,7 @@ module.exports = function ({ types: t }) {
         visitor: {
             Program: {
                 enter(path, state) {
-                    if (isInsideNodeModules(state)) {
-                        return
-                    }
-
+                    state.file.isAnimated = ANIMATED_PATHS.some(path => state.filename.includes(path))
                     state.file.hasAnyUnistyle = false
                     state.file.hasVariants = false
                     state.file.styleSheetLocalName = ''
@@ -47,11 +55,11 @@ module.exports = function ({ types: t }) {
                     state.file.forceProcessing = false
                 },
                 exit(path, state) {
-                    if (isInsideNodeModules(state)) {
+                    if (isInsideNodeModules(state) && !state.file.isAnimated) {
                         return
                     }
 
-                    if (state.file.hasAnyUnistyle || state.file.hasVariants) {
+                    if (state.file.hasAnyUnistyle || state.file.hasVariants || state.file.isAnimated) {
                         addUnistylesImport(t, path, state)
                     }
                 }
@@ -100,7 +108,7 @@ module.exports = function ({ types: t }) {
                 })
             },
             ImportDeclaration(path, state) {
-                if (isInsideNodeModules(state)) {
+                if (isInsideNodeModules(state) && !state.file.isAnimated) {
                     return
                 }
 
