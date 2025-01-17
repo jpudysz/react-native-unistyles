@@ -44,7 +44,7 @@ module.exports = function ({ types: t }) {
         visitor: {
             Program: {
                 enter(path, state) {
-                    state.file.replceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS
+                    state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS
                         .concat(state.opts.autoProcessPaths ?? [])
                         .some(path => state.filename.includes(path))
 
@@ -56,11 +56,11 @@ module.exports = function ({ types: t }) {
                     state.file.forceProcessing = false
                 },
                 exit(path, state) {
-                    if (isInsideNodeModules(state) && !state.file.replceWithUnistyles) {
+                    if (isInsideNodeModules(state) && !state.file.replaceWithUnistyles) {
                         return
                     }
 
-                    if (state.file.hasAnyUnistyle || state.file.hasVariants || state.file.replceWithUnistyles) {
+                    if (state.file.hasAnyUnistyle || state.file.hasVariants || state.file.replaceWithUnistyles) {
                         addUnistylesImport(t, path, state)
                     }
                 }
@@ -109,7 +109,7 @@ module.exports = function ({ types: t }) {
                 })
             },
             ImportDeclaration(path, state) {
-                if (isInsideNodeModules(state) && !state.file.replceWithUnistyles) {
+                if (isInsideNodeModules(state) && !state.file.replaceWithUnistyles) {
                     return
                 }
 
