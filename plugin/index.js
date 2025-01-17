@@ -24,20 +24,29 @@ const reactNativeComponentNames = [
     // TouchableWithoutFeedback - can't accept a ref
 ]
 
+// auto replace RN imports to Unistyles imports under these paths
+// our implementation simply borrows 'ref' to register it in ShadowRegistry
+// so we won't affect anyone's implementation
+const REPLACE_WITH_UNISTYLES_PATHS = [
+    'react-native-reanimated/src/component',
+    'react-native-gesture-handler/src/components'
+]
+
 // options
-// { debug: boolean, isLocal: boolean, autoProcessImports: Array<string> }
+// { debug: boolean, isLocal: boolean, autoProcessImports: Array<string>, autoProcessPaths: Array<string> }
 // debug - logs found dependencies in every StyleSheet
 // isLocal - only applicable for Unistyles monorepo for path resolution, don't use it!
-// autoProcessImports - list of imports that should trigger unistyles babel plugin
+// autoProcessImports - list of imports that should trigger unistyles babel plugin eg. @codemask/ui
+// autoProcessPaths - list of paths that should trigger unistyles babel plugin, check default list above
 module.exports = function ({ types: t }) {
     return {
         name: 'babel-react-native-unistyles',
         visitor: {
             Program: {
                 enter(path, state) {
-                    if (isInsideNodeModules(state)) {
-                        return
-                    }
+                    state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS
+                        .concat(state.opts.autoProcessPaths ?? [])
+                        .some(path => state.filename.includes(path))
 
                     state.file.hasAnyUnistyle = false
                     state.file.hasVariants = false
@@ -47,11 +56,11 @@ module.exports = function ({ types: t }) {
                     state.file.forceProcessing = false
                 },
                 exit(path, state) {
-                    if (isInsideNodeModules(state)) {
+                    if (isInsideNodeModules(state) && !state.file.replaceWithUnistyles) {
                         return
                     }
 
-                    if (state.file.hasAnyUnistyle || state.file.hasVariants) {
+                    if (state.file.hasAnyUnistyle || state.file.hasVariants || state.file.replaceWithUnistyles) {
                         addUnistylesImport(t, path, state)
                     }
                 }
@@ -100,7 +109,7 @@ module.exports = function ({ types: t }) {
                 })
             },
             ImportDeclaration(path, state) {
-                if (isInsideNodeModules(state)) {
+                if (isInsideNodeModules(state) && !state.file.replaceWithUnistyles) {
                     return
                 }
 
@@ -114,7 +123,7 @@ module.exports = function ({ types: t }) {
                     })
                 }
 
-                if (importSource.includes('react-native')) {
+                if (importSource === 'react-native') {
                     path.node.specifiers.forEach(specifier => {
                         if (specifier.imported && reactNativeComponentNames.includes(specifier.imported.name)) {
                             state.reactNativeImports[specifier.local.name] = specifier.imported.name

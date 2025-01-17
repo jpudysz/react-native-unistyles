@@ -4,7 +4,7 @@
 using namespace margelo::nitro::unistyles;
 
 ColorScheme HybridUnistylesRuntime::getColorScheme() {
-    auto colorScheme = this->_nativePlatform.getColorScheme();
+    auto colorScheme = this->_nativePlatform->getColorScheme();
 
     return static_cast<ColorScheme>(colorScheme);
 }
@@ -16,7 +16,7 @@ bool HybridUnistylesRuntime::getHasAdaptiveThemes() {
 };
 
 Dimensions HybridUnistylesRuntime::getScreen() {
-    return this->_nativePlatform.getScreenDimensions();
+    return this->_nativePlatform->getScreenDimensions();
 };
 
 std::optional<std::string> HybridUnistylesRuntime::getThemeName() {
@@ -26,7 +26,7 @@ std::optional<std::string> HybridUnistylesRuntime::getThemeName() {
 };
 
 std::string HybridUnistylesRuntime::getContentSizeCategory() {
-    return this->_nativePlatform.getContentSizeCategory();
+    return this->_nativePlatform->getContentSizeCategory();
 };
 
 std::optional<std::string> HybridUnistylesRuntime::getBreakpoint() {
@@ -36,25 +36,25 @@ std::optional<std::string> HybridUnistylesRuntime::getBreakpoint() {
 };
 
 bool HybridUnistylesRuntime::getRtl() {
-    return this->_nativePlatform.getPrefersRtlDirection();
+    return this->_nativePlatform->getPrefersRtlDirection();
 }
 
 Insets HybridUnistylesRuntime::getInsets() {
-    return this->_nativePlatform.getInsets();
+    return this->_nativePlatform->getInsets();
 };
 
 Orientation HybridUnistylesRuntime::getOrientation() {
-    auto orientation = this->_nativePlatform.getOrientation();
+    auto orientation = this->_nativePlatform->getOrientation();
 
     return static_cast<Orientation>(orientation);
 };
 
 double HybridUnistylesRuntime::getPixelRatio() {
-    return this->_nativePlatform.getPixelRatio();
+    return this->_nativePlatform->getPixelRatio();
 };
 
 double HybridUnistylesRuntime::getFontScale() {
-    return this->_nativePlatform.getFontScale();
+    return this->_nativePlatform->getFontScale();
 };
 
 std::unordered_map<std::string, double> HybridUnistylesRuntime::getBreakpoints() {
@@ -133,7 +133,7 @@ jsi::Value HybridUnistylesRuntime::getTheme(jsi::Runtime &rt, const jsi::Value &
         if (args[0].isUndefined()) {
             return state.getCurrentJSTheme();
         }
-        
+
         helpers::assertThat(rt, args[0].isString(), "UnistylesRuntime.getTheme expected to be called with string.");
 
         auto themeName = args[0].asString(rt).utf8(rt);
@@ -164,11 +164,11 @@ jsi::Value HybridUnistylesRuntime::updateTheme(jsi::Runtime &rt, const jsi::Valu
 }
 
 void HybridUnistylesRuntime::setImmersiveMode(bool isEnabled) {
-    this->_nativePlatform.setImmersiveMode(isEnabled);
+    this->_nativePlatform->setImmersiveMode(isEnabled);
 };
 
 void HybridUnistylesRuntime::setRootViewBackgroundColor(double color) {
-    this->_nativePlatform.setRootViewBackgroundColor(color);
+    this->_nativePlatform->setRootViewBackgroundColor(color);
 }
 
 jsi::Value HybridUnistylesRuntime::createHybridStatusBar(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
@@ -188,7 +188,7 @@ jsi::Value HybridUnistylesRuntime::createHybridNavigationBar(jsi::Runtime &rt, c
 }
 
 UnistylesCxxMiniRuntime HybridUnistylesRuntime::getMiniRuntime() {
-    UnistylesNativeMiniRuntime nativeMiniRuntime = this->_nativePlatform.getMiniRuntime();
+    UnistylesNativeMiniRuntime nativeMiniRuntime = this->_nativePlatform->getMiniRuntime();
     UnistylesCxxMiniRuntime cxxMiniRuntime{
         this->getThemeName(),
         this->getBreakpoint(),
@@ -260,16 +260,16 @@ void HybridUnistylesRuntime::registerPlatformListener(const std::function<void (
 }
 
 void HybridUnistylesRuntime::registerNativePlatformListener(const std::function<void(std::vector<UnistyleDependency>, UnistylesNativeMiniRuntime)>& listener) {
-    this->_nativePlatform.registerPlatformListener(listener);
+    this->_nativePlatform->registerPlatformListener(listener);
     this->_onNativeDependenciesChange = listener;
 }
 
 void HybridUnistylesRuntime::registerImeListener(const std::function<void(UnistylesNativeMiniRuntime)>& listener) {
-    this->_nativePlatform.registerImeListener(listener);
+    this->_nativePlatform->registerImeListener(listener);
 }
 
 void HybridUnistylesRuntime::unregisterNativePlatformListeners() {
-    this->_nativePlatform.unregisterPlatformListeners();
+    this->_nativePlatform->unregisterPlatformListeners();
 }
 
 void HybridUnistylesRuntime::includeDependenciesForColorSchemeChange(std::vector<UnistyleDependency>& deps) {

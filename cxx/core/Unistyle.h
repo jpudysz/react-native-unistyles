@@ -34,6 +34,10 @@ struct Unistyle {
     std::vector<UnistyleDependency> dependencies{};
     std::shared_ptr<StyleSheet> parent;
 
+    // defines if given unattached unistyle was modified
+    // and should be recomputed when mounting new node
+    bool isDirty = false;
+
     inline void addDependency(UnistyleDependency dependency) {
         // we can't add dependencies if unistyle is sealed
         if (this->_isSealed) {
