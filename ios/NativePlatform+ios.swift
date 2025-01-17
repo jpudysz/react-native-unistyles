@@ -15,7 +15,9 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     var dependencyListeners: Array<CxxDependencyListener> = []
     var imeListeners: Array<CxxImeListener> = []
 
-    init() {
+    override init() {
+        super.init()
+        
         self.miniRuntime = self.buildMiniRuntime()
 
         setupPlatformListeners()

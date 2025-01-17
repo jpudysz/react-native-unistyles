@@ -36,7 +36,7 @@ struct UnistylesModule : public jni::HybridClass<UnistylesModule> {
 private:
     std::shared_ptr<UIManager> _uiManager;
     RuntimeExecutor _runtimeExecutor;
-    Unistyles::HybridNativePlatformSpecCxx* _nativePlatform;
+    std::shared_ptr<HybridNativePlatformSpec> _nativePlatform;
 };
 
 }
