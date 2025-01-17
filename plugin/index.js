@@ -33,7 +33,7 @@ const REPLACE_WITH_UNISTYLES_PATHS = [
 ]
 
 // options
-// { debug: boolean, isLocal: boolean, autoProcessImports: Array<string>, autoProcessPaths: Array<string> }
+// { debug: boolean, isLocal: boolean, autoProcessImports: Array<string> }
 // debug - logs found dependencies in every StyleSheet
 // isLocal - only applicable for Unistyles monorepo for path resolution, don't use it!
 // autoProcessImports - list of imports that should trigger unistyles babel plugin
@@ -43,8 +43,8 @@ module.exports = function ({ types: t }) {
         visitor: {
             Program: {
                 enter(path, state) {
-                    state.file.forceProcessing = REPLACE_WITH_UNISTYLES_PATHS
-                        .concat(state.opts.autoProcessPaths ?? [])
+                    state.file.isAnimated = REPLACE_WITH_UNISTYLES_PATHS
+                        .concat(state.opts.autoProcessImports ?? [])
                         .some(path => state.filename.includes(path))
                     state.file.hasAnyUnistyle = false
                     state.file.hasVariants = false
