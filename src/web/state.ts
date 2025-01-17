@@ -49,8 +49,10 @@ export class UnistylesState {
             return
         }
 
-        if (!this.hasAdaptiveThemes && this.CSSVars) {
-            document.querySelector(':root')?.classList.add(this.themeName ?? '')
+        // Ensure we have a themeName before calling this
+        // classList.add throws a "SyntaxError" DOMException if one of the arguments is an empty string.
+        if (!this.hasAdaptiveThemes && this.CSSVars && this.themeName) {
+            document.querySelector(':root')?.classList.add(this.themeName)
         }
 
         this.services.listener.initListeners()
