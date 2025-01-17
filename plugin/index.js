@@ -114,7 +114,7 @@ module.exports = function ({ types: t }) {
 
                 const importSource = path.node.source.value
 
-                if (importSource.includes('react-native-unistyles')) {
+                if (importSource === 'react-native-unistyles') {
                     path.node.specifiers.forEach(specifier => {
                         if (specifier.imported && specifier.imported.name === 'StyleSheet') {
                             state.file.styleSheetLocalName = specifier.local.name
@@ -122,7 +122,7 @@ module.exports = function ({ types: t }) {
                     })
                 }
 
-                if (importSource.includes('react-native')) {
+                if (importSource === 'react-native') {
                     path.node.specifiers.forEach(specifier => {
                         if (specifier.imported && reactNativeComponentNames.includes(specifier.imported.name)) {
                             state.reactNativeImports[specifier.local.name] = specifier.imported.name
