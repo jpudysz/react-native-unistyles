@@ -47,6 +47,7 @@ module.exports = function ({ types: t }) {
                     state.file.replceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS
                         .concat(state.opts.autoProcessPaths ?? [])
                         .some(path => state.filename.includes(path))
+
                     state.file.hasAnyUnistyle = false
                     state.file.hasVariants = false
                     state.file.styleSheetLocalName = ''
@@ -114,7 +115,7 @@ module.exports = function ({ types: t }) {
 
                 const importSource = path.node.source.value
 
-                if (importSource === 'react-native-unistyles') {
+                if (importSource.includes('react-native-unistyles')) {
                     path.node.specifiers.forEach(specifier => {
                         if (specifier.imported && specifier.imported.name === 'StyleSheet') {
                             state.file.styleSheetLocalName = specifier.local.name
