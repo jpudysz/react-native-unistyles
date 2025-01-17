@@ -1,3 +1,4 @@
+/** @param {import('./index').UnistylesPluginPass} state */
 function addUnistylesImport(t, path, state) {
     const localNames = Object.keys(state.reactNativeImports)
     const names = Object.values(state.reactNativeImports)

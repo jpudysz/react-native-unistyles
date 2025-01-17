@@ -1,17 +1,23 @@
 const path = require('path')
 const pak = require('../package.json')
 
+/** @type {import('../plugin').UnistylesPluginOptions} */
+const unistylesPluginConfig = {
+    debug: true,
+    isLocal: true,
+    autoProcessImports: ['@lib/theme', './st'],
+}
+
 module.exports = api => {
     api.cache(true)
 
     return {
         presets: ['module:@react-native/babel-preset'],
         plugins: [
-            [path.join(__dirname, '../plugin'), {
-                debug: true,
-                isLocal: true,
-                autoProcessImports: ['@lib/theme', './st'],
-            }],
+            [
+                path.join(__dirname, '../plugin'),
+                unistylesPluginConfig
+            ],
             [
                 'module-resolver',
                 {
