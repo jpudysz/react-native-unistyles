@@ -113,8 +113,22 @@ The migration process is quite simple, but it can be tedious since you'll need t
     +    return <UniButton />
     }
     ```
+9. If you want to speed up the migration process, but keep your views re-rendered, use [useUnistyles](/v3/references/use-unistyles) hook:
 
-9. If you need to access `breakpoint` to show/hide your components use `Display` and `Hide` components instead:
+    ```tsx
+    import { Button } from 'react-native'
+    import { useUnistyles } from 'react-native-unistyles'
+
+    const MyText = () => {
+        const { theme } = useUnistyles()
+
+        return (
+            <Button color={theme.colors.primary} />
+        )
+    }
+    ```
+
+10. If you need to access `breakpoint` to show/hide your components use `Display` and `Hide` components instead:
 
     ```tsx
     import { Text } from 'react-native'
@@ -132,7 +146,7 @@ The migration process is quite simple, but it can be tedious since you'll need t
     }
     ```
 
-10. If you used `UnistylesProvider`, remove it as it has no effect anymore:
+11. If you used `UnistylesProvider`, remove it as it has no effect anymore:
 
     ```diff lang="tsx"
     -import { UnistylesProvider } from 'react-native-unistyles'
@@ -142,7 +156,7 @@ The migration process is quite simple, but it can be tedious since you'll need t
     -</UnistylesProvider>
     ```
 
-11. If you want to move your component based on keyboard position, use `ime` inset:
+12. If you want to move your component based on keyboard position, use `ime` inset:
 
     ```diff lang="tsx"
     const style = StyleSheet.create({
@@ -152,8 +166,8 @@ The migration process is quite simple, but it can be tedious since you'll need t
         }
     })
     ```
-12. Some `UnistylesRuntime` methods have been renamed. Follow TypeScript types to use new names.
-13. Some `UnistylesRuntime` methods have been removed:
+13. Some `UnistylesRuntime` methods have been renamed. Follow TypeScript types to use new names.
+14. Some `UnistylesRuntime` methods have been removed:
 
     ```diff lang="tsx"
     - UnistylesRuntime.addPlugin(plugin) // Unistyles has no plugins anymore
@@ -162,21 +176,21 @@ The migration process is quite simple, but it can be tedious since you'll need t
     - UnistylesRuntime.navigationBar.setColor(color) // removed due to Android 15 deprecation
     ```
 
-14. `UnistylesRuntime` methods that accepted `color` and `alpha` have been changed to accept `color` only. Each method supports **any** color that is respected by React Native:
+15. `UnistylesRuntime` methods that accepted `color` and `alpha` have been changed to accept `color` only. Each method supports **any** color that is respected by React Native:
 
     ```diff lang="tsx"
     - UnistylesRuntime.setRootViewBackgroundColor(color, alpha) // no need for separate alpha
     + UnistylesRuntime.setRootViewBackgroundColor(color) // accepts any color
     ```
 
-15. `hairlineWidth` has been moved from `UnistylesRuntime` to `StyleSheet`. Use `StyleSheet.hairlineWidth` instead:
+16. `hairlineWidth` has been moved from `UnistylesRuntime` to `StyleSheet`. Use `StyleSheet.hairlineWidth` instead:
 
     ```diff lang="tsx"
     - UnistylesRuntime.hairlineWidth // no longer available
     + StyleSheet.hairlineWidth // matches StyleSheet API
     ```
 
-16. If your app used variants, move config to `styles.useVariants` instead:
+17. If your app used variants, move config to `styles.useVariants` instead:
 
     ```diff lang="tsx"
     - import { useStyles } from 'react-native-unistyles'
@@ -196,9 +210,9 @@ The migration process is quite simple, but it can be tedious since you'll need t
     }
     ```
 
-17. `Style is not bound!` error
+18. `Style is not bound!` error or `Unistyles: we detected style object with N unistyles styles. (...)` warning
 
-    If you encountered this error, it means that you're spreading styles out of the style tag. This is not possible in Unistyles anymore as spreading will remove `C++` state:
+    If you encountered this warning or error, it means that you're spreading your styles. This is not possible in Unistyles 3.0 anymore as spreading will remove `C++` state:
 
     ```tsx
     // not ok
@@ -206,12 +220,18 @@ The migration process is quite simple, but it can be tedious since you'll need t
 
     <View style={styles} />
 
-    // ok
+    // not ok
     <View style={{...style1, ...style2}} />
+    ```
 
+    Instead, use array syntax provided by React Native:
+
+    ```tsx
     // ok
     <View style={[style1, style2]} />
     ```
+
+    By using array syntax, we know **the order of merging** that is necessary to resolve styles correctly.
 
 </Steps>
 
