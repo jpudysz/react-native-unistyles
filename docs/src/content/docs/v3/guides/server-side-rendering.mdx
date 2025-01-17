@@ -15,9 +15,11 @@ import Seo from '../../../../components/Seo.astro'
 
 Unistyles 3.0 is fully compatible with Next.js Server Side Rendering (SSR). We're supporting both client and server components.
 
-# Usage
+### Usage
 
-```tsx title="Style.tsx"
+To use server-side rendered styles, you just need to call `useServerUnistyles` function in your server component.
+
+```tsx title="Style.tsx" /useServerUnistyles/
 'use client'
 
 import { PropsWithChildren } from 'react'
@@ -30,6 +32,8 @@ export const Style = ({ children }: PropsWithChildren) => {
     return <>{children}</>
 }
 ```
+
+With the component in place, make sure it wraps your body's children:
 
 ```diff lang="tsx" title="layout.tsx"
 + import '../unistyles'
@@ -56,5 +60,5 @@ export default function RootLayout({
 The `unistyles.ts` file is where Unistyles is configured. For more details, refer to the [configuration guide](/v3/start/configuration).
 </Aside>
 
-With this setup, we will ensure that Unistyles is initialized correctly and injects CSS on the server.
+With this setup, we will ensure that Unistyles is initialized correctly and injects CSS on the server side.
 </Seo>
