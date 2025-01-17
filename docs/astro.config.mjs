@@ -82,6 +82,7 @@ export default defineConfig({
                 {
                     label: 'Guides',
                     items: [
+                        { label: 'Merging styles', slug: 'v3/guides/merging-styles', badge: 'New!' },
                         { label: 'Theming', slug: 'v3/guides/theming' },
                         { label: 'Avoiding Keyboard', slug: 'v3/guides/avoiding-keyboard' },
                         { label: 'Expo Router', slug: 'v3/guides/expo-router' },
