@@ -16,12 +16,14 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
     type TProps = GenericComponentProps<TComponent>
     type PropsWithUnistyles = PartialBy<TProps, keyof TMappings | SupportedStyleProps> & {
         uniProps?: Mappings<TProps>
+    }
+    type UnistyleStyles = {
         style?: UnistylesValues,
         contentContainerStyle?: UnistylesValues
     }
 
     return forwardRef<GenericComponentRef<TComponent>, PropsWithUnistyles>((props, ref) => {
-        const narrowedProps = props as PropsWithUnistyles
+        const narrowedProps = props as PropsWithUnistyles & UnistyleStyles
         const styleClassNames = getClassName(narrowedProps.style)
         const contentContainerStyleClassNames = getClassName(narrowedProps.contentContainerStyle)
         const { proxifiedRuntime, proxifiedTheme } = useProxifiedUnistyles()
