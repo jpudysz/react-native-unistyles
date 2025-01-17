@@ -32,17 +32,12 @@ const REPLACE_WITH_UNISTYLES_PATHS = [
     'react-native-gesture-handler/src/components'
 ]
 
-// options
-// { debug: boolean, isLocal: boolean, autoProcessImports: Array<string>, autoProcessPaths: Array<string> }
-// debug - logs found dependencies in every StyleSheet
-// isLocal - only applicable for Unistyles monorepo for path resolution, don't use it!
-// autoProcessImports - list of imports that should trigger unistyles babel plugin eg. @codemask/ui
-// autoProcessPaths - list of paths that should trigger unistyles babel plugin, check default list above
 module.exports = function ({ types: t }) {
     return {
         name: 'babel-react-native-unistyles',
         visitor: {
             Program: {
+                /** @param {import('./index').UnistylesPluginPass} state */
                 enter(path, state) {
                     state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS
                         .concat(state.opts.autoProcessPaths ?? [])
@@ -108,6 +103,7 @@ module.exports = function ({ types: t }) {
                     }
                 })
             },
+            /** @param {import('./index').UnistylesPluginPass} state */
             ImportDeclaration(path, state) {
                 if (isInsideNodeModules(state) && !state.file.replaceWithUnistyles) {
                     return
