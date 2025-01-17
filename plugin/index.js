@@ -27,16 +27,13 @@ const reactNativeComponentNames = [
 // auto replace RN imports to Unistyles imports under these paths
 // our implementation simply borrows 'ref' to register it in ShadowRegistry
 // so we won't affect anyone's implementation
-const ANIMATED_PATHS = [
+const REPLACE_WITH_UNISTYLES_PATHS = [
     'react-native-reanimated/src/component',
-
-    // todo, uncomment it when we will support custom RN Views paths
-    // as RN Animated internally uses relative imports
-    // 'react-native/Libraries/Animated/components'
+    'react-native-gesture-handler/src/components'
 ]
 
 // options
-// { debug: boolean, isLocal: boolean, autoProcessImports: Array<string> }
+// { debug: boolean, isLocal: boolean, autoProcessImports: Array<string>, autoProcessPaths: Array<string> }
 // debug - logs found dependencies in every StyleSheet
 // isLocal - only applicable for Unistyles monorepo for path resolution, don't use it!
 // autoProcessImports - list of imports that should trigger unistyles babel plugin
@@ -46,7 +43,9 @@ module.exports = function ({ types: t }) {
         visitor: {
             Program: {
                 enter(path, state) {
-                    state.file.isAnimated = ANIMATED_PATHS.some(path => state.filename.includes(path))
+                    state.file.forceProcessing = REPLACE_WITH_UNISTYLES_PATHS
+                        .concat(state.opts.autoProcessPaths ?? [])
+                        .some(path => state.filename.includes(path))
                     state.file.hasAnyUnistyle = false
                     state.file.hasVariants = false
                     state.file.styleSheetLocalName = ''
