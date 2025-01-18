@@ -63,6 +63,7 @@ function addStyleSheetTag(t, path, state) {
     callee.container.arguments.push(t.numericLiteral(uniqueId))
 }
 
+/** @param {import('./index').UnistylesPluginPass} state */
 function analyzeDependencies(t, state, name, unistyleObj, themeName, rtName) {
     const debugMessage = deps => {
         if (state.opts.debug) {

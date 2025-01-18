@@ -180,9 +180,75 @@ import { Image } from 'react-native-unistyles/components/native/Image'
 <Image source={require('./image.png')} style={styles.image} ref={ref2} />
 ```
 
-
 ### Summary
 
 That's it! We hope you enjoy the DX of Unistyles 3.0 with the help of the Babel plugin. If you encounter any Babel issues, we're ready to tackle them and resolve them with priority!
+
+## Additional configuration
+
+The Babel plugin comes with a few additional options to extend its usage.
+
+### `autoProcessImports`
+
+If you use ui-kit components, you can configure the Babel plugin to process them.
+
+```js title="babel.config.js"
+/** @type {import('react-native-unistyles/plugin').UnistylesPluginOptions} */
+const unistylesPluginConfig = {
+    autoProcessImports: ['@lib/ui-kit'],
+}
+
+module.exports = function (api) {
+    api.cache(true)
+
+    return {
+        plugins: [
+            ['react-native-unistyles/plugin', unistylesPluginConfig]
+        ]
+    }
+}
+```
+
+### `autoProcessPaths`
+
+Similar to `autoProcessImports`, you can configure the Babel plugin to process paths.
+
+```js title="babel.config.js"
+/** @type {import('react-native-unistyles/plugin').UnistylesPluginOptions} */
+const unistylesPluginConfig = {
+    autoProcessPaths: ['external-library/components'],
+}
+
+module.exports = function (api) {
+    api.cache(true)
+
+    return {
+        plugins: [
+            ['react-native-unistyles/plugin', unistylesPluginConfig]
+        ]
+    }
+}
+```
+
+### `debug`
+
+In order to debug issues with the Babel plugin you can enable the `debug` boolean.
+
+```js title="babel.config.js"
+/** @type {import('react-native-unistyles/plugin').UnistylesPluginOptions} */
+const unistylesPluginConfig = {
+    debug: true,
+}
+
+module.exports = function (api) {
+    api.cache(true)
+
+    return {
+        plugins: [
+            ['react-native-unistyles/plugin', unistylesPluginConfig]
+        ]
+    }
+}
+```
 
 </Seo>
