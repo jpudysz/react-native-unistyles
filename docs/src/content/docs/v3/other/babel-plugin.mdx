@@ -203,23 +203,6 @@ However, in some cases you might want to process files that miss such import:
 
 If that's your case, you can configure the Babel plugin to process them.
 
-```js title="babel.config.js"
-/** @type {import('react-native-unistyles/plugin').UnistylesPluginOptions} */
-const unistylesPluginConfig = {
-    autoProcessImports: ['@react-native-ui-kit', '@codemask/styles'],
-}
-
-module.exports = function (api) {
-    api.cache(true)
-
-    return {
-        plugins: [
-            ['react-native-unistyles/plugin', unistylesPluginConfig]
-        ]
-    }
-}
-```
-
 #### `autoProcessPaths`
 
 By default babel plugin will ignore `node_modules`.
@@ -233,31 +216,20 @@ Defaults to:
 ['react-native-reanimated/src/component', 'react-native-gesture-handler/src/components']
 ```
 
-```js title="babel.config.js"
-/** @type {import('react-native-unistyles/plugin').UnistylesPluginOptions} */
-const unistylesPluginConfig = {
-    autoProcessPaths: ['external-library/components'],
-}
-
-module.exports = function (api) {
-    api.cache(true)
-
-    return {
-        plugins: [
-            ['react-native-unistyles/plugin', unistylesPluginConfig]
-        ]
-    }
-}
-```
-
 #### `debug`
 
 In order to list detected dependencies by the Babel plugin you can enable the `debug` flag.
 It will `console.log` name of the file and component with Unistyles dependencies.
 
+#### Usage in `babel.config.js`
+
+You can apply any of the options above as follows:
+
 ```js title="babel.config.js"
 /** @type {import('react-native-unistyles/plugin').UnistylesPluginOptions} */
-const unistylesPluginConfig = {
+const unistylesPluginOptions = {
+    autoProcessImports: ['@react-native-ui-kit', '@codemask/styles'],
+    autoProcessPaths: ['external-library/components'],
     debug: true,
 }
 
@@ -266,7 +238,7 @@ module.exports = function (api) {
 
     return {
         plugins: [
-            ['react-native-unistyles/plugin', unistylesPluginConfig]
+            ['react-native-unistyles/plugin', unistylesPluginOptions]
         ]
     }
 }
