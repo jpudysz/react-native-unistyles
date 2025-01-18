@@ -2,7 +2,7 @@ const path = require('path')
 const pak = require('../package.json')
 
 /** @type {import('../plugin').UnistylesPluginOptions} */
-const unistylesPluginConfig = {
+const unistylesPluginOptions = {
     debug: true,
     isLocal: true,
     autoProcessImports: ['@lib/theme', './st'],
@@ -16,7 +16,7 @@ module.exports = api => {
         plugins: [
             [
                 path.join(__dirname, '../plugin'),
-                unistylesPluginConfig
+                unistylesPluginOptions
             ],
             [
                 'module-resolver',

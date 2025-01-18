@@ -192,43 +192,9 @@ The Babel plugin comes with a few additional options to extend its usage.
 
 If you use ui-kit components, you can configure the Babel plugin to process them.
 
-```js title="babel.config.js"
-/** @type {import('react-native-unistyles/plugin').UnistylesPluginOptions} */
-const unistylesPluginConfig = {
-    autoProcessImports: ['@lib/ui-kit'],
-}
-
-module.exports = function (api) {
-    api.cache(true)
-
-    return {
-        plugins: [
-            ['react-native-unistyles/plugin', unistylesPluginConfig]
-        ]
-    }
-}
-```
-
 ### `autoProcessPaths`
 
 Similar to `autoProcessImports`, you can configure the Babel plugin to process paths.
-
-```js title="babel.config.js"
-/** @type {import('react-native-unistyles/plugin').UnistylesPluginOptions} */
-const unistylesPluginConfig = {
-    autoProcessPaths: ['external-library/components'],
-}
-
-module.exports = function (api) {
-    api.cache(true)
-
-    return {
-        plugins: [
-            ['react-native-unistyles/plugin', unistylesPluginConfig]
-        ]
-    }
-}
-```
 
 ### `debug`
 
@@ -236,7 +202,9 @@ In order to debug issues with the Babel plugin you can enable the `debug` boolea
 
 ```js title="babel.config.js"
 /** @type {import('react-native-unistyles/plugin').UnistylesPluginOptions} */
-const unistylesPluginConfig = {
+const unistylesPluginOptions = {
+    autoProcessImports: ['@lib/ui-kit'],
+    autoProcessPaths: ['external-library/components'],
     debug: true,
 }
 
@@ -245,7 +213,7 @@ module.exports = function (api) {
 
     return {
         plugins: [
-            ['react-native-unistyles/plugin', unistylesPluginConfig]
+            ['react-native-unistyles/plugin', unistylesPluginOptions]
         ]
     }
 }
