@@ -82,11 +82,12 @@ export default defineConfig({
                 {
                     label: 'Guides',
                     items: [
+                        { label: 'Merging styles', slug: 'v3/guides/merging-styles', badge: 'New!' },
                         { label: 'Theming', slug: 'v3/guides/theming' },
                         { label: 'Avoiding Keyboard', slug: 'v3/guides/avoiding-keyboard' },
                         { label: 'Expo Router', slug: 'v3/guides/expo-router' },
                         { label: 'Custom web', slug: 'v3/guides/custom-web', badge: 'WIP' },
-                        { label: 'Server side rendering', slug: 'v3/guides/server-side-rendering', badge: 'WIP' },
+                        { label: 'Server side rendering', slug: 'v3/guides/server-side-rendering', badge: 'New!' },
                     ]
                 },
                 {
@@ -102,8 +103,10 @@ export default defineConfig({
                         { label: 'Compound Variants', slug: 'v3/references/compound-variants' },
                         { label: 'Web styles', slug: 'v3/references/web-styles' },
                         { label: 'Web Only Features', slug: 'v3/references/web-only' },
-                        { label: 'Scoped theme', slug: 'v3/references/scoped-theme', badge: 'New!' },
-                        { label: 'withUnistyles', slug: 'v3/references/with-unistyles',  badge: 'New!' },
+                        { label: 'Scoped theme', slug: 'v3/references/scoped-theme' },
+                        { label: 'Update 3rd party views', slug: 'v3/references/3rd-party-views', badge: 'New!' },
+                        { label: 'withUnistyles', slug: 'v3/references/with-unistyles' },
+                        { label: 'useUnistyles', slug: 'v3/references/use-unistyles', badge: 'New!' },
                         { label: 'Display and Hide', slug: 'v3/references/display-hide' },
                         { label: 'Edge to edge', slug: 'v3/references/edge-to-edge' },
                         { label: 'Dimensions', slug: 'v3/references/dimensions' },
@@ -114,7 +117,7 @@ export default defineConfig({
                     label: 'Other',
                     items: [
                         { label: 'How to report a bug?', slug: 'v3/other/how-to-report-bug' },
-                        { label: 'Babel plugin', slug: 'v3/other/babel-plugin' },
+                        { label: 'Babel plugin', slug: 'v3/other/babel-plugin', badge: 'Updated' },
                         { label: 'Dependencies', slug: 'v3/other/dependencies' },
                         { label: 'For library authors', slug: 'v3/other/for-library-authors' },
                         { label: 'For sponsors', slug: 'v3/other/for-sponsors' },

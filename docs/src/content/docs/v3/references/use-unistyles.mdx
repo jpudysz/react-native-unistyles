@@ -1,0 +1,165 @@
+---
+title: useUnistyles
+description: Learn about escape hatch in Unistyles 3.0
+---
+
+import { Card } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'useUnistyles',
+        description: 'Learn about escape hatch in Unistyles 3.0'
+    }}
+>
+
+Unistyles provides a way to access your app's theme and runtime within your components through a hook.
+
+:::caution
+We strongly recommend **not using** this hook, as it will re-render your component on every change. This hook was created to simplify the migration process and should only be used when other methods fail.
+
+Follow our [decision algorithm](/v3/references/3rd-party-views) to learn when to use this hook.
+:::
+
+### When to use it?
+
+If you're using `react-native`, `react-native-reanimated`, or `react-native-gesture-handler` components, you should avoid this hook. Unistyles updates these views via the ShadowTree without causing **any re-renders**.
+
+Consider using this hook only if:
+- You need to update a view in a third-party library like `react-native-blurhash`
+- You've already tried using [withUnistyles](/v3/references/with-unistyles) without success
+
+### How to use it?
+
+This is a standard hook that exposes `theme` and `rt` (runtime) properties. You can import it from `react-native-unistyles`:
+
+```tsx
+import { useUnistyles } from 'react-native-unistyles'
+
+const MyComponent = () => {
+    const { theme, rt } = useUnistyles()
+
+    return (
+        // your view
+    )
+}
+```
+
+### Why isn't it recommended?
+
+We encourage using `withUnistyles` instead because it ensures only a single component is re-rendered instead of multiple components or the entire app. If you use this hook in a root component, you lose all the benefits of ShadowTree updates and trigger full app re-renders on every change.
+
+Learn more about [How Unistyles works?](/v3/start/how-unistyles-works) to understand why this is not ideal.
+
+Another advantage of `withUnistyles` is that it tracks style dependencies, ensuring only components with changed dependencies are re-rendered. In contrast, `useUnistyles` will re-render the component whenever `theme` or `rt` properties change. Note that `runtime` contains multiple values that can change frequently during your app's lifecycle.
+
+### How to use it correctly?
+
+If you must use this hook, follow these best practices:
+
+#### 1. Use it only for a single component
+```tsx
+import { useUnistyles } from 'react-native-unistyles'
+import Icon from 'react-native-cool-icons/MaterialIcons'
+
+const MyComponent = () => {
+    const { theme } = useUnistyles()
+
+    // Ensure this component has no children
+    return (
+        <Icon color={theme.colors.primary} />
+    )
+}
+```
+
+Like `withUnistyles`, create a new component and use the hook there. Avoid using this hook in your root component or screen, as it will cause unnecessary re-renders for other components.
+
+#### 2. Use it with `react-navigation` components like `Stack` or `Tabs`
+```tsx
+import { Stack } from 'expo-router'
+
+export default function Layout() {
+    const { theme } = useUnistyles()
+
+    return (
+        <Stack
+            screenOptions={{
+                headerStyle: {
+                    backgroundColor: theme.colors.background
+                }
+            }}
+        >
+            <Stack.Screen name="home" />
+        </Stack>
+    )
+}
+```
+
+This is allowed because `react-navigation` does not re-render screens on style prop change. Note that using `withUnistyles` instead may generate a warning since `Stack` components won't allow other external components.
+
+#### 3. Migration from Unistyles 2.0
+If you're migrating from version 2.0 to 3.0, you can use `useUnistyles` to access the theme and runtime in your components. This works similarly to the `useStyles` hook in 2.0. Once migration is complete, refactor your code to align with Unistyles 3.0 principles.
+
+### Bad Practices
+
+#### 1. Using it with complex components:
+```tsx
+import { useUnistyles } from 'react-native-unistyles'
+import { Blurhash } from 'react-native-blurhash'
+
+const MyComponent = () => {
+    const { theme } = useUnistyles()
+
+    return (
+        <View>
+            <Component1 />
+            <Component2 />
+            <ComponentN />
+            <Blurhash
+                blurhash="LGFFaXYk^6#M@-5c,1J5@[or[Q6."
+                style={{
+                    backgroundColor: theme.colors.primary
+                }}
+            />
+        </View>
+    )
+}
+```
+This will re-render multiple components unnecessarily. Instead move `Blurhash` to a separate component and use `withUnistyles` there.
+
+#### 2. Using it at the root level:
+```tsx
+import { useUnistyles } from 'react-native-unistyles'
+
+const MyApp = () => {
+    const { theme } = useUnistyles()
+
+    return (
+        <View>
+            <App />
+        </View>
+    )
+}
+```
+Using the hook at the root level eliminates all Unistyles benefits, causing your app to re-render unnecessarily.
+
+#### 3. Using it with `react-native` components:
+```tsx
+import { useUnistyles } from 'react-native-unistyles'
+import { Text } from 'react-native'
+
+const MyComponent = () => {
+    const { theme } = useUnistyles()
+
+    return (
+        <Text style={{ color: theme.colors.primary }}>
+            Hello world
+        </Text>
+    )
+}
+```
+This is a bad practice. Unistyles updates `react-native` components through the ShadowTree without re-rendering. Using this hook here will cause unnecessary re-renders. Once again follow our [decision algorithm](/v3/references/3rd-party-views) to learn about another options.
+
+
+
+</Seo>
