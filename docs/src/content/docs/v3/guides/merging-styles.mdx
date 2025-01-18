@@ -3,7 +3,7 @@ title: Merging styles
 description: Learn about how to merge styles with Unistyles 3.0
 ---
 
-import { Card } from '@astrojs/starlight/components'
+import { Card, Aside } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
 
 <Seo
@@ -13,6 +13,56 @@ import Seo from '../../../../components/Seo.astro'
     }}
 >
 
-TODO
+While using Unistyles, it's crucial to understand how styles need to be merged and why it is so important.
+
+### Introduction
+
+In the early versions of Unistyles 3.0, we tried to solve this issue with a Babel plugin. However, it was too complex to maintain various edge cases (especially with `Pressable`), and developers frequently encountered many `Unistyles: Style is not bound!` errors.
+
+With the new approach, we shift the responsibility of merging styles to the user. In other words, the Babel plugin will no longer convert your style tags from objects to arrays.
+
+### How to merge multiple styles
+
+Unistyles doesn't provide any extra API for merging styles. Instead, we encourage you to use the `[]` syntax supported by React Native components.
+
+```tsx
+<View style={[styles.container, styles.container2]} />
+```
+
+If Unistyles detects that you've used the spread operator and the styles have no attached C++ state, it will:
+- Restore the state on the C++ side
+- Merge styles in an unpredictable order (as we lose order information)
+- Warn you in `__DEV__` mode about this
+
+<Aside title="Example error" type="caution">
+Unistyles: We detected a style object with 2 Unistyles styles. This might cause no updates or unpredictable behavior. Please check the `style` prop for `View` and use array syntax instead of object syntax.
+</Aside>
+
+When you see this warning, your component will render correctly, but any new event that re-computes your styles could:
+- Output incorrect styles due to the unknown order of merging
+- Not update at all if, during the merging process, you altered props that were previously listening for changes
+
+It's critical to ship Unistyles 3.0 apps without this warning, as it can cause unexpected behavior.
+
+### Spreading a single Unistyle
+
+Another problematic case is spreading a single Unistyle and merging it, e.g., with inline styles:
+
+```tsx
+<View style={{...styles.container, ...{ backgroundColor: 'red' }}} />
+```
+
+Although we can restore the C++ state for `styles.container`, we cannot identify that `backgroundColor: red` should override the `backgroundColor` used in `styles.container`. The order of merging will be preserved until the first re-computation of styles.
+
+Also, keep in mind that restoring the C++ state takes unnecessary extra time, so it's better to avoid it.
+
+### Summary
+
+- Use the `[]` syntax to merge styles
+- Avoid spreading Unistyles
+- Avoid merging your styles with the spread operator
+- Unistyles will warn you about this in `__DEV__` mode
+
+With this new approach, you're in control of merging your styles.
 
 </Seo>
