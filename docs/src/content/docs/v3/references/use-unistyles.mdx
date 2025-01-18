@@ -125,7 +125,7 @@ const MyComponent = () => {
     )
 }
 ```
-This will re-render multiple components unnecessarily.
+This will re-render multiple components unnecessarily. Instead move `Blurhash` to a separate component and use `withUnistyles` there.
 
 #### 2. Using it at the root level:
 ```tsx
@@ -158,7 +158,7 @@ const MyComponent = () => {
     )
 }
 ```
-This is a bad practice. Unistyles updates `react-native` components through the ShadowTree without re-rendering. Using this hook here will cause unnecessary re-renders.
+This is a bad practice. Unistyles updates `react-native` components through the ShadowTree without re-rendering. Using this hook here will cause unnecessary re-renders. Once again follow our [decision algorithm](/v3/references/3rd-party-views) to learn about another options.
 
 
 
