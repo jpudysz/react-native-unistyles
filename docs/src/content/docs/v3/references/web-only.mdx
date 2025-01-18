@@ -154,9 +154,43 @@ const styles = StyleSheet.create({
 
 Unistyles 3.0 converts all of your themes to CSS variables by default. Removing heavy JS work when changing the theme, and allowing CSS engine to take over.
 
-You should in fact [disable](/v3/start/configuration#settings-optional) this feature in some cases.
+In more detail, it converts all string into CSS variable, for example if we have such theme:
 
-#### Here are some examples:
+```ts
+const darkTheme = {
+    colors: {
+        primary: '#4b7594'
+    },
+    gap: (v: number) => v * 8,
+    fontSize: 16
+}
+```
+
+It will be converted to:
+
+```css
+:root.dark {
+    --colors-primary: #4b7594;
+}
+```
+
+And used in your styles instead of string values.
+
+<Aside type="caution">
+Everything other than string is ommited in this conversion step.
+</Aside>
+
+##### If you're using `adaptiveThemes`
+CSS variables will be placed under the `@media (prefers-color-scheme)` [query](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme) ensuring that the app will automatically switch to the new theme.
+
+##### If you're not using `adaptiveThemes`
+Class of your html root element will be updated to match the new one.
+
+<Aside type="caution">
+You should in fact [disable](/v3/start/configuration#settings-optional) this feature in some cases.
+</Aside>
+
+#### Here are some examples where you should disable it:
 
 ##### You're having different size variables / functions in your themes
 ```tsx
