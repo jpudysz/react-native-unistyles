@@ -116,7 +116,7 @@ export default defineConfig({
                     label: 'Other',
                     items: [
                         { label: 'How to report a bug?', slug: 'v3/other/how-to-report-bug' },
-                        { label: 'Babel plugin', slug: 'v3/other/babel-plugin' },
+                        { label: 'Babel plugin', slug: 'v3/other/babel-plugin', badge: 'Updated' },
                         { label: 'Dependencies', slug: 'v3/other/dependencies' },
                         { label: 'For library authors', slug: 'v3/other/for-library-authors' },
                         { label: 'For sponsors', slug: 'v3/other/for-sponsors' },
