@@ -225,6 +225,8 @@ module.exports = function (api) {
 By default babel plugin will ignore `node_modules`.
 However similar to `autoProcessImports`, you can configure it to process extra paths.
 
+Under these paths we will replace `react-native` imports with `react-native-unistyles` factories that will borrow components refs [read more](/v3/other/babel-plugin#3-component-factory-borrowing-ref).
+
 Defaults to:
 
 ```ts
