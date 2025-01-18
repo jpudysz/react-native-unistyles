@@ -150,4 +150,40 @@ const styles = StyleSheet.create({
 })
 ```
 
+### CSS Variables
+
+Unistyles 3.0 converts all of your themes to CSS variables by default. Removing heavy JS work when changing the theme, and allowing CSS engine to take over.
+
+You should in fact [disable](/v3/start/configuration#settings-optional) this feature in some cases.
+
+#### Here are some examples:
+
+##### You're having different size variables / functions in your themes
+```tsx
+const regularTheme = {
+    colors: sharedColors,
+    gap: (v: number) => v * 8,
+    fontSize: 16
+}
+
+const largeTheme = {
+    colors: sharedColors,
+    gap: (v: number) => v * 16,
+    fontSize: 32
+}
+```
+
+##### You're using boolean values to style your components
+
+```tsx
+const styles = StyleSheet.create(theme => ({
+    container: {
+        backgroundColor: theme.isDark
+            ? theme.colors.grey200
+            : theme.colors.grey700
+    }
+}))
+```
+
+If none of the above applies to you, you can use CSS variables to boost your app's performance.
 </Seo>
