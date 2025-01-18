@@ -104,6 +104,7 @@ export default defineConfig({
                         { label: 'Web styles', slug: 'v3/references/web-styles' },
                         { label: 'Web Only Features', slug: 'v3/references/web-only' },
                         { label: 'Scoped theme', slug: 'v3/references/scoped-theme' },
+                        { label: 'Update 3rd party views', slug: 'v3/references/3rd-party-views', badge: 'New!' },
                         { label: 'withUnistyles', slug: 'v3/references/with-unistyles' },
                         { label: 'useUnistyles', slug: 'v3/references/use-unistyles', badge: 'New!' },
                         { label: 'Display and Hide', slug: 'v3/references/display-hide' },
