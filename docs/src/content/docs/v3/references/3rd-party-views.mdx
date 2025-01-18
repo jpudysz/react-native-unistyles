@@ -1,0 +1,28 @@
+---
+title: How to auto-update 3rd party views?
+description: Learn about how to use Unistyles with 3rd party components
+---
+
+import { Card } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'How to auto-update 3rd party views?',
+        description: 'Learn about how to use Unistyles with 3rd party components'
+    }}
+>
+
+:::tip
+This is our decision algorithm that ensures best practices for your app.
+:::
+
+1. If you're using `react-native`, `react-native-reanimated`, or `react-native-gesture-handler` components, avoid doing anything. It will work out of the box.
+
+2. If you're using third-party components and you're confident they internally use `react-native` components, check the [Babel plugin configuration](/v3/other/babel-plugin#extra-configuration) to see if they can be processed to work out of the box.
+
+3. If that fails, try migrating to the [withUnistyles](/v3/references/with-unistyles) factory. It follows best practices and ensures that only a single component is re-rendered when dependencies change.
+
+4. If that also fails, follow best practices and use the [useUnistyles](/v3/references/use-unistyles) hook.
+
+</Seo>
