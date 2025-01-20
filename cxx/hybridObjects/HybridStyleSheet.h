@@ -73,6 +73,7 @@ private:
     void onImeChange(UnistylesNativeMiniRuntime miniRuntime);
     void notifyJSListeners(std::vector<UnistyleDependency>& dependencies);
 
+    bool isInitialized = false;
     double __unid = -1;
     std::vector<std::unique_ptr<const std::function<void(std::vector<UnistyleDependency>&)>>> _changeListeners{};
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;

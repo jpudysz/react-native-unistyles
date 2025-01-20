@@ -77,6 +77,10 @@ jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisV
 }
 
 jsi::Value HybridStyleSheet::init(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
+    if (this->isInitialized) {
+        return jsi::Value::undefined();
+    }
+    
     // create new state
     auto& registry = core::UnistylesRegistry::get();
 
@@ -84,6 +88,8 @@ jsi::Value HybridStyleSheet::init(jsi::Runtime &rt, const jsi::Value &thisVal, c
 
     loadExternalMethods(thisVal, rt);
     registerHooks(rt);
+    
+    this->isInitialized = true;
 
     return jsi::Value::undefined();
 }
