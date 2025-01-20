@@ -152,9 +152,9 @@ const styles = StyleSheet.create({
 
 ### CSS Variables
 
-Unistyles 3.0 converts all of your themes to CSS variables by default. Removing heavy JS work when changing the theme, and allowing CSS engine to take over.
+Unistyles 3.0 converts all your themes to CSS variables by default, eliminating heavy JS processing when changing the theme and allowing the CSS engine to take over.
 
-In more detail, it converts all string into CSS variable, for example if we have such theme:
+In more detail, it converts all **strings** into CSS variables. For example, if we have the following theme:
 
 ```ts
 const darkTheme = {
@@ -174,11 +174,7 @@ It will be converted to:
 }
 ```
 
-And used in your styles instead of string values.
-
-<Aside type="caution">
-Everything other than string is ommited in this conversion step.
-</Aside>
+After conversion, Unistyles will use CSS variable instead of string to reference the theme value.
 
 ##### If you're using `adaptiveThemes`
 CSS variables will be placed under the `@media (prefers-color-scheme)` [query](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme) ensuring that the app will automatically switch to the new theme.
@@ -187,13 +183,15 @@ CSS variables will be placed under the `@media (prefers-color-scheme)` [query](h
 Class of your html root element will be updated to match the new one.
 
 <Aside type="caution">
-You should in fact [disable](/v3/start/configuration#settings-optional) this feature in some cases.
+It's possible to [disable](/v3/start/configuration#settings-optional) this feature in some cases.
 </Aside>
 
-#### Here are some examples where you should disable it:
+### When to disable CSS variables?
 
-##### You're having different size variables / functions in your themes
+##### When you have different size variables / functions in your themes
+
 ```tsx
+// ❌ Not OK
 const regularTheme = {
     colors: sharedColors,
     gap: (v: number) => v * 8,
@@ -202,19 +200,56 @@ const regularTheme = {
 
 const largeTheme = {
     colors: sharedColors,
+    // gap function has a different factor
     gap: (v: number) => v * 16,
+    // fontSize is a different value
     fontSize: 32
 }
 ```
 
-##### You're using boolean values to style your components
+```tsx
+// ✅ OK
+const lightTheme = {
+    colors: {
+        ...sharedColors,
+        background: '#fff',
+        typography: '#000'
+    },
+    gap: (v: number) => v * 8,
+    fontSize: 16
+}
+
+const darkTheme = {
+    colors: {
+        ...sharedColors,
+        background: '#000',
+        typography: '#fff'
+    },
+    gap: (v: number) => v * 8,
+    fontSize: 16
+}
+```
+
+##### When you use conditions to style your components instead of relying on the same theme values
 
 ```tsx
+// ❌ Not OK
 const styles = StyleSheet.create(theme => ({
     container: {
+        // this is a condition and won't work with CSS variables
         backgroundColor: theme.isDark
             ? theme.colors.grey200
             : theme.colors.grey700
+    }
+}))
+```
+
+```tsx
+// ✅ OK
+const styles = StyleSheet.create(theme => ({
+    container: {
+        // your rely on the same theme values across different themes
+        backgroundColor: theme.colors.background
     }
 }))
 ```
