@@ -20,7 +20,10 @@ export const createUnistylesElement = (Component: any) => React.forwardRef((prop
             {...props}
             ref={(ref: unknown) => {
                 if (ref) {
-                    storedRef.current = ref
+                    storedRef.current = Component.name === 'KeyboardAvoidingView'
+                        // @ts-ignore this is special case for KeyboardAvoidingView
+                        ? ref.viewRef.current
+                        : ref
                 }
 
                 passForwardedRef(props, ref, forwardedRef)
