@@ -17,17 +17,20 @@ Unistyles 3.0 is fully compatible with Next.js Server Side Rendering (SSR). We'r
 
 ### Usage
 
-To use server-side rendered styles, you just need to call `useServerUnistyles` function in your server component.
+To use server-side rendered styles you need to create such client component first:
 
-```tsx title="Style.tsx" /useServerUnistyles/
+```tsx title="Style.tsx" /useServerUnistyles/ /useServerInsertedHTML/
 'use client'
 
 import { PropsWithChildren } from 'react'
 import { useServerUnistyles } from 'react-native-unistyles/server'
+import { useServerInsertedHTML } from 'next/navigation'
 import './unistyles'
 
 export const Style = ({ children }: PropsWithChildren) => {
-    useServerUnistyles()
+    const unistyles = useServerUnistyles()
+
+    useServerInsertedHTML(() => unistyles)
 
     return <>{children}</>
 }
