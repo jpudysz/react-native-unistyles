@@ -10,12 +10,7 @@ export const createUnistylesImageBackground = (Component: typeof ImageBackground
 
     useEffect(() => {
         return () => {
-            if (storedRef.current) {
-                // @ts-ignore
-                UnistylesShadowRegistry.remove(storedRef.current)
-            }
-
-            if (!storedImageRef.current) {
+            if (storedImageRef.current) {
                 // @ts-ignore
                 UnistylesShadowRegistry.remove(storedImageRef.current)
             }
@@ -36,6 +31,11 @@ export const createUnistylesImageBackground = (Component: typeof ImageBackground
                 }
 
                 passForwardedRef(props, ref, forwardedRef)
+
+                return () => {
+                    // @ts-ignore
+                    UnistylesShadowRegistry.remove(ref)
+                }
             }}
             imageRef={ref => {
                 if (ref) {
