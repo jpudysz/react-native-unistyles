@@ -53,13 +53,13 @@ void HostUnistyle::set(jsi::Runtime& rt, const jsi::PropNameID& propNameId, cons
 
 jsi::Function HostUnistyle::createAddVariantsProxyFunction(jsi::Runtime& rt) {
     auto useVariantsFnName = jsi::PropNameID::forUtf8(rt, helpers::ADD_VARIANTS_FN);
-    auto parser = parser::Parser(this->_unistylesRuntime);
 
-    return jsi::Function::createFromHostFunction(rt, useVariantsFnName, 1, [this, &parser](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count){
+    return jsi::Function::createFromHostFunction(rt, useVariantsFnName, 1, [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count){
         helpers::assertThat(rt, count == 1, "Unistyles: useVariants expected to be called with one argument.");
         helpers::assertThat(rt, arguments[0].isObject(), "Unistyles: useVariants expected to be called with object.");
 
         Variants variants = helpers::variantsToPairs(rt, arguments[0].asObject(rt));
+        parser::Parser parser = parser::Parser(this->_unistylesRuntime);
 
         helpers::enumerateJSIObject(rt, thisVal.asObject(rt), [this, &parser, &rt, &variants](const std::string& name, jsi::Value& value){
             if (name == helpers::ADD_VARIANTS_FN || !this->_stylesheet->unistyles.contains(name)) {
