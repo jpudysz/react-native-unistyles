@@ -118,6 +118,10 @@ void HybridStyleSheet::parseSettings(jsi::Runtime &rt, jsi::Object settings) {
             return;
         }
 
+        if (propertyName == "CSSVars") {
+            return;
+        }
+
         helpers::assertThat(rt, false, "StyleSheet.configure's settings received unexpected key: '" + std::string(propertyName) + "'");
     });
 }
@@ -255,13 +259,13 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
     auto dependentStyleSheets = registry.getStyleSheetsToRefresh(rt, dependencies);
 
     parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets, std::nullopt);
-    
+
     // we need to stop here if there is nothing to update at the moment,
     // but we need to compute dependentStyleSheets
     if (dependencyMap.empty()) {
         return;
     }
-    
+
     parser.rebuildShadowLeafUpdates(rt, dependencyMap);
 
     this->notifyJSListeners(dependencies);
@@ -306,13 +310,13 @@ void HybridStyleSheet::onPlatformNativeDependenciesChange(std::vector<UnistyleDe
         auto dependentStyleSheets = registry.getStyleSheetsToRefresh(rt, unistyleDependencies);
 
         parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets, miniRuntime);
-        
+
         // we need to stop here if there is nothing to update at the moment,
         // but we need to compute dependentStyleSheets
         if (dependencyMap.empty()) {
             return;
         }
-        
+
         parser.rebuildShadowLeafUpdates(rt, dependencyMap);
 
         this->notifyJSListeners(unistyleDependencies);
