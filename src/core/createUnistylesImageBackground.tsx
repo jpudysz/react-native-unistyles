@@ -5,7 +5,6 @@ import { passForwardedRef } from './passForwardRef'
 import { maybeWarnAboutMultipleUnistyles } from './warn'
 
 export const createUnistylesImageBackground = (Component: typeof ImageBackground) => React.forwardRef<ImageBackground, ImageBackgroundProps>((props, forwardedRef) => {
-    const storedRef = useRef<ImageBackground | null>(null)
     const storedImageRef = useRef<Image | null>(null)
 
     useEffect(() => {
@@ -26,10 +25,6 @@ export const createUnistylesImageBackground = (Component: typeof ImageBackground
         <Component
             {...props}
             ref={ref => {
-                if (ref) {
-                    storedRef.current = ref
-                }
-
                 passForwardedRef(props, ref, forwardedRef)
 
                 return () => {
