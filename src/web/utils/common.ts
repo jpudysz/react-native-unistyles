@@ -5,7 +5,7 @@ export const reduceObject = <TObj extends Record<string, any>, TReducer>(
 
 export const keyInObject = <T extends Record<string, any>>(obj: T, key: PropertyKey): key is keyof T => key in obj
 
-export const isServer = () => typeof window === 'undefined'
+export const isServer = () => typeof window === 'undefined' || typeof document === 'undefined'
 
 export const error = (message: string) => new Error(`Unistyles: ${message}`)
 
