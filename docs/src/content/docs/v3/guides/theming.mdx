@@ -129,6 +129,26 @@ const styles = StyleSheet.create(theme => ({
 }))
 ```
 
+Other, discouraged way is to access it in the hook `useUnistyles`:
+
+```tsx /useUnistyles/
+import { useUnistyles } from 'react-native-unistyles'
+
+const MyComponent = () => {
+    const { theme } = useUnistyles()
+
+    return (
+        <Text>
+            My theme is {theme.colors.primary}
+        </Text>
+    )
+}
+```
+
+:::caution
+`useUnistyles` is not recommended as it will re-render your component on every change of the theme
+:::
+
 ### Get the current theme name
 
 To get the current theme name, import `UnistylesRuntime`:
