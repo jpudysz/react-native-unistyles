@@ -70,46 +70,7 @@ const stylesheet = StyleSheet.create((theme, rt) => ({
 This helps us identify your `StyleSheet` while you're developing your app and trigger multiple `hot-reloads`. Such identification is required to swap your `StyleSheet` with another one, ensuring that you get up-to-date values during reloads.
 This feature does not affect your app in production, as the bundle never reloads in that environment.
 
-### 3. Modifying your component `style` prop
-
-Each `Unistyle` (C++ HybridObject) has an attached `C++` state. This state can be lost when using the spread operator, which is why Unistyles safeguards against that.
-
-If we try to read the style on C++ side without its associated state, an error will be thrown: `Unistyle is not bound!`.
-
-However, this doesn't mean you can't copy or spread your styles. It is still possible to do so, but it requires the Babel plugin, which converts your styles into an array format.
-
-```ts
-// 😩 ouch, you have just removed C++ state
-const mergedStyles = {
-    ...styles.container,
-    ...styles.text
-}
-
-// 💥 Unistyle is not bound!
-<View style={mergedStyles} />
-```
-
-```ts
-// 😎 you're safe
-const mergedStyles = [
-    styles.container,
-    styles.text
-]
-
-// 😇 we can read the state
-<View style={mergedStyles} />
-```
-
-Or with babel plugin:
-
-```ts
-<View style={{...styles.container, ...styles.text}} />
-
-// 😇 will be replaced with
-<View style={[styles.container, styles.text]} />
-```
-
-### 4. Component factory
+### 3. Component factory (borrowing ref)
 
 This is the most crucial part—without it, Unistyles won’t be able to update your views from C++.
 In the early versions of Unistyles 3.0, we tried solving this problem by using the `ref` prop, but it wasn’t reliable enough.
@@ -180,63 +141,95 @@ import { Image } from 'react-native-unistyles/components/native/Image'
 <Image source={require('./image.png')} style={styles.image} ref={ref2} />
 ```
 
-### Summary
+### 4. Creating scopes for stateless variants
 
-That's it! We hope you enjoy the DX of Unistyles 3.0 with the help of the Babel plugin. If you encounter any Babel issues, we're ready to tackle them and resolve them with priority!
+When you use variants, each time you call `useVariants`, a new scope is created. This scope contains a local copy of stylesheet that won't affect other components.
+This feature is similar to time travel, allowing you to explore different states of your styles with different calls to `useVariants`.
 
-## Additional configuration
+From your perspective, using variants is simple: you just need to call the `useVariants` hook:
+
+```tsx
+styles.useVariants({
+    size: 'small'
+})
+```
+
+Behind the scenes, we create a scoped constant that can be accessed anywhere within the same block:
+
+```tsx
+const _styles = styles
+{
+    const styles = _styles.useVariants({
+        size: 'small'
+    })
+
+    // Your code here
+}
+```
+
+This approach also works seamlessly with `console.log`, allowing you to inspect styles at any point:
+
+```tsx
+// Styles without variants
+console.log(styles.container)
+
+styles.useVariants({
+    size: 'small'
+})
+
+// Styles with variants: small
+console.log(styles.container)
+
+styles.useVariants({
+    size: 'large'
+})
+
+// Styles with variants: large
+console.log(styles.container)
+```
+
+By leveraging such scopes, we ensure support for any level of nesting!
+
+### Extra configuration
 
 The Babel plugin comes with a few additional options to extend its usage.
 
-### `autoProcessImports`
+#### `autoProcessImports`
 
-If you use ui-kit components, you can configure the Babel plugin to process them.
+By default babel plugin will look for any `react-native-unistyles` import to start processing your file.
+However, in some cases you might want to process files that miss such import:
+- ui-kits that aggregates Unistyles components
+- monorepos that use Unistyles under absolute path like `@codemask/styles`
 
-```js title="babel.config.js"
-/** @type {import('react-native-unistyles/plugin').UnistylesPluginOptions} */
-const unistylesPluginConfig = {
-    autoProcessImports: ['@lib/ui-kit'],
-}
+If that's your case, you can configure the Babel plugin to process them.
 
-module.exports = function (api) {
-    api.cache(true)
+#### `autoProcessPaths`
 
-    return {
-        plugins: [
-            ['react-native-unistyles/plugin', unistylesPluginConfig]
-        ]
-    }
-}
+By default babel plugin will ignore `node_modules`.
+However similar to `autoProcessImports`, you can configure it to process extra paths.
+
+Under these paths we will replace `react-native` imports with `react-native-unistyles` factories that will borrow components refs [read more](/v3/other/babel-plugin#3-component-factory-borrowing-ref).
+
+Defaults to:
+
+```ts
+['react-native-reanimated/src/component', 'react-native-gesture-handler/src/components']
 ```
 
-### `autoProcessPaths`
+#### `debug`
 
-Similar to `autoProcessImports`, you can configure the Babel plugin to process paths.
+In order to list detected dependencies by the Babel plugin you can enable the `debug` flag.
+It will `console.log` name of the file and component with Unistyles dependencies.
+
+#### Usage in `babel.config.js`
+
+You can apply any of the options above as follows:
 
 ```js title="babel.config.js"
 /** @type {import('react-native-unistyles/plugin').UnistylesPluginOptions} */
-const unistylesPluginConfig = {
+const unistylesPluginOptions = {
+    autoProcessImports: ['@react-native-ui-kit', '@codemask/styles'],
     autoProcessPaths: ['external-library/components'],
-}
-
-module.exports = function (api) {
-    api.cache(true)
-
-    return {
-        plugins: [
-            ['react-native-unistyles/plugin', unistylesPluginConfig]
-        ]
-    }
-}
-```
-
-### `debug`
-
-In order to debug issues with the Babel plugin you can enable the `debug` boolean.
-
-```js title="babel.config.js"
-/** @type {import('react-native-unistyles/plugin').UnistylesPluginOptions} */
-const unistylesPluginConfig = {
     debug: true,
 }
 
@@ -245,7 +238,7 @@ module.exports = function (api) {
 
     return {
         plugins: [
-            ['react-native-unistyles/plugin', unistylesPluginConfig]
+            ['react-native-unistyles/plugin', unistylesPluginOptions]
         ]
     }
 }

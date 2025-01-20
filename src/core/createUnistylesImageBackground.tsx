@@ -5,17 +5,11 @@ import { passForwardedRef } from './passForwardRef'
 import { maybeWarnAboutMultipleUnistyles } from './warn'
 
 export const createUnistylesImageBackground = (Component: typeof ImageBackground) => React.forwardRef<ImageBackground, ImageBackgroundProps>((props, forwardedRef) => {
-    const storedRef = useRef<ImageBackground | null>(null)
     const storedImageRef = useRef<Image | null>(null)
 
     useEffect(() => {
         return () => {
-            if (storedRef.current) {
-                // @ts-ignore
-                UnistylesShadowRegistry.remove(storedRef.current)
-            }
-
-            if (!storedImageRef.current) {
+            if (storedImageRef.current) {
                 // @ts-ignore
                 UnistylesShadowRegistry.remove(storedImageRef.current)
             }
@@ -31,11 +25,12 @@ export const createUnistylesImageBackground = (Component: typeof ImageBackground
         <Component
             {...props}
             ref={ref => {
-                if (ref) {
-                    storedRef.current = ref
-                }
-
                 passForwardedRef(props, ref, forwardedRef)
+
+                return () => {
+                    // @ts-ignore
+                    UnistylesShadowRegistry.remove(ref)
+                }
             }}
             imageRef={ref => {
                 if (ref) {
