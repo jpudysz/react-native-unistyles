@@ -68,18 +68,19 @@ export const isInDocument = (element: HTMLElement) => document.body.contains(ele
 
 export const getMediaQuery = (query: string, allBreakpoints: Array<string>) => {
     if (Object.values(Orientation).includes(query as Orientation)) {
-        return `(orientation: ${query})`
+        return `@media (orientation: ${query})`
     }
 
     if (isUnistylesMq(query)) {
         const { minWidth, maxWidth, minHeight, maxHeight } = parseMq(query)
 
-        return [
+        const queries = [
             minWidth ? `(min-width: ${minWidth}px)` : undefined,
             maxWidth ? `(max-width: ${maxWidth}px)` : undefined,
             minHeight ? `(min-height: ${minHeight}px)` : undefined,
             maxHeight ? `(max-height: ${maxHeight}px)` : undefined
         ].filter(Boolean).join(' and ')
+        return `@media ${queries}`
     }
 
     const breakpointValue = UnistylesWeb.runtime.breakpoints[query as keyof UnistylesBreakpoints] ?? 0
