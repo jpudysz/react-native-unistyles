@@ -3,6 +3,19 @@ import { UnistylesShadowRegistry } from '../specs'
 import { passForwardedRef } from './passForwardRef'
 import { maybeWarnAboutMultipleUnistyles } from './warn'
 
+const getNativeRef = (Component: any, ref: any) => {
+    switch (Component.name) {
+        case 'KeyboardAvoidingView':
+            return ref.viewRef?.current
+        case 'FlatList':
+            return ref.getNativeScrollRef?.()
+        case 'VirtualizedList':
+            return ref.getScrollRef?.()
+        default:
+            return ref
+    }
+}
+
 export const createUnistylesElement = (Component: any) => React.forwardRef((props, forwardedRef) => {
     const storedRef = useRef<unknown>(null)
 
@@ -20,10 +33,7 @@ export const createUnistylesElement = (Component: any) => React.forwardRef((prop
             {...props}
             ref={(ref: unknown) => {
                 if (ref) {
-                    storedRef.current = Component.name === 'KeyboardAvoidingView'
-                        // @ts-ignore this is special case for KeyboardAvoidingView
-                        ? ref.viewRef.current
-                        : ref
+                    storedRef.current = getNativeRef(Component, ref)
                 }
 
                 passForwardedRef(props, ref, forwardedRef)
