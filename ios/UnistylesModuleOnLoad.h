@@ -8,12 +8,12 @@
 #import "TurboUnistyles/TurboUnistyles.h"
 #import <React/RCTSurfacePresenter.h>
 #import <React/RCTScheduler.h>
-#import <React/RCTRuntimeExecutorModule.h>
-#import <ReactCommon/RCTRuntimeExecutor.h>
+#import <React/RCTCallInvoker.h>
+#import <React/RCTCallInvokerModule.h>
 #import <ReactCommon/RCTTurboModuleWithJSIBindings.h>
 
-@interface UnistylesModule: RCTEventEmitter<NativeTurboUnistylesSpec>
+@interface UnistylesModule: RCTEventEmitter<NativeTurboUnistylesSpec, RCTCallInvokerModule>
 @end
 
-@interface UnistylesModule()<RCTTurboModuleWithJSIBindings, RCTRuntimeExecutorModule>
+@interface UnistylesModule()<RCTTurboModuleWithJSIBindings>
 @end
