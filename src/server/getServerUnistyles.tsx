@@ -15,6 +15,7 @@ export const getServerUnistyles = ({ includeRNWStyles = true }: ServerUnistylesS
     return <>
         {rnwStyle && <style id='rnw-style'>{rnwStyle}</style>}
         <style id='unistyles-web'>{css}</style>
-        <script id='unistyles-script'>{`window.__UNISTYLES_STATE__ = ${JSON.stringify(state)}`}</script>
+        {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Needs the json quotes to be unescaped */}
+        <script id='unistyles-script' dangerouslySetInnerHTML={{ __html: `window.__UNISTYLES_STATE__ = ${JSON.stringify(state)}`}} />
     </>
 }
