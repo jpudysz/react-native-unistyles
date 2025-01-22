@@ -11,7 +11,7 @@ using namespace margelo::nitro;
 RCT_EXPORT_MODULE(Unistyles)
 
 __weak RCTSurfacePresenter* _surfacePresenter;
-@synthesize runtimeExecutor = _runtimeExecutor;
+@synthesize callInvoker = _callInvoker;
 
 + (BOOL)requiresMainQueueSetup {
     return YES;
@@ -36,13 +36,9 @@ __weak RCTSurfacePresenter* _surfacePresenter;
 }
 
 - (void)createHybrids:(jsi::Runtime&)rt {
-    auto runOnJSThread = ([executor = _runtimeExecutor](std::function<void(jsi::Runtime& rt)> &&callback) {
-        __block auto objcCallback = callback;
-
-        [executor execute:^(jsi::Runtime& rt){
-            objcCallback(rt);
-        }];
-    });
+    auto runOnJSThread = [callInvoker = _callInvoker.callInvoker](std::function<void(jsi::Runtime& rt)> &&callback){
+        callInvoker->invokeAsync(std::move(callback));
+    };
 
     auto nativePlatform = Unistyles::NativePlatform::create().getCxxPart();
     auto unistylesRuntime = std::make_shared<HybridUnistylesRuntime>(nativePlatform, rt, runOnJSThread);
