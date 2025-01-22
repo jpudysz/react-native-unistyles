@@ -20,8 +20,8 @@ class UnistylesPackage: TurboReactPackage() {
             mapOf(UnistylesModule.NAME to ReactModuleInfo(
                 UnistylesModule.NAME,
                 UnistylesModule.NAME,
-                _canOverrideExistingModule = true,
-                _needsEagerInit = true,
+                canOverrideExistingModule = true,
+                needsEagerInit = true,
                 isCxxModule = true,
                 isTurboModule = true
             ))
