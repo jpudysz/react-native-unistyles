@@ -194,21 +194,39 @@ By leveraging such scopes, we ensure support for any level of nesting!
 
 The Babel plugin comes with a few additional options to extend its usage.
 
+:::caution
+By default babel plugin will look for any `react-native-unistyles` import to start processing your file.
+You can change this behaviour with options below:
+:::
+
+#### `autoProcessRoot`
+
+If you want to process all your files, regardless of whether they include a `react-native-unistyles` import, you can set the `autoProcessRoot` option.
+
+```js
+{
+    autoProcessRoot: 'src' // or 'app', or any name of your root folder
+}
+```
+
+Folder name will be resolved with `process.cwd()`.
+
 #### `autoProcessImports`
 
-By default babel plugin will look for any `react-native-unistyles` import to start processing your file.
-However, in some cases you might want to process files that miss such import:
-- ui-kits that aggregates Unistyles components
-- monorepos that use Unistyles under absolute path like `@codemask/styles`
+This configuration should be used when you want to process only files containing specific imports.
+It can be useful for monorepos that use Unistyles with absolute paths, such as `@codemask/styles`.
 
-If that's your case, you can configure the Babel plugin to process them.
+```js
+{
+    autoProcessImports: ['@codemask/styles'] // whenever Babel encounters this import, it will process your file
+}
+```
 
 #### `autoProcessPaths`
 
-By default babel plugin will ignore `node_modules`.
-However similar to `autoProcessImports`, you can configure it to process extra paths.
-
-Under these paths we will replace `react-native` imports with `react-native-unistyles` factories that will borrow components refs [read more](/v3/other/babel-plugin#3-component-factory-borrowing-ref).
+This configuration is unrelated to the `autoProcessRoot` and `autoProcessImports` options and can be used alongside them.
+By default, the Babel plugin ignores `node_modules`. However, you can extend these paths to attempt converting 3rd components into Unistyles compatible ones.
+Within these paths, we will replace `react-native` imports with `react-native-unistyles` factories that borrow component refs. [Read more](/v3/other/babel-plugin#3-component-factory-borrowing-ref).
 
 Defaults to:
 
@@ -228,7 +246,9 @@ You can apply any of the options above as follows:
 ```js title="babel.config.js"
 /** @type {import('react-native-unistyles/plugin').UnistylesPluginOptions} */
 const unistylesPluginOptions = {
+    autoProcessRoot: 'src',
     autoProcessImports: ['@react-native-ui-kit', '@codemask/styles'],
+
     autoProcessPaths: ['external-library/components'],
     debug: true,
 }

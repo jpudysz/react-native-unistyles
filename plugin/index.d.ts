@@ -1,18 +1,20 @@
 export interface UnistylesPluginOptions {
+    /**
+     * Example: "src" or "apps/mobile"
+     * Add this option if some of your components don't have `react-native-unistyles` import.
+     * Babel plugin will automatically process all files under this root.
+     */
+    autoProcessRoot?: string
+
   /**
-   * By default babel plugin will look for any `react-native-unistyles` import to start processing your file.
-   * However, in some cases you might want to process files that miss such import:
-   * - ui-kits that aggregates Unistyles components
-   * - monorepos that use Unistyles under absolute path like `@codemask/styles`
-   *
-   * If that's your case, you can configure the Babel plugin to process them.
+   * Example: ['@codemask/styles']
+   * Enable this option if you want to process only files containing specific imports.
    */
   autoProcessImports?: string[]
 
   /**
-   * By default babel plugin will ignore `node_modules`.
-   * However similar to `autoProcessImports`, you can configure it to process extra paths.
-   *
+   * Example: ['external-library/components']
+   * Enable this option to process some 3rd party components under `node_modules`.
    * Under these paths we will replace `react-native` imports with `react-native-unistyles` factories that will borrow components refs [read more](https://www.unistyl.es/v3/other/babel-plugin#3-component-factory-borrowing-ref).
    *
    * Defaults to:

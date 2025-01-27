@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef } from 'react'
+import React, { forwardRef, useLayoutEffect, useRef } from 'react'
 import { Pressable as NativePressableReactNative } from 'react-native'
 import type { PressableProps as Props, View } from 'react-native'
 import { UnistylesShadowRegistry } from '../../specs'
@@ -11,7 +11,7 @@ type PressableProps = Props & {
 export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ...props }, forwardedRef) => {
     const storedRef = useRef<View | null>()
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         return () => {
             if (storedRef.current) {
                 // @ts-expect-error - this is hidden from TS
