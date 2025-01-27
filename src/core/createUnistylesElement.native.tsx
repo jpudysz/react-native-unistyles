@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useLayoutEffect, useRef } from 'react'
 import { UnistylesShadowRegistry } from '../specs'
 import { passForwardedRef } from './passForwardRef'
 import { maybeWarnAboutMultipleUnistyles } from './warn'
@@ -19,7 +19,7 @@ const getNativeRef = (Component: any, ref: any) => {
 export const createUnistylesElement = (Component: any) => React.forwardRef((props, forwardedRef) => {
     const storedRef = useRef<unknown>(null)
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         return () => {
             if (storedRef.current) {
                 // @ts-ignore

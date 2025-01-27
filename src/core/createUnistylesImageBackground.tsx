@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useLayoutEffect, useRef } from 'react'
 import type { Image, ImageBackground, ImageBackgroundProps } from 'react-native'
 import { UnistylesShadowRegistry } from '../specs'
 import { passForwardedRef } from './passForwardRef'
@@ -7,7 +7,7 @@ import { maybeWarnAboutMultipleUnistyles } from './warn'
 export const createUnistylesImageBackground = (Component: typeof ImageBackground) => React.forwardRef<ImageBackground, ImageBackgroundProps>((props, forwardedRef) => {
     const storedImageRef = useRef<Image | null>(null)
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         return () => {
             if (storedImageRef.current) {
                 // @ts-ignore
