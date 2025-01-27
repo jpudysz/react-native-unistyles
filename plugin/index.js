@@ -48,14 +48,16 @@ module.exports = function ({ types: t }) {
                     state.file.styleSheetLocalName = ''
                     state.file.tagNumber = 0
                     state.reactNativeImports = {}
-                    state.file.forceProcessing = false
+                    state.file.forceProcessing = state.opts.autoProcessRoot
+                        ? state.filename.includes(`${state.file.opts.root}/${state.opts.autoProcessRoot}/`)
+                        : false
                 },
                 exit(path, state) {
                     if (isInsideNodeModules(state) && !state.file.replaceWithUnistyles) {
                         return
                     }
 
-                    if (state.file.hasAnyUnistyle || state.file.hasVariants || state.file.replaceWithUnistyles) {
+                    if (state.file.hasAnyUnistyle || state.file.hasVariants || state.file.replaceWithUnistyles || state.file.forceProcessing) {
                         addUnistylesImport(t, path, state)
                     }
                 }
