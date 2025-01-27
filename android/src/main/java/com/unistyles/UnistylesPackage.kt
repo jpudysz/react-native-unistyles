@@ -1,12 +1,12 @@
 package com.unistyles
 
-import com.facebook.react.TurboReactPackage
+import com.facebook.react.BaseReactPackage
 import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.module.model.ReactModuleInfo
 import com.facebook.react.module.model.ReactModuleInfoProvider
 
-class UnistylesPackage: TurboReactPackage() {
+class UnistylesPackage: BaseReactPackage() {
     override fun getModule(name: String, reactContext: ReactApplicationContext): NativeModule? {
         return if (name == UnistylesModule.NAME) {
             UnistylesModule(reactContext)
@@ -20,10 +20,10 @@ class UnistylesPackage: TurboReactPackage() {
             mapOf(UnistylesModule.NAME to ReactModuleInfo(
                 UnistylesModule.NAME,
                 UnistylesModule.NAME,
-                canOverrideExistingModule = true,
-                needsEagerInit = true,
-                isCxxModule = true,
-                isTurboModule = true
+                true,
+                true,
+                true,
+                true
             ))
         }
     }
