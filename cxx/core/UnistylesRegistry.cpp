@@ -86,6 +86,27 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
     this->trafficController.resumeUnistylesTraffic();
 }
 
+void core::UnistylesRegistry::removeDuplicatedUnistyles(jsi::Runtime& rt, const ShadowNodeFamily *shadowNodeFamily, std::vector<core::Unistyle::Shared>& unistyles) {
+    auto targetFamilyUnistyles = this->_shadowRegistry[&rt][shadowNodeFamily];
+
+    unistyles.erase(
+        std::remove_if(
+            unistyles.begin(),
+            unistyles.end(),
+            [&targetFamilyUnistyles](const core::Unistyle::Shared& unistyle) {
+                return std::any_of(
+                    targetFamilyUnistyles.begin(),
+                    targetFamilyUnistyles.end(),
+                    [&unistyle](const std::shared_ptr<core::UnistyleData>& data) {
+                        return data->unistyle == unistyle;
+                    }
+                );
+            }
+        ),
+        unistyles.end()
+    );
+}
+
 void core::UnistylesRegistry::unlinkShadowNodeWithUnistyles(jsi::Runtime& rt, const ShadowNodeFamily* shadowNodeFamily) {
     this->_shadowRegistry[&rt].erase(shadowNodeFamily);
     this->trafficController.removeShadowNode(shadowNodeFamily);
@@ -201,16 +222,16 @@ std::vector<std::shared_ptr<core::StyleSheet>> core::UnistylesRegistry::getStyle
 core::Unistyle::Shared core::UnistylesRegistry::getUnistyleById(jsi::Runtime& rt, std::string unistyleID) {
     for (auto& pair: this->_styleSheetRegistry[&rt]) {
         auto [_, stylesheet] = pair;
-        
+
         for (auto unistylePair: stylesheet->unistyles) {
             auto [_, unistyle] = unistylePair;
-            
+
             if (unistyle->unid == unistyleID) {
                 return unistyle;
             }
         }
     }
-    
+
     return nullptr;
 }
 

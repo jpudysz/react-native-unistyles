@@ -2,35 +2,8 @@ const { addUnistylesImport, isInsideNodeModules } = require('./import')
 const { hasStringRef } = require('./ref')
 const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyles, isKindOfStyleSheet } = require('./stylesheet')
 const { extractVariants } = require('./variants')
-
-const reactNativeComponentNames = [
-    'ActivityIndicator',
-    'View',
-    'Text',
-    'Image',
-    'ImageBackground',
-    'KeyboardAvoidingView',
-    'Pressable',
-    'ScrollView',
-    'FlatList',
-    'SectionList',
-    'Switch',
-    'TextInput',
-    'RefreshControl',
-    'TouchableHighlight',
-    'TouchableOpacity',
-    'VirtualizedList',
-    // Modal - there is no exposed native handle
-    // TouchableWithoutFeedback - can't accept a ref
-]
-
-// auto replace RN imports to Unistyles imports under these paths
-// our implementation simply borrows 'ref' to register it in ShadowRegistry
-// so we won't affect anyone's implementation
-const REPLACE_WITH_UNISTYLES_PATHS = [
-    'react-native-reanimated/src/component',
-    'react-native-gesture-handler/src/components'
-]
+const { REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_PATHS, REPLACE_WITH_UNISTYLES_EXOTIC_PATHS } = require('./consts')
+const { handleExoticImport } = require('./exotic')
 
 module.exports = function ({ types: t }) {
     return {
@@ -107,6 +80,13 @@ module.exports = function ({ types: t }) {
             },
             /** @param {import('./index').UnistylesPluginPass} state */
             ImportDeclaration(path, state) {
+                const exoticImport = REPLACE_WITH_UNISTYLES_EXOTIC_PATHS
+                    .find(exotic => state.filename.includes(exotic.path))
+
+                if (exoticImport) {
+                    return handleExoticImport(t, path, state, exoticImport)
+                }
+
                 if (isInsideNodeModules(state) && !state.file.replaceWithUnistyles) {
                     return
                 }
@@ -123,7 +103,7 @@ module.exports = function ({ types: t }) {
 
                 if (importSource === 'react-native') {
                     path.node.specifiers.forEach(specifier => {
-                        if (specifier.imported && reactNativeComponentNames.includes(specifier.imported.name)) {
+                        if (specifier.imported && REACT_NATIVE_COMPONENT_NAMES.includes(specifier.imported.name)) {
                             state.reactNativeImports[specifier.local.name] = specifier.imported.name
                         }
                     })
