@@ -15,7 +15,7 @@ function extractVariants(t, path, state) {
         return (
             t.isIdentifier(variant.expression.callee.object, { name: calleeName }) &&
             t.isIdentifier(variant.expression.callee.property, { name: 'useVariants' }) &&
-            t.isObjectExpression(variant.expression.arguments[0])
+            variant.expression.arguments.length === 1
         )
     })
 
