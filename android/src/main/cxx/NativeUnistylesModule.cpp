@@ -37,7 +37,7 @@ jni::local_ref<BindingsInstallerHolder::javaobject> UnistylesModule::getBindings
     auto& uiManager = jobj->cthis()->_uiManager;
     auto& nativePlatform = jobj->cthis()->_nativePlatform;
 
-    return BindingsInstallerHolder::newObjectCxxArgs([&runtimeExecutor, uiManager, nativePlatform](jsi::Runtime& rt) {
+    return BindingsInstallerHolder::newObjectCxxArgs([&runtimeExecutor, &uiManager, &nativePlatform](jsi::Runtime& rt) {
         // function is called on: first init and every live reload
         // check if this is live reload, if so let's replace UnistylesRuntime with new runtime
         auto hasUnistylesRuntime = HybridObjectRegistry::hasHybridObject("UnistylesRuntime");

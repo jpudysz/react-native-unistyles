@@ -23,6 +23,10 @@ class NativePlatformInsets(
     private val _imeListeners: MutableList<CxxImeListener> = mutableListOf()
     private var _insets: Insets = Insets(0.0, 0.0, 0.0, 0.0, 0.0)
 
+    fun onDestroy() {
+        this.removeImeListeners()
+    }
+
     fun getInsets(): Insets {
         val density = reactContext.resources.displayMetrics.density
 
