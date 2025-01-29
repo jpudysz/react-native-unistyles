@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useRef } from 'react'
 import { UnistylesShadowRegistry } from '../specs'
 import { passForwardedRef } from './passForwardRef'
 import { maybeWarnAboutMultipleUnistyles } from './warn'
+import { copyComponentProperties } from '../utils'
 
 const getNativeRef = (Component: any, ref: any) => {
     switch (Component.name) {
@@ -16,31 +17,35 @@ const getNativeRef = (Component: any, ref: any) => {
     }
 }
 
-export const createUnistylesElement = (Component: any) => React.forwardRef((props, forwardedRef) => {
-    const storedRef = useRef<unknown>(null)
+export const createUnistylesElement = (Component: any) => {
+    const UnistylesComponent = React.forwardRef((props, forwardedRef) => {
+        const storedRef = useRef<unknown>(null)
 
-    useLayoutEffect(() => {
-        return () => {
-            if (storedRef.current) {
-                // @ts-ignore
-                UnistylesShadowRegistry.remove(storedRef.current)
-            }
-        }
-    }, [])
-
-    return (
-        <Component
-            {...props}
-            ref={(ref: unknown) => {
-                if (ref) {
-                    storedRef.current = getNativeRef(Component, ref)
+        useLayoutEffect(() => {
+            return () => {
+                if (storedRef.current) {
+                    // @ts-ignore
+                    UnistylesShadowRegistry.remove(storedRef.current)
                 }
+            }
+        }, [])
 
-                passForwardedRef(props, ref, forwardedRef)
+        return (
+            <Component
+                {...props}
+                ref={(ref: unknown) => {
+                    if (ref) {
+                        storedRef.current = getNativeRef(Component, ref)
+                    }
 
-                // @ts-ignore we don't know the type of the component
-                maybeWarnAboutMultipleUnistyles(props.style, Component.displayName)
-            }}
-        />
-    )
-})
+                    passForwardedRef(props, ref, forwardedRef)
+
+                    // @ts-ignore we don't know the type of the component
+                    maybeWarnAboutMultipleUnistyles(props.style, Component.displayName)
+                }}
+            />
+        )
+    })
+
+    return copyComponentProperties(Component, UnistylesComponent)
+}
