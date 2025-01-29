@@ -30,13 +30,33 @@ const REPLACE_WITH_UNISTYLES_PATHS = [
 
 // this is more powerful API as it allows to convert unmatched imports to Unistyles
 // { path: string, imports: Array<{ name: string, isDefault: boolean, path: string, mapTo: string }> }
-// name <- target import name
+// path => node_modules path
+// imports:
+// name? <- target import name if isDefault is false
 // isDefault <- is the import default?
 // path <- path to the target import
 // mapTo <- name of the Unistyles component
 const REPLACE_WITH_UNISTYLES_EXOTIC_PATHS = []
 
+// this list will additionally detect React Native direct imports
+const NATIVE_COMPONENTS_PATHS = {
+    imports: [
+        {
+            name: 'NativeText',
+            isDefault: false,
+            path: 'react-native/Libraries/Text/TextNativeComponent',
+            mapTo: 'NativeText'
+        },
+        {
+            isDefault: true,
+            path: 'react-native/Libraries/Components/View/ViewNativeComponent',
+            mapTo: 'NativeView'
+        }
+    ]
+}
+
 module.exports = {
+    NATIVE_COMPONENTS_PATHS,
     REACT_NATIVE_COMPONENT_NAMES,
     REPLACE_WITH_UNISTYLES_PATHS,
     REPLACE_WITH_UNISTYLES_EXOTIC_PATHS
