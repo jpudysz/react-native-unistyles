@@ -12,6 +12,13 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     std::vector<std::vector<folly::dynamic>> arguments;
     auto& registry = core::UnistylesRegistry::get();
 
+    // this is special case for Animated, and prevents appending same unistyles to node
+    registry.removeDuplicatedUnistyles(rt, &shadowNodeWrapper->getFamily(), unistyleWrappers);
+
+    if (unistyleWrappers.empty()) {
+        return jsi::Value::undefined();
+    }
+
     for (size_t i = 0; i < unistyleWrappers.size(); i++) {
         if (unistyleWrappers[i]->type == core::UnistyleType::DynamicFunction) {
             try {

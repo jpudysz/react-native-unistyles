@@ -8,6 +8,22 @@ type PressableProps = Props & {
     variants?: Record<string, string | boolean>
 }
 
+const getStyles = (styleProps: Record<string, any> = {}) => {
+    const unistyleKey = Object
+        .keys(styleProps)
+        .find(key => key.startsWith('unistyles-'))
+
+    if (!unistyleKey) {
+        return styleProps
+    }
+
+    return {
+        // styles without C++ state
+        ...styleProps[unistyleKey].uni__getStyles(),
+        [unistyleKey]: styleProps[unistyleKey].uni__getStyles()
+    }
+}
+
 export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ...props }, forwardedRef) => {
     const storedRef = useRef<View | null>()
 
@@ -28,7 +44,7 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                     ? style({ pressed: false })
                     : style
 
-                // @ts-expect-error web types are not compatible with RN styles
+                // @ts-expect-error - this is hidden from TS
                 UnistylesShadowRegistry.add(ref, unistyles)
 
                 if (ref) {
@@ -40,12 +56,14 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
             style={state => {
                 const unistyles = typeof style === 'function'
                     ? style(state)
-                    : style
+                    : getStyles(style as unknown as Record<string, any>)
 
                 if (!storedRef.current) {
                     return unistyles
                 }
 
+                // @ts-expect-error - this is hidden from TS
+                UnistylesShadowRegistry.remove(storedRef.current)
                 // @ts-expect-error - this is hidden from TS
                 UnistylesShadowRegistry.add(storedRef.current, unistyles)
 

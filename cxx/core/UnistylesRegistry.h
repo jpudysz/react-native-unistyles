@@ -44,6 +44,7 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     void shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Value& maybePressableId);
     shadow::ShadowTrafficController trafficController{};
     const std::optional<std::string> getScopedTheme();
+    void removeDuplicatedUnistyles(jsi::Runtime& rt, const ShadowNodeFamily* shadowNodeFamily, std::vector<core::Unistyle::Shared>& unistyles);
     void setScopedTheme(std::optional<std::string> themeName);
     core::Unistyle::Shared getUnistyleById(jsi::Runtime& rt, std::string unistyleID);
 
