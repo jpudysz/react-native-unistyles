@@ -1,6 +1,10 @@
 import { Link } from 'expo-router'
 import React from 'react'
-import { Pressable, Text, View } from 'react-native'
+// @ts-ignore
+import { NativeText } from 'react-native/Libraries/Text/TextNativeComponent'
+// @ts-ignore
+import View from 'react-native/Libraries/Components/View/ViewNativeComponent'
+import { Pressable } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 
 export default function HomeScreen() {
@@ -11,14 +15,14 @@ export default function HomeScreen() {
     return (
         <View style={styles.container}>
             <View style={styles.test}>
-                <Text>
+                <NativeText style={styles.typography}>
                     Hello world
-                </Text>
+                </NativeText>
                 <Link href="/explore" asChild>
                     <Pressable style={styles.button}>
-                        <Text>
+                        <NativeText style={styles.typography}>
                             Explore
-                        </Text>
+                        </NativeText>
                     </Pressable>
                 </Link>
             </View>
@@ -32,6 +36,11 @@ const styles = StyleSheet.create(theme => ({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: theme.colors.backgroundColor
+    },
+    typography: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: theme.colors.typography
     },
     test: {
         width: '100%',
