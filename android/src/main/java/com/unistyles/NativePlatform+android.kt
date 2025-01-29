@@ -32,9 +32,8 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
         reactContext.addLifecycleEventListener(this)
     }
 
-    fun invalidate() {
+    fun onDestroy() {
         reactContext.removeLifecycleEventListener(this)
-        _listener.invalidate()
     }
 
     override fun onHostResume() {

@@ -31,7 +31,8 @@ class NativePlatformListener(
         reactContext.registerReceiver(configurationChangeReceiver, IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED))
     }
 
-    fun invalidate() {
+    fun onDestroy() {
+        this.removePlatformListeners()
         reactContext.unregisterReceiver(configurationChangeReceiver)
     }
 
