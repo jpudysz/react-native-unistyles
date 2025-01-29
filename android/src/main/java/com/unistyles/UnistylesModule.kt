@@ -26,10 +26,6 @@ class UnistylesModule(reactContext: ReactApplicationContext): NativeTurboUnistyl
         mHybridData = initializeHybridData(reactContext)
     }
 
-    override fun invalidate() {
-        _nativePlatform.invalidate()
-    }
-
     private fun initializeHybridData(reactContext: ReactApplicationContext): HybridData {
         val runtimeExecutor = reactContext.catalystInstance?.runtimeExecutor
             ?: throw IllegalStateException("Unistyles: React Native runtime executor is not available. Please follow installation guides.")
