@@ -26,15 +26,18 @@ export const deepMergeObjects = <T extends Record<PropertyKey, any>>(...sources:
 }
 
 export const copyComponentProperties = (Component: any, UnistylesComponent: any) => {
-    Object.entries(Object.getOwnPropertyDescriptors(Component)).forEach(([key, propertyDescriptor]) => {
+    Object.entries(Component).forEach(([key, value]) => {
         // Filter out the keys we don't want to copy
         if (['$$typeof', 'render'].includes(key)) {
             return
         }
 
-        // @ts-expect-error Copy extra component properties - example: Image.getSize, Image.displayName
-        UnistylesComponent[key] = propertyDescriptor.value ?? propertyDescriptor.get()
+        UnistylesComponent[key] = value
     })
+
+    // Those are not enumerable, so we need to copy them manually
+    UnistylesComponent.displayName = Component.displayName
+    UnistylesComponent.name = Component.name
 
     return UnistylesComponent
 }
