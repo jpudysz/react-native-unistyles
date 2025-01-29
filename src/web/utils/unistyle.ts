@@ -49,7 +49,13 @@ export const extractSecrets = (object: any) => {
         return undefined
     }
 
-    return reduceObject(Object.getOwnPropertyDescriptors(secrets), secret => secret.value)
+    const hiddenSecrets = Object.getOwnPropertyDescriptors(secrets)
+
+    if (Object.keys(hiddenSecrets).length === 0) {
+        return undefined
+    }
+
+    return reduceObject(hiddenSecrets, secret => secret.value)
 }
 
 export const removeInlineStyles = (values: UnistylesValues) => {

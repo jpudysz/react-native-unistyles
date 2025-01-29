@@ -1,0 +1,5 @@
+{
+  "main": "../../../lib/commonjs/components/native/Animated.js",
+  "module": "../../../lib/module/components/native/Animated.js",
+  "react-native": "../../../src/components/native/Animated.tsx"
+}
