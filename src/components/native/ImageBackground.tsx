@@ -5,13 +5,14 @@ import type { UnistylesValues } from '../../types'
 import { getClassName } from '../../core'
 import { isServer } from '../../web/utils'
 import { UnistylesShadowRegistry } from '../../web'
+import { copyComponentProperties } from '../../utils'
 
 type Props = {
     style?: UnistylesValues
     imageStyle?: UnistylesValues
 }
 
-export const ImageBackground = forwardRef<unknown, Props>((props, forwardedRef) => {
+const UnistylesImageBackground = forwardRef<unknown, Props>((props, forwardedRef) => {
     let storedRef: NativeImageBackground | null = null
     let storedImageRef: NativeImageBackground | null = null
     const styleClassNames = getClassName(props.style)
@@ -54,3 +55,5 @@ export const ImageBackground = forwardRef<unknown, Props>((props, forwardedRef) 
         />
     )
 })
+
+export const ImageBackground = copyComponentProperties(NativeImageBackground, UnistylesImageBackground)
