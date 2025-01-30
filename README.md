@@ -47,6 +47,9 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 <a href="https://galaxies.dev">
      <img src="https://avatars.githubusercontent.com/u/118431096?s=200&v=4" height="70px" width="70px" alt="galaxies-dev" />
 </a>
+<a href="https://github.com/FTCHD">
+     <img src="https://avatars.githubusercontent.com/u/144691102?v=4" height="70px" width="70px" alt="FTCHD" />
+</a>
 <a href="https://github.com/mobily">
      <img src="https://avatars.githubusercontent.com/u/1467712?v=4" height="70px" width="70px" alt="mobily" />
 </a>
@@ -62,8 +65,14 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 <a href="https://github.com/oscklm">
      <img src="https://avatars.githubusercontent.com/u/22825865?v=4" height="70px" width="70px" alt="oscklm" />
 </a>
-<a href="https://github.com/giovannilondero">
-     <img src="https://avatars.githubusercontent.com/u/10998991?v=4" height="70px" width="70px" alt="giovannilondero" />
+<a href="https://github.com/guillaumehcht">
+     <img src="https://avatars.githubusercontent.com/u/80776475?v=4" height="70px" width="70px" alt="guillaumehcht" />
+</a>
+<a href="https://github.com/FilipiRafael">
+     <img src="https://avatars.githubusercontent.com/u/61629642?v=4" height="70px" width="70px" alt="FilipiRafael" />
+</a>
+<a href="https://github.com/4cc3ssX">
+     <img src="https://avatars.githubusercontent.com/u/57473799?v=4" height="70px" width="70px" alt="4cc3ssX" />
 </a>
 
 ## Past sponsors
@@ -88,6 +97,9 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 </a>
 <a href="https://github.com/hyoban">
      <img src="https://avatars.githubusercontent.com/u/38493346?v=4" height="70px" width="70px" alt="hyoban" />
+</a>
+<a href="https://github.com/giovannilondero">
+     <img src="https://avatars.githubusercontent.com/u/10998991?v=4" height="70px" width="70px" alt="giovannilondero" />
 </a>
 
 ## Sponsor my work

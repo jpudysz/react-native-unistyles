@@ -73,7 +73,7 @@ export default defineConfig({
 					items: [
 						{ label: 'Introduction', slug: 'v3/start/introduction' },
                         { label: 'Getting started', slug: 'v3/start/getting-started' },
-                        { label: 'Configuration', slug: 'v3/start/configuration' },
+                        { label: 'Configuration', slug: 'v3/start/configuration', badge: 'Updated' },
                         { label: 'New features', slug: 'v3/start/new-features' },
                         { label: 'Look under the hood', slug: 'v3/start/how-unistyles-works' },
                         { label: 'Migration guide', slug: 'v3/start/migration-guide' }
@@ -82,12 +82,12 @@ export default defineConfig({
                 {
                     label: 'Guides',
                     items: [
-                        { label: 'Merging styles', slug: 'v3/guides/merging-styles', badge: 'New!' },
+                        { label: 'Merging styles', slug: 'v3/guides/merging-styles', badge: 'Updated' },
                         { label: 'Theming', slug: 'v3/guides/theming' },
                         { label: 'Avoiding Keyboard', slug: 'v3/guides/avoiding-keyboard' },
                         { label: 'Expo Router', slug: 'v3/guides/expo-router' },
                         { label: 'Custom web', slug: 'v3/guides/custom-web', badge: 'WIP' },
-                        { label: 'Server side rendering', slug: 'v3/guides/server-side-rendering', badge: 'New!' },
+                        { label: 'Server side rendering', slug: 'v3/guides/server-side-rendering' },
                     ]
                 },
                 {
@@ -102,11 +102,11 @@ export default defineConfig({
                         { label: 'Variants', slug: 'v3/references/variants' },
                         { label: 'Compound Variants', slug: 'v3/references/compound-variants' },
                         { label: 'Web styles', slug: 'v3/references/web-styles' },
-                        { label: 'Web Only Features', slug: 'v3/references/web-only', badge: 'Updated' },
+                        { label: 'Web Only Features', slug: 'v3/references/web-only' },
                         { label: 'Scoped theme', slug: 'v3/references/scoped-theme' },
-                        { label: 'Update 3rd party views', slug: 'v3/references/3rd-party-views', badge: 'New!' },
+                        { label: 'Update 3rd party views', slug: 'v3/references/3rd-party-views' },
                         { label: 'withUnistyles', slug: 'v3/references/with-unistyles' },
-                        { label: 'useUnistyles', slug: 'v3/references/use-unistyles', badge: 'New!' },
+                        { label: 'useUnistyles', slug: 'v3/references/use-unistyles' },
                         { label: 'Display and Hide', slug: 'v3/references/display-hide' },
                         { label: 'Edge to edge', slug: 'v3/references/edge-to-edge' },
                         { label: 'Dimensions', slug: 'v3/references/dimensions' },

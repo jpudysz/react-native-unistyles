@@ -136,6 +136,14 @@ const styles = StyleSheet.create(theme => ({
 }))
 ```
 
+### Pixel/Point mode for native breakpoints
+
+By default, Unistyles will use `pixels` for native breakpoints. This means that the breakpoints and [mq](/v3/references/media-queries) will be computed based on mobile screen pixels.
+You can change this behavior by setting `nativeBreakpointsMode` to `points` in your [configuration](/v3/start/configuration#settings-optional).
+
+If `nativeBreakpointsMode` is set to `points` all breakpoints and `mq` will be computed based on mobile screen points (screen in pixels divided by pixel ratio).
+
+
 ### Show/Hide your components based on breakpoints
 
 In order to show or hide your components based on the screen size, you can leverage the `mq` utility and one of the two built-in components: `Display` and `Hide`.
