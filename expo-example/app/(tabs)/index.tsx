@@ -1,10 +1,6 @@
-import { Link } from 'expo-router'
 import React from 'react'
-// @ts-ignore
-import { NativeText } from 'react-native/Libraries/Text/TextNativeComponent'
-// @ts-ignore
-import View from 'react-native/Libraries/Components/View/ViewNativeComponent'
-import { Pressable } from 'react-native'
+import { Link } from 'expo-router'
+import { Pressable, View, Text } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 
 export default function HomeScreen() {
@@ -15,14 +11,14 @@ export default function HomeScreen() {
     return (
         <View style={styles.container}>
             <View style={styles.test}>
-                <NativeText style={styles.typography}>
+                <Text style={styles.typography}>
                     Hello world
-                </NativeText>
+                </Text>
                 <Link href="/explore" asChild>
                     <Pressable style={styles.button}>
-                        <NativeText style={styles.typography}>
+                        <Text style={styles.typography}>
                             Explore
-                        </NativeText>
+                        </Text>
                     </Pressable>
                 </Link>
             </View>
