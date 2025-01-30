@@ -2,7 +2,7 @@ const { addUnistylesImport, isInsideNodeModules } = require('./import')
 const { hasStringRef } = require('./ref')
 const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyles, isKindOfStyleSheet } = require('./stylesheet')
 const { extractVariants } = require('./variants')
-const { REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_PATHS, REPLACE_WITH_UNISTYLES_EXOTIC_PATHS } = require('./consts')
+const { REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_PATHS, REPLACE_WITH_UNISTYLES_EXOTIC_PATHS, NATIVE_COMPONENTS_PATHS } = require('./consts')
 const { handleExoticImport } = require('./exotic')
 
 module.exports = function ({ types: t }) {
@@ -107,6 +107,10 @@ module.exports = function ({ types: t }) {
                             state.reactNativeImports[specifier.local.name] = specifier.imported.name
                         }
                     })
+                }
+
+                if (importSource.includes('react-native/Libraries')) {
+                    handleExoticImport(t, path, state, NATIVE_COMPONENTS_PATHS)
                 }
 
                 if (!state.file.forceProcessing && Array.isArray(state.opts.autoProcessImports)) {

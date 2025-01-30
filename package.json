@@ -11,15 +11,15 @@
     "precommit": "concurrently 'yarn tsc' 'yarn lint' 'yarn test'",
     "release": "release-it"
   },
-  "main": "lib/commonjs/index",
-  "module": "lib/module/index",
+  "main": "lib/commonjs/index.js",
+  "module": "lib/module/index.js",
   "types": "lib/typescript/src/index.d.ts",
   "source": "src/index",
   "exports": {
     ".": {
       "types": "./lib/typescript/src/index.d.ts",
-      "module": "./lib/module/index",
-      "default": "./lib/commonjs/index",
+      "module": "./lib/module/index.js",
+      "default": "./lib/commonjs/index.js",
       "react-native": "./src/index"
     },
     "./components/native/*": {
@@ -34,8 +34,8 @@
     "./package.json": "./package.json",
     "./server": {
       "types": "./lib/typescript/src/server/index.d.ts",
-      "module": "./lib/module/server/index",
-      "default": "./lib/commonjs/server/index",
+      "module": "./lib/module/server/index.js",
+      "default": "./lib/commonjs/server/index.js",
       "react-native": "./src/server"
     }
   },
