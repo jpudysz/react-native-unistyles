@@ -54,6 +54,10 @@ struct Unistyle {
     inline bool dependsOn(UnistyleDependency dependency) {
         return std::find(this->dependencies.begin(), this->dependencies.end(), dependency) != this->dependencies.end();
     }
+    
+    inline bool isSealed() {
+        return this->_isSealed;
+    }
 
     inline void seal() {
         this->_isSealed = true;
