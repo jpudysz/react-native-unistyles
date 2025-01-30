@@ -1,6 +1,6 @@
 const { addUnistylesImport, isInsideNodeModules } = require('./import')
 const { hasStringRef } = require('./ref')
-const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyles, isKindOfStyleSheet } = require('./stylesheet')
+const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyles, isKindOfStyleSheet, addThemeDependencyToMemberExpression } = require('./stylesheet')
 const { extractVariants } = require('./variants')
 const { REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_PATHS, REPLACE_WITH_UNISTYLES_EXOTIC_PATHS, NATIVE_COMPONENTS_PATHS } = require('./consts')
 const { handleExoticImport } = require('./exotic')
@@ -181,6 +181,13 @@ module.exports = function ({ types: t }) {
                         body.properties.forEach(property => {
                             if (t.isObjectProperty(property)) {
                                 const propertyValues = getUnistyles(t, property)
+
+                                // maybe user used inlined theme? ({ container: theme.components.container })
+                                if (propertyValues.length === 0 && t.isMemberExpression(property.value)) {
+                                    if (property.value.object.object.name === themeLocalName) {
+                                        addThemeDependencyToMemberExpression(t, property)
+                                    }
+                                }
 
                                 propertyValues.forEach(propertyValue => {
                                     analyzeDependencies(t, state, property.key.name, propertyValue, themeLocalName, miniRuntimeLocalName)

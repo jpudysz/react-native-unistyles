@@ -219,10 +219,21 @@ function getUnistyles(t, property) {
     return []
 }
 
+function addThemeDependencyToMemberExpression(t, path) {
+    path.value = t.objectExpression([
+        t.spreadElement(path.value),
+        t.objectProperty(
+            t.identifier('uni__dependencies'),
+            t.arrayExpression([t.numericLiteral(UnistyleDependency.Theme)])
+        )
+    ])
+}
+
 module.exports = {
     isUnistylesStyleSheet,
     analyzeDependencies,
     addStyleSheetTag,
     getUnistyles,
-    isKindOfStyleSheet
+    isKindOfStyleSheet,
+    addThemeDependencyToMemberExpression
 }
