@@ -114,6 +114,12 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         func getScreenDimensionsFn() -> Dimensions {
             guard let presentedViewController = RCTPresentedViewController(),
                   let windowFrame = presentedViewController.view.window?.frame else {
+                
+                // when user goes to background RCTPresentedViewController is not available, try to get last known value
+                if let cachedRuntime = self.miniRuntime, UIApplication.shared.applicationState == .background {
+                    return cachedRuntime.screen;
+                }
+                
                 // this should never happen, but it's better to return zeros
                 return Dimensions(width: 0, height: 0)
             }
@@ -137,10 +143,10 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         let screenDimensions = getScreenDimensions()
 
         if (screenDimensions.width > screenDimensions.height) {
-            return Orientation.landscape;
+            return Orientation.landscape
         }
 
-        return Orientation.portrait;
+        return Orientation.portrait
     }
 
     func getContentSizeCategory() -> String {
@@ -268,8 +274,14 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
         func getPixelRatioFn() -> Double {
             guard let presentedViewController = RCTPresentedViewController(),
                   let window = presentedViewController.view.window else {
+
+                // when user goes to background RCTPresentedViewController is not available, try to get last known value
+                if let cachedRuntime = self.miniRuntime, UIApplication.shared.applicationState == .background {
+                    return cachedRuntime.pixelRatio;
+                }
+                
                 // this should never happen, but it's better to return default
-                return 1;
+                return 1
             }
 
             return window.screen.scale
@@ -297,7 +309,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     }
 
     func getNavigationBarDimensions() -> Dimensions {
-        return Dimensions(width: 0, height: 0);
+        return Dimensions(width: 0, height: 0)
     }
 
     func setStatusBarHidden(isHidden: Bool) throws {
