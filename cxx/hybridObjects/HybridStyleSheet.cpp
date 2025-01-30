@@ -127,6 +127,20 @@ void HybridStyleSheet::parseSettings(jsi::Runtime &rt, jsi::Object settings) {
         if (propertyName == "CSSVars") {
             return;
         }
+        
+        if (propertyName == "nativeBreakpointsMode") {
+            helpers::assertThat(rt, propertyValue.isString(), "StyleSheet.configure's nativeBreakpointsMode must be a string");
+            
+            auto mode = propertyValue.asString(rt).utf8(rt);
+            
+            helpers::assertThat(rt, mode == "pixels" || mode == "points", "StyleSheet.configure's nativeBreakpointsMode must be one of: pixels or points");
+            
+            if (mode == "points") {
+                registry.shouldUsePointsForBreakpoints = true;
+            }
+            
+            return;
+        }
 
         helpers::assertThat(rt, false, "StyleSheet.configure's settings received unexpected key: '" + std::string(propertyName) + "'");
     });
@@ -142,7 +156,13 @@ void HybridStyleSheet::parseBreakpoints(jsi::Runtime &rt, jsi::Object breakpoint
     auto& state = registry.getState(rt);
 
     registry.registerBreakpoints(rt, sortedBreakpoints);
-    state.computeCurrentBreakpoint(this->_unistylesRuntime->getScreen().width);
+    
+    auto rawWidth = this->_unistylesRuntime->getScreen().width;
+    auto width = registry.shouldUsePointsForBreakpoints
+        ? rawWidth / this->_unistylesRuntime->getPixelRatio()
+        : rawWidth;
+    
+    state.computeCurrentBreakpoint(width);
 }
 
 void HybridStyleSheet::parseThemes(jsi::Runtime &rt, jsi::Object themes) {
@@ -293,7 +313,12 @@ void HybridStyleSheet::onPlatformNativeDependenciesChange(std::vector<UnistyleDe
         auto dimensionsIt = std::find(dependencies.begin(), dependencies.end(), UnistyleDependency::DIMENSIONS);
 
         if (dimensionsIt != dependencies.end()) {
-            registry.getState(rt).computeCurrentBreakpoint(this->_unistylesRuntime->getScreen().width);
+            auto rawWidth = this->_unistylesRuntime->getScreen().width;
+            auto width = registry.shouldUsePointsForBreakpoints
+                ? rawWidth / this->_unistylesRuntime->getPixelRatio()
+                : rawWidth;
+            
+            registry.getState(rt).computeCurrentBreakpoint(width);
         }
 
         // check if color scheme changed and then if Unistyles state depend on it (adaptive themes)
