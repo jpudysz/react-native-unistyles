@@ -62,7 +62,7 @@ declare module 'react-native-unistyles' {
 
 StyleSheet.configure({
     settings: {
-        adaptiveThemes: true,
+        adaptiveThemes: true
     },
     breakpoints,
     themes: {

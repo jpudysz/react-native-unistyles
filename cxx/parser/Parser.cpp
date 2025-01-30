@@ -653,7 +653,11 @@ jsi::Value parser::Parser::getValueFromBreakpoints(jsi::Runtime& rt, Unistyle::S
     auto sortedBreakpoints = state.getSortedBreakpointPairs();
     auto hasBreakpoints = !sortedBreakpoints.empty();
     auto currentBreakpoint = state.getCurrentBreakpointName();
-    auto dimensions = this->_unistylesRuntime->getScreen();
+    auto rawDimensions = this->_unistylesRuntime->getScreen();
+    auto pixelRatio = this->_unistylesRuntime->getPixelRatio();
+    auto dimensions = registry.shouldUsePointsForBreakpoints
+        ? Dimensions(rawDimensions.width / pixelRatio, rawDimensions.height / pixelRatio)
+        : rawDimensions;
     auto currentOrientation = dimensions.width > dimensions.height
         ? "landscape"
         : "portrait";

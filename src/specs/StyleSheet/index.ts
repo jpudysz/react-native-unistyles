@@ -12,7 +12,8 @@ type UnistylesThemeSettings = {
 }
 
 type UnistylesSettings = UnistylesThemeSettings & {
-    CSSVars?: boolean
+    CSSVars?: boolean,
+    nativeBreakpointsMode?: 'pixels' | 'points'
 }
 
 export type UnistylesConfig = {

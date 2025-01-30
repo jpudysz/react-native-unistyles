@@ -81,6 +81,7 @@ module.exports = function ({ types: t }) {
             /** @param {import('./index').UnistylesPluginPass} state */
             ImportDeclaration(path, state) {
                 const exoticImport = REPLACE_WITH_UNISTYLES_EXOTIC_PATHS
+                    .concat(state.opts.autoRemapImports ?? [])
                     .find(exotic => state.filename.includes(exotic.path))
 
                 if (exoticImport) {

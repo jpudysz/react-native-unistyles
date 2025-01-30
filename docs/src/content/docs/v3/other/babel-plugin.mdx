@@ -222,9 +222,57 @@ It can be useful for monorepos that use Unistyles with absolute paths, such as `
 }
 ```
 
+#### `autoRemapImports`
+
+This is the most powerful option, but most likely you won't need to use it.
+It allows you to remap uncommon imports to Unistyles components.
+
+This may happen if a 3rd library does not import `react-native` components directly, but instead uses its own factory or a relative path.
+Unistyles uses it internally to support the following imports from `react-native` internals:
+
+```js
+import { NativeText } from "react-native/Libraries/Text/TextNativeComponent"
+import View from "react-native/Libraries/Components/View/ViewNativeComponent"
+```
+
+Let's say you have a library called `custom-library` that imports `react-native` raw components directly:
+
+```js title="node_modules/custom-library/components/index.js"
+import { NativeText } from "react-native/Libraries/Text/TextNativeComponent"
+import View from "react-native/Libraries/Components/View/ViewNativeComponent"
+```
+
+To convert it to Unistyles, you can use following configuration:
+
+```ts
+{
+    autoRemapImports: [
+        path: 'node_modules/custom-library/components', // <- must be path from node_modules
+        imports: [
+            {
+                isDefault: false, // <- is default import?
+                name: 'NativeText', // <- if not, what's the import name?
+                path: 'react-native/Libraries/Text/TextNativeComponent' // <- what's the import source?
+                mapTo: 'NativeText' // <- which Unistyles component should be used? Check react-native-unistyles/src/components/native
+            },
+            {
+                isDefault: true,
+                path: 'react-native/Libraries/Components/View/ViewNativeComponent',
+                mapTo: 'NativeView'
+            }
+        ]
+    ]
+}
+```
+
+:::caution
+If you use raw `react-native` imports within your code, Unistyles will auto map it to `react-native-unistyles` factories.
+This options should be only used for 3rd party libraries from `node_modules`.
+:::
+
 #### `autoProcessPaths`
 
-This configuration is unrelated to the `autoProcessRoot` and `autoProcessImports` options and can be used alongside them.
+This configuration is unrelated to the `autoProcessRoot`, `autoProcessImports` and `autoRemapImports` options and can be used alongside them.
 By default, the Babel plugin ignores `node_modules`. However, you can extend these paths to attempt converting 3rd components into Unistyles compatible ones.
 Within these paths, we will replace `react-native` imports with `react-native-unistyles` factories that borrow component refs. [Read more](/v3/other/babel-plugin#3-component-factory-borrowing-ref).
 
