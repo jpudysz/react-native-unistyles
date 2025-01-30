@@ -27,6 +27,8 @@ struct UnistylesRegistry: public StyleSheetRegistry {
 
     UnistylesRegistry(const UnistylesRegistry&) = delete;
     UnistylesRegistry(const UnistylesRegistry&&) = delete;
+    
+    bool shouldUsePointsForBreakpoints = false;
 
     void registerTheme(jsi::Runtime& rt, std::string name, jsi::Value& theme);
     void registerBreakpoints(jsi::Runtime& rt, std::vector<std::pair<std::string, double>>& sortedBreakpoints);
