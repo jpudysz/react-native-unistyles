@@ -399,8 +399,10 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared u
 
     helpers::enumerateJSIObject(rt, style, [&](const std::string& propertyName, jsi::Value& propertyValue){
         // parse dependencies only once
-        if (propertyName == helpers::STYLE_DEPENDENCIES && unistyle->dependencies.empty()) {
-            unistyle->dependencies = this->parseDependencies(rt, propertyValue.asObject(rt));
+        if (propertyName == helpers::STYLE_DEPENDENCIES && !unistyle->isSealed()) {
+            auto newDeps = this->parseDependencies(rt, propertyValue.asObject(rt));
+            
+            unistyle->dependencies.insert(unistyle->dependencies.end(), newDeps.begin(), newDeps.end());
 
             return;
         }
