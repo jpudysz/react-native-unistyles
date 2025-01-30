@@ -73,11 +73,12 @@ const breakpoints = {
 
 ### Settings (Optional)
 
-The `Settings` object has been simplified, and in the most recent version, it supports only three properties:
+The `Settings` object has been simplified, and in the most recent version, it supports only four properties:
 
 - **`adaptiveThemes`** – a boolean that enables or disables adaptive themes [learn more](/v3/guides/theming#adaptive-themes)
 - **`initialTheme`** – a string or a synchronous function that sets the initial theme
 - **`CSSVars`** – a boolean that enables or disables CSS variables (defaults to `true`) [learn more](/v3/references/web-only#css-variables)
+- **`nativeBreakpointsMode`** - iOS/Android only. User preferred mode for breakpoints. Can be either `points` or `pixels` (defaults to `pixels`) [learn more](/v3/references/breakpoints#pixelpoint-mode-for-native-breakpoints)
 
 ```tsx title="unistyles.ts"
 const settings = {

@@ -44,6 +44,10 @@ When you see this warning, your component will render correctly, but any new eve
 
 It's critical to ship Unistyles 3.0 apps without this warning, as it can cause unexpected behavior.
 
+<Aside title="Reanimated" type="caution">
+By default `Animated` components will flatten your styles array. This means that you can only pass single unistyle to `Animated` components, otherwise you'll get a warning from above.
+</Aside>
+
 ### Spreading a single Unistyle
 
 Another problematic case is spreading a single Unistyle and merging it, e.g., with inline styles:
