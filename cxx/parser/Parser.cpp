@@ -526,7 +526,7 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
 
             Variants variants = helpers::variantsToPairs(rt, rawVariants.asObject(rt));
 
-            unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
+            unistyleFn->parsedStyle = parser.parseFirstLevel(rt, unistyleFn, variants);
             unistyleFn->seal();
 
             // for compatibility purpose save last arguments to style instance. It will work ok, if user sees warning about multiple unistyles
