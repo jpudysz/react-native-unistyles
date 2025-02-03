@@ -816,13 +816,14 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(({ components: { test }}, { insets: { ime }, screen }) => ({
+                const styles = StyleSheet.create(({ components: { test }}, { insets: { ime }, screen: { height }, statusBar  }) => ({
                     container: {
                         backgroundColor: test
                     },
                     container2: {
                         paddingBottom: ime,
-                        height: screen.height
+                        height,
+                        width: statusBar.width
                     }
                 }))
             `,
@@ -841,15 +842,16 @@ pluginTester({
                 }
 
                 const styles = StyleSheet.create(
-                    ({ components: { test } }, { insets: { ime }, screen }) => ({
+                    ({ components: { test } }, { insets: { ime }, screen: { height }, statusBar }) => ({
                         container: {
                             backgroundColor: test,
                             uni__dependencies: [0]
                         },
                         container2: {
                             paddingBottom: ime,
-                            height: screen.height,
-                            uni__dependencies: [14, 6]
+                            height,
+                            width: statusBar.width,
+                            uni__dependencies: [14, 6, 12]
                         }
                     }),
                     664955283
