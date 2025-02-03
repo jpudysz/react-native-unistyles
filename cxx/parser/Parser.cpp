@@ -18,7 +18,7 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
 
         if (styleValue.isFunction(rt)) {
             styleSheet->unistyles[styleKey] = std::make_shared<UnistyleDynamicFunction>(
-                helpers::HashGenerator::generateHash(styleKey),
+                helpers::HashGenerator::generateHash(styleKey + std::to_string(styleSheet->tag)),
                 UnistyleType::DynamicFunction,
                 styleKey,
                 styleValue,
@@ -29,7 +29,7 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
         }
 
         styleSheet->unistyles[styleKey] = std::make_shared<Unistyle>(
-            helpers::HashGenerator::generateHash(styleKey),
+            helpers::HashGenerator::generateHash(styleKey + std::to_string(styleSheet->tag)),
             UnistyleType::Object,
             styleKey,
             styleValue,
@@ -361,7 +361,7 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle
         unistyleFn->unprocessedValue = std::move(functionResult);
         unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
     }
-    
+
     if (unistyle->isDirty) {
         unistyle->isDirty = false;
     }
@@ -401,7 +401,7 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared u
         // parse dependencies only once
         if (propertyName == helpers::STYLE_DEPENDENCIES && !unistyle->isSealed()) {
             auto newDeps = this->parseDependencies(rt, propertyValue.asObject(rt));
-            
+
             unistyle->dependencies.insert(unistyle->dependencies.end(), newDeps.begin(), newDeps.end());
 
             return;
