@@ -3,7 +3,7 @@ title: useUnistyles
 description: Learn about escape hatch in Unistyles 3.0
 ---
 
-import { Card } from '@astrojs/starlight/components'
+import { Card, Aside } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
 
 <Seo
@@ -44,6 +44,26 @@ const MyComponent = () => {
     )
 }
 ```
+
+<Aside title="Subscriptions">
+Unistyles will monitor your destructured props and re-render your component only when the desired value changes.
+If you use `theme`, it will automatically subscribe to theme changes.
+Destructuring `rt` won't create an automatic subscription, as this object contains multiple values that can change frequently during your app's lifecycle.
+To create a subscription, you need to use a specific property on the `rt` object, such as `rt.colorScheme` or `rt.screen.width`.
+
+```tsx title="Case 1 - theme only subscription"
+// subscribe to theme changes, rt is not yet used
+const { theme, rt } = useUnistyles()
+```
+vs
+```tsx title="Case 2 - theme and insets subscription"
+// subscribe to theme changes, and insets
+const { theme, rt } = useUnistyles()
+
+rt.insets // reading this value will automatically subscribe to insets changes
+```
+
+</Aside>
 
 ### Why isn't it recommended?
 
