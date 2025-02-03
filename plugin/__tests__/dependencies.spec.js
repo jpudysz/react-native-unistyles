@@ -709,6 +709,58 @@ pluginTester({
             `
         },
         {
+            title: 'Should correctly detect inline spread',
+            code: `
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View style={styles.container}>
+                            <Text style={styles.container2}>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(theme => ({
+                    container: {
+                        ...theme.components.container
+                    },
+                    container2: {
+                        ...theme.components.text
+                    }
+                }))
+            `,
+            output: `
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import { View } from 'react-native-unistyles/components/native/View'
+
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View style={styles.container}>
+                            <Text style={styles.container2}>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    theme => ({
+                        container: {
+                            ...theme.components.container,
+                            uni__dependencies: [0]
+                        },
+                        container2: {
+                            ...theme.components.text,
+                            uni__dependencies: [0]
+                        }
+                    }),
+                    664955283
+                )
+            `
+        },
+        {
             title: 'Should correctly detect inline theme dependencies',
             code: `
                 import { View, Text } from 'react-native'
@@ -724,7 +776,7 @@ pluginTester({
 
                 const styles = StyleSheet.create(theme => ({
                     container: theme.components.container,
-                    container2: theme.components.text
+                    container2: theme.components.text.nested.deep
                 }))
             `,
             output: `
@@ -744,11 +796,65 @@ pluginTester({
                 const styles = StyleSheet.create(
                     theme => ({
                         container: { ...theme.components.container, uni__dependencies: [0] },
-                        container2: { ...theme.components.text, uni__dependencies: [0] }
+                        container2: { ...theme.components.text.nested.deep, uni__dependencies: [0] }
                     }),
                     664955283
                 )
             `
         },
+        {
+            title: 'Should correctly detect destructured dependencies',
+            code: `
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View style={styles.container}>
+                            <Text style={styles.container2}>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(({ components: { test }}, { insets: { ime }, screen }) => ({
+                    container: {
+                        backgroundColor: test
+                    },
+                    container2: {
+                        paddingBottom: ime,
+                        height: screen.height
+                    }
+                }))
+            `,
+            output: `
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import { View } from 'react-native-unistyles/components/native/View'
+
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View style={styles.container}>
+                            <Text style={styles.container2}>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    ({ components: { test } }, { insets: { ime }, screen }) => ({
+                        container: {
+                            backgroundColor: test,
+                            uni__dependencies: [0]
+                        },
+                        container2: {
+                            paddingBottom: ime,
+                            height: screen.height,
+                            uni__dependencies: [14, 6]
+                        }
+                    }),
+                    664955283
+                )
+            `
+        }
     ]
 })

@@ -1,4 +1,16 @@
 function getIdentifierNameFromExpression(t, memberExpression) {
+    if (t.isIdentifier(memberExpression)) {
+        return [memberExpression.name]
+    }
+
+    if (t.isSpreadElement(memberExpression)) {
+        return [getIdentifierNameFromExpression(t, memberExpression.argument)].flat()
+    }
+
+    if (t.isObjectProperty(memberExpression)) {
+        return [getIdentifierNameFromExpression(t, memberExpression.value)].flat()
+    }
+
     if (t.isMemberExpression(memberExpression)) {
         if (memberExpression.computed) {
             return [
