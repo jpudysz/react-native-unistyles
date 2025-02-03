@@ -63,8 +63,71 @@ function addStyleSheetTag(t, path, state) {
     callee.container.arguments.push(t.numericLiteral(uniqueId))
 }
 
+function getStyleSheetLocalNames(t, functionArg) {
+    const params = functionArg.params
+    const hasTheme = params.length >= 1
+    const hasMiniRuntime = params.length === 2
+    const getProperty = (property, allowNested) => {
+        if (t.isIdentifier(property.value)) {
+            return property.value.name
+        }
+
+        if (!t.isObjectPattern(property.value)) {
+            return undefined
+        }
+
+        if (allowNested) {
+            return property.value.properties.flatMap(getProperty)
+        }
+
+        // we can force allow nested only for insets
+        const hasIme = property.value.properties.find(property => property.key.name === 'ime')
+        const lastKeyValue = property.value.properties.flatMap(getProperty)
+
+        if (hasIme) {
+            return lastKeyValue
+        }
+
+        return `${property.key.name}.${lastKeyValue}`
+    }
+    const getLocalNames = (param, allowNested) => {
+        if (t.isObjectPattern(param)) {
+            return param.properties
+                .flatMap(property => getProperty(property, allowNested))
+                .filter(Boolean)
+        }
+
+
+        if (t.isIdentifier(param)) {
+            return [param.name]
+        }
+
+        return []
+    }
+
+    return {
+        theme: hasTheme ? getLocalNames(params[0], true) : [],
+        miniRuntime: hasMiniRuntime ? getLocalNames(params[1], false) : []
+    }
+}
+
+function maybeAddThemeDependencyToMemberExpression(t, property, themeLocalNames) {
+    if (t.isIdentifier(property)) {
+        return themeLocalNames.includes(property.name)
+    }
+
+    if (t.isObjectProperty(property)) {
+        return maybeAddThemeDependencyToMemberExpression(t, property.value, themeLocalNames)
+    }
+
+    if (t.isMemberExpression(property)) {
+        return maybeAddThemeDependencyToMemberExpression(t, property.object, themeLocalNames)
+    }
+}
+
+
 /** @param {import('./index').UnistylesPluginPass} state */
-function analyzeDependencies(t, state, name, unistyleObj, themeName, rtName) {
+function analyzeDependencies(t, state, name, unistyleObj, themeNames, rtNames) {
     const debugMessage = deps => {
         if (state.opts.debug) {
             const mappedDeps = deps
@@ -78,16 +141,42 @@ function analyzeDependencies(t, state, name, unistyleObj, themeName, rtName) {
     const dependencies = []
 
     Object.values(unistyle).forEach(uni => {
-        const identifier = getIdentifierNameFromExpression(t, uni.value)
+        const identifiers = getIdentifierNameFromExpression(t, uni)
 
-        if (identifier.includes(themeName)) {
+        if (themeNames.some(name => identifiers.some(id => id === name))) {
             dependencies.push(UnistyleDependency.Theme)
         }
 
-        if (identifier.includes(rtName)) {
+        const matchingRtNames = rtNames.reduce((acc, name) => {
+            if (name.includes('.')) {
+                const key = name.split('.').at(0)
+
+                if (identifiers.some(id => name.includes(id))) {
+                    return [
+                        ...acc,
+                        key
+                    ]
+                }
+
+                return acc
+            }
+
+
+            if (identifiers.some(id => id === name)) {
+                return [
+                    ...acc,
+                    name
+                ]
+            }
+
+            return acc
+        }, [])
+
+        if (matchingRtNames.length > 0) {
             const propertyNames = getSecondPropertyName(t, uni.value)
 
-            propertyNames
+            matchingRtNames
+                .concat(propertyNames)
                 .filter(Boolean)
                 .forEach(propertyName => {
                     switch (propertyName) {
@@ -235,5 +324,7 @@ module.exports = {
     addStyleSheetTag,
     getUnistyles,
     isKindOfStyleSheet,
+    getStyleSheetLocalNames,
+    maybeAddThemeDependencyToMemberExpression,
     addThemeDependencyToMemberExpression
 }
