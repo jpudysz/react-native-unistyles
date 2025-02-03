@@ -67,21 +67,33 @@ function getStyleSheetLocalNames(t, functionArg) {
     const params = functionArg.params
     const hasTheme = params.length >= 1
     const hasMiniRuntime = params.length === 2
-    const getProperty = property => {
+    const getProperty = (property, allowNested) => {
         if (t.isIdentifier(property.value)) {
             return property.value.name
         }
 
-        if (t.isObjectPattern(property.value)) {
+        if (!t.isObjectPattern(property.value)) {
+            return undefined
+        }
+
+        if (allowNested) {
             return property.value.properties.flatMap(getProperty)
         }
 
-        return undefined
+        // we can force allow nested only for insets
+        const hasIme = property.value.properties.find(property => property.key.name === 'ime')
+        const lastKeyValue = property.value.properties.flatMap(getProperty)
+
+        if (hasIme) {
+            return lastKeyValue
+        }
+
+        return `${property.key.name}.${lastKeyValue}`
     }
-    const getLocalNames = param => {
+    const getLocalNames = (param, allowNested) => {
         if (t.isObjectPattern(param)) {
             return param.properties
-                .flatMap(getProperty)
+                .flatMap(property => getProperty(property, allowNested))
                 .filter(Boolean)
         }
 
@@ -94,8 +106,8 @@ function getStyleSheetLocalNames(t, functionArg) {
     }
 
     return {
-        theme: hasTheme ? getLocalNames(params[0]) : [],
-        miniRuntime: hasMiniRuntime ? getLocalNames(params[1]) : []
+        theme: hasTheme ? getLocalNames(params[0], true) : [],
+        miniRuntime: hasMiniRuntime ? getLocalNames(params[1], false) : []
     }
 }
 
@@ -135,7 +147,30 @@ function analyzeDependencies(t, state, name, unistyleObj, themeNames, rtNames) {
             dependencies.push(UnistyleDependency.Theme)
         }
 
-        const matchingRtNames = rtNames.filter(name => identifiers.some(id => id === name))
+        const matchingRtNames = rtNames.reduce((acc, name) => {
+            if (name.includes('.')) {
+                const key = name.split('.').at(0)
+
+                if (identifiers.some(id => name.includes(id))) {
+                    return [
+                        ...acc,
+                        key
+                    ]
+                }
+
+                return acc
+            }
+
+
+            if (identifiers.some(id => id === name)) {
+                return [
+                    ...acc,
+                    name
+                ]
+            }
+
+            return acc
+        }, [])
 
         if (matchingRtNames.length > 0) {
             const propertyNames = getSecondPropertyName(t, uni.value)
