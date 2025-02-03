@@ -1,6 +1,6 @@
 const { addUnistylesImport, isInsideNodeModules } = require('./import')
 const { hasStringRef } = require('./ref')
-const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyles, isKindOfStyleSheet, addThemeDependencyToMemberExpression } = require('./stylesheet')
+const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyles, isKindOfStyleSheet, maybeAddThemeDependencyToMemberExpression, addThemeDependencyToMemberExpression,  getStyleSheetLocalNames } = require('./stylesheet')
 const { extractVariants } = require('./variants')
 const { REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_PATHS, REPLACE_WITH_UNISTYLES_EXOTIC_PATHS, NATIVE_COMPONENTS_PATHS } = require('./consts')
 const { handleExoticImport } = require('./exotic')
@@ -156,7 +156,7 @@ module.exports = function ({ types: t }) {
                             const propertyValues = getUnistyles(t, property)
 
                             propertyValues.forEach(propertyValue => {
-                                analyzeDependencies(t, state, property.key.name, propertyValue)
+                                analyzeDependencies(t, state, property.key.name, propertyValue, [], [])
                             })
                         }
                     })
@@ -164,15 +164,7 @@ module.exports = function ({ types: t }) {
 
                 // Function passed to StyleSheet.create (e.g., theme => ({ container: {} }))
                 if (t.isArrowFunctionExpression(arg) || t.isFunctionExpression(arg)) {
-                    const params = arg.params
-                    const hasTheme = params.length >= 1
-                    const hasMiniRuntime = params.length === 2
-                    const themeLocalName = hasTheme
-                        ? params[0].name
-                        : undefined
-                    const miniRuntimeLocalName = hasMiniRuntime
-                        ? params[1].name
-                        : undefined
+                    const localNames = getStyleSheetLocalNames(t, arg)
                     const body = t.isBlockStatement(arg.body)
                         ? arg.body.body.find(statement => t.isReturnStatement(statement)).argument
                         : arg.body
@@ -183,15 +175,14 @@ module.exports = function ({ types: t }) {
                             if (t.isObjectProperty(property)) {
                                 const propertyValues = getUnistyles(t, property)
 
+                                // special case for non object/function properties
                                 // maybe user used inlined theme? ({ container: theme.components.container })
-                                if (propertyValues.length === 0 && t.isMemberExpression(property.value)) {
-                                    if (property.value.object.object.name === themeLocalName) {
-                                        addThemeDependencyToMemberExpression(t, property)
-                                    }
+                                if (propertyValues.length === 0 && maybeAddThemeDependencyToMemberExpression(t, property, localNames.theme)) {
+                                    addThemeDependencyToMemberExpression(t, property)
                                 }
 
                                 propertyValues.forEach(propertyValue => {
-                                    analyzeDependencies(t, state, property.key.name, propertyValue, themeLocalName, miniRuntimeLocalName)
+                                    analyzeDependencies(t, state, property.key.name, propertyValue, localNames.theme, localNames.miniRuntime)
                                 })
                             }
                         })
