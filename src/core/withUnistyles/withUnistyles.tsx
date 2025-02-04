@@ -48,14 +48,16 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
                 : {}),
         } as any
 
-        // @ts-ignore
         maybeWarnAboutMultipleUnistyles(
+            // @ts-ignore
             narrowedProps.style,
+            // @ts-ignore
             `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`,
         )
-        // @ts-ignore
         maybeWarnAboutMultipleUnistyles(
+            // @ts-ignore
             narrowedProps.contentContainerStyle,
+            // @ts-ignore
             `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`,
         )
 

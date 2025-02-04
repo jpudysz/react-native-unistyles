@@ -36,14 +36,16 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         const narrowedProps = props as PropsWithUnistyles
         const NativeComponent = Component as ComponentType
 
-        // @ts-ignore we don't know the type of the component
         maybeWarnAboutMultipleUnistyles(
+            // @ts-ignore we don't know the type of the component
             narrowedProps.style,
+            // @ts-ignore we don't know the type of the component
             `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`,
         )
-        // @ts-ignore we don't know the type of the component
         maybeWarnAboutMultipleUnistyles(
+            // @ts-ignore we don't know the type of the component
             narrowedProps.contentContainerStyle,
+            // @ts-ignore we don't know the type of the component
             `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`,
         )
 

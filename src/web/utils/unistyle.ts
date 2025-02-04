@@ -28,8 +28,8 @@ export const assignSecrets = <T>(object: T, secrets: UnistyleSecrets) => {
 
     // @ts-expect-error assign hidden secrets
     object[`unistyles-${secretsId}`] = {}
-    // @ts-expect-error assign hidden secrets
     Object.defineProperties(
+        // @ts-expect-error assign hidden secrets
         object[`unistyles-${secretsId}`],
         reduceObject(secrets, secret => ({
             value: secret,
