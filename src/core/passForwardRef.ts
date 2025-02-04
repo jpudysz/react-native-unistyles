@@ -1,11 +1,7 @@
 import React from 'react'
 import { UnistylesShadowRegistry } from '../specs'
 
-export const passForwardedRef = <T>(
-    props: any,
-    ref: T,
-    forwardedRef: React.ForwardedRef<T>
-) => {
+export const passForwardedRef = <T>(props: any, ref: T, forwardedRef: React.ForwardedRef<T>) => {
     const passForwardedRef = () => {
         if (typeof forwardedRef === 'function') {
             return forwardedRef(ref)

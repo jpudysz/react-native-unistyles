@@ -1,5 +1,5 @@
-import type { ViewProps } from 'react-native'
 import { type ComponentType, createElement, forwardRef } from 'react'
+import type { ViewProps } from 'react-native'
 import { createUnistylesElement } from '../../core'
 
 // credits to @hirbod

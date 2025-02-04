@@ -4,31 +4,31 @@ import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
 export enum ColorScheme {
     Light = 'light',
     Dark = 'dark',
-    Unspecified = 'unspecified'
+    Unspecified = 'unspecified',
 }
 
 export enum Orientation {
     Portrait = 'portrait',
-    Landscape = 'landscape'
+    Landscape = 'landscape',
 }
 
 export interface Dimensions {
-    readonly width: number,
+    readonly width: number
     readonly height: number
 }
 
 export interface Insets {
-    readonly top: number,
-    readonly bottom: number,
-    readonly left: number,
-    readonly right: number,
+    readonly top: number
+    readonly bottom: number
+    readonly left: number
+    readonly right: number
     readonly ime: number
 }
 
 export enum StatusBarStyle {
     Default = 'default',
     Light = 'light',
-    Dark = 'dark'
+    Dark = 'dark',
 }
 
 export type AppThemeName = keyof UnistylesThemes

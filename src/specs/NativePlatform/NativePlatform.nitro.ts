@@ -19,45 +19,47 @@ export enum UnistyleDependency {
     FontScale = 11,
     StatusBar = 12,
     NavigationBar = 13,
-    Ime = 14
+    Ime = 14,
 }
 
 export interface UnistylesNativeMiniRuntime {
-    readonly colorScheme: ColorScheme,
-    readonly screen: Dimensions,
-    readonly contentSizeCategory: string,
-    readonly insets: Insets,
-    readonly pixelRatio: number,
-    readonly fontScale: number,
+    readonly colorScheme: ColorScheme
+    readonly screen: Dimensions
+    readonly contentSizeCategory: string
+    readonly insets: Insets
+    readonly pixelRatio: number
+    readonly fontScale: number
     readonly rtl: boolean
-    readonly statusBar: Dimensions,
+    readonly statusBar: Dimensions
     readonly navigationBar: Dimensions
-    readonly isPortrait: boolean,
+    readonly isPortrait: boolean
     readonly isLandscape: boolean
 }
 
 // represents any native API that can communicate with Unistyles
 // not available from JS
-export interface NativePlatform extends HybridObject<{ ios: 'swift', android: 'kotlin' }> {
-    getInsets(): Insets,
-    getColorScheme(): ColorScheme,
-    getFontScale(): number,
-    getPixelRatio(): number,
-    getOrientation(): Orientation,
-    getContentSizeCategory(): string,
-    getScreenDimensions(): Dimensions,
-    getStatusBarDimensions(): Dimensions,
-    getNavigationBarDimensions(): Dimensions,
-    getPrefersRtlDirection(): boolean,
+export interface NativePlatform extends HybridObject<{ ios: 'swift'; android: 'kotlin' }> {
+    getInsets(): Insets
+    getColorScheme(): ColorScheme
+    getFontScale(): number
+    getPixelRatio(): number
+    getOrientation(): Orientation
+    getContentSizeCategory(): string
+    getScreenDimensions(): Dimensions
+    getStatusBarDimensions(): Dimensions
+    getNavigationBarDimensions(): Dimensions
+    getPrefersRtlDirection(): boolean
 
-    setRootViewBackgroundColor(color: number): void,
-    setNavigationBarHidden?(isHidden: boolean): void,
-    setStatusBarHidden(isHidden: boolean): void,
-    setImmersiveMode(isEnabled: boolean): void,
+    setRootViewBackgroundColor(color: number): void
+    setNavigationBarHidden?(isHidden: boolean): void
+    setStatusBarHidden(isHidden: boolean): void
+    setImmersiveMode(isEnabled: boolean): void
 
     // private
-    getMiniRuntime(): UnistylesNativeMiniRuntime,
-    registerPlatformListener(callback: (dependencies: Array<UnistyleDependency>, miniRuntime: UnistylesNativeMiniRuntime) => void): void,
-    registerImeListener(callback: (miniRuntime: UnistylesNativeMiniRuntime) => void): void,
+    getMiniRuntime(): UnistylesNativeMiniRuntime
+    registerPlatformListener(
+        callback: (dependencies: Array<UnistyleDependency>, miniRuntime: UnistylesNativeMiniRuntime) => void,
+    ): void
+    registerImeListener(callback: (miniRuntime: UnistylesNativeMiniRuntime) => void): void
     unregisterPlatformListeners(): void
 }

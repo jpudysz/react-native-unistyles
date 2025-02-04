@@ -1,10 +1,10 @@
 import type { UnistylesValues } from '../../types'
-import { isPseudo } from './pseudo'
-import { getStyle } from './style'
 import { deepMergeObjects } from '../../utils'
-import { getTransformStyle, getBoxShadow, getFilterStyle } from './object'
-import { isShadow, isFilter, isTextShadow, isTransform, isBoxShadow } from './utils'
-import { getTextShadowStyle, getBoxShadowStyle } from './shadow'
+import { getBoxShadow, getFilterStyle, getTransformStyle } from './object'
+import { isPseudo } from './pseudo'
+import { getBoxShadowStyle, getTextShadowStyle } from './shadow'
+import { getStyle } from './style'
+import { isBoxShadow, isFilter, isShadow, isTextShadow, isTransform } from './utils'
 
 export const convertUnistyles = (value: UnistylesValues) => {
     // Flag to mark if textShadow is already created
@@ -14,10 +14,20 @@ export const convertUnistyles = (value: UnistylesValues) => {
 
     const stylesArray = Object.entries({
         ...value,
-        ...value._web
+        ...value._web,
     }).flatMap(([unistylesKey, unistylesValue]) => {
         // Keys to omit
-        if (['_classNames', '_web', 'variants', 'compoundVariants', 'uni__dependencies', '__unistyles-secrets__'].includes(unistylesKey) || unistylesKey.startsWith('variant-')) {
+        if (
+            [
+                '_classNames',
+                '_web',
+                'variants',
+                'compoundVariants',
+                'uni__dependencies',
+                '__unistyles-secrets__',
+            ].includes(unistylesKey) ||
+            unistylesKey.startsWith('variant-')
+        ) {
             return []
         }
 

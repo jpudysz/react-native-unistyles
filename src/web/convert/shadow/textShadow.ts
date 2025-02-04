@@ -19,7 +19,7 @@ export const getTextShadowStyle = (styles: Record<string, any>) => {
     // If no breakpoints were used return styles without media queries
     if (breakpoints.length === 0) {
         return {
-            textShadow: createTextShadowValue(styles as TextShadow)
+            textShadow: createTextShadowValue(styles as TextShadow),
         }
     }
 
@@ -35,11 +35,11 @@ export const getTextShadowStyle = (styles: Record<string, any>) => {
                     textShadowColor: color,
                     textShadowOffset: {
                         width,
-                        height
+                        height,
                     },
-                    textShadowRadius: radius
-                })
-            }
+                    textShadowRadius: radius,
+                }),
+            },
         }
     })
 

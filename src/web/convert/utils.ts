@@ -1,21 +1,24 @@
 // based on react-native-web normalizer
 // https://github.com/necolas/react-native-web
 import normalizeColors from '@react-native/normalize-colors'
-import { BOX_SHADOW_STYLES, TEXT_SHADOW_STYLES, type AllShadow, type AllShadowKeys, type Filters } from './types'
-import type { TransformStyles } from '../../types/core'
 import type { BoxShadowValue } from 'react-native'
+import type { TransformStyles } from '../../types/core'
+import { type AllShadow, type AllShadowKeys, BOX_SHADOW_STYLES, type Filters, TEXT_SHADOW_STYLES } from './types'
 
-export const isTransform = (key: string, value: any): value is Array<TransformStyles> => key === 'transform' && Array.isArray(value)
+export const isTransform = (key: string, value: any): value is Array<TransformStyles> =>
+    key === 'transform' && Array.isArray(value)
 
-export const isTextShadow = (key: string) => TEXT_SHADOW_STYLES.includes(key as typeof TEXT_SHADOW_STYLES[number])
+export const isTextShadow = (key: string) => TEXT_SHADOW_STYLES.includes(key as (typeof TEXT_SHADOW_STYLES)[number])
 
-export const isShadow = (key: string) => BOX_SHADOW_STYLES.includes(key as typeof BOX_SHADOW_STYLES[number])
+export const isShadow = (key: string) => BOX_SHADOW_STYLES.includes(key as (typeof BOX_SHADOW_STYLES)[number])
 
 export const isFilter = (key: string, value: any): value is Array<Filters> => key === 'filter' && Array.isArray(value)
 
-export const isBoxShadow = (key: string, value: any): value is Array<BoxShadowValue> => key === 'boxShadow' && Array.isArray(value)
+export const isBoxShadow = (key: string, value: any): value is Array<BoxShadowValue> =>
+    key === 'boxShadow' && Array.isArray(value)
 
-export const normalizeNumericValue = (value: number | string) => value && typeof value === 'number' ? `${value}px` : value
+export const normalizeNumericValue = (value: number | string) =>
+    value && typeof value === 'number' ? `${value}px` : value
 
 export const normalizeColor = (color: string, opacity = 1) => {
     // If the opacity is 1 there's no need to normalize the color
@@ -44,7 +47,11 @@ export const normalizeColor = (color: string, opacity = 1) => {
     return color
 }
 
-export const extractShadowValue = <TKey extends AllShadowKeys>(key: TKey, breakpoint: string, styles: any): AllShadow[TKey] => {
+export const extractShadowValue = <TKey extends AllShadowKeys>(
+    key: TKey,
+    breakpoint: string,
+    styles: any,
+): AllShadow[TKey] => {
     const value = styles[key]
 
     if (key === 'textShadowOffset' || key === 'shadowOffset') {
@@ -52,7 +59,7 @@ export const extractShadowValue = <TKey extends AllShadowKeys>(key: TKey, breakp
 
         return {
             width: typeof width === 'object' ? width[breakpoint] : width,
-            height: typeof height === 'object' ? height[breakpoint] : height
+            height: typeof height === 'object' ? height[breakpoint] : height,
         } as AllShadow[TKey]
     }
 

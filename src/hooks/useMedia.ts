@@ -26,8 +26,10 @@ export const useMedia = (config: { mq: symbol }) => {
             minWidth !== undefined ? `(min-width: ${minWidth}px)` : undefined,
             maxWidth !== undefined ? `(max-width: ${maxWidth}px)` : undefined,
             minHeight !== undefined ? `(min-height: ${minHeight}px)` : undefined,
-            maxHeight !== undefined ? `(max-height: ${maxHeight}px)` : undefined
-        ].filter(Boolean).join(' and ')
+            maxHeight !== undefined ? `(max-height: ${maxHeight}px)` : undefined,
+        ]
+            .filter(Boolean)
+            .join(' and ')
 
         const media = window.matchMedia(mediaQuery)
         const handler = (event: MediaQueryListEvent) => setIsVisible(event.matches)
@@ -42,6 +44,6 @@ export const useMedia = (config: { mq: symbol }) => {
     useEffect(() => () => disposeRef.current(), [])
 
     return {
-        isVisible
+        isVisible,
     }
 }

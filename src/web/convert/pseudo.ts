@@ -133,5 +133,4 @@ export const isPseudo = (selector: string) => pseudos.some(pseudo => selector.st
 
 type AddDynamicSelector<T extends string> = T extends `${infer U}(` ? `${U}(${string})` : T
 
-export type Pseudo = AddDynamicSelector<typeof pseudos[number]>
-
+export type Pseudo = AddDynamicSelector<(typeof pseudos)[number]>

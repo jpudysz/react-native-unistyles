@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useRef, useState } from 'react'
-import { UnistylesRuntime, UnistylesShadowRegistry, type UnistylesMiniRuntime } from '../../specs'
+import { type UnistylesMiniRuntime, UnistylesRuntime, UnistylesShadowRegistry } from '../../specs'
 // It's imported that way because of circular dependency
 import { UnistyleDependency } from '../../specs/NativePlatform'
 import type { UnistylesTheme } from '../../types'
@@ -44,7 +44,7 @@ export const useProxifiedUnistyles = () => {
 
                 setTheme(UnistylesRuntime.getTheme(scopedTheme))
             },
-            updateRuntime: () => runtimeChanged()
+            updateRuntime: () => runtimeChanged(),
         })
     }
 
@@ -59,7 +59,7 @@ export const useProxifiedUnistyles = () => {
             dependencies.add(UnistyleDependency.Theme)
 
             return target[prop]
-        }
+        },
     })
     const proxifiedRuntime = new Proxy(getMiniRuntime(), {
         get: (target, prop) => {
@@ -68,7 +68,7 @@ export const useProxifiedUnistyles = () => {
             }
 
             return target[prop as keyof typeof target]
-        }
+        },
     })
 
     return {
@@ -86,6 +86,6 @@ export const useProxifiedUnistyles = () => {
             }
 
             reinitListener()
-        }
+        },
     }
 }

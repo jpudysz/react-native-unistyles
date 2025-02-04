@@ -1,9 +1,9 @@
+import type { UnistyleDependency, UnistylesMiniRuntime } from '../specs'
 import type { UnistylesTheme, UnistylesValues } from '../types'
 import type { StyleSheet, StyleSheetWithSuperPowers } from '../types/stylesheet'
-import { generateHash, extractUnistyleDependencies, error } from './utils'
-import type { UnistylesMiniRuntime, UnistyleDependency } from '../specs'
 import { CSSState } from './css'
 import type { UnistylesServices } from './types'
+import { error, extractUnistyleDependencies, generateHash } from './utils'
 
 export class UnistylesRegistry {
     private readonly stylesheets = new Map<StyleSheetWithSuperPowers<StyleSheet>, StyleSheet>()
@@ -24,7 +24,9 @@ export class UnistylesRegistry {
             const scopedTheme = this.services.runtime.getTheme(scopedThemeName, this.services.state.CSSVars)
 
             if (!scopedTheme) {
-                throw error(`Unistyles: You're trying to use scoped theme '${scopedThemeName}' but it wasn't registered.`)
+                throw error(
+                    `Unistyles: You're trying to use scoped theme '${scopedThemeName}' but it wasn't registered.`,
+                )
             }
 
             return stylesheet(scopedTheme, this.services.runtime.miniRuntime)
@@ -36,7 +38,10 @@ export class UnistylesRegistry {
             return computedStylesheet
         }
 
-        const currentTheme = this.services.runtime.getTheme(this.services.runtime.themeName, this.services.state.CSSVars)
+        const currentTheme = this.services.runtime.getTheme(
+            this.services.runtime.themeName,
+            this.services.state.CSSVars,
+        )
         const createdStylesheet = stylesheet(currentTheme, this.services.runtime.miniRuntime)
         const dependencies = Object.values(createdStylesheet).flatMap(value => extractUnistyleDependencies(value))
 
@@ -46,7 +51,10 @@ export class UnistylesRegistry {
         return createdStylesheet
     }
 
-    addDependenciesToStylesheet = (stylesheet: (theme: UnistylesTheme, miniRuntime: UnistylesMiniRuntime) => StyleSheet, dependencies: Array<UnistyleDependency>) => {
+    addDependenciesToStylesheet = (
+        stylesheet: (theme: UnistylesTheme, miniRuntime: UnistylesMiniRuntime) => StyleSheet,
+        dependencies: Array<UnistyleDependency>,
+    ) => {
         this.disposeListenersMap.get(stylesheet)?.()
 
         const dependenciesMap = this.dependenciesMap.get(stylesheet) ?? new Set(dependencies)

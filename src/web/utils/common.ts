@@ -1,7 +1,10 @@
 export const reduceObject = <TObj extends Record<string, any>, TReducer>(
     obj: TObj,
     reducer: (value: TObj[keyof TObj], key: keyof TObj) => TReducer,
-) => Object.fromEntries(Object.entries(obj).map(([key, value]) => [key, reducer(value as TObj[keyof TObj], key)])) as { [K in keyof TObj]: TReducer }
+) =>
+    Object.fromEntries(Object.entries(obj).map(([key, value]) => [key, reducer(value as TObj[keyof TObj], key)])) as {
+        [K in keyof TObj]: TReducer
+    }
 
 export const keyInObject = <T extends Record<string, any>>(obj: T, key: PropertyKey): key is keyof T => key in obj
 
@@ -14,12 +17,7 @@ export const equal = <T>(a: T, b: T) => {
         return true
     }
 
-    if (
-        typeof a !== 'object'
-        || a === null
-        || typeof b !== 'object'
-        || b === null
-    ) {
+    if (typeof a !== 'object' || a === null || typeof b !== 'object' || b === null) {
         return false
     }
 

@@ -1,55 +1,55 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
-  "files": {
-    "include": ["src/**/*.ts", "src/**/*.tsx"],
-    "ignore": ["example", "expo-example", "docs", "plugin", "lib"]
-  },
-  "formatter": {
-    "enabled": true,
-    "indentStyle": "tab"
-  },
-  "linter": {
-    "enabled": true,
-    "rules": {
-      "recommended": true,
-      "suspicious": {
-        "noEmptyInterface": "off",
-        "noExplicitAny": "off"
-      },
-      "complexity": {
-        "noForEach": "off",
-        "noUselessSwitchCase": "off",
-        "noBannedTypes": "off"
-      },
-      "correctness": {
-        "useExhaustiveDependencies": "off"
-      }
-    }
-  },
-  "organizeImports": {
-    "enabled": true
-  },
-  "javascript": {
-    "formatter": {
-      "enabled": true,
-      "quoteStyle": "single",
-      "jsxQuoteStyle": "double",
-      "trailingCommas": "all",
-      "semicolons": "asNeeded",
-      "arrowParentheses": "asNeeded",
-      "indentStyle": "tab",
-      "indentWidth": 4,
-      "lineWidth": 120
+    "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
+    "files": {
+        "include": ["src/**/*.ts", "src/**/*.tsx"],
+        "ignore": ["example", "expo-example", "docs", "plugin", "lib"]
     },
-    "globals": [],
-    "jsxRuntime": "reactClassic"
-  },
-  "json": {
     "formatter": {
-      "enabled": true,
-      "indentWidth": 2,
-      "indentStyle": "tab",
-      "lineWidth": 120
+        "enabled": true,
+        "indentStyle": "space"
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "recommended": true,
+            "suspicious": {
+                "noEmptyInterface": "off",
+                "noExplicitAny": "off"
+            },
+            "complexity": {
+                "noForEach": "off",
+                "noUselessSwitchCase": "off",
+                "noBannedTypes": "off"
+            },
+            "correctness": {
+                "useExhaustiveDependencies": "off"
+            }
+        }
+    },
+    "organizeImports": {
+        "enabled": true
+    },
+    "javascript": {
+        "formatter": {
+            "enabled": true,
+            "quoteStyle": "single",
+            "jsxQuoteStyle": "double",
+            "trailingCommas": "all",
+            "semicolons": "asNeeded",
+            "arrowParentheses": "asNeeded",
+            "indentStyle": "space",
+            "indentWidth": 4,
+            "lineWidth": 120
+        },
+        "globals": [],
+        "jsxRuntime": "reactClassic"
+    },
+    "json": {
+        "formatter": {
+            "enabled": true,
+            "indentWidth": 4,
+            "indentStyle": "space",
+            "lineWidth": 120
+        }
     }
-  }
 }

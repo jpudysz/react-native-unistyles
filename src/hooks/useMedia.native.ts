@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useState } from 'react'
+import { isUnistylesMq, isValidMq, parseMq } from '../mq'
 import { StyleSheet, UnistyleDependency, UnistylesRuntime } from '../specs'
-import { isValidMq, parseMq, isUnistylesMq } from '../mq'
 
 export const useMedia = (config: { mq: symbol }) => {
     const computeIsVisible = (): boolean => {
@@ -60,6 +60,6 @@ export const useMedia = (config: { mq: symbol }) => {
     }, [config.mq])
 
     return {
-        isVisible
+        isVisible,
     }
 }

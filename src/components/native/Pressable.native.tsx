@@ -1,17 +1,15 @@
 import React, { forwardRef, useLayoutEffect, useRef } from 'react'
 import { Pressable as NativePressableReactNative } from 'react-native'
 import type { PressableProps as Props, View } from 'react-native'
-import { UnistylesShadowRegistry } from '../../specs'
 import { passForwardedRef } from '../../core'
+import { UnistylesShadowRegistry } from '../../specs'
 
 type PressableProps = Props & {
     variants?: Record<string, string | boolean>
 }
 
 const getStyles = (styleProps: Record<string, any> = {}) => {
-    const unistyleKey = Object
-        .keys(styleProps)
-        .find(key => key.startsWith('unistyles-'))
+    const unistyleKey = Object.keys(styleProps).find(key => key.startsWith('unistyles-'))
 
     if (!unistyleKey) {
         return styleProps
@@ -20,7 +18,7 @@ const getStyles = (styleProps: Record<string, any> = {}) => {
     return {
         // styles without C++ state
         ...styleProps[unistyleKey].uni__getStyles(),
-        [unistyleKey]: styleProps[unistyleKey].uni__getStyles()
+        [unistyleKey]: styleProps[unistyleKey].uni__getStyles(),
     }
 }
 
@@ -40,9 +38,7 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
         <NativePressableReactNative
             {...props}
             ref={ref => {
-                const unistyles = typeof style === 'function'
-                    ? style({ pressed: false })
-                    : style
+                const unistyles = typeof style === 'function' ? style({ pressed: false }) : style
 
                 // @ts-expect-error - this is hidden from TS
                 UnistylesShadowRegistry.add(ref, unistyles)
@@ -54,9 +50,8 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                 return passForwardedRef(props, ref, forwardedRef)
             }}
             style={state => {
-                const unistyles = typeof style === 'function'
-                    ? style(state)
-                    : getStyles(style as unknown as Record<string, any>)
+                const unistyles =
+                    typeof style === 'function' ? style(state) : getStyles(style as unknown as Record<string, any>)
 
                 if (!storedRef.current) {
                     return unistyles

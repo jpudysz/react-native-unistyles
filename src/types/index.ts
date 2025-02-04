@@ -5,7 +5,7 @@ export type {
     ScreenSize,
     NestedStyle,
     RNValue,
-    RNStyle
+    RNStyle,
 } from './core'
 export type {
     CreateUnistylesStyleSheet,
@@ -14,7 +14,7 @@ export type {
     UnistylesValues,
     UnistyleText,
     UnistyleView,
-    UnistyleImage
+    UnistyleImage,
 } from './stylesheet'
 export type { ReactNativeStyleSheet } from './breakpoints'
 export type { ExtractVariantNames, UnistylesVariants } from './variants'

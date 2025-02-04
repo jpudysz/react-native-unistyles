@@ -1,10 +1,10 @@
+import type { UnistylesBreakpoints } from '../../global'
+import { isUnistylesMq, parseMq } from '../../mq'
 import type { UnistyleDependency } from '../../specs/NativePlatform'
 import { ColorScheme, Orientation } from '../../specs/types'
 import type { StyleSheet, StyleSheetWithSuperPowers, UnistylesValues } from '../../types/stylesheet'
-import { isUnistylesMq, parseMq } from '../../mq'
-import { keyInObject, reduceObject } from './common'
-import type { UnistylesBreakpoints } from '../../global'
 import { UnistylesWeb } from '../index'
+import { keyInObject, reduceObject } from './common'
 
 export const schemeToTheme = (scheme: ColorScheme) => {
     switch (scheme) {
@@ -17,9 +17,9 @@ export const schemeToTheme = (scheme: ColorScheme) => {
 }
 
 export type UnistyleSecrets = {
-    __uni__stylesheet: StyleSheetWithSuperPowers<StyleSheet>,
-    __uni__key: string,
-    __uni__args?: Array<any>,
+    __uni__stylesheet: StyleSheetWithSuperPowers<StyleSheet>
+    __uni__key: string
+    __uni__args?: Array<any>
     __uni_variants: Record<string, string | boolean | undefined>
 }
 
@@ -29,11 +29,14 @@ export const assignSecrets = <T>(object: T, secrets: UnistyleSecrets) => {
     // @ts-expect-error assign hidden secrets
     object[`unistyles-${secretsId}`] = {}
     // @ts-expect-error assign hidden secrets
-    Object.defineProperties(object[`unistyles-${secretsId}`], reduceObject(secrets, secret => ({
-        value: secret,
-        enumerable: false,
-        configurable: true
-    })))
+    Object.defineProperties(
+        object[`unistyles-${secretsId}`],
+        reduceObject(secrets, secret => ({
+            value: secret,
+            enumerable: false,
+            configurable: true,
+        })),
+    )
 
     return object
 }
@@ -61,11 +64,14 @@ export const extractSecrets = (object: any) => {
 export const removeInlineStyles = (values: UnistylesValues) => {
     const returnValue = {}
 
-    Object.defineProperties(returnValue, reduceObject(values, value => ({
-        value,
-        enumerable: false,
-        configurable: true
-    })))
+    Object.defineProperties(
+        returnValue,
+        reduceObject(values, value => ({
+            value,
+            enumerable: false,
+            configurable: true,
+        })),
+    )
 
     return returnValue
 }
@@ -84,23 +90,27 @@ export const getMediaQuery = (query: string, allBreakpoints: Array<string>) => {
             minWidth ? `(min-width: ${minWidth}px)` : undefined,
             maxWidth ? `(max-width: ${maxWidth}px)` : undefined,
             minHeight ? `(min-height: ${minHeight}px)` : undefined,
-            maxHeight ? `(max-height: ${maxHeight}px)` : undefined
-        ].filter(Boolean).join(' and ')
+            maxHeight ? `(max-height: ${maxHeight}px)` : undefined,
+        ]
+            .filter(Boolean)
+            .join(' and ')
         return `@media ${queries}`
     }
 
     const breakpointValue = UnistylesWeb.runtime.breakpoints[query as keyof UnistylesBreakpoints] ?? 0
     const nextBreakpoint = allBreakpoints
-            .filter((b): b is keyof UnistylesBreakpoints => b in UnistylesWeb.runtime.breakpoints)
-            .map(b => UnistylesWeb.runtime.breakpoints[b] as number)
-            .sort((a, b) => a - b)
-            .find(b => b > breakpointValue)
-        const queries = [
-            `(min-width: ${breakpointValue}px)`,
-            nextBreakpoint ? `(max-width: ${nextBreakpoint - 1}px)` : undefined,
-        ].filter(Boolean).join(' and ')
+        .filter((b): b is keyof UnistylesBreakpoints => b in UnistylesWeb.runtime.breakpoints)
+        .map(b => UnistylesWeb.runtime.breakpoints[b] as number)
+        .sort((a, b) => a - b)
+        .find(b => b > breakpointValue)
+    const queries = [
+        `(min-width: ${breakpointValue}px)`,
+        nextBreakpoint ? `(max-width: ${nextBreakpoint - 1}px)` : undefined,
+    ]
+        .filter(Boolean)
+        .join(' and ')
 
-        return `@media ${queries}`
+    return `@media ${queries}`
 }
 
 export const extractUnistyleDependencies = (value: any) => {
@@ -108,7 +118,9 @@ export const extractUnistyleDependencies = (value: any) => {
         return []
     }
 
-    const dependencies: Array<UnistyleDependency> = keyInObject(value, 'uni__dependencies') ? value.uni__dependencies : []
+    const dependencies: Array<UnistyleDependency> = keyInObject(value, 'uni__dependencies')
+        ? value.uni__dependencies
+        : []
 
     return Array.isArray(dependencies) ? dependencies : []
 }

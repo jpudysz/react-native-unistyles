@@ -11,7 +11,7 @@ type SetProps = {
     propertyKey: string
     value: any
 }
-type HydrateState = Array<[ string, Array<[ string, Array<[ string, any ]> ]> ]>
+type HydrateState = Array<[string, Array<[string, Array<[string, any]>]>]>
 
 const safeGetMap = (map: Map<string, Map<string, any>>, key: string) => {
     const nextLevelMap = map.get(key)
@@ -72,7 +72,9 @@ export class CSSState {
 
         const convertToCSS = (key: string, value: any, prev = '-') => {
             if (typeof value === 'object' && value !== null) {
-                Object.entries(value).forEach(([nestedKey, nestedValue]) => convertToCSS(nestedKey, nestedValue, `${prev}-${key}`))
+                Object.entries(value).forEach(([nestedKey, nestedValue]) =>
+                    convertToCSS(nestedKey, nestedValue, `${prev}-${key}`),
+                )
             }
 
             if (typeof value === 'string') {
@@ -150,9 +152,9 @@ export class CSSState {
                             className,
                             Array.from(style.entries()).map(([property, value]) => {
                                 return [property, value]
-                            })
+                            }),
                         ]
-                    })
+                    }),
                 ]
             }) as HydrateState
         }
@@ -173,7 +175,7 @@ export class CSSState {
                             propertyKey,
                             value,
                             mediaQuery,
-                            isMq
+                            isMq,
                         })
                     })
                 })

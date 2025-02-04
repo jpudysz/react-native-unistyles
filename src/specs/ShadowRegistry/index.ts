@@ -4,27 +4,30 @@ import type { ShadowNode, Unistyle, ViewHandle } from './types'
 
 interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     // Babel API
-    add(handle?: ViewHandle, styles?: Array<Unistyle>): void,
-    remove(handle?: ViewHandle): void,
+    add(handle?: ViewHandle, styles?: Array<Unistyle>): void
+    remove(handle?: ViewHandle): void
     // JSI
-    link(node: ShadowNode, styles?: Array<Unistyle>): void,
-    unlink(node: ShadowNode): void,
-    setScopedTheme(themeName?: string): void,
+    link(node: ShadowNode, styles?: Array<Unistyle>): void
+    unlink(node: ShadowNode): void
+    setScopedTheme(themeName?: string): void
     getScopedTheme(): string | undefined
 }
 
 const HybridShadowRegistry = NitroModules.createHybridObject<ShadowRegistry>('UnistylesShadowRegistry')
 
 const findShadowNodeForHandle = (handle: ViewHandle) => {
-    const node = handle?.__internalInstanceHandle?.stateNode?.node
-        ?? handle?.getScrollResponder?.()?.getNativeScrollRef?.()?.__internalInstanceHandle?.stateNode?.node
-        ?? handle?.getNativeScrollRef?.()?.__internalInstanceHandle?.stateNode?.node
-        ?? handle?._viewRef?.__internalInstanceHandle?.stateNode?.node
-        ?? handle?.viewRef?.current?.__internalInstanceHandle?.stateNode?.node
-        ?? handle?._nativeRef?.__internalInstanceHandle?.stateNode?.node
+    const node =
+        handle?.__internalInstanceHandle?.stateNode?.node ??
+        handle?.getScrollResponder?.()?.getNativeScrollRef?.()?.__internalInstanceHandle?.stateNode?.node ??
+        handle?.getNativeScrollRef?.()?.__internalInstanceHandle?.stateNode?.node ??
+        handle?._viewRef?.__internalInstanceHandle?.stateNode?.node ??
+        handle?.viewRef?.current?.__internalInstanceHandle?.stateNode?.node ??
+        handle?._nativeRef?.__internalInstanceHandle?.stateNode?.node
 
     if (!node) {
-        throw new Error(`Unistyles: Could not find shadow node for one of your components of type ${handle?.__internalInstanceHandle?.elementType ?? 'unknown'}`)
+        throw new Error(
+            `Unistyles: Could not find shadow node for one of your components of type ${handle?.__internalInstanceHandle?.elementType ?? 'unknown'}`,
+        )
     }
 
     return node
@@ -36,9 +39,7 @@ HybridShadowRegistry.add = (handle, styles) => {
         return
     }
 
-    const stylesArray = Array.isArray(styles)
-        ? styles.flat()
-        : [styles]
+    const stylesArray = Array.isArray(styles) ? styles.flat() : [styles]
 
     // filter Reanimated styles and styles that are undefined
     const filteredStyles = stylesArray
@@ -59,10 +60,6 @@ HybridShadowRegistry.remove = handle => {
     HybridShadowRegistry.unlink(findShadowNodeForHandle(handle))
 }
 
-type PrivateMethods =
-    | 'add'
-    | 'remove'
-    | 'link'
-    | 'unlink'
+type PrivateMethods = 'add' | 'remove' | 'link' | 'unlink'
 
 export const UnistylesShadowRegistry = HybridShadowRegistry as Omit<ShadowRegistry, PrivateMethods>

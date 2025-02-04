@@ -1,9 +1,9 @@
+import { UnistyleDependency } from '../specs'
 import type { UnistylesTheme, UnistylesValues } from '../types'
 import { deepMergeObjects } from '../utils'
+import type { UnistylesServices } from './types'
 import { extractSecrets, extractUnistyleDependencies } from './utils'
 import { getVariants } from './variants'
-import type { UnistylesServices } from './types'
-import { UnistyleDependency } from '../specs'
 
 export class UnistylesShadowRegistry {
     // MOCKS
@@ -38,11 +38,12 @@ export class UnistylesShadowRegistry {
                 }
 
                 const { __uni__key, __uni__stylesheet, __uni__args = [], __uni_variants: variants } = secrets
-                const newComputedStylesheet = this.services.registry.getComputedStylesheet(__uni__stylesheet, scopedTheme)
-                const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
-                const result = typeof style === 'function'
-                    ? style(...__uni__args)
-                    : style
+                const newComputedStylesheet = this.services.registry.getComputedStylesheet(
+                    __uni__stylesheet,
+                    scopedTheme,
+                )
+                const style = newComputedStylesheet[__uni__key] as UnistylesValues | ((...args: any) => UnistylesValues)
+                const result = typeof style === 'function' ? style(...__uni__args) : style
                 const variantsResult = getVariants(result, variants)
                 const resultWithVariants = deepMergeObjects(result, variantsResult)
                 const dependencies = extractUnistyleDependencies(resultWithVariants)
@@ -70,9 +71,12 @@ export class UnistylesShadowRegistry {
             : dependencies
 
         if (!existingHash) {
-            this.disposeMap.set(hash, this.services.listener.addListeners(filteredDependencies, () => {
-                this.services.registry.applyStyles(hash, getParsedStyles())
-            }))
+            this.disposeMap.set(
+                hash,
+                this.services.listener.addListeners(filteredDependencies, () => {
+                    this.services.registry.applyStyles(hash, getParsedStyles())
+                }),
+            )
         }
 
         return { injectedClassName, hash }

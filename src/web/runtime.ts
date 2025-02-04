@@ -1,10 +1,10 @@
 import { UnistyleDependency } from '../specs/NativePlatform'
-import { ColorScheme, Orientation, type AppTheme, type AppThemeName } from '../specs/types'
 import type { UnistylesMiniRuntime } from '../specs/UnistylesRuntime'
+import { type AppTheme, type AppThemeName, ColorScheme, Orientation } from '../specs/types'
 import { WebContentSizeCategory } from '../types'
 import { NavigationBar, StatusBar } from './mock'
-import { error, isServer, schemeToTheme } from './utils'
 import type { UnistylesServices } from './types'
+import { error, isServer, schemeToTheme } from './utils'
 
 export class UnistylesRuntime {
     lightMedia = this.getLightMedia()
@@ -88,13 +88,13 @@ export class UnistylesRuntime {
         if (isServer()) {
             return {
                 width: 0,
-                height: 0
+                height: 0,
             }
         }
 
         return {
             width: window.innerWidth,
-            height: window.innerHeight
+            height: window.innerHeight,
         }
     }
 
@@ -108,7 +108,7 @@ export class UnistylesRuntime {
             bottom: 0,
             left: 0,
             right: 0,
-            ime: 0
+            ime: 0,
         }
     }
 
@@ -142,14 +142,14 @@ export class UnistylesRuntime {
             insets: this.insets,
             statusBar: {
                 width: this.statusBar.width,
-                height: this.statusBar.height
+                height: this.statusBar.height,
             },
             navigationBar: {
                 width: this.navigationBar.width,
                 height: this.navigationBar.height,
             },
             rtl: this.rtl,
-            hasAdaptiveThemes: this.hasAdaptiveThemes
+            hasAdaptiveThemes: this.hasAdaptiveThemes,
         }
     }
 

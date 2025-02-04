@@ -1,7 +1,7 @@
 import type { BoxShadowValue } from 'react-native'
-import { normalizeNumericValue } from '../utils'
-import { keyInObject } from '../../utils'
 import { deepMergeObjects } from '../../../utils'
+import { keyInObject } from '../../utils'
+import { normalizeNumericValue } from '../utils'
 
 const createBoxShadowValue = (style: BoxShadowValue) => {
     const { offsetX, offsetY, blurRadius = 0, spreadDistance = 0, color = '#000', inset } = style
@@ -22,32 +22,36 @@ export const getBoxShadow = (boxShadow: Array<BoxShadowValue>) => {
     })
 
     if (breakpoints.size === 0) {
-        const boxShadowStyle = Object.fromEntries(boxShadow.map(shadow => {
-            const [key] = Object.keys(shadow)
-            return [key, shadow[key as keyof BoxShadowValue]]
-        }))
+        const boxShadowStyle = Object.fromEntries(
+            boxShadow.map(shadow => {
+                const [key] = Object.keys(shadow)
+                return [key, shadow[key as keyof BoxShadowValue]]
+            }),
+        )
 
         return {
-            boxShadow: createBoxShadowValue(boxShadowStyle)
+            boxShadow: createBoxShadowValue(boxShadowStyle),
         }
     }
 
     const breakpointStyles = Array.from(breakpoints).map(breakpoint => {
-        const styles = Object.fromEntries(boxShadow.map(shadow => {
-            const [key] = Object.keys(shadow)
-            const value = shadow[key as keyof BoxShadowValue]
+        const styles = Object.fromEntries(
+            boxShadow.map(shadow => {
+                const [key] = Object.keys(shadow)
+                const value = shadow[key as keyof BoxShadowValue]
 
-            if (typeof value === 'object' && keyInObject(value, breakpoint)) {
-                return [key, value[breakpoint]]
-            }
+                if (typeof value === 'object' && keyInObject(value, breakpoint)) {
+                    return [key, value[breakpoint]]
+                }
 
-            return [key, value]
-        }))
+                return [key, value]
+            }),
+        )
 
         return {
             [breakpoint]: {
-                boxShadow: createBoxShadowValue(styles)
-            }
+                boxShadow: createBoxShadowValue(styles),
+            },
         }
     })
 
