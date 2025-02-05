@@ -84,7 +84,7 @@ type UseVariantsFn<T> = {
 }
 
 const create = <S extends StyleSheet>(
-    stylesheet: StyleSheetWithSuperPowers<S>,
+    stylesheet: StyleSheetWithSuperPowers<S>
 ): ReactNativeStyleSheet<S> & UseVariantsFn<typeof stylesheet> =>
     stylesheet as ReactNativeStyleSheet<S> & UseVariantsFn<typeof stylesheet>
 

@@ -4,12 +4,12 @@ import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
 export enum ColorScheme {
     Light = 'light',
     Dark = 'dark',
-    Unspecified = 'unspecified',
+    Unspecified = 'unspecified'
 }
 
 export enum Orientation {
     Portrait = 'portrait',
-    Landscape = 'landscape',
+    Landscape = 'landscape'
 }
 
 export interface Dimensions {
@@ -28,7 +28,7 @@ export interface Insets {
 export enum StatusBarStyle {
     Default = 'default',
     Light = 'light',
-    Dark = 'dark',
+    Dark = 'dark'
 }
 
 export type AppThemeName = keyof UnistylesThemes

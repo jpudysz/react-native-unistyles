@@ -17,8 +17,7 @@ export const isFilter = (key: string, value: any): value is Array<Filters> => ke
 export const isBoxShadow = (key: string, value: any): value is Array<BoxShadowValue> =>
     key === 'boxShadow' && Array.isArray(value)
 
-export const normalizeNumericValue = (value: number | string) =>
-    value && typeof value === 'number' ? `${value}px` : value
+export const normalizeNumericValue = (value: number | string) => (value && typeof value === 'number' ? `${value}px` : value)
 
 export const normalizeColor = (color: string, opacity = 1) => {
     // If the opacity is 1 there's no need to normalize the color
@@ -47,11 +46,7 @@ export const normalizeColor = (color: string, opacity = 1) => {
     return color
 }
 
-export const extractShadowValue = <TKey extends AllShadowKeys>(
-    key: TKey,
-    breakpoint: string,
-    styles: any,
-): AllShadow[TKey] => {
+export const extractShadowValue = <TKey extends AllShadowKeys>(key: TKey, breakpoint: string, styles: any): AllShadow[TKey] => {
     const value = styles[key]
 
     if (key === 'textShadowOffset' || key === 'shadowOffset') {
@@ -59,7 +54,7 @@ export const extractShadowValue = <TKey extends AllShadowKeys>(
 
         return {
             width: typeof width === 'object' ? width[breakpoint] : width,
-            height: typeof height === 'object' ? height[breakpoint] : height,
+            height: typeof height === 'object' ? height[breakpoint] : height
         } as AllShadow[TKey]
     }
 

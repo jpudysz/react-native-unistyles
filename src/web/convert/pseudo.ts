@@ -126,7 +126,7 @@ export const pseudos = [
     '_view-transition-group',
     '_view-transition-image-pair',
     '_view-transition-new',
-    '_view-transition-old',
+    '_view-transition-old'
 ] as const
 
 export const isPseudo = (selector: string) => pseudos.some(pseudo => selector.startsWith(pseudo))

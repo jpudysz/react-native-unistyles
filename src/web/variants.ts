@@ -34,11 +34,7 @@ export const getVariants = (styles: UnistylesValues, selectedVariants: Record<st
         styles.compoundVariants?.flatMap(compoundVariant => {
             const { styles, ...conditions } = compoundVariant
 
-            if (
-                Object.entries(conditions).some(
-                    ([variant, value]) => String(selectedVariants[variant]) !== String(value),
-                )
-            ) {
+            if (Object.entries(conditions).some(([variant, value]) => String(selectedVariants[variant]) !== String(value))) {
                 return []
             }
 

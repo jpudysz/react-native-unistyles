@@ -26,7 +26,7 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
 
     if (!node) {
         throw new Error(
-            `Unistyles: Could not find shadow node for one of your components of type ${handle?.__internalInstanceHandle?.elementType ?? 'unknown'}`,
+            `Unistyles: Could not find shadow node for one of your components of type ${handle?.__internalInstanceHandle?.elementType ?? 'unknown'}`
         )
     }
 

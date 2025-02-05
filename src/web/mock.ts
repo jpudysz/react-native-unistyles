@@ -9,7 +9,7 @@ export const StatusBar: StatusBarSpec = {
     equals: () => true,
     toString: () => 'StatusBar',
     __type: 'web',
-    name: 'StatusBar',
+    name: 'StatusBar'
 }
 
 export const NavigationBar: NavigationBarSpec = {
@@ -20,5 +20,5 @@ export const NavigationBar: NavigationBarSpec = {
     dispose: () => {},
     toString: () => 'NavigationBar',
     __type: 'web',
-    name: 'NavigationBar',
+    name: 'NavigationBar'
 }

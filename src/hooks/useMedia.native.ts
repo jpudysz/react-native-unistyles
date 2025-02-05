@@ -60,6 +60,6 @@ export const useMedia = (config: { mq: symbol }) => {
     }, [config.mq])
 
     return {
-        isVisible,
+        isVisible
     }
 }

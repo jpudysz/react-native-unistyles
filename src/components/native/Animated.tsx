@@ -13,5 +13,5 @@ export const Animated = {
     FlatList: RNAnimated.createAnimatedComponent(FlatList),
     Image: RNAnimated.createAnimatedComponent(Image),
     ScrollView: RNAnimated.createAnimatedComponent(ScrollView),
-    SectionList: RNAnimated.createAnimatedComponent(SectionList),
+    SectionList: RNAnimated.createAnimatedComponent(SectionList)
 }

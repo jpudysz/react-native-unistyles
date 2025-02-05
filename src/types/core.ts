@@ -12,7 +12,7 @@ import type {
     SkewXTransform,
     SkewYTransform,
     TranslateXTransform,
-    TranslateYTransform,
+    TranslateYTransform
 } from 'react-native/Libraries/StyleSheet/StyleSheetTypes'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
 

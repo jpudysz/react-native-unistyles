@@ -25,18 +25,18 @@ export const StyleSheet = {
         left: 0,
         top: 0,
         right: 0,
-        bottom: 0,
+        bottom: 0
     },
     absoluteFillObject: {
         position: 'absolute',
         left: 0,
         top: 0,
         right: 0,
-        bottom: 0,
+        bottom: 0
     },
     compose: (a: object, b: object) => deepMergeObjects(a, b),
     flatten: (...styles: Array<object>) => deepMergeObjects(...styles),
-    hairlineWidth: 1,
+    hairlineWidth: 1
 } as unknown as typeof NativeStyleSheet
 
 export const UnistylesRuntime = UnistylesWeb.runtime as unknown as typeof NativeUnistylesRuntime

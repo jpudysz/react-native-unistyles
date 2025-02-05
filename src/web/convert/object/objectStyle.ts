@@ -21,7 +21,7 @@ const createStylesValue = <TStyles extends Styles>(styles: Array<TStyles>, norma
 export const getObjectStyle = <TStyles extends Styles>(
     styles: Array<TStyles>,
     styleKey: string,
-    normalize: Normalize<TStyles>,
+    normalize: Normalize<TStyles>
 ) => {
     const breakpoints = new Set<string>()
     const normalStyles: Array<TStyles> = []
@@ -64,16 +64,16 @@ export const getObjectStyle = <TStyles extends Styles>(
         return [
             {
                 [breakpoint]: {
-                    [styleKey]: createStylesValue(stylesPerBreakpoint, normalize),
-                },
-            },
+                    [styleKey]: createStylesValue(stylesPerBreakpoint, normalize)
+                }
+            }
         ]
     })
 
     return deepMergeObjects<Record<string, any>>(
         {
-            [styleKey]: createStylesValue(normalStyles, normalize),
+            [styleKey]: createStylesValue(normalStyles, normalize)
         },
-        ...breakpointStyles,
+        ...breakpointStyles
     )
 }

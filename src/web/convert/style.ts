@@ -1,13 +1,6 @@
 import { keyInObject } from '../utils'
 
-const SKIP_STYLES = new Set([
-    'borderCurve',
-    'elevation',
-    'textAlignVertical',
-    'includeFontPadding',
-    'overlayColor',
-    'tintColor',
-])
+const SKIP_STYLES = new Set(['borderCurve', 'elevation', 'textAlignVertical', 'includeFontPadding', 'overlayColor', 'tintColor'])
 
 const CSS_NUMBER_KEYS = new Set([
     'animationIterationCount',
@@ -54,73 +47,73 @@ const CSS_NUMBER_KEYS = new Set([
     'strokeMiterlimit',
     'strokeOpacity',
     'strokeWidth',
-    'aspectRatio',
+    'aspectRatio'
 ])
 
 const convertMap = {
     marginHorizontal: (value: number) => ({
-        marginInline: value,
+        marginInline: value
     }),
     marginVertical: (value: number) => ({
-        marginBlock: value,
+        marginBlock: value
     }),
     paddingHorizontal: (value: number) => ({
-        paddingInline: value,
+        paddingInline: value
     }),
     paddingVertical: (value: number) => ({
-        paddingBlock: value,
+        paddingBlock: value
     }),
     writingDirection: (value: string) => ({
-        direction: value,
+        direction: value
     }),
     borderBottomEndRadius: (value: number) => ({
-        borderBottomRightRadius: value,
+        borderBottomRightRadius: value
     }),
     borderBottomStartRadius: (value: number) => ({
-        borderBottomLeftRadius: value,
+        borderBottomLeftRadius: value
     }),
     borderEndColor: (value: string) => ({
-        borderInlineEndColor: value,
+        borderInlineEndColor: value
     }),
     borderStartColor: (value: string) => ({
-        borderInlineStartColor: value,
+        borderInlineStartColor: value
     }),
     borderTopEndRadius: (value: number) => ({
-        borderTopRightRadius: value,
+        borderTopRightRadius: value
     }),
     borderTopStartRadius: (value: number) => ({
-        borderTopLeftRadius: value,
+        borderTopLeftRadius: value
     }),
     borderEndWidth: (value: number) => ({
-        borderInlineEndWidth: value,
+        borderInlineEndWidth: value
     }),
     borderStartWidth: (value: number) => ({
-        borderInlineStartWidth: value,
+        borderInlineStartWidth: value
     }),
     end: (value: number) => ({
-        right: value,
+        right: value
     }),
     start: (value: number) => ({
-        left: value,
+        left: value
     }),
     marginEnd: (value: number) => ({
-        marginRight: value,
+        marginRight: value
     }),
     marginStart: (value: number) => ({
-        marginLeft: value,
+        marginLeft: value
     }),
     paddingEnd: (value: number) => ({
-        paddingRight: value,
+        paddingRight: value
     }),
     paddingStart: (value: number) => ({
-        paddingLeft: value,
+        paddingLeft: value
     }),
     transformMatrix: (value: Array<number>) => ({
-        transform: `matrix(${value.join(', ')})`,
+        transform: `matrix(${value.join(', ')})`
     }),
     resizeMode: (value: string) => ({
-        backgroundSize: value,
-    }),
+        backgroundSize: value
+    })
 } as Record<PropertyKey, (value: any) => Record<string, any>>
 
 const convertNumber = (key: string, value: any) => {
@@ -141,6 +134,6 @@ export const getStyle = (key: string, value: any) => {
     }
 
     return {
-        [key]: convertNumber(key, value),
+        [key]: convertNumber(key, value)
     }
 }

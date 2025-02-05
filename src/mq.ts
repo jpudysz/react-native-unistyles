@@ -15,7 +15,7 @@ type MQHandler = {
     }
     width(
         wMin?: Nullable<MQValue>,
-        wMax?: MQValue,
+        wMax?: MQValue
     ): {
         and: {
             height(hMin?: Nullable<MQValue>, hMax?: MQValue): symbol
@@ -23,7 +23,7 @@ type MQHandler = {
     }
     height(
         hMin?: Nullable<MQValue>,
-        hMax?: MQValue,
+        hMax?: MQValue
     ): {
         and: {
             width(wMin?: Nullable<MQValue>, wMax?: MQValue): symbol
@@ -54,20 +54,20 @@ export const mq: MQHandler = {
         width: (wMin: Nullable<MQValue> = 0, wMax: MQValue = Number.POSITIVE_INFINITY) =>
             `:w[${getMQValue(wMin)}, ${getMQValue(wMax)}]` as unknown as symbol,
         height: (hMin: Nullable<MQValue> = 0, hMax: MQValue = Number.POSITIVE_INFINITY) =>
-            `:h[${getMQValue(hMin)}, ${getMQValue(hMax)}]` as unknown as symbol,
+            `:h[${getMQValue(hMin)}, ${getMQValue(hMax)}]` as unknown as symbol
     },
     width: (wMin: Nullable<MQValue> = 0, wMax: MQValue = Number.POSITIVE_INFINITY) => ({
         and: {
             height: (hMin: Nullable<MQValue> = 0, hMax: MQValue = Number.POSITIVE_INFINITY) =>
-                `:w[${getMQValue(wMin)}, ${getMQValue(wMax)}]:h[${getMQValue(hMin)}, ${getMQValue(hMax)}]` as unknown as symbol,
-        },
+                `:w[${getMQValue(wMin)}, ${getMQValue(wMax)}]:h[${getMQValue(hMin)}, ${getMQValue(hMax)}]` as unknown as symbol
+        }
     }),
     height: (hMin: Nullable<MQValue> = 0, hMax: MQValue = Number.POSITIVE_INFINITY) => ({
         and: {
             width: (wMin: Nullable<MQValue> = 0, wMax: MQValue = Number.POSITIVE_INFINITY) =>
-                `:w[${getMQValue(wMin)}, ${getMQValue(wMax)}]:h[${getMQValue(hMin)}, ${getMQValue(hMax)}]` as unknown as symbol,
-        },
-    }),
+                `:w[${getMQValue(wMin)}, ${getMQValue(wMax)}]:h[${getMQValue(hMin)}, ${getMQValue(hMax)}]` as unknown as symbol
+        }
+    })
 }
 
 export const parseMq = (mq: string) => {
@@ -78,7 +78,7 @@ export const parseMq = (mq: string) => {
         minWidth: !width || fromW === 'Infinity' ? undefined : Number(fromW),
         maxWidth: !width || toW === 'Infinity' ? undefined : Number(toW),
         minHeight: !height || fromH === 'Infinity' ? undefined : Number(fromH),
-        maxHeight: !height || toH === 'Infinity' ? undefined : Number(toH),
+        maxHeight: !height || toH === 'Infinity' ? undefined : Number(toH)
     }
 }
 

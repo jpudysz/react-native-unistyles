@@ -15,40 +15,37 @@ const getDropShadowStyle = (dropShadow: DropShadowValue) => {
 export const getFilterStyle = (filters: Array<Filters>) => {
     const restFilters = filters.filter(filter => Object.keys(filter)[0] !== 'dropShadow')
     const dropShadow = (() => {
-        const dropShadowValue = filters.find(filter => Object.keys(filter)[0] === 'dropShadow')?.dropShadow as Record<
-            string,
-            any
-        >
+        const dropShadowValue = filters.find(filter => Object.keys(filter)[0] === 'dropShadow')?.dropShadow as Record<string, any>
 
         if (typeof dropShadowValue !== 'object') {
             return []
         }
 
         const breakpoints = Object.keys(dropShadowValue).filter(
-            key => Object.keys(UnistylesWeb.runtime.breakpoints).includes(key) || isUnistylesMq(key),
+            key => Object.keys(UnistylesWeb.runtime.breakpoints).includes(key) || isUnistylesMq(key)
         )
         const breakpointsDropShadow = Object.fromEntries(
-            breakpoints.map(breakpoint => [breakpoint, getDropShadowStyle(dropShadowValue[breakpoint])]),
+            breakpoints.map(breakpoint => [breakpoint, getDropShadowStyle(dropShadowValue[breakpoint])])
         )
 
         if (breakpoints.length === 0) {
             return [
                 {
-                    dropShadow: getDropShadowStyle(dropShadowValue as DropShadowValue),
-                },
+                    dropShadow: getDropShadowStyle(dropShadowValue as DropShadowValue)
+                }
             ]
         }
 
         return [
             {
-                dropShadow: breakpointsDropShadow,
-            },
+                dropShadow: breakpointsDropShadow
+            }
         ]
     })()
 
     return getObjectStyle(
         [...restFilters, ...dropShadow],
         'filter',
-        (key, value) => `${hyphenate(key)}(${normalizeNumericValue(value as number | string)})`,
+        (key, value) => `${hyphenate(key)}(${normalizeNumericValue(value as number | string)})`
     )
 }

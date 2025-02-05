@@ -7,7 +7,7 @@ export const getClassName = (unistyle: UnistylesValues | undefined | Array<Unist
     }
 
     const { hash, injectedClassName } = UnistylesWeb.shadowRegistry.addStyles(
-        Array.isArray(unistyle) ? unistyle.flat(Number.POSITIVE_INFINITY) : [unistyle],
+        Array.isArray(unistyle) ? unistyle.flat(Number.POSITIVE_INFINITY) : [unistyle]
     )
 
     return hash ? { $$css: true, hash, injectedClassName } : undefined

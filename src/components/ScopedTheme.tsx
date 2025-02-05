@@ -18,11 +18,10 @@ const Apply = ({ name }: { name?: keyof UnistylesThemes }) => {
 
 export const ScopedTheme: React.FunctionComponent<React.PropsWithChildren<ThemeProps>> = ({ name, children }) => {
     const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
-    const mappedChildren = [
+
+    return [
         <Apply key={name} name={name} />,
         children,
-        <Apply key="dispose" name={previousScopedTheme as keyof UnistylesThemes | undefined} />,
+        <Apply key="dispose" name={previousScopedTheme as keyof UnistylesThemes | undefined} />
     ]
-
-    return <>{mappedChildren}</>
 }

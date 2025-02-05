@@ -34,12 +34,12 @@
             "enabled": true,
             "quoteStyle": "single",
             "jsxQuoteStyle": "double",
-            "trailingCommas": "all",
+            "trailingCommas": "none",
             "semicolons": "asNeeded",
             "arrowParentheses": "asNeeded",
             "indentStyle": "space",
             "indentWidth": 4,
-            "lineWidth": 120
+            "lineWidth": 130
         },
         "globals": [],
         "jsxRuntime": "reactClassic"
@@ -49,7 +49,7 @@
             "enabled": true,
             "indentWidth": 4,
             "indentStyle": "space",
-            "lineWidth": 120
+            "lineWidth": 130
         }
     }
 }

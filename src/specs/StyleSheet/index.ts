@@ -46,7 +46,7 @@ HybridUnistylesStyleSheet.absoluteFill = NativeStyleSheet.absoluteFill
 HybridUnistylesStyleSheet.flatten = NativeStyleSheet.flatten
 HybridUnistylesStyleSheet.compose = NativeStyleSheet.compose
 HybridUnistylesStyleSheet.jsMethods = {
-    processColor,
+    processColor
 }
 
 HybridUnistylesStyleSheet.init()

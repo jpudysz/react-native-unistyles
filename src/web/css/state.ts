@@ -73,7 +73,7 @@ export class CSSState {
         const convertToCSS = (key: string, value: any, prev = '-') => {
             if (typeof value === 'object' && value !== null) {
                 Object.entries(value).forEach(([nestedKey, nestedValue]) =>
-                    convertToCSS(nestedKey, nestedValue, `${prev}-${key}`),
+                    convertToCSS(nestedKey, nestedValue, `${prev}-${key}`)
                 )
             }
 
@@ -152,9 +152,9 @@ export class CSSState {
                             className,
                             Array.from(style.entries()).map(([property, value]) => {
                                 return [property, value]
-                            }),
+                            })
                         ]
-                    }),
+                    })
                 ]
             }) as HydrateState
         }
@@ -175,7 +175,7 @@ export class CSSState {
                             propertyKey,
                             value,
                             mediaQuery,
-                            isMq,
+                            isMq
                         })
                     })
                 })

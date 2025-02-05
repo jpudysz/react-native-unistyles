@@ -18,7 +18,7 @@ const getStyles = (styleProps: Record<string, any> = {}) => {
     return {
         // styles without C++ state
         ...styleProps[unistyleKey].uni__getStyles(),
-        [unistyleKey]: styleProps[unistyleKey].uni__getStyles(),
+        [unistyleKey]: styleProps[unistyleKey].uni__getStyles()
     }
 }
 
@@ -50,8 +50,7 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                 return passForwardedRef(props, ref, forwardedRef)
             }}
             style={state => {
-                const unistyles =
-                    typeof style === 'function' ? style(state) : getStyles(style as unknown as Record<string, any>)
+                const unistyles = typeof style === 'function' ? style(state) : getStyles(style as unknown as Record<string, any>)
 
                 if (!storedRef.current) {
                     return unistyles

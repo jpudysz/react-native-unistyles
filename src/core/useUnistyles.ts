@@ -6,6 +6,6 @@ export const useUnistyles = () => {
 
     return {
         theme: proxifiedTheme as UnistylesTheme,
-        rt: proxifiedRuntime,
+        rt: proxifiedRuntime
     }
 }

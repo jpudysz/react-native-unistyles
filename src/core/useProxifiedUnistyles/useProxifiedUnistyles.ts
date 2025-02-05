@@ -23,7 +23,7 @@ const RTDependencyMap = {
     screen: UnistyleDependency.Dimensions,
     statusBar: UnistyleDependency.StatusBar,
     pixelRatio: UnistyleDependency.PixelRatio,
-    themeName: UnistyleDependency.ThemeName,
+    themeName: UnistyleDependency.ThemeName
 } satisfies Partial<Record<keyof UnistylesMiniRuntime, UnistyleDependency>>
 
 export const useProxifiedUnistyles = () => {
@@ -44,7 +44,7 @@ export const useProxifiedUnistyles = () => {
 
                 setTheme(UnistylesRuntime.getTheme(scopedTheme))
             },
-            updateRuntime: () => runtimeChanged(),
+            updateRuntime: () => runtimeChanged()
         })
     }
 
@@ -59,7 +59,7 @@ export const useProxifiedUnistyles = () => {
             dependencies.add(UnistyleDependency.Theme)
 
             return target[prop]
-        },
+        }
     })
     const proxifiedRuntime = new Proxy(getMiniRuntime(), {
         get: (target, prop) => {
@@ -68,7 +68,7 @@ export const useProxifiedUnistyles = () => {
             }
 
             return target[prop as keyof typeof target]
-        },
+        }
     })
 
     return {
@@ -86,6 +86,6 @@ export const useProxifiedUnistyles = () => {
             }
 
             reinitListener()
-        },
+        }
     }
 }

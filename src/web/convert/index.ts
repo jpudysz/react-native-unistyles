@@ -14,18 +14,13 @@ export const convertUnistyles = (value: UnistylesValues) => {
 
     const stylesArray = Object.entries({
         ...value,
-        ...value._web,
+        ...value._web
     }).flatMap(([unistylesKey, unistylesValue]) => {
         // Keys to omit
         if (
-            [
-                '_classNames',
-                '_web',
-                'variants',
-                'compoundVariants',
-                'uni__dependencies',
-                '__unistyles-secrets__',
-            ].includes(unistylesKey) ||
+            ['_classNames', '_web', 'variants', 'compoundVariants', 'uni__dependencies', '__unistyles-secrets__'].includes(
+                unistylesKey
+            ) ||
             unistylesKey.startsWith('variant-')
         ) {
             return []

@@ -38,10 +38,7 @@ export class UnistylesShadowRegistry {
                 }
 
                 const { __uni__key, __uni__stylesheet, __uni__args = [], __uni_variants: variants } = secrets
-                const newComputedStylesheet = this.services.registry.getComputedStylesheet(
-                    __uni__stylesheet,
-                    scopedTheme,
-                )
+                const newComputedStylesheet = this.services.registry.getComputedStylesheet(__uni__stylesheet, scopedTheme)
                 const style = newComputedStylesheet[__uni__key] as UnistylesValues | ((...args: any) => UnistylesValues)
                 const result = typeof style === 'function' ? style(...__uni__args) : style
                 const variantsResult = getVariants(result, variants)
@@ -75,7 +72,7 @@ export class UnistylesShadowRegistry {
                 hash,
                 this.services.listener.addListeners(filteredDependencies, () => {
                     this.services.registry.applyStyles(hash, getParsedStyles())
-                }),
+                })
             )
         }
 

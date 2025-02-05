@@ -34,8 +34,8 @@ export const assignSecrets = <T>(object: T, secrets: UnistyleSecrets) => {
         reduceObject(secrets, secret => ({
             value: secret,
             enumerable: false,
-            configurable: true,
-        })),
+            configurable: true
+        }))
     )
 
     return object
@@ -69,8 +69,8 @@ export const removeInlineStyles = (values: UnistylesValues) => {
         reduceObject(values, value => ({
             value,
             enumerable: false,
-            configurable: true,
-        })),
+            configurable: true
+        }))
     )
 
     return returnValue
@@ -90,7 +90,7 @@ export const getMediaQuery = (query: string, allBreakpoints: Array<string>) => {
             minWidth ? `(min-width: ${minWidth}px)` : undefined,
             maxWidth ? `(max-width: ${maxWidth}px)` : undefined,
             minHeight ? `(min-height: ${minHeight}px)` : undefined,
-            maxHeight ? `(max-height: ${maxHeight}px)` : undefined,
+            maxHeight ? `(max-height: ${maxHeight}px)` : undefined
         ]
             .filter(Boolean)
             .join(' and ')
@@ -103,10 +103,7 @@ export const getMediaQuery = (query: string, allBreakpoints: Array<string>) => {
         .map(b => UnistylesWeb.runtime.breakpoints[b] as number)
         .sort((a, b) => a - b)
         .find(b => b > breakpointValue)
-    const queries = [
-        `(min-width: ${breakpointValue}px)`,
-        nextBreakpoint ? `(max-width: ${nextBreakpoint - 1}px)` : undefined,
-    ]
+    const queries = [`(min-width: ${breakpointValue}px)`, nextBreakpoint ? `(max-width: ${nextBreakpoint - 1}px)` : undefined]
         .filter(Boolean)
         .join(' and ')
 
@@ -118,9 +115,7 @@ export const extractUnistyleDependencies = (value: any) => {
         return []
     }
 
-    const dependencies: Array<UnistyleDependency> = keyInObject(value, 'uni__dependencies')
-        ? value.uni__dependencies
-        : []
+    const dependencies: Array<UnistyleDependency> = keyInObject(value, 'uni__dependencies') ? value.uni__dependencies : []
 
     return Array.isArray(dependencies) ? dependencies : []
 }

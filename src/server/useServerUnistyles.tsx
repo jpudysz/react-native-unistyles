@@ -6,7 +6,7 @@ import { resetServerUnistyles } from './resetServerUnistyles'
 import { DefaultServerUnistylesSettings, type ServerUnistylesSettings } from './types'
 
 export const useServerUnistyles = (
-    settings: ServerUnistylesSettings = DefaultServerUnistylesSettings,
+    settings: ServerUnistylesSettings = DefaultServerUnistylesSettings
 ): React.ReactNode | null => {
     const isServerInserted = useRef(false)
 

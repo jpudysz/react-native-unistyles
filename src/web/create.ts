@@ -10,17 +10,12 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, id?: s
     }
 
     const computedStylesheet = UnistylesWeb.registry.getComputedStylesheet(stylesheet)
-    const addSecrets = (
-        value: any,
-        key: string,
-        args = undefined as Array<any> | undefined,
-        variants = {} as Variants,
-    ) =>
+    const addSecrets = (value: any, key: string, args = undefined as Array<any> | undefined, variants = {} as Variants) =>
         assignSecrets(value, {
             __uni__key: key,
             __uni__stylesheet: stylesheet,
             __uni__args: args,
-            __uni_variants: variants,
+            __uni_variants: variants
         })
 
     const createStyleSheetStyles = (variants?: Variants) => {
@@ -32,7 +27,7 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, id?: s
                         const result = removeInlineStyles(value(...args))
 
                         return addSecrets(result, key, args, variants)
-                    },
+                    }
                 ]
             }
 
@@ -46,7 +41,7 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, id?: s
         'useVariants',
         (variants: Variants) => {
             return createStyleSheetStyles(variants)
-        },
+        }
     ]
 
     return createStyleSheetStyles()

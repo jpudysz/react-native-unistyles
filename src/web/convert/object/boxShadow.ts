@@ -26,11 +26,11 @@ export const getBoxShadow = (boxShadow: Array<BoxShadowValue>) => {
             boxShadow.map(shadow => {
                 const [key] = Object.keys(shadow)
                 return [key, shadow[key as keyof BoxShadowValue]]
-            }),
+            })
         )
 
         return {
-            boxShadow: createBoxShadowValue(boxShadowStyle),
+            boxShadow: createBoxShadowValue(boxShadowStyle)
         }
     }
 
@@ -45,13 +45,13 @@ export const getBoxShadow = (boxShadow: Array<BoxShadowValue>) => {
                 }
 
                 return [key, value]
-            }),
+            })
         )
 
         return {
             [breakpoint]: {
-                boxShadow: createBoxShadowValue(styles),
-            },
+                boxShadow: createBoxShadowValue(styles)
+            }
         }
     })
 

@@ -74,9 +74,9 @@ export class UnistylesState {
                             key,
                             Object.fromEntries(
                                 Object.entries(value).map(([nestedKey, nestedValue]) =>
-                                    convertTheme(nestedKey, nestedValue, `${prev}-${key}`),
-                                ),
-                            ),
+                                    convertTheme(nestedKey, nestedValue, `${prev}-${key}`)
+                                )
+                            )
                         ]
                     }
 
@@ -92,8 +92,8 @@ export class UnistylesState {
                     Object.fromEntries(
                         Object.entries(theme).map(([key, value]) => {
                             return convertTheme(key, value)
-                        }),
-                    ) as UnistylesTheme,
+                        })
+                    ) as UnistylesTheme
                 )
             }
         })
@@ -103,17 +103,13 @@ export class UnistylesState {
         this.hasAdaptiveThemes = settings?.adaptiveThemes ?? false
 
         if (settings.initialTheme && settings.adaptiveThemes) {
-            throw error(
-                "You're trying to set initial theme and enable adaptiveThemes, but these options are mutually exclusive.",
-            )
+            throw error("You're trying to set initial theme and enable adaptiveThemes, but these options are mutually exclusive.")
         }
 
         // Adaptive themes
         if (settings.adaptiveThemes) {
             if (!this.themes.get('light') || !this.themes.get('dark')) {
-                throw error(
-                    `You're trying to enable adaptiveThemes, but you didn't register both 'light' and 'dark' themes.`,
-                )
+                throw error(`You're trying to enable adaptiveThemes, but you didn't register both 'light' and 'dark' themes.`)
             }
 
             this.themeName = schemeToTheme(this.services.runtime.colorScheme) as AppThemeName
@@ -122,8 +118,7 @@ export class UnistylesState {
         }
 
         if (settings.initialTheme) {
-            const initialTheme =
-                typeof settings.initialTheme === 'function' ? settings.initialTheme() : settings.initialTheme
+            const initialTheme = typeof settings.initialTheme === 'function' ? settings.initialTheme() : settings.initialTheme
 
             if (!this.themes.get(initialTheme)) {
                 throw error(`You're trying to select theme "${initialTheme}" but it wasn't registered.`)

@@ -26,7 +26,7 @@ export const useMedia = (config: { mq: symbol }) => {
             minWidth !== undefined ? `(min-width: ${minWidth}px)` : undefined,
             maxWidth !== undefined ? `(max-width: ${maxWidth}px)` : undefined,
             minHeight !== undefined ? `(min-height: ${minHeight}px)` : undefined,
-            maxHeight !== undefined ? `(max-height: ${maxHeight}px)` : undefined,
+            maxHeight !== undefined ? `(max-height: ${maxHeight}px)` : undefined
         ]
             .filter(Boolean)
             .join(' and ')
@@ -44,6 +44,6 @@ export const useMedia = (config: { mq: symbol }) => {
     useEffect(() => () => disposeRef.current(), [])
 
     return {
-        isVisible,
+        isVisible
     }
 }

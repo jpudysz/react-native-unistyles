@@ -19,7 +19,7 @@ export const getBoxShadowStyle = (styles: Record<string, any>) => {
     // If no breakpoints were used return styles without media queries
     if (breakpoints.length === 0) {
         return {
-            boxShadow: createBoxShadowValue(styles as BoxShadow),
+            boxShadow: createBoxShadowValue(styles as BoxShadow)
         }
     }
 
@@ -36,12 +36,12 @@ export const getBoxShadowStyle = (styles: Record<string, any>) => {
                     shadowColor: color,
                     shadowOffset: {
                         width,
-                        height,
+                        height
                     },
                     shadowRadius: radius,
-                    shadowOpacity: opacity,
-                }),
-            },
+                    shadowOpacity: opacity
+                })
+            }
         }
     })
 

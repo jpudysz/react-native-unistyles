@@ -14,7 +14,7 @@ type GenericComponentRef<T> = ComponentRef<T>
 
 export const withUnistyles = <TComponent, TMappings extends GenericComponentProps<TComponent>>(
     Component: TComponent,
-    mappings?: Mappings<TMappings>,
+    mappings?: Mappings<TMappings>
 ) => {
     type TProps = GenericComponentProps<TComponent>
     type PropsWithUnistyles = PartialBy<TProps, keyof TMappings | SupportedStyleProps> & {
@@ -38,27 +38,27 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
             ...deepMergeObjects(mappingsProps, unistyleProps, props),
             ...(narrowedProps.style
                 ? {
-                      style: styleClassNames,
+                      style: styleClassNames
                   }
                 : {}),
             ...(narrowedProps.contentContainerStyle
                 ? {
-                      style: contentContainerStyleClassNames,
+                      style: contentContainerStyleClassNames
                   }
-                : {}),
+                : {})
         } as any
 
         maybeWarnAboutMultipleUnistyles(
             // @ts-ignore
             narrowedProps.style,
             // @ts-ignore
-            `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`,
+            `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`
         )
         maybeWarnAboutMultipleUnistyles(
             // @ts-ignore
             narrowedProps.contentContainerStyle,
             // @ts-ignore
-            `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`,
+            `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`
         )
 
         const NativeComponent = Component as ComponentType

@@ -13,22 +13,25 @@ type GenericComponentRef<T> = ComponentRef<T>
 
 export const withUnistyles = <TComponent, TMappings extends GenericComponentProps<TComponent>>(
     Component: TComponent,
-    mappings?: Mappings<TMappings>,
+    mappings?: Mappings<TMappings>
 ) => {
     type TProps = GenericComponentProps<TComponent>
     type PropsWithUnistyles = PartialBy<TProps, keyof TMappings | SupportedStyleProps> & {
         uniProps?: Mappings<TProps>
     }
     const getSecrets = (
-        styleProps: Record<string, any> = {},
-    ): { uni__getStyles(): any; uni__dependencies: Array<UnistyleDependency> } => {
+        styleProps: Record<string, any> = {}
+    ): {
+        uni__getStyles(): any
+        uni__dependencies: Array<UnistyleDependency>
+    } => {
         const unistyleKey = Object.keys(styleProps).find(key => key.startsWith('unistyles-'))
 
         return unistyleKey
             ? styleProps[unistyleKey]
             : {
                   uni__getStyles: () => styleProps,
-                  uni__dependencies: [],
+                  uni__dependencies: []
               }
     }
 
@@ -40,13 +43,13 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
             // @ts-ignore we don't know the type of the component
             narrowedProps.style,
             // @ts-ignore we don't know the type of the component
-            `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`,
+            `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`
         )
         maybeWarnAboutMultipleUnistyles(
             // @ts-ignore we don't know the type of the component
             narrowedProps.contentContainerStyle,
             // @ts-ignore we don't know the type of the component
-            `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`,
+            `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`
         )
 
         const { proxifiedRuntime, proxifiedTheme, addDependencies } = useProxifiedUnistyles()
@@ -56,9 +59,7 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
             const contentContainerStyleSecrets = getSecrets(narrowedProps.contentContainerStyle)
 
             addDependencies(
-                Array.from(
-                    new Set([...styleSecrets.uni__dependencies, ...contentContainerStyleSecrets.uni__dependencies]),
-                ),
+                Array.from(new Set([...styleSecrets.uni__dependencies, ...contentContainerStyleSecrets.uni__dependencies]))
             )
         }, [narrowedProps.style, narrowedProps.contentContainerStyle])
 
@@ -72,14 +73,14 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
             ...deepMergeObjects(mappingsProps, unistyleProps, props),
             ...(narrowedProps.style
                 ? {
-                      style: styleSecrets.uni__getStyles(),
+                      style: styleSecrets.uni__getStyles()
                   }
                 : {}),
             ...(narrowedProps.contentContainerStyle
                 ? {
-                      contentContainerStyle: contentContainerStyleSecrets.uni__getStyles(),
+                      contentContainerStyle: contentContainerStyleSecrets.uni__getStyles()
                   }
-                : {}),
+                : {})
         } as any
 
         return <NativeComponent {...(finalProps as TProps)} ref={ref} />
