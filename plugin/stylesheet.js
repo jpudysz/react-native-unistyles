@@ -515,7 +515,15 @@ function addDependencies(t, state, unistyle, detectedDependencies) {
 
             if (t.isBlockStatement(unistyle.value.body)) {
                 targets = getReturnStatementsFromBody(t, unistyle.value.body)
-                    .map(node => node.argument)
+                    .map(node => {
+                        if (t.isIdentifier(node.argument)) {
+                            node.argument = t.objectExpression([
+                                t.spreadElement(node.argument)
+                            ])
+                        }
+
+                        return node.argument
+                    })
             }
         }
 
