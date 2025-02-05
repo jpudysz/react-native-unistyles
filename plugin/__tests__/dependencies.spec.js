@@ -506,7 +506,7 @@ pluginTester({
                         container: (headerColors, colorMap) => ({
                             backgroundColor: headerColors[rt.colorScheme],
                             paddingBottom: colorMap[theme.colors.primary],
-                            uni__dependencies: [5, 0]
+                            uni__dependencies: [0, 5]
                         })
                     }),
                     664955283
@@ -559,7 +559,7 @@ pluginTester({
                                     translateY: -rt.insets.ime
                                 }
                             ],
-                            uni__dependencies: [9]
+                            uni__dependencies: [14]
                         }
                     }),
                     664955283
@@ -627,7 +627,7 @@ pluginTester({
                             if (someRandomInt === 5) {
                                 return {
                                     backgroundColor: theme.colors.background,
-                                    uni__dependencies: [0]
+                                    uni__dependencies: [0, 9, 11]
                                 }
                             }
 
@@ -635,19 +635,19 @@ pluginTester({
                                 return {
                                     backgroundColor: theme.colors.barbie,
                                     paddingBottom: rt.insets.bottom,
-                                    uni__dependencies: [0, 9]
+                                    uni__dependencies: [0, 9, 11]
                                 }
                             }
 
                             if (someRandomInt === 15) {
                                 return {
                                     fontSize: rt.fontScale * 10,
-                                    uni__dependencies: [11]
+                                    uni__dependencies: [0, 9, 11]
                                 }
                             } else {
                                 return {
                                     backgroundColor: theme.colors.blood,
-                                    uni__dependencies: [0]
+                                    uni__dependencies: [0, 9, 11]
                                 }
                             }
                         }
