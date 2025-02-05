@@ -283,7 +283,7 @@ pluginTester({
                             backgroundColor: 'red',
                             variants: {},
                             paddingTop: rt.insets.top,
-                            uni__dependencies: [4, 9]
+                            uni__dependencies: [9, 4]
                         })
                     }),
                     798826616
@@ -332,7 +332,7 @@ pluginTester({
                             backgroundColor: hhsa.colors.background,
                             variants: {},
                             paddingTop: dee.colorScheme === 'dark' ? 0 : 10,
-                            uni__dependencies: [0, 4, 5]
+                            uni__dependencies: [0, 5, 4]
                         })
                     }),
                     798826616
@@ -383,7 +383,7 @@ pluginTester({
                             backgroundColor: theme.colors.background,
                             variants: {},
                             paddingTop: rt.insets.top,
-                            uni__dependencies: [0, 4, 9]
+                            uni__dependencies: [0, 9, 4]
                         })
                     }
                 }, 798826616)
@@ -442,7 +442,7 @@ pluginTester({
                             backgroundColor: theme.colors.background,
                             variants: {},
                             paddingTop: rt.insets.top,
-                            uni__dependencies: [0, 4, 9]
+                            uni__dependencies: [0, 9, 4]
                         })
                     }
                 }, 798826616)
@@ -452,7 +452,7 @@ pluginTester({
                             backgroundColor: theme.colors.background,
                             variants: {},
                             paddingTop: rt.insets.top,
-                            uni__dependencies: [0, 4, 9]
+                            uni__dependencies: [0, 9, 4]
                         })
                     }
                 }, 798826617)
@@ -510,7 +510,7 @@ pluginTester({
                             backgroundColor: theme.colors.background,
                             variants: {},
                             paddingTop: rt.insets.top,
-                            uni__dependencies: [0, 4, 9]
+                            uni__dependencies: [0, 9, 4]
                         }),
                         pressable: {
                             marginRight: arg1 + arg2
