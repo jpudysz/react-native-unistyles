@@ -1,5 +1,5 @@
-import { error, isServer } from '../web/utils'
 import { UnistylesWeb } from '../web'
+import { error, isServer } from '../web/utils'
 
 export const resetServerUnistyles = () => {
     if (!isServer()) {

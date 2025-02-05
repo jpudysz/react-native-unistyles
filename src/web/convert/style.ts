@@ -1,13 +1,6 @@
 import { keyInObject } from '../utils'
 
-const SKIP_STYLES = new Set([
-    'borderCurve',
-    'elevation',
-    'textAlignVertical',
-    'includeFontPadding',
-    'overlayColor',
-    'tintColor'
-])
+const SKIP_STYLES = new Set(['borderCurve', 'elevation', 'textAlignVertical', 'includeFontPadding', 'overlayColor', 'tintColor'])
 
 const CSS_NUMBER_KEYS = new Set([
     'animationIterationCount',

@@ -1,4 +1,4 @@
 export type ServerUnistylesSettings = {
-  includeRNWStyles?: boolean
+    includeRNWStyles?: boolean
 }
 export const DefaultServerUnistylesSettings = {}

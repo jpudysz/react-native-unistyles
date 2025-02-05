@@ -126,12 +126,11 @@ export const pseudos = [
     '_view-transition-group',
     '_view-transition-image-pair',
     '_view-transition-new',
-    '_view-transition-old',
+    '_view-transition-old'
 ] as const
 
 export const isPseudo = (selector: string) => pseudos.some(pseudo => selector.startsWith(pseudo))
 
 type AddDynamicSelector<T extends string> = T extends `${infer U}(` ? `${U}(${string})` : T
 
-export type Pseudo = AddDynamicSelector<typeof pseudos[number]>
-
+export type Pseudo = AddDynamicSelector<(typeof pseudos)[number]>

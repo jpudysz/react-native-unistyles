@@ -7,6 +7,7 @@
     "test:coverage": "jest --passWithNoTests --coverage",
     "tsc": "node_modules/typescript/bin/tsc --noEmit",
     "lint": "biome lint",
+    "check": "biome check --write",
     "prepare": "husky && bob build",
     "precommit": "concurrently 'yarn tsc' 'yarn lint' 'yarn test'",
     "release": "release-it"

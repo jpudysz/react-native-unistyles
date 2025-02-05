@@ -1,8 +1,8 @@
 import React, { useLayoutEffect, useRef } from 'react'
 import { UnistylesShadowRegistry } from '../specs'
+import { copyComponentProperties } from '../utils'
 import { passForwardedRef } from './passForwardRef'
 import { maybeWarnAboutMultipleUnistyles } from './warn'
-import { copyComponentProperties } from '../utils'
 
 const getNativeRef = (Component: any, ref: any) => {
     switch (Component.name) {

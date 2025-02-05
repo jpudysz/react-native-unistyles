@@ -1,8 +1,8 @@
-import { create } from './create'
-import { deepMergeObjects } from '../utils'
+import type { UnistylesShadowRegistry as NativeUnistylesShadowRegistry } from '../specs/ShadowRegistry'
 import type { StyleSheet as NativeStyleSheet } from '../specs/StyleSheet'
 import type { Runtime as NativeUnistylesRuntime } from '../specs/UnistylesRuntime'
-import type { UnistylesShadowRegistry as NativeUnistylesShadowRegistry } from '../specs/ShadowRegistry'
+import { deepMergeObjects } from '../utils'
+import { create } from './create'
 import { UnistylesServices } from './services'
 import { isServer } from './utils'
 
@@ -25,7 +25,7 @@ export const StyleSheet = {
         left: 0,
         top: 0,
         right: 0,
-        bottom: 0,
+        bottom: 0
     },
     absoluteFillObject: {
         position: 'absolute',
@@ -43,4 +43,3 @@ export const UnistylesRuntime = UnistylesWeb.runtime as unknown as typeof Native
 export const UnistylesShadowRegistry = UnistylesWeb.shadowRegistry as unknown as typeof NativeUnistylesShadowRegistry
 
 export * from './mock'
-

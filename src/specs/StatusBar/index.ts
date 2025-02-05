@@ -1,13 +1,13 @@
 import { StatusBar as NativeStatusBar } from 'react-native'
-import type { UnistylesStatusBar as UnistylesStatusBarSpec } from './UnistylesStatusBar.nitro'
 import { StatusBarStyle } from '../types'
+import type { UnistylesStatusBar as UnistylesStatusBarSpec } from './UnistylesStatusBar.nitro'
 
 export type StatusBarHiddenAnimation = 'none' | 'fade' | 'slide'
 
 interface PrivateUnistylesStatusBar extends Omit<UnistylesStatusBarSpec, 'setBackgroundColor' | 'setHidden'> {
-    setStyle(style: StatusBarStyle, animated?: boolean): void,
-    setHidden(isHidden: boolean, animation?: StatusBarHiddenAnimation): void,
-    _setHidden(isHidden: boolean, animation?: StatusBarHiddenAnimation): void,
+    setStyle(style: StatusBarStyle, animated?: boolean): void
+    setHidden(isHidden: boolean, animation?: StatusBarHiddenAnimation): void
+    _setHidden(isHidden: boolean, animation?: StatusBarHiddenAnimation): void
 }
 
 export const attachStatusBarJSMethods = (hybridObject: UnistylesStatusBar) => {
@@ -31,8 +31,6 @@ export const attachStatusBarJSMethods = (hybridObject: UnistylesStatusBar) => {
     }
 }
 
-type PrivateMethods =
-    | '_setHidden'
-    | 'dispose'
+type PrivateMethods = '_setHidden' | 'dispose'
 
 export type UnistylesStatusBar = Omit<PrivateUnistylesStatusBar, PrivateMethods>

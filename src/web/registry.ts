@@ -1,9 +1,9 @@
+import type { UnistyleDependency, UnistylesMiniRuntime } from '../specs'
 import type { UnistylesTheme, UnistylesValues } from '../types'
 import type { StyleSheet, StyleSheetWithSuperPowers } from '../types/stylesheet'
-import { generateHash, extractUnistyleDependencies, error } from './utils'
-import type { UnistylesMiniRuntime, UnistyleDependency } from '../specs'
 import { CSSState } from './css'
 import type { UnistylesServices } from './types'
+import { error, extractUnistyleDependencies, generateHash } from './utils'
 
 export class UnistylesRegistry {
     private readonly stylesheets = new Map<StyleSheetWithSuperPowers<StyleSheet>, StyleSheet>()
@@ -46,7 +46,10 @@ export class UnistylesRegistry {
         return createdStylesheet
     }
 
-    addDependenciesToStylesheet = (stylesheet: (theme: UnistylesTheme, miniRuntime: UnistylesMiniRuntime) => StyleSheet, dependencies: Array<UnistyleDependency>) => {
+    addDependenciesToStylesheet = (
+        stylesheet: (theme: UnistylesTheme, miniRuntime: UnistylesMiniRuntime) => StyleSheet,
+        dependencies: Array<UnistyleDependency>
+    ) => {
         this.disposeListenersMap.get(stylesheet)?.()
 
         const dependenciesMap = this.dependenciesMap.get(stylesheet) ?? new Set(dependencies)

@@ -13,15 +13,15 @@ export enum Orientation {
 }
 
 export interface Dimensions {
-    readonly width: number,
+    readonly width: number
     readonly height: number
 }
 
 export interface Insets {
-    readonly top: number,
-    readonly bottom: number,
-    readonly left: number,
-    readonly right: number,
+    readonly top: number
+    readonly bottom: number
+    readonly left: number
+    readonly right: number
     readonly ime: number
 }
 

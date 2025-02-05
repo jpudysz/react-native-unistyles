@@ -4,7 +4,10 @@ import type { UnistylesServices } from './types'
 export class UnistylesListener {
     private isInitialized = false
     private listeners = Array.from({ length: Object.keys(UnistyleDependency).length / 2 }, () => new Set<VoidFunction>())
-    private stylesheetListeners = Array.from({ length: Object.keys(UnistyleDependency).length / 2 }, () => new Set<VoidFunction>())
+    private stylesheetListeners = Array.from(
+        { length: Object.keys(UnistyleDependency).length / 2 },
+        () => new Set<VoidFunction>()
+    )
 
     constructor(private services: UnistylesServices) {}
 

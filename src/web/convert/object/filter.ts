@@ -1,10 +1,10 @@
 import type { DropShadowValue } from 'react-native'
-import { hyphenate } from '../../utils'
-import type { Filters } from '../types'
-import { getObjectStyle } from './objectStyle'
-import { normalizeColor, normalizeNumericValue } from '../utils'
 import { isUnistylesMq } from '../../../mq'
 import { UnistylesWeb } from '../../index'
+import { hyphenate } from '../../utils'
+import type { Filters } from '../types'
+import { normalizeColor, normalizeNumericValue } from '../utils'
+import { getObjectStyle } from './objectStyle'
 
 const getDropShadowStyle = (dropShadow: DropShadowValue) => {
     const { offsetX = 0, offsetY = 0, standardDeviation = 0, color = '#000' } = dropShadow
@@ -21,19 +21,31 @@ export const getFilterStyle = (filters: Array<Filters>) => {
             return []
         }
 
-        const breakpoints = Object.keys(dropShadowValue).filter(key => Object.keys(UnistylesWeb.runtime.breakpoints).includes(key) || isUnistylesMq(key))
-        const breakpointsDropShadow = Object.fromEntries(breakpoints.map(breakpoint => [breakpoint, getDropShadowStyle(dropShadowValue[breakpoint])]))
+        const breakpoints = Object.keys(dropShadowValue).filter(
+            key => Object.keys(UnistylesWeb.runtime.breakpoints).includes(key) || isUnistylesMq(key)
+        )
+        const breakpointsDropShadow = Object.fromEntries(
+            breakpoints.map(breakpoint => [breakpoint, getDropShadowStyle(dropShadowValue[breakpoint])])
+        )
 
         if (breakpoints.length === 0) {
-            return [{
-                dropShadow: getDropShadowStyle(dropShadowValue as DropShadowValue)
-            }]
+            return [
+                {
+                    dropShadow: getDropShadowStyle(dropShadowValue as DropShadowValue)
+                }
+            ]
         }
 
-        return [{
-            dropShadow: breakpointsDropShadow
-        }]
+        return [
+            {
+                dropShadow: breakpointsDropShadow
+            }
+        ]
     })()
 
-    return getObjectStyle([...restFilters, ...dropShadow], 'filter', (key, value) => `${hyphenate(key)}(${normalizeNumericValue(value as number | string)})`)
+    return getObjectStyle(
+        [...restFilters, ...dropShadow],
+        'filter',
+        (key, value) => `${hyphenate(key)}(${normalizeNumericValue(value as number | string)})`
+    )
 }

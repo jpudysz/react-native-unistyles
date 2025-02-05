@@ -16,7 +16,7 @@ export const convertToCSS = (hash: string, value: Record<string, any>, state: CS
                             mediaQuery,
                             className: pseudoClassName,
                             propertyKey: breakpointStyleKey,
-                            value: breakpointStyleValue,
+                            value: breakpointStyleValue
                         })
                     })
 
@@ -26,7 +26,7 @@ export const convertToCSS = (hash: string, value: Record<string, any>, state: CS
                 state.set({
                     className: pseudoClassName,
                     propertyKey: pseudoStyleKey,
-                    value: pseudoStyleValue,
+                    value: pseudoStyleValue
                 })
             })
 
@@ -42,7 +42,7 @@ export const convertToCSS = (hash: string, value: Record<string, any>, state: CS
                     mediaQuery,
                     className: hash,
                     propertyKey: breakpointStyleKey,
-                    value: breakpointStyleValue,
+                    value: breakpointStyleValue
                 })
             })
 
@@ -52,7 +52,7 @@ export const convertToCSS = (hash: string, value: Record<string, any>, state: CS
         state.set({
             className: hash,
             propertyKey: styleKey,
-            value: styleValue,
+            value: styleValue
         })
     })
 }

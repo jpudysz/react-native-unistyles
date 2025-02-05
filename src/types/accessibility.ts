@@ -25,5 +25,5 @@ export enum AndroidContentSizeCategory {
 }
 
 export enum WebContentSizeCategory {
-    Unspecified = 'web-unspecified',
+    Unspecified = 'web-unspecified'
 }

@@ -1,37 +1,37 @@
 import { processColor } from 'react-native'
 import { NitroModules } from 'react-native-nitro-modules'
-import type { UnistylesRuntime as UnistylesRuntimeSpec, UnistylesMiniRuntime } from './UnistylesRuntime.nitro'
-import type { AppBreakpoint, AppTheme, AppThemeName, Color, ColorScheme, Orientation } from '../types'
-import { attachStatusBarJSMethods, type UnistylesStatusBar } from '../StatusBar'
-import type { UnistylesNavigationBar } from '../NavigtionBar'
-import type { AndroidContentSizeCategory, IOSContentSizeCategory, UnistylesTheme } from '../../types'
 import { isIOS } from '../../common'
 import type { UnistylesThemes } from '../../global'
+import type { AndroidContentSizeCategory, IOSContentSizeCategory, UnistylesTheme } from '../../types'
+import type { UnistylesNavigationBar } from '../NavigtionBar'
+import { type UnistylesStatusBar, attachStatusBarJSMethods } from '../StatusBar'
+import type { AppBreakpoint, AppTheme, AppThemeName, Color, ColorScheme, Orientation } from '../types'
+import type { UnistylesMiniRuntime, UnistylesRuntime as UnistylesRuntimeSpec } from './UnistylesRuntime.nitro'
 
 export interface UnistylesRuntimePrivate extends Omit<UnistylesRuntimeSpec, 'setRootViewBackgroundColor'> {
-    readonly colorScheme: ColorScheme,
-    readonly themeName?: AppThemeName,
-    readonly contentSizeCategory: IOSContentSizeCategory | AndroidContentSizeCategory,
-    readonly breakpoint?: AppBreakpoint,
-    readonly orientation: Orientation,
+    readonly colorScheme: ColorScheme
+    readonly themeName?: AppThemeName
+    readonly contentSizeCategory: IOSContentSizeCategory | AndroidContentSizeCategory
+    readonly breakpoint?: AppBreakpoint
+    readonly orientation: Orientation
 
     // other HybridObjects
-    statusBar: UnistylesStatusBar,
-    navigationBar: UnistylesNavigationBar,
+    statusBar: UnistylesStatusBar
+    navigationBar: UnistylesNavigationBar
 
-    getTheme(themeName?: keyof UnistylesThemes): UnistylesTheme,
+    getTheme(themeName?: keyof UnistylesThemes): UnistylesTheme
     setTheme(themeName: AppThemeName): void
-    updateTheme(themeName: AppThemeName, updater: (currentTheme: AppTheme) => AppTheme): void,
-    setRootViewBackgroundColor(color?: string): void,
+    updateTheme(themeName: AppThemeName, updater: (currentTheme: AppTheme) => AppTheme): void
+    setRootViewBackgroundColor(color?: string): void
     _setRootViewBackgroundColor(color?: Color): void
 
     // constructors
-    createHybridStatusBar(): UnistylesStatusBar,
+    createHybridStatusBar(): UnistylesStatusBar
     createHybridNavigationBar(): UnistylesNavigationBar
 }
 
 type PrivateMethods =
-    |'createHybridStatusBar'
+    | 'createHybridStatusBar'
     | 'createHybridNavigationBar'
     | 'dispose'
     | 'miniRuntime'
@@ -39,8 +39,7 @@ type PrivateMethods =
 
 type UnistylesRuntime = Omit<UnistylesRuntimePrivate, PrivateMethods>
 
-const HybridUnistylesRuntime = NitroModules
-    .createHybridObject<UnistylesRuntimePrivate>('UnistylesRuntime')
+const HybridUnistylesRuntime = NitroModules.createHybridObject<UnistylesRuntimePrivate>('UnistylesRuntime')
 
 HybridUnistylesRuntime.statusBar = HybridUnistylesRuntime.createHybridStatusBar()
 HybridUnistylesRuntime.navigationBar = HybridUnistylesRuntime.createHybridNavigationBar()
@@ -53,13 +52,12 @@ HybridUnistylesRuntime.setRootViewBackgroundColor = (color?: string) => {
 }
 
 if (isIOS) {
-    HybridUnistylesRuntime.setImmersiveMode = (isEnabled: boolean) => HybridUnistylesRuntime.statusBar.setHidden(isEnabled, 'fade')
+    HybridUnistylesRuntime.setImmersiveMode = (isEnabled: boolean) =>
+        HybridUnistylesRuntime.statusBar.setHidden(isEnabled, 'fade')
 }
 
 attachStatusBarJSMethods(HybridUnistylesRuntime.statusBar)
 
 export const Runtime = HybridUnistylesRuntime as UnistylesRuntime
 
-export type {
-    UnistylesMiniRuntime
-}
+export type { UnistylesMiniRuntime }

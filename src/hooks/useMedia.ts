@@ -27,7 +27,9 @@ export const useMedia = (config: { mq: symbol }) => {
             maxWidth !== undefined ? `(max-width: ${maxWidth}px)` : undefined,
             minHeight !== undefined ? `(min-height: ${minHeight}px)` : undefined,
             maxHeight !== undefined ? `(max-height: ${maxHeight}px)` : undefined
-        ].filter(Boolean).join(' and ')
+        ]
+            .filter(Boolean)
+            .join(' and ')
 
         const media = window.matchMedia(mediaQuery)
         const handler = (event: MediaQueryListEvent) => setIsVisible(event.matches)
