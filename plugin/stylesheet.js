@@ -41,7 +41,7 @@ function isUnistylesStyleSheet(t, path, state) {
 }
 
 function isKindOfStyleSheet(t, path, state) {
-    if (!state.file.forceProcessing) {
+    if (!state.file.forceProcessing && !state.file.hasUnistylesImport) {
         return false
     }
 
