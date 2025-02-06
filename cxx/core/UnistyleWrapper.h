@@ -183,6 +183,7 @@ inline static jsi::Value valueFromUnistyle(jsi::Runtime& rt, std::shared_ptr<Hyb
 
     hostFn.setNativeState(rt, std::move(wrappedUnistyle));
     hostFn.setProperty(rt, unistyleID, jsi::Object(rt));
+    hostFn.setProperty(rt, helpers::STYLESHEET_VARIANTS.c_str(), helpers::variantsToValue(rt, variants));
 
     return std::move(hostFn);
 }
