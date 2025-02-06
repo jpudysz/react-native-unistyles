@@ -1,5 +1,3 @@
-const { getIdentifierNameFromExpression, getSecondPropertyName } = require('./common')
-
 const UnistyleDependency = {
     Theme: 0,
     ThemeName: 1,
@@ -19,7 +17,7 @@ const UnistyleDependency = {
 }
 
 function stringToUniqueId(str) {
-    let hash = 0;
+    let hash = 0
 
     for (let i = 0; i < str.length; i++) {
         hash = (hash << 5) - hash + str.charCodeAt(i)
@@ -63,268 +61,505 @@ function addStyleSheetTag(t, path, state) {
     callee.container.arguments.push(t.numericLiteral(uniqueId))
 }
 
-function getStyleSheetLocalNames(t, functionArg) {
-    const params = functionArg.params
-    const hasTheme = params.length >= 1
-    const hasMiniRuntime = params.length === 2
-    const getProperty = (property, allowNested) => {
-        if (t.isIdentifier(property.value)) {
-            return property.value.name
-        }
-
-        if (!t.isObjectPattern(property.value)) {
-            return undefined
-        }
-
-        if (allowNested) {
-            return property.value.properties.flatMap(getProperty)
-        }
-
-        // we can force allow nested only for insets
-        const hasIme = property.value.properties.find(property => property.key.name === 'ime')
-        const lastKeyValue = property.value.properties.flatMap(getProperty)
-
-        if (hasIme) {
-            return lastKeyValue
-        }
-
-        return `${property.key.name}.${lastKeyValue}`
-    }
-    const getLocalNames = (param, allowNested) => {
-        if (t.isObjectPattern(param)) {
-            return param.properties
-                .flatMap(property => getProperty(property, allowNested))
-                .filter(Boolean)
-        }
-
-
-        if (t.isIdentifier(param)) {
-            return [param.name]
-        }
-
-        return []
+const getProperty = (t, property) => {
+    if (!property) {
+        return undefined
     }
 
-    return {
-        theme: hasTheme ? getLocalNames(params[0], true) : [],
-        miniRuntime: hasMiniRuntime ? getLocalNames(params[1], false) : []
-    }
-}
-
-function maybeAddThemeDependencyToMemberExpression(t, property, themeLocalNames) {
     if (t.isIdentifier(property)) {
-        return themeLocalNames.includes(property.name)
+        return {
+            properties: [property.name]
+        }
     }
 
-    if (t.isObjectProperty(property)) {
-        return maybeAddThemeDependencyToMemberExpression(t, property.value, themeLocalNames)
+    if (t.isObjectPattern(property)) {
+        const matchingProperties = property.properties.flatMap(p => getProperty(t, p))
+
+        return {
+            properties: matchingProperties.flatMap(properties => properties.properties)
+        }
     }
 
-    if (t.isMemberExpression(property)) {
-        return maybeAddThemeDependencyToMemberExpression(t, property.object, themeLocalNames)
+    if (t.isObjectProperty(property) && t.isIdentifier(property.value)) {
+        return {
+            properties: [property.key.name]
+        }
+    }
+
+    if (t.isObjectProperty(property) && t.isObjectPattern(property.value)) {
+        const matchingProperties = property.value.properties.flatMap(p => getProperty(t, p))
+
+        return {
+            parent: property.key.name,
+            properties: matchingProperties.flatMap(properties => properties.properties)
+        }
+    }
+
+    return undefined
+}
+
+function getStylesDependenciesFromObject(t, path) {
+    const detectedStylesWithVariants = new Set()
+    const stylesheet = path.node.arguments[0]
+
+    stylesheet.properties.forEach(property => {
+        if (!t.isIdentifier(property.key)) {
+            return
+        }
+
+        if (t.isObjectProperty(property)) {
+            if(t.isObjectExpression(property.value)) {
+                property.value.properties.forEach(innerProp => {
+                    if (t.isIdentifier(innerProp.key) && innerProp.key.name === 'variants') {
+                        detectedStylesWithVariants.add({
+                            label: 'variants',
+                            key: property.key.name
+                        })
+                    }
+                })
+
+            }
+        }
+
+        if (t.isArrowFunctionExpression(property.value)) {
+            if(t.isObjectExpression(property.value.body)) {
+                property.value.body.properties.forEach(innerProp => {
+                    if (t.isIdentifier(innerProp.key) && innerProp.key.name === 'variants') {
+                        detectedStylesWithVariants.add({
+                            label: 'variants',
+                            key: property.key.name
+                        })
+                    }
+                })
+
+            }
+        }
+    })
+
+    const variants = Array.from(detectedStylesWithVariants)
+
+    return variants.reduce((acc, { key, label }) => {
+        if (acc[key]) {
+            return {
+                ...acc,
+                [key]: [
+                    ...acc[key],
+                    label
+                ]
+            }
+        }
+
+        return {
+            ...acc,
+            [key]: [label]
+        }
+    }, [])
+}
+
+function getStylesDependenciesFromFunction(t, path) {
+    const funcPath = path.get('arguments.0')
+
+    if (!funcPath) {
+        return
+    }
+
+    const params = funcPath.node.params
+    const [themeParam, rtParam] = params
+
+    let themeNames = []
+
+    // destructured theme object
+    if (themeParam.type === 'ObjectPattern') {
+        // If destructured, collect all property names
+        for (const prop of themeParam.properties) {
+            themeNames.push(getProperty(t, prop))
+        }
+    }
+
+    // user used 'theme' without destructuring
+    if (themeParam.type === 'Identifier') {
+        themeNames.push({
+            properties: [themeParam.name]
+        })
+    }
+
+    let rtNames = []
+
+    // destructured rt object
+    if (rtParam && rtParam.type === 'ObjectPattern') {
+        // If destructured, collect all property names
+        for (const prop of rtParam.properties) {
+            rtNames.push(getProperty(t, prop))
+        }
+    }
+
+    // user used 'rt' without destructuring
+    if (rtParam && rtParam.type === 'Identifier') {
+        rtNames.push({
+            properties: [rtParam.name]
+        })
+    }
+
+    // get returned object or return statement from StyleSheet.create function
+    let returnedObjectPath = null
+
+    if (funcPath.get('body').isObjectExpression()) {
+        returnedObjectPath = funcPath.get('body')
+    } else {
+        funcPath.traverse({
+            ReturnStatement(retPath) {
+                if (!returnedObjectPath && retPath.get('argument').isObjectExpression()) {
+                    returnedObjectPath = retPath.get('argument')
+                }
+            }
+        })
+    }
+
+    if (!returnedObjectPath) {
+        // there is no returned object
+        // abort
+
+        return
+    }
+
+    const detectedStylesWithVariants = new Set()
+
+    // detect variants via Scope
+    returnedObjectPath.get('properties').forEach(propPath => {
+        // get style name
+        const stylePath = propPath.get('key')
+
+        if (!stylePath.isIdentifier()) {
+            return
+        }
+
+        const styleKey = stylePath.node.name
+
+        const valuePath = propPath.get('value')
+
+        if (valuePath.isObjectExpression()) {
+            const hasVariants = valuePath.get('properties').some(innerProp => {
+                const innerKey = innerProp.get('key')
+
+                return innerKey.isIdentifier() && innerKey.node.name === 'variants'
+            })
+
+            if (hasVariants) {
+                detectedStylesWithVariants.add({
+                    label: 'variants',
+                    key: styleKey
+                })
+            }
+        }
+
+        if (valuePath.isArrowFunctionExpression()) {
+            if(t.isObjectExpression(valuePath.node.body)) {
+                const hasVariants = valuePath.node.body.properties.some(innerProp => {
+
+                    return t.isIdentifier(innerProp.key) && innerProp.key.name === 'variants'
+                })
+
+                if (hasVariants) {
+                    detectedStylesWithVariants.add({
+                        label: 'variants',
+                        key: styleKey
+                    })
+                }
+            }
+        }
+    })
+
+    const detectedStylesWithTheme = new Set()
+
+    // detect theme dependencies via Scope
+    themeNames.forEach(({ properties }) => {
+        properties.forEach(property => {
+            const binding = funcPath.scope.getBinding(property)
+
+            if (!binding) {
+                return
+            }
+
+            binding.referencePaths.forEach(refPath => {
+                // find key of the style that we are referring to
+                const containerProp = refPath
+                    .findParent(parent => parent.isObjectProperty() && parent.parentPath === returnedObjectPath)
+
+                if (!containerProp) {
+                    return
+                }
+
+                const keyNode = containerProp.get('key')
+                const styleKey = keyNode.isIdentifier()
+                    ? keyNode.node.name
+                    : keyNode.isLiteral()
+                        ? keyNode.node.value
+                        : null
+
+                if (styleKey) {
+                    detectedStylesWithTheme.add({
+                        label: 'theme',
+                        key: styleKey
+                    })
+                }
+            })
+        })
+    })
+
+    const detectedStylesWithRt = new Set()
+    const localRtName = t.isIdentifier(rtParam)
+        ? rtParam.name
+        : undefined
+
+    // detect rt dependencies via Scope
+    rtNames.forEach(({ properties, parent }) => {
+        properties.forEach(property => {
+            const rtBinding = funcPath.scope.getBinding(property)
+
+            if (!rtBinding) {
+                return
+            }
+
+            const isValidDependency = Boolean(toUnistylesDependency(property))
+
+            let validRtName = property
+
+            // user used nested destructing, find out parent key
+            if (!isValidDependency && (!localRtName || (localRtName && localRtName !== property))) {
+                if (!parent) {
+                    return
+                }
+
+                if (!Boolean(toUnistylesDependency(parent))) {
+                    return
+                }
+
+                validRtName = parent
+            }
+
+            rtBinding.referencePaths.forEach(refPath => {
+                // to detect rt dependencies we need to get parameter not rt itself
+                // eg. rt.screen.width -> screen
+                // rt.insets.top -> insets
+                // special case: rt.insets.ime -> ime
+
+                let usedLabel = validRtName
+
+                if (refPath.parentPath.isMemberExpression() && refPath.parentPath.get('object') === refPath) {
+                    const memberExpr = refPath.parentPath
+                    const propPath = memberExpr.get('property')
+
+                    if (propPath.isIdentifier()) {
+                        if (localRtName) {
+                            usedLabel = propPath.node.name
+                        }
+
+                        if (
+                            usedLabel === 'insets' &&
+                            memberExpr.parentPath.isMemberExpression() &&
+                            memberExpr.parentPath.get('object') === memberExpr
+                        ) {
+                            const secondPropPath = memberExpr.parentPath.get('property')
+
+                            if (secondPropPath.isIdentifier() && secondPropPath.node.name === 'ime') {
+                                usedLabel = 'ime'
+                            }
+                        }
+                    }
+                }
+
+                // find key of the style that we are referring to
+                const containerProp = refPath
+                    .findParent(parent => parent.isObjectProperty() && parent.parentPath === returnedObjectPath)
+
+                if (!containerProp) {
+                    return
+                }
+
+                const keyNode = containerProp.get('key')
+                const styleKey = keyNode.isIdentifier()
+                    ? keyNode.node.name
+                    : keyNode.isLiteral()
+                        ? keyNode.node.value
+                        : null
+
+                if (styleKey) {
+                    detectedStylesWithRt.add({
+                        label: usedLabel,
+                        key: styleKey
+                    })
+                }
+            })
+        })
+    })
+
+    const variants = Array.from(detectedStylesWithVariants)
+    const theme = Array.from(detectedStylesWithTheme)
+    const rt = Array.from(detectedStylesWithRt)
+
+    return theme
+        .concat(rt)
+        .concat(variants)
+        .reduce((acc, { key, label }) => {
+            if (acc[key]) {
+                return {
+                    ...acc,
+                    [key]: [
+                        ...acc[key],
+                        label
+                    ]
+                }
+            }
+
+            return {
+                ...acc,
+                [key]: [label]
+            }
+        }, [])
+}
+
+function toUnistylesDependency(dependency) {
+    switch (dependency) {
+        case 'theme': {
+            return UnistyleDependency.Theme
+        }
+        case 'themeName': {
+            return UnistyleDependency.ThemeName
+        }
+        case 'adaptiveThemes': {
+            return UnistyleDependency.AdaptiveThemes
+        }
+        case 'breakpoint': {
+            return UnistyleDependency.Breakpoints
+        }
+        case 'colorScheme': {
+            return UnistyleDependency.ColorScheme
+        }
+        case 'screen': {
+            return UnistyleDependency.Dimensions
+        }
+        case 'isPortrait':
+        case 'isLandscape': {
+            return UnistyleDependency.Orientation
+        }
+        case 'contentSizeCategory': {
+            return UnistyleDependency.ContentSizeCategory
+        }
+        case 'ime': {
+            return UnistyleDependency.Ime
+        }
+        case 'insets': {
+            return UnistyleDependency.Insets
+        }
+        case 'pixelRatio': {
+            return UnistyleDependency.PixelRatio
+        }
+        case 'fontScale': {
+            return UnistyleDependency.FontScale
+        }
+        case 'statusBar': {
+            return UnistyleDependency.StatusBar
+        }
+        case 'navigationBar': {
+            return UnistyleDependency.NavigationBar
+        }
+        case 'variants': {
+            return UnistyleDependency.Variants
+        }
+
+        // breakpoints are too complex and are handled by C++
     }
 }
 
+function getReturnStatementsFromBody(t, node, results = []) {
+    if (t.isReturnStatement(node)) {
+        results.push(node)
+    }
 
-/** @param {import('./index').UnistylesPluginPass} state */
-function analyzeDependencies(t, state, name, unistyleObj, themeNames, rtNames) {
+    if (t.isBlockStatement(node)) {
+        node.body.forEach(child => getReturnStatementsFromBody(t, child, results))
+    }
+
+    if (t.isIfStatement(node)) {
+        getReturnStatementsFromBody(t, node.consequent, results)
+
+        if (node.alternate) {
+            getReturnStatementsFromBody(t, node.alternate, results)
+        }
+    }
+
+    return results
+}
+
+function addDependencies(t, state, styleName, unistyle, detectedDependencies) {
     const debugMessage = deps => {
         if (state.opts.debug) {
             const mappedDeps = deps
                 .map(dep => Object.keys(UnistyleDependency).find(key => UnistyleDependency[key] === dep))
                 .join(', ')
 
-            console.log(`${state.filename.replace(`${state.file.opts.root}/`, '')}: styles.${name}: [${mappedDeps}]`)
+            console.log(`${state.filename.replace(`${state.file.opts.root}/`, '')}: styles.${styleName}: [${mappedDeps}]`)
         }
     }
-    const unistyle = unistyleObj.properties
-    const dependencies = []
 
-    Object.values(unistyle).forEach(uni => {
-        const identifiers = getIdentifierNameFromExpression(t, uni)
+    const styleDependencies = detectedDependencies.map(toUnistylesDependency)
 
-        if (themeNames.some(name => identifiers.some(id => id === name))) {
-            dependencies.push(UnistyleDependency.Theme)
-        }
-
-        const matchingRtNames = rtNames.reduce((acc, name) => {
-            if (name.includes('.')) {
-                const key = name.split('.').at(0)
-
-                if (identifiers.some(id => name.includes(id))) {
-                    return [
-                        ...acc,
-                        key
-                    ]
-                }
-
-                return acc
-            }
-
-
-            if (identifiers.some(id => id === name)) {
-                return [
-                    ...acc,
-                    name
-                ]
-            }
-
-            return acc
-        }, [])
-
-        if (matchingRtNames.length > 0) {
-            const propertyNames = getSecondPropertyName(t, uni.value)
-
-            matchingRtNames
-                .concat(propertyNames)
-                .filter(Boolean)
-                .forEach(propertyName => {
-                    switch (propertyName) {
-                        case 'themeName': {
-                            dependencies.push(UnistyleDependency.ThemeName)
-
-                            return
-                        }
-                        case 'adaptiveThemes': {
-                            dependencies.push(UnistyleDependency.AdaptiveThemes)
-
-                            return
-                        }
-                        case 'breakpoint': {
-                            dependencies.push(UnistyleDependency.Breakpoints)
-
-                            return
-                        }
-                        case 'colorScheme': {
-                            dependencies.push(UnistyleDependency.ColorScheme)
-
-                            return
-                        }
-                        case 'screen': {
-                            dependencies.push(UnistyleDependency.Dimensions)
-
-                            return
-                        }
-                        case 'isPortrait':
-                        case 'isLandscape': {
-                            dependencies.push(UnistyleDependency.Orientation)
-
-                            return
-                        }
-                        case 'contentSizeCategory': {
-                            dependencies.push(UnistyleDependency.ContentSizeCategory)
-
-                            return
-                        }
-                        case 'ime': {
-                            dependencies.push(UnistyleDependency.Ime)
-
-                            return
-                        }
-                        case 'insets': {
-                            dependencies.push(UnistyleDependency.Insets)
-
-                            return
-                        }
-                        case 'pixelRatio': {
-                            dependencies.push(UnistyleDependency.PixelRatio)
-
-                            return
-                        }
-                        case 'fontScale': {
-                            dependencies.push(UnistyleDependency.FontScale)
-
-                            return
-                        }
-                        case 'statusBar': {
-                            dependencies.push(UnistyleDependency.StatusBar)
-
-                            return
-                        }
-                        case 'navigationBar': {
-                            dependencies.push(UnistyleDependency.NavigationBar)
-
-                            return
-                        }
-                    }
-                })
-        }
-
-        if (uni.key && uni.key.name === 'variants') {
-            dependencies.push(UnistyleDependency.Variants)
-        }
-
-        // breakpoints are too complex and are handled by C++
-    })
-
-    // add dependencies to the unistyle object if any found
-    if (dependencies.length > 0) {
-        const uniqueDependencies = Array.from(new Set(dependencies))
+    // add metadata about dependencies
+    if (styleDependencies.length > 0) {
+        const uniqueDependencies = Array.from(new Set(styleDependencies))
 
         debugMessage(uniqueDependencies)
 
-        unistyleObj.properties.push(
-            t.objectProperty(
-                t.identifier('uni__dependencies'),
-                t.arrayExpression(uniqueDependencies.map(dep => t.numericLiteral(dep)))
-            )
-        )
-    }
-}
+        let targets = []
 
-function getUnistyles(t, property) {
-    const propertyValue = t.isArrowFunctionExpression(property.value)
-        ? property.value.body
-        : property.value
+        if (t.isArrowFunctionExpression(unistyle.value) || t.isFunctionExpression(unistyle.value)) {
+            if (t.isObjectExpression(unistyle.value.body)) {
+                targets.push(unistyle.value.body)
+            }
 
-    if (t.isObjectExpression(propertyValue)) {
-        return [propertyValue]
-    }
-
-    if (t.isBlockStatement(propertyValue)) {
-        // here we might have single return statement
-        // or if-else statements with return statements
-        return propertyValue.body
-            .flatMap(value => {
-                if (t.isReturnStatement(value)) {
-                    return [value]
-                }
-
-                if (!t.isIfStatement(value)) {
-                    return []
-                }
-
-                return [value.consequent, value.alternate]
-                    .filter(Boolean)
-                    .flatMap(value => {
-                        if (t.isBlockStatement(value)) {
-                            return value.body.filter(t.isReturnStatement)
+            if (t.isBlockStatement(unistyle.value.body)) {
+                targets = getReturnStatementsFromBody(t, unistyle.value.body)
+                    .map(node => {
+                        if (t.isIdentifier(node.argument)) {
+                            node.argument = t.objectExpression([
+                                t.spreadElement(node.argument)
+                            ])
                         }
+
+                        return node.argument
                     })
+            }
+        }
+
+        if (t.isObjectExpression(unistyle.value)) {
+            targets.push(unistyle.value)
+        }
+
+        if (t.isMemberExpression(unistyle.value)) {
+            // convert to object
+            unistyle.value = t.objectExpression([t.spreadElement(unistyle.value)])
+
+            targets.push(unistyle.value)
+        }
+
+        if (targets.length > 0) {
+            targets.forEach(target => {
+                target.properties.push(
+                    t.objectProperty(
+                        t.identifier('uni__dependencies'),
+                        t.arrayExpression(uniqueDependencies.map(dep => t.numericLiteral(dep)))
+                    )
+                )
             })
-            .map(value => value.argument)
+        }
     }
-
-    return []
-}
-
-function addThemeDependencyToMemberExpression(t, path) {
-    path.value = t.objectExpression([
-        t.spreadElement(path.value),
-        t.objectProperty(
-            t.identifier('uni__dependencies'),
-            t.arrayExpression([t.numericLiteral(UnistyleDependency.Theme)])
-        )
-    ])
 }
 
 module.exports = {
     isUnistylesStyleSheet,
-    analyzeDependencies,
+    addDependencies,
     addStyleSheetTag,
-    getUnistyles,
-    isKindOfStyleSheet,
-    getStyleSheetLocalNames,
-    maybeAddThemeDependencyToMemberExpression,
-    addThemeDependencyToMemberExpression
+    getStylesDependenciesFromObject,
+    getStylesDependenciesFromFunction,
+    isKindOfStyleSheet
 }

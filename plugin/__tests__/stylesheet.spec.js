@@ -283,7 +283,7 @@ pluginTester({
                             backgroundColor: 'red',
                             variants: {},
                             paddingTop: rt.insets.top,
-                            uni__dependencies: [4, 9]
+                            uni__dependencies: [9, 4]
                         })
                     }),
                     798826616
@@ -332,7 +332,7 @@ pluginTester({
                             backgroundColor: hhsa.colors.background,
                             variants: {},
                             paddingTop: dee.colorScheme === 'dark' ? 0 : 10,
-                            uni__dependencies: [0, 4, 5]
+                            uni__dependencies: [0, 5, 4]
                         })
                     }),
                     798826616
@@ -383,14 +383,14 @@ pluginTester({
                             backgroundColor: theme.colors.background,
                             variants: {},
                             paddingTop: rt.insets.top,
-                            uni__dependencies: [0, 4, 9]
+                            uni__dependencies: [0, 9, 4]
                         })
                     }
                 }, 798826616)
             `
         },
         {
-            title: 'Should generates two different ids for 2 stylesheets in the same file',
+            title: 'Should generate two different ids for 2 stylesheets in the same file',
             code: `
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
@@ -442,7 +442,7 @@ pluginTester({
                             backgroundColor: theme.colors.background,
                             variants: {},
                             paddingTop: rt.insets.top,
-                            uni__dependencies: [0, 4, 9]
+                            uni__dependencies: [0, 9, 4]
                         })
                     }
                 }, 798826616)
@@ -452,200 +452,10 @@ pluginTester({
                             backgroundColor: theme.colors.background,
                             variants: {},
                             paddingTop: rt.insets.top,
-                            uni__dependencies: [0, 4, 9]
+                            uni__dependencies: [0, 9, 4]
                         })
                     }
                 }, 798826617)
-            `
-        },
-        {
-            title: 'Should do nothing if pressable is parameterless arrow function and style is an object',
-            code: `
-                import { View, Pressable, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View style={styles.container}>
-                            <Pressable style={() => styles.pressable}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top
-                        }),
-                        pressable: {
-                            marginRight: arg1 + arg2
-                        }
-                    }
-                })
-            `,
-            output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/components/native/Pressable'
-                import { View } from 'react-native-unistyles/components/native/View'
-
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = () => {
-                    return (
-                        <View style={styles.container}>
-                            <Pressable style={() => styles.pressable}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => {
-                    return {
-                        container: () => ({
-                            backgroundColor: theme.colors.background,
-                            variants: {},
-                            paddingTop: rt.insets.top,
-                            uni__dependencies: [0, 4, 9]
-                        }),
-                        pressable: {
-                            marginRight: arg1 + arg2
-                        }
-                    }
-                }, 798826616)
-            `
-        },
-        {
-            title: 'Should handle pressable with arrow function and array of styles',
-            code: `
-                import { View, Pressable, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = ({ height }) => {
-                    return (
-                        <View style={styles.container}>
-                            <Pressable style={({ pressed }) => [styles.sectionItem, styles.other(1), { height }, pressed && styles.pressed]}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => ({
-                    sectionItem: {
-                        width: 100,
-                        height: 100,
-                        theme: theme.colors.red
-                    },
-                    pressed: {
-                        marginBottom: rt.insets.bottom
-                    }
-                }))
-            `,
-            output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/components/native/Pressable'
-                import { View } from 'react-native-unistyles/components/native/View'
-
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = ({ height }) => {
-                    return (
-                        <View style={styles.container}>
-                            <Pressable style={({ pressed }) => [styles.sectionItem, styles.other(1), { height }, pressed && styles.pressed]}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create(
-                    (theme, rt) => ({
-                        sectionItem: {
-                            width: 100,
-                            height: 100,
-                            theme: theme.colors.red,
-                            uni__dependencies: [0]
-                        },
-                        pressed: {
-                            marginBottom: rt.insets.bottom,
-                            uni__dependencies: [9]
-                        }
-                    }),
-                    798826616
-                )
-            `
-        },
-        {
-            title: 'Should handle nested functions',
-            code: `
-                import { View, Pressable, Text } from 'react-native'
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = ({ height }) => {
-                    return (
-                        <View style={styles.container}>
-                            <Pressable style={({ pressed }) => [styles.sectionItem, { height }, pressed && styles.pressed(pressed), pressed ? styles.pressed : styles.notPressed]}>
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create((theme, rt) => ({
-                    sectionItem: {
-                        width: 100,
-                        height: 100,
-                        theme: theme.colors.red
-                    },
-                    pressed: pressed => ({
-                        marginBottom: rt.insets.bottom
-                    })
-                }))
-            `,
-            output: `
-                import { Text } from 'react-native-unistyles/components/native/Text'
-                import { Pressable } from 'react-native-unistyles/components/native/Pressable'
-                import { View } from 'react-native-unistyles/components/native/View'
-
-                import { StyleSheet } from 'react-native-unistyles'
-
-                export const Example = ({ height }) => {
-                    return (
-                        <View style={styles.container}>
-                            <Pressable
-                                style={({ pressed }) => [
-                                    styles.sectionItem,
-                                    { height },
-                                    pressed && styles.pressed(pressed),
-                                    pressed ? styles.pressed : styles.notPressed
-                                ]}
-                            >
-                                <Text>Hello world</Text>
-                            </Pressable>
-                        </View>
-                    )
-                }
-
-                const styles = StyleSheet.create(
-                    (theme, rt) => ({
-                        sectionItem: {
-                            width: 100,
-                            height: 100,
-                            theme: theme.colors.red,
-                            uni__dependencies: [0]
-                        },
-                        pressed: pressed => ({
-                            marginBottom: rt.insets.bottom,
-                            uni__dependencies: [9]
-                        })
-                    }),
-                    798826616
-                )
             `
         },
         {
