@@ -1,6 +1,6 @@
 const { addUnistylesImport, isInsideNodeModules } = require('./import')
 const { hasStringRef } = require('./ref')
-const { isUnistylesStyleSheet, analyzeDependencies, addStyleSheetTag, getUnistyles, isKindOfStyleSheet, maybeAddThemeDependencyToMemberExpression, addThemeDependencyToMemberExpression,  getStyleSheetLocalNames } = require('./stylesheet')
+const { isUnistylesStyleSheet, addStyleSheetTag, isKindOfStyleSheet, getStylesDependenciesFromFunction, addDependencies, getStylesDependenciesFromObject } = require('./stylesheet')
 const { extractVariants } = require('./variants')
 const { REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_PATHS, REPLACE_WITH_UNISTYLES_EXOTIC_PATHS, NATIVE_COMPONENTS_PATHS } = require('./consts')
 const { handleExoticImport } = require('./exotic')
@@ -149,43 +149,38 @@ module.exports = function ({ types: t }) {
 
                 const arg = path.node.arguments[0]
 
-                // Object passed to StyleSheet.create
+                // Object passed to StyleSheet.create (may contain variants)
                 if (t.isObjectExpression(arg)) {
-                    arg.properties.forEach(property => {
-                        if (t.isObjectProperty(property)) {
-                            const propertyValues = getUnistyles(t, property)
+                    const detectedDependencies = getStylesDependenciesFromObject(t, path)
 
-                            propertyValues.forEach(propertyValue => {
-                                analyzeDependencies(t, state, property.key.name, propertyValue, [], [])
+                    if (detectedDependencies) {
+                        if (t.isObjectExpression(arg)) {
+                            arg.properties.forEach(property => {
+                                if (detectedDependencies[property.key.name]) {
+                                    addDependencies(t, state, property.key.name, property, detectedDependencies[property.key.name])
+                                }
                             })
                         }
-                    })
+                    }
                 }
 
                 // Function passed to StyleSheet.create (e.g., theme => ({ container: {} }))
                 if (t.isArrowFunctionExpression(arg) || t.isFunctionExpression(arg)) {
-                    const localNames = getStyleSheetLocalNames(t, arg)
-                    const body = t.isBlockStatement(arg.body)
-                        ? arg.body.body.find(statement => t.isReturnStatement(statement)).argument
-                        : arg.body
+                    const detectedDependencies = getStylesDependenciesFromFunction(t, path)
 
-                    // Ensure the function body returns an object
-                    if (t.isObjectExpression(body)) {
-                        body.properties.forEach(property => {
-                            if (t.isObjectProperty(property)) {
-                                const propertyValues = getUnistyles(t, property)
+                    if (detectedDependencies) {
+                        const body = t.isBlockStatement(arg.body)
+                            ? arg.body.body.find(statement => t.isReturnStatement(statement)).argument
+                            : arg.body
 
-                                // special case for non object/function properties
-                                // maybe user used inlined theme? ({ container: theme.components.container })
-                                if (propertyValues.length === 0 && maybeAddThemeDependencyToMemberExpression(t, property, localNames.theme)) {
-                                    addThemeDependencyToMemberExpression(t, property)
+                        // Ensure the function body returns an object
+                        if (t.isObjectExpression(body)) {
+                            body.properties.forEach(property => {
+                                if (detectedDependencies[property.key.name]) {
+                                    addDependencies(t, state, property.key.name, property, detectedDependencies[property.key.name])
                                 }
-
-                                propertyValues.forEach(propertyValue => {
-                                    analyzeDependencies(t, state, property.key.name, propertyValue, localNames.theme, localNames.miniRuntime)
-                                })
-                            }
-                        })
+                            })
+                        }
                     }
                 }
             }

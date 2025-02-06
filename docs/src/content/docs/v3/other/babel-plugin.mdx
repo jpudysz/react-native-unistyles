@@ -64,6 +64,21 @@ const stylesheet = StyleSheet.create((theme, rt) => ({
 }))
 ```
 
+<Aside type="caution" title="Dependency detection limitation">
+We put a lot of effort into making dependency detection as accurate as possible, thus we support:
+- destructuring of `theme` and `rt` objects
+- style's as functions / arrow functions / objects
+- nested ifs and other conditionals
+- ternary operators
+- logical operators
+- binary operators
+- and much more...
+
+**What we don't support**:
+- moving functions/arrow functions out of StyleSheet.create
+- `theme` and `rt` reassignment to other variables (we don't track them)
+</Aside>
+
 
 ### 2. Attaching unique id to each StyleSheet
 
