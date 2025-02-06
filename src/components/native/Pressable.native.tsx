@@ -55,7 +55,7 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
             }}
             style={state => {
                 const unistyles = typeof style === 'function'
-                    ? style(state)
+                    ? style.call(style, state)
                     : getStyles(style as unknown as Record<string, any>)
 
                 if (!storedRef.current) {
