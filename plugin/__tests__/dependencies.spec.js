@@ -857,6 +857,105 @@ pluginTester({
                     664955283
                 )
             `
+        },
+        {
+            title: 'Should correctly detect dependencies in weirdest syntax',
+            code: `
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View style={styles.container}>
+                            <Text style={styles.container2}>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(({ components: { test, other: { nested }} }, { insets: { ime }, screen, statusBar: { width, height }  }) => {
+                    const otherVariable = 2
+
+                    return {
+                        container: () => {
+                            if (otherVariable === 2) {
+                                return {
+                                    backgroundColor: nested
+                                }
+                            }
+
+                            if (otherVariable === 3) {
+                                return {
+                                    marginTop: ime,
+                                    height: screen.height
+                                }
+                            }
+
+                            return nested
+                        },
+                        container2: () => ({
+                            paddingBottom: ime,
+                            height,
+                            width
+                        })
+                    }
+                })
+            `,
+            output: `
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import { View } from 'react-native-unistyles/components/native/View'
+
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View style={styles.container}>
+                            <Text style={styles.container2}>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    (
+                        {
+                            components: {
+                                test,
+                                other: { nested }
+                            }
+                        },
+                        { insets: { ime }, screen, statusBar: { width, height } }
+                    ) => {
+                        const otherVariable = 2
+
+                        return {
+                            container: () => {
+                                if (otherVariable === 2) {
+                                    return {
+                                        backgroundColor: nested,
+                                        uni__dependencies: [0, 14, 6]
+                                    }
+                                }
+
+                                if (otherVariable === 3) {
+                                    return {
+                                        marginTop: ime,
+                                        height: screen.height,
+                                        uni__dependencies: [0, 14, 6]
+                                    }
+                                }
+
+                                return { ...nested, uni__dependencies: [0, 14, 6] }
+                            },
+                            container2: () => ({
+                                paddingBottom: ime,
+                                height,
+                                width,
+                                uni__dependencies: [14, 12]
+                            })
+                        }
+                    },
+                    664955283
+                )
+            `
         }
     ]
 })

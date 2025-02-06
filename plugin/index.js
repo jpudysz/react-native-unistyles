@@ -157,7 +157,7 @@ module.exports = function ({ types: t }) {
                         if (t.isObjectExpression(arg)) {
                             arg.properties.forEach(property => {
                                 if (detectedDependencies[property.key.name]) {
-                                    addDependencies(t, state, property, detectedDependencies[property.key.name])
+                                    addDependencies(t, state, property.key.name, property, detectedDependencies[property.key.name])
                                 }
                             })
                         }
@@ -177,7 +177,7 @@ module.exports = function ({ types: t }) {
                         if (t.isObjectExpression(body)) {
                             body.properties.forEach(property => {
                                 if (detectedDependencies[property.key.name]) {
-                                    addDependencies(t, state, property, detectedDependencies[property.key.name])
+                                    addDependencies(t, state, property.key.name, property, detectedDependencies[property.key.name])
                                 }
                             })
                         }
