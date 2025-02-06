@@ -17,6 +17,7 @@ module.exports = function ({ types: t }) {
                         .some(path => state.filename.includes(path))
 
                     state.file.hasAnyUnistyle = false
+                    state.file.hasUnistylesImport = false
                     state.file.hasVariants = false
                     state.file.styleSheetLocalName = ''
                     state.file.tagNumber = 0
@@ -95,6 +96,8 @@ module.exports = function ({ types: t }) {
                 const importSource = path.node.source.value
 
                 if (importSource.includes('react-native-unistyles')) {
+                    state.file.hasUnistylesImport = true
+
                     path.node.specifiers.forEach(specifier => {
                         if (specifier.imported && specifier.imported.name === 'StyleSheet') {
                             state.file.styleSheetLocalName = specifier.local.name
