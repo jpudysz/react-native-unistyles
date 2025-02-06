@@ -68,30 +68,30 @@ const getProperty = (t, property) => {
 
     if (t.isIdentifier(property)) {
         return {
-            property: property.name
+            properties: [property.name]
         }
     }
 
     if (t.isObjectPattern(property)) {
-        const [matchingProperty] = property.properties.flatMap(p => getProperty(t, p))
+        const matchingProperties = property.properties.flatMap(p => getProperty(t, p))
 
         return {
-            property: matchingProperty.property
+            properties: matchingProperties.flatMap(properties => properties.properties)
         }
     }
 
     if (t.isObjectProperty(property) && t.isIdentifier(property.value)) {
         return {
-            property: property.key.name
+            properties: [property.key.name]
         }
     }
 
     if (t.isObjectProperty(property) && t.isObjectPattern(property.value)) {
-        const [matchingProperty] = property.value.properties.flatMap(p => getProperty(t, p))
+        const matchingProperties = property.value.properties.flatMap(p => getProperty(t, p))
 
         return {
             parent: property.key.name,
-            property: matchingProperty.property
+            properties: matchingProperties.flatMap(properties => properties.properties)
         }
     }
 
@@ -179,7 +179,7 @@ function getStylesDependenciesFromFunction(t, path) {
     // user used 'theme' without destructuring
     if (themeParam.type === 'Identifier') {
         themeNames.push({
-            property: themeParam.name
+            properties: [themeParam.name]
         })
     }
 
@@ -196,7 +196,7 @@ function getStylesDependenciesFromFunction(t, path) {
     // user used 'rt' without destructuring
     if (rtParam && rtParam.type === 'Identifier') {
         rtNames.push({
-            property: rtParam.name
+            properties: [rtParam.name]
         })
     }
 
@@ -272,35 +272,37 @@ function getStylesDependenciesFromFunction(t, path) {
     const detectedStylesWithTheme = new Set()
 
     // detect theme dependencies via Scope
-    themeNames.forEach(({ property }) => {
-        const binding = funcPath.scope.getBinding(property)
+    themeNames.forEach(({ properties }) => {
+        properties.forEach(property => {
+            const binding = funcPath.scope.getBinding(property)
 
-        if (!binding) {
-            return
-        }
-
-        binding.referencePaths.forEach(refPath => {
-            // find key of the style that we are referring to
-            const containerProp = refPath
-                .findParent(parent => parent.isObjectProperty() && parent.parentPath === returnedObjectPath)
-
-            if (!containerProp) {
+            if (!binding) {
                 return
             }
 
-            const keyNode = containerProp.get('key')
-            const styleKey = keyNode.isIdentifier()
-                ? keyNode.node.name
-                : keyNode.isLiteral()
-                    ? keyNode.node.value
-                    : null
+            binding.referencePaths.forEach(refPath => {
+                // find key of the style that we are referring to
+                const containerProp = refPath
+                    .findParent(parent => parent.isObjectProperty() && parent.parentPath === returnedObjectPath)
 
-            if (styleKey) {
-                detectedStylesWithTheme.add({
-                    label: 'theme',
-                    key: styleKey
-                })
-            }
+                if (!containerProp) {
+                    return
+                }
+
+                const keyNode = containerProp.get('key')
+                const styleKey = keyNode.isIdentifier()
+                    ? keyNode.node.name
+                    : keyNode.isLiteral()
+                        ? keyNode.node.value
+                        : null
+
+                if (styleKey) {
+                    detectedStylesWithTheme.add({
+                        label: 'theme',
+                        key: styleKey
+                    })
+                }
+            })
         })
     })
 
@@ -310,82 +312,84 @@ function getStylesDependenciesFromFunction(t, path) {
         : undefined
 
     // detect rt dependencies via Scope
-    rtNames.flat().forEach(({ property, parent }) => {
-        const rtBinding = funcPath.scope.getBinding(property)
+    rtNames.forEach(({ properties, parent }) => {
+        properties.forEach(property => {
+            const rtBinding = funcPath.scope.getBinding(property)
 
-        if (!rtBinding) {
-            return
-        }
-
-        const isValidDependency = Boolean(toUnistylesDependency(property))
-
-        let validRtName = property
-
-        // user used nested destructing, find out parent key
-        if (!isValidDependency && (!localRtName || (localRtName && localRtName !== property))) {
-            if (!parent) {
+            if (!rtBinding) {
                 return
             }
 
-            if (!Boolean(toUnistylesDependency(parent))) {
-                return
+            const isValidDependency = Boolean(toUnistylesDependency(property))
+
+            let validRtName = property
+
+            // user used nested destructing, find out parent key
+            if (!isValidDependency && (!localRtName || (localRtName && localRtName !== property))) {
+                if (!parent) {
+                    return
+                }
+
+                if (!Boolean(toUnistylesDependency(parent))) {
+                    return
+                }
+
+                validRtName = parent
             }
 
-            validRtName = parent
-        }
+            rtBinding.referencePaths.forEach(refPath => {
+                // to detect rt dependencies we need to get parameter not rt itself
+                // eg. rt.screen.width -> screen
+                // rt.insets.top -> insets
+                // special case: rt.insets.ime -> ime
 
-        rtBinding.referencePaths.forEach(refPath => {
-            // to detect rt dependencies we need to get parameter not rt itself
-            // eg. rt.screen.width -> screen
-            // rt.insets.top -> insets
-            // special case: rt.insets.ime -> ime
+                let usedLabel = validRtName
 
-            let usedLabel = validRtName
+                if (refPath.parentPath.isMemberExpression() && refPath.parentPath.get('object') === refPath) {
+                    const memberExpr = refPath.parentPath
+                    const propPath = memberExpr.get('property')
 
-            if (refPath.parentPath.isMemberExpression() && refPath.parentPath.get('object') === refPath) {
-                const memberExpr = refPath.parentPath
-                const propPath = memberExpr.get('property')
+                    if (propPath.isIdentifier()) {
+                        if (localRtName) {
+                            usedLabel = propPath.node.name
+                        }
 
-                if (propPath.isIdentifier()) {
-                    if (localRtName) {
-                        usedLabel = propPath.node.name
-                    }
+                        if (
+                            usedLabel === 'insets' &&
+                            memberExpr.parentPath.isMemberExpression() &&
+                            memberExpr.parentPath.get('object') === memberExpr
+                        ) {
+                            const secondPropPath = memberExpr.parentPath.get('property')
 
-                    if (
-                        usedLabel === 'insets' &&
-                        memberExpr.parentPath.isMemberExpression() &&
-                        memberExpr.parentPath.get('object') === memberExpr
-                    ) {
-                        const secondPropPath = memberExpr.parentPath.get('property')
-
-                        if (secondPropPath.isIdentifier() && secondPropPath.node.name === 'ime') {
-                            usedLabel = 'ime'
+                            if (secondPropPath.isIdentifier() && secondPropPath.node.name === 'ime') {
+                                usedLabel = 'ime'
+                            }
                         }
                     }
                 }
-            }
 
-            // find key of the style that we are referring to
-            const containerProp = refPath
-                .findParent(parent => parent.isObjectProperty() && parent.parentPath === returnedObjectPath)
+                // find key of the style that we are referring to
+                const containerProp = refPath
+                    .findParent(parent => parent.isObjectProperty() && parent.parentPath === returnedObjectPath)
 
-            if (!containerProp) {
-                return
-            }
+                if (!containerProp) {
+                    return
+                }
 
-            const keyNode = containerProp.get('key')
-            const styleKey = keyNode.isIdentifier()
-                ? keyNode.node.name
-                : keyNode.isLiteral()
-                    ? keyNode.node.value
-                    : null
+                const keyNode = containerProp.get('key')
+                const styleKey = keyNode.isIdentifier()
+                    ? keyNode.node.name
+                    : keyNode.isLiteral()
+                        ? keyNode.node.value
+                        : null
 
-            if (styleKey) {
-                detectedStylesWithRt.add({
-                    label: usedLabel,
-                    key: styleKey
-                })
-            }
+                if (styleKey) {
+                    detectedStylesWithRt.add({
+                        label: usedLabel,
+                        key: styleKey
+                    })
+                }
+            })
         })
     })
 
@@ -487,14 +491,14 @@ function getReturnStatementsFromBody(t, node, results = []) {
     return results
 }
 
-function addDependencies(t, state, unistyle, detectedDependencies) {
+function addDependencies(t, state, styleName, unistyle, detectedDependencies) {
     const debugMessage = deps => {
         if (state.opts.debug) {
             const mappedDeps = deps
                 .map(dep => Object.keys(UnistyleDependency).find(key => UnistyleDependency[key] === dep))
                 .join(', ')
 
-            console.log(`${state.filename.replace(`${state.file.opts.root}/`, '')}: styles.${name}: [${mappedDeps}]`)
+            console.log(`${state.filename.replace(`${state.file.opts.root}/`, '')}: styles.${styleName}: [${mappedDeps}]`)
         }
     }
 
@@ -508,7 +512,7 @@ function addDependencies(t, state, unistyle, detectedDependencies) {
 
         let targets = []
 
-        if (t.isArrowFunctionExpression(unistyle.value)) {
+        if (t.isArrowFunctionExpression(unistyle.value) || t.isFunctionExpression(unistyle.value)) {
             if (t.isObjectExpression(unistyle.value.body)) {
                 targets.push(unistyle.value.body)
             }
