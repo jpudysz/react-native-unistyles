@@ -1,8 +1,8 @@
 import React, { forwardRef, useLayoutEffect, useRef } from 'react'
 import { Pressable as NativePressableReactNative } from 'react-native'
 import type { PressableProps as Props, View } from 'react-native'
-import { passForwardedRef } from '../../core'
 import { UnistylesShadowRegistry } from '../../specs'
+import { passForwardedRef } from '../../core'
 
 type PressableProps = Props & {
     variants?: Record<string, string | boolean>
@@ -20,7 +20,7 @@ const getStyles = (styleProps: Record<string, any> = {}) => {
     return {
         // styles without C++ state
         ...styleProps[unistyleKey].uni__getStyles(),
-        [unistyleKey]: styleProps[unistyleKey].uni__getStyles()
+        [unistyleKey]: styleProps[unistyleKey]
     }
 }
 
@@ -40,13 +40,6 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
         <NativePressableReactNative
             {...props}
             ref={ref => {
-                const unistyles = typeof style === 'function'
-                    ? style({ pressed: false })
-                    : style
-
-                // @ts-expect-error - this is hidden from TS
-                UnistylesShadowRegistry.add(ref, unistyles)
-
                 if (ref) {
                     storedRef.current = ref
                 }
@@ -54,16 +47,18 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                 return passForwardedRef(props, ref, forwardedRef)
             }}
             style={state => {
-                const unistyles = typeof style === 'function'
+                const isPropStyleAFunction = typeof style === 'function'
+                const unistyles = isPropStyleAFunction
                     ? style.call(style, state)
                     : getStyles(style as unknown as Record<string, any>)
 
-                if (!storedRef.current) {
+                if (!storedRef.current || !isPropStyleAFunction) {
                     return unistyles
                 }
 
                 // @ts-expect-error - this is hidden from TS
                 UnistylesShadowRegistry.remove(storedRef.current)
+
                 // @ts-expect-error - this is hidden from TS
                 UnistylesShadowRegistry.add(storedRef.current, unistyles)
 
