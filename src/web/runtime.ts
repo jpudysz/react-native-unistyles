@@ -1,10 +1,10 @@
 import { UnistyleDependency } from '../specs/NativePlatform'
-import { ColorScheme, Orientation, type AppTheme, type AppThemeName } from '../specs/types'
 import type { UnistylesMiniRuntime } from '../specs/UnistylesRuntime'
+import { type AppTheme, type AppThemeName, ColorScheme, Orientation } from '../specs/types'
 import { WebContentSizeCategory } from '../types'
 import { NavigationBar, StatusBar } from './mock'
-import { error, isServer, schemeToTheme } from './utils'
 import type { UnistylesServices } from './types'
+import { error, isServer, schemeToTheme } from './utils'
 
 export class UnistylesRuntime {
     lightMedia = this.getLightMedia()

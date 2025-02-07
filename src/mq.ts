@@ -1,6 +1,6 @@
-import type { Nullable } from './types'
 import type { UnistylesBreakpoints } from './global'
 import { UnistylesRuntime } from './specs'
+import type { Nullable } from './types'
 
 const IS_UNISTYLES_REGEX = /:([hw])\[(\d+)(?:,\s*(\d+|Infinity))?]/
 const UNISTYLES_WIDTH_REGEX = /:(w)\[(\d+)(?:,\s*(\d+|Infinity))?]/

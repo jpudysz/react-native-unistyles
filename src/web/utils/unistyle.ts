@@ -1,10 +1,10 @@
+import type { UnistylesBreakpoints } from '../../global'
+import { isUnistylesMq, parseMq } from '../../mq'
 import type { UnistyleDependency } from '../../specs/NativePlatform'
 import { ColorScheme, Orientation } from '../../specs/types'
 import type { StyleSheet, StyleSheetWithSuperPowers, UnistylesValues } from '../../types/stylesheet'
-import { isUnistylesMq, parseMq } from '../../mq'
-import { keyInObject, reduceObject } from './common'
-import type { UnistylesBreakpoints } from '../../global'
 import { UnistylesWeb } from '../index'
+import { keyInObject, reduceObject } from './common'
 
 export const schemeToTheme = (scheme: ColorScheme) => {
     switch (scheme) {

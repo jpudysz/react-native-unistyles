@@ -1,12 +1,12 @@
 import './TurboUnistyles'
 
-import { Runtime } from './UnistylesRuntime'
+import { UnistyleDependency } from './NativePlatform'
+import { UnistylesShadowRegistry } from './ShadowRegistry'
 import { StyleSheet } from './StyleSheet'
 import type { UnistylesStyleSheet } from './StyleSheet'
-import { UnistylesShadowRegistry } from './ShadowRegistry'
+import { Runtime } from './UnistylesRuntime'
 import type { UnistylesMiniRuntime } from './UnistylesRuntime'
-import { StatusBarStyle, ColorScheme, Orientation } from './types'
-import { UnistyleDependency } from './NativePlatform'
+import { ColorScheme, Orientation, StatusBarStyle } from './types'
 
 export {
     StatusBarStyle,

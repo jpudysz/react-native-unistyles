@@ -1,11 +1,11 @@
 import React, { type ComponentType, forwardRef, type ComponentProps, type ComponentRef } from 'react'
+import type { UnistylesValues } from '../../types'
 import type { PartialBy } from '../../types/common'
 import { deepMergeObjects } from '../../utils'
-import type { Mappings, SupportedStyleProps } from './types'
-import type { UnistylesValues } from '../../types'
 import { getClassName } from '../getClassname'
-import { maybeWarnAboutMultipleUnistyles } from '../warn'
 import { useProxifiedUnistyles } from '../useProxifiedUnistyles'
+import { maybeWarnAboutMultipleUnistyles } from '../warn'
+import type { Mappings, SupportedStyleProps } from './types'
 
 // @ts-expect-error
 type GenericComponentProps<T> = ComponentProps<T>
