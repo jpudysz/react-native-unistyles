@@ -1,4 +1,4 @@
-function extractVariants(t, path, state) {
+export function extractVariants(t, path, state) {
     const maybeVariants = path.node.body.filter(node => (
         t.isExpressionStatement(node) &&
         t.isCallExpression(node.expression) &&
@@ -59,8 +59,4 @@ function extractVariants(t, path, state) {
     ]
 
     state.file.hasVariants = true
-}
-
-module.exports = {
-    extractVariants
 }

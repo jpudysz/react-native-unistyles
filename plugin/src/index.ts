@@ -1,16 +1,15 @@
-const { addUnistylesImport, isInsideNodeModules } = require('./import')
-const { hasStringRef } = require('./ref')
-const { isUnistylesStyleSheet, addStyleSheetTag, isKindOfStyleSheet, getStylesDependenciesFromFunction, addDependencies, getStylesDependenciesFromObject } = require('./stylesheet')
-const { extractVariants } = require('./variants')
-const { REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_PATHS, REPLACE_WITH_UNISTYLES_EXOTIC_PATHS, NATIVE_COMPONENTS_PATHS } = require('./consts')
-const { handleExoticImport } = require('./exotic')
+import { addUnistylesImport, isInsideNodeModules } from './import'
+import { hasStringRef } from './ref'
+import { isUnistylesStyleSheet, addStyleSheetTag, isKindOfStyleSheet, getStylesDependenciesFromFunction, addDependencies, getStylesDependenciesFromObject } from './stylesheet'
+import { extractVariants } from './variants'
+import { REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_PATHS, REPLACE_WITH_UNISTYLES_EXOTIC_PATHS, NATIVE_COMPONENTS_PATHS } from './consts'
+import { handleExoticImport } from './exotic'
 
-module.exports = function ({ types: t }) {
+export default function ({ types: t }) {
     return {
         name: 'babel-react-native-unistyles',
         visitor: {
             Program: {
-                /** @param {import('./index').UnistylesPluginPass} state */
                 enter(path, state) {
                     state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS
                         .concat(state.opts.autoProcessPaths ?? [])
@@ -79,7 +78,6 @@ module.exports = function ({ types: t }) {
                     }
                 })
             },
-            /** @param {import('./index').UnistylesPluginPass} state */
             ImportDeclaration(path, state) {
                 const exoticImport = REPLACE_WITH_UNISTYLES_EXOTIC_PATHS
                     .concat(state.opts.autoRemapImports ?? [])

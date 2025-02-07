@@ -1,4 +1,4 @@
-const REACT_NATIVE_COMPONENT_NAMES = [
+export const REACT_NATIVE_COMPONENT_NAMES = [
     'ActivityIndicator',
     'View',
     'Text',
@@ -23,7 +23,7 @@ const REACT_NATIVE_COMPONENT_NAMES = [
 // auto replace RN imports to Unistyles imports under these paths
 // our implementation simply borrows 'ref' to register it in ShadowRegistry
 // so we won't affect anyone's implementation
-const REPLACE_WITH_UNISTYLES_PATHS = [
+export const REPLACE_WITH_UNISTYLES_PATHS = [
     'react-native-reanimated/src/component',
     'react-native-gesture-handler/src/components'
 ]
@@ -36,10 +36,10 @@ const REPLACE_WITH_UNISTYLES_PATHS = [
 // isDefault <- is the import default?
 // path <- path to the target import
 // mapTo <- name of the Unistyles component
-const REPLACE_WITH_UNISTYLES_EXOTIC_PATHS = []
+export const REPLACE_WITH_UNISTYLES_EXOTIC_PATHS = []
 
 // this list will additionally detect React Native direct imports
-const NATIVE_COMPONENTS_PATHS = {
+export const NATIVE_COMPONENTS_PATHS = {
     imports: [
         {
             name: 'NativeText',
@@ -53,11 +53,4 @@ const NATIVE_COMPONENTS_PATHS = {
             mapTo: 'NativeView'
         }
     ]
-}
-
-module.exports = {
-    NATIVE_COMPONENTS_PATHS,
-    REACT_NATIVE_COMPONENT_NAMES,
-    REPLACE_WITH_UNISTYLES_PATHS,
-    REPLACE_WITH_UNISTYLES_EXOTIC_PATHS
 }

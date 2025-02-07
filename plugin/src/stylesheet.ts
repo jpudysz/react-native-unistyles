@@ -16,7 +16,7 @@ const UnistyleDependency = {
     Ime: 14
 }
 
-function stringToUniqueId(str) {
+export function stringToUniqueId(str) {
     let hash = 0
 
     for (let i = 0; i < str.length; i++) {
@@ -29,7 +29,7 @@ function stringToUniqueId(str) {
     return absHash % 1000000000
 }
 
-function isUnistylesStyleSheet(t, path, state) {
+export function isUnistylesStyleSheet(t, path, state) {
     const callee = path.get('callee')
 
     return (
@@ -40,7 +40,7 @@ function isUnistylesStyleSheet(t, path, state) {
     )
 }
 
-function isKindOfStyleSheet(t, path, state) {
+export function isKindOfStyleSheet(t, path, state) {
     if (!state.file.forceProcessing && !state.file.hasUnistylesImport) {
         return false
     }
@@ -54,7 +54,7 @@ function isKindOfStyleSheet(t, path, state) {
     )
 }
 
-function addStyleSheetTag(t, path, state) {
+export function addStyleSheetTag(t, path, state) {
     const callee = path.get('callee')
     const uniqueId = stringToUniqueId(state.filename.replace(state.cwd, '')) + ++state.file.tagNumber
 
@@ -98,7 +98,7 @@ const getProperty = (t, property) => {
     return undefined
 }
 
-function getStylesDependenciesFromObject(t, path) {
+export function getStylesDependenciesFromObject(t, path) {
     const detectedStylesWithVariants = new Set()
     const stylesheet = path.node.arguments[0]
 
@@ -108,7 +108,7 @@ function getStylesDependenciesFromObject(t, path) {
         }
 
         if (t.isObjectProperty(property)) {
-            if(t.isObjectExpression(property.value)) {
+            if (t.isObjectExpression(property.value)) {
                 property.value.properties.forEach(innerProp => {
                     if (t.isIdentifier(innerProp.key) && innerProp.key.name === 'variants') {
                         detectedStylesWithVariants.add({
@@ -122,7 +122,7 @@ function getStylesDependenciesFromObject(t, path) {
         }
 
         if (t.isArrowFunctionExpression(property.value)) {
-            if(t.isObjectExpression(property.value.body)) {
+            if (t.isObjectExpression(property.value.body)) {
                 property.value.body.properties.forEach(innerProp => {
                     if (t.isIdentifier(innerProp.key) && innerProp.key.name === 'variants') {
                         detectedStylesWithVariants.add({
@@ -156,7 +156,7 @@ function getStylesDependenciesFromObject(t, path) {
     }, [])
 }
 
-function getStylesDependenciesFromFunction(t, path) {
+export function getStylesDependenciesFromFunction(t, path) {
     const funcPath = path.get('arguments.0')
 
     if (!funcPath) {
@@ -253,7 +253,7 @@ function getStylesDependenciesFromFunction(t, path) {
         }
 
         if (valuePath.isArrowFunctionExpression()) {
-            if(t.isObjectExpression(valuePath.node.body)) {
+            if (t.isObjectExpression(valuePath.node.body)) {
                 const hasVariants = valuePath.node.body.properties.some(innerProp => {
 
                     return t.isIdentifier(innerProp.key) && innerProp.key.name === 'variants'
@@ -418,7 +418,7 @@ function getStylesDependenciesFromFunction(t, path) {
         }, [])
 }
 
-function toUnistylesDependency(dependency) {
+export function toUnistylesDependency(dependency) {
     switch (dependency) {
         case 'theme': {
             return UnistyleDependency.Theme
@@ -471,7 +471,7 @@ function toUnistylesDependency(dependency) {
     }
 }
 
-function getReturnStatementsFromBody(t, node, results = []) {
+export function getReturnStatementsFromBody(t, node, results = []) {
     if (t.isReturnStatement(node)) {
         results.push(node)
     }
@@ -491,7 +491,7 @@ function getReturnStatementsFromBody(t, node, results = []) {
     return results
 }
 
-function addDependencies(t, state, styleName, unistyle, detectedDependencies) {
+export function addDependencies(t, state, styleName, unistyle, detectedDependencies) {
     const debugMessage = deps => {
         if (state.opts.debug) {
             const mappedDeps = deps
@@ -553,13 +553,4 @@ function addDependencies(t, state, styleName, unistyle, detectedDependencies) {
             })
         }
     }
-}
-
-module.exports = {
-    isUnistylesStyleSheet,
-    addDependencies,
-    addStyleSheetTag,
-    getStylesDependenciesFromObject,
-    getStylesDependenciesFromFunction,
-    isKindOfStyleSheet
 }
