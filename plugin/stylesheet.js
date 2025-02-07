@@ -169,7 +169,7 @@ function getStylesDependenciesFromFunction(t, path) {
     let themeNames = []
 
     // destructured theme object
-    if (themeParam.type === 'ObjectPattern') {
+    if (themeParam && themeParam.type === 'ObjectPattern') {
         // If destructured, collect all property names
         for (const prop of themeParam.properties) {
             themeNames.push(getProperty(t, prop))
@@ -177,7 +177,7 @@ function getStylesDependenciesFromFunction(t, path) {
     }
 
     // user used 'theme' without destructuring
-    if (themeParam.type === 'Identifier') {
+    if (themeParam && themeParam.type === 'Identifier') {
         themeNames.push({
             properties: [themeParam.name]
         })
