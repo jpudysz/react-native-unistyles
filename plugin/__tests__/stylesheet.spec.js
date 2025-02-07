@@ -504,6 +504,58 @@ pluginTester({
                     798826616
                 )
             `
-        }
+        },
+        {
+            title: 'Should support style names of javascript array/object prototype functions using object',
+            code: `
+                import { StyleSheet } from 'react-native-unistyles'
+
+                const styles = StyleSheet.create({
+                    map: {},
+                    length: {},
+                    constructor: {},
+                    toString: {}
+                })
+            `,
+            output: `
+                import { StyleSheet } from 'react-native-unistyles'
+
+                const styles = StyleSheet.create(
+                    {
+                        map: {},
+                        length: {},
+                        constructor: {},
+                        toString: {}
+                    },
+                    798826616
+                )
+            `
+        }, ,
+        {
+            title: 'Should support style names of javascript array/object prototype functions using function',
+            code: `
+                import { StyleSheet } from 'react-native-unistyles'
+
+                const styles = StyleSheet.create((theme) => ({
+                    map: {},
+                    length: {},
+                    constructor: {},
+                    toString: {}
+                }))
+            `,
+            output: `
+                import { StyleSheet } from 'react-native-unistyles'
+
+                const styles = StyleSheet.create(
+                    theme => ({
+                        map: {},
+                        length: {},
+                        constructor: {},
+                        toString: {}
+                    }),
+                    798826616
+                )
+            `
+        },
     ]
 })
