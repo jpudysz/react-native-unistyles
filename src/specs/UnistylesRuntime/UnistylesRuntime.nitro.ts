@@ -1,7 +1,7 @@
 import type { HybridObject } from 'react-native-nitro-modules'
-import type { AppBreakpoint, AppThemeName, Dimensions, Insets } from '../types'
 import type { AndroidContentSizeCategory, IOSContentSizeCategory, WebContentSizeCategory } from '../../types'
 import type { UnistylesNativeMiniRuntime } from '../NativePlatform'
+import type { AppBreakpoint, AppThemeName, Dimensions, Insets } from '../types'
 
 type ColorScheme = 'light' | 'dark' | 'unspecified'
 type Orientation = 'portrait' | 'landscape'

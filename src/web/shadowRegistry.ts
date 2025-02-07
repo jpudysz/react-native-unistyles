@@ -1,9 +1,9 @@
+import { UnistyleDependency } from '../specs'
 import type { UnistylesTheme, UnistylesValues } from '../types'
 import { deepMergeObjects } from '../utils'
+import type { UnistylesServices } from './types'
 import { extractSecrets, extractUnistyleDependencies } from './utils'
 import { getVariants } from './variants'
-import type { UnistylesServices } from './types'
-import { UnistyleDependency } from '../specs'
 
 export class UnistylesShadowRegistry {
     // MOCKS

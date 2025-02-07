@@ -1,9 +1,9 @@
 import React, { forwardRef } from 'react'
 import { Pressable as NativePressableReactNative } from 'react-native'
 import type { PressableProps as Props, View } from 'react-native'
+import { getClassName } from '../../core'
 import { UnistylesShadowRegistry } from '../../specs'
 import type { UnistylesValues } from '../../types'
-import { getClassName } from '../../core'
 import { isServer } from '../../web/utils'
 
 type Variants = Record<string, string | boolean | undefined>

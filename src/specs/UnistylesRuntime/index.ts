@@ -1,12 +1,12 @@
 import { processColor } from 'react-native'
 import { NitroModules } from 'react-native-nitro-modules'
-import type { UnistylesRuntime as UnistylesRuntimeSpec, UnistylesMiniRuntime } from './UnistylesRuntime.nitro'
-import type { AppBreakpoint, AppTheme, AppThemeName, Color, ColorScheme, Orientation } from '../types'
-import { attachStatusBarJSMethods, type UnistylesStatusBar } from '../StatusBar'
-import type { UnistylesNavigationBar } from '../NavigtionBar'
-import type { AndroidContentSizeCategory, IOSContentSizeCategory, UnistylesTheme } from '../../types'
 import { isIOS } from '../../common'
 import type { UnistylesThemes } from '../../global'
+import type { AndroidContentSizeCategory, IOSContentSizeCategory, UnistylesTheme } from '../../types'
+import type { UnistylesNavigationBar } from '../NavigtionBar'
+import { type UnistylesStatusBar, attachStatusBarJSMethods } from '../StatusBar'
+import type { AppBreakpoint, AppTheme, AppThemeName, Color, ColorScheme, Orientation } from '../types'
+import type { UnistylesMiniRuntime, UnistylesRuntime as UnistylesRuntimeSpec } from './UnistylesRuntime.nitro'
 
 export interface UnistylesRuntimePrivate extends Omit<UnistylesRuntimeSpec, 'setRootViewBackgroundColor'> {
     readonly colorScheme: ColorScheme,

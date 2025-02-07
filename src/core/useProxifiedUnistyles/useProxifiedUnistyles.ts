@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useRef, useState } from 'react'
-import { UnistylesRuntime, UnistylesShadowRegistry, type UnistylesMiniRuntime } from '../../specs'
+import { type UnistylesMiniRuntime, UnistylesRuntime, UnistylesShadowRegistry } from '../../specs'
 // It's imported that way because of circular dependency
 import { UnistyleDependency } from '../../specs/NativePlatform'
 import type { UnistylesTheme } from '../../types'

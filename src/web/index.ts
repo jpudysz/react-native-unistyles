@@ -1,8 +1,8 @@
-import { create } from './create'
-import { deepMergeObjects } from '../utils'
+import type { UnistylesShadowRegistry as NativeUnistylesShadowRegistry } from '../specs/ShadowRegistry'
 import type { StyleSheet as NativeStyleSheet } from '../specs/StyleSheet'
 import type { Runtime as NativeUnistylesRuntime } from '../specs/UnistylesRuntime'
-import type { UnistylesShadowRegistry as NativeUnistylesShadowRegistry } from '../specs/ShadowRegistry'
+import { deepMergeObjects } from '../utils'
+import { create } from './create'
 import { UnistylesServices } from './services'
 import { isServer } from './utils'
 

@@ -1,6 +1,6 @@
 import type { FilterFunction, TextStyle, ViewStyle } from 'react-native'
-import type { ToDeepUnistyles } from '../../types/stylesheet'
 import type { UnionToIntersection } from '../../types'
+import type { ToDeepUnistyles } from '../../types/stylesheet'
 
 export type ShadowOffset = ToDeepUnistyles<{ width: number, height: number }>
 

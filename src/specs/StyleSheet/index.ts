@@ -1,9 +1,9 @@
-import { NitroModules } from 'react-native-nitro-modules'
-import { processColor, StyleSheet as NativeStyleSheet } from 'react-native'
+import { StyleSheet as NativeStyleSheet, processColor } from 'react-native'
 import type { StyleSheet as NativeStyleSheetType } from 'react-native'
-import type { UnistylesStyleSheet as UnistylesStyleSheetSpec } from './UnistylesStyleSheet.nitro'
+import { NitroModules } from 'react-native-nitro-modules'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../../global'
 import type { CreateUnistylesStyleSheet } from '../../types'
+import type { UnistylesStyleSheet as UnistylesStyleSheetSpec } from './UnistylesStyleSheet.nitro'
 
 type UnistylesThemeSettings = {
     initialTheme: (() => keyof UnistylesThemes) | keyof UnistylesThemes

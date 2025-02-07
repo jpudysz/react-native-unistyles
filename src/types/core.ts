@@ -1,3 +1,4 @@
+import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
 import type {
     MatrixTransform,
     PerspectiveTransform,
@@ -13,7 +14,6 @@ import type {
     TranslateXTransform,
     TranslateYTransform
 } from 'react-native/Libraries/StyleSheet/StyleSheetTypes'
-import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
 
 export type ShadowOffset = {

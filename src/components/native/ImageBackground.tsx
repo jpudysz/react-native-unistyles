@@ -1,11 +1,11 @@
 import React from 'react'
-import { ImageBackground as NativeImageBackground } from 'react-native'
 import { forwardRef } from 'react'
-import type { UnistylesValues } from '../../types'
+import { ImageBackground as NativeImageBackground } from 'react-native'
 import { getClassName } from '../../core'
-import { isServer } from '../../web/utils'
-import { UnistylesShadowRegistry } from '../../web'
+import type { UnistylesValues } from '../../types'
 import { copyComponentProperties } from '../../utils'
+import { UnistylesShadowRegistry } from '../../web'
+import { isServer } from '../../web/utils'
 
 type Props = {
     style?: UnistylesValues
