@@ -1,4 +1,4 @@
-function handleExoticImport(t, path, state, exoticImport) {
+export function handleExoticImport(t, path, state, exoticImport) {
     const specifiers = path.node.specifiers
     const source = path.node.source
 
@@ -47,8 +47,4 @@ function handleExoticImport(t, path, state, exoticImport) {
             return
         }
     })
-}
-
-module.exports = {
-    handleExoticImport
 }
