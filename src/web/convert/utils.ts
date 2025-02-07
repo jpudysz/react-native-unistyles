@@ -1,9 +1,9 @@
 // based on react-native-web normalizer
 // https://github.com/necolas/react-native-web
 import normalizeColors from '@react-native/normalize-colors'
-import { BOX_SHADOW_STYLES, TEXT_SHADOW_STYLES, type AllShadow, type AllShadowKeys, type Filters } from './types'
-import type { TransformStyles } from '../../types/core'
 import type { BoxShadowValue } from 'react-native'
+import type { TransformStyles } from '../../types/core'
+import { type AllShadow, type AllShadowKeys, BOX_SHADOW_STYLES, type Filters, TEXT_SHADOW_STYLES } from './types'
 
 export const isTransform = (key: string, value: any): value is Array<TransformStyles> => key === 'transform' && Array.isArray(value)
 

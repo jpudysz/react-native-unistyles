@@ -1,4 +1,4 @@
-import type { StyleSheetWithSuperPowers, StyleSheet } from '../types/stylesheet'
+import type { StyleSheet, StyleSheetWithSuperPowers } from '../types/stylesheet'
 import { UnistylesWeb } from './index'
 import { assignSecrets, error, removeInlineStyles } from './utils'
 

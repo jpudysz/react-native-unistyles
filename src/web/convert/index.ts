@@ -1,10 +1,10 @@
 import type { UnistylesValues } from '../../types'
-import { isPseudo } from './pseudo'
-import { getStyle } from './style'
 import { deepMergeObjects } from '../../utils'
-import { getTransformStyle, getBoxShadow, getFilterStyle } from './object'
-import { isShadow, isFilter, isTextShadow, isTransform, isBoxShadow } from './utils'
-import { getTextShadowStyle, getBoxShadowStyle } from './shadow'
+import { getBoxShadow, getFilterStyle, getTransformStyle } from './object'
+import { isPseudo } from './pseudo'
+import { getBoxShadowStyle, getTextShadowStyle } from './shadow'
+import { getStyle } from './style'
+import { isBoxShadow, isFilter, isShadow, isTextShadow, isTransform } from './utils'
 
 export const convertUnistyles = (value: UnistylesValues) => {
     // Flag to mark if textShadow is already created

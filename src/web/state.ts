@@ -1,11 +1,11 @@
-import type { UnistylesTheme } from '../types'
+import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
+import { UnistyleDependency } from '../specs/NativePlatform'
 import type { UnistylesConfig } from '../specs/StyleSheet'
 import type { AppBreakpoint, AppTheme, AppThemeName } from '../specs/types'
-import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
-import { error, hyphenate, isServer, schemeToTheme } from './utils'
-import { UnistyleDependency } from '../specs/NativePlatform'
+import type { UnistylesTheme } from '../types'
 import type { UnionToIntersection } from '../types'
 import type { UnistylesServices } from './types'
+import { error, hyphenate, isServer, schemeToTheme } from './utils'
 
 type UnistylesSettings = Partial<UnionToIntersection<Required<UnistylesConfig>['settings']>>
 

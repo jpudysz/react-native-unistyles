@@ -1,6 +1,6 @@
-import { getObjectStyle } from './objectStyle'
-import { normalizeNumericValue } from '../utils'
 import type { TransformStyles } from '../../../types/core'
+import { normalizeNumericValue } from '../utils'
+import { getObjectStyle } from './objectStyle'
 
 const normalizeTransform = (key: string, value: any) => {
     if (key.includes('scale')) {
