@@ -8,8 +8,9 @@
     "tsc": "node_modules/typescript/bin/tsc --noEmit",
     "lint": "biome lint",
     "check": "biome check --write",
+    "check:ci": "biome check",
     "prepare": "husky && bob build",
-    "precommit": "concurrently 'yarn tsc' 'yarn lint' 'yarn test'",
+    "precommit": "concurrently 'yarn tsc' 'yarn lint' 'yarn check' 'yarn test'",
     "release": "release-it"
   },
   "main": "lib/commonjs/index.js",
