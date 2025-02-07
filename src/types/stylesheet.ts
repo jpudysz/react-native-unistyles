@@ -1,11 +1,11 @@
-import type { BoxShadowValue, ImageStyle, TextStyle, ViewStyle, FilterFunction } from 'react-native'
-import type { ShadowOffset, TransformStyles, UnistylesTheme } from './core'
+import type { CSSProperties } from 'react'
+import type { BoxShadowValue, FilterFunction, ImageStyle, TextStyle, ViewStyle } from 'react-native'
 import type { UnistylesBreakpoints } from '../global'
 import type { UnistylesMiniRuntime } from '../specs'
-import type { ReactNativeStyleSheet } from './breakpoints'
-import type { ExtractVariantNames } from './variants'
-import type { CSSProperties } from 'react'
 import type { Pseudo } from '../web/convert/pseudo'
+import type { ReactNativeStyleSheet } from './breakpoints'
+import type { ShadowOffset, TransformStyles, UnistylesTheme } from './core'
+import type { ExtractVariantNames } from './variants'
 
 // these props are treated differently to nest breakpoints and media queries
 type NestedKeys = 'shadowOffset' | 'transform' | 'textShadowOffset' | 'boxShadow' | 'filter'

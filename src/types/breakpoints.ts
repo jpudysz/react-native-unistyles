@@ -1,7 +1,7 @@
 import type { ColorValue, OpaqueColorValue } from 'react-native'
-import type { BreakpointsOrMediaQueries, ToDeepUnistyles } from './stylesheet'
-import type { TransformStyles } from './core'
 import type { SafeReturnType } from './common'
+import type { TransformStyles } from './core'
+import type { BreakpointsOrMediaQueries, ToDeepUnistyles } from './stylesheet'
 
 type ExtractTransformArray<T> = T extends object
     ? { [K in keyof T]: ExtractBreakpoints<T[K]> }

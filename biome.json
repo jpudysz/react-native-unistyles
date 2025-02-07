@@ -5,8 +5,7 @@
     "ignore": ["example", "expo-example", "docs", "plugin", "lib"]
   },
   "formatter": {
-    "enabled": true,
-    "indentStyle": "tab"
+    "enabled": false
   },
   "linter": {
     "enabled": true,
@@ -30,26 +29,7 @@
     "enabled": true
   },
   "javascript": {
-    "formatter": {
-      "enabled": true,
-      "quoteStyle": "single",
-      "jsxQuoteStyle": "double",
-      "trailingCommas": "all",
-      "semicolons": "asNeeded",
-      "arrowParentheses": "asNeeded",
-      "indentStyle": "tab",
-      "indentWidth": 4,
-      "lineWidth": 120
-    },
     "globals": [],
     "jsxRuntime": "reactClassic"
-  },
-  "json": {
-    "formatter": {
-      "enabled": true,
-      "indentWidth": 2,
-      "indentStyle": "tab",
-      "lineWidth": 120
-    }
   }
 }

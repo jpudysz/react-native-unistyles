@@ -1,10 +1,10 @@
 import React from 'react'
 import type { UnistylesValues } from '../types'
-import { getClassName } from './getClassname'
-import { isServer } from '../web/utils'
-import { UnistylesShadowRegistry } from '../web'
-import { maybeWarnAboutMultipleUnistyles } from './warn'
 import { copyComponentProperties } from '../utils'
+import { UnistylesShadowRegistry } from '../web'
+import { isServer } from '../web/utils'
+import { getClassName } from './getClassname'
+import { maybeWarnAboutMultipleUnistyles } from './warn'
 
 type ComponentProps = {
     style?: UnistylesValues | Array<UnistylesValues>

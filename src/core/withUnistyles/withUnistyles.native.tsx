@@ -2,9 +2,9 @@ import React, { forwardRef, useEffect, type ComponentType } from 'react'
 import type { UnistyleDependency } from '../../specs'
 import type { PartialBy } from '../../types/common'
 import { deepMergeObjects } from '../../utils'
-import type { Mappings, SupportedStyleProps } from './types'
-import { maybeWarnAboutMultipleUnistyles } from '../warn'
 import { useProxifiedUnistyles } from '../useProxifiedUnistyles'
+import { maybeWarnAboutMultipleUnistyles } from '../warn'
+import type { Mappings, SupportedStyleProps } from './types'
 
 // @ts-expect-error
 type GenericComponentProps<P> = ComponentProps<P>

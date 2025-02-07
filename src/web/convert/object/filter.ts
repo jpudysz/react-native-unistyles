@@ -1,10 +1,10 @@
 import type { DropShadowValue } from 'react-native'
-import { hyphenate } from '../../utils'
-import type { Filters } from '../types'
-import { getObjectStyle } from './objectStyle'
-import { normalizeColor, normalizeNumericValue } from '../utils'
 import { isUnistylesMq } from '../../../mq'
 import { UnistylesWeb } from '../../index'
+import { hyphenate } from '../../utils'
+import type { Filters } from '../types'
+import { normalizeColor, normalizeNumericValue } from '../utils'
+import { getObjectStyle } from './objectStyle'
 
 const getDropShadowStyle = (dropShadow: DropShadowValue) => {
     const { offsetX = 0, offsetY = 0, standardDeviation = 0, color = '#000' } = dropShadow

@@ -1,6 +1,6 @@
 import { StatusBar as NativeStatusBar } from 'react-native'
-import type { UnistylesStatusBar as UnistylesStatusBarSpec } from './UnistylesStatusBar.nitro'
 import { StatusBarStyle } from '../types'
+import type { UnistylesStatusBar as UnistylesStatusBarSpec } from './UnistylesStatusBar.nitro'
 
 export type StatusBarHiddenAnimation = 'none' | 'fade' | 'slide'
 

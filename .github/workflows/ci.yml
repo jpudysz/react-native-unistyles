@@ -28,6 +28,9 @@ jobs:
       - name: Lint files
         run: yarn lint
 
+      - name: Check files formatting
+        run: yarn check:ci
+
       - name: Type check files
         run: yarn tsc
 
