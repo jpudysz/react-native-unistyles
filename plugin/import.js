@@ -43,7 +43,9 @@ function addUnistylesImport(t, path, state) {
     nodesToRemove.forEach(node => path.node.body.splice(path.node.body.indexOf(node), 1))
 }
 
-const isInsideNodeModules = state => state.file.opts.filename.includes('node_modules')
+const isInsideNodeModules = state => {
+    return state.file.opts.filename.includes('node_modules') && !state.file.opts.filename.includes(state.opts.autoProcessImports ?? [])
+}
 
 module.exports = {
     isInsideNodeModules,
