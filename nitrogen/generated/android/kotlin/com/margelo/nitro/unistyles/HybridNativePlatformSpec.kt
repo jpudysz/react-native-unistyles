@@ -7,7 +7,6 @@
 
 package com.margelo.nitro.unistyles
 
-import android.util.Log
 import androidx.annotation.Keep
 import com.facebook.jni.HybridData
 import com.facebook.proguard.annotations.DoNotStrip
@@ -29,16 +28,12 @@ abstract class HybridNativePlatformSpec: HybridObject() {
   private var mHybridData: HybridData = initHybrid()
 
   init {
-    // Pass this `HybridData` through to it's base class,
-    // to represent inheritance to JHybridObject on C++ side
     super.updateNative(mHybridData)
   }
 
-  /**
-   * Call from a child class to initialize HybridData with a child.
-   */
   override fun updateNative(hybridData: HybridData) {
     mHybridData = hybridData
+    super.updateNative(hybridData)
   }
 
   // Properties
@@ -131,16 +126,5 @@ abstract class HybridNativePlatformSpec: HybridObject() {
 
   companion object {
     private const val TAG = "HybridNativePlatformSpec"
-    init {
-      try {
-        Log.i(TAG, "Loading unistyles C++ library...")
-        System.loadLibrary("unistyles")
-        Log.i(TAG, "Successfully loaded unistyles C++ library!")
-      } catch (e: Error) {
-        Log.e(TAG, "Failed to load unistyles C++ library! Is it properly installed and linked? " +
-                    "Is the name correct? (see `CMakeLists.txt`, at `add_library(...)`)", e)
-        throw e
-      }
-    }
   }
 }

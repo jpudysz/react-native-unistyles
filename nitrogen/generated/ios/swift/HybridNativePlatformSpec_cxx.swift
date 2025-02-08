@@ -101,7 +101,7 @@ public class HybridNativePlatformSpec_cxx {
 
   // Methods
   @inline(__always)
-  public func getInsets() -> bridge.Result_Insets_ {
+  public final func getInsets() -> bridge.Result_Insets_ {
     do {
       let __result = try self.__implementation.getInsets()
       let __resultCpp = __result
@@ -113,7 +113,7 @@ public class HybridNativePlatformSpec_cxx {
   }
   
   @inline(__always)
-  public func getColorScheme() -> bridge.Result_ColorScheme_ {
+  public final func getColorScheme() -> bridge.Result_ColorScheme_ {
     do {
       let __result = try self.__implementation.getColorScheme()
       let __resultCpp = __result
@@ -125,7 +125,7 @@ public class HybridNativePlatformSpec_cxx {
   }
   
   @inline(__always)
-  public func getFontScale() -> bridge.Result_double_ {
+  public final func getFontScale() -> bridge.Result_double_ {
     do {
       let __result = try self.__implementation.getFontScale()
       let __resultCpp = __result
@@ -137,7 +137,7 @@ public class HybridNativePlatformSpec_cxx {
   }
   
   @inline(__always)
-  public func getPixelRatio() -> bridge.Result_double_ {
+  public final func getPixelRatio() -> bridge.Result_double_ {
     do {
       let __result = try self.__implementation.getPixelRatio()
       let __resultCpp = __result
@@ -149,7 +149,7 @@ public class HybridNativePlatformSpec_cxx {
   }
   
   @inline(__always)
-  public func getOrientation() -> bridge.Result_Orientation_ {
+  public final func getOrientation() -> bridge.Result_Orientation_ {
     do {
       let __result = try self.__implementation.getOrientation()
       let __resultCpp = __result
@@ -161,7 +161,7 @@ public class HybridNativePlatformSpec_cxx {
   }
   
   @inline(__always)
-  public func getContentSizeCategory() -> bridge.Result_std__string_ {
+  public final func getContentSizeCategory() -> bridge.Result_std__string_ {
     do {
       let __result = try self.__implementation.getContentSizeCategory()
       let __resultCpp = std.string(__result)
@@ -173,7 +173,7 @@ public class HybridNativePlatformSpec_cxx {
   }
   
   @inline(__always)
-  public func getScreenDimensions() -> bridge.Result_Dimensions_ {
+  public final func getScreenDimensions() -> bridge.Result_Dimensions_ {
     do {
       let __result = try self.__implementation.getScreenDimensions()
       let __resultCpp = __result
@@ -185,7 +185,7 @@ public class HybridNativePlatformSpec_cxx {
   }
   
   @inline(__always)
-  public func getStatusBarDimensions() -> bridge.Result_Dimensions_ {
+  public final func getStatusBarDimensions() -> bridge.Result_Dimensions_ {
     do {
       let __result = try self.__implementation.getStatusBarDimensions()
       let __resultCpp = __result
@@ -197,7 +197,7 @@ public class HybridNativePlatformSpec_cxx {
   }
   
   @inline(__always)
-  public func getNavigationBarDimensions() -> bridge.Result_Dimensions_ {
+  public final func getNavigationBarDimensions() -> bridge.Result_Dimensions_ {
     do {
       let __result = try self.__implementation.getNavigationBarDimensions()
       let __resultCpp = __result
@@ -209,7 +209,7 @@ public class HybridNativePlatformSpec_cxx {
   }
   
   @inline(__always)
-  public func getPrefersRtlDirection() -> bridge.Result_bool_ {
+  public final func getPrefersRtlDirection() -> bridge.Result_bool_ {
     do {
       let __result = try self.__implementation.getPrefersRtlDirection()
       let __resultCpp = __result
@@ -221,7 +221,7 @@ public class HybridNativePlatformSpec_cxx {
   }
   
   @inline(__always)
-  public func setRootViewBackgroundColor(color: Double) -> bridge.Result_void_ {
+  public final func setRootViewBackgroundColor(color: Double) -> bridge.Result_void_ {
     do {
       try self.__implementation.setRootViewBackgroundColor(color: color)
       return bridge.create_Result_void_()
@@ -232,7 +232,7 @@ public class HybridNativePlatformSpec_cxx {
   }
   
   @inline(__always)
-  public func setNavigationBarHidden(isHidden: Bool) -> bridge.Result_void_ {
+  public final func setNavigationBarHidden(isHidden: Bool) -> bridge.Result_void_ {
     do {
       try self.__implementation.setNavigationBarHidden(isHidden: isHidden)
       return bridge.create_Result_void_()
@@ -243,7 +243,7 @@ public class HybridNativePlatformSpec_cxx {
   }
   
   @inline(__always)
-  public func setStatusBarHidden(isHidden: Bool) -> bridge.Result_void_ {
+  public final func setStatusBarHidden(isHidden: Bool) -> bridge.Result_void_ {
     do {
       try self.__implementation.setStatusBarHidden(isHidden: isHidden)
       return bridge.create_Result_void_()
@@ -254,7 +254,7 @@ public class HybridNativePlatformSpec_cxx {
   }
   
   @inline(__always)
-  public func setImmersiveMode(isEnabled: Bool) -> bridge.Result_void_ {
+  public final func setImmersiveMode(isEnabled: Bool) -> bridge.Result_void_ {
     do {
       try self.__implementation.setImmersiveMode(isEnabled: isEnabled)
       return bridge.create_Result_void_()
@@ -265,7 +265,7 @@ public class HybridNativePlatformSpec_cxx {
   }
   
   @inline(__always)
-  public func getMiniRuntime() -> bridge.Result_UnistylesNativeMiniRuntime_ {
+  public final func getMiniRuntime() -> bridge.Result_UnistylesNativeMiniRuntime_ {
     do {
       let __result = try self.__implementation.getMiniRuntime()
       let __resultCpp = __result
@@ -277,7 +277,7 @@ public class HybridNativePlatformSpec_cxx {
   }
   
   @inline(__always)
-  public func registerPlatformListener(callback: bridge.Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime) -> bridge.Result_void_ {
+  public final func registerPlatformListener(callback: bridge.Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime) -> bridge.Result_void_ {
     do {
       try self.__implementation.registerPlatformListener(callback: { () -> ([UnistyleDependency], UnistylesNativeMiniRuntime) -> Void in
         let __wrappedFunction = bridge.wrap_Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime(callback)
@@ -299,7 +299,7 @@ public class HybridNativePlatformSpec_cxx {
   }
   
   @inline(__always)
-  public func registerImeListener(callback: bridge.Func_void_UnistylesNativeMiniRuntime) -> bridge.Result_void_ {
+  public final func registerImeListener(callback: bridge.Func_void_UnistylesNativeMiniRuntime) -> bridge.Result_void_ {
     do {
       try self.__implementation.registerImeListener(callback: { () -> (UnistylesNativeMiniRuntime) -> Void in
         let __wrappedFunction = bridge.wrap_Func_void_UnistylesNativeMiniRuntime(callback)
@@ -315,7 +315,7 @@ public class HybridNativePlatformSpec_cxx {
   }
   
   @inline(__always)
-  public func unregisterPlatformListeners() -> bridge.Result_void_ {
+  public final func unregisterPlatformListeners() -> bridge.Result_void_ {
     do {
       try self.__implementation.unregisterPlatformListeners()
       return bridge.create_Result_void_()
