@@ -44,7 +44,9 @@ function addUnistylesImport(t, path, state) {
 }
 
 const isInsideNodeModules = state => {
-    return state.file.opts.filename.includes('node_modules') && !state.file.opts.filename.includes(state.opts.autoProcessImports ?? [])
+    return state.file.opts.filename.includes('node_modules') && !(state.opts.autoProcessImports ?? []).some(importName => {
+        return state.file.opts.filename.includes(importName)
+    })
 }
 
 module.exports = {
