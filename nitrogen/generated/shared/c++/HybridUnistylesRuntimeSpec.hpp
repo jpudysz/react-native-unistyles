@@ -56,7 +56,7 @@ namespace margelo::nitro::unistyles {
       explicit HybridUnistylesRuntimeSpec(): HybridObject(TAG) { }
 
       // Destructor
-      virtual ~HybridUnistylesRuntimeSpec() { }
+      ~HybridUnistylesRuntimeSpec() override = default;
 
     public:
       // Properties

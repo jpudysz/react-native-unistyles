@@ -58,7 +58,9 @@ namespace margelo::nitro::unistyles {
 
   public:
     // Get the Swift part
-    inline Unistyles::HybridNativePlatformSpec_cxx getSwiftPart() noexcept { return _swiftPart; }
+    inline Unistyles::HybridNativePlatformSpec_cxx& getSwiftPart() noexcept {
+      return _swiftPart;
+    }
 
   public:
     // Get memory pressure

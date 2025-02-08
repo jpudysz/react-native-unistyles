@@ -9,7 +9,7 @@ import Foundation
 import NitroModules
 
 /// See ``HybridNativePlatformSpec``
-public protocol HybridNativePlatformSpec_protocol: AnyObject {
+public protocol HybridNativePlatformSpec_protocol: HybridObject {
   // Properties
   
 
@@ -35,7 +35,7 @@ public protocol HybridNativePlatformSpec_protocol: AnyObject {
 }
 
 /// See ``HybridNativePlatformSpec``
-public class HybridNativePlatformSpec_base: HybridObjectSpec {
+public class HybridNativePlatformSpec_base {
   private weak var cxxWrapper: HybridNativePlatformSpec_cxx? = nil
   public func getCxxWrapper() -> HybridNativePlatformSpec_cxx {
   #if DEBUG
@@ -51,7 +51,6 @@ public class HybridNativePlatformSpec_base: HybridObjectSpec {
       return cxxWrapper
     }
   }
-  public var memorySize: Int { return 0 }
 }
 
 /**
