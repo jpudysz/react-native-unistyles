@@ -5,9 +5,11 @@ import android.os.Build
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import androidx.annotation.Keep
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsCompat
+import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.bridge.ReactApplicationContext
 import com.margelo.nitro.unistyles.Insets
 import com.margelo.nitro.unistyles.UnistyleDependency
@@ -15,6 +17,8 @@ import com.margelo.nitro.unistyles.UnistylesNativeMiniRuntime
 
 typealias CxxImeListener = (miniRuntime: UnistylesNativeMiniRuntime) -> Unit
 
+@Keep
+@DoNotStrip
 class NativePlatformInsets(
     private val reactContext: ReactApplicationContext,
     private val getMiniRuntime: () -> UnistylesNativeMiniRuntime,

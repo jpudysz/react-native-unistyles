@@ -6,11 +6,13 @@ import android.os.Build
 import android.util.DisplayMetrics
 import android.view.View
 import android.view.WindowManager
+import androidx.annotation.Keep
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactApplicationContext
 import com.margelo.nitro.unistyles.ColorScheme
@@ -22,6 +24,8 @@ import com.margelo.nitro.unistyles.UnistyleDependency
 import com.margelo.nitro.unistyles.UnistylesNativeMiniRuntime
 import java.util.Locale
 
+@Keep
+@DoNotStrip
 class NativePlatformAndroid(private val reactContext: ReactApplicationContext): HybridNativePlatformSpec(), LifecycleEventListener {
     private val _insets = NativePlatformInsets(reactContext, this::getMiniRuntime) { this.diffMiniRuntime() }
     private var _miniRuntime: UnistylesNativeMiniRuntime = buildMiniRuntime()

@@ -37,87 +37,87 @@ abstract class HybridNativePlatformSpec: HybridObject() {
   }
 
   // Properties
-  
+
 
   // Methods
   @DoNotStrip
   @Keep
   abstract fun getInsets(): Insets
-  
+
   @DoNotStrip
   @Keep
   abstract fun getColorScheme(): ColorScheme
-  
+
   @DoNotStrip
   @Keep
   abstract fun getFontScale(): Double
-  
+
   @DoNotStrip
   @Keep
   abstract fun getPixelRatio(): Double
-  
+
   @DoNotStrip
   @Keep
   abstract fun getOrientation(): Orientation
-  
+
   @DoNotStrip
   @Keep
   abstract fun getContentSizeCategory(): String
-  
+
   @DoNotStrip
   @Keep
   abstract fun getScreenDimensions(): Dimensions
-  
+
   @DoNotStrip
   @Keep
   abstract fun getStatusBarDimensions(): Dimensions
-  
+
   @DoNotStrip
   @Keep
   abstract fun getNavigationBarDimensions(): Dimensions
-  
+
   @DoNotStrip
   @Keep
   abstract fun getPrefersRtlDirection(): Boolean
-  
+
   @DoNotStrip
   @Keep
   abstract fun setRootViewBackgroundColor(color: Double): Unit
-  
+
   @DoNotStrip
   @Keep
   abstract fun setNavigationBarHidden(isHidden: Boolean): Unit
-  
+
   @DoNotStrip
   @Keep
   abstract fun setStatusBarHidden(isHidden: Boolean): Unit
-  
+
   @DoNotStrip
   @Keep
   abstract fun setImmersiveMode(isEnabled: Boolean): Unit
-  
+
   @DoNotStrip
   @Keep
   abstract fun getMiniRuntime(): UnistylesNativeMiniRuntime
-  
+
   abstract fun registerPlatformListener(callback: (dependencies: Array<UnistyleDependency>, miniRuntime: UnistylesNativeMiniRuntime) -> Unit): Unit
-  
+
   @DoNotStrip
   @Keep
-  private fun registerPlatformListener_cxx(callback: Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime): Unit {
+  fun registerPlatformListener_cxx(callback: Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime): Unit {
     val __result = registerPlatformListener(callback)
     return __result
   }
-  
+
   abstract fun registerImeListener(callback: (miniRuntime: UnistylesNativeMiniRuntime) -> Unit): Unit
-  
+
   @DoNotStrip
   @Keep
-  private fun registerImeListener_cxx(callback: Func_void_UnistylesNativeMiniRuntime): Unit {
+  fun registerImeListener_cxx(callback: Func_void_UnistylesNativeMiniRuntime): Unit {
     val __result = registerImeListener(callback)
     return __result
   }
-  
+
   @DoNotStrip
   @Keep
   abstract fun unregisterPlatformListeners(): Unit
