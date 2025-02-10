@@ -35,7 +35,7 @@ inline static Unistyle::Shared unistyleFromStaticStyleSheet(jsi::Runtime& rt, js
 
 inline static std::vector<std::string> getUnistylesHashKeys(jsi::Runtime& rt, jsi::Object& object) {
     std::vector<std::string> matchingKeys{};
-    const std::string prefix = "unistyles-";
+    const std::string prefix = "unistyles_";
 
     auto propertyNames = object.getPropertyNames(rt);
     size_t length = propertyNames.length(rt);
@@ -82,13 +82,13 @@ inline static std::vector<Unistyle::Shared> unistylesFromNonExistentNativeState(
 
 You likely altered unistyle hash key and we're not able to recover C++ state attached to this node.)");
     }
-    
+
     // someone merged unistyles, and will be warned in JS
     // the best we can do is to return first unistyle
     if (unistyles.size() > 1) {
         return {unistyles.at(0)};
     }
-    
+
     return unistyles;
 }
 
@@ -137,7 +137,7 @@ inline static jsi::Value objectFromUnistyle(jsi::Runtime& rt, std::shared_ptr<Hy
     auto parsedArguments = arguments.has_value()
         ? helpers::parseDynamicFunctionArguments(rt, arguments.value())
         : std::optional<std::vector<folly::dynamic>>{};
-    
+
     if (arguments.has_value()) {
         // this is required for HybridShadowRegistry::link
         helpers::defineHiddenProperty(rt, secrets, helpers::ARGUMENTS.c_str(), arguments.value());
@@ -148,7 +148,7 @@ inline static jsi::Value objectFromUnistyle(jsi::Runtime& rt, std::shared_ptr<Hy
 
     // this is required for withUnistyles
     helpers::defineHiddenProperty(rt, secrets, helpers::STYLE_DEPENDENCIES.c_str(), helpers::dependenciesToJSIArray(rt, unistyle->dependencies));
-    
+
     // this is required for withUnistyles
     auto hostFn = jsi::Function::createFromHostFunction(
         rt,
@@ -160,7 +160,7 @@ inline static jsi::Value objectFromUnistyle(jsi::Runtime& rt, std::shared_ptr<Hy
 
         return jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
     });
-    
+
     helpers::defineHiddenProperty(rt, secrets, helpers::GET_STYLES.c_str(), std::move(hostFn));
 
     obj.setProperty(rt, unistyleID, secrets);
