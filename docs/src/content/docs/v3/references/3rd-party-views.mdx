@@ -17,11 +17,13 @@ import Seo from '../../../../components/Seo.astro'
 This is our decision algorithm that ensures best practices for your app.
 :::
 
-1. If you're using `react-native`, `react-native-reanimated`, or `react-native-gesture-handler` components, avoid doing anything. It will work out of the box.
+1. If you're using `react-native`, `react-native-reanimated`, or `react-native-gesture-handler` components with `style` prop, avoid doing anything. It will work out of the box.
+
+2. For `react-native` components with `contentContainerStyle` prop, you can use the [withUnistyles](/v3/references/with-unistyles) factory. It will auto map this property for you.
 
 2. If you're using third-party components and you're confident they internally use `react-native` components, check the [Babel plugin configuration](/v3/other/babel-plugin#extra-configuration) to see if they can be processed to work out of the box.
 
-3. If that fails, try migrating to the [withUnistyles](/v3/references/with-unistyles) factory. It follows best practices and ensures that only a single component is re-rendered when dependencies change.
+3. If that fails, try migrating to the [withUnistyles](/v3/references/with-unistyles) factory. It follows best practices and ensures that only a single component is re-rendered when dependencies change. It's also recommended to map `react-native` properties like `color` or `trackColor`.
 
 4. If that also fails, follow best practices and use the [useUnistyles](/v3/references/use-unistyles) hook.
 
