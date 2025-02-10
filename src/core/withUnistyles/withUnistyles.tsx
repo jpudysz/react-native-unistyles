@@ -37,7 +37,7 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
                 style: styleClassNames,
             } : {},
             ...narrowedProps.contentContainerStyle ? {
-                style: contentContainerStyleClassNames,
+                contentContainerStyle: contentContainerStyleClassNames,
             } : {},
         } as any
 
