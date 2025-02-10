@@ -153,7 +153,7 @@ function getStylesDependenciesFromObject(t, path) {
             ...acc,
             [key]: [label]
         }
-    }, [])
+    }, {})
 }
 
 function getStylesDependenciesFromFunction(t, path) {
@@ -415,7 +415,7 @@ function getStylesDependenciesFromFunction(t, path) {
                 ...acc,
                 [key]: [label]
             }
-        }, [])
+        }, {})
 }
 
 function toUnistylesDependency(dependency) {

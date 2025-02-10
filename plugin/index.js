@@ -159,7 +159,7 @@ module.exports = function ({ types: t }) {
                     if (detectedDependencies) {
                         if (t.isObjectExpression(arg)) {
                             arg.properties.forEach(property => {
-                                if (detectedDependencies[property.key.name]) {
+                                if (detectedDependencies.hasOwnProperty(property.key.name)) {
                                     addDependencies(t, state, property.key.name, property, detectedDependencies[property.key.name])
                                 }
                             })
@@ -179,7 +179,7 @@ module.exports = function ({ types: t }) {
                         // Ensure the function body returns an object
                         if (t.isObjectExpression(body)) {
                             body.properties.forEach(property => {
-                                if (detectedDependencies[property.key.name]) {
+                                if (detectedDependencies.hasOwnProperty(property.key.name)) {
                                     addDependencies(t, state, property.key.name, property, detectedDependencies[property.key.name])
                                 }
                             })
