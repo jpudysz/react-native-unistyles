@@ -19,7 +19,7 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
     const getSecrets = (styleProps: Record<string, any> = {}): { uni__getStyles(): any, uni__dependencies: Array<UnistyleDependency> } => {
         const unistyleKey = Object
             .keys(styleProps)
-            .find(key => key.startsWith('unistyles-'))
+            .find(key => key.startsWith('unistyles_'))
 
         return unistyleKey
             ? styleProps[unistyleKey]
