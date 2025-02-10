@@ -65,5 +65,5 @@ const cyrb53 = (data: string, seed = 0) => {
 export const generateHash = (value: any) => {
     const serialized = serialize(value)
 
-    return `unistyles-${cyrb53(serialized).toString(36)}`
+    return `unistyles_${cyrb53(serialized).toString(36)}`
 }
