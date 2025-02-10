@@ -1,10 +1,11 @@
-import React, { forwardRef, useEffect, type ComponentType } from 'react'
-import type { UnistyleDependency } from '../../specs'
+import React, { forwardRef, useEffect, type ComponentType, useRef } from 'react'
+import { type UnistyleDependency, UnistylesShadowRegistry } from '../../specs'
 import type { PartialBy } from '../../types/common'
 import { deepMergeObjects } from '../../utils'
 import { useProxifiedUnistyles } from '../useProxifiedUnistyles'
 import { maybeWarnAboutMultipleUnistyles } from '../warn'
 import type { Mappings, SupportedStyleProps } from './types'
+import type { UnistylesTheme } from '../../types'
 
 // @ts-expect-error
 type GenericComponentProps<P> = ComponentProps<P>
@@ -38,7 +39,8 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         // @ts-ignore we don't know the type of the component
         maybeWarnAboutMultipleUnistyles(narrowedProps.contentContainerStyle, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
 
-        const { proxifiedRuntime, proxifiedTheme, addDependencies } = useProxifiedUnistyles()
+        const scopedTheme = useRef(UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme)
+        const { proxifiedRuntime, proxifiedTheme, addDependencies } = useProxifiedUnistyles(scopedTheme.current)
 
         useEffect(() => {
             const styleSecrets = getSecrets(narrowedProps.style)
