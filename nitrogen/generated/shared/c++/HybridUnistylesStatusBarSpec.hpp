@@ -40,7 +40,7 @@ namespace margelo::nitro::unistyles {
       explicit HybridUnistylesStatusBarSpec(): HybridObject(TAG) { }
 
       // Destructor
-      virtual ~HybridUnistylesStatusBarSpec() { }
+      ~HybridUnistylesStatusBarSpec() override = default;
 
     public:
       // Properties

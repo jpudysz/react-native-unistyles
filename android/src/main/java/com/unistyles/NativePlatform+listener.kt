@@ -6,12 +6,16 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.Keep
+import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.bridge.ReactApplicationContext
 import com.margelo.nitro.unistyles.UnistyleDependency
 import com.margelo.nitro.unistyles.UnistylesNativeMiniRuntime
 
 typealias CxxDependencyListener = (dependencies: Array<UnistyleDependency>, miniRuntime: UnistylesNativeMiniRuntime) -> Unit
 
+@Keep
+@DoNotStrip
 class NativePlatformListener(
     private val reactContext: ReactApplicationContext,
     private val getMiniRuntime: () -> UnistylesNativeMiniRuntime,

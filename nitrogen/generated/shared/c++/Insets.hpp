@@ -47,7 +47,7 @@ namespace margelo::nitro {
 
   // C++ Insets <> JS Insets (object)
   template <>
-  struct JSIConverter<Insets> {
+  struct JSIConverter<Insets> final {
     static inline Insets fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
       jsi::Object obj = arg.asObject(runtime);
       return Insets(
