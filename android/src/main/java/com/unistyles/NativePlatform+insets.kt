@@ -27,6 +27,17 @@ class NativePlatformInsets(
     private val _imeListeners: MutableList<CxxImeListener> = mutableListOf()
     private var _insets: Insets = Insets(0.0, 0.0, 0.0, 0.0, 0.0)
 
+    init {
+        // get initial insets
+        reactContext.currentActivity?.let { activity ->
+            val insets = ViewCompat.getRootWindowInsets(activity.window.decorView)
+
+            insets?.let { windowInsets ->
+                setInsets(windowInsets, activity.window, null, true)
+            }
+        }
+    }
+
     fun onDestroy() {
         this.removeImeListeners()
     }
@@ -43,7 +54,7 @@ class NativePlatformInsets(
         )
     }
 
-    fun setInsets(insetsCompat: WindowInsetsCompat, window: Window, animatedBottomInsets: Double?) {
+    fun setInsets(insetsCompat: WindowInsetsCompat, window: Window, animatedBottomInsets: Double?, skipUpdate: Boolean = false) {
         // below Android 11, we need to use window flags to detect status bar visibility
         val isStatusBarVisible = when(Build.VERSION.SDK_INT) {
             in 30..Int.MAX_VALUE -> {
@@ -89,6 +100,10 @@ class NativePlatformInsets(
             insets.right.toDouble(),
             imeInsets
         )
+
+        if (skipUpdate) {
+            return
+        }
 
         diffMiniRuntime()
 
