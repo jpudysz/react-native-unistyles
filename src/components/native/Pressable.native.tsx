@@ -11,7 +11,7 @@ type PressableProps = Props & {
 const getStyles = (styleProps: Record<string, any> = {}) => {
     const unistyleKey = Object
         .keys(styleProps)
-        .find(key => key.startsWith('unistyles-'))
+        .find(key => key.startsWith('unistyles_'))
 
     if (!unistyleKey) {
         return styleProps
