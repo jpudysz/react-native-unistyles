@@ -17,7 +17,7 @@ std::string HashGenerator::generateHash(const std::string& input) {
     std::stringstream ss;
     ss << std::hex << std::setfill('0') << std::setw(8) << (combinedHash & 0xFFFFFFFF);
 
-    return "unistyles-" + ss.str();
+    return "unistyles_" + ss.str();
 }
 
 }
