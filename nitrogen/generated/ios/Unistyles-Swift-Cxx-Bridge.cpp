@@ -41,7 +41,7 @@ namespace margelo::nitro::unistyles::bridge::swift {
       throw std::runtime_error("Class \"HybridNativePlatformSpec\" is not implemented in Swift!");
     }
   #endif
-    Unistyles::HybridNativePlatformSpec_cxx swiftPart = swiftWrapper->getSwiftPart();
+    Unistyles::HybridNativePlatformSpec_cxx& swiftPart = swiftWrapper->getSwiftPart();
     return swiftPart.toUnsafe();
   }
 

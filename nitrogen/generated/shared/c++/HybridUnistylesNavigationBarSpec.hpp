@@ -40,7 +40,7 @@ namespace margelo::nitro::unistyles {
       explicit HybridUnistylesNavigationBarSpec(): HybridObject(TAG) { }
 
       // Destructor
-      virtual ~HybridUnistylesNavigationBarSpec() { }
+      ~HybridUnistylesNavigationBarSpec() override = default;
 
     public:
       // Properties

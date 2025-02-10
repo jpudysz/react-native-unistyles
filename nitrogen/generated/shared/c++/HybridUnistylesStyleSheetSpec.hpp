@@ -43,7 +43,7 @@ namespace margelo::nitro::unistyles {
       explicit HybridUnistylesStyleSheetSpec(): HybridObject(TAG) { }
 
       // Destructor
-      virtual ~HybridUnistylesStyleSheetSpec() { }
+      ~HybridUnistylesStyleSheetSpec() override = default;
 
     public:
       // Properties

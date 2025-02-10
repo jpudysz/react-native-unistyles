@@ -44,7 +44,7 @@ namespace margelo::nitro {
 
   // C++ Dimensions <> JS Dimensions (object)
   template <>
-  struct JSIConverter<Dimensions> {
+  struct JSIConverter<Dimensions> final {
     static inline Dimensions fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
       jsi::Object obj = arg.asObject(runtime);
       return Dimensions(

@@ -40,7 +40,7 @@ namespace margelo::nitro::unistyles {
       explicit HybridUnistylesShadowRegistrySpec(): HybridObject(TAG) { }
 
       // Destructor
-      virtual ~HybridUnistylesShadowRegistrySpec() { }
+      ~HybridUnistylesShadowRegistrySpec() override = default;
 
     public:
       // Properties
