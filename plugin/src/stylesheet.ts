@@ -153,10 +153,10 @@ export function isKindOfStyleSheet(path: NodePath<CallExpression>, state: Unisty
 }
 
 export function addStyleSheetTag(path: NodePath<CallExpression>, state: UnistylesPluginPass) {
-    const callee = path.get('callee')
-    const uniqueId = stringToUniqueId(state.filename.replace(state.cwd, '')) + ++state.file.tagNumber
+    const str = state.filename?.replace(state.cwd, '') ?? ''
+    const uniqueId = stringToUniqueId(str) + ++state.file.tagNumber
 
-    callee.container.arguments.push(numericLiteral(uniqueId))
+    path.node.arguments.push(numericLiteral(uniqueId))
 }
 
 export function getStylesDependenciesFromObject(path: NodePath<CallExpression>) {

@@ -120,6 +120,7 @@ interface UnistylesState {
 export interface UnistylesPluginPass {
     file: BabelFile & UnistylesState,
     opts: UnistylesPluginOptions,
+    cwd: string,
     filename: string | undefined,
     reactNativeImports: Record<string, string>
 }
