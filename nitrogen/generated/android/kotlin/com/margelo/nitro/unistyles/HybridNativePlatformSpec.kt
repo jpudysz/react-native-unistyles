@@ -7,7 +7,6 @@
 
 package com.margelo.nitro.unistyles
 
-import android.util.Log
 import androidx.annotation.Keep
 import com.facebook.jni.HybridData
 import com.facebook.proguard.annotations.DoNotStrip
@@ -29,100 +28,96 @@ abstract class HybridNativePlatformSpec: HybridObject() {
   private var mHybridData: HybridData = initHybrid()
 
   init {
-    // Pass this `HybridData` through to it's base class,
-    // to represent inheritance to JHybridObject on C++ side
     super.updateNative(mHybridData)
   }
 
-  /**
-   * Call from a child class to initialize HybridData with a child.
-   */
   override fun updateNative(hybridData: HybridData) {
     mHybridData = hybridData
+    super.updateNative(hybridData)
   }
 
   // Properties
-  
+
 
   // Methods
   @DoNotStrip
   @Keep
   abstract fun getInsets(): Insets
-  
+
   @DoNotStrip
   @Keep
   abstract fun getColorScheme(): ColorScheme
-  
+
   @DoNotStrip
   @Keep
   abstract fun getFontScale(): Double
-  
+
   @DoNotStrip
   @Keep
   abstract fun getPixelRatio(): Double
-  
+
   @DoNotStrip
   @Keep
   abstract fun getOrientation(): Orientation
-  
+
   @DoNotStrip
   @Keep
   abstract fun getContentSizeCategory(): String
-  
+
   @DoNotStrip
   @Keep
   abstract fun getScreenDimensions(): Dimensions
-  
+
   @DoNotStrip
   @Keep
   abstract fun getStatusBarDimensions(): Dimensions
-  
+
   @DoNotStrip
   @Keep
   abstract fun getNavigationBarDimensions(): Dimensions
-  
+
   @DoNotStrip
   @Keep
   abstract fun getPrefersRtlDirection(): Boolean
-  
+
   @DoNotStrip
   @Keep
   abstract fun setRootViewBackgroundColor(color: Double): Unit
-  
+
   @DoNotStrip
   @Keep
   abstract fun setNavigationBarHidden(isHidden: Boolean): Unit
-  
+
   @DoNotStrip
   @Keep
   abstract fun setStatusBarHidden(isHidden: Boolean): Unit
-  
+
   @DoNotStrip
   @Keep
   abstract fun setImmersiveMode(isEnabled: Boolean): Unit
-  
+
   @DoNotStrip
   @Keep
   abstract fun getMiniRuntime(): UnistylesNativeMiniRuntime
-  
+
   abstract fun registerPlatformListener(callback: (dependencies: Array<UnistyleDependency>, miniRuntime: UnistylesNativeMiniRuntime) -> Unit): Unit
-  
+
   @DoNotStrip
   @Keep
-  private fun registerPlatformListener_cxx(callback: Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime): Unit {
+  fun registerPlatformListener_cxx(callback: Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime): Unit {
     val __result = registerPlatformListener(callback)
     return __result
   }
-  
+
   abstract fun registerImeListener(callback: (miniRuntime: UnistylesNativeMiniRuntime) -> Unit): Unit
-  
+
   @DoNotStrip
   @Keep
-  private fun registerImeListener_cxx(callback: Func_void_UnistylesNativeMiniRuntime): Unit {
+  fun registerImeListener_cxx(callback: Func_void_UnistylesNativeMiniRuntime): Unit {
     val __result = registerImeListener(callback)
     return __result
   }
-  
+
   @DoNotStrip
   @Keep
   abstract fun unregisterPlatformListeners(): Unit
@@ -131,16 +126,5 @@ abstract class HybridNativePlatformSpec: HybridObject() {
 
   companion object {
     private const val TAG = "HybridNativePlatformSpec"
-    init {
-      try {
-        Log.i(TAG, "Loading unistyles C++ library...")
-        System.loadLibrary("unistyles")
-        Log.i(TAG, "Successfully loaded unistyles C++ library!")
-      } catch (e: Error) {
-        Log.e(TAG, "Failed to load unistyles C++ library! Is it properly installed and linked? " +
-                    "Is the name correct? (see `CMakeLists.txt`, at `add_library(...)`)", e)
-        throw e
-      }
-    }
   }
 }

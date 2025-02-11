@@ -5,9 +5,11 @@ import android.os.Build
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import androidx.annotation.Keep
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsCompat
+import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.bridge.ReactApplicationContext
 import com.margelo.nitro.unistyles.Insets
 import com.margelo.nitro.unistyles.UnistyleDependency
@@ -15,6 +17,8 @@ import com.margelo.nitro.unistyles.UnistylesNativeMiniRuntime
 
 typealias CxxImeListener = (miniRuntime: UnistylesNativeMiniRuntime) -> Unit
 
+@Keep
+@DoNotStrip
 class NativePlatformInsets(
     private val reactContext: ReactApplicationContext,
     private val getMiniRuntime: () -> UnistylesNativeMiniRuntime,
@@ -22,6 +26,17 @@ class NativePlatformInsets(
 ) {
     private val _imeListeners: MutableList<CxxImeListener> = mutableListOf()
     private var _insets: Insets = Insets(0.0, 0.0, 0.0, 0.0, 0.0)
+
+    init {
+        // get initial insets
+        reactContext.currentActivity?.let { activity ->
+            val insets = ViewCompat.getRootWindowInsets(activity.window.decorView)
+
+            insets?.let { windowInsets ->
+                setInsets(windowInsets, activity.window, null, true)
+            }
+        }
+    }
 
     fun onDestroy() {
         this.removeImeListeners()
@@ -39,7 +54,7 @@ class NativePlatformInsets(
         )
     }
 
-    fun setInsets(insetsCompat: WindowInsetsCompat, window: Window, animatedBottomInsets: Double?) {
+    fun setInsets(insetsCompat: WindowInsetsCompat, window: Window, animatedBottomInsets: Double?, skipUpdate: Boolean = false) {
         // below Android 11, we need to use window flags to detect status bar visibility
         val isStatusBarVisible = when(Build.VERSION.SDK_INT) {
             in 30..Int.MAX_VALUE -> {
@@ -85,6 +100,10 @@ class NativePlatformInsets(
             insets.right.toDouble(),
             imeInsets
         )
+
+        if (skipUpdate) {
+            return
+        }
 
         diffMiniRuntime()
 

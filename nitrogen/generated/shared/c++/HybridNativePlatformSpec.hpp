@@ -59,7 +59,7 @@ namespace margelo::nitro::unistyles {
       explicit HybridNativePlatformSpec(): HybridObject(TAG) { }
 
       // Destructor
-      virtual ~HybridNativePlatformSpec() { }
+      ~HybridNativePlatformSpec() override = default;
 
     public:
       // Properties

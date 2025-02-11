@@ -11,7 +11,7 @@ type PressableProps = Props & {
 const getStyles = (styleProps: Record<string, any> = {}) => {
     const unistyleKey = Object
         .keys(styleProps)
-        .find(key => key.startsWith('unistyles-'))
+        .find(key => key.startsWith('unistyles_'))
 
     if (!unistyleKey) {
         return styleProps
@@ -52,7 +52,7 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                     ? style.call(style, state)
                     : getStyles(style as unknown as Record<string, any>)
 
-                if (!storedRef.current || !isPropStyleAFunction) {
+                if (!storedRef.current) {
                     return unistyles
                 }
 
