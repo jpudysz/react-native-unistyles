@@ -41,28 +41,38 @@ jsi::Value HostUnistyle::get(jsi::Runtime& rt, const jsi::PropNameID& propNameId
     // check if Unistyles recomputed new style in the background
     // (when no node was mounted), if so we need to simply rebuild unistyle to get fresh data
     if (unistyle->isDirty) {
+        this->_cache.erase(propertyName);
+
         auto parser = parser::Parser(this->_unistylesRuntime);
 
         parser.rebuildUnistyle(rt, unistyle, this->_variants, std::nullopt);
     }
-    
+
     if (unistyle->type == UnistyleType::DynamicFunction) {
         // for dynamic functions we will also bind "this"
         auto styleFn = valueFromUnistyle(rt, this->_unistylesRuntime, unistyle, this->_variants);
-        
+
         // construct newThis
         jsi::Object newThis = jsi::Object(rt);
         newThis.setProperty(rt, helpers::STYLESHEET_VARIANTS.c_str(), helpers::variantsToValue(rt, this->_variants));
-        
+
         auto functionPrototype = rt.global()
             .getPropertyAsObject(rt, "Function")
             .getPropertyAsObject(rt, "prototype")
             .getPropertyAsFunction(rt, "bind");
-        
+
         return functionPrototype.callWithThis(rt, styleFn.asObject(rt), newThis);
     }
 
-    return valueFromUnistyle(rt, this->_unistylesRuntime, unistyle, this->_variants);
+    if (this->_cache.contains(propertyName)) {
+        return jsi::Value(rt, this->_cache[propertyName]);
+    }
+
+    auto style = valueFromUnistyle(rt, this->_unistylesRuntime, unistyle, this->_variants);
+
+    this->_cache.emplace(propertyName, jsi::Value(rt, style));
+
+    return style;
 }
 
 void HostUnistyle::set(jsi::Runtime& rt, const jsi::PropNameID& propNameId, const jsi::Value& value) {}

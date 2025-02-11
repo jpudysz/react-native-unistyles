@@ -22,6 +22,7 @@ private:
     Variants _variants;
     std::shared_ptr<StyleSheet> _stylesheet;
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
+    std::unordered_map<std::string, jsi::Value> _cache;
 };
 
 }
