@@ -71,7 +71,8 @@ function getProperty(property) {
     return undefined
 }
 
-function toUnistylesDependency(dependency) {
+function toUnistylesDependency(dependency: string) {
+    // breakpoints are too complex and are handled by C++
     switch (dependency) {
         case 'theme': {
             return UnistyleDependency.Theme
@@ -119,8 +120,8 @@ function toUnistylesDependency(dependency) {
         case 'variants': {
             return UnistyleDependency.Variants
         }
-
-        // breakpoints are too complex and are handled by C++
+        default:
+            return null
     }
 }
 
