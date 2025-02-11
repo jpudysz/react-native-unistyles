@@ -142,12 +142,13 @@ export function isKindOfStyleSheet(path: NodePath<CallExpression>, state: Unisty
         return false
     }
 
-    const callee = path.get('callee')
+    const { callee } = path.node
 
     return (
-        isMemberExpression(callee.node) &&
-        callee.node.property.name === 'create' &&
-        isIdentifier(callee.node.object)
+        isMemberExpression(callee) &&
+        isIdentifier(callee.property) &&
+        callee.property.name === 'create' &&
+        isIdentifier(callee.object)
     )
 }
 
