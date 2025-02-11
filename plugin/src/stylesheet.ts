@@ -124,14 +124,17 @@ export function stringToUniqueId(str: string) {
 }
 
 export function isUnistylesStyleSheet(path: NodePath<CallExpression>, state: UnistylesPluginPass) {
-    const callee = path.get('callee')
+    const { callee } = path.node
 
-    return (
-        isMemberExpression(callee.node) &&
-        callee.node.property.name === 'create' &&
-        isIdentifier(callee.node.object) &&
-        callee.node.object.name === state.file.styleSheetLocalName
-    )
+    if (isMemberExpression(callee) && isIdentifier(callee.property)) {
+        return (
+            callee.property.name === 'create' &&
+            isIdentifier(callee.object) &&
+            callee.object.name === state.file.styleSheetLocalName
+        )
+    }
+
+    return false
 }
 
 export function isKindOfStyleSheet(path: NodePath<CallExpression>, state: UnistylesPluginPass) {
