@@ -1,12 +1,35 @@
-type RemapImport = {
+import type { BabelFile } from "@babel/core"
+
+export type RemapImport = {
+    /**
+     * The target import name if `isDefault` is false.
+     */
     name?: string,
+    /**
+     * Whether the import is default.
+     */
     isDefault: boolean,
+    /**
+     * The path to the target import.
+     */
     path: string,
+    /**
+     * The name of the Unistyles component.
+     */
     mapTo: string
 }
 
-type RemapConfig = {
+/**
+ * A more powerful API that allows converting unmatched imports to Unistyles.
+ */
+export type RemapConfig = {
+    /**
+     * The node_modules path.
+     */
     path: string,
+    /**
+     * An array of import objects with the following properties:
+     */
     imports: Array<RemapImport>
 }
 
@@ -84,6 +107,19 @@ export interface UnistylesPluginOptions {
     isLocal?: boolean
 }
 
+interface UnistylesState {
+    hasAnyUnistyle: boolean,
+    hasVariants: boolean,
+    hasUnistylesImport: boolean,
+    forceProcessing: boolean,
+    styleSheetLocalName: string,
+    tagNumber: number,
+    replaceWithUnistyles: boolean
+}
+
 export interface UnistylesPluginPass {
-    opts: UnistylesPluginOptions
+    file: BabelFile & UnistylesState,
+    opts: UnistylesPluginOptions,
+    filename: string | undefined,
+    reactNativeImports: Record<string, string>
 }

@@ -1,6 +1,8 @@
-import { identifier, importDeclaration, importSpecifier, isImportDeclaration, stringLiteral } from "@babel/types"
+import type { NodePath } from "@babel/core"
+import { identifier, importDeclaration, importSpecifier, isImportDeclaration, stringLiteral, type Program } from "@babel/types"
+import type { UnistylesPluginPass } from "./types"
 
-export function addUnistylesImport(path, state) {
+export function addUnistylesImport(path: NodePath<Program>, state: UnistylesPluginPass) {
     const localNames = Object.keys(state.reactNativeImports)
     const names = Object.values(state.reactNativeImports)
     const pairs = Object.entries(state.reactNativeImports)
@@ -44,6 +46,6 @@ export function addUnistylesImport(path, state) {
     nodesToRemove.forEach(node => path.node.body.splice(path.node.body.indexOf(node), 1))
 }
 
-export function isInsideNodeModules(state) {
+export function isInsideNodeModules(state: UnistylesPluginPass) {
     return state.file.opts.filename.includes('node_modules')
 }

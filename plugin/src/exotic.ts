@@ -1,6 +1,8 @@
-import { identifier, importDeclaration, importDefaultSpecifier, importSpecifier, isImportDefaultSpecifier, isImportSpecifier, stringLiteral } from '@babel/types'
+import type { NodePath } from '@babel/core'
+import { identifier, importDeclaration, importDefaultSpecifier, importSpecifier, isImportDefaultSpecifier, isImportSpecifier, stringLiteral, type ImportDeclaration } from '@babel/types'
+import type { RemapConfig, UnistylesPluginPass } from './types'
 
-export function handleExoticImport(path, state, exoticImport) {
+export function handleExoticImport(path: NodePath<ImportDeclaration>, state: UnistylesPluginPass, exoticImport: Pick<RemapConfig, 'imports'>) {
     const specifiers = path.node.specifiers
     const source = path.node.source
 

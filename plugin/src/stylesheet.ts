@@ -1,4 +1,6 @@
-import { arrayExpression, identifier, isArrowFunctionExpression, isBlockStatement, isFunctionExpression, isIdentifier, isIfStatement, isMemberExpression, isObjectExpression, isObjectPattern, isObjectProperty, isReturnStatement, numericLiteral, objectExpression, objectProperty, spreadElement } from "@babel/types"
+import type { NodePath } from "@babel/core"
+import { arrayExpression, identifier, isArrowFunctionExpression, isBlockStatement, isFunctionExpression, isIdentifier, isIfStatement, isMemberExpression, isObjectExpression, isObjectPattern, isObjectProperty, isReturnStatement, numericLiteral, objectExpression, objectProperty, spreadElement, type CallExpression } from "@babel/types"
+import type { UnistylesPluginPass } from "./types"
 
 const UnistyleDependency = {
     Theme: 0,
@@ -18,52 +20,7 @@ const UnistyleDependency = {
     Ime: 14
 }
 
-export function stringToUniqueId(str) {
-    let hash = 0
-
-    for (let i = 0; i < str.length; i++) {
-        hash = (hash << 5) - hash + str.charCodeAt(i)
-        hash |= 0
-    }
-
-    const absHash = Math.abs(hash)
-
-    return absHash % 1000000000
-}
-
-export function isUnistylesStyleSheet(path, state) {
-    const callee = path.get('callee')
-
-    return (
-        isMemberExpression(callee.node) &&
-        callee.node.property.name === 'create' &&
-        isIdentifier(callee.node.object) &&
-        callee.node.object.name === state.file.styleSheetLocalName
-    )
-}
-
-export function isKindOfStyleSheet(path, state) {
-    if (!state.file.forceProcessing && !state.file.hasUnistylesImport) {
-        return false
-    }
-
-    const callee = path.get('callee')
-
-    return (
-        isMemberExpression(callee.node) &&
-        callee.node.property.name === 'create' &&
-        isIdentifier(callee.node.object)
-    )
-}
-
-export function addStyleSheetTag(path, state) {
-    const callee = path.get('callee')
-    const uniqueId = stringToUniqueId(state.filename.replace(state.cwd, '')) + ++state.file.tagNumber
-
-    callee.container.arguments.push(numericLiteral(uniqueId))
-}
-
-const getProperty = (property) => {
+function getProperty(property) {
     if (!property) {
         return undefined
     }
@@ -100,7 +57,105 @@ const getProperty = (property) => {
     return undefined
 }
 
-export function getStylesDependenciesFromObject(path) {
+function toUnistylesDependency(dependency) {
+    switch (dependency) {
+        case 'theme': {
+            return UnistyleDependency.Theme
+        }
+        case 'themeName': {
+            return UnistyleDependency.ThemeName
+        }
+        case 'adaptiveThemes': {
+            return UnistyleDependency.AdaptiveThemes
+        }
+        case 'breakpoint': {
+            return UnistyleDependency.Breakpoints
+        }
+        case 'colorScheme': {
+            return UnistyleDependency.ColorScheme
+        }
+        case 'screen': {
+            return UnistyleDependency.Dimensions
+        }
+        case 'isPortrait':
+        case 'isLandscape': {
+            return UnistyleDependency.Orientation
+        }
+        case 'contentSizeCategory': {
+            return UnistyleDependency.ContentSizeCategory
+        }
+        case 'ime': {
+            return UnistyleDependency.Ime
+        }
+        case 'insets': {
+            return UnistyleDependency.Insets
+        }
+        case 'pixelRatio': {
+            return UnistyleDependency.PixelRatio
+        }
+        case 'fontScale': {
+            return UnistyleDependency.FontScale
+        }
+        case 'statusBar': {
+            return UnistyleDependency.StatusBar
+        }
+        case 'navigationBar': {
+            return UnistyleDependency.NavigationBar
+        }
+        case 'variants': {
+            return UnistyleDependency.Variants
+        }
+
+        // breakpoints are too complex and are handled by C++
+    }
+}
+
+export function stringToUniqueId(str: string) {
+    let hash = 0
+
+    for (let i = 0; i < str.length; i++) {
+        hash = (hash << 5) - hash + str.charCodeAt(i)
+        hash |= 0
+    }
+
+    const absHash = Math.abs(hash)
+
+    return absHash % 1000000000
+}
+
+export function isUnistylesStyleSheet(path: NodePath<CallExpression>, state: UnistylesPluginPass) {
+    const callee = path.get('callee')
+
+    return (
+        isMemberExpression(callee.node) &&
+        callee.node.property.name === 'create' &&
+        isIdentifier(callee.node.object) &&
+        callee.node.object.name === state.file.styleSheetLocalName
+    )
+}
+
+export function isKindOfStyleSheet(path: NodePath<CallExpression>, state: UnistylesPluginPass) {
+    if (!state.file.forceProcessing && !state.file.hasUnistylesImport) {
+        return false
+    }
+
+    const callee = path.get('callee')
+
+    return (
+        isMemberExpression(callee.node) &&
+        callee.node.property.name === 'create' &&
+        isIdentifier(callee.node.object)
+    )
+}
+
+export function addStyleSheetTag(path: NodePath<CallExpression>, state: UnistylesPluginPass) {
+    const callee = path.get('callee')
+    const uniqueId = stringToUniqueId(state.filename.replace(state.cwd, '')) + ++state.file.tagNumber
+
+    callee.container.arguments.push(numericLiteral(uniqueId))
+}
+
+export function getStylesDependenciesFromObject(path: NodePath<CallExpression>) {
     const detectedStylesWithVariants = new Set()
     const stylesheet = path.node.arguments[0]
 
@@ -158,7 +213,7 @@ export function getStylesDependenciesFromObject(path) {
     }, [])
 }
 
-export function getStylesDependenciesFromFunction(path) {
+export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>) {
     const funcPath = path.get('arguments.0')
 
     if (!funcPath) {
@@ -418,59 +473,6 @@ export function getStylesDependenciesFromFunction(path) {
                 [key]: [label]
             }
         }, [])
-}
-
-export function toUnistylesDependency(dependency) {
-    switch (dependency) {
-        case 'theme': {
-            return UnistyleDependency.Theme
-        }
-        case 'themeName': {
-            return UnistyleDependency.ThemeName
-        }
-        case 'adaptiveThemes': {
-            return UnistyleDependency.AdaptiveThemes
-        }
-        case 'breakpoint': {
-            return UnistyleDependency.Breakpoints
-        }
-        case 'colorScheme': {
-            return UnistyleDependency.ColorScheme
-        }
-        case 'screen': {
-            return UnistyleDependency.Dimensions
-        }
-        case 'isPortrait':
-        case 'isLandscape': {
-            return UnistyleDependency.Orientation
-        }
-        case 'contentSizeCategory': {
-            return UnistyleDependency.ContentSizeCategory
-        }
-        case 'ime': {
-            return UnistyleDependency.Ime
-        }
-        case 'insets': {
-            return UnistyleDependency.Insets
-        }
-        case 'pixelRatio': {
-            return UnistyleDependency.PixelRatio
-        }
-        case 'fontScale': {
-            return UnistyleDependency.FontScale
-        }
-        case 'statusBar': {
-            return UnistyleDependency.StatusBar
-        }
-        case 'navigationBar': {
-            return UnistyleDependency.NavigationBar
-        }
-        case 'variants': {
-            return UnistyleDependency.Variants
-        }
-
-        // breakpoints are too complex and are handled by C++
-    }
 }
 
 export function getReturnStatementsFromBody(node, results = []) {

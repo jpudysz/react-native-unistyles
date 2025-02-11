@@ -1,6 +1,8 @@
-import { blockStatement, callExpression, identifier, isCallExpression, isExpressionStatement, isIdentifier, isMemberExpression, memberExpression, variableDeclaration, variableDeclarator } from "@babel/types"
+import { blockStatement, callExpression, identifier, isCallExpression, isExpressionStatement, isIdentifier, isMemberExpression, memberExpression, variableDeclaration, variableDeclarator, type BlockStatement } from "@babel/types"
+import type { UnistylesPluginPass } from "./types"
+import type { NodePath } from "@babel/core"
 
-export function extractVariants(path, state) {
+export function extractVariants(path: NodePath<BlockStatement>, state: UnistylesPluginPass) {
     const maybeVariants = path.node.body.filter(node => (
         isExpressionStatement(node) &&
         isCallExpression(node.expression) &&
