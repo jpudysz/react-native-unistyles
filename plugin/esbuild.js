@@ -1,6 +1,5 @@
 const esbuild = require('esbuild');
 
-// TODO: add yarn tsc &&
 esbuild.build({
   entryPoints: ['./plugin/src/index.ts'],
   outfile: './plugin/index.js',

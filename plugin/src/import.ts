@@ -1,6 +1,6 @@
-import type { NodePath } from "@babel/core"
-import { identifier, importDeclaration, importSpecifier, isImportDeclaration, stringLiteral, type ImportDeclaration, type Program } from "@babel/types"
-import type { UnistylesPluginPass } from "./types"
+import type { NodePath } from '@babel/core'
+import { type ImportDeclaration, type Program, identifier, importDeclaration, importSpecifier, isImportDeclaration, stringLiteral } from '@babel/types'
+import type { UnistylesPluginPass } from './types'
 
 export function addUnistylesImport(path: NodePath<Program>, state: UnistylesPluginPass) {
     const localNames = Object.keys(state.reactNativeImports)
