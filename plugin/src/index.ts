@@ -1,12 +1,12 @@
+import type { PluginItem } from '@babel/core'
+import { isArrowFunctionExpression, isBlockStatement, isFunctionExpression, isIdentifier, isImportSpecifier, isObjectExpression, isObjectProperty, isReturnStatement } from '@babel/types'
+import { NATIVE_COMPONENTS_PATHS, REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_EXOTIC_PATHS, REPLACE_WITH_UNISTYLES_PATHS } from './consts'
+import { handleExoticImport } from './exotic'
 import { addUnistylesImport, isInsideNodeModules } from './import'
 import { hasStringRef } from './ref'
-import { isUnistylesStyleSheet, addStyleSheetTag, isKindOfStyleSheet, getStylesDependenciesFromFunction, addDependencies, getStylesDependenciesFromObject } from './stylesheet'
-import { extractVariants } from './variants'
-import { REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_PATHS, REPLACE_WITH_UNISTYLES_EXOTIC_PATHS, NATIVE_COMPONENTS_PATHS } from './consts'
-import { handleExoticImport } from './exotic'
-import { isArrowFunctionExpression, isBlockStatement, isFunctionExpression, isIdentifier, isImportSpecifier, isObjectExpression, isObjectProperty, isReturnStatement } from '@babel/types'
-import type { PluginItem } from '@babel/core'
+import { addDependencies, addStyleSheetTag, getStylesDependenciesFromFunction, getStylesDependenciesFromObject, isKindOfStyleSheet, isUnistylesStyleSheet } from './stylesheet'
 import type { UnistylesPluginPass } from './types'
+import { extractVariants } from './variants'
 
 export default function (): PluginItem {
     return {

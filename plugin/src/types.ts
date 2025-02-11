@@ -1,4 +1,4 @@
-import type { BabelFile } from "@babel/core"
+import type { BabelFile } from '@babel/core'
 
 export type RemapImport = {
     /**
@@ -35,7 +35,7 @@ export type RemapConfig = {
 
 export interface UnistylesPluginOptions {
     /**
-     * Example: "src" or "apps/mobile"
+     * Example: 'src' or 'apps/mobile'
      * Add this option if some of your components don't have `react-native-unistyles` import.
      * Babel plugin will automatically process all files under this root.
      */
@@ -49,28 +49,28 @@ export interface UnistylesPluginOptions {
 
     /**
      * Example: [{
-     *     path: "node_modules/custom-library/components",
+     *     path: 'node_modules/custom-library/components',
      *     imports: [
      *         {
-     *             name: "NativeText",
+     *             name: 'NativeText',
      *             isDefault: false,
-     *             path: "react-native/Libraries/Text/TextNativeComponent",
-     *             mapTo: "NativeText"
+     *             path: 'react-native/Libraries/Text/TextNativeComponent',
+     *             mapTo: 'NativeText'
      *         },
      *         {
      *             isDefault: true,
-     *             path: "react-native/Libraries/Components/View/ViewNativeComponent",
-     *             mapTo: "NativeView"
+     *             path: 'react-native/Libraries/Components/View/ViewNativeComponent',
+     *             mapTo: 'NativeView'
      *         }
      *     ]
      * }]
      *
      * Will map:
-     *      import { NativeText } from "react-native/Libraries/Text/TextNativeComponent"
-     *      to Unistyles "NativeText"
+     *      import { NativeText } from 'react-native/Libraries/Text/TextNativeComponent'
+     *      to Unistyles 'NativeText'
      *
-     *      import View from "react-native/Libraries/Components/View/ViewNativeComponent"
-     *      to Unistyles "NativeView"
+     *      import View from 'react-native/Libraries/Components/View/ViewNativeComponent'
+     *      to Unistyles 'NativeView'
      *
      * This is the most powerful way of remapping imports. If 3rd party library uses imports different from `react-native` we can remap them to `react-native-unistyles` factories.
      * Internally we do that for raw RCTView and RCTText components.

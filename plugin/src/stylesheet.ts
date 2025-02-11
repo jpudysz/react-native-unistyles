@@ -1,6 +1,6 @@
-import type { NodePath } from "@babel/core"
-import { arrayExpression, identifier, isArrowFunctionExpression, isBlockStatement, isFunctionExpression, isIdentifier, isIfStatement, isMemberExpression, isObjectExpression, isObjectPattern, isObjectProperty, isReturnStatement, numericLiteral, objectExpression, objectProperty, spreadElement, type BlockStatement, type CallExpression, type Identifier, type ObjectExpression, type ObjectPattern, type ObjectProperty, type RestElement, type ReturnStatement, type Statement } from "@babel/types"
-import type { UnistylesPluginPass } from "./types"
+import type { NodePath } from '@babel/core'
+import { type BlockStatement, type CallExpression, type Identifier, type ObjectExpression, type ObjectPattern, type ObjectProperty, type RestElement, type ReturnStatement, type Statement, arrayExpression, identifier, isArrowFunctionExpression, isBlockStatement, isFunctionExpression, isIdentifier, isIfStatement, isMemberExpression, isObjectExpression, isObjectPattern, isObjectProperty, isReturnStatement, numericLiteral, objectExpression, objectProperty, spreadElement } from '@babel/types'
+import type { UnistylesPluginPass } from './types'
 
 type Styles = {
     [key: string]: string[]
@@ -271,7 +271,7 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
     const params = funcPath.node.params
     const [themeParam, rtParam] = params
 
-    let themeNames: Props[] = []
+    const themeNames: Props[] = []
 
     // destructured theme object
     if (isObjectPattern(themeParam)) {
@@ -292,7 +292,7 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
         })
     }
 
-    let rtNames: Props[] = []
+    const rtNames: Props[] = []
 
     // destructured rt object
     if (isObjectPattern(rtParam)) {
@@ -467,7 +467,7 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
                     return
                 }
 
-                if (!Boolean(toUnistylesDependency(parent))) {
+                if (!toUnistylesDependency(parent)) {
                     return
                 }
 
