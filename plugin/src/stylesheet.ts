@@ -1,5 +1,5 @@
 import type { NodePath } from "@babel/core"
-import { arrayExpression, identifier, isArrowFunctionExpression, isBlockStatement, isFunctionExpression, isIdentifier, isIfStatement, isMemberExpression, isObjectExpression, isObjectPattern, isObjectProperty, isReturnStatement, numericLiteral, objectExpression, objectProperty, spreadElement, type ArrowFunctionExpression, type CallExpression, type FunctionExpression, type ObjectExpression } from "@babel/types"
+import { arrayExpression, identifier, isArrowFunctionExpression, isBlockStatement, isFunctionExpression, isIdentifier, isIfStatement, isMemberExpression, isObjectExpression, isObjectPattern, isObjectProperty, isReturnStatement, numericLiteral, objectExpression, objectProperty, spreadElement, type ArrowFunctionExpression, type BlockStatement, type CallExpression, type FunctionExpression, type ObjectExpression, type ObjectProperty, type ReturnStatement, type Statement } from "@babel/types"
 import type { UnistylesPluginPass } from "./types"
 
 type Variants = {
@@ -124,7 +124,7 @@ function toUnistylesDependency(dependency) {
     }
 }
 
-function getReturnStatementsFromBody(node, results = []) {
+function getReturnStatementsFromBody(node: BlockStatement | Statement, results: ReturnStatement[] = []) {
     if (isReturnStatement(node)) {
         results.push(node)
     }
@@ -552,14 +552,14 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
         }, {})
 }
 
-export function addDependencies(state, styleName, unistyle, detectedDependencies) {
-    const debugMessage = deps => {
+export function addDependencies(state: UnistylesPluginPass, styleName: string, unistyle: ObjectProperty, detectedDependencies: string[]) {
+    const debugMessage = (deps: (number | undefined)[]) => {
         if (state.opts.debug) {
             const mappedDeps = deps
-                .map(dep => Object.keys(UnistyleDependency).find(key => UnistyleDependency[key] === dep))
+                .map(dep => Object.keys(UnistyleDependency).find(key => UnistyleDependency[key as keyof typeof UnistyleDependency] === dep))
                 .join(', ')
 
-            console.log(`${state.filename.replace(`${state.file.opts.root}/`, '')}: styles.${styleName}: [${mappedDeps}]`)
+            console.log(`${state.filename?.replace(`${state.file.opts.root}/`, '')}: styles.${styleName}: [${mappedDeps}]`)
         }
     }
 
@@ -571,7 +571,7 @@ export function addDependencies(state, styleName, unistyle, detectedDependencies
 
         debugMessage(uniqueDependencies)
 
-        let targets = []
+        let targets: ObjectExpression[] = []
 
         if (isArrowFunctionExpression(unistyle.value) || isFunctionExpression(unistyle.value)) {
             if (isObjectExpression(unistyle.value.body)) {
@@ -589,6 +589,7 @@ export function addDependencies(state, styleName, unistyle, detectedDependencies
 
                         return node.argument
                     })
+                    .filter((node): node is ObjectExpression => isObjectExpression(node))
             }
         }
 
@@ -608,7 +609,7 @@ export function addDependencies(state, styleName, unistyle, detectedDependencies
                 target.properties.push(
                     objectProperty(
                         identifier('uni__dependencies'),
-                        arrayExpression(uniqueDependencies.map(dep => numericLiteral(dep)))
+                        arrayExpression(uniqueDependencies.filter((dep): dep is number => dep !== undefined).map(dep => numericLiteral(dep)))
                     )
                 )
             })
