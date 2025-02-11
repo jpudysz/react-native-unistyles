@@ -34,7 +34,7 @@ export function addUnistylesImport(path: NodePath<Program>, state: UnistylesPlug
         const newImport = importDeclaration(
             [importSpecifier(identifier(localName), identifier(name))],
             stringLiteral(state.opts.isLocal
-                ? state.file.opts.filename?.split('react-native-unistyles').at(0)?.concat(`react-native-unistyles/components/native/${name}`) ?? ''
+                ? state.file.opts.filename?.split('react-native-unistyles').at(0)?.concat(`react-native-unistyles/src/components/native/${name}`) ?? ''
                 : `react-native-unistyles/components/native/${name}`
             )
         )
