@@ -124,7 +124,27 @@ function toUnistylesDependency(dependency) {
     }
 }
 
-export function stringToUniqueId(str: string) {
+function getReturnStatementsFromBody(node, results = []) {
+    if (isReturnStatement(node)) {
+        results.push(node)
+    }
+
+    if (isBlockStatement(node)) {
+        node.body.forEach(child => getReturnStatementsFromBody(child, results))
+    }
+
+    if (isIfStatement(node)) {
+        getReturnStatementsFromBody(node.consequent, results)
+
+        if (node.alternate) {
+            getReturnStatementsFromBody(node.alternate, results)
+        }
+    }
+
+    return results
+}
+
+function stringToUniqueId(str: string) {
     let hash = 0
 
     for (let i = 0; i < str.length; i++) {
@@ -530,26 +550,6 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
 
             return acc;
         }, {})
-}
-
-export function getReturnStatementsFromBody(node, results = []) {
-    if (isReturnStatement(node)) {
-        results.push(node)
-    }
-
-    if (isBlockStatement(node)) {
-        node.body.forEach(child => getReturnStatementsFromBody(child, results))
-    }
-
-    if (isIfStatement(node)) {
-        getReturnStatementsFromBody(node.consequent, results)
-
-        if (node.alternate) {
-            getReturnStatementsFromBody(node.alternate, results)
-        }
-    }
-
-    return results
 }
 
 export function addDependencies(state, styleName, unistyle, detectedDependencies) {
