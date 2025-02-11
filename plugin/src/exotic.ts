@@ -27,7 +27,7 @@ export function handleExoticImport(path: NodePath<ImportDeclaration>, state: Uni
                         ? state.file.opts.filename?.split('react-native-unistyles').at(0)?.concat(`react-native-unistyles/components/native/${rule.mapTo}`) ?? ''
                         : `react-native-unistyles/components/native/${rule.mapTo}`
                     )
-                ) as any // TODO: Fix this
+                )
 
                 path.replaceWith(newImport)
             } else {
@@ -37,7 +37,7 @@ export function handleExoticImport(path: NodePath<ImportDeclaration>, state: Uni
                         ? state.file.opts.filename?.split('react-native-unistyles').at(0)?.concat(`react-native-unistyles/components/native/${rule.mapTo}`) ?? ''
                         : `react-native-unistyles/components/native/${rule.mapTo}`
                     )
-                ) as any // TODO: Fix this
+                )
 
                 path.node.specifiers = specifiers.filter(s => s !== specifier)
 
