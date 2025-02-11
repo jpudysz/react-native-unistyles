@@ -1,17 +1,12 @@
 import type { NodePath } from "@babel/core"
-import { arrayExpression, identifier, isArrowFunctionExpression, isBlockStatement, isFunctionExpression, isIdentifier, isIfStatement, isMemberExpression, isObjectExpression, isObjectPattern, isObjectProperty, isReturnStatement, numericLiteral, objectExpression, objectProperty, spreadElement, type ArrowFunctionExpression, type BlockStatement, type CallExpression, type FunctionExpression, type ObjectExpression, type ObjectProperty, type ReturnStatement, type Statement } from "@babel/types"
+import { arrayExpression, identifier, isArrowFunctionExpression, isBlockStatement, isFunctionExpression, isIdentifier, isIfStatement, isMemberExpression, isObjectExpression, isObjectPattern, isObjectProperty, isReturnStatement, numericLiteral, objectExpression, objectProperty, spreadElement, type BlockStatement, type CallExpression, type Identifier, type ObjectExpression, type ObjectPattern, type ObjectProperty, type RestElement, type ReturnStatement, type Statement } from "@babel/types"
 import type { UnistylesPluginPass } from "./types"
 
-type Variants = {
+type Styles = {
     [key: string]: string[]
 }
 
-type ThemeName = {
-    properties: string[]
-    parent?: string
-}
-
-type RtName = {
+type Props = {
     properties: string[]
     parent?: string
 }
@@ -34,37 +29,43 @@ const UnistyleDependency = {
     Ime: 14
 }
 
-function getProperty(property) {
+function getProperty(property: ObjectProperty | RestElement): Props | undefined {
     if (!property) {
         return undefined
     }
 
     if (isIdentifier(property)) {
+        const prop = (property as Identifier)
+
         return {
-            properties: [property.name]
+            properties: [prop.name]
         }
     }
 
     if (isObjectPattern(property)) {
-        const matchingProperties = property.properties.flatMap(p => getProperty(p))
+        const prop = property as ObjectPattern
+        const matchingProperties = prop.properties.flatMap(p => getProperty(p))
 
         return {
-            properties: matchingProperties.flatMap(properties => properties.properties)
+            properties: matchingProperties.flatMap(properties => properties?.properties).filter((prop): prop is string => prop !== undefined)
         }
     }
 
     if (isObjectProperty(property) && isIdentifier(property.value)) {
+        const prop = property.key as Identifier
+
         return {
-            properties: [property.key.name]
+            properties: [prop.name]
         }
     }
 
     if (isObjectProperty(property) && isObjectPattern(property.value)) {
         const matchingProperties = property.value.properties.flatMap(p => getProperty(p))
+        const prop = property.key as Identifier
 
         return {
-            parent: property.key.name,
-            properties: matchingProperties.flatMap(properties => properties.properties)
+            parent: prop.name,
+            properties: matchingProperties.flatMap(properties => properties?.properties).filter((prop): prop is string => prop !== undefined)
         }
     }
 
@@ -236,7 +237,7 @@ export function getStylesDependenciesFromObject(path: NodePath<CallExpression>) 
 
     const variants = Array.from(detectedStylesWithVariants)
 
-    return variants.reduce<Variants>((acc, { key, label }) => {
+    return variants.reduce<Styles>((acc, { key, label }) => {
         if (acc[key]) {
             acc[key] = [
                 ...acc[key],
@@ -270,13 +271,17 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
     const params = funcPath.node.params
     const [themeParam, rtParam] = params
 
-    let themeNames: ThemeName[] = []
+    let themeNames: Props[] = []
 
     // destructured theme object
     if (isObjectPattern(themeParam)) {
         // If destructured, collect all property names
         for (const prop of themeParam.properties) {
-            themeNames.push(getProperty(prop))
+            const property = getProperty(prop)
+
+            if (property) {
+                themeNames.push(property)
+            }
         }
     }
 
@@ -287,13 +292,17 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
         })
     }
 
-    let rtNames: RtName[] = []
+    let rtNames: Props[] = []
 
     // destructured rt object
     if (isObjectPattern(rtParam)) {
         // If destructured, collect all property names
         for (const prop of rtParam.properties) {
-            rtNames.push(getProperty(prop))
+            const property = getProperty(prop)
+
+            if (property) {
+                rtNames.push(property)
+            }
         }
     }
 
@@ -537,7 +546,7 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
     return theme
         .concat(rt)
         .concat(variants)
-        .reduce<Variants>((acc, { key, label }) => {
+        .reduce<Styles>((acc, { key, label }) => {
             if (acc[key]) {
                 acc[key] = [
                     ...acc[key],
@@ -554,7 +563,7 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
 }
 
 export function addDependencies(state: UnistylesPluginPass, styleName: string, unistyle: ObjectProperty, detectedDependencies: string[]) {
-    const debugMessage = (deps: (number | undefined)[]) => {
+    const debugMessage = (deps: (number | null)[]) => {
         if (state.opts.debug) {
             const mappedDeps = deps
                 .map(dep => Object.keys(UnistyleDependency).find(key => UnistyleDependency[key as keyof typeof UnistyleDependency] === dep))
