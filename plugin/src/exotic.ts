@@ -1,4 +1,4 @@
-import type { NodePath } from '@babel/core';
+import type { NodePath } from '@babel/core'
 import { type ImportDeclaration, identifier, importDeclaration, importDefaultSpecifier, importSpecifier, isImportDefaultSpecifier, isImportSpecifier, stringLiteral } from '@babel/types'
 import type { RemapConfig, UnistylesPluginPass } from './types'
 
