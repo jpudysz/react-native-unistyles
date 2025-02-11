@@ -196,7 +196,7 @@ export function addStyleSheetTag(path: NodePath<CallExpression>, state: Unistyle
 }
 
 export function getStylesDependenciesFromObject(path: NodePath<CallExpression>) {
-    const detectedStylesWithVariants = new Set<{ label: 'variants'; key: string }>()
+    const detectedStylesWithVariants = new Set<{ label: string, key: string }>()
     const stylesheet = path.node.arguments[0]
 
     if (isObjectExpression(stylesheet)) {
@@ -339,8 +339,8 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
         return
     }
 
-    const detectedStylesWithVariants = new Set<{ label: string; key: string }>()
-    const properties = returnedObjectPath.get('properties') as NodePath[];
+    const detectedStylesWithVariants = new Set<{ label: string, key: string }>()
+    const properties = returnedObjectPath.get('properties') as NodePath[]
 
     // detect variants via Scope
     properties.forEach(propPath => {
@@ -397,7 +397,7 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
         }
     })
 
-    const detectedStylesWithTheme = new Set<{ label: string; key: string }>()
+    const detectedStylesWithTheme = new Set<{ label: string, key: string }>()
 
     // detect theme dependencies via Scope
     themeNames.forEach(({ properties }) => {
@@ -427,7 +427,7 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
                     ? (keyNode.isStringLiteral() || keyNode.isNumericLiteral() || keyNode.isBooleanLiteral())
                         ? String(keyNode.node.value)
                         : null
-                    : null;
+                    : null
 
                 const styleKey = keyNode.isIdentifier()
                     ? keyNode.node.name
@@ -443,7 +443,7 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
         })
     })
 
-    const detectedStylesWithRt = new Set<{ label: string; key: string }>()
+    const detectedStylesWithRt = new Set<{ label: string, key: string }>()
     const localRtName = isIdentifier(rtParam)
         ? rtParam.name
         : undefined
@@ -523,7 +523,7 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
                     ? (keyNode.isStringLiteral() || keyNode.isNumericLiteral() || keyNode.isBooleanLiteral())
                         ? String(keyNode.node.value)
                         : null
-                    : null;
+                    : null
 
                 const styleKey = keyNode.isIdentifier()
                     ? keyNode.node.name
@@ -553,12 +553,12 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
                     label,
                 ]
 
-                return acc;
+                return acc
             }
 
             acc[key] = [label]
 
-            return acc;
+            return acc
         }, {})
 }
 

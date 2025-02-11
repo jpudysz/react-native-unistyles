@@ -31,17 +31,17 @@ export function extractVariants(path: NodePath<BlockStatement>, state: Unistyles
         return
     }
 
-    const node = targetVariant.expression;
+    const node = targetVariant.expression
     if (!isCallExpression(node)) {
-        return;
+        return
     }
 
-    const callee = node.callee;
+    const callee = node.callee
     if (!isMemberExpression(callee) || !isIdentifier(callee.object)) {
-        return;
+        return
     }
 
-    const calleeName = callee.object.name;
+    const calleeName = callee.object.name
     const newUniqueName = path.scope.generateUidIdentifier(calleeName)
 
     // Create shadow declaration eg. const _styles = styles

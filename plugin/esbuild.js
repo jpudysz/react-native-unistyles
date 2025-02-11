@@ -1,4 +1,4 @@
-const esbuild = require('esbuild');
+const esbuild = require('esbuild')
 
 esbuild.build({
   entryPoints: ['./plugin/src/index.ts'],
@@ -11,4 +11,4 @@ esbuild.build({
   platform: 'node',
   sourcemap: 'linked',
   minify: true,
-});
+})
