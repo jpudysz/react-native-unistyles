@@ -1,4 +1,6 @@
-export function handleExoticImport(t, path, state, exoticImport) {
+import { identifier, importDeclaration, importDefaultSpecifier, importSpecifier, isImportDefaultSpecifier, isImportSpecifier, stringLiteral } from '@babel/types'
+
+export function handleExoticImport(path, state, exoticImport) {
     const specifiers = path.node.specifiers
     const source = path.node.source
 
@@ -8,7 +10,7 @@ export function handleExoticImport(t, path, state, exoticImport) {
 
     specifiers.forEach(specifier => {
         for (const rule of exoticImport.imports) {
-            const hasMatchingImportType = (!rule.isDefault && t.isImportSpecifier(specifier)) || (rule.isDefault && t.isImportDefaultSpecifier(specifier))
+            const hasMatchingImportType = (!rule.isDefault && isImportSpecifier(specifier)) || (rule.isDefault && isImportDefaultSpecifier(specifier))
             const hasMatchingImportName = rule.isDefault || (!rule.isDefault && rule.name === specifier.local.name)
             const hasMatchingPath = rule.path === source.value
 
@@ -16,10 +18,10 @@ export function handleExoticImport(t, path, state, exoticImport) {
                 continue
             }
 
-            if (t.isImportDefaultSpecifier(specifier)) {
-                const newImport = t.importDeclaration(
-                    [t.importDefaultSpecifier(t.identifier(specifier.local.name))],
-                    t.stringLiteral(state.opts.isLocal
+            if (isImportDefaultSpecifier(specifier)) {
+                const newImport = importDeclaration(
+                    [importDefaultSpecifier(identifier(specifier.local.name))],
+                    stringLiteral(state.opts.isLocal
                         ? state.file.opts.filename.split('react-native-unistyles').at(0).concat(`react-native-unistyles/components/native/${rule.mapTo}`)
                         : `react-native-unistyles/components/native/${rule.mapTo}`
                     )
@@ -27,9 +29,9 @@ export function handleExoticImport(t, path, state, exoticImport) {
 
                 path.replaceWith(newImport)
             } else {
-                const newImport = t.importDeclaration(
-                    [t.importSpecifier(t.identifier(rule.mapTo), t.identifier(rule.mapTo))],
-                    t.stringLiteral(state.opts.isLocal
+                const newImport = importDeclaration(
+                    [importSpecifier(identifier(rule.mapTo), identifier(rule.mapTo))],
+                    stringLiteral(state.opts.isLocal
                         ? state.file.opts.filename.split('react-native-unistyles').at(0).concat(`react-native-unistyles/components/native/${rule.mapTo}`)
                         : `react-native-unistyles/components/native/${rule.mapTo}`
                     )

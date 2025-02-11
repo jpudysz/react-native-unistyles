@@ -84,9 +84,11 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
+    "@babel/core": "7.26.8",
     "@babel/plugin-syntax-jsx": "7.25.9",
     "@babel/preset-flow": "7.25.9",
     "@babel/preset-typescript": "7.26.0",
+    "@babel/types": "7.26.8",
     "@biomejs/biome": "1.9.4",
     "@commitlint/config-conventional": "19.6.0",
     "@react-native/normalize-colors": "0.77.0",

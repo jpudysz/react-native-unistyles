@@ -1,7 +1,9 @@
-export function hasStringRef(t, path) {
+import { isJSXAttribute, isJSXIdentifier, isStringLiteral } from "@babel/types";
+
+export function hasStringRef(path) {
     return path.node.openingElement.attributes.find(attr =>
-        t.isJSXAttribute(attr) &&
-        t.isJSXIdentifier(attr.name, { name: 'ref' }) &&
-        t.isStringLiteral(attr.value)
+        isJSXAttribute(attr) &&
+        isJSXIdentifier(attr.name, { name: 'ref' }) &&
+        isStringLiteral(attr.value)
     )
 }

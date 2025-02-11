@@ -4,8 +4,9 @@ import { isUnistylesStyleSheet, addStyleSheetTag, isKindOfStyleSheet, getStylesD
 import { extractVariants } from './variants'
 import { REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_PATHS, REPLACE_WITH_UNISTYLES_EXOTIC_PATHS, NATIVE_COMPONENTS_PATHS } from './consts'
 import { handleExoticImport } from './exotic'
+import { isArrowFunctionExpression, isBlockStatement, isFunctionExpression, isObjectExpression, isReturnStatement } from '@babel/types'
 
-export default function ({ types: t }) {
+export default function () {
     return {
         name: 'babel-react-native-unistyles',
         visitor: {
@@ -31,7 +32,7 @@ export default function ({ types: t }) {
                     }
 
                     if (state.file.hasAnyUnistyle || state.file.hasVariants || state.file.replaceWithUnistyles || state.file.forceProcessing) {
-                        addUnistylesImport(t, path, state)
+                        addUnistylesImport(path, state)
                     }
                 }
             },
@@ -67,7 +68,7 @@ export default function ({ types: t }) {
                 }
 
                 path.node.declarations.forEach((declaration) => {
-                    if (t.isArrowFunctionExpression(declaration.init) || t.isFunctionExpression(declaration.init)) {
+                    if (isArrowFunctionExpression(declaration.init) || isFunctionExpression(declaration.init)) {
                         const componentName = declaration.id
                             ? declaration.id.name
                             : null
@@ -84,7 +85,7 @@ export default function ({ types: t }) {
                     .find(exotic => state.filename.includes(exotic.path))
 
                 if (exoticImport) {
-                    return handleExoticImport(t, path, state, exoticImport)
+                    return handleExoticImport(path, state, exoticImport)
                 }
 
                 if (isInsideNodeModules(state) && !state.file.replaceWithUnistyles) {
@@ -112,7 +113,7 @@ export default function ({ types: t }) {
                 }
 
                 if (importSource.includes('react-native/Libraries')) {
-                    handleExoticImport(t, path, state, NATIVE_COMPONENTS_PATHS)
+                    handleExoticImport(path, state, NATIVE_COMPONENTS_PATHS)
                 }
 
                 if (!state.file.forceProcessing && Array.isArray(state.opts.autoProcessImports)) {
@@ -124,7 +125,7 @@ export default function ({ types: t }) {
                     return
                 }
 
-                if (hasStringRef(t, path)) {
+                if (hasStringRef(path)) {
                     throw new Error("Detected string based ref which is not supported by Unistyles.")
                 }
             },
@@ -133,32 +134,32 @@ export default function ({ types: t }) {
                     return
                 }
 
-                extractVariants(t, path, state)
+                extractVariants(path, state)
             },
             CallExpression(path, state) {
                 if (isInsideNodeModules(state)) {
                     return
                 }
 
-                if (!isUnistylesStyleSheet(t, path, state) && !isKindOfStyleSheet(t, path, state)) {
+                if (!isUnistylesStyleSheet(path, state) && !isKindOfStyleSheet(path, state)) {
                     return
                 }
 
                 state.file.hasAnyUnistyle = true
 
-                addStyleSheetTag(t, path, state)
+                addStyleSheetTag(path, state)
 
                 const arg = path.node.arguments[0]
 
                 // Object passed to StyleSheet.create (may contain variants)
-                if (t.isObjectExpression(arg)) {
-                    const detectedDependencies = getStylesDependenciesFromObject(t, path)
+                if (isObjectExpression(arg)) {
+                    const detectedDependencies = getStylesDependenciesFromObject(path)
 
                     if (detectedDependencies) {
-                        if (t.isObjectExpression(arg)) {
+                        if (isObjectExpression(arg)) {
                             arg.properties.forEach(property => {
                                 if (detectedDependencies[property.key.name]) {
-                                    addDependencies(t, state, property.key.name, property, detectedDependencies[property.key.name])
+                                    addDependencies(state, property.key.name, property, detectedDependencies[property.key.name])
                                 }
                             })
                         }
@@ -166,19 +167,19 @@ export default function ({ types: t }) {
                 }
 
                 // Function passed to StyleSheet.create (e.g., theme => ({ container: {} }))
-                if (t.isArrowFunctionExpression(arg) || t.isFunctionExpression(arg)) {
-                    const detectedDependencies = getStylesDependenciesFromFunction(t, path)
+                if (isArrowFunctionExpression(arg) || isFunctionExpression(arg)) {
+                    const detectedDependencies = getStylesDependenciesFromFunction(path)
 
                     if (detectedDependencies) {
-                        const body = t.isBlockStatement(arg.body)
-                            ? arg.body.body.find(statement => t.isReturnStatement(statement)).argument
+                        const body = isBlockStatement(arg.body)
+                            ? arg.body.body.find(statement => isReturnStatement(statement)).argument
                             : arg.body
 
                         // Ensure the function body returns an object
-                        if (t.isObjectExpression(body)) {
+                        if (isObjectExpression(body)) {
                             body.properties.forEach(property => {
                                 if (detectedDependencies[property.key.name]) {
-                                    addDependencies(t, state, property.key.name, property, detectedDependencies[property.key.name])
+                                    addDependencies(state, property.key.name, property, detectedDependencies[property.key.name])
                                 }
                             })
                         }

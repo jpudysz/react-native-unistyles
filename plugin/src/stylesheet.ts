@@ -1,3 +1,5 @@
+import { arrayExpression, identifier, isArrowFunctionExpression, isBlockStatement, isFunctionExpression, isIdentifier, isIfStatement, isMemberExpression, isObjectExpression, isObjectPattern, isObjectProperty, isReturnStatement, numericLiteral, objectExpression, objectProperty, spreadElement } from "@babel/types"
+
 const UnistyleDependency = {
     Theme: 0,
     ThemeName: 1,
@@ -29,18 +31,18 @@ export function stringToUniqueId(str) {
     return absHash % 1000000000
 }
 
-export function isUnistylesStyleSheet(t, path, state) {
+export function isUnistylesStyleSheet(path, state) {
     const callee = path.get('callee')
 
     return (
-        t.isMemberExpression(callee.node) &&
+        isMemberExpression(callee.node) &&
         callee.node.property.name === 'create' &&
-        t.isIdentifier(callee.node.object) &&
+        isIdentifier(callee.node.object) &&
         callee.node.object.name === state.file.styleSheetLocalName
     )
 }
 
-export function isKindOfStyleSheet(t, path, state) {
+export function isKindOfStyleSheet(path, state) {
     if (!state.file.forceProcessing && !state.file.hasUnistylesImport) {
         return false
     }
@@ -48,46 +50,46 @@ export function isKindOfStyleSheet(t, path, state) {
     const callee = path.get('callee')
 
     return (
-        t.isMemberExpression(callee.node) &&
+        isMemberExpression(callee.node) &&
         callee.node.property.name === 'create' &&
-        t.isIdentifier(callee.node.object)
+        isIdentifier(callee.node.object)
     )
 }
 
-export function addStyleSheetTag(t, path, state) {
+export function addStyleSheetTag(path, state) {
     const callee = path.get('callee')
     const uniqueId = stringToUniqueId(state.filename.replace(state.cwd, '')) + ++state.file.tagNumber
 
-    callee.container.arguments.push(t.numericLiteral(uniqueId))
+    callee.container.arguments.push(numericLiteral(uniqueId))
 }
 
-const getProperty = (t, property) => {
+const getProperty = (property) => {
     if (!property) {
         return undefined
     }
 
-    if (t.isIdentifier(property)) {
+    if (isIdentifier(property)) {
         return {
             properties: [property.name]
         }
     }
 
-    if (t.isObjectPattern(property)) {
-        const matchingProperties = property.properties.flatMap(p => getProperty(t, p))
+    if (isObjectPattern(property)) {
+        const matchingProperties = property.properties.flatMap(p => getProperty(p))
 
         return {
             properties: matchingProperties.flatMap(properties => properties.properties)
         }
     }
 
-    if (t.isObjectProperty(property) && t.isIdentifier(property.value)) {
+    if (isObjectProperty(property) && isIdentifier(property.value)) {
         return {
             properties: [property.key.name]
         }
     }
 
-    if (t.isObjectProperty(property) && t.isObjectPattern(property.value)) {
-        const matchingProperties = property.value.properties.flatMap(p => getProperty(t, p))
+    if (isObjectProperty(property) && isObjectPattern(property.value)) {
+        const matchingProperties = property.value.properties.flatMap(p => getProperty(p))
 
         return {
             parent: property.key.name,
@@ -98,19 +100,19 @@ const getProperty = (t, property) => {
     return undefined
 }
 
-export function getStylesDependenciesFromObject(t, path) {
+export function getStylesDependenciesFromObject(path) {
     const detectedStylesWithVariants = new Set()
     const stylesheet = path.node.arguments[0]
 
     stylesheet.properties.forEach(property => {
-        if (!t.isIdentifier(property.key)) {
+        if (!isIdentifier(property.key)) {
             return
         }
 
-        if (t.isObjectProperty(property)) {
-            if (t.isObjectExpression(property.value)) {
+        if (isObjectProperty(property)) {
+            if (isObjectExpression(property.value)) {
                 property.value.properties.forEach(innerProp => {
-                    if (t.isIdentifier(innerProp.key) && innerProp.key.name === 'variants') {
+                    if (isIdentifier(innerProp.key) && innerProp.key.name === 'variants') {
                         detectedStylesWithVariants.add({
                             label: 'variants',
                             key: property.key.name
@@ -121,10 +123,10 @@ export function getStylesDependenciesFromObject(t, path) {
             }
         }
 
-        if (t.isArrowFunctionExpression(property.value)) {
-            if (t.isObjectExpression(property.value.body)) {
+        if (isArrowFunctionExpression(property.value)) {
+            if (isObjectExpression(property.value.body)) {
                 property.value.body.properties.forEach(innerProp => {
-                    if (t.isIdentifier(innerProp.key) && innerProp.key.name === 'variants') {
+                    if (isIdentifier(innerProp.key) && innerProp.key.name === 'variants') {
                         detectedStylesWithVariants.add({
                             label: 'variants',
                             key: property.key.name
@@ -156,7 +158,7 @@ export function getStylesDependenciesFromObject(t, path) {
     }, [])
 }
 
-export function getStylesDependenciesFromFunction(t, path) {
+export function getStylesDependenciesFromFunction(path) {
     const funcPath = path.get('arguments.0')
 
     if (!funcPath) {
@@ -172,7 +174,7 @@ export function getStylesDependenciesFromFunction(t, path) {
     if (themeParam && themeParam.type === 'ObjectPattern') {
         // If destructured, collect all property names
         for (const prop of themeParam.properties) {
-            themeNames.push(getProperty(t, prop))
+            themeNames.push(getProperty(prop))
         }
     }
 
@@ -189,7 +191,7 @@ export function getStylesDependenciesFromFunction(t, path) {
     if (rtParam && rtParam.type === 'ObjectPattern') {
         // If destructured, collect all property names
         for (const prop of rtParam.properties) {
-            rtNames.push(getProperty(t, prop))
+            rtNames.push(getProperty(prop))
         }
     }
 
@@ -253,10 +255,10 @@ export function getStylesDependenciesFromFunction(t, path) {
         }
 
         if (valuePath.isArrowFunctionExpression()) {
-            if (t.isObjectExpression(valuePath.node.body)) {
+            if (isObjectExpression(valuePath.node.body)) {
                 const hasVariants = valuePath.node.body.properties.some(innerProp => {
 
-                    return t.isIdentifier(innerProp.key) && innerProp.key.name === 'variants'
+                    return isIdentifier(innerProp.key) && innerProp.key.name === 'variants'
                 })
 
                 if (hasVariants) {
@@ -307,7 +309,7 @@ export function getStylesDependenciesFromFunction(t, path) {
     })
 
     const detectedStylesWithRt = new Set()
-    const localRtName = t.isIdentifier(rtParam)
+    const localRtName = isIdentifier(rtParam)
         ? rtParam.name
         : undefined
 
@@ -471,27 +473,27 @@ export function toUnistylesDependency(dependency) {
     }
 }
 
-export function getReturnStatementsFromBody(t, node, results = []) {
-    if (t.isReturnStatement(node)) {
+export function getReturnStatementsFromBody(node, results = []) {
+    if (isReturnStatement(node)) {
         results.push(node)
     }
 
-    if (t.isBlockStatement(node)) {
-        node.body.forEach(child => getReturnStatementsFromBody(t, child, results))
+    if (isBlockStatement(node)) {
+        node.body.forEach(child => getReturnStatementsFromBody(child, results))
     }
 
-    if (t.isIfStatement(node)) {
-        getReturnStatementsFromBody(t, node.consequent, results)
+    if (isIfStatement(node)) {
+        getReturnStatementsFromBody(node.consequent, results)
 
         if (node.alternate) {
-            getReturnStatementsFromBody(t, node.alternate, results)
+            getReturnStatementsFromBody(node.alternate, results)
         }
     }
 
     return results
 }
 
-export function addDependencies(t, state, styleName, unistyle, detectedDependencies) {
+export function addDependencies(state, styleName, unistyle, detectedDependencies) {
     const debugMessage = deps => {
         if (state.opts.debug) {
             const mappedDeps = deps
@@ -512,17 +514,17 @@ export function addDependencies(t, state, styleName, unistyle, detectedDependenc
 
         let targets = []
 
-        if (t.isArrowFunctionExpression(unistyle.value) || t.isFunctionExpression(unistyle.value)) {
-            if (t.isObjectExpression(unistyle.value.body)) {
+        if (isArrowFunctionExpression(unistyle.value) || isFunctionExpression(unistyle.value)) {
+            if (isObjectExpression(unistyle.value.body)) {
                 targets.push(unistyle.value.body)
             }
 
-            if (t.isBlockStatement(unistyle.value.body)) {
-                targets = getReturnStatementsFromBody(t, unistyle.value.body)
+            if (isBlockStatement(unistyle.value.body)) {
+                targets = getReturnStatementsFromBody(unistyle.value.body)
                     .map(node => {
-                        if (t.isIdentifier(node.argument)) {
-                            node.argument = t.objectExpression([
-                                t.spreadElement(node.argument)
+                        if (isIdentifier(node.argument)) {
+                            node.argument = objectExpression([
+                                spreadElement(node.argument)
                             ])
                         }
 
@@ -531,13 +533,13 @@ export function addDependencies(t, state, styleName, unistyle, detectedDependenc
             }
         }
 
-        if (t.isObjectExpression(unistyle.value)) {
+        if (isObjectExpression(unistyle.value)) {
             targets.push(unistyle.value)
         }
 
-        if (t.isMemberExpression(unistyle.value)) {
+        if (isMemberExpression(unistyle.value)) {
             // convert to object
-            unistyle.value = t.objectExpression([t.spreadElement(unistyle.value)])
+            unistyle.value = objectExpression([spreadElement(unistyle.value)])
 
             targets.push(unistyle.value)
         }
@@ -545,9 +547,9 @@ export function addDependencies(t, state, styleName, unistyle, detectedDependenc
         if (targets.length > 0) {
             targets.forEach(target => {
                 target.properties.push(
-                    t.objectProperty(
-                        t.identifier('uni__dependencies'),
-                        t.arrayExpression(uniqueDependencies.map(dep => t.numericLiteral(dep)))
+                    objectProperty(
+                        identifier('uni__dependencies'),
+                        arrayExpression(uniqueDependencies.map(dep => numericLiteral(dep)))
                     )
                 )
             })
