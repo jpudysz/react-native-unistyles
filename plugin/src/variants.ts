@@ -1,4 +1,4 @@
-import { blockStatement, callExpression, identifier, isCallExpression, isExpressionStatement, isIdentifier, isMemberExpression, memberExpression, variableDeclaration, variableDeclarator, type BlockStatement } from "@babel/types"
+import { blockStatement, callExpression, identifier, isCallExpression, isExpressionStatement, isIdentifier, isMemberExpression, memberExpression, variableDeclaration, variableDeclarator, type BlockStatement, type ExpressionStatement } from "@babel/types"
 import type { UnistylesPluginPass } from "./types"
 import type { NodePath } from "@babel/core"
 
@@ -13,7 +13,11 @@ export function extractVariants(path: NodePath<BlockStatement>, state: Unistyles
         return
     }
 
-    const targetVariant = maybeVariants.find(variant => {
+    const targetVariant = maybeVariants.find((variant): variant is ExpressionStatement => {
+        if (!isExpressionStatement(variant) || !isCallExpression(variant.expression) || !isMemberExpression(variant.expression.callee) || !isIdentifier(variant.expression.callee.object)) {
+            return false
+        }
+
         const calleeName = variant.expression.callee.object.name
 
         return (
@@ -27,8 +31,17 @@ export function extractVariants(path: NodePath<BlockStatement>, state: Unistyles
         return
     }
 
-    const calleeName = targetVariant.expression.callee.object.name
-    const node = targetVariant.expression
+    const node = targetVariant.expression;
+    if (!isCallExpression(node)) {
+        return;
+    }
+
+    const callee = node.callee;
+    if (!isMemberExpression(callee) || !isIdentifier(callee.object)) {
+        return;
+    }
+
+    const calleeName = callee.object.name;
     const newUniqueName = path.scope.generateUidIdentifier(calleeName)
 
     // Create shadow declaration eg. const _styles = styles
