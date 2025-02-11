@@ -9,6 +9,5 @@ esbuild.build({
   allowOverwrite: true,
   logLevel: 'warning',
   platform: 'node',
-  sourcemap: 'linked',
   minify: true,
 })
