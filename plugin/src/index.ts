@@ -4,7 +4,7 @@ import { isUnistylesStyleSheet, addStyleSheetTag, isKindOfStyleSheet, getStylesD
 import { extractVariants } from './variants'
 import { REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_PATHS, REPLACE_WITH_UNISTYLES_EXOTIC_PATHS, NATIVE_COMPONENTS_PATHS } from './consts'
 import { handleExoticImport } from './exotic'
-import { isArrowFunctionExpression, isBlockStatement, isFunctionExpression, isObjectExpression, isReturnStatement } from '@babel/types'
+import { isArrowFunctionExpression, isBlockStatement, isFunctionExpression, isIdentifier, isImportSpecifier, isObjectExpression, isObjectProperty, isReturnStatement } from '@babel/types'
 import type { PluginItem } from '@babel/core'
 import type { UnistylesPluginPass } from './types'
 
@@ -13,10 +13,10 @@ export default function (): PluginItem {
         name: 'babel-react-native-unistyles',
         visitor: {
             Program: {
-                enter(path, state: UnistylesPluginPass) {
+                enter(_, state: UnistylesPluginPass) {
                     state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS
                         .concat(state.opts.autoProcessPaths ?? [])
-                        .some(path => state.filename.includes(path))
+                        .some(path => state.filename?.includes(path))
 
                     state.file.hasAnyUnistyle = false
                     state.file.hasUnistylesImport = false
@@ -24,7 +24,7 @@ export default function (): PluginItem {
                     state.file.styleSheetLocalName = ''
                     state.file.tagNumber = 0
                     state.reactNativeImports = {}
-                    state.file.forceProcessing = state.opts.autoProcessRoot
+                    state.file.forceProcessing = state.opts.autoProcessRoot && state.filename
                         ? state.filename.includes(`${state.file.opts.root}/${state.opts.autoProcessRoot}/`)
                         : false
                 },
@@ -71,7 +71,7 @@ export default function (): PluginItem {
 
                 path.node.declarations.forEach((declaration) => {
                     if (isArrowFunctionExpression(declaration.init) || isFunctionExpression(declaration.init)) {
-                        const componentName = declaration.id
+                        const componentName = declaration.id && isIdentifier(declaration.id)
                             ? declaration.id.name
                             : null
 
@@ -84,7 +84,7 @@ export default function (): PluginItem {
             ImportDeclaration(path, state: UnistylesPluginPass) {
                 const exoticImport = REPLACE_WITH_UNISTYLES_EXOTIC_PATHS
                     .concat(state.opts.autoRemapImports ?? [])
-                    .find(exotic => state.filename.includes(exotic.path))
+                    .find(exotic => state.filename?.includes(exotic.path))
 
                 if (exoticImport) {
                     return handleExoticImport(path, state, exoticImport)
@@ -100,7 +100,7 @@ export default function (): PluginItem {
                     state.file.hasUnistylesImport = true
 
                     path.node.specifiers.forEach(specifier => {
-                        if (specifier.imported && specifier.imported.name === 'StyleSheet') {
+                        if (isImportSpecifier(specifier) && isIdentifier(specifier.imported) && specifier.imported.name === 'StyleSheet') {
                             state.file.styleSheetLocalName = specifier.local.name
                         }
                     })
@@ -108,7 +108,7 @@ export default function (): PluginItem {
 
                 if (importSource === 'react-native') {
                     path.node.specifiers.forEach(specifier => {
-                        if (specifier.imported && REACT_NATIVE_COMPONENT_NAMES.includes(specifier.imported.name)) {
+                        if (isImportSpecifier(specifier) && isIdentifier(specifier.imported) && REACT_NATIVE_COMPONENT_NAMES.includes(specifier.imported.name)) {
                             state.reactNativeImports[specifier.local.name] = specifier.imported.name
                         }
                     })
@@ -160,8 +160,8 @@ export default function (): PluginItem {
                     if (detectedDependencies) {
                         if (isObjectExpression(arg)) {
                             arg.properties.forEach(property => {
-                                if (detectedDependencies[property.key.name]) {
-                                    addDependencies(state, property.key.name, property, detectedDependencies[property.key.name])
+                                if (isObjectProperty(property) && isIdentifier(property.key) && detectedDependencies[property.key.name]) {
+                                    addDependencies(state, property.key.name, property, detectedDependencies[property.key.name] ?? [])
                                 }
                             })
                         }
@@ -174,14 +174,14 @@ export default function (): PluginItem {
 
                     if (detectedDependencies) {
                         const body = isBlockStatement(arg.body)
-                            ? arg.body.body.find(statement => isReturnStatement(statement)).argument
+                            ? arg.body.body.find(statement => isReturnStatement(statement))?.argument
                             : arg.body
 
                         // Ensure the function body returns an object
                         if (isObjectExpression(body)) {
                             body.properties.forEach(property => {
-                                if (detectedDependencies[property.key.name]) {
-                                    addDependencies(state, property.key.name, property, detectedDependencies[property.key.name])
+                                if (isObjectProperty(property) && isIdentifier(property.key) && detectedDependencies[property.key.name]) {
+                                    addDependencies(state, property.key.name, property, detectedDependencies[property.key.name] ?? [])
                                 }
                             })
                         }
