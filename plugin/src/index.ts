@@ -160,7 +160,7 @@ export default function (): PluginItem {
                     if (detectedDependencies) {
                         if (isObjectExpression(arg)) {
                             arg.properties.forEach(property => {
-                                if (isObjectProperty(property) && isIdentifier(property.key) && detectedDependencies[property.key.name]) {
+                                if (isObjectProperty(property) && isIdentifier(property.key) && Object.prototype.hasOwnProperty.call(detectedDependencies, property.key.name)) {
                                     addDependencies(state, property.key.name, property, detectedDependencies[property.key.name] ?? [])
                                 }
                             })
@@ -180,7 +180,7 @@ export default function (): PluginItem {
                         // Ensure the function body returns an object
                         if (isObjectExpression(body)) {
                             body.properties.forEach(property => {
-                                if (isObjectProperty(property) && isIdentifier(property.key) && detectedDependencies[property.key.name]) {
+                                if (isObjectProperty(property) && isIdentifier(property.key) && Object.prototype.hasOwnProperty.call(detectedDependencies, property.key.name)) {
                                     addDependencies(state, property.key.name, property, detectedDependencies[property.key.name] ?? [])
                                 }
                             })
