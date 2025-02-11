@@ -1,8 +1,10 @@
-export function extractVariants(t, path, state) {
+import { blockStatement, callExpression, identifier, isCallExpression, isExpressionStatement, isIdentifier, isMemberExpression, memberExpression, variableDeclaration, variableDeclarator } from "@babel/types"
+
+export function extractVariants(path, state) {
     const maybeVariants = path.node.body.filter(node => (
-        t.isExpressionStatement(node) &&
-        t.isCallExpression(node.expression) &&
-        t.isMemberExpression(node.expression.callee)
+        isExpressionStatement(node) &&
+        isCallExpression(node.expression) &&
+        isMemberExpression(node.expression.callee)
     ))
 
     if (maybeVariants.length === 0) {
@@ -13,8 +15,8 @@ export function extractVariants(t, path, state) {
         const calleeName = variant.expression.callee.object.name
 
         return (
-            t.isIdentifier(variant.expression.callee.object, { name: calleeName }) &&
-            t.isIdentifier(variant.expression.callee.property, { name: 'useVariants' }) &&
+            isIdentifier(variant.expression.callee.object, { name: calleeName }) &&
+            isIdentifier(variant.expression.callee.property, { name: 'useVariants' }) &&
             variant.expression.arguments.length === 1
         )
     })
@@ -28,17 +30,17 @@ export function extractVariants(t, path, state) {
     const newUniqueName = path.scope.generateUidIdentifier(calleeName)
 
     // Create shadow declaration eg. const _styles = styles
-    const shadowDeclaration = t.variableDeclaration('const', [
-        t.variableDeclarator(newUniqueName, t.identifier(calleeName))
+    const shadowDeclaration = variableDeclaration('const', [
+        variableDeclarator(newUniqueName, identifier(calleeName))
     ])
 
     // Create the new call expression eg. const styles = _styles.useVariants(...)
-    const newCallExpression = t.callExpression(
-        t.memberExpression(t.identifier(newUniqueName.name), t.identifier('useVariants')),
+    const newCallExpression = callExpression(
+        memberExpression(identifier(newUniqueName.name), identifier('useVariants')),
         node.arguments
     )
-    const finalDeclaration = t.variableDeclaration('const', [
-        t.variableDeclarator(t.identifier(calleeName), newCallExpression)
+    const finalDeclaration = variableDeclaration('const', [
+        variableDeclarator(identifier(calleeName), newCallExpression)
     ])
 
     // Find the current node's index, we will move everything after to new block
@@ -47,7 +49,7 @@ export function extractVariants(t, path, state) {
     const rest = path.node.body.slice(pathIndex + 1)
 
     // move rest to new block (scope)
-    const blockStatement = t.blockStatement([
+    const statement = blockStatement([
         finalDeclaration,
         ...rest
     ])
@@ -55,7 +57,7 @@ export function extractVariants(t, path, state) {
     path.node.body = [
         ...path.node.body.slice(0, pathIndex),
         shadowDeclaration,
-        blockStatement
+        statement
     ]
 
     state.file.hasVariants = true

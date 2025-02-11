@@ -1,4 +1,6 @@
-export function addUnistylesImport(t, path, state) {
+import { identifier, importDeclaration, importSpecifier, isImportDeclaration, stringLiteral } from "@babel/types"
+
+export function addUnistylesImport(path, state) {
     const localNames = Object.keys(state.reactNativeImports)
     const names = Object.values(state.reactNativeImports)
     const pairs = Object.entries(state.reactNativeImports)
@@ -7,7 +9,7 @@ export function addUnistylesImport(t, path, state) {
     // remove rn-imports
     path.node.body.forEach(node => {
         // user might have multiple imports like import type, import
-        if (t.isImportDeclaration(node) && node.source.value === 'react-native') {
+        if (isImportDeclaration(node) && node.source.value === 'react-native') {
             node.specifiers = node.specifiers.filter(specifier => !localNames.some(name => name === specifier.local.name))
 
             if (node.specifiers.length === 0) {
@@ -18,7 +20,7 @@ export function addUnistylesImport(t, path, state) {
 
     // remove RNWeb imports
     names.forEach(name => {
-        const rnWebImport = path.node.body.find(node => t.isImportDeclaration(node) && node.source.value === `react-native-web/dist/exports/${name}`)
+        const rnWebImport = path.node.body.find(node => isImportDeclaration(node) && node.source.value === `react-native-web/dist/exports/${name}`)
 
         if (rnWebImport) {
             rnWebImport.specifiers = []
@@ -27,9 +29,9 @@ export function addUnistylesImport(t, path, state) {
 
     // import components from react-native-unistyles
     pairs.forEach(([localName, name]) => {
-        const newImport = t.importDeclaration(
-            [t.importSpecifier(t.identifier(localName), t.identifier(name))],
-            t.stringLiteral(state.opts.isLocal
+        const newImport = importDeclaration(
+            [importSpecifier(identifier(localName), identifier(name))],
+            stringLiteral(state.opts.isLocal
                 ? state.file.opts.filename.split('react-native-unistyles').at(0).concat(`react-native-unistyles/components/native/${name}`)
                 : `react-native-unistyles/components/native/${name}`
             )
@@ -42,4 +44,6 @@ export function addUnistylesImport(t, path, state) {
     nodesToRemove.forEach(node => path.node.body.splice(path.node.body.indexOf(node), 1))
 }
 
-export const isInsideNodeModules = state => state.file.opts.filename.includes('node_modules')
+export function isInsideNodeModules(state) {
+    return state.file.opts.filename.includes('node_modules')
+}
