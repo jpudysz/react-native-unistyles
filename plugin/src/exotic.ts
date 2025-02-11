@@ -1,6 +1,6 @@
-import type { NodePath } from '@babel/core'
 import { identifier, importDeclaration, importDefaultSpecifier, importSpecifier, isImportDefaultSpecifier, isImportSpecifier, stringLiteral, type ImportDeclaration } from '@babel/types'
 import type { RemapConfig, UnistylesPluginPass } from './types'
+import type { NodePath } from '@babel/core';
 
 export function handleExoticImport(path: NodePath<ImportDeclaration>, state: UnistylesPluginPass, exoticImport: Pick<RemapConfig, 'imports'>) {
     const specifiers = path.node.specifiers
@@ -24,20 +24,20 @@ export function handleExoticImport(path: NodePath<ImportDeclaration>, state: Uni
                 const newImport = importDeclaration(
                     [importDefaultSpecifier(identifier(specifier.local.name))],
                     stringLiteral(state.opts.isLocal
-                        ? state.file.opts.filename.split('react-native-unistyles').at(0).concat(`react-native-unistyles/components/native/${rule.mapTo}`)
+                        ? state.file.opts.filename?.split('react-native-unistyles').at(0)?.concat(`react-native-unistyles/components/native/${rule.mapTo}`) ?? ''
                         : `react-native-unistyles/components/native/${rule.mapTo}`
                     )
-                )
+                ) as any // TODO: Fix this
 
                 path.replaceWith(newImport)
             } else {
                 const newImport = importDeclaration(
                     [importSpecifier(identifier(rule.mapTo), identifier(rule.mapTo))],
                     stringLiteral(state.opts.isLocal
-                        ? state.file.opts.filename.split('react-native-unistyles').at(0).concat(`react-native-unistyles/components/native/${rule.mapTo}`)
+                        ? state.file.opts.filename?.split('react-native-unistyles').at(0)?.concat(`react-native-unistyles/components/native/${rule.mapTo}`) ?? ''
                         : `react-native-unistyles/components/native/${rule.mapTo}`
                     )
-                )
+                ) as any // TODO: Fix this
 
                 path.node.specifiers = specifiers.filter(s => s !== specifier)
 
