@@ -11,7 +11,8 @@
     "check:ci": "biome check",
     "prepare": "husky && bob build",
     "precommit": "concurrently 'yarn tsc' 'yarn lint' 'yarn check' 'yarn test'",
-    "release": "release-it"
+    "release": "release-it",
+    "build:plugin": "node plugin/esbuild.js"
   },
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
@@ -95,6 +96,7 @@
     "babel-plugin-tester": "11.0.4",
     "commitlint": "19.6.1",
     "concurrently": "9.1.2",
+    "esbuild": "0.25.0",
     "husky": "9.1.7",
     "jest": "29.7.0",
     "metro-react-native-babel-preset": "0.77.0",
