@@ -2,6 +2,10 @@ import type { NodePath } from "@babel/core"
 import { arrayExpression, identifier, isArrowFunctionExpression, isBlockStatement, isFunctionExpression, isIdentifier, isIfStatement, isMemberExpression, isObjectExpression, isObjectPattern, isObjectProperty, isReturnStatement, numericLiteral, objectExpression, objectProperty, spreadElement, type CallExpression } from "@babel/types"
 import type { UnistylesPluginPass } from "./types"
 
+type Variants = {
+    [key: string]: string[]
+}
+
 const UnistyleDependency = {
     Theme: 0,
     ThemeName: 1,
@@ -160,61 +164,61 @@ export function addStyleSheetTag(path: NodePath<CallExpression>, state: Unistyle
 }
 
 export function getStylesDependenciesFromObject(path: NodePath<CallExpression>) {
-    const detectedStylesWithVariants = new Set()
+    const detectedStylesWithVariants = new Set<{ label: 'variants'; key: string }>()
     const stylesheet = path.node.arguments[0]
 
-    stylesheet.properties.forEach(property => {
-        if (!isIdentifier(property.key)) {
-            return
-        }
-
-        if (isObjectProperty(property)) {
-            if (isObjectExpression(property.value)) {
-                property.value.properties.forEach(innerProp => {
-                    if (isIdentifier(innerProp.key) && innerProp.key.name === 'variants') {
-                        detectedStylesWithVariants.add({
-                            label: 'variants',
-                            key: property.key.name
-                        })
-                    }
-                })
-
+    if (isObjectExpression(stylesheet)) {
+        stylesheet?.properties.forEach(property => {
+            if (!isObjectProperty(property) || !isIdentifier(property.key)) {
+                return
             }
-        }
 
-        if (isArrowFunctionExpression(property.value)) {
-            if (isObjectExpression(property.value.body)) {
-                property.value.body.properties.forEach(innerProp => {
-                    if (isIdentifier(innerProp.key) && innerProp.key.name === 'variants') {
-                        detectedStylesWithVariants.add({
-                            label: 'variants',
-                            key: property.key.name
-                        })
-                    }
-                })
+            if (isObjectProperty(property)) {
+                if (isObjectExpression(property.value)) {
+                    property.value.properties.forEach(innerProp => {
+                        if (isObjectProperty(innerProp) && isIdentifier(innerProp.key) && isIdentifier(property.key) && innerProp.key.name === 'variants') {
+                            detectedStylesWithVariants.add({
+                                label: 'variants',
+                                key: property.key.name
+                            })
+                        }
+                    })
 
+                }
             }
-        }
-    })
+
+            if (isArrowFunctionExpression(property.value)) {
+                if (isObjectExpression(property.value.body)) {
+                    property.value.body.properties.forEach(innerProp => {
+                        if (isObjectProperty(innerProp) && isIdentifier(innerProp.key) && isIdentifier(property.key) && innerProp.key.name === 'variants') {
+                            detectedStylesWithVariants.add({
+                                label: 'variants',
+                                key: property.key.name
+                            })
+                        }
+                    })
+
+                }
+            }
+        })
+    }
 
     const variants = Array.from(detectedStylesWithVariants)
 
-    return variants.reduce((acc, { key, label }) => {
+    return variants.reduce<Variants>((acc, { key, label }) => {
         if (acc[key]) {
-            return {
-                ...acc,
-                [key]: [
-                    ...acc[key],
-                    label
-                ]
-            }
+            acc[key] = [
+                ...acc[key],
+                label
+            ]
+
+            return acc
         }
 
-        return {
-            ...acc,
-            [key]: [label]
-        }
-    }, [])
+        acc[key] = [label]
+
+        return acc
+    }, {})
 }
 
 export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>) {
