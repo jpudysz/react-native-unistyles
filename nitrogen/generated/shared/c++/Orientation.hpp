@@ -41,7 +41,7 @@ namespace margelo::nitro {
 
   // C++ Orientation <> JS Orientation (union)
   template <>
-  struct JSIConverter<Orientation> {
+  struct JSIConverter<Orientation> final {
     static inline Orientation fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
       std::string unionValue = JSIConverter<std::string>::fromJSI(runtime, arg);
       switch (hashString(unionValue.c_str(), unionValue.size())) {

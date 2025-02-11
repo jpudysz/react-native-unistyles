@@ -65,7 +65,7 @@ namespace margelo::nitro {
 
   // C++ UnistylesCxxMiniRuntime <> JS UnistylesCxxMiniRuntime (object)
   template <>
-  struct JSIConverter<UnistylesCxxMiniRuntime> {
+  struct JSIConverter<UnistylesCxxMiniRuntime> final {
     static inline UnistylesCxxMiniRuntime fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
       jsi::Object obj = arg.asObject(runtime);
       return UnistylesCxxMiniRuntime(

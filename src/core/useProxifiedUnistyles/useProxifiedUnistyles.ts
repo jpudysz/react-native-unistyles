@@ -26,8 +26,8 @@ const RTDependencyMap = {
     themeName: UnistyleDependency.ThemeName,
 } satisfies Partial<Record<keyof UnistylesMiniRuntime, UnistyleDependency>>
 
-export const useProxifiedUnistyles = () => {
-    const scopedTheme = UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme
+export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
+    const scopedTheme = forcedTheme ?? UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme
     const [dependencies] = useState(() => new Set<number>())
     const [theme, setTheme] = useState(UnistylesRuntime.getTheme(scopedTheme))
     const [_, runtimeChanged] = useReducer(() => ({}), {})

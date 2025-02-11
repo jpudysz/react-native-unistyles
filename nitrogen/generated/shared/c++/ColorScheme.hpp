@@ -42,7 +42,7 @@ namespace margelo::nitro {
 
   // C++ ColorScheme <> JS ColorScheme (union)
   template <>
-  struct JSIConverter<ColorScheme> {
+  struct JSIConverter<ColorScheme> final {
     static inline ColorScheme fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
       std::string unionValue = JSIConverter<std::string>::fromJSI(runtime, arg);
       switch (hashString(unionValue.c_str(), unionValue.size())) {

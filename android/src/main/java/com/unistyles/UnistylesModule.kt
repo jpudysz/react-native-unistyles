@@ -11,6 +11,7 @@ import com.facebook.react.turbomodule.core.interfaces.TurboModuleWithJSIBindings
 import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.common.UIManagerType
 import com.margelo.nitro.unistyles.HybridNativePlatformSpec
+import com.margelo.nitro.unistyles.unistylesOnLoad.Companion.initializeNative
 
 @Suppress("KotlinJniMissingFunction")
 class UnistylesModule(reactContext: ReactApplicationContext): NativeTurboUnistylesSpec(reactContext), TurboModuleWithJSIBindings {
@@ -20,6 +21,10 @@ class UnistylesModule(reactContext: ReactApplicationContext): NativeTurboUnistyl
 
     companion object {
         const val NAME = NativeTurboUnistylesSpec.NAME
+
+        init {
+            initializeNative()
+        }
     }
 
     init {
