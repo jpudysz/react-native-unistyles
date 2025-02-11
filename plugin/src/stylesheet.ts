@@ -1,9 +1,19 @@
 import type { NodePath } from "@babel/core"
-import { arrayExpression, identifier, isArrowFunctionExpression, isBlockStatement, isFunctionExpression, isIdentifier, isIfStatement, isMemberExpression, isObjectExpression, isObjectPattern, isObjectProperty, isReturnStatement, numericLiteral, objectExpression, objectProperty, spreadElement, type CallExpression } from "@babel/types"
+import { arrayExpression, identifier, isArrowFunctionExpression, isBlockStatement, isFunctionExpression, isIdentifier, isIfStatement, isMemberExpression, isObjectExpression, isObjectPattern, isObjectProperty, isReturnStatement, numericLiteral, objectExpression, objectProperty, spreadElement, type ArrowFunctionExpression, type CallExpression, type FunctionExpression, type ObjectExpression } from "@babel/types"
 import type { UnistylesPluginPass } from "./types"
 
 type Variants = {
     [key: string]: string[]
+}
+
+type ThemeName = {
+    properties: string[]
+    parent?: string
+}
+
+type RtName = {
+    properties: string[]
+    parent?: string
 }
 
 const UnistyleDependency = {
@@ -228,13 +238,21 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
         return
     }
 
+    if (Array.isArray(funcPath)) {
+        return
+    }
+
+    if (!isFunctionExpression(funcPath.node) && !isArrowFunctionExpression(funcPath.node)) {
+        return
+    }
+
     const params = funcPath.node.params
     const [themeParam, rtParam] = params
 
-    let themeNames = []
+    let themeNames: ThemeName[] = []
 
     // destructured theme object
-    if (themeParam && themeParam.type === 'ObjectPattern') {
+    if (isObjectPattern(themeParam)) {
         // If destructured, collect all property names
         for (const prop of themeParam.properties) {
             themeNames.push(getProperty(prop))
@@ -242,16 +260,16 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
     }
 
     // user used 'theme' without destructuring
-    if (themeParam && themeParam.type === 'Identifier') {
+    if (isIdentifier(themeParam)) {
         themeNames.push({
             properties: [themeParam.name]
         })
     }
 
-    let rtNames = []
+    let rtNames: RtName[] = []
 
     // destructured rt object
-    if (rtParam && rtParam.type === 'ObjectPattern') {
+    if (isObjectPattern(rtParam)) {
         // If destructured, collect all property names
         for (const prop of rtParam.properties) {
             rtNames.push(getProperty(prop))
@@ -259,22 +277,26 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
     }
 
     // user used 'rt' without destructuring
-    if (rtParam && rtParam.type === 'Identifier') {
+    if (isIdentifier(rtParam)) {
         rtNames.push({
             properties: [rtParam.name]
         })
     }
 
     // get returned object or return statement from StyleSheet.create function
-    let returnedObjectPath = null
+    let returnedObjectPath: NodePath<ObjectExpression> | null = null
 
-    if (funcPath.get('body').isObjectExpression()) {
-        returnedObjectPath = funcPath.get('body')
+    if (isObjectExpression(funcPath.node.body)) {
+        returnedObjectPath = funcPath.get('body') as NodePath<ObjectExpression>
     } else {
         funcPath.traverse({
             ReturnStatement(retPath) {
                 if (!returnedObjectPath && retPath.get('argument').isObjectExpression()) {
-                    returnedObjectPath = retPath.get('argument')
+                    const argumentPath = retPath.get('argument')
+
+                    if (argumentPath.isObjectExpression()) {
+                        returnedObjectPath = argumentPath
+                    }
                 }
             }
         })
@@ -287,24 +309,36 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
         return
     }
 
-    const detectedStylesWithVariants = new Set()
+    const detectedStylesWithVariants = new Set<{ label: string; key: string }>()
+    const properties = returnedObjectPath.get('properties') as NodePath[];
 
     // detect variants via Scope
-    returnedObjectPath.get('properties').forEach(propPath => {
+    properties.forEach(propPath => {
         // get style name
         const stylePath = propPath.get('key')
+
+        if (Array.isArray(stylePath)) {
+            return
+        }
 
         if (!stylePath.isIdentifier()) {
             return
         }
 
         const styleKey = stylePath.node.name
-
         const valuePath = propPath.get('value')
+
+        if (Array.isArray(valuePath)) {
+            return
+        }
 
         if (valuePath.isObjectExpression()) {
             const hasVariants = valuePath.get('properties').some(innerProp => {
                 const innerKey = innerProp.get('key')
+
+                if (Array.isArray(innerKey)) {
+                    return
+                }
 
                 return innerKey.isIdentifier() && innerKey.node.name === 'variants'
             })
@@ -320,8 +354,7 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
         if (valuePath.isArrowFunctionExpression()) {
             if (isObjectExpression(valuePath.node.body)) {
                 const hasVariants = valuePath.node.body.properties.some(innerProp => {
-
-                    return isIdentifier(innerProp.key) && innerProp.key.name === 'variants'
+                    return isObjectProperty(innerProp) && isIdentifier(innerProp.key) && innerProp.key.name === 'variants'
                 })
 
                 if (hasVariants) {
@@ -334,7 +367,7 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
         }
     })
 
-    const detectedStylesWithTheme = new Set()
+    const detectedStylesWithTheme = new Set<{ label: string; key: string }>()
 
     // detect theme dependencies via Scope
     themeNames.forEach(({ properties }) => {
@@ -355,11 +388,20 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
                 }
 
                 const keyNode = containerProp.get('key')
+
+                if (Array.isArray(keyNode)) {
+                    return
+                }
+
+                const keyValue = keyNode.isLiteral()
+                    ? (keyNode.isStringLiteral() || keyNode.isNumericLiteral() || keyNode.isBooleanLiteral())
+                        ? String(keyNode.node.value)
+                        : null
+                    : null;
+
                 const styleKey = keyNode.isIdentifier()
                     ? keyNode.node.name
-                    : keyNode.isLiteral()
-                        ? keyNode.node.value
-                        : null
+                    : keyValue
 
                 if (styleKey) {
                     detectedStylesWithTheme.add({
@@ -371,7 +413,7 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
         })
     })
 
-    const detectedStylesWithRt = new Set()
+    const detectedStylesWithRt = new Set<{ label: string; key: string }>()
     const localRtName = isIdentifier(rtParam)
         ? rtParam.name
         : undefined
@@ -410,7 +452,7 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
 
                 let usedLabel = validRtName
 
-                if (refPath.parentPath.isMemberExpression() && refPath.parentPath.get('object') === refPath) {
+                if (refPath.parentPath?.isMemberExpression() && refPath.parentPath.get('object') === refPath) {
                     const memberExpr = refPath.parentPath
                     const propPath = memberExpr.get('property')
 
@@ -442,11 +484,20 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
                 }
 
                 const keyNode = containerProp.get('key')
+
+                if (Array.isArray(keyNode)) {
+                    return
+                }
+
+                const keyValue = keyNode.isLiteral()
+                    ? (keyNode.isStringLiteral() || keyNode.isNumericLiteral() || keyNode.isBooleanLiteral())
+                        ? String(keyNode.node.value)
+                        : null
+                    : null;
+
                 const styleKey = keyNode.isIdentifier()
                     ? keyNode.node.name
-                    : keyNode.isLiteral()
-                        ? keyNode.node.value
-                        : null
+                    : keyValue
 
                 if (styleKey) {
                     detectedStylesWithRt.add({
@@ -465,22 +516,20 @@ export function getStylesDependenciesFromFunction(path: NodePath<CallExpression>
     return theme
         .concat(rt)
         .concat(variants)
-        .reduce((acc, { key, label }) => {
+        .reduce<Variants>((acc, { key, label }) => {
             if (acc[key]) {
-                return {
-                    ...acc,
-                    [key]: [
-                        ...acc[key],
-                        label
-                    ]
-                }
+                acc[key] = [
+                    ...acc[key],
+                    label,
+                ]
+
+                return acc;
             }
 
-            return {
-                ...acc,
-                [key]: [label]
-            }
-        }, [])
+            acc[key] = [label]
+
+            return acc;
+        }, {})
 }
 
 export function getReturnStatementsFromBody(node, results = []) {
