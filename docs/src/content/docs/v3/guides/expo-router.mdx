@@ -24,13 +24,13 @@ This combination may cause some issues. To prevent that you need to modify your 
 ```diff lang="json" title="package.json"
 {
 -   "main": "expo-router/entry"
-+   "main": "index.js"
++   "main": "index.ts"
 }
 ```
 
-Then, create `index.js` file with following content:
+Then, create `index.ts` file with following content:
 
-```js title="index.js"
+```js title="index.ts"
 import 'expo-router/entry'
 import './unistyles' // <-- file that initializes Unistyles
 ```
