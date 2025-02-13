@@ -1,4 +1,4 @@
-import type { PluginItem } from '@babel/core'
+import type { PluginObj } from '@babel/core'
 import * as t from '@babel/types'
 import { NATIVE_COMPONENTS_PATHS, REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_EXOTIC_PATHS, REPLACE_WITH_UNISTYLES_PATHS } from './consts'
 import { handleExoticImport } from './exotic'
@@ -8,12 +8,12 @@ import { addDependencies, addStyleSheetTag, getStylesDependenciesFromFunction, g
 import type { UnistylesPluginPass } from './types'
 import { extractVariants } from './variants'
 
-export default function (): PluginItem {
+export default function (): PluginObj<UnistylesPluginPass> {
     return {
         name: 'babel-react-native-unistyles',
         visitor: {
             Program: {
-                enter(_, state: UnistylesPluginPass) {
+                enter(_, state) {
                     state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS
                         .concat(state.opts.autoProcessPaths ?? [])
                         .some(path => state.filename?.includes(path))
@@ -28,7 +28,7 @@ export default function (): PluginItem {
                         ? state.filename.includes(`${state.file.opts.root}/${state.opts.autoProcessRoot}/`)
                         : false
                 },
-                exit(path, state: UnistylesPluginPass) {
+                exit(path, state) {
                     if (isInsideNodeModules(state) && !state.file.replaceWithUnistyles) {
                         return
                     }
@@ -38,7 +38,7 @@ export default function (): PluginItem {
                     }
                 }
             },
-            FunctionDeclaration(path, state: UnistylesPluginPass) {
+            FunctionDeclaration(path, state) {
                 if (isInsideNodeModules(state)) {
                     return
                 }
@@ -51,7 +51,7 @@ export default function (): PluginItem {
                     state.file.hasVariants = false
                 }
             },
-            ClassDeclaration(path, state: UnistylesPluginPass) {
+            ClassDeclaration(path, state) {
                 if (isInsideNodeModules(state)) {
                     return
                 }
@@ -64,7 +64,7 @@ export default function (): PluginItem {
                     state.file.hasVariants = false
                 }
             },
-            VariableDeclaration(path, state: UnistylesPluginPass) {
+            VariableDeclaration(path, state) {
                 if (isInsideNodeModules(state)) {
                     return
                 }
@@ -81,7 +81,7 @@ export default function (): PluginItem {
                     }
                 })
             },
-            ImportDeclaration(path, state: UnistylesPluginPass) {
+            ImportDeclaration(path, state) {
                 const exoticImport = REPLACE_WITH_UNISTYLES_EXOTIC_PATHS
                     .concat(state.opts.autoRemapImports ?? [])
                     .find(exotic => state.filename?.includes(exotic.path))
@@ -122,7 +122,7 @@ export default function (): PluginItem {
                     state.file.forceProcessing = state.opts.autoProcessImports.includes(importSource)
                 }
             },
-            JSXElement(path, state: UnistylesPluginPass) {
+            JSXElement(path, state) {
                 if (isInsideNodeModules(state)) {
                     return
                 }
@@ -131,14 +131,14 @@ export default function (): PluginItem {
                     throw new Error("Detected string based ref which is not supported by Unistyles.")
                 }
             },
-            BlockStatement(path, state: UnistylesPluginPass) {
+            BlockStatement(path, state) {
                 if (isInsideNodeModules(state)) {
                     return
                 }
 
                 extractVariants(path, state)
             },
-            CallExpression(path, state: UnistylesPluginPass) {
+            CallExpression(path, state) {
                 if (isInsideNodeModules(state)) {
                     return
                 }
