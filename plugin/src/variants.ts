@@ -1,28 +1,28 @@
 import type { NodePath } from '@babel/core'
-import { type BlockStatement, type ExpressionStatement, blockStatement, callExpression, identifier, isCallExpression, isExpressionStatement, isIdentifier, isMemberExpression, memberExpression, variableDeclaration, variableDeclarator } from '@babel/types'
+import * as t from '@babel/types'
 import type { UnistylesPluginPass } from './types'
 
-export function extractVariants(path: NodePath<BlockStatement>, state: UnistylesPluginPass) {
+export function extractVariants(path: NodePath<t.BlockStatement>, state: UnistylesPluginPass) {
     const maybeVariants = path.node.body.filter(node => (
-        isExpressionStatement(node) &&
-        isCallExpression(node.expression) &&
-        isMemberExpression(node.expression.callee)
+        t.isExpressionStatement(node) &&
+        t.isCallExpression(node.expression) &&
+        t.isMemberExpression(node.expression.callee)
     ))
 
     if (maybeVariants.length === 0) {
         return
     }
 
-    const targetVariant = maybeVariants.find((variant): variant is ExpressionStatement => {
-        if (!isExpressionStatement(variant) || !isCallExpression(variant.expression) || !isMemberExpression(variant.expression.callee) || !isIdentifier(variant.expression.callee.object)) {
+    const targetVariant = maybeVariants.find((variant): variant is t.ExpressionStatement => {
+        if (!t.isExpressionStatement(variant) || !t.isCallExpression(variant.expression) || !t.isMemberExpression(variant.expression.callee) || !t.isIdentifier(variant.expression.callee.object)) {
             return false
         }
 
         const calleeName = variant.expression.callee.object.name
 
         return (
-            isIdentifier(variant.expression.callee.object, { name: calleeName }) &&
-            isIdentifier(variant.expression.callee.property, { name: 'useVariants' }) &&
+            t.isIdentifier(variant.expression.callee.object, { name: calleeName }) &&
+            t.isIdentifier(variant.expression.callee.property, { name: 'useVariants' }) &&
             variant.expression.arguments.length === 1
         )
     })
@@ -32,12 +32,12 @@ export function extractVariants(path: NodePath<BlockStatement>, state: Unistyles
     }
 
     const node = targetVariant.expression
-    if (!isCallExpression(node)) {
+    if (!t.isCallExpression(node)) {
         return
     }
 
     const callee = node.callee
-    if (!isMemberExpression(callee) || !isIdentifier(callee.object)) {
+    if (!t.isMemberExpression(callee) || !t.isIdentifier(callee.object)) {
         return
     }
 
@@ -45,17 +45,17 @@ export function extractVariants(path: NodePath<BlockStatement>, state: Unistyles
     const newUniqueName = path.scope.generateUidIdentifier(calleeName)
 
     // Create shadow declaration eg. const _styles = styles
-    const shadowDeclaration = variableDeclaration('const', [
-        variableDeclarator(newUniqueName, identifier(calleeName))
+    const shadowDeclaration = t.variableDeclaration('const', [
+        t.variableDeclarator(newUniqueName, t.identifier(calleeName))
     ])
 
     // Create the new call expression eg. const styles = _styles.useVariants(...)
-    const newCallExpression = callExpression(
-        memberExpression(identifier(newUniqueName.name), identifier('useVariants')),
+    const newCallExpression = t.callExpression(
+        t.memberExpression(t.identifier(newUniqueName.name), t.identifier('useVariants')),
         node.arguments
     )
-    const finalDeclaration = variableDeclaration('const', [
-        variableDeclarator(identifier(calleeName), newCallExpression)
+    const finalDeclaration = t.variableDeclaration('const', [
+        t.variableDeclarator(t.identifier(calleeName), newCallExpression)
     ])
 
     // Find the current node's index, we will move everything after to new block
@@ -64,7 +64,7 @@ export function extractVariants(path: NodePath<BlockStatement>, state: Unistyles
     const rest = path.node.body.slice(pathIndex + 1)
 
     // move rest to new block (scope)
-    const statement = blockStatement([
+    const statement = t.blockStatement([
         finalDeclaration,
         ...rest
     ])

@@ -1,17 +1,17 @@
 import type { NodePath } from '@babel/core'
-import { type ImportDeclaration, type Program, identifier, importDeclaration, importSpecifier, isImportDeclaration, stringLiteral } from '@babel/types'
+import * as t from '@babel/types'
 import type { UnistylesPluginPass } from './types'
 
-export function addUnistylesImport(path: NodePath<Program>, state: UnistylesPluginPass) {
+export function addUnistylesImport(path: NodePath<t.Program>, state: UnistylesPluginPass) {
     const localNames = Object.keys(state.reactNativeImports)
     const names = Object.values(state.reactNativeImports)
     const pairs = Object.entries(state.reactNativeImports)
-    const nodesToRemove: Array<ImportDeclaration> = []
+    const nodesToRemove: Array<t.ImportDeclaration> = []
 
     // remove rn-imports
     path.node.body.forEach(node => {
         // user might have multiple imports like import type, import
-        if (isImportDeclaration(node) && node.source.value === 'react-native') {
+        if (t.isImportDeclaration(node) && node.source.value === 'react-native') {
             node.specifiers = node.specifiers.filter(specifier => !localNames.some(name => name === specifier.local.name))
 
             if (node.specifiers.length === 0) {
@@ -22,7 +22,7 @@ export function addUnistylesImport(path: NodePath<Program>, state: UnistylesPlug
 
     // remove RNWeb imports
     names.forEach(name => {
-        const rnWebImport = path.node.body.find((node): node is ImportDeclaration => isImportDeclaration(node) && node.source.value === `react-native-web/dist/exports/${name}`)
+        const rnWebImport = path.node.body.find((node): node is t.ImportDeclaration => t.isImportDeclaration(node) && node.source.value === `react-native-web/dist/exports/${name}`)
 
         if (rnWebImport) {
             rnWebImport.specifiers = []
@@ -31,9 +31,9 @@ export function addUnistylesImport(path: NodePath<Program>, state: UnistylesPlug
 
     // import components from react-native-unistyles
     pairs.forEach(([localName, name]) => {
-        const newImport = importDeclaration(
-            [importSpecifier(identifier(localName), identifier(name))],
-            stringLiteral(state.opts.isLocal
+        const newImport = t.importDeclaration(
+            [t.importSpecifier(t.identifier(localName), t.identifier(name))],
+            t.stringLiteral(state.opts.isLocal
                 ? state.file.opts.filename?.split('react-native-unistyles').at(0)?.concat(`react-native-unistyles/src/components/native/${name}`) ?? ''
                 : `react-native-unistyles/components/native/${name}`
             )

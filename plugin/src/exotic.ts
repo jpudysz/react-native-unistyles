@@ -1,8 +1,8 @@
 import type { NodePath } from '@babel/core'
-import { type ImportDeclaration, identifier, importDeclaration, importDefaultSpecifier, importSpecifier, isImportDefaultSpecifier, isImportSpecifier, stringLiteral } from '@babel/types'
+import * as t from '@babel/types'
 import type { RemapConfig, UnistylesPluginPass } from './types'
 
-export function handleExoticImport(path: NodePath<ImportDeclaration>, state: UnistylesPluginPass, exoticImport: Pick<RemapConfig, 'imports'>) {
+export function handleExoticImport(path: NodePath<t.ImportDeclaration>, state: UnistylesPluginPass, exoticImport: Pick<RemapConfig, 'imports'>) {
     const specifiers = path.node.specifiers
     const source = path.node.source
 
@@ -12,7 +12,7 @@ export function handleExoticImport(path: NodePath<ImportDeclaration>, state: Uni
 
     specifiers.forEach(specifier => {
         for (const rule of exoticImport.imports) {
-            const hasMatchingImportType = (!rule.isDefault && isImportSpecifier(specifier)) || (rule.isDefault && isImportDefaultSpecifier(specifier))
+            const hasMatchingImportType = (!rule.isDefault && t.isImportSpecifier(specifier)) || (rule.isDefault && t.isImportDefaultSpecifier(specifier))
             const hasMatchingImportName = rule.isDefault || (!rule.isDefault && rule.name === specifier.local.name)
             const hasMatchingPath = rule.path === source.value
 
@@ -20,10 +20,10 @@ export function handleExoticImport(path: NodePath<ImportDeclaration>, state: Uni
                 continue
             }
 
-            if (isImportDefaultSpecifier(specifier)) {
-                const newImport = importDeclaration(
-                    [importDefaultSpecifier(identifier(specifier.local.name))],
-                    stringLiteral(state.opts.isLocal
+            if (t.isImportDefaultSpecifier(specifier)) {
+                const newImport = t.importDeclaration(
+                    [t.importDefaultSpecifier(t.identifier(specifier.local.name))],
+                    t.stringLiteral(state.opts.isLocal
                         ? state.file.opts.filename?.split('react-native-unistyles').at(0)?.concat(`react-native-unistyles/components/native/${rule.mapTo}`) ?? ''
                         : `react-native-unistyles/components/native/${rule.mapTo}`
                     )
@@ -31,9 +31,9 @@ export function handleExoticImport(path: NodePath<ImportDeclaration>, state: Uni
 
                 path.replaceWith(newImport)
             } else {
-                const newImport = importDeclaration(
-                    [importSpecifier(identifier(rule.mapTo), identifier(rule.mapTo))],
-                    stringLiteral(state.opts.isLocal
+                const newImport = t.importDeclaration(
+                    [t.importSpecifier(t.identifier(rule.mapTo), t.identifier(rule.mapTo))],
+                    t.stringLiteral(state.opts.isLocal
                         ? state.file.opts.filename?.split('react-native-unistyles').at(0)?.concat(`react-native-unistyles/components/native/${rule.mapTo}`) ?? ''
                         : `react-native-unistyles/components/native/${rule.mapTo}`
                     )
