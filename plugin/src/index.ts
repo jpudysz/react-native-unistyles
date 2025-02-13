@@ -1,5 +1,5 @@
 import type { PluginItem } from '@babel/core'
-import { isArrowFunctionExpression, isBlockStatement, isFunctionExpression, isIdentifier, isImportSpecifier, isObjectExpression, isObjectProperty, isReturnStatement } from '@babel/types'
+import * as t from '@babel/types'
 import { NATIVE_COMPONENTS_PATHS, REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_EXOTIC_PATHS, REPLACE_WITH_UNISTYLES_PATHS } from './consts'
 import { handleExoticImport } from './exotic'
 import { addUnistylesImport, isInsideNodeModules } from './import'
@@ -70,8 +70,8 @@ export default function (): PluginItem {
                 }
 
                 path.node.declarations.forEach((declaration) => {
-                    if (isArrowFunctionExpression(declaration.init) || isFunctionExpression(declaration.init)) {
-                        const componentName = declaration.id && isIdentifier(declaration.id)
+                    if (t.isArrowFunctionExpression(declaration.init) || t.isFunctionExpression(declaration.init)) {
+                        const componentName = declaration.id && t.isIdentifier(declaration.id)
                             ? declaration.id.name
                             : null
 
@@ -100,7 +100,7 @@ export default function (): PluginItem {
                     state.file.hasUnistylesImport = true
 
                     path.node.specifiers.forEach(specifier => {
-                        if (isImportSpecifier(specifier) && isIdentifier(specifier.imported) && specifier.imported.name === 'StyleSheet') {
+                        if (t.isImportSpecifier(specifier) && t.isIdentifier(specifier.imported) && specifier.imported.name === 'StyleSheet') {
                             state.file.styleSheetLocalName = specifier.local.name
                         }
                     })
@@ -108,7 +108,7 @@ export default function (): PluginItem {
 
                 if (importSource === 'react-native') {
                     path.node.specifiers.forEach(specifier => {
-                        if (isImportSpecifier(specifier) && isIdentifier(specifier.imported) && REACT_NATIVE_COMPONENT_NAMES.includes(specifier.imported.name)) {
+                        if (t.isImportSpecifier(specifier) && t.isIdentifier(specifier.imported) && REACT_NATIVE_COMPONENT_NAMES.includes(specifier.imported.name)) {
                             state.reactNativeImports[specifier.local.name] = specifier.imported.name
                         }
                     })
@@ -154,13 +154,13 @@ export default function (): PluginItem {
                 const arg = path.node.arguments[0]
 
                 // Object passed to StyleSheet.create (may contain variants)
-                if (isObjectExpression(arg)) {
+                if (t.isObjectExpression(arg)) {
                     const detectedDependencies = getStylesDependenciesFromObject(path)
 
                     if (detectedDependencies) {
-                        if (isObjectExpression(arg)) {
+                        if (t.isObjectExpression(arg)) {
                             arg.properties.forEach(property => {
-                                if (isObjectProperty(property) && isIdentifier(property.key) && Object.prototype.hasOwnProperty.call(detectedDependencies, property.key.name)) {
+                                if (t.isObjectProperty(property) && t.isIdentifier(property.key) && Object.prototype.hasOwnProperty.call(detectedDependencies, property.key.name)) {
                                     addDependencies(state, property.key.name, property, detectedDependencies[property.key.name] ?? [])
                                 }
                             })
@@ -169,18 +169,18 @@ export default function (): PluginItem {
                 }
 
                 // Function passed to StyleSheet.create (e.g., theme => ({ container: {} }))
-                if (isArrowFunctionExpression(arg) || isFunctionExpression(arg)) {
+                if (t.isArrowFunctionExpression(arg) || t.isFunctionExpression(arg)) {
                     const detectedDependencies = getStylesDependenciesFromFunction(path)
 
                     if (detectedDependencies) {
-                        const body = isBlockStatement(arg.body)
-                            ? arg.body.body.find(statement => isReturnStatement(statement))?.argument
+                        const body = t.isBlockStatement(arg.body)
+                            ? arg.body.body.find(statement => t.isReturnStatement(statement))?.argument
                             : arg.body
 
                         // Ensure the function body returns an object
-                        if (isObjectExpression(body)) {
+                        if (t.isObjectExpression(body)) {
                             body.properties.forEach(property => {
-                                if (isObjectProperty(property) && isIdentifier(property.key) && Object.prototype.hasOwnProperty.call(detectedDependencies, property.key.name)) {
+                                if (t.isObjectProperty(property) && t.isIdentifier(property.key) && Object.prototype.hasOwnProperty.call(detectedDependencies, property.key.name)) {
                                     addDependencies(state, property.key.name, property, detectedDependencies[property.key.name] ?? [])
                                 }
                             })
