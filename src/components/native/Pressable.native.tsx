@@ -40,9 +40,17 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
         <NativePressableReactNative
             {...props}
             ref={ref => {
+                const isPropStyleAFunction = typeof style === 'function'
+                const unistyles = isPropStyleAFunction
+                    ? style.call(style, { pressed: false })
+                    : getStyles(style as unknown as Record<string, any>)
+
                 if (ref) {
                     storedRef.current = ref
                 }
+
+                // @ts-expect-error - this is hidden from TS
+                UnistylesShadowRegistry.add(storedRef.current, unistyles)
 
                 return passForwardedRef(props, ref, forwardedRef)
             }}
