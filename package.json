@@ -9,10 +9,11 @@
     "lint": "biome lint",
     "check": "biome check --write",
     "check:ci": "biome check",
-    "prepare": "husky && bob build && yarn build:plugin",
+    "prepare": "husky && bob build && yarn plugin:build && yarn plugin:types",
     "precommit": "concurrently 'yarn tsc' 'yarn lint' 'yarn check' 'yarn test'",
     "release": "release-it",
-    "build:plugin": "node plugin/esbuild.js"
+    "plugin:build": "node plugin/esbuild.js",
+    "plugin:types": "tsc --emitDeclarationOnly --declaration plugin/src/types.ts --outDir plugin && mv plugin/types.d.ts plugin/index.d.ts && yarn check"
   },
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
@@ -32,6 +33,7 @@
     },
     "./plugin": {
       "module": "./plugin/index.js",
+      "types": "./plugin/index.d.ts",
       "default": "./plugin/index.js"
     },
     "./package.json": "./package.json",
@@ -55,6 +57,8 @@
     "react-native.config.js",
     "Unistyles.podspec",
     "!plugin/__tests__",
+    "!plugin/src",
+    "!plugin/esbuild.js",
     "!ios/build",
     "!android/build",
     "!android/gradle",
