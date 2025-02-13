@@ -1,5 +1,5 @@
 import { pluginTester } from 'babel-plugin-tester'
-import plugin from '../'
+import plugin from '../src/index'
 
 pluginTester({
     plugin,
@@ -101,6 +101,6 @@ pluginTester({
                     467105739
                 )
             `
-        },
+        }
     ]
 })
