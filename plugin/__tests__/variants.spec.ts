@@ -1,6 +1,5 @@
 import { pluginTester } from 'babel-plugin-tester'
-import { Text } from 'react-native'
-import plugin from '../'
+import plugin from '../src/index'
 
 pluginTester({
     plugin,
@@ -98,7 +97,7 @@ pluginTester({
                             uni__dependencies: [0, 4]
                         }
                     }),
-                    895830154
+                    895829844
                 )
             `
         },
@@ -143,7 +142,7 @@ pluginTester({
                     }
                 }
 
-                const s = StyleSheet.create({}, 895830154)
+                const s = StyleSheet.create({}, 895829844)
             `
         },
         {
@@ -215,8 +214,8 @@ pluginTester({
                     }
                 }
 
-                const styles = StyleSheet.create({}, 895830154)
+                const styles = StyleSheet.create({}, 895829844)
             `
-        },
+        }
     ]
 })

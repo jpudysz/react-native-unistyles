@@ -9,9 +9,11 @@
     "lint": "biome lint",
     "check": "biome check --write",
     "check:ci": "biome check",
-    "prepare": "husky && bob build",
+    "prepare": "husky && bob build && yarn plugin:build && yarn plugin:types",
     "precommit": "concurrently 'yarn tsc' 'yarn lint' 'yarn check' 'yarn test'",
-    "release": "release-it"
+    "release": "release-it",
+    "plugin:build": "node plugin/esbuild.js",
+    "plugin:types": "tsc --emitDeclarationOnly --declaration plugin/src/types.ts --outDir plugin && mv plugin/types.d.ts plugin/index.d.ts && yarn check"
   },
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
@@ -31,6 +33,7 @@
     },
     "./plugin": {
       "module": "./plugin/index.js",
+      "types": "./plugin/index.d.ts",
       "default": "./plugin/index.js"
     },
     "./package.json": "./package.json",
@@ -54,6 +57,8 @@
     "react-native.config.js",
     "Unistyles.podspec",
     "!plugin/__tests__",
+    "!plugin/src",
+    "!plugin/esbuild.js",
     "!ios/build",
     "!android/build",
     "!android/gradle",
@@ -83,9 +88,11 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
+    "@babel/core": "7.26.8",
     "@babel/plugin-syntax-jsx": "7.25.9",
     "@babel/preset-flow": "7.25.9",
     "@babel/preset-typescript": "7.26.0",
+    "@babel/types": "7.26.8",
     "@biomejs/biome": "1.9.4",
     "@commitlint/config-conventional": "19.6.0",
     "@react-native/normalize-colors": "0.77.0",
@@ -95,6 +102,7 @@
     "babel-plugin-tester": "11.0.4",
     "commitlint": "19.6.1",
     "concurrently": "9.1.2",
+    "esbuild": "0.25.0",
     "husky": "9.1.7",
     "jest": "29.7.0",
     "metro-react-native-babel-preset": "0.77.0",
@@ -178,5 +186,8 @@
     "name": "TurboUnistyles",
     "type": "modules",
     "jsSrcsDir": "./src/specs/TurboUnistyles"
+  },
+  "resolutions": {
+    "@babel/types": "7.26.8"
   }
 }

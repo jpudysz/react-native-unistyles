@@ -1,5 +1,5 @@
 import { pluginTester } from 'babel-plugin-tester'
-import plugin from '../'
+import plugin from '../src/index'
 
 pluginTester({
     plugin,
@@ -72,7 +72,7 @@ pluginTester({
                             uni__dependencies: [0, 9, 4]
                         }
                     }),
-                    664955283
+                    664955593
                 )
             `
         },
@@ -127,7 +127,7 @@ pluginTester({
                             uni__dependencies: [0, 9]
                         }
                     }),
-                    664955283
+                    664955593
                 )
             `
         },
@@ -176,7 +176,7 @@ pluginTester({
                             uni__dependencies: [0, 9, 12, 13]
                         }
                     }),
-                    664955283
+                    664955593
                 )
             `
         },
@@ -352,7 +352,7 @@ pluginTester({
                             uni__dependencies: [0, 11, 10, 3, 5]
                         }
                     }),
-                    664955283
+                    664955593
                 )
             `
         },
@@ -415,7 +415,7 @@ pluginTester({
                             }
                         }
                     }),
-                    664955283
+                    664955593
                 )
             `
         },
@@ -462,7 +462,7 @@ pluginTester({
                             uni__dependencies: [0, 14]
                         }
                     }),
-                    664955283
+                    664955593
                 )
             `
         },
@@ -509,7 +509,7 @@ pluginTester({
                             uni__dependencies: [0, 5]
                         })
                     }),
-                    664955283
+                    664955593
                 )
             `
         },
@@ -562,7 +562,7 @@ pluginTester({
                             uni__dependencies: [14]
                         }
                     }),
-                    664955283
+                    664955593
                 )
             `
         },
@@ -652,7 +652,7 @@ pluginTester({
                             }
                         }
                     }),
-                    664955283
+                    664955593
                 )
             `
         },
@@ -704,7 +704,7 @@ pluginTester({
                             uni__dependencies: [0, 3]
                         }
                     }),
-                    664955283
+                    664955593
                 )
             `
         },
@@ -756,7 +756,7 @@ pluginTester({
                             uni__dependencies: [0]
                         }
                     }),
-                    664955283
+                    664955593
                 )
             `
         },
@@ -798,7 +798,7 @@ pluginTester({
                         container: { ...theme.components.container, uni__dependencies: [0] },
                         container2: { ...theme.components.text.nested.deep, uni__dependencies: [0] }
                     }),
-                    664955283
+                    664955593
                 )
             `
         },
@@ -854,7 +854,7 @@ pluginTester({
                             uni__dependencies: [14, 6, 12]
                         }
                     }),
-                    664955283
+                    664955593
                 )
             `
         },
@@ -953,7 +953,7 @@ pluginTester({
                             })
                         }
                     },
-                    664955283
+                    664955593
                 )
             `
         }

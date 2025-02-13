@@ -1,5 +1,5 @@
 import { pluginTester } from 'babel-plugin-tester'
-import plugin from '../'
+import plugin from '../src/index'
 
 pluginTester({
     plugin,
@@ -53,7 +53,7 @@ pluginTester({
                             backgroundColor: 'red'
                         }
                     },
-                    798826616
+                    798826926
                 )
             `
         },
@@ -98,7 +98,7 @@ pluginTester({
                             uni__dependencies: [0]
                         }
                     }),
-                    798826616
+                    798826926
                 )
             `
         },
@@ -143,7 +143,7 @@ pluginTester({
                             uni__dependencies: [0]
                         }
                     }),
-                    798826616
+                    798826926
                 )
             `
         },
@@ -190,7 +190,7 @@ pluginTester({
                             uni__dependencies: [4]
                         }
                     },
-                    798826616
+                    798826926
                 )
             `
         },
@@ -237,7 +237,7 @@ pluginTester({
                             uni__dependencies: [4]
                         })
                     },
-                    798826616
+                    798826926
                 )
             `
         },
@@ -286,7 +286,7 @@ pluginTester({
                             uni__dependencies: [9, 4]
                         })
                     }),
-                    798826616
+                    798826926
                 )
             `
         },
@@ -335,7 +335,7 @@ pluginTester({
                             uni__dependencies: [0, 5, 4]
                         })
                     }),
-                    798826616
+                    798826926
                 )
             `
         },
@@ -386,7 +386,7 @@ pluginTester({
                             uni__dependencies: [0, 9, 4]
                         })
                     }
-                }, 798826616)
+                }, 798826926)
             `
         },
         {
@@ -445,7 +445,7 @@ pluginTester({
                             uni__dependencies: [0, 9, 4]
                         })
                     }
-                }, 798826616)
+                }, 798826926)
                 const styles2 = StyleSheet.create((theme, rt) => {
                     return {
                         container: () => ({
@@ -455,7 +455,7 @@ pluginTester({
                             uni__dependencies: [0, 9, 4]
                         })
                     }
-                }, 798826617)
+                }, 798826927)
             `
         },
         {
@@ -501,7 +501,7 @@ pluginTester({
                     {
                         inputContainer: {}
                     },
-                    798826616
+                    798826926
                 )
             `
         },
@@ -509,7 +509,6 @@ pluginTester({
             title: 'Should support style names of javascript array/object prototype functions using object',
             code: `
                 import { StyleSheet } from 'react-native-unistyles'
-
                 const styles = StyleSheet.create({
                     map: {},
                     length: {},
@@ -519,7 +518,6 @@ pluginTester({
             `,
             output: `
                 import { StyleSheet } from 'react-native-unistyles'
-
                 const styles = StyleSheet.create(
                     {
                         map: {},
@@ -527,15 +525,14 @@ pluginTester({
                         constructor: {},
                         toString: {}
                     },
-                    798826616
+                    798826926
                 )
             `
-        }, ,
+        },
         {
             title: 'Should support style names of javascript array/object prototype functions using function',
             code: `
                 import { StyleSheet } from 'react-native-unistyles'
-
                 const styles = StyleSheet.create((theme) => ({
                     map: {},
                     length: {},
@@ -545,7 +542,6 @@ pluginTester({
             `,
             output: `
                 import { StyleSheet } from 'react-native-unistyles'
-
                 const styles = StyleSheet.create(
                     theme => ({
                         map: {},
@@ -553,9 +549,9 @@ pluginTester({
                         constructor: {},
                         toString: {}
                     }),
-                    798826616
+                    798826926
                 )
             `
-        },
+        }
     ]
 })

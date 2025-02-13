@@ -1,4 +1,8 @@
-function handleExoticImport(t, path, state, exoticImport) {
+import type { NodePath } from '@babel/core'
+import * as t from '@babel/types'
+import type { RemapConfig, UnistylesPluginPass } from './types'
+
+export function handleExoticImport(path: NodePath<t.ImportDeclaration>, state: UnistylesPluginPass, exoticImport: Pick<RemapConfig, 'imports'>) {
     const specifiers = path.node.specifiers
     const source = path.node.source
 
@@ -20,7 +24,7 @@ function handleExoticImport(t, path, state, exoticImport) {
                 const newImport = t.importDeclaration(
                     [t.importDefaultSpecifier(t.identifier(specifier.local.name))],
                     t.stringLiteral(state.opts.isLocal
-                        ? state.file.opts.filename.split('react-native-unistyles').at(0).concat(`react-native-unistyles/components/native/${rule.mapTo}`)
+                        ? state.file.opts.filename?.split('react-native-unistyles').at(0)?.concat(`react-native-unistyles/components/native/${rule.mapTo}`) ?? ''
                         : `react-native-unistyles/components/native/${rule.mapTo}`
                     )
                 )
@@ -30,7 +34,7 @@ function handleExoticImport(t, path, state, exoticImport) {
                 const newImport = t.importDeclaration(
                     [t.importSpecifier(t.identifier(rule.mapTo), t.identifier(rule.mapTo))],
                     t.stringLiteral(state.opts.isLocal
-                        ? state.file.opts.filename.split('react-native-unistyles').at(0).concat(`react-native-unistyles/components/native/${rule.mapTo}`)
+                        ? state.file.opts.filename?.split('react-native-unistyles').at(0)?.concat(`react-native-unistyles/components/native/${rule.mapTo}`) ?? ''
                         : `react-native-unistyles/components/native/${rule.mapTo}`
                     )
                 )
@@ -47,8 +51,4 @@ function handleExoticImport(t, path, state, exoticImport) {
             return
         }
     })
-}
-
-module.exports = {
-    handleExoticImport
 }

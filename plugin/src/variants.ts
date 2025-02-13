@@ -1,4 +1,8 @@
-function extractVariants(t, path, state) {
+import type { NodePath } from '@babel/core'
+import * as t from '@babel/types'
+import type { UnistylesPluginPass } from './types'
+
+export function extractVariants(path: NodePath<t.BlockStatement>, state: UnistylesPluginPass) {
     const maybeVariants = path.node.body.filter(node => (
         t.isExpressionStatement(node) &&
         t.isCallExpression(node.expression) &&
@@ -9,7 +13,11 @@ function extractVariants(t, path, state) {
         return
     }
 
-    const targetVariant = maybeVariants.find(variant => {
+    const targetVariant = maybeVariants.find((variant): variant is t.ExpressionStatement => {
+        if (!t.isExpressionStatement(variant) || !t.isCallExpression(variant.expression) || !t.isMemberExpression(variant.expression.callee) || !t.isIdentifier(variant.expression.callee.object)) {
+            return false
+        }
+
         const calleeName = variant.expression.callee.object.name
 
         return (
@@ -23,8 +31,17 @@ function extractVariants(t, path, state) {
         return
     }
 
-    const calleeName = targetVariant.expression.callee.object.name
     const node = targetVariant.expression
+    if (!t.isCallExpression(node)) {
+        return
+    }
+
+    const callee = node.callee
+    if (!t.isMemberExpression(callee) || !t.isIdentifier(callee.object)) {
+        return
+    }
+
+    const calleeName = callee.object.name
     const newUniqueName = path.scope.generateUidIdentifier(calleeName)
 
     // Create shadow declaration eg. const _styles = styles
@@ -47,7 +64,7 @@ function extractVariants(t, path, state) {
     const rest = path.node.body.slice(pathIndex + 1)
 
     // move rest to new block (scope)
-    const blockStatement = t.blockStatement([
+    const statement = t.blockStatement([
         finalDeclaration,
         ...rest
     ])
@@ -55,12 +72,8 @@ function extractVariants(t, path, state) {
     path.node.body = [
         ...path.node.body.slice(0, pathIndex),
         shadowDeclaration,
-        blockStatement
+        statement
     ]
 
     state.file.hasVariants = true
-}
-
-module.exports = {
-    extractVariants
 }
