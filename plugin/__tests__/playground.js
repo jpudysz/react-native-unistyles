@@ -1,5 +1,5 @@
 const babel = require('@babel/core')
-const plugin = require('../src/index')
+const plugin = require('../index')
 
 const filePath = '../../expo-example/app/(tabs)/index.tsx'
 
