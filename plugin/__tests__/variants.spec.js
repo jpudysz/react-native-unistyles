@@ -1,6 +1,5 @@
 import { pluginTester } from 'babel-plugin-tester'
-import { Text } from 'react-native'
-import plugin from '../'
+import plugin from '../src/index'
 
 pluginTester({
     plugin,
@@ -217,6 +216,6 @@ pluginTester({
 
                 const styles = StyleSheet.create({}, 895830154)
             `
-        },
+        }
     ]
 })
