@@ -109,11 +109,13 @@ void core::UnistylesRegistry::removeDuplicatedUnistyles(jsi::Runtime& rt, const 
 
 void core::UnistylesRegistry::unlinkShadowNodeWithUnistyles(jsi::Runtime& rt, const ShadowNodeFamily* shadowNodeFamily) {
     this->_shadowRegistry[&rt].erase(shadowNodeFamily);
-    this->trafficController.removeShadowNode(shadowNodeFamily);
-
-    if (this->_shadowRegistry[&rt].empty()) {
-        this->_shadowRegistry.erase(&rt);
-    }
+    this->trafficController.withLock([this, &rt, shadowNodeFamily](){
+        this->trafficController.removeShadowNode(shadowNodeFamily);
+        
+        if (this->_shadowRegistry[&rt].empty()) {
+            this->_shadowRegistry.erase(&rt);
+        }
+    });
 }
 
 std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(jsi::Runtime& rt, int unid, core::StyleSheetType type, jsi::Object&& rawValue) {

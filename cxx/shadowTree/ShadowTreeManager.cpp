@@ -8,43 +8,46 @@ using AffectedNodes = std::unordered_map<const ShadowNodeFamily*, std::unordered
 
 void shadow::ShadowTreeManager::updateShadowTree(const ShadowTreeRegistry& shadowTreeRegistry) {
     auto& registry = core::UnistylesRegistry::get();
-    auto updates = registry.trafficController.getUpdates();
+    
+    registry.trafficController.withLock([&](){
+        auto updates = registry.trafficController.getUpdates();
 
-    if (updates.empty()) {
-        return;
-    }
+        if (updates.empty()) {
+            return;
+        }
 
-    shadowTreeRegistry.enumerate([&updates](const ShadowTree& shadowTree, bool& stop){
-        // we could iterate via updates and create multiple commits
-        // but it can cause performance issues for hundreds of nodes
-        // so let's mutate Shadow Tree in single transaction
-        auto transaction = [&](const RootShadowNode& oldRootShadowNode) {
-            auto affectedNodes = shadow::ShadowTreeManager::findAffectedNodes(oldRootShadowNode, updates);
-            auto newRootNode = std::static_pointer_cast<RootShadowNode>(shadow::ShadowTreeManager::cloneShadowTree(
-                oldRootShadowNode,
-                updates,
-                affectedNodes
-            ));
+        shadowTreeRegistry.enumerate([&updates](const ShadowTree& shadowTree, bool& stop){
+            // we could iterate via updates and create multiple commits
+            // but it can cause performance issues for hundreds of nodes
+            // so let's mutate Shadow Tree in single transaction
+            auto transaction = [&](const RootShadowNode& oldRootShadowNode) {
+                auto affectedNodes = shadow::ShadowTreeManager::findAffectedNodes(oldRootShadowNode, updates);
+                auto newRootNode = std::static_pointer_cast<RootShadowNode>(shadow::ShadowTreeManager::cloneShadowTree(
+                    oldRootShadowNode,
+                    updates,
+                    affectedNodes
+                ));
 
-            // set unistyles trait
-            auto unistylesRootNode = std::reinterpret_pointer_cast<core::UnistylesCommitShadowNode>(newRootNode);
+                // set unistyles trait
+                auto unistylesRootNode = std::reinterpret_pointer_cast<core::UnistylesCommitShadowNode>(newRootNode);
 
-            unistylesRootNode->addUnistylesCommitTrait();
+                unistylesRootNode->addUnistylesCommitTrait();
 
-            return newRootNode;
-        };
+                return newRootNode;
+            };
 
-        // commit once!
-        // CommitOptions:
-        // enableStateReconciliation: https://reactnative.dev/architecture/render-pipeline#react-native-renderer-state-updates
-        // mountSynchronously: must be true as this is update from C++ not React
-        shadowTree.commit(transaction, {false, true});
+            // commit once!
+            // CommitOptions:
+            // enableStateReconciliation: https://reactnative.dev/architecture/render-pipeline#react-native-renderer-state-updates
+            // mountSynchronously: must be true as this is update from C++ not React
+            shadowTree.commit(transaction, {false, true});
 
 
-        // for now we're assuming single surface, can be improved in the future
-        // stop = true means stop enumerating next shadow tree
-        // so in other words first shadow tree is our desired tree
-        stop = true;
+            // for now we're assuming single surface, can be improved in the future
+            // stop = true means stop enumerating next shadow tree
+            // so in other words first shadow tree is our desired tree
+            stop = true;
+        });
     });
 }
 
