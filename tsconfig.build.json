@@ -4,5 +4,5 @@
   "compilerOptions": {
     "noEmit": false
   },
-  "exclude": ["example", "expo-example", "plugin/__tests__", "docs"]
+  "exclude": ["example", "expo-example", "plugin", "docs"]
 }
