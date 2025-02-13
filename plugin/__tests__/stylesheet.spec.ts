@@ -53,7 +53,7 @@ pluginTester({
                             backgroundColor: 'red'
                         }
                     },
-                    798826616
+                    798826926
                 )
             `
         },
@@ -98,7 +98,7 @@ pluginTester({
                             uni__dependencies: [0]
                         }
                     }),
-                    798826616
+                    798826926
                 )
             `
         },
@@ -143,7 +143,7 @@ pluginTester({
                             uni__dependencies: [0]
                         }
                     }),
-                    798826616
+                    798826926
                 )
             `
         },
@@ -190,7 +190,7 @@ pluginTester({
                             uni__dependencies: [4]
                         }
                     },
-                    798826616
+                    798826926
                 )
             `
         },
@@ -237,7 +237,7 @@ pluginTester({
                             uni__dependencies: [4]
                         })
                     },
-                    798826616
+                    798826926
                 )
             `
         },
@@ -286,7 +286,7 @@ pluginTester({
                             uni__dependencies: [9, 4]
                         })
                     }),
-                    798826616
+                    798826926
                 )
             `
         },
@@ -335,7 +335,7 @@ pluginTester({
                             uni__dependencies: [0, 5, 4]
                         })
                     }),
-                    798826616
+                    798826926
                 )
             `
         },
@@ -386,7 +386,7 @@ pluginTester({
                             uni__dependencies: [0, 9, 4]
                         })
                     }
-                }, 798826616)
+                }, 798826926)
             `
         },
         {
@@ -445,7 +445,7 @@ pluginTester({
                             uni__dependencies: [0, 9, 4]
                         })
                     }
-                }, 798826616)
+                }, 798826926)
                 const styles2 = StyleSheet.create((theme, rt) => {
                     return {
                         container: () => ({
@@ -455,7 +455,7 @@ pluginTester({
                             uni__dependencies: [0, 9, 4]
                         })
                     }
-                }, 798826617)
+                }, 798826927)
             `
         },
         {
@@ -501,7 +501,7 @@ pluginTester({
                     {
                         inputContainer: {}
                     },
-                    798826616
+                    798826926
                 )
             `
         },
@@ -525,7 +525,7 @@ pluginTester({
                         constructor: {},
                         toString: {}
                     },
-                    798826616
+                    798826926
                 )
             `
         },
@@ -549,7 +549,7 @@ pluginTester({
                         constructor: {},
                         toString: {}
                     }),
-                    798826616
+                    798826926
                 )
             `
         }
