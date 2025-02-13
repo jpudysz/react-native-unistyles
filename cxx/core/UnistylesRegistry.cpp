@@ -108,8 +108,8 @@ void core::UnistylesRegistry::removeDuplicatedUnistyles(jsi::Runtime& rt, const 
 }
 
 void core::UnistylesRegistry::unlinkShadowNodeWithUnistyles(jsi::Runtime& rt, const ShadowNodeFamily* shadowNodeFamily) {
-    this->_shadowRegistry[&rt].erase(shadowNodeFamily);
     this->trafficController.withLock([this, &rt, shadowNodeFamily](){
+        this->_shadowRegistry[&rt].erase(shadowNodeFamily);
         this->trafficController.removeShadowNode(shadowNodeFamily);
         
         if (this->_shadowRegistry[&rt].empty()) {
