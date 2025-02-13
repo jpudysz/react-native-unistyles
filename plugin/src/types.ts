@@ -14,7 +14,7 @@ export type RemapImport = {
      */
     path: string,
     /**
-     * The name of the Unistyles component.
+     * The name of the Unistyles component, check `react-native-unistyles/src/components/native`
      */
     mapTo: string
 }
