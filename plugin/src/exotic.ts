@@ -1,6 +1,7 @@
 import type { NodePath } from '@babel/core'
 import * as t from '@babel/types'
-import type { RemapConfig, UnistylesPluginPass } from './types'
+import type { RemapConfig } from '../index'
+import type { UnistylesPluginPass } from './types'
 
 export function handleExoticImport(path: NodePath<t.ImportDeclaration>, state: UnistylesPluginPass, exoticImport: Pick<RemapConfig, 'imports'>) {
     const specifiers = path.node.specifiers

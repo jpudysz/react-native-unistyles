@@ -9,11 +9,10 @@
     "lint": "biome lint",
     "check": "biome check --write",
     "check:ci": "biome check",
-    "prepare": "husky && bob build && yarn plugin:build && yarn plugin:types",
+    "prepare": "husky && bob build && yarn plugin:build",
     "precommit": "concurrently 'yarn tsc' 'yarn lint' 'yarn check' 'yarn test'",
     "release": "release-it",
-    "plugin:build": "node plugin/esbuild.js",
-    "plugin:types": "tsc --emitDeclarationOnly --declaration plugin/src/types.ts --outDir plugin && mv plugin/types.d.ts plugin/index.d.ts && yarn check"
+    "plugin:build": "node plugin/esbuild.js"
   },
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
