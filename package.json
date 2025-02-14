@@ -22,7 +22,7 @@
     ".": {
       "types": "./lib/typescript/src/index.d.ts",
       "module": "./lib/module/index.js",
-      "react-native": "./src/index",
+      "react-native": "./src/index.ts",
       "default": "./lib/commonjs/index.js"
     },
     "./components/native/*": {
@@ -39,7 +39,7 @@
     "./server": {
       "types": "./lib/typescript/src/server/index.d.ts",
       "module": "./lib/module/server/index.js",
-      "react-native": "./src/server",
+      "react-native": "./src/server.ts",
       "default": "./lib/commonjs/server/index.js"
     }
   },
