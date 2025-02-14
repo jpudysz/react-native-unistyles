@@ -1,5 +1,5 @@
 import { pluginTester } from 'babel-plugin-tester'
-import plugin from '../'
+import plugin from '../src/index'
 
 pluginTester({
     plugin,
@@ -54,7 +54,7 @@ pluginTester({
                             flex: 1
                         }
                     },
-                    467105739
+                    467105429
                 )
             `
         },
@@ -98,9 +98,9 @@ pluginTester({
                             flex: 1
                         }
                     },
-                    467105739
+                    467105429
                 )
             `
-        },
+        }
     ]
 })
