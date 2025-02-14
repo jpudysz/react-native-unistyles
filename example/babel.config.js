@@ -1,7 +1,7 @@
 const path = require('path')
 const pak = require('../package.json')
 
-/** @type {import('../plugin/src/types').UnistylesPluginOptions} */
+/** @type {import('../plugin').UnistylesPluginOptions} */
 const unistylesPluginOptions = {
     debug: true,
     isLocal: true,
