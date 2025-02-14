@@ -1,22 +1,24 @@
-import type { BabelFile } from '@babel/core';
+import type { BabelFile } from '@babel/core'
+
 export type RemapImport = {
     /**
      * The target import name if `isDefault` is false.
      */
-    name?: string;
+    name?: string,
     /**
      * Whether the import is default.
      */
-    isDefault: boolean;
+    isDefault: boolean,
     /**
      * The path to the target import.
      */
-    path: string;
+    path: string,
     /**
-     * The name of the Unistyles component.
+     * The name of the Unistyles component, check `react-native-unistyles/src/components/native`
      */
-    mapTo: string;
-};
+    mapTo: string
+}
+
 /**
  * A more powerful API that allows converting unmatched imports to Unistyles.
  */
@@ -24,24 +26,27 @@ export type RemapConfig = {
     /**
      * The node_modules path.
      */
-    path: string;
+    path: string,
     /**
      * An array of import objects with the following properties:
      */
-    imports: Array<RemapImport>;
-};
+    imports: Array<RemapImport>
+}
+
 export interface UnistylesPluginOptions {
     /**
      * Example: 'src' or 'apps/mobile'
      * Add this option if some of your components don't have `react-native-unistyles` import.
      * Babel plugin will automatically process all files under this root.
      */
-    autoProcessRoot?: string;
+    autoProcessRoot?: string,
+
     /**
     * Example: ['@codemask/styles']
     * Enable this option if you want to process only files containing specific imports.
     */
-    autoProcessImports?: Array<string>;
+    autoProcessImports?: Array<string>,
+
     /**
      * Example: [{
      *     path: 'node_modules/custom-library/components',
@@ -74,7 +79,8 @@ export interface UnistylesPluginOptions {
      * imports.name is Optional if library used export default
      * imports.mapTo - name of the component from react-native-unistyles/src/components/native
      */
-    autoRemapImports?: Array<RemapConfig>;
+    autoRemapImports?: Array<RemapConfig>,
+
     /**
     * Example: ['external-library/components']
     * Enable this option to process some 3rd party components under `node_modules`.
@@ -86,31 +92,35 @@ export interface UnistylesPluginOptions {
     * ['react-native-reanimated/src/component', 'react-native-gesture-handler/src/components']
     * ```
     */
-    autoProcessPaths?: Array<string>;
+    autoProcessPaths?: Array<string>,
+
     /**
     * In order to list detected dependencies by the Babel plugin you can enable the `debug` flag.
     * It will `console.log` name of the file and component with Unistyles dependencies.
     */
-    debug?: boolean;
+    debug?: boolean,
+
     /**
     * Only applicable for Unistyles monorepo for
     * path resolution, don't use it!
     */
-    isLocal?: boolean;
+    isLocal?: boolean
 }
+
 interface UnistylesState {
-    hasAnyUnistyle: boolean;
-    hasVariants: boolean;
-    hasUnistylesImport: boolean;
-    forceProcessing: boolean;
-    styleSheetLocalName: string;
-    tagNumber: number;
-    replaceWithUnistyles: boolean;
+    hasAnyUnistyle: boolean,
+    hasVariants: boolean,
+    hasUnistylesImport: boolean,
+    forceProcessing: boolean,
+    styleSheetLocalName: string,
+    tagNumber: number,
+    replaceWithUnistyles: boolean
 }
+
 export interface UnistylesPluginPass {
-    file: BabelFile & UnistylesState;
-    opts: UnistylesPluginOptions;
-    cwd: string;
-    filename: string | undefined;
-    reactNativeImports: Record<string, string>;
+    file: BabelFile & UnistylesState,
+    opts: UnistylesPluginOptions,
+    cwd: string,
+    filename: string | undefined,
+    reactNativeImports: Record<string, string>
 }

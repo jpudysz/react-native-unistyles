@@ -1,9 +1,12 @@
-/** @param {import('./index').UnistylesPluginPass} state */
-function addUnistylesImport(t, path, state) {
+import type { NodePath } from '@babel/core'
+import * as t from '@babel/types'
+import type { UnistylesPluginPass } from './types'
+
+export function addUnistylesImport(path: NodePath<t.Program>, state: UnistylesPluginPass) {
     const localNames = Object.keys(state.reactNativeImports)
     const names = Object.values(state.reactNativeImports)
     const pairs = Object.entries(state.reactNativeImports)
-    const nodesToRemove = []
+    const nodesToRemove: Array<t.ImportDeclaration> = []
 
     // remove rn-imports
     path.node.body.forEach(node => {
@@ -19,7 +22,7 @@ function addUnistylesImport(t, path, state) {
 
     // remove RNWeb imports
     names.forEach(name => {
-        const rnWebImport = path.node.body.find(node => t.isImportDeclaration(node) && node.source.value === `react-native-web/dist/exports/${name}`)
+        const rnWebImport = path.node.body.find((node): node is t.ImportDeclaration => t.isImportDeclaration(node) && node.source.value === `react-native-web/dist/exports/${name}`)
 
         if (rnWebImport) {
             rnWebImport.specifiers = []
@@ -31,7 +34,7 @@ function addUnistylesImport(t, path, state) {
         const newImport = t.importDeclaration(
             [t.importSpecifier(t.identifier(localName), t.identifier(name))],
             t.stringLiteral(state.opts.isLocal
-                ? state.file.opts.filename.split('react-native-unistyles').at(0).concat(`react-native-unistyles/src/components/native/${name}`)
+                ? state.file.opts.filename?.split('react-native-unistyles').at(0)?.concat(`react-native-unistyles/src/components/native/${name}`) ?? ''
                 : `react-native-unistyles/components/native/${name}`
             )
         )
@@ -43,9 +46,6 @@ function addUnistylesImport(t, path, state) {
     nodesToRemove.forEach(node => path.node.body.splice(path.node.body.indexOf(node), 1))
 }
 
-const isInsideNodeModules = state => state.file.opts.filename.includes('node_modules')
-
-module.exports = {
-    isInsideNodeModules,
-    addUnistylesImport
+export function isInsideNodeModules(state: UnistylesPluginPass) {
+    return state.file.opts.filename?.includes('node_modules')
 }
