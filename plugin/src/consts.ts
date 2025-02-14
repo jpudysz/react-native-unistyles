@@ -1,4 +1,4 @@
-import type { RemapConfig } from './types'
+import type { RemapConfig } from '../index'
 
 export const REACT_NATIVE_COMPONENT_NAMES = [
     'ActivityIndicator',
