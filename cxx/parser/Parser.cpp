@@ -62,10 +62,10 @@ jsi::Value parser::Parser::getParsedStyleSheetForScopedTheme(jsi::Runtime& rt, c
         .asObject(rt);
 }
 
-void parser::Parser::rebuildUnistyleWithScopedTheme(jsi::Runtime& rt, jsi::Value& jsScopedTheme, std::shared_ptr<core::UnistyleData> unistyleData) {
-    auto parsedStyleSheet = jsScopedTheme.isUndefined()
+void parser::Parser::rebuildUnistyleWithScopedTheme(jsi::Runtime& rt, jsi::Value& scopedStyleSheet, std::shared_ptr<core::UnistyleData> unistyleData) {
+    auto parsedStyleSheet = scopedStyleSheet.isUndefined()
         ? this->getParsedStyleSheetForScopedTheme(rt, unistyleData->unistyle, unistyleData->scopedTheme.value())
-        : jsScopedTheme.asObject(rt);
+        : scopedStyleSheet.asObject(rt);
 
     if (parsedStyleSheet.isUndefined()) {
         return;

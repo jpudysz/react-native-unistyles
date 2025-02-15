@@ -49,7 +49,6 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     }
 
     auto parser = parser::Parser(this->_unistylesRuntime);
-    auto parsedStyleSheet = jsi::Value::undefined();
     std::vector<std::shared_ptr<core::UnistyleData>> unistylesData{};
 
     // create unistyleData based on wrappers
@@ -78,9 +77,7 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
 
         // before linking we need to check if given unistyle is affected by scoped theme
         if (scopedTheme.has_value()) {
-            if (parsedStyleSheet.isUndefined()) {
-                parsedStyleSheet = parser.getParsedStyleSheetForScopedTheme(rt, unistyle, scopedTheme.value());
-            }
+            auto parsedStyleSheet = parser.getParsedStyleSheetForScopedTheme(rt, unistyle, scopedTheme.value());
 
             // if so we need to force update
             parser.rebuildUnistyleWithScopedTheme(rt, parsedStyleSheet, unistyleData);
