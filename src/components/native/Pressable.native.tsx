@@ -26,6 +26,7 @@ const getStyles = (styleProps: Record<string, any> = {}) => {
 
 export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ...props }, forwardedRef) => {
     const storedRef = useRef<View | null>()
+    const scopedTheme = UnistylesShadowRegistry.getScopedTheme()
 
     useLayoutEffect(() => {
         return () => {
@@ -56,6 +57,10 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
             }}
             style={state => {
                 const isPropStyleAFunction = typeof style === 'function'
+                const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
+
+                UnistylesShadowRegistry.setScopedTheme(scopedTheme)
+
                 const unistyles = isPropStyleAFunction
                     ? style.call(style, state)
                     : getStyles(style as unknown as Record<string, any>)
@@ -69,6 +74,8 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
 
                 // @ts-expect-error - this is hidden from TS
                 UnistylesShadowRegistry.add(storedRef.current, unistyles)
+
+                UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
 
                 return unistyles
             }}
