@@ -76,11 +76,16 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
         );
 
         // before linking we need to check if given unistyle is affected by scoped theme
-        if (scopedTheme.has_value()) {
+        if (scopedTheme.has_value() && unistyle->styleKey != helpers::EXOTIC_STYLE_KEY) {
             auto parsedStyleSheet = parser.getParsedStyleSheetForScopedTheme(rt, unistyle, scopedTheme.value());
 
             // if so we need to force update
             parser.rebuildUnistyleWithScopedTheme(rt, parsedStyleSheet, unistyleData);
+        }
+
+        // for exotic unistyles, do nothing
+        if (unistyle->styleKey == helpers::EXOTIC_STYLE_KEY) {
+            unistyleData->unistyle->parsedStyle = std::make_optional<jsi::Object>(jsi::Value(rt, unistyle->rawValue).asObject(rt));
         }
 
         unistylesData.emplace_back(unistyleData);
