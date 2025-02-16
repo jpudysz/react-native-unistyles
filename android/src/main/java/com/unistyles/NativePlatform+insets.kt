@@ -24,6 +24,7 @@ class NativePlatformInsets(
     private val getMiniRuntime: () -> UnistylesNativeMiniRuntime,
     private val diffMiniRuntime: () -> Array<UnistyleDependency>
 ) {
+    private var _shouldListenToImeEvents = false
     private val _imeListeners: MutableList<CxxImeListener> = mutableListOf()
     private var _insets: Insets = Insets(0.0, 0.0, 0.0, 0.0, 0.0)
 
@@ -113,6 +114,8 @@ class NativePlatformInsets(
     }
 
     fun startInsetsListener() {
+        _shouldListenToImeEvents = true
+
         reactContext.currentActivity?.let { activity ->
             activity.findViewById<View>(android.R.id.content)?.let { mainView ->
                 ViewCompat.setOnApplyWindowInsetsListener(mainView) { _, insets ->
@@ -130,6 +133,10 @@ class NativePlatformInsets(
                                 insets: WindowInsetsCompat,
                                 runningAnimations: List<WindowInsetsAnimationCompat>
                             ): WindowInsetsCompat {
+                                if (!_shouldListenToImeEvents) {
+                                    return insets
+                                }
+
                                 runningAnimations.firstOrNull()?.let {
                                     val bottomInset = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom.toDouble() - this@NativePlatformInsets._insets.bottom
                                     val nextBottomInset = if (bottomInset < 0) {
@@ -160,9 +167,10 @@ class NativePlatformInsets(
         reactContext.currentActivity?.let { activity ->
             activity.window?.decorView?.let { view ->
                 ViewCompat.setOnApplyWindowInsetsListener(view, null)
-                ViewCompat.setWindowInsetsAnimationCallback(view, null)
             }
         }
+
+        _shouldListenToImeEvents = false
     }
 
     fun addImeListener(listener: CxxImeListener) {
