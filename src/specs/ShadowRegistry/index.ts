@@ -45,6 +45,7 @@ HybridShadowRegistry.add = (handle, styles) => {
         .filter(style => !style?.initial?.updater)
         .filter(style => style && Object.keys(style).length > 0)
         .flat()
+        .filter(Boolean)
 
     if (filteredStyles.length > 0) {
         HybridShadowRegistry.link(findShadowNodeForHandle(handle), filteredStyles)

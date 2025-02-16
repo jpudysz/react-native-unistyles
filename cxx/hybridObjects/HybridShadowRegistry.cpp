@@ -85,7 +85,7 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
 
         // for exotic unistyles, do nothing
         if (unistyle->styleKey == helpers::EXOTIC_STYLE_KEY) {
-            unistyleData->unistyle->parsedStyle = std::make_optional<jsi::Object>(jsi::Value(rt, unistyle->rawValue).asObject(rt));
+            unistyleData->parsedStyle = std::make_optional<jsi::Object>(jsi::Value(rt, unistyle->rawValue).asObject(rt));
         }
 
         unistylesData.emplace_back(unistyleData);
