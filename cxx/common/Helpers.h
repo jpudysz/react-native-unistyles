@@ -225,4 +225,89 @@ inline static jsi::Array dependenciesToJSIArray(jsi::Runtime& rt, const std::vec
     return result;
 }
 
+inline void debugPrintJSIObject(jsi::Runtime& rt, std::string& name, jsi::Object& obj) {
+    auto console = rt.global().getPropertyAsObject(rt, "console");
+    auto log = console.getPropertyAsFunction(rt, "log");
+    auto parser = [&](const std::string& key, jsi::Value& value){
+        if (value.isBool()) {
+            std::string output = key + ": " + (value.getBool() ? "true" : "false");
+            log.call(rt, output);
+
+            return;
+        }
+
+        if (value.isNumber()) {
+            std::string output = key + ": " + std::to_string(value.getNumber());
+            log.call(rt, output);
+
+            return;
+        }
+
+        if (value.isString()) {
+            std::string output = key + ": " + value.getString(rt).utf8(rt);
+            log.call(rt, output);
+
+            return;
+        }
+
+        if (value.isUndefined()) {
+            std::string output = key + ": undefined";
+            log.call(rt, output);
+
+            return;
+        }
+
+        if (value.isNull()) {
+            std::string output = key + ": null";
+            log.call(rt, output);
+
+            return;
+        }
+    };
+
+    log.call(rt, "===" + name + "===");
+
+    enumerateJSIObject(rt, obj, [&](const std::string& key, jsi::Value& value){
+        if (value.isObject()) {
+            if (value.asObject(rt).isArray(rt)) {
+                iterateJSIArray(rt, value.asObject(rt).asArray(rt), [&](size_t i, jsi::Value& nestedValue){
+                    std::string printableKey = key + ": Array[" + std::to_string(i) + "]";
+
+                    log.call(rt, printableKey);
+
+                    if (nestedValue.isObject()) {
+                        enumerateJSIObject(rt, nestedValue.asObject(rt), [&](const std::string& nestedKey, jsi::Value& nestedValue){
+                            parser(nestedKey, nestedValue);
+                        });
+                    } else {
+                        parser(printableKey, nestedValue);
+                    }
+
+                    std::string endKey = key + ": Array[end]";
+
+                    log.call(rt, endKey);
+                });
+            }
+
+            if (value.asObject(rt).isFunction(rt)) {
+                std::string output = key + ": [Function]";
+
+                log.call(rt, output);
+
+                return;
+            }
+
+            enumerateJSIObject(rt, value.asObject(rt), [&](const std::string& nestedKey, jsi::Value& nestedValue){
+                parser(nestedKey, nestedValue);
+            });
+
+            return;
+        }
+
+        parser(key, value);
+    });
+
+    log.call(rt, "===/" + name + "===");
+}
+
 }
