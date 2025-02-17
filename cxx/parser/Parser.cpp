@@ -916,7 +916,49 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
                 return convertedStyles.setProperty(rt, propertyName.c_str(), jsi::Value(state.parseColor(propertyValue)));
             }
 
-            convertedStyles.setProperty(rt, propertyName.c_str(), propertyValue);
+            if (!propertyValue.isObject()) {
+                return convertedStyles.setProperty(rt, propertyName.c_str(), propertyValue);
+            }
+
+            auto objValue = propertyValue.asObject(rt);
+
+            if (!objValue.isArray(rt)) {
+                return convertedStyles.setProperty(rt, propertyName.c_str(), propertyValue);
+            }
+
+            // parse nested arrays like boxShadow
+            auto arrValue = objValue.asArray(rt);
+            auto parsedArray = jsi::Array(rt, arrValue.length(rt));
+
+            helpers::iterateJSIArray(rt, arrValue, [&](size_t i, jsi::Value& nestedValue){
+                if (nestedValue.isObject()) {
+                    jsi::Object obj = jsi::Object(rt);
+
+                    helpers::enumerateJSIObject(rt, nestedValue.asObject(rt), [&](const std::string& propertyName, jsi::Value& propertyValue){
+                        if (this->isColor(propertyName)) {
+                            obj.setProperty(rt, propertyName.c_str(), state.parseColor(propertyValue));
+
+                            return;
+                        }
+
+                        obj.setProperty(rt, propertyName.c_str(), propertyValue);
+                    });
+
+                    parsedArray.setValueAtIndex(rt, i, std::move(obj));
+
+                    return;
+                }
+
+                if (this->isColor(propertyName)) {
+                    parsedArray.setValueAtIndex(rt, i, jsi::Value(state.parseColor(nestedValue)));
+
+                    return;
+                }
+
+                parsedArray.setValueAtIndex(rt, i, nestedValue);
+            });
+
+            return convertedStyles.setProperty(rt, propertyName.c_str(), parsedArray);
         });
     }
 
