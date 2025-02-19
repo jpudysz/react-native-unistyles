@@ -130,15 +130,40 @@
     });
 }
 
+- (UIWindow *)getMainWindow {
+    for (UIScene *scene in [UIApplication sharedApplication].connectedScenes) {
+        if ([scene isKindOfClass:[UIWindowScene class]]) {
+            UIWindowScene *windowScene = (UIWindowScene *)scene;
+            for (UIWindow *window in windowScene.windows) {
+                if (window.isKeyWindow) {
+                    return window;
+                }
+            }
+        }
+    }
+
+    return nil;
+}
+
 - (Insets)getInsets {
-    UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
+    UIWindow *window = [self getMainWindow];
+
+    if (window == nil) {
+        return {0, 0, 0, 0};
+    }
+
     UIEdgeInsets safeArea = window.safeAreaInsets;
 
     return {(int)safeArea.top, (int)safeArea.bottom, (int)safeArea.left, (int)safeArea.right};
 }
 
 - (Dimensions)getStatusBarDimensions {
-    UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
+    UIWindow *window = [self getMainWindow];
+
+    if (window == nil) {
+        return {0, 0};
+    }
+
     CGRect statusBarFrame = window.windowScene.statusBarManager.statusBarFrame;
 
     return {(int)statusBarFrame.size.width, (int)statusBarFrame.size.height};
@@ -183,7 +208,7 @@
 
             return;
         }
-        
+
         presentedViewController.view.backgroundColor = backgroundColor;
     });
 }
