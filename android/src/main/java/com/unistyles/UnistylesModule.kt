@@ -23,6 +23,7 @@ import kotlin.math.roundToInt
 class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener {
     private var isCxxReady: Boolean = false
     private var platform: Platform = Platform(reactContext)
+    private var _shouldListenToImeEvents = false
 
     private val configurationChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -137,6 +138,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     override fun onHostResume() {
         this.enableEdgeToEdge()
+        _shouldListenToImeEvents = true
 
         if (isCxxReady) {
             this.onConfigChange()
@@ -178,6 +180,10 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                                 insets: WindowInsetsCompat,
                                 runningAnimations: List<WindowInsetsAnimationCompat>
                             ): WindowInsetsCompat {
+                                if (!_shouldListenToImeEvents) {
+                                    return insets
+                                }
+
                                 runningAnimations.firstOrNull()?.let { animation ->
                                     val progress = animation.fraction
                                     val nextBottomInset = if (isGoingUp) {
@@ -208,9 +214,10 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         this.reactApplicationContext.currentActivity?.let { activity ->
             activity.window?.decorView?.let { view ->
                 ViewCompat.setOnApplyWindowInsetsListener(view, null)
-                ViewCompat.setWindowInsetsAnimationCallback(view, null)
             }
         }
+
+        _shouldListenToImeEvents = false
     }
 
     override fun onHostDestroy() {}
