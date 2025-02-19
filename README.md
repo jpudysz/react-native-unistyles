@@ -77,6 +77,9 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 <a href="https://github.com/dacoto97">
      <img src="https://avatars.githubusercontent.com/u/16915053?v=4" height="70px" width="70px" alt="dacoto97" />
 </a>
+<a href="https://github.com/chinamcafee">
+     <img src="https://avatars.githubusercontent.com/u/3439961?v=4" height="70px" width="70px" alt="chinamcafee" />
+</a>
 
 ## Past sponsors
 
