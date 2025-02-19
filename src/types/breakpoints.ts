@@ -53,7 +53,9 @@ type FlattenVariants<T, ShouldFlatten> = T extends object
 
 type ParseVariants<T> = T extends object
     ? T[keyof T] extends object
-        ? UnionToIntersection<ParseVariants<T[keyof T]>>
+        ? UnionToIntersection<ParseVariants<T[keyof T]>> extends never
+            ? ParseVariants<T[keyof T]>
+            : UnionToIntersection<ParseVariants<T[keyof T]>>
         : T
     : T
 
