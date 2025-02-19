@@ -908,7 +908,7 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
     for (const auto& unistyleData : unistyles) {
         // this can happen for exotic stylesheets
         if (!unistyleData->parsedStyle.has_value()) {
-            return nullptr;
+            continue;
         }
 
         helpers::enumerateJSIObject(rt, unistyleData->parsedStyle.value(), [&](const std::string& propertyName, jsi::Value& propertyValue){
