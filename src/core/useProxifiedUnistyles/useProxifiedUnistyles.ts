@@ -31,7 +31,7 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
     const [dependencies] = useState(() => new Set<number>())
     const [theme, setTheme] = useState(UnistylesRuntime.getTheme(scopedTheme))
     const [_, runtimeChanged] = useReducer(() => ({}), {})
-    const disposeRef = useRef<VoidFunction>()
+    const disposeRef = useRef<VoidFunction>(undefined)
 
     const reinitListener = () => {
         disposeRef.current?.()
