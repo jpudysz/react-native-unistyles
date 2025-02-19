@@ -25,7 +25,7 @@ const getStyles = (styleProps: Record<string, any> = {}) => {
 }
 
 export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ...props }, forwardedRef) => {
-    const storedRef = useRef<View | null>()
+    const storedRef = useRef<View | null>(null)
     const scopedTheme = UnistylesShadowRegistry.getScopedTheme()
 
     useLayoutEffect(() => {

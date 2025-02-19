@@ -1,6 +1,6 @@
 import React from 'react'
 import { forwardRef } from 'react'
-import { ImageBackground as NativeImageBackground } from 'react-native'
+import { type ImageStyle, ImageBackground as NativeImageBackground, type StyleProp, type ViewStyle } from 'react-native'
 import { getClassName } from '../../core'
 import type { UnistylesValues } from '../../types'
 import { copyComponentProperties } from '../../utils'
@@ -19,11 +19,10 @@ const UnistylesImageBackground = forwardRef<unknown, Props>((props, forwardedRef
     const imageClassNames = getClassName(props.imageStyle)
 
     return (
-        // @ts-expect-error - RN types are not compatible with RNW styles
         <NativeImageBackground
             {...props}
-            style={styleClassNames}
-            imageStyle={imageClassNames}
+            style={styleClassNames as StyleProp<ViewStyle>}
+            imageStyle={imageClassNames as StyleProp<ImageStyle>}
             ref={isServer() ? undefined : ref => {
                 if (!ref) {
                     // @ts-expect-error hidden from TS
