@@ -305,6 +305,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, Dependenc
                 unistyle->rawValue = parsedStyleSheetsWithDefaultTheme[unistyleStyleSheet].asObject(rt).getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
                 this->rebuildUnistyle(rt, unistyle, unistyleData->variants, unistyleData->dynamicFunctionMetadata);
                 unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
+                unistyle->isDirty = true;
             }
 
             if (!parsedUnistyles.contains(unistyle)) {
