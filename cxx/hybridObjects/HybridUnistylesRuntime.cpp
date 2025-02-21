@@ -73,9 +73,13 @@ void HybridUnistylesRuntime::setTheme(const std::string &themeName) {
     helpers::assertThat(*_rt, !this->getHasAdaptiveThemes(), "Unistyles: You're trying to set theme to: '" + themeName + "', but adaptiveThemes are enabled.");
 
     auto& state = core::UnistylesRegistry::get().getState(*_rt);
+    auto& currentThemeName = state.getCurrentThemeName();
 
     state.setTheme(themeName);
-    this->_onDependenciesChange({UnistyleDependency::THEME, UnistyleDependency::THEMENAME});
+
+    if (currentThemeName != themeName) {
+        this->_onDependenciesChange({UnistyleDependency::THEME, UnistyleDependency::THEMENAME});
+    }
 };
 
 void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
