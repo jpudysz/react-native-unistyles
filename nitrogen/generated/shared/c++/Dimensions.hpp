@@ -33,6 +33,7 @@ namespace margelo::nitro::unistyles {
     double height     SWIFT_PRIVATE;
 
   public:
+    Dimensions() = default;
     explicit Dimensions(double width, double height): width(width), height(height) {}
   };
 
