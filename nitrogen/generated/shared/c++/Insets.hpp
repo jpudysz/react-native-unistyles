@@ -36,6 +36,7 @@ namespace margelo::nitro::unistyles {
     double ime     SWIFT_PRIVATE;
 
   public:
+    Insets() = default;
     explicit Insets(double top, double bottom, double left, double right, double ime): top(top), bottom(bottom), left(left), right(right), ime(ime) {}
   };
 

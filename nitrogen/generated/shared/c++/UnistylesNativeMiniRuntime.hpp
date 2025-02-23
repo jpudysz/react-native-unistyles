@@ -50,6 +50,7 @@ namespace margelo::nitro::unistyles {
     bool isLandscape     SWIFT_PRIVATE;
 
   public:
+    UnistylesNativeMiniRuntime() = default;
     explicit UnistylesNativeMiniRuntime(ColorScheme colorScheme, Dimensions screen, std::string contentSizeCategory, Insets insets, double pixelRatio, double fontScale, bool rtl, Dimensions statusBar, Dimensions navigationBar, bool isPortrait, bool isLandscape): colorScheme(colorScheme), screen(screen), contentSizeCategory(contentSizeCategory), insets(insets), pixelRatio(pixelRatio), fontScale(fontScale), rtl(rtl), statusBar(statusBar), navigationBar(navigationBar), isPortrait(isPortrait), isLandscape(isLandscape) {}
   };
 
