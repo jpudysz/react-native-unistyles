@@ -54,6 +54,7 @@ namespace margelo::nitro::unistyles {
     bool isLandscape     SWIFT_PRIVATE;
 
   public:
+    UnistylesCxxMiniRuntime() = default;
     explicit UnistylesCxxMiniRuntime(std::optional<std::string> themeName, std::optional<std::string> breakpoint, bool hasAdaptiveThemes, ColorScheme colorScheme, Dimensions screen, std::string contentSizeCategory, Insets insets, double pixelRatio, double fontScale, bool rtl, Dimensions statusBar, Dimensions navigationBar, bool isPortrait, bool isLandscape): themeName(themeName), breakpoint(breakpoint), hasAdaptiveThemes(hasAdaptiveThemes), colorScheme(colorScheme), screen(screen), contentSizeCategory(contentSizeCategory), insets(insets), pixelRatio(pixelRatio), fontScale(fontScale), rtl(rtl), statusBar(statusBar), navigationBar(navigationBar), isPortrait(isPortrait), isLandscape(isLandscape) {}
   };
 
