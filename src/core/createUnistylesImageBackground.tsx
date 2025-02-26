@@ -32,6 +32,11 @@ export const createUnistylesImageBackground = (Component: typeof ImageBackground
                     return () => {
                         // @ts-ignore
                         UnistylesShadowRegistry.remove(ref)
+
+                        if (storedImageRef.current) {
+                            // @ts-ignore
+                            UnistylesShadowRegistry.remove(storedImageRef.current)
+                        }
                     }
                 }}
                 imageRef={ref => {
