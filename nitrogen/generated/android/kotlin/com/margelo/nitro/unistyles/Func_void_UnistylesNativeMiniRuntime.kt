@@ -40,7 +40,7 @@ fun interface Func_void_UnistylesNativeMiniRuntime: (UnistylesNativeMiniRuntime)
 @Keep
 @Suppress(
   "KotlinJniMissingFunction", "unused",
-  "RedundantSuppression", "RedundantUnitReturnType",
+  "RedundantSuppression", "RedundantUnitReturnType", "FunctionName",
   "ConvertSecondaryConstructorToPrimary", "ClassName", "LocalVariableName",
 )
 class Func_void_UnistylesNativeMiniRuntime_cxx: Func_void_UnistylesNativeMiniRuntime {
@@ -54,8 +54,13 @@ class Func_void_UnistylesNativeMiniRuntime_cxx: Func_void_UnistylesNativeMiniRun
     mHybridData = hybridData
   }
 
+  @DoNotStrip
+  @Keep
+  override fun invoke(miniRuntime: UnistylesNativeMiniRuntime): Unit
+    = invoke_cxx(miniRuntime)
+
   @FastNative
-  external override fun invoke(miniRuntime: UnistylesNativeMiniRuntime): Unit
+  private external fun invoke_cxx(miniRuntime: UnistylesNativeMiniRuntime): Unit
 }
 
 /**

@@ -41,7 +41,7 @@ namespace margelo::nitro::unistyles {
      * Invokes the function this `JFunc_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime` instance holds through JNI.
      */
     void invoke(const std::vector<UnistyleDependency>& dependencies, const UnistylesNativeMiniRuntime& miniRuntime) const {
-      static const auto method = getClass()->getMethod<void(jni::alias_ref<jni::JArrayClass<JUnistyleDependency>> /* dependencies */, jni::alias_ref<JUnistylesNativeMiniRuntime> /* miniRuntime */)>("invoke");
+      static const auto method = javaClassStatic()->getMethod<void(jni::alias_ref<jni::JArrayClass<JUnistyleDependency>> /* dependencies */, jni::alias_ref<JUnistylesNativeMiniRuntime> /* miniRuntime */)>("invoke");
       method(self(), [&]() {
         size_t __size = dependencies.size();
         jni::local_ref<jni::JArrayClass<JUnistyleDependency>> __array = jni::JArrayClass<JUnistyleDependency>::newArray(__size);
@@ -89,7 +89,7 @@ namespace margelo::nitro::unistyles {
   public:
     static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/unistyles/Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_cxx;";
     static void registerNatives() {
-      registerHybrid({makeNativeMethod("invoke", JFunc_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_cxx::invoke_cxx)});
+      registerHybrid({makeNativeMethod("invoke_cxx", JFunc_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_cxx::invoke_cxx)});
     }
 
   private:
