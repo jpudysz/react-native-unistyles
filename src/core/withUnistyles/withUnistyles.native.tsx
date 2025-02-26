@@ -12,22 +12,48 @@ type GenericComponentProps<P> = ComponentProps<P>
 // @ts-expect-error
 type GenericComponentRef<T> = ComponentRef<T>
 
+type UnistylesSecrets = {
+    uni__getStyles: () => Record<string, any>,
+    uni__dependencies: Array<UnistyleDependency>
+}
+
+type MappedSecrets = {
+    styles: Record<string, any>,
+    dependencies: Array<UnistyleDependency>
+}
+
 export const withUnistyles = <TComponent, TMappings extends GenericComponentProps<TComponent>>(Component: TComponent, mappings?: Mappings<TMappings>) => {
     type TProps = GenericComponentProps<TComponent>
     type PropsWithUnistyles = PartialBy<TProps, keyof TMappings | SupportedStyleProps> & {
         uniProps?: Mappings<TProps>
     }
-    const getSecrets = (styleProps: Record<string, any> = {}): { uni__getStyles(): any, uni__dependencies: Array<UnistyleDependency> } => {
-        const unistyleKey = Object
-            .keys(styleProps)
-            .find(key => key.startsWith('unistyles_'))
+    const getSecrets = (styleProps: Record<string, any> = {}): MappedSecrets => {
+        const styles = Array.isArray(styleProps)
+            ? styleProps
+            : [styleProps]
 
-        return unistyleKey
-            ? styleProps[unistyleKey]
-            : {
-                uni__getStyles: () => styleProps,
-                uni__dependencies: [],
-            }
+        const secrets: Array<UnistylesSecrets> = styles
+            .filter(Boolean)
+            .reduce((acc, style) => {
+                const unistyleKey = Object
+                    .keys(style)
+                    .find(key => key.startsWith('unistyles_'))
+
+                return acc.concat([
+                    unistyleKey
+                        ? style[unistyleKey]
+                        : {
+                            uni__getStyles: () => styleProps,
+                            uni__dependencies: [],
+                        }
+                ])
+            }, [])
+
+        return {
+            styles: secrets.reduce((acc, secret) => Object
+                .assign(acc, secret.uni__getStyles()), {} as Record<string, any>),
+            dependencies: secrets.flatMap(secret => secret.uni__dependencies),
+        }
     }
 
     return forwardRef<GenericComponentRef<TComponent>, PropsWithUnistyles>((props, ref) => {
@@ -46,7 +72,7 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
             const styleSecrets = getSecrets(narrowedProps.style)
             const contentContainerStyleSecrets = getSecrets(narrowedProps.contentContainerStyle)
 
-            addDependencies(Array.from(new Set([...styleSecrets.uni__dependencies, ...contentContainerStyleSecrets.uni__dependencies])))
+            addDependencies(Array.from(new Set([...styleSecrets.dependencies, ...contentContainerStyleSecrets.dependencies])))
         }, [narrowedProps.style, narrowedProps.contentContainerStyle])
 
         const mappingsProps = mappings ? mappings(proxifiedTheme, proxifiedRuntime) : {}
@@ -58,10 +84,10 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         const finalProps = {
             ...deepMergeObjects(mappingsProps, unistyleProps, props),
             ...narrowedProps.style ? {
-                style: styleSecrets.uni__getStyles(),
+                style: styleSecrets.styles,
             } : {},
             ...narrowedProps.contentContainerStyle ? {
-                contentContainerStyle: contentContainerStyleSecrets.uni__getStyles(),
+                contentContainerStyle: contentContainerStyleSecrets.styles,
             } : {},
         } as any
 
