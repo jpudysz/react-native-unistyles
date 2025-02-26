@@ -10,9 +10,9 @@
   "dependencies": {
     "react": "19.0.0",
     "react-native": "0.78.0",
-    "react-native-blurhash": "2.1.0",
+    "react-native-blurhash": "2.1.1",
     "react-native-edge-to-edge": "1.4.3",
-    "react-native-nitro-modules": "0.23.0",
+    "react-native-nitro-modules": "0.24.1",
     "react-native-unistyles": "workspace:*"
   },
   "devDependencies": {

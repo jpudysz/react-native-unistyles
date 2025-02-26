@@ -40,7 +40,7 @@ fun interface Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRunti
 @Keep
 @Suppress(
   "KotlinJniMissingFunction", "unused",
-  "RedundantSuppression", "RedundantUnitReturnType",
+  "RedundantSuppression", "RedundantUnitReturnType", "FunctionName",
   "ConvertSecondaryConstructorToPrimary", "ClassName", "LocalVariableName",
 )
 class Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_cxx: Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime {
@@ -54,8 +54,13 @@ class Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_cxx: 
     mHybridData = hybridData
   }
 
+  @DoNotStrip
+  @Keep
+  override fun invoke(dependencies: Array<UnistyleDependency>, miniRuntime: UnistylesNativeMiniRuntime): Unit
+    = invoke_cxx(dependencies,miniRuntime)
+
   @FastNative
-  external override fun invoke(dependencies: Array<UnistyleDependency>, miniRuntime: UnistylesNativeMiniRuntime): Unit
+  private external fun invoke_cxx(dependencies: Array<UnistyleDependency>, miniRuntime: UnistylesNativeMiniRuntime): Unit
 }
 
 /**
