@@ -42,6 +42,11 @@ export const createUnistylesElement = (Component: any) => {
 
                     // @ts-ignore we don't know the type of the component
                     maybeWarnAboutMultipleUnistyles(props.style, Component.displayName)
+
+                    return () => {
+                        // @ts-ignore
+                        UnistylesShadowRegistry.remove(ref)
+                    }
                 }}
             />
         )
