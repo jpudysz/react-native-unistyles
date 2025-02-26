@@ -6379,9 +6379,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"astro@npm:5.3.0":
-  version: 5.3.0
-  resolution: "astro@npm:5.3.0"
+"astro@npm:5.3.1":
+  version: 5.3.1
+  resolution: "astro@npm:5.3.1"
   dependencies:
     "@astrojs/compiler": ^2.10.3
     "@astrojs/internal-helpers": 0.5.1
@@ -6408,7 +6408,6 @@ __metadata:
     es-module-lexer: ^1.6.0
     esbuild: ^0.24.2
     estree-walker: ^3.0.3
-    fast-glob: ^3.3.3
     flattie: ^1.1.1
     github-slugger: ^2.0.0
     html-escaper: 3.0.3
@@ -6417,11 +6416,11 @@ __metadata:
     kleur: ^4.1.5
     magic-string: ^0.30.17
     magicast: ^0.3.5
-    micromatch: ^4.0.8
     mrmime: ^2.0.0
     neotraverse: ^0.6.18
     p-limit: ^6.2.0
     p-queue: ^8.1.0
+    picomatch: ^4.0.2
     preferred-pm: ^4.1.1
     prompts: ^2.4.2
     rehype: ^13.0.2
@@ -6429,6 +6428,7 @@ __metadata:
     sharp: ^0.33.3
     shiki: ^1.29.2
     tinyexec: ^0.3.2
+    tinyglobby: ^0.2.12
     tsconfck: ^3.1.4
     ultrahtml: ^1.5.3
     unist-util-visit: ^5.0.0
@@ -6448,7 +6448,7 @@ __metadata:
       optional: true
   bin:
     astro: astro.js
-  checksum: 40d32834413bdbf6098ed52a7be9d202d7448687e8a9e7547d5f55edb2d6452c20360fe9f6e8a2e62626a7f77fbefafffef01a1945b5a40dc30a51d021bcc255
+  checksum: 41eb8bafbe7d663e578184d71e1be69d46291027c662059862a9b2a53bc85892f79f093b6b7b0b7692b5d8cdca7ede09c6a010a6fdbd305d6e17b9ffa88aaaf5
   languageName: node
   linkType: hard
 
@@ -9088,9 +9088,9 @@ __metadata:
     jest: 29.7.0
     react: 19.0.0
     react-native: 0.78.0
-    react-native-blurhash: 2.1.0
+    react-native-blurhash: 2.1.1
     react-native-edge-to-edge: 1.4.3
-    react-native-nitro-modules: 0.23.0
+    react-native-nitro-modules: 0.24.1
     react-native-unistyles: "workspace:*"
     react-test-renderer: 19.0.0
     typescript: 5.7.3
@@ -9262,8 +9262,8 @@ __metadata:
     react-native: 0.77.1
     react-native-edge-to-edge: 1.4.3
     react-native-gesture-handler: 2.24.0
-    react-native-nitro-modules: 0.23.0
-    react-native-reanimated: 3.16.7
+    react-native-nitro-modules: 0.24.1
+    react-native-reanimated: 3.17.0
     react-native-safe-area-context: 5.2.0
     react-native-screens: 4.9.0
     react-native-web: 0.19.13
@@ -9476,7 +9476,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-glob@npm:^3.2.12, fast-glob@npm:^3.2.5, fast-glob@npm:^3.2.9, fast-glob@npm:^3.3.1, fast-glob@npm:^3.3.2, fast-glob@npm:^3.3.3":
+"fast-glob@npm:^3.2.12, fast-glob@npm:^3.2.5, fast-glob@npm:^3.2.9, fast-glob@npm:^3.3.1, fast-glob@npm:^3.3.2":
   version: 3.3.3
   resolution: "fast-glob@npm:3.3.3"
   dependencies:
@@ -9567,6 +9567,18 @@ __metadata:
     setimmediate: ^1.0.5
     ua-parser-js: ^1.0.35
   checksum: e609b5b64686bc96495a5c67728ed9b2710b9b3d695c5759c5f5e47c9483d1c323543ac777a86459e3694efc5712c6ce7212e944feb19752867d699568bb0e54
+  languageName: node
+  linkType: hard
+
+"fdir@npm:^6.4.3":
+  version: 6.4.3
+  resolution: "fdir@npm:6.4.3"
+  peerDependencies:
+    picomatch: ^3 || ^4
+  peerDependenciesMeta:
+    picomatch:
+      optional: true
+  checksum: fa53e13c63e8c14add5b70fd47e28267dd5481ebbba4b47720ec25aae7d10a800ef0f2e33de350faaf63c10b3d7b64138925718832220d593f75e724846c736d
   languageName: node
   linkType: hard
 
@@ -14402,18 +14414,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nitro-codegen@npm:0.23.0":
-  version: 0.23.0
-  resolution: "nitro-codegen@npm:0.23.0"
+"nitro-codegen@npm:0.24.1":
+  version: 0.24.1
+  resolution: "nitro-codegen@npm:0.24.1"
   dependencies:
     chalk: ^5.3.0
-    react-native-nitro-modules: ^0.23.0
+    react-native-nitro-modules: ^0.24.1
     ts-morph: ^25.0.0
     yargs: ^17.7.2
     zod: ^3.23.8
   bin:
     nitro-codegen: lib/index.js
-  checksum: a68b1c1e826cb07abdbe3cedcaa606e9ad06c6a2715fc23f63f1dbee57675a8df3c92a694551c84692769477834884e90505a9f894a247178cba96b0f2b1857e
+  checksum: 54726c574c281a67f5b014850ad52e0b5ac354664a6911aeb845815fd5089e75389fb97657be4502981c343678458d1856c2bf82063145b45551d38294fc7a91
   languageName: node
   linkType: hard
 
@@ -15829,13 +15841,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-blurhash@npm:2.1.0":
-  version: 2.1.0
-  resolution: "react-native-blurhash@npm:2.1.0"
+"react-native-blurhash@npm:2.1.1":
+  version: 2.1.1
+  resolution: "react-native-blurhash@npm:2.1.1"
   peerDependencies:
     react: ">=16.8.1"
     react-native: ">=0.60.0-rc.0 <1.0.x"
-  checksum: 763e9a9cd7f8c9d6ac26ee0903b4f05b9ed9cef0615133024bf57ca134221cf330117f648e5f1afc418657f75f31b195d86d52bbd6e3cb58d3b03093e52c9247
+  checksum: 44547849e8e04c3392a8a6b7cbbf1e413aded44b98917c67c84ecedf130844bda7c80a549460fe61f699d39d92488921f28f78fcfa7fe2fbc3947113a5a5d7b5
   languageName: node
   linkType: hard
 
@@ -15908,7 +15920,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-is-edge-to-edge@npm:^1.1.6":
+"react-native-is-edge-to-edge@npm:1.1.6, react-native-is-edge-to-edge@npm:^1.1.6":
   version: 1.1.6
   resolution: "react-native-is-edge-to-edge@npm:1.1.6"
   peerDependencies:
@@ -15918,19 +15930,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-nitro-modules@npm:0.23.0, react-native-nitro-modules@npm:^0.23.0":
-  version: 0.23.0
-  resolution: "react-native-nitro-modules@npm:0.23.0"
+"react-native-nitro-modules@npm:0.24.1, react-native-nitro-modules@npm:^0.24.1":
+  version: 0.24.1
+  resolution: "react-native-nitro-modules@npm:0.24.1"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: ee98b818c920411dcd5d77ccb5cd7872d195e3ae2d7d122a0673879b120378d5004b0ebc6291226f71c25998e03270e16922d998db839a86d91b9ff8f03f5d1c
+  checksum: 9da099f80b40a449f0b2b4648bc13468feab6ebf0e249e2173e5a42b01e7b71ac87c819a360a8453b304c442485428696bdb5a05c20cde6d7bfa9cdb30f0983b
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:3.16.7":
-  version: 3.16.7
-  resolution: "react-native-reanimated@npm:3.16.7"
+"react-native-reanimated@npm:3.17.0":
+  version: 3.17.0
+  resolution: "react-native-reanimated@npm:3.17.0"
   dependencies:
     "@babel/plugin-transform-arrow-functions": ^7.0.0-0
     "@babel/plugin-transform-class-properties": ^7.0.0-0
@@ -15943,11 +15955,12 @@ __metadata:
     "@babel/preset-typescript": ^7.16.7
     convert-source-map: ^2.0.0
     invariant: ^2.2.4
+    react-native-is-edge-to-edge: 1.1.6
   peerDependencies:
     "@babel/core": ^7.0.0-0
     react: "*"
     react-native: "*"
-  checksum: 108095709cd7a3effc5b5d276d94e161b399bd2d06e32140834168a0051545401bb09228071447e5925571da3f86f335d2a82c76751cdae07f66faf50b25c97f
+  checksum: 59b647ee17ba916c460a1143f6ea2c58ea81f17329fef0ceff1e5e1ec20e6db458ed5394f3a3483a3f307f568a07bd9dedc3af32e8f9d2ff6b51571126acbf5e
   languageName: node
   linkType: hard
 
@@ -15982,7 +15995,7 @@ __metadata:
     "@astrojs/sitemap": 3.2.1
     "@astrojs/starlight": 0.32.1
     "@fontsource-variable/nunito": 5.1.1
-    astro: 5.3.0
+    astro: 5.3.1
     astro-expressive-code: 0.40.2
     astro-seo: 0.8.4
     autoprefixer: 10.4.20
@@ -16015,11 +16028,11 @@ __metadata:
     husky: 9.1.7
     jest: 29.7.0
     metro-react-native-babel-preset: 0.77.0
-    nitro-codegen: 0.23.0
+    nitro-codegen: 0.24.1
     react: 18.3.1
     react-native: 0.77.1
     react-native-builder-bob: 0.37.0
-    react-native-nitro-modules: 0.23.0
+    react-native-nitro-modules: 0.24.1
     react-native-web: 0.19.13
     react-test-renderer: 18.3.1
     release-it: 17.11.0
@@ -18236,6 +18249,16 @@ __metadata:
   version: 0.3.2
   resolution: "tinyexec@npm:0.3.2"
   checksum: bd491923020610bdeadb0d8cf5d70e7cbad5a3201620fd01048c9bf3b31ffaa75c33254e1540e13b993ce4e8187852b0b5a93057bb598e7a57afa2ca2048a35c
+  languageName: node
+  linkType: hard
+
+"tinyglobby@npm:^0.2.12":
+  version: 0.2.12
+  resolution: "tinyglobby@npm:0.2.12"
+  dependencies:
+    fdir: ^6.4.3
+    picomatch: ^4.0.2
+  checksum: ef9357fa1b2b661afdccd315cb4995f5f36bce948faaace68aae85fe57bdd8f837883045c88efc50d3186bac6586e4ae2f31026b9a3aac061b884217e6092e23
   languageName: node
   linkType: hard
 
