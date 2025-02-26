@@ -261,7 +261,7 @@ void HybridStyleSheet::registerHooks(jsi::Runtime& rt) {
     core::UnistylesRegistry::get().trafficController.restore();
 
     this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(this->_uiManager);
-    this->_unistylesMountHook = std::make_shared<core::UnistylesMountHook>(this->_uiManager, this->_unistylesRuntime);
+    this->_unistylesMountHook = std::make_shared<core::UnistylesMountHook>(this->_uiManager);
 }
 
 void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies) {
