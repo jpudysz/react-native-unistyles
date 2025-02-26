@@ -22,7 +22,7 @@ void core::UnistylesMountHook::shadowTreeDidMount(RootShadowNode::Shared const &
     // one more time merge Unistyles changes
     auto& registry = core::UnistylesRegistry::get();
 
-    if (!registry.trafficController.shouldStop()) {
-        shadow::ShadowTreeManager::updateShadowTree(this->_uiManager->getShadowTreeRegistry());
+    if (registry.trafficController.shouldStop()) {
+        registry.trafficController.resumeUnistylesTraffic();
     }
 }
