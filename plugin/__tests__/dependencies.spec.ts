@@ -956,6 +956,59 @@ pluginTester({
                     664955593
                 )
             `
+        },
+        {
+            title: 'Should correctly detect ime from destructured insets',
+            code: `
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View style={styles.container}>
+                            <Text style={styles.keyboardAvoidingView}>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, { insets }) => ({
+                    keyboardAvoidingView: {
+                        flex: 1,
+                        paddingTop: insets.top + 16,
+                        paddingLeft: insets.left + 16,
+                        paddingRight: insets.right + 16,
+                        paddingBottom: insets.ime || insets.bottom + 50
+                    }
+                }))
+            `,
+            output: `
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import { View } from 'react-native-unistyles/components/native/View'
+
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View style={styles.container}>
+                            <Text style={styles.keyboardAvoidingView}>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    (theme, { insets }) => ({
+                        keyboardAvoidingView: {
+                            flex: 1,
+                            paddingTop: insets.top + 16,
+                            paddingLeft: insets.left + 16,
+                            paddingRight: insets.right + 16,
+                            paddingBottom: insets.ime || insets.bottom + 50,
+                            uni__dependencies: [9, 14]
+                        }
+                    }),
+                    664955593
+                )
+            `
         }
     ]
 })

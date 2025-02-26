@@ -502,6 +502,18 @@ export function getStylesDependenciesFromFunction(path: NodePath<t.CallExpressio
                                 usedLabel = 'ime'
                             }
                         }
+
+                        if (
+                            usedLabel === 'insets' &&
+                            (memberExpr.parentPath.isBinaryExpression() || memberExpr.parentPath.isLogicalExpression())
+                        ) {
+
+                            const secondPropPath = memberExpr.node.property
+
+                            if (t.isIdentifier(secondPropPath) && secondPropPath.name === 'ime') {
+                                usedLabel = 'ime'
+                            }
+                        }
                     }
                 }
 
