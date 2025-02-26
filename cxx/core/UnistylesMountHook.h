@@ -3,15 +3,13 @@
 #include <react/renderer/uimanager/UIManager.h>
 #include <react/renderer/uimanager/UIManagerMountHook.h>
 #include "ShadowTreeManager.h"
-#include "HybridUnistylesRuntime.h"
 
 namespace margelo::nitro::unistyles::core {
 
 using namespace facebook::react;
 
 struct UnistylesMountHook : public UIManagerMountHook {
-    UnistylesMountHook(std::shared_ptr<UIManager> uiManager, std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime)
-        : _uiManager{uiManager}, _unistylesRuntime{unistylesRuntime} {
+    UnistylesMountHook(std::shared_ptr<UIManager> uiManager): _uiManager{uiManager} {
         _uiManager->registerMountHook(*this);
     }
 
@@ -21,7 +19,6 @@ struct UnistylesMountHook : public UIManagerMountHook {
 
 private:
     std::shared_ptr<UIManager> _uiManager;
-    std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
 };
 
 }
