@@ -29,7 +29,7 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
     }
     const getSecrets = (styleProps: Record<string, any> = {}): MappedSecrets => {
         const styles = Array.isArray(styleProps)
-            ? styleProps
+            ? styleProps.flat()
             : [styleProps]
 
         const secrets: Array<UnistylesSecrets> = styles
