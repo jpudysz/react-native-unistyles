@@ -67,6 +67,10 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     private fun onConfigChange() {
+        if (!this.isCxxReady) {
+            return
+        }
+        
         val colorScheme = this.platform.getColorScheme()
         val contentSizeCategory = this.platform.getContentSizeCategory()
 
@@ -77,6 +81,10 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     private fun onLayoutConfigChange() {
+        if (!this.isCxxReady) {
+            return
+        }
+
         val screen = this.platform.getScreenDimensions()
         val insets = this.platform.getInsets()
         val statusBar = this.platform.getStatusBarDimensions()
