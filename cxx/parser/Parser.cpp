@@ -881,21 +881,43 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, Unistyle::Shared u
 
             return;
         }
-
+        
+        auto isArray = nestedObjectStyle.isArray(rt);
+        
+        if (!isArray) {
+            parsedStyle.setProperty(rt, propertyName.c_str(), this->getValueFromBreakpoints(rt, unistyle, nestedObjectStyle));
+        }
+        
         // possible with variants and compoundVariants
-        if (nestedObjectStyle.isArray(rt) && propertyName == "transform") {
+        if (propertyName == "transform") {
             parsedStyle.setProperty(rt, propertyName.c_str(), parseTransforms(rt, unistyle, nestedObjectStyle));
 
             return;
         }
 
-        if (nestedObjectStyle.isArray(rt) && propertyName == "fontVariant") {
+        if (propertyName == "boxShadow") {
+            parsedStyle.setProperty(rt, propertyName.c_str(), parseBoxShadow(rt, unistyle, nestedObjectStyle));
+
+            return;
+        }
+
+        if (propertyName == "filter") {
+            parsedStyle.setProperty(rt, propertyName.c_str(), parseFilters(rt, unistyle, nestedObjectStyle));
+
+            return;
+        }
+
+        if (propertyName == "fontVariant") {
             parsedStyle.setProperty(rt, propertyName.c_str(), propertyValue);
 
             return;
         }
 
-        parsedStyle.setProperty(rt, propertyName.c_str(), this->getValueFromBreakpoints(rt, unistyle, nestedObjectStyle));
+        if (propertyName == "shadowOffset" || propertyName == "textShadowOffset") {
+            parsedStyle.setProperty(rt, propertyName.c_str(), this->parseSecondLevel(rt, unistyle, propertyValue));
+
+            return;
+        }
     });
 
     return parsedStyle;
