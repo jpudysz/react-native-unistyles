@@ -73,6 +73,9 @@ export default defineConfig({
                 {
                     label: 'Tutorial', slug: 'v3/tutorial/intro', badge: 'WIP',
                 },
+                {
+                    label: 'LLMS', slug: 'v3/llms/info', badge: 'Hot!',
+                },
 				{
 					label: 'Start here',
 					items: [
@@ -156,13 +159,6 @@ export default defineConfig({
                     projectName: 'React Native Unistyles 3.0',
                     description: 'Easily style cross platform React Native apps with a single StyleSheet',
                     details: 'This documentation site is a source of truth for the good practices while building apps with React Native Unistyles.',
-                    optionalLinks: [
-                        {
-                            'label': 'Github issues',
-                            'link': 'https://github.com/jpudysz/react-native-unistyles/issues',
-                            'description': 'All Github issues related to Unistyles'
-                        }
-                    ],
                     promote: [
                         'v3/start/**', 'v3/guides/**', 'v3/references/**'
                     ],
