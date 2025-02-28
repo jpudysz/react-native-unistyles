@@ -77,7 +77,7 @@ The `Settings` object has been simplified, and in the most recent version, it su
 
 - **`adaptiveThemes`** – a boolean that enables or disables adaptive themes [learn more](/v3/guides/theming#adaptive-themes)
 - **`initialTheme`** – a string or a synchronous function that sets the initial theme
-- **`CSSVars`** – a boolean that enables or disables CSS variables (defaults to `true`) [learn more](/v3/references/web-only#css-variables)
+- **`CSSVars`** – a boolean that enables or disables web CSS variables (defaults to `true`) [learn more](/v3/references/web-only#css-variables)
 - **`nativeBreakpointsMode`** - iOS/Android only. User preferred mode for breakpoints. Can be either `points` or `pixels` (defaults to `pixels`) [learn more](/v3/references/breakpoints#pixelpoint-mode-for-native-breakpoints)
 
 ```tsx title="unistyles.ts"
@@ -88,7 +88,7 @@ const settings = {
 // or with a synchronous function
 const settings = {
     initialTheme: () => {
-        // get preferred theme from user's preferences/MMKV/SQL etc.
+        // get preferred theme from user's preferences/MMKV/SQL/StanJS etc.
 
         return storage.getString('preferredTheme') ?? 'light'
     }
@@ -190,6 +190,7 @@ StyleSheet.configure({
 
 <Aside>
 Don't forget to import this config somewhere in your project, for example in `index.ts` file.
+You **must** call `StyleSheet.configure` **before** any `StyleSheet.create` call.
 
 For expo router users, please refer to the [Expo Router guide](/v3/guides/expo-router).
 </Aside>

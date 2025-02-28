@@ -68,12 +68,16 @@ export default defineConfig({
                 discord: 'https://discord.gg/akGHf27P4C'
             },
 			sidebar: [
+                {
+                    label: 'Tutorial', slug: 'v3/tutorial/intro', badge: 'WIP',
+                },
 				{
 					label: 'Start here',
 					items: [
 						{ label: 'Introduction', slug: 'v3/start/introduction' },
                         { label: 'Getting started', slug: 'v3/start/getting-started' },
-                        { label: 'Configuration', slug: 'v3/start/configuration', badge: 'Updated' },
+                        { label: 'Configuration', slug: 'v3/start/configuration' },
+                        { label: 'When to use Unistyles?', slug: 'v3/start/when-to-use-unistyles', badge: 'New!' },
                         { label: 'New features', slug: 'v3/start/new-features' },
                         { label: 'Look under the hood', slug: 'v3/start/how-unistyles-works' },
                         { label: 'Migration guide', slug: 'v3/start/migration-guide' }
@@ -82,7 +86,8 @@ export default defineConfig({
                 {
                     label: 'Guides',
                     items: [
-                        { label: 'Merging styles', slug: 'v3/guides/merging-styles', badge: 'Updated' },
+                        { label: 'Merging styles', slug: 'v3/guides/merging-styles' },
+                        { label: 'Why my view doesn\'t update?', slug: 'v3/guides/why-my-view-doesnt-update', badge: 'New!' },
                         { label: 'Theming', slug: 'v3/guides/theming' },
                         { label: 'Avoiding Keyboard', slug: 'v3/guides/avoiding-keyboard' },
                         { label: 'Expo Router', slug: 'v3/guides/expo-router' },
@@ -116,8 +121,7 @@ export default defineConfig({
                 {
                     label: 'Other',
                     items: [
-                        { label: 'How to report a bug?', slug: 'v3/other/how-to-report-bug' },
-                        { label: 'Babel plugin', slug: 'v3/other/babel-plugin', badge: 'Updated' },
+                        { label: 'Babel plugin', slug: 'v3/other/babel-plugin' },
                         { label: 'Dependencies', slug: 'v3/other/dependencies' },
                         { label: 'For library authors', slug: 'v3/other/for-library-authors' },
                         { label: 'For sponsors', slug: 'v3/other/for-sponsors' },

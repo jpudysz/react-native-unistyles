@@ -29,6 +29,10 @@ Unistyles 3.0 is tightly integrated with `Fabric` and the latest version of Reac
 | Expo SDK    | 52+     | (if you use Expo)    |
 | Xcode    | 16+     | Required by Nitro Modules    |
 
+:::caution
+There is a known bug in Xcode 16.2. If you use this version, please follow [this github issue](https://github.com/jpudysz/react-native-unistyles/issues/507#issuecomment-2602963047)
+:::
+
 Since Unistyles relies on `Fabric`, it cannot run on the `Old Architecture` or older versions of React Native. If you can’t meet these requirements, you can use Unistyles 2.0+, which is compatible with those versions.
 
 ### Installation
@@ -39,7 +43,7 @@ yarn add react-native-nitro-modules react-native-edge-to-edge
 ```
 
 :::caution
-Always use fixed version of `react-native-nitro-modules` to avoid unexpected behaviors.
+To avoid unexpected behaviors always use a fixed version of `react-native-nitro-modules`.
 Check compatibility table [here](https://github.com/jpudysz/react-native-unistyles?tab=readme-ov-file#installation).
 :::
 
@@ -50,6 +54,12 @@ module.exports = function (api) {
   api.cache(true)
 
   return {
+    // for bare React Native
+    // presets: ['module:@react-native/babel-preset'],
+
+    // or for Expo
+    // presets: ['babel-preset-expo'],
+
     // other config
     plugins: [
         // other plugins

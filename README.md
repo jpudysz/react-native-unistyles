@@ -24,7 +24,7 @@ Install dependencies:
 yarn add react-native-edge-to-edge react-native-nitro-modules@0.24.1
 ```
 
-> Always use fixed version of `react-native-nitro-modules` to avoid unexpected behaviors.
+> To avoid unexpected behavior, always use a fixed version of `react-native-nitro-modules`
 
 | react-native-unistyles | react-native-nitro-modules |
 |------------------------|----------------------------|
@@ -84,9 +84,6 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 <a href="https://github.com/FilipiRafael">
      <img src="https://avatars.githubusercontent.com/u/61629642?v=4" height="70px" width="70px" alt="FilipiRafael" />
 </a>
-<a href="https://github.com/4cc3ssX">
-     <img src="https://avatars.githubusercontent.com/u/57473799?v=4" height="70px" width="70px" alt="4cc3ssX" />
-</a>
 <a href="https://github.com/dacoto97">
      <img src="https://avatars.githubusercontent.com/u/16915053?v=4" height="70px" width="70px" alt="dacoto97" />
 </a>
@@ -119,6 +116,9 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 </a>
 <a href="https://github.com/giovannilondero">
      <img src="https://avatars.githubusercontent.com/u/10998991?v=4" height="70px" width="70px" alt="giovannilondero" />
+</a>
+<a href="https://github.com/4cc3ssX">
+     <img src="https://avatars.githubusercontent.com/u/57473799?v=4" height="70px" width="70px" alt="4cc3ssX" />
 </a>
 
 ## Sponsor my work
