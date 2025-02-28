@@ -40,13 +40,16 @@ Unistyles: We detected a style object with 2 Unistyles styles. This might cause 
 
 When you see this warning, your component will render correctly, but any new event that re-computes your styles could:
 - Output incorrect styles due to the unknown order of merging
-- Not update at all if, during the merging process, you altered props that were previously listening for changes
+- Not update at all if during the merging process, you altered props that were previously listening for changes
 
 It's critical to ship Unistyles 3.0 apps without this warning, as it can cause unexpected behavior.
 
-<Aside title="Reanimated" type="caution">
-By default `Animated` components will flatten your styles array. This means that you can only pass single unistyle to `Animated` components, otherwise you'll get a warning from above.
-</Aside>
+### Reanimated
+
+By default `Animated` components will flatten your styles array. This means that you can only pass **single** unistyle to `Animated` components.
+If you want to get rid of this warning, for `react-native-reanimated` 3.x please follow [this thread](https://github.com/jpudysz/react-native-unistyles/issues/512) to apply a patch.
+
+Patch is not necessary from `react-native-reanimated` 4.0.0-beta.3 as it was merged to the main branch.
 
 ### Spreading a single Unistyle
 

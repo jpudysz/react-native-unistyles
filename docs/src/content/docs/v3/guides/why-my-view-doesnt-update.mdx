@@ -1,0 +1,104 @@
+---
+title: Why my view doesn't update?
+description: Learn how to resolve the issue when your view is not updating as expected
+---
+
+import { Card, Aside } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Why my view doesn\'t update?',
+        description: 'Learn how to resolve the issue when your view is not updating as expected'
+    }}
+>
+
+If you start working with Unistyles 3.0, it might be unclear why some views are updated while others aren't.
+Before diving into this guide, make sure you've read the other guides covering the basics of the new Unistyles:
+
+- [Look under the hood](/v3/start/how-unistyles-works)
+- [Merging styles](/v3/guides/merging-styles)
+- [Babel plugin](/v3/other/babel-plugin)
+
+### Problem 1: Babel
+
+To leverage ShadowTree updates and avoid unnecessary re-renders, Unistyles must process both `StyleSheets` and your components.
+By default, the Babel plugin looks for `react-native-unistyles` imports and always ignores the `node_modules` folder.
+
+If you separate `StyleSheets` from your components, it's your responsibility to configure Babel to detect components that lack a Unistyles import.
+We've added plenty of options, so be sure to [check them out](/v3/other/babel-plugin##extra-configuration).
+
+### Problem 2: Dependency detection
+
+
+Unistyles will automatically detect all your dependencies for every `StyleSheet`, but there's a chance you used custom syntax that isn't covered by the plugin.
+If Babel fails to detect some style dependencies, they won't be updated when necessary.
+
+You can easily debug this issue by adding the following Babel plugin configuration:
+
+```js title="babel.config.js"
+module.exports = function (api) {
+  api.cache(true)
+
+  return {
+    // other config
+    plugins: [
+        // other plugins
+        ['react-native-unistyles/plugin', {
+            debug: true
+        }]
+    ]
+  }
+}
+```
+
+Then, restart the Metro server cache and check the console, where you'll find every file and style with its detected dependencies.
+
+### Problem 3: Non React Native components
+
+Unistyles can only update React Native components. If you're using a third-party component, you'll need to apply a different strategy.
+Follow our [decision algorithm](/v3/references/3rd-party-views) to help you choose the best approach.
+
+### Problem 4: Web styles are not applied
+
+This issue indicates that the Babel plugin didn't detect some of your components. Initially, it may seem like native styles are working correctly, but that's not the case.
+
+On mobile, styles are returned the same way as in React Native. You can always `console.log` them to inspect the parsed values:
+
+```tsx title="mobile"
+export const MyView: React.FunctionComponent = () => {
+    console.log(styles.container) // { backgroundColor: 'red' }
+
+    return (
+        ...
+    )
+}
+
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: 'red'
+    }
+})
+```
+
+For the web, styles are not returned directly, as they are converted into CSS classes. If you try to log them, there will be no output:
+
+```tsx title="web"
+export const MyView: React.FunctionComponent = () => {
+    console.log(styles.container) // {}
+
+    return (
+        ...
+    )
+}
+
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: 'red'
+    }
+})
+```
+
+That's why you might mistakenly think the problem is only on the web. Please follow the [Babel config](/v3/other/babel-plugin##extra-configuration) to ensure all your components and StyleSheets are detected correctly.
+
+</Seo>

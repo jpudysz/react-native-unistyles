@@ -1,0 +1,44 @@
+---
+title: When to use Unistyles 3.0?
+description: Learn more when should you consider using Unistyles 3.0
+---
+
+import { Steps } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'When to use Unistyles 3.0?',
+        description: 'Learn more when should you consider using Unistyles 3.0'
+    }}
+>
+
+This guide will explain when you should consider using Unistyles and when it's not the best option.
+
+### When should you use Unistyles?
+
+Unistyles is recommended for projects that:
+- leverage the New Architecture and care about performance and memory usage
+- use two or more themes (we support an unlimited number of themes and [adaptive themes](/v3/guides/theming#adaptive-themes))
+- require rendering on the web (we [auto-generate](/v3/references/web-styles) CSS classes)
+- want to use [variants](/v3/references/variants) and [compound variants](/v3/references/compound-variants)
+- want to use pseudo-classes and custom web styles ([learn more](/v3/references/web-only))
+- feel confident with the styling patterns introduced by React Native (Unistyles follows the same approach)
+- don't want to pollute your native view hierarchy
+
+### When is Unistyles not the best option?
+
+- You're looking for a component library (Unistyles has no components, instead we encourage you to build your own design system specifically tailored to your project)
+- You use Tailwind on the web, as Unistyles has no native bindings to process `classNames` on native side. Instead, we recommend using [NativeWind](https://www.nativewind.dev/)
+- You're building a super simple app that doesn't require theme changes or any advanced features. In this case, stick with React Native's `StyleSheet` and consider updating to Unistyles 3.0 when it will be more efficient
+
+### When you can't use Unistyles 3.0?
+
+- In Expo Go apps, as Unistyles is not (yet) selected by the Expo team
+- In apps that can’t update to the New Architecture. Instead, consider using [Unistyles 2.0](https://v2.unistyl.es/start/introduction/)
+
+### Other alternatives
+
+To find other alternatives, please check the latest [State of React Native survey](https://stateofreactnative.com/).
+
+</Seo>

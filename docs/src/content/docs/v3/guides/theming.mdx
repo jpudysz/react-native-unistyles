@@ -106,7 +106,7 @@ StyleSheet.configure({
 StyleSheet.configure({
     settings: {
         initialTheme: () =>  {
-            // get preferred theme from user's preferences/MMKV/SQL etc.
+            // get preferred theme from user's preferences/MMKV/SQL/StanJS etc.
             return storage.getString('preferredTheme') ?? 'light'
         }
     }
@@ -146,7 +146,7 @@ const MyComponent = () => {
 ```
 
 :::caution
-`useUnistyles` is not recommended as it will re-render your component on every change of the theme
+`useUnistyles` is not recommended as it will re-render your component on every change of the theme. Lear more about [useUnistyles](/v3/references/use-unistyles)
 :::
 
 ### Get the current theme name
@@ -215,7 +215,7 @@ export const ToggleAdaptiveThemes = () => (
 )
 ```
 
-With disabled adaptive themes, you can now change the theme.
+With adaptive themes disabled, you can now manually change the theme.
 
 ### Check if adaptive themes are enabled
 

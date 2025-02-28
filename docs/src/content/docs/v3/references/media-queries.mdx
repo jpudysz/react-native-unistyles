@@ -139,7 +139,7 @@ const styles = Stylesheet.create(theme => ({
         alignItems: 'center'
         backgroundColor: {
             sm: theme.colors.background,
-            // Unistyles will firsly resolve to this style, even though sm may be also correct
+            // Unistyles will firsly resolve to this style, even though 'sm' breakpoint may be also correct
             [mq.only.width(200, 'xl')]: theme.colors.barbie
         }
     }

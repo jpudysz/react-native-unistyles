@@ -41,9 +41,29 @@ The `unistyles.ts` file is where Unistyles is configured. For more details, refe
 
 With this setup, we will ensure that Unistyles is initialized before any other component.
 
-### Static rendering
+### Expo Router Web - Static rendering
 
-If you're using Expo Router with static rendering for the web, you also need to import the Unistyles initialization file in the `+html.tsx` file:
+:::caution
+This is the default option in Expo SDK 52.
+:::
+
+You can check if you are using static rendering in `app.json`:
+
+```json title="app.json"
+{
+  "expo": {
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    }
+  }
+}
+```
+
+For Expo static rendering, every page will be resolved with the Root HTML file. Unfortunately, this file is hidden, and you need to create it manually.
+Please follow the [Expo guide](https://docs.expo.dev/router/reference/static-rendering/#root-html) and add a `+html.tsx` file.
+
+In this file, initialize Unistyles by importing the config file:
 
 ```diff lang="tsx" title="+html.tsx"
 import React from 'react'
@@ -51,9 +71,11 @@ import { ScrollViewStyleReset } from 'expo-router/html'
 import { type PropsWithChildren } from 'react'
 + import '../unistyles' // <-- file that initializes Unistyles
 
-export default function Root({ children }: PropsWithChildren) {}
+export default function Root({ children }: PropsWithChildren) {
+    ...
+}
 ```
 
-It ensures that initialization of Unistyles is called whenever Expo Router tries to render next static page.
+This ensures that Unistyles is initialized whenever Expo Router renders the next static page.
 
 </Seo>
