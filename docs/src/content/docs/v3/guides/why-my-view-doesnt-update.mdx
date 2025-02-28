@@ -1,5 +1,5 @@
 ---
-title: Why my view doesn't re-render?
+title: Why my view doesn't update?
 description: Learn how to resolve the issue when your view is not updating as expected
 ---
 
@@ -8,7 +8,7 @@ import Seo from '../../../../components/Seo.astro'
 
 <Seo
     seo={{
-        title: 'Why my view doesn\'t re-render?',
+        title: 'Why my view doesn\'t update?',
         description: 'Learn how to resolve the issue when your view is not updating as expected'
     }}
 >
@@ -51,5 +51,54 @@ module.exports = function (api) {
   }
 }
 ```
+
+Then, restart the Metro server cache and check the console, where you'll find every file and style with its detected dependencies.
+
+### Problem 3: Non React Native components
+
+Unistyles can only update React Native components. If you're using a third-party component, you'll need to apply a different strategy.
+Follow our [decision algorithm](/v3/references/3rd-party-views) to help you choose the best approach.
+
+### Problem 4: Web styles are not applied
+
+This issue indicates that the Babel plugin didn't detect some of your components. Initially, it may seem like native styles are working correctly, but that's not the case.
+
+On mobile, styles are returned the same way as in React Native. You can always `console.log` them to inspect the parsed values:
+
+```tsx title="mobile"
+export const MyView: React.FunctionComponent = () => {
+    console.log(styles.container) // { backgroundColor: 'red' }
+
+    return (
+        ...
+    )
+}
+
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: 'red'
+    }
+})
+```
+
+For the web, styles are not returned directly, as they are converted into CSS classes. If you try to log them, there will be no output:
+
+```tsx title="web"
+export const MyView: React.FunctionComponent = () => {
+    console.log(styles.container) // {}
+
+    return (
+        ...
+    )
+}
+
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: 'red'
+    }
+})
+```
+
+That's why you might mistakenly think the problem is only on the web. Please follow the [Babel config](/v3/other/babel-plugin##extra-configuration) to ensure all your components and StyleSheets are detected correctly.
 
 </Seo>

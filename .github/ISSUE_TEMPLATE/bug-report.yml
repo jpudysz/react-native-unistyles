@@ -5,21 +5,12 @@ body:
   - type: markdown
     attributes:
       value: |
-        Before submitting a new bug or issue, please check the following links to see if a solution or similar question already exists:
-        - [How to report a bug](https://www.unistyl.es/v3/other/how-to-report-bug)
-        - [Issues tab](https://github.com/jpudysz/react-native-unistyles/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc)
-        - [Closed issues tab](https://github.com/jpudysz/react-native-unistyles/issues?q=is%3Aissue+is%3Aclosed)
-        - [Discussions tab](https://github.com/jpudysz/react-native-unistyles/discussions)
-
-  - type: markdown
-    attributes:
-      value: |
         ## Required Information
 
   - type: textarea
     id: description
     attributes:
-      label: Description
+      label: What happened?
       description: Provide a clear, concise, and descriptive explanation of the bug. Include screenshots or a video if needed by dragging and dropping them into the box below.
     validations:
       required: true
@@ -57,7 +48,7 @@ body:
     attributes:
       label: React Native Version
       description: Which version of React Native are you using?
-      placeholder: 0.76.0
+      placeholder: 0.78.0
     validations:
       required: true
 
@@ -82,3 +73,14 @@ body:
       options:
         - 'Yes'
         - 'No'
+
+  - type: checkboxes
+    attributes:
+        label: Additional information
+        description: Please check all the boxes that apply
+        options:
+          - label: I use recommended version of `react-native-nitro-modules` [compatibility table](https://github.com/jpudysz/react-native-unistyles?tab=readme-ov-file#installation)
+            required: true
+          - label: I've searched for [similar issues in this repository](https://github.com/jpudysz/react-native-unistyles/issues) and found none
+            required: true
+          - label: I double-checked that my issue was not covered in [documentation](https://unistyl.es/v3/guides/why-my-view-doesnt-update)
