@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config'
 import starlight from '@astrojs/starlight'
 import sitemap from '@astrojs/sitemap'
+import starlightLlmsTxt from 'starlight-llms-txt'
 import expressiveCode, { ExpressiveCodeTheme } from 'astro-expressive-code'
 import fs from 'node:fs'
 
@@ -50,6 +51,7 @@ const oldPaths = {
 }
 
 export default defineConfig({
+    site: 'https://unistyl.es/v3/',
 	integrations: [
         expressiveCode({
             themes: [customTheme],
@@ -149,6 +151,26 @@ export default defineConfig({
                     link: 'https://x.com/messages/compose?recipient_id=769868612198887425'
                 }
 			],
+            plugins: [
+                starlightLlmsTxt({
+                    projectName: 'React Native Unistyles 3.0',
+                    description: 'Easily style cross platform React Native apps with a single StyleSheet',
+                    details: 'This documentation site is a source of truth for the good practices while building apps with React Native Unistyles.',
+                    optionalLinks: [
+                        {
+                            'label': 'Github issues',
+                            'link': 'https://github.com/jpudysz/react-native-unistyles/issues',
+                            'description': 'All Github issues related to Unistyles'
+                        }
+                    ],
+                    promote: [
+                        'v3/start/**', 'v3/guides/**', 'v3/references/**'
+                    ],
+                    exclude: [
+                        'v3/examples/**', 'v3/tutorial/**', 'v3/guides/custom-web', 'v3/other/for-sponsors'
+                    ]
+                })
+            ]
 		}),
         sitemap(),
 	],
