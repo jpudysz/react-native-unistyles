@@ -1,0 +1,55 @@
+---
+title: Why my view doesn't re-render?
+description: Learn how to resolve the issue when your view is not updating as expected
+---
+
+import { Card, Aside } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Why my view doesn\'t re-render?',
+        description: 'Learn how to resolve the issue when your view is not updating as expected'
+    }}
+>
+
+If you start working with Unistyles 3.0, it might be unclear why some views are updated while others aren't.
+Before diving into this guide, make sure you've read the other guides covering the basics of the new Unistyles:
+
+- [Look under the hood](/v3/start/how-unistyles-works)
+- [Merging styles](/v3/guides/merging-styles)
+- [Babel plugin](/v3/other/babel-plugin)
+
+### Problem 1: Babel
+
+To leverage ShadowTree updates and avoid unnecessary re-renders, Unistyles must process both `StyleSheets` and your components.
+By default, the Babel plugin looks for `react-native-unistyles` imports and always ignores the `node_modules` folder.
+
+If you separate `StyleSheets` from your components, it's your responsibility to configure Babel to detect components that lack a Unistyles import.
+We've added plenty of options, so be sure to [check them out](/v3/other/babel-plugin##extra-configuration).
+
+### Problem 2: Dependency detection
+
+
+Unistyles will automatically detect all your dependencies for every `StyleSheet`, but there's a chance you used custom syntax that isn't covered by the plugin.
+If Babel fails to detect some style dependencies, they won't be updated when necessary.
+
+You can easily debug this issue by adding the following Babel plugin configuration:
+
+```js title="babel.config.js"
+module.exports = function (api) {
+  api.cache(true)
+
+  return {
+    // other config
+    plugins: [
+        // other plugins
+        ['react-native-unistyles/plugin', {
+            debug: true
+        }]
+    ]
+  }
+}
+```
+
+</Seo>
