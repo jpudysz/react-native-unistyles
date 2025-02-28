@@ -5599,6 +5599,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/braces@npm:*":
+  version: 3.0.5
+  resolution: "@types/braces@npm:3.0.5"
+  checksum: 1c0091921cf7429f95404ee2a7fd7e52e52ddd160cf2eb3b1b841649debf47b062386209388877a7548d8aae906346a0832e41bae143f8e576710fd22314b69d
+  languageName: node
+  linkType: hard
+
 "@types/conventional-commits-parser@npm:^5.0.0":
   version: 5.0.1
   resolution: "@types/conventional-commits-parser@npm:5.0.1"
@@ -5734,6 +5741,15 @@ __metadata:
   version: 2.0.13
   resolution: "@types/mdx@npm:2.0.13"
   checksum: 195137b548e75a85f0558bb1ca5088aff1c01ae0fc64454da06085b7513a043356d0bb51ed559d3cbc7ad724ccd8cef2a7d07d014b89a47a74dff8875ceb3b15
+  languageName: node
+  linkType: hard
+
+"@types/micromatch@npm:^4.0.9":
+  version: 4.0.9
+  resolution: "@types/micromatch@npm:4.0.9"
+  dependencies:
+    "@types/braces": "*"
+  checksum: 109920dd54116dc9b52a2973221230f0db98f119c5c20169f84358c4f956fe7c9f20b645824c1fcdf872ad2beb7c795fb503663da3283c4896785c23443abc32
   languageName: node
   linkType: hard
 
@@ -10433,6 +10449,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"hast-util-select@npm:^6.0.3":
+  version: 6.0.4
+  resolution: "hast-util-select@npm:6.0.4"
+  dependencies:
+    "@types/hast": ^3.0.0
+    "@types/unist": ^3.0.0
+    bcp-47-match: ^2.0.0
+    comma-separated-tokens: ^2.0.0
+    css-selector-parser: ^3.0.0
+    devlop: ^1.0.0
+    direction: ^2.0.0
+    hast-util-has-property: ^3.0.0
+    hast-util-to-string: ^3.0.0
+    hast-util-whitespace: ^3.0.0
+    nth-check: ^2.0.0
+    property-information: ^7.0.0
+    space-separated-tokens: ^2.0.0
+    unist-util-visit: ^5.0.0
+    zwitch: ^2.0.0
+  checksum: 94f3c193529bcc75d3e4b0062cb932fb1a88c83c1080cfcaa9a43f453ca3c18b8aefc00bc98ad9d494070017e7632a5d39ceaa94edca2e4bce51d124ac9911fc
+  languageName: node
+  linkType: hard
+
 "hast-util-to-estree@npm:^3.0.0":
   version: 3.1.1
   resolution: "hast-util-to-estree@npm:3.1.1"
@@ -10499,6 +10538,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"hast-util-to-mdast@npm:^10.0.0":
+  version: 10.1.2
+  resolution: "hast-util-to-mdast@npm:10.1.2"
+  dependencies:
+    "@types/hast": ^3.0.0
+    "@types/mdast": ^4.0.0
+    "@ungap/structured-clone": ^1.0.0
+    hast-util-phrasing: ^3.0.0
+    hast-util-to-html: ^9.0.0
+    hast-util-to-text: ^4.0.0
+    hast-util-whitespace: ^3.0.0
+    mdast-util-phrasing: ^4.0.0
+    mdast-util-to-hast: ^13.0.0
+    mdast-util-to-string: ^4.0.0
+    rehype-minify-whitespace: ^6.0.0
+    trim-trailing-lines: ^2.0.0
+    unist-util-position: ^5.0.0
+    unist-util-visit: ^5.0.0
+  checksum: 38febec776a3b33120d44c6e6b4de150e4102c12b1967c094029968e4c7c72599fac3b0713f4f9b3d28a81a96d41b3d72264fdcf89c805bda46a1b4b92108933
+  languageName: node
+  linkType: hard
+
 "hast-util-to-parse5@npm:^8.0.0":
   version: 8.0.0
   resolution: "hast-util-to-parse5@npm:8.0.0"
@@ -10523,7 +10584,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hast-util-to-text@npm:^4.0.1, hast-util-to-text@npm:^4.0.2":
+"hast-util-to-text@npm:^4.0.0, hast-util-to-text@npm:^4.0.1, hast-util-to-text@npm:^4.0.2":
   version: 4.0.2
   resolution: "hast-util-to-text@npm:4.0.2"
   dependencies:
@@ -15624,6 +15685,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"property-information@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "property-information@npm:7.0.0"
+  checksum: c12fbaf841d9e7ea2215139ec53a7fe848b1a214d486623b64b7b56de3e4e601ec8211b0fb10dabda86de67ae06aaa328d9bdafe9c6b64e7f23d78f0dbf4bbfc
+  languageName: node
+  linkType: hard
+
 "proto-list@npm:~1.2.1":
   version: 1.2.4
   resolution: "proto-list@npm:1.2.4"
@@ -16002,6 +16070,7 @@ __metadata:
     postcss-easing-gradients: 3.0.1
     postcss-nested: 7.0.2
     sharp: 0.33.5
+    starlight-llms-txt: 0.4.1
     typescript: 5.7.3
   languageName: unknown
   linkType: soft
@@ -16525,7 +16594,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rehype-parse@npm:^9.0.0":
+"rehype-minify-whitespace@npm:^6.0.0":
+  version: 6.0.2
+  resolution: "rehype-minify-whitespace@npm:6.0.2"
+  dependencies:
+    "@types/hast": ^3.0.0
+    hast-util-minify-whitespace: ^1.0.0
+  checksum: 3ebceb08af1ce08dab68860ecbf56dc804ede3200a4757e1681c967e8390cbf615e662862a92154c565c3841f847425fcc0fdce8ecd46696c58eb55facfce7f1
+  languageName: node
+  linkType: hard
+
+"rehype-parse@npm:^9.0.0, rehype-parse@npm:^9.0.1":
   version: 9.0.1
   resolution: "rehype-parse@npm:9.0.1"
   dependencies:
@@ -16555,6 +16634,19 @@ __metadata:
     "@types/hast": ^3.0.0
     hast-util-to-estree: ^3.0.0
   checksum: d3d544ad4a18485ec6b03a194b40473f96e2169c63d6a8ee3ce9af5e87b946c308fb9549b53e010c7dd39740337e387bb1a8856ce1b47f3e957b696f1d5b2d0c
+  languageName: node
+  linkType: hard
+
+"rehype-remark@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "rehype-remark@npm:10.0.0"
+  dependencies:
+    "@types/hast": ^3.0.0
+    "@types/mdast": ^4.0.0
+    hast-util-to-mdast: ^10.0.0
+    unified: ^11.0.0
+    vfile: ^6.0.0
+  checksum: bdab8c83384ec8b6ea3fc087cec70e95254fc32505862635b070362c5398ba125386eb77185010f7c19798b982c201ee4bc40db72615e9e9d2c0e0116113006b
   languageName: node
   linkType: hard
 
@@ -17772,6 +17864,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"starlight-llms-txt@npm:0.4.1":
+  version: 0.4.1
+  resolution: "starlight-llms-txt@npm:0.4.1"
+  dependencies:
+    "@astrojs/mdx": ^4.0.5
+    "@types/hast": ^3.0.4
+    "@types/micromatch": ^4.0.9
+    github-slugger: ^2.0.0
+    hast-util-select: ^6.0.3
+    micromatch: ^4.0.8
+    rehype-parse: ^9.0.1
+    rehype-remark: ^10.0.0
+    remark-gfm: ^4.0.0
+    remark-stringify: ^11.0.0
+    unified: ^11.0.5
+    unist-util-remove: ^4.0.0
+  peerDependencies:
+    "@astrojs/starlight": ">=0.31"
+    astro: ^5.1.6
+  checksum: d69d424da0b7050fcd7b9d3f81a33effbed62016a7269417f26b9d1d4871bf8eda0ed21a10d6f7788a4cf5f10ce045465ef103e9f3716713db66fbba9e5e9f1d
+  languageName: node
+  linkType: hard
+
 "statuses@npm:2.0.1":
   version: 2.0.1
   resolution: "statuses@npm:2.0.1"
@@ -18324,6 +18439,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"trim-trailing-lines@npm:^2.0.0":
+  version: 2.1.0
+  resolution: "trim-trailing-lines@npm:2.1.0"
+  checksum: 4bfed49a8c064c93d15e560bec81083fdbb0a525300f07006b76bcc753816091c5ef25e6a82d1bb6fe678e4e1ecde5a7f8dd7f6fa1c9da74b80d3a64497a87f6
+  languageName: node
+  linkType: hard
+
 "trough@npm:^2.0.0":
   version: 2.2.0
   resolution: "trough@npm:2.2.0"
@@ -18700,6 +18822,17 @@ __metadata:
     "@types/unist": ^3.0.0
     unist-util-visit: ^5.0.0
   checksum: 8aabdb9d0e3e744141bc123d8f87b90835d521209ad3c6c4619d403b324537152f0b8f20dda839b40c3aa0abfbf1828b3635a7a8bb159c3ed469e743023510ee
+  languageName: node
+  linkType: hard
+
+"unist-util-remove@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "unist-util-remove@npm:4.0.0"
+  dependencies:
+    "@types/unist": ^3.0.0
+    unist-util-is: ^6.0.0
+    unist-util-visit-parents: ^6.0.0
+  checksum: 684db988a486782ae3e721d03bd502f9aaa5ef9d55c688da7cdc777864210faa02552d8a40def856d7c31c281816cdd8b9562ea86d4eec9f122c6aaf5a799f26
   languageName: node
   linkType: hard
 
