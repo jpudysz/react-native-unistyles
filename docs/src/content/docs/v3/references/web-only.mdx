@@ -13,7 +13,7 @@ import Seo from '../../../../components/Seo.astro'
     }}
 >
 
-Unistyles comes with some web-only features that are not available on the React Native side.
+Unistyles comes with some web-only features that are not available with React Native or React Native Web.
 
 ### Web only styles
 
@@ -31,11 +31,14 @@ const styles = StyleSheet.create({
 })
 ```
 
+Web styles support **any** CSS property and value that matches the `CSSProperties` type from React.
+
 <Aside>
-The `_web` styles are ignored on Android and iOS.
+The `_web` styles are ignored on Android and iOS, but are merged with other styles on web.
 </Aside>
 
-The `_web` key supports **any** CSS property and value that matches the `CSSProperties` type from React.
+
+Within `_web` block, you can't use any React Native specific styles:
 
 ```ts
 const styles = StyleSheet.create({
@@ -49,10 +52,6 @@ const styles = StyleSheet.create({
     }
 })
 ```
-
-<Aside>
-The `_web` doesn't support React Native specific styles. To use them, you can move them up to the `style` level.
-</Aside>
 
 The `transform` property on the web should be a string:
 
@@ -69,7 +68,7 @@ const styles = StyleSheet.create({
 })
 ```
 
-Or can be lifted  to the `style` level:
+If you want to use React Native specific styles on web simply move them to the `style` level:
 
 ```diff lang="ts"
 const styles = StyleSheet.create({

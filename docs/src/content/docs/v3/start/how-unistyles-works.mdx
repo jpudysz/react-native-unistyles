@@ -26,7 +26,7 @@ To get the most out of Unistyles, it’s important to understand how it works an
 ### 1. StyleSheets
 
 A typical app consist of many `StyleSheets`. A `StyleSheet` is a JavaScript object that holds one or many styles. Each style is associated with native view.
-What’s more important is that each `StyleSheet` is unique, tailored to the needs of the view it’s associated with, or to a shared component.
+What’s more important is that each `StyleSheet` is unique, tailored to the needs of the view, or to a shared component.
 
 <div style="display:flex;justify-content:center;flex-direction:column;align-items:center;">
     <img
@@ -148,7 +148,7 @@ With Unistyles 2.0 or any other library, we would need to re-render your entire 
     </span>
 </div>
 
-Instead, with all the optimizations and features that Unistyles 3.0 brings, we can update your `ShadowTree` directly from C++:
+Instead, with all the optimizations and features that Unistyles 3.0 brings, we can target only specific nodes and update your `ShadowTree` directly from C++:
 
 <div style="display:flex;justify-content:center;flex-direction:column;align-items:center;">
     <img

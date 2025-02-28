@@ -28,10 +28,12 @@ If you're using `react-native`, `react-native-reanimated`, or `react-native-gest
 Consider using this hook only if:
 - You need to update a view in a third-party library like `react-native-blurhash`
 - You've already tried using [withUnistyles](/v3/references/with-unistyles) without success
+- You want to style [navigation](https://reactnavigation.org/) props as `react-navigation` is optimized for that and never re-render your screens
+- some libraries like `react-navigation` warns you that only specific children are allowed, so `withUnistyles` is not an option
 
 ### How to use it?
 
-This is a standard hook that exposes `theme` and `rt` (runtime) properties. You can import it from `react-native-unistyles`:
+This is a standard hook that exposes `theme` and `rt` ([runtime](/v3/references/mini-runtime)) properties. You can import it from `react-native-unistyles`:
 
 ```tsx
 import { useUnistyles } from 'react-native-unistyles'
@@ -52,12 +54,12 @@ Destructuring `rt` won't create an automatic subscription, as this object contai
 To create a subscription, you need to use a specific property on the `rt` object, such as `rt.colorScheme` or `rt.screen.width`.
 
 ```tsx title="Case 1 - theme only subscription"
-// subscribe to theme changes, rt is not yet used
+// subscribes to theme changes, rt is not yet used
 const { theme, rt } = useUnistyles()
 ```
 vs
 ```tsx title="Case 2 - theme and insets subscription"
-// subscribe to theme changes, and insets
+// subscribes to theme and insets changes
 const { theme, rt } = useUnistyles()
 
 rt.insets // reading this value will automatically subscribe to insets changes

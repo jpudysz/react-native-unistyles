@@ -523,6 +523,12 @@ function getStylesDependenciesFromFunction(path) {
                 usedLabel = "ime";
               }
             }
+            if (usedLabel === "insets" && (memberExpr.parentPath.isBinaryExpression() || memberExpr.parentPath.isLogicalExpression())) {
+              const secondPropPath = memberExpr.node.property;
+              if (t4.isIdentifier(secondPropPath) && secondPropPath.name === "ime") {
+                usedLabel = "ime";
+              }
+            }
           }
         }
         const containerProp = refPath.findParent((parent2) => parent2.isObjectProperty() && parent2.parentPath === returnedObjectPath);

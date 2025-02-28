@@ -14,7 +14,7 @@ import Seo from '../../../../components/Seo.astro'
 >
 
 Unistyles uses `WindowsInsetsCompat` API to handle insets on Android. This API requires your app to have edge to edge layout enabled.
-In other words, it means that your `StatusBar` is always `translucent` and the app can draw below the `NavigationBar`. A translucent status bar is also the default when you build your app with Expo. To leverage `WindowInsetsCompat`, Unistyles enables `edgeToEdge` layout by default.
+In other words, it means that your `StatusBar` is always `translucent` and the app can draw behind the `NavigationBar`. A translucent status bar is also the default when you build your app with Expo. To leverage `WindowInsetsCompat`, Unistyles enables `edgeToEdge` layout by default.
 
 As a result you need to use paddings to draw your app content above system bars. To learn more about `edgeToEdge` layout please check [Window insets in Compose](https://developer.android.com/develop/ui/compose/layouts/insets).
 

@@ -17,7 +17,7 @@ If you need to pass a value from JSX to your `stylesheet` you can do so using a 
 
 ### Usage
 
-To use a dynamic function, change your stylesheet's value from an `object` to a `function`:
+To use a dynamic function, change **any** stylesheet's value from an `object` to a `function`:
 
 ```diff lang="tsx" del="container: {" ins="container: () => ({"
 const styles = StyleSheet.create(theme => ({

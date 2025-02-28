@@ -41,11 +41,11 @@ and use it anywhere in your code, even outside a React component.
 | contentSizeCategory | IOSContentSizeCategory or AndroidContentSizeCategory | Your device's [content size category](/v3/references/content-size-category/) |
 | insets | \{ top: number, bottom: number, left: number, right: number, ime: number \} | Device insets which are safe to put content into |
 | statusBar | \{width: number, height: number\} | Status bar dimensions |
-| navigationBar | \{width: number, height: number\} | Navigation bar dimensions (Android) |
+| navigationBar | \{width: number, height: number\} | Navigation bar dimensions (Android only) |
 | pixelRatio | number | Pixel density of the device |
 | fontScale | number | Font scale of the device |
 | rtl | boolean | Indicates if the device is in RTL mode |
-| getTheme | (themeName?: string) => Theme | Get theme by name or current theme if not specified |
+| getTheme | (themeName?: string) => Theme | Get theme by name or current theme if name was not specified |
 
 ## Setters
 
@@ -64,6 +64,8 @@ and use it anywhere in your code, even outside a React component.
 You should think of `UnistylesRuntime` as a JavaScript object.
 It's not a React hook, so it doesn't re-render your component when eg. screen size or breakpoint changes.
 Instead it will return up to date value whenever you access it.
+
+If you're looking for a way to get fresh values and re-render your component, please check [useUnistyles](/v3/references/use-unistyles) hook.
 
 ### How to re-render my stylesheets based on `UnistylesRuntime`?
 
@@ -84,6 +86,8 @@ const style = StyleSheet.create((theme, rt) => ({
     }
 }))
 ```
+
+Your `container` style will be auto-recalculated when `screen` changes.
 
 Learn more on how Unistyles [re-calculates your styles](/v3/start/how-unistyles-works).
 

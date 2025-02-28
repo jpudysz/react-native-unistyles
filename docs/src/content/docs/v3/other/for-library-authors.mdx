@@ -17,7 +17,7 @@ Unistyles is highly extensible and can be used to build UI kits and various othe
 
 ## Using Unistyles in your library
 
-`StyleSheet.configure` should be invoked as soon as possible, before the metro bundler references any `StyleSheet` from your library.
+`StyleSheet.configure` **must** be invoked as soon as possible, before the metro bundler references any `StyleSheet` from your library.
 
 You can then call `StyleSheet.configure` multiple times to override configurations.
 However, keep in mind that `StyleSheet.configure` makes a roundtrip to C++, which can add a few `ms` to your app's startup time.
@@ -48,6 +48,11 @@ Unistyles is compatible with:
 ## Out of the box support for Web
 
 Building a UI kit for both React Native and Web couldn’t be easier. Unistyles automatically manages your styles and converts them into CSS classes.
+
+## Babel config
+
+Make sure to instruct your users to add [autoProcessPaths](/v3/other/babel-plugin#extra-configuration) babel option.
+It will whitelist your `ui-kit` and process your files even though there are in `node_modules` folder.
 
 ## Why to choose Unistyles?
 
