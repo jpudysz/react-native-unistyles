@@ -84,3 +84,4 @@ body:
           - label: I've searched for [similar issues in this repository](https://github.com/jpudysz/react-native-unistyles/issues) and found none
             required: true
           - label: I double-checked that my issue was not covered in [documentation](https://unistyl.es/v3/guides/why-my-view-doesnt-update)
+            required: true
