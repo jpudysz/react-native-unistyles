@@ -70,8 +70,6 @@ export const removeInlineStyles = (values: UnistylesValues) => {
     return returnValue
 }
 
-export const isInDocument = (element: HTMLElement) => document.body.contains(element)
-
 export const getMediaQuery = (query: string, allBreakpoints: Array<string>) => {
     if (Object.values(Orientation).includes(query as Orientation)) {
         return `@media (orientation: ${query})`

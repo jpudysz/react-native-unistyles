@@ -1,7 +1,7 @@
 import { UnistyleDependency } from '../specs/NativePlatform'
 import type { UnistylesMiniRuntime } from '../specs/UnistylesRuntime'
 import { type AppTheme, type AppThemeName, ColorScheme, Orientation } from '../specs/types'
-import { WebContentSizeCategory } from '../types'
+import { type UnistylesTheme, WebContentSizeCategory } from '../types'
 import { NavigationBar, StatusBar } from './mock'
 import type { UnistylesServices } from './types'
 import { error, isServer, schemeToTheme } from './utils'
@@ -213,7 +213,11 @@ export class UnistylesRuntime {
             : this.services.state.themes.get(themeName ?? '')
 
         if (!themeName || !theme) {
-            throw error(`You're trying to get theme "${themeName}" but it wasn't registered.`)
+            return new Proxy({} as UnistylesTheme, {
+                get: () => {
+                    throw error(`You're trying to get theme "${themeName}" but it wasn't registered.`)
+                }
+            })
         }
 
         return theme
