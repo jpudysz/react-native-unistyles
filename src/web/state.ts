@@ -58,7 +58,11 @@ export class UnistylesState {
         this.services.listener.initListeners()
     }
 
-    private initThemes = (themes = {} as UnistylesThemes, CSSVars = true) => {
+    private initThemes = (themes?: UnistylesThemes, CSSVars = true) => {
+        if (!themes) {
+            return
+        }
+
         this.CSSVars = CSSVars
 
         Object.entries(themes).forEach(([themeName, theme]) => {
@@ -117,7 +121,11 @@ export class UnistylesState {
         }
     }
 
-    private initBreakpoints = (breakpoints = {} as UnistylesBreakpoints) => {
+    private initBreakpoints = (breakpoints?: UnistylesBreakpoints) => {
+        if (!breakpoints) {
+            return
+        }
+
         this.breakpoints = breakpoints
         const breakpointsEntries = Object.entries(breakpoints)
 
