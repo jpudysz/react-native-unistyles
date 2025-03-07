@@ -21,7 +21,7 @@ export class UnistylesRegistry {
         }
 
         if (scopedThemeName) {
-            const scopedTheme = this.services.runtime.getTheme(scopedThemeName, this.services.state.CSSVars)
+            const scopedTheme = this.services.runtime.getTheme(scopedThemeName)
 
             if (!scopedTheme) {
                 throw error(`Unistyles: You're trying to use scoped theme '${scopedThemeName}' but it wasn't registered.`)
