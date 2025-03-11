@@ -3,7 +3,7 @@ title: SSR
 description: Learn about SSR with Unistyles 3.0
 ---
 
-import { Card, Aside } from '@astrojs/starlight/components'
+import { Card, Aside, Tabs,TabItem } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
 
 <Seo
@@ -17,57 +17,99 @@ Unistyles 3.0 is fully compatible with Next.js Server Side Rendering (SSR). We'r
 
 ### Usage
 
-To use server-side rendered styles, create following **client side** component:
+<Tabs>
+    <TabItem label="App router">
+        To use server-side rendered styles, create following **client side** component:
 
-```tsx title="Style.tsx" /useServerUnistyles/ /useServerInsertedHTML/ /'use client'/
-'use client'
+        ```tsx title="Style.tsx" /useServerUnistyles/ /useServerInsertedHTML/ /'use client'/
+        'use client'
 
-import { PropsWithChildren } from 'react'
-import { useServerUnistyles } from 'react-native-unistyles/server'
-import { useServerInsertedHTML } from 'next/navigation'
-import './unistyles'
+        import { PropsWithChildren } from 'react'
+        import { useServerUnistyles } from 'react-native-unistyles/server'
+        import { useServerInsertedHTML } from 'next/navigation'
+        import './unistyles'
 
-export const Style = ({ children }: PropsWithChildren) => {
-    const unistyles = useServerUnistyles()
+        export const Style = ({ children }: PropsWithChildren) => {
+            const unistyles = useServerUnistyles()
 
-    useServerInsertedHTML(() => unistyles)
+            useServerInsertedHTML(() => unistyles)
 
-    return <>{children}</>
-}
-```
+            return <>{children}</>
+        }
+        ```
 
-With the component in place, make sure it wraps your body's children:
+        With the component in place, make sure it wraps your body's children:
 
-```diff lang="tsx" title="layout.tsx"
-+ import '../unistyles'
-+ import { Style } from '../Style'
+        ```diff lang="tsx" title="layout.tsx"
+        + import '../unistyles'
+        + import { Style } from '../Style'
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en">
-      <body>
-+        <Style>
-            {children}
-+        </Style>
-      </body>
-    </html>
-  );
-}
-```
+        export default function RootLayout({
+        children,
+        }: Readonly<{
+        children: React.ReactNode;
+        }>) {
+        return (
+            <html lang="en">
+            <body>
+        +        <Style>
+                    {children}
+        +        </Style>
+            </body>
+            </html>
+        );
+        }
+        ```
 
-<Aside>
-The `unistyles.ts` file is where Unistyles is configured. For more details, refer to the [configuration guide](/v3/start/configuration).
-</Aside>
+        <Aside>
+        The `unistyles.ts` file is where Unistyles is configured. For more details, refer to the [configuration guide](/v3/start/configuration).
+        </Aside>
 
-With this setup, we will ensure that Unistyles is initialized correctly and injects CSS on the server side.
+        With this setup, we will ensure that Unistyles is initialized correctly and injects CSS on the server side.
+
+        ### Config (Optional)
+
+        `useServerUnistyles` accepts an optional config object:
+
+        - **`includeRNWStyles`** – a boolean that enables or disables injecting React Native Web default CSS styles. Defaults to `true`.
+    </TabItem>
+    <TabItem label="Pages router">
+        To use server-side rendered styles, add the following code to your codebase:
+
+        ```diff lang="tsx" title="_document.tsx"
+        + import { getServerUnistyles, resetServerUnistyles } from 'react-native-unistyles/server'
+
+            export default class Document extends NextDocument {
+        +       static async getInitialProps({ renderPage }: DocumentContext) {
+        +           const page = await renderPage()
+        +           const styles = getServerUnistyles()
+
+        +           resetServerUnistyles()
+
+        +           return {
+        +               ...page,
+        +               styles
+        +           }
+        +       }
+        ```
+
+        And add the following use effect to your `_app.tsx`
+        ```diff lang="tsx" title="_app.tsx"
+        + import { hydrateServerUnistyles } from 'react-native-unistyles/server'
+
+        {/* JSX of your component */}
+        + useEffect(() => {
+        +     hydrateServerUnistyles()
+        + }, [])
+        ```
+
+         ### Config (Optional)
+
+        `getServerUnistyles` accepts an optional config object:
+
+        - **`includeRNWStyles`** – a boolean that enables or disables injecting React Native Web default CSS styles. Defaults to `true`.
+    </TabItem>
+</Tabs>
+
+
 </Seo>
-
-### Config (Optional)
-
-`useServerUnistyles` accepts an optional config object:
-
-- **`includeRNWStyles`** – a boolean that enables or disables injecting React Native Web default CSS styles. Defaults to `true`.
