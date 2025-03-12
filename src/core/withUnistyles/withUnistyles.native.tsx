@@ -1,11 +1,10 @@
 import React, { forwardRef, useEffect, type ComponentType, useRef } from 'react'
 import { type UnistyleDependency, UnistylesShadowRegistry } from '../../specs'
 import type { UnistylesTheme } from '../../types'
-import type { PartialBy } from '../../types/common'
 import { deepMergeObjects } from '../../utils'
 import { useProxifiedUnistyles } from '../useProxifiedUnistyles'
 import { maybeWarnAboutMultipleUnistyles } from '../warn'
-import type { Mappings, SupportedStyleProps } from './types'
+import type { Mappings } from './types'
 
 // @ts-expect-error
 type GenericComponentProps<P> = ComponentProps<P>
@@ -24,7 +23,7 @@ type MappedSecrets = {
 
 export const withUnistyles = <TComponent, TMappings extends GenericComponentProps<TComponent>>(Component: TComponent, mappings?: Mappings<TMappings>) => {
     type TProps = GenericComponentProps<TComponent>
-    type PropsWithUnistyles = PartialBy<TProps, keyof TMappings | SupportedStyleProps> & {
+    type PropsWithUnistyles = Partial<TProps> & {
         uniProps?: Mappings<TProps>
     }
     const getSecrets = (styleProps: Record<string, any> = {}): MappedSecrets => {
