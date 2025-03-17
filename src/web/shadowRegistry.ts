@@ -27,7 +27,7 @@ export class UnistylesShadowRegistry {
         this.services.registry.connect(ref, hash)
     }
 
-    addStyles = (unistyles: Array<UnistylesValues>) => {
+    addStyles = (unistyles: Array<UnistylesValues>, forChild?: boolean) => {
         const getParsedStyles = () => {
             const allStyles = unistyles.map(unistyle => {
                 const secrets = extractSecrets(unistyle)
@@ -61,7 +61,7 @@ export class UnistylesShadowRegistry {
         // Copy scoped theme to not use referenced value
         const scopedTheme = this.scopedTheme
         const parsedStyles = getParsedStyles()
-        const { hash, existingHash } = this.services.registry.add(parsedStyles)
+        const { hash, existingHash } = this.services.registry.add(parsedStyles, forChild)
         const injectedClassNames = parsedStyles?._web?._classNames ?? []
         const injectedClassName = Array.isArray(injectedClassNames) ? injectedClassNames.join(' ') : injectedClassNames
         const dependencies = extractUnistyleDependencies(parsedStyles)
@@ -75,7 +75,11 @@ export class UnistylesShadowRegistry {
             }))
         }
 
-        return { injectedClassName, hash }
+        const hashClassname = forChild
+            ? hash.replace(' > *', '')
+            : hash
+
+        return { injectedClassName, hash: hashClassname }
     }
 
     setScopedTheme = (theme?: UnistylesTheme) => {
