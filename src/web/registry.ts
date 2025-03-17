@@ -92,8 +92,11 @@ export class UnistylesRegistry {
         return false
     }
 
-    add = (value: UnistylesValues) => {
-        const hash = generateHash(value)
+    add = (value: UnistylesValues, forChild?: boolean) => {
+        const generatedHash = generateHash(value)
+        const hash = forChild
+            ? `${generatedHash} > *`
+            : generatedHash
 
         if (!this.stylesCache.has(hash)) {
             this.applyStyles(hash, value)
