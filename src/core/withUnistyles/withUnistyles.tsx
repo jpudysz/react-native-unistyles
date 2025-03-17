@@ -23,17 +23,22 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
 
     return forwardRef<GenericComponentRef<TComponent>, PropsWithUnistyles>((props, ref) => {
         const narrowedProps = props as PropsWithUnistyles & UnistyleStyles
-        const styleClassNames = getClassName(narrowedProps.style)
+        const styleClassNames = getClassName(narrowedProps.style, true)
         const contentContainerStyleClassNames = getClassName(narrowedProps.contentContainerStyle)
         const { proxifiedRuntime, proxifiedTheme } = useProxifiedUnistyles()
 
         const mappingsProps = mappings ? mappings(proxifiedTheme, proxifiedRuntime) : {}
         const unistyleProps = narrowedProps.uniProps ? narrowedProps.uniProps(proxifiedTheme, proxifiedRuntime) : {}
 
+        const emptyStyles = Object.fromEntries(Object.entries(Object.getOwnPropertyDescriptors(narrowedProps.style))
+            .filter(([key]) => !key.startsWith('unistyles') && !key.startsWith('_'))
+            .map(([key]) => [key, undefined]))
+
         const combinedProps = {
             ...deepMergeObjects(mappingsProps, unistyleProps, props),
             ...narrowedProps.style ? {
-                style: styleClassNames,
+                // Override default component styles with undefined values to reset them
+                style: emptyStyles
             } : {},
             ...narrowedProps.contentContainerStyle ? {
                 contentContainerStyle: contentContainerStyleClassNames,
@@ -47,6 +52,13 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
 
         const NativeComponent = Component as ComponentType
 
-        return <NativeComponent {...combinedProps} ref={ref} />
+        return (
+            <div
+                className={styleClassNames?.hash}
+                style={{ display: 'contents' }}
+            >
+                <NativeComponent {...combinedProps} ref={ref} />
+            </div>
+        )
     })
 }
