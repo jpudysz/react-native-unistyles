@@ -4,7 +4,7 @@
 #include <folly/dynamic.h>
 #include "Unistyle.h"
 #include "Dimensions.hpp"
-#include "Constants.h"
+#include "UnistylesConstants.h"
 #include "Helpers.h"
 #include "MediaQueries.h"
 #include "HybridUnistylesRuntime.h"
