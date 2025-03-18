@@ -63,6 +63,22 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
     })
     const proxifiedRuntime = new Proxy(getMiniRuntime(), {
         get: (target, prop) => {
+            if (prop === 'insets') {
+                return new Proxy(target.insets, {
+                    get: (target, prop) => {
+                        if (prop === 'ime') {
+                            dependencies.add(UnistyleDependency.Ime)
+
+                            return target[prop as keyof typeof target]
+                        }
+
+                        dependencies.add(UnistyleDependency.Insets)
+
+                        return target[prop as keyof typeof target]
+                    }
+                })
+            }
+
             if (prop in RTDependencyMap) {
                 dependencies.add(RTDependencyMap[prop as keyof typeof RTDependencyMap])
             }
