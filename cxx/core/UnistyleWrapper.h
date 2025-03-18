@@ -5,7 +5,7 @@
 #include "UnistylesRegistry.h"
 #include "Helpers.h"
 #include "HybridUnistylesRuntime.h"
-#include "Constants.h"
+#include "UnistylesConstants.h"
 #include "Parser.h"
 
 namespace margelo::nitro::unistyles::core {

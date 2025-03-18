@@ -3,7 +3,7 @@
 #include <jsi/jsi.h>
 #include "Unistyle.h"
 #include "Helpers.h"
-#include "Constants.h"
+#include "UnistylesConstants.h"
 
 namespace margelo::nitro::unistyles::core {
 

@@ -6,7 +6,7 @@
 #include "HybridUnistylesStyleSheetSpec.hpp"
 #include "RNStyle.h"
 #include "Helpers.h"
-#include "Constants.h"
+#include "UnistylesConstants.h"
 #include "Breakpoints.h"
 #include "Parser.h"
 #include "UnistylesCommitHook.h"
