@@ -27,7 +27,7 @@ class NativePlatformListener(
         override fun onReceive(context: Context, intent: Intent) {
             Handler(Looper.getMainLooper()).postDelayed({
                 this@NativePlatformListener.onConfigChange()
-            }, 10)
+            }, 25)
         }
     }
 
