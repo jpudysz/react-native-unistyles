@@ -30,9 +30,14 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         const mappingsProps = mappings ? mappings(proxifiedTheme, proxifiedRuntime) : {}
         const unistyleProps = narrowedProps.uniProps ? narrowedProps.uniProps(proxifiedTheme, proxifiedRuntime) : {}
 
-        const emptyStyles = Object.fromEntries(Object.entries(Object.getOwnPropertyDescriptors(narrowedProps.style))
-            .filter(([key]) => !key.startsWith('unistyles') && !key.startsWith('_'))
-            .map(([key]) => [key, undefined]))
+
+        const emptyStyles = narrowedProps.style
+            ? Object.fromEntries(
+                  Object.entries(Object.getOwnPropertyDescriptors(narrowedProps.style))
+                      .filter(([key]) => !key.startsWith("unistyles") && !key.startsWith("_"))
+                      .map(([key]) => [key, undefined])
+              )
+            : undefined
 
         const combinedProps = {
             ...deepMergeObjects(mappingsProps, unistyleProps, props),
