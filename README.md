@@ -28,8 +28,8 @@ yarn add react-native-edge-to-edge react-native-nitro-modules@0.24.1
 
 | react-native-unistyles | react-native-nitro-modules |
 |------------------------|----------------------------|
-| 3.0.0.beta.7           | 0.22.1                     |
 | 3.0.0.beta.8           | 0.24.1                     |
+| 3.0.0-nightly-20250319 | 0.24.1                    |
 
 Then follow [installation guides](https://unistyl.es/v3/start/getting-started) for your platform.
 
@@ -81,11 +81,8 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 <a href="https://github.com/guillaumehcht">
      <img src="https://avatars.githubusercontent.com/u/80776475?v=4" height="70px" width="70px" alt="guillaumehcht" />
 </a>
-<a href="https://github.com/FilipiRafael">
-     <img src="https://avatars.githubusercontent.com/u/61629642?v=4" height="70px" width="70px" alt="FilipiRafael" />
-</a>
-<a href="https://github.com/dacoto97">
-     <img src="https://avatars.githubusercontent.com/u/16915053?v=4" height="70px" width="70px" alt="dacoto97" />
+<a href="https://github.com/ryanlanciaux">
+     <img src="https://avatars.githubusercontent.com/u/85041?v=4" height="70px" width="70px" alt="ryanlanciaux" />
 </a>
 <a href="https://github.com/chinamcafee">
      <img src="https://avatars.githubusercontent.com/u/3439961?v=4" height="70px" width="70px" alt="chinamcafee" />
@@ -119,6 +116,12 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 </a>
 <a href="https://github.com/4cc3ssX">
      <img src="https://avatars.githubusercontent.com/u/57473799?v=4" height="70px" width="70px" alt="4cc3ssX" />
+</a>
+<a href="https://github.com/FilipiRafael">
+     <img src="https://avatars.githubusercontent.com/u/61629642?v=4" height="70px" width="70px" alt="FilipiRafael" />
+</a>
+<a href="https://github.com/dacoto97">
+     <img src="https://avatars.githubusercontent.com/u/16915053?v=4" height="70px" width="70px" alt="dacoto97" />
 </a>
 
 ## Sponsor my work
