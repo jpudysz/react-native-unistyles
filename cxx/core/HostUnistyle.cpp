@@ -87,19 +87,29 @@ jsi::Function HostUnistyle::createAddVariantsProxyFunction(jsi::Runtime& rt) {
         Variants variants = helpers::variantsToPairs(rt, arguments[0].asObject(rt));
         parser::Parser parser = parser::Parser(this->_unistylesRuntime);
 
-        helpers::enumerateJSIObject(rt, thisVal.asObject(rt), [this, &parser, &rt, &variants](const std::string& name, jsi::Value& value){
-            if (name == helpers::ADD_VARIANTS_FN || !this->_stylesheet->unistyles.contains(name)) {
+        auto stylesheetCopy = std::make_shared<StyleSheet>(
+            this->_stylesheet->tag,
+            this->_stylesheet->type,
+            jsi::Value(rt, this->_stylesheet->rawValue).asObject(rt)
+        );
+        
+        parser.buildUnistyles(rt, stylesheetCopy);
+        
+        helpers::enumerateJSIObject(rt, thisVal.asObject(rt), [this, &parser, &rt, &variants, stylesheetCopy](const std::string& name, jsi::Value& value){
+            if (name == helpers::ADD_VARIANTS_FN || !stylesheetCopy->unistyles.contains(name)) {
                 return;
             }
 
-            auto unistyle = this->_stylesheet->unistyles[name];
+            auto unistyle = stylesheetCopy->unistyles[name];
+            
+            unistyle->isDirty = true;
 
             if (unistyle->dependsOn(UnistyleDependency::VARIANTS)) {
                 parser.rebuildUnistyle(rt, unistyle, variants, std::nullopt);
             }
         });
 
-        auto style = std::make_shared<core::HostUnistyle>(this->_stylesheet, this->_unistylesRuntime, variants);
+        auto style = std::make_shared<core::HostUnistyle>(stylesheetCopy, this->_unistylesRuntime, variants);
         auto styleHostObject = jsi::Object::createFromHostObject(rt, style);
 
         return styleHostObject;
