@@ -51,7 +51,7 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                 }
 
                 // @ts-expect-error - this is hidden from TS
-                UnistylesShadowRegistry.add(storedRef.current, unistyles)
+                UnistylesShadowRegistry.add(ref, unistyles)
 
                 return passForwardedRef(props, ref, forwardedRef)
             }}
