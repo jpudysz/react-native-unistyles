@@ -13,7 +13,7 @@ export default function (): PluginObj<UnistylesPluginPass> {
         name: 'babel-react-native-unistyles',
         visitor: {
             Program: {
-                enter(_, state) {
+                enter(path, state) {
                     state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS
                         .concat(state.opts.autoProcessPaths ?? [])
                         .some(path => state.filename?.includes(path))
@@ -27,6 +27,16 @@ export default function (): PluginObj<UnistylesPluginPass> {
                     state.file.forceProcessing = state.opts.autoProcessRoot && state.filename
                         ? state.filename.includes(`${state.file.opts.root}/${state.opts.autoProcessRoot}/`)
                         : false
+
+                    path.traverse({
+                        BlockStatement(blockPath) {
+                            if (isInsideNodeModules(state)) {
+                                return
+                            }
+
+                            extractVariants(blockPath, state)
+                        }
+                    })
                 },
                 exit(path, state) {
                     if (isInsideNodeModules(state) && !state.file.replaceWithUnistyles) {
@@ -130,13 +140,6 @@ export default function (): PluginObj<UnistylesPluginPass> {
                 if (hasStringRef(path)) {
                     throw new Error("Detected string based ref which is not supported by Unistyles.")
                 }
-            },
-            BlockStatement(path, state) {
-                if (isInsideNodeModules(state)) {
-                    return
-                }
-
-                extractVariants(path, state)
             },
             CallExpression(path, state) {
                 if (isInsideNodeModules(state)) {
