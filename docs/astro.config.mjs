@@ -96,6 +96,7 @@ export default defineConfig({
                         { label: 'Theming', slug: 'v3/guides/theming' },
                         { label: 'Avoiding Keyboard', slug: 'v3/guides/avoiding-keyboard' },
                         { label: 'Expo Router', slug: 'v3/guides/expo-router' },
+                        { label: 'React Compiler', slug: 'v3/guides/react-compiler', badge: 'New!' },
                         { label: 'Custom web', slug: 'v3/guides/custom-web', badge: 'WIP' },
                         { label: 'Server side rendering', slug: 'v3/guides/server-side-rendering' },
                     ]
