@@ -94,6 +94,7 @@ jsi::Function HostUnistyle::createAddVariantsProxyFunction(jsi::Runtime& rt) {
         );
         
         parser.buildUnistyles(rt, stylesheetCopy);
+        parser.parseUnistyles(rt, stylesheetCopy);
         
         helpers::enumerateJSIObject(rt, thisVal.asObject(rt), [this, &parser, &rt, &variants, stylesheetCopy](const std::string& name, jsi::Value& value){
             if (name == helpers::ADD_VARIANTS_FN || !stylesheetCopy->unistyles.contains(name)) {
@@ -102,8 +103,6 @@ jsi::Function HostUnistyle::createAddVariantsProxyFunction(jsi::Runtime& rt) {
 
             auto unistyle = stylesheetCopy->unistyles[name];
             
-            unistyle->isDirty = true;
-
             if (unistyle->dependsOn(UnistyleDependency::VARIANTS)) {
                 parser.rebuildUnistyle(rt, unistyle, variants, std::nullopt);
             }
