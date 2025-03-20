@@ -1,0 +1,39 @@
+---
+title: React Compiler
+description: Integrate React Compiler with Unistyles
+---
+
+import { Card, Aside } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'React Compiler',
+        description: 'Integrate React Compiler with Unistyles',
+    }}
+>
+React Compiler is a build-time only tool that automatically optimizes your React app. When using Unistyles with React Compiler, it's necessary to configure it properly.
+
+# With Expo
+Follow official [expo guide](https://docs.expo.dev/guides/react-compiler/), no changes are required!
+
+# With bare React Native
+Follow official [react guide](https://react.dev/learn/react-compiler#usage-with-babel) with a one major difference:
+
+It is crucial that React Compiler is run *after* Unistyles Babel plugin. Otherwise, issues will occur.
+
+It is due to the fact that Unistyles must parse `Variants` before React Compiler. You can learn more about how the Babel plugin works [here](/v3/other/babel-plugin)
+
+```diff lang="js" title="babel.config.js"
+module.exports = function () {
+  return {
+    plugins: [
+      ['react-native-unistyles/plugin'], // Must run before react-compiler
++      'babel-plugin-react-compiler',
+      // Rest of the plugins
+    ]
+  }
+}
+```
+</Seo>
+
