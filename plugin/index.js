@@ -672,8 +672,8 @@ function index_default() {
     name: "babel-react-native-unistyles",
     visitor: {
       Program: {
-        enter(_, state) {
-          state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS.concat(state.opts.autoProcessPaths ?? []).some((path) => state.filename?.includes(path));
+        enter(path, state) {
+          state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS.concat(state.opts.autoProcessPaths ?? []).some((path2) => state.filename?.includes(path2));
           state.file.hasAnyUnistyle = false;
           state.file.hasUnistylesImport = false;
           state.file.hasVariants = false;
@@ -681,6 +681,14 @@ function index_default() {
           state.file.tagNumber = 0;
           state.reactNativeImports = {};
           state.file.forceProcessing = state.opts.autoProcessRoot && state.filename ? state.filename.includes(`${state.file.opts.root}/${state.opts.autoProcessRoot}/`) : false;
+          path.traverse({
+            BlockStatement(blockPath) {
+              if (isInsideNodeModules(state)) {
+                return;
+              }
+              extractVariants(blockPath, state);
+            }
+          });
         },
         exit(path, state) {
           if (isInsideNodeModules(state) && !state.file.replaceWithUnistyles) {
@@ -760,12 +768,6 @@ function index_default() {
         if (hasStringRef(path)) {
           throw new Error("Detected string based ref which is not supported by Unistyles.");
         }
-      },
-      BlockStatement(path, state) {
-        if (isInsideNodeModules(state)) {
-          return;
-        }
-        extractVariants(path, state);
       },
       CallExpression(path, state) {
         if (isInsideNodeModules(state)) {
