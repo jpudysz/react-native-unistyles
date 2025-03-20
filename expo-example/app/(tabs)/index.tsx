@@ -9,7 +9,7 @@ export default function HomeScreen() {
     })
 
     return (
-        <View style={styles.container}>
+        <View style={styles.container()}>
             <View style={styles.test}>
                 <Text style={styles.typography}>
                     Hello world
@@ -27,12 +27,12 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create(theme => ({
-    container: {
+    container: () => ({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: theme.colors.backgroundColor
-    },
+    }),
     typography: {
         fontSize: 20,
         fontWeight: 'bold',
