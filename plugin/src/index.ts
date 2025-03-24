@@ -154,7 +154,9 @@ export default function (): PluginObj<UnistylesPluginPass> {
 
                 addStyleSheetTag(path, state)
 
-                const arg = path.node.arguments[0]
+                const arg = t.isAssignmentExpression(path.node.arguments[0])
+                    ? path.node.arguments[0].right
+                    : path.node.arguments[0]
 
                 // Object passed to StyleSheet.create (may contain variants)
                 if (t.isObjectExpression(arg)) {
