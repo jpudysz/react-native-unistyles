@@ -54,7 +54,10 @@ export class UnistylesRegistry {
         dependencies.forEach(dependency => dependenciesMap.add(dependency))
 
         const dispose = this.services.listener.addStylesheetListeners(Array.from(dependenciesMap), () => {
-            const newComputedStylesheet = stylesheet(this.services.runtime.theme, this.services.runtime.miniRuntime)
+            const newComputedStylesheet = stylesheet(
+                this.services.runtime.getTheme(this.services.runtime.themeName, this.services.state.CSSVars),
+                this.services.runtime.miniRuntime
+            )
 
             this.stylesheets.set(stylesheet, newComputedStylesheet)
         })
