@@ -253,9 +253,7 @@ export function getStylesDependenciesFromObject(path: NodePath<t.CallExpression>
     }, {})
 }
 
-export function getStylesDependenciesFromFunction(path: NodePath<t.CallExpression>) {
-    const funcPath = path.get('arguments.0')
-
+export function getStylesDependenciesFromFunction(funcPath: NodePath<t.Node> | Array<NodePath<t.Node>>) {
     if (!funcPath) {
         return
     }

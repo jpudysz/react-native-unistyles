@@ -175,7 +175,10 @@ export default function (): PluginObj<UnistylesPluginPass> {
 
                 // Function passed to StyleSheet.create (e.g., theme => ({ container: {} }))
                 if (t.isArrowFunctionExpression(arg) || t.isFunctionExpression(arg)) {
-                    const detectedDependencies = getStylesDependenciesFromFunction(path)
+                    const funcPath = t.isAssignmentExpression(path.node.arguments[0])
+                        ? path.get('arguments.0.right')
+                        : path.get('arguments.0')
+                    const detectedDependencies = getStylesDependenciesFromFunction(funcPath)
 
                     if (detectedDependencies) {
                         const body = t.isBlockStatement(arg.body)
