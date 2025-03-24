@@ -362,8 +362,7 @@ function getStylesDependenciesFromObject(path) {
     return acc;
   }, {});
 }
-function getStylesDependenciesFromFunction(path) {
-  const funcPath = path.get("arguments.0");
+function getStylesDependenciesFromFunction(funcPath) {
   if (!funcPath) {
     return;
   }
@@ -778,7 +777,7 @@ function index_default() {
         }
         state.file.hasAnyUnistyle = true;
         addStyleSheetTag(path, state);
-        const arg = path.node.arguments[0];
+        const arg = t6.isAssignmentExpression(path.node.arguments[0]) ? path.node.arguments[0].right : path.node.arguments[0];
         if (t6.isObjectExpression(arg)) {
           const detectedDependencies = getStylesDependenciesFromObject(path);
           if (detectedDependencies) {
@@ -792,7 +791,8 @@ function index_default() {
           }
         }
         if (t6.isArrowFunctionExpression(arg) || t6.isFunctionExpression(arg)) {
-          const detectedDependencies = getStylesDependenciesFromFunction(path);
+          const funcPath = t6.isAssignmentExpression(path.node.arguments[0]) ? path.get("arguments.0.right") : path.get("arguments.0");
+          const detectedDependencies = getStylesDependenciesFromFunction(funcPath);
           if (detectedDependencies) {
             const body = t6.isBlockStatement(arg.body) ? arg.body.body.find((statement) => t6.isReturnStatement(statement))?.argument : arg.body;
             if (t6.isObjectExpression(body)) {
