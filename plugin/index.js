@@ -778,7 +778,7 @@ function index_default() {
         }
         state.file.hasAnyUnistyle = true;
         addStyleSheetTag(path, state);
-        const arg = path.node.arguments[0];
+        const arg = t6.isAssignmentExpression(path.node.arguments[0]) ? path.node.arguments[0].right : path.node.arguments[0];
         if (t6.isObjectExpression(arg)) {
           const detectedDependencies = getStylesDependenciesFromObject(path);
           if (detectedDependencies) {

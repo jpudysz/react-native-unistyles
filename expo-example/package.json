@@ -16,6 +16,7 @@
     "expo-linking": "7.0.5",
     "expo-router": "4.0.17",
     "expo-status-bar": "2.0.1",
+    "lucide-react-native": "0.483.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.77.1",
@@ -25,10 +26,13 @@
     "react-native-reanimated": "3.17.0",
     "react-native-safe-area-context": "5.2.0",
     "react-native-screens": "4.9.0",
+    "react-native-svg": "15.11.2",
     "react-native-web": "0.19.13"
   },
   "devDependencies": {
     "@babel/core": "7.26.9",
+    "@babel/plugin-transform-private-methods": "7.25.9",
+    "@babel/plugin-transform-private-property-in-object": "7.25.9",
     "@types/react": "18.3.18",
     "typescript": "5.7.3"
   },
