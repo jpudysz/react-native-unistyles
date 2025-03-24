@@ -80,19 +80,20 @@ export class UnistylesRegistry {
 
         if (stylesCounter.size === 0) {
             // Move this to the end of the event loop so the element is removed from the DOM
-            Promise.resolve().then(() => {
+            return Promise.resolve().then(() => {
+                // Check if element is still in the DOM
                 if (document.querySelector(`.${hash}`)) {
-                    return
+                    return false
                 }
 
                 this.css.remove(hash)
                 this.stylesCache.delete(hash)
-            })
 
-            return true
+                return true
+            })
         }
 
-        return false
+        return Promise.resolve(false)
     }
 
     add = (value: UnistylesValues, forChild?: boolean) => {
