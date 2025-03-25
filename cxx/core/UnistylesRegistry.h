@@ -56,7 +56,7 @@ private:
     std::optional<std::string> _scopedTheme{};
     std::unordered_map<jsi::Runtime*, UnistylesState> _states{};
     std::unordered_map<jsi::Runtime*, std::unordered_map<int, std::shared_ptr<core::StyleSheet>>> _styleSheetRegistry{};
-    std::unordered_map<jsi::Runtime*, std::unordered_map<const ShadowNodeFamily*, std::vector<const std::shared_ptr<UnistyleData>>>> _shadowRegistry{};
+    std::unordered_map<jsi::Runtime*, std::unordered_map<const ShadowNodeFamily*, std::vector<std::shared_ptr<UnistyleData>>>> _shadowRegistry{};
 };
 
 inline UnistylesRegistry& UnistylesRegistry::get() {
