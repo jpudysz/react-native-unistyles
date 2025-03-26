@@ -122,6 +122,10 @@ inline Variants variantsToPairs(jsi::Runtime& rt, jsi::Object&& variants) {
         if (variantValue.isString()) {
             pairs.emplace_back(std::make_pair(variantName, variantValue.asString(rt).utf8(rt)));
         }
+
+        if (variantValue.isNumber()) {
+            pairs.emplace_back(std::make_pair(variantName, std::to_string(static_cast<int>(variantValue.asNumber()))));
+        }
     });
 
     return pairs;
