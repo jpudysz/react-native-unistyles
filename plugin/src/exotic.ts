@@ -2,6 +2,7 @@ import type { NodePath } from '@babel/core'
 import * as t from '@babel/types'
 import type { RemapConfig } from '../index'
 import type { UnistylesPluginPass } from './types'
+import { toPlatformPath } from './paths'
 
 export function handleExoticImport(path: NodePath<t.ImportDeclaration>, state: UnistylesPluginPass, exoticImport: Pick<RemapConfig, 'imports'>) {
     const specifiers = path.node.specifiers
@@ -25,8 +26,8 @@ export function handleExoticImport(path: NodePath<t.ImportDeclaration>, state: U
                 const newImport = t.importDeclaration(
                     [t.importDefaultSpecifier(t.identifier(specifier.local.name))],
                     t.stringLiteral(state.opts.isLocal
-                        ? state.file.opts.filename?.split('react-native-unistyles').at(0)?.concat(`react-native-unistyles/components/native/${rule.mapTo}`) ?? ''
-                        : `react-native-unistyles/components/native/${rule.mapTo}`
+                        ? state.file.opts.filename?.split('react-native-unistyles').at(0)?.concat(toPlatformPath(`react-native-unistyles/components/native/${rule.mapTo}`)) ?? ''
+                        : toPlatformPath(`react-native-unistyles/components/native/${rule.mapTo}`)
                     )
                 )
 
@@ -35,8 +36,8 @@ export function handleExoticImport(path: NodePath<t.ImportDeclaration>, state: U
                 const newImport = t.importDeclaration(
                     [t.importSpecifier(t.identifier(rule.mapTo), t.identifier(rule.mapTo))],
                     t.stringLiteral(state.opts.isLocal
-                        ? state.file.opts.filename?.split('react-native-unistyles').at(0)?.concat(`react-native-unistyles/components/native/${rule.mapTo}`) ?? ''
-                        : `react-native-unistyles/components/native/${rule.mapTo}`
+                        ? state.file.opts.filename?.split('react-native-unistyles').at(0)?.concat(toPlatformPath(`react-native-unistyles/components/native/${rule.mapTo}`)) ?? ''
+                        : toPlatformPath(`react-native-unistyles/components/native/${rule.mapTo}`)
                     )
                 )
 

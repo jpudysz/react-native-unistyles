@@ -1,6 +1,7 @@
 import type { NodePath } from '@babel/core'
 import * as t from '@babel/types'
 import type { UnistylesPluginPass } from './types'
+import { toPlatformPath } from './paths'
 
 export function addUnistylesImport(path: NodePath<t.Program>, state: UnistylesPluginPass) {
     const localNames = Object.keys(state.reactNativeImports)
@@ -22,7 +23,7 @@ export function addUnistylesImport(path: NodePath<t.Program>, state: UnistylesPl
 
     // remove RNWeb imports
     names.forEach(name => {
-        const rnWebImport = path.node.body.find((node): node is t.ImportDeclaration => t.isImportDeclaration(node) && node.source.value === `react-native-web/dist/exports/${name}`)
+        const rnWebImport = path.node.body.find((node): node is t.ImportDeclaration => t.isImportDeclaration(node) && node.source.value === toPlatformPath(`react-native-web/dist/exports/${name}`))
 
         if (rnWebImport) {
             rnWebImport.specifiers = []
@@ -34,8 +35,8 @@ export function addUnistylesImport(path: NodePath<t.Program>, state: UnistylesPl
         const newImport = t.importDeclaration(
             [t.importSpecifier(t.identifier(localName), t.identifier(name))],
             t.stringLiteral(state.opts.isLocal
-                ? state.file.opts.filename?.split('react-native-unistyles').at(0)?.concat(`react-native-unistyles/src/components/native/${name}`) ?? ''
-                : `react-native-unistyles/components/native/${name}`
+                ? state.file.opts.filename?.split('react-native-unistyles').at(0)?.concat(toPlatformPath(`react-native-unistyles/src/components/native/${name}`)) ?? ''
+                : toPlatformPath(`react-native-unistyles/components/native/${name}`)
             )
         )
 
