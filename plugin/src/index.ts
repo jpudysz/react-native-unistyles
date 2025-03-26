@@ -3,11 +3,11 @@ import * as t from '@babel/types'
 import { NATIVE_COMPONENTS_PATHS, REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_EXOTIC_PATHS, REPLACE_WITH_UNISTYLES_PATHS } from './consts'
 import { handleExoticImport } from './exotic'
 import { addUnistylesImport, isInsideNodeModules } from './import'
+import { toPlatformPath } from './paths'
 import { hasStringRef } from './ref'
 import { addDependencies, addStyleSheetTag, getStylesDependenciesFromFunction, getStylesDependenciesFromObject, isKindOfStyleSheet, isUnistylesStyleSheet } from './stylesheet'
 import type { UnistylesPluginPass } from './types'
 import { extractVariants } from './variants'
-import { toPlatformPath } from './paths'
 
 export default function (): PluginObj<UnistylesPluginPass> {
     return {
