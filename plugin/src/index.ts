@@ -7,6 +7,7 @@ import { hasStringRef } from './ref'
 import { addDependencies, addStyleSheetTag, getStylesDependenciesFromFunction, getStylesDependenciesFromObject, isKindOfStyleSheet, isUnistylesStyleSheet } from './stylesheet'
 import type { UnistylesPluginPass } from './types'
 import { extractVariants } from './variants'
+import { toPlatformPath } from './paths'
 
 export default function (): PluginObj<UnistylesPluginPass> {
     return {
@@ -15,6 +16,7 @@ export default function (): PluginObj<UnistylesPluginPass> {
             Program: {
                 enter(path, state) {
                     state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS
+                        .map(toPlatformPath)
                         .concat(state.opts.autoProcessPaths ?? [])
                         .some(path => state.filename?.includes(path))
 
@@ -25,7 +27,7 @@ export default function (): PluginObj<UnistylesPluginPass> {
                     state.file.tagNumber = 0
                     state.reactNativeImports = {}
                     state.file.forceProcessing = state.opts.autoProcessRoot && state.filename
-                        ? state.filename.includes(`${state.file.opts.root}/${state.opts.autoProcessRoot}/`)
+                        ? state.filename.includes(toPlatformPath(`${state.file.opts.root}/${state.opts.autoProcessRoot}/`))
                         : false
 
                     path.traverse({
@@ -124,7 +126,7 @@ export default function (): PluginObj<UnistylesPluginPass> {
                     })
                 }
 
-                if (importSource.includes('react-native/Libraries')) {
+                if (importSource.includes(toPlatformPath('react-native/Libraries'))) {
                     handleExoticImport(path, state, NATIVE_COMPONENTS_PATHS)
                 }
 
