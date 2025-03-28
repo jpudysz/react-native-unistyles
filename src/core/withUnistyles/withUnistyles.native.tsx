@@ -42,7 +42,7 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
                     unistyleKey
                         ? style[unistyleKey]
                         : {
-                            uni__getStyles: () => styleProps,
+                            uni__getStyles: () => style,
                             uni__dependencies: [],
                         }
                 ])
