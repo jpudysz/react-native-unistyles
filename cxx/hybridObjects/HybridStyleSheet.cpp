@@ -80,7 +80,7 @@ jsi::Value HybridStyleSheet::init(jsi::Runtime &rt, const jsi::Value &thisVal, c
     if (this->isInitialized) {
         return jsi::Value::undefined();
     }
-    
+
     // create new state
     auto& registry = core::UnistylesRegistry::get();
 
@@ -88,7 +88,7 @@ jsi::Value HybridStyleSheet::init(jsi::Runtime &rt, const jsi::Value &thisVal, c
 
     loadExternalMethods(thisVal, rt);
     registerHooks(rt);
-    
+
     this->isInitialized = true;
 
     return jsi::Value::undefined();
@@ -127,18 +127,18 @@ void HybridStyleSheet::parseSettings(jsi::Runtime &rt, jsi::Object settings) {
         if (propertyName == "CSSVars") {
             return;
         }
-        
+
         if (propertyName == "nativeBreakpointsMode") {
             helpers::assertThat(rt, propertyValue.isString(), "StyleSheet.configure's nativeBreakpointsMode must be a string");
-            
+
             auto mode = propertyValue.asString(rt).utf8(rt);
-            
+
             helpers::assertThat(rt, mode == "pixels" || mode == "points", "StyleSheet.configure's nativeBreakpointsMode must be one of: pixels or points");
-            
+
             if (mode == "points") {
                 registry.shouldUsePointsForBreakpoints = true;
             }
-            
+
             return;
         }
 
@@ -156,12 +156,12 @@ void HybridStyleSheet::parseBreakpoints(jsi::Runtime &rt, jsi::Object breakpoint
     auto& state = registry.getState(rt);
 
     registry.registerBreakpoints(rt, sortedBreakpoints);
-    
+
     auto rawWidth = this->_unistylesRuntime->getScreen().width;
     auto width = registry.shouldUsePointsForBreakpoints
         ? rawWidth / this->_unistylesRuntime->getPixelRatio()
         : rawWidth;
-    
+
     state.computeCurrentBreakpoint(width);
 }
 
@@ -258,7 +258,11 @@ void HybridStyleSheet::loadExternalMethods(const jsi::Value& thisValue, jsi::Run
 
 void HybridStyleSheet::registerHooks(jsi::Runtime& rt) {
     // cleanup Shadow updates
-    core::UnistylesRegistry::get().trafficController.restore();
+    auto& registry = core::UnistylesRegistry::get();
+    
+    registry.trafficController.withLock([&registry](){
+        registry.trafficController.restore();
+    });
 
     this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(this->_uiManager);
     this->_unistylesMountHook = std::make_shared<core::UnistylesMountHook>(this->_uiManager);
@@ -317,7 +321,7 @@ void HybridStyleSheet::onPlatformNativeDependenciesChange(std::vector<UnistyleDe
             auto width = registry.shouldUsePointsForBreakpoints
                 ? rawWidth / this->_unistylesRuntime->getPixelRatio()
                 : rawWidth;
-            
+
             registry.getState(rt).computeCurrentBreakpoint(width);
         }
 

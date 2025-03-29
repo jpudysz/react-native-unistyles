@@ -1,10 +1,10 @@
 import React from 'react'
-import { UnistylesShadowRegistry } from '../specs'
 
 export const passForwardedRef = <T>(
-    props: any,
     ref: T,
-    forwardedRef: React.ForwardedRef<T>
+    forwardedRef: React.ForwardedRef<T>,
+    onMount?: () => void,
+    onUnmount?: () => void
 ) => {
     const passForwardedRef = () => {
         if (typeof forwardedRef === 'function') {
@@ -19,10 +19,10 @@ export const passForwardedRef = <T>(
     }
     const forwardedRefReturnFn = passForwardedRef()
 
-    // @ts-expect-error hidden from TS
-    UnistylesShadowRegistry.add(ref, props.style)
+    onMount?.()
 
     return () => {
         forwardedRefReturnFn?.()
+        onUnmount?.()
     }
 }

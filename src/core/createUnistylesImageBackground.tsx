@@ -27,17 +27,23 @@ export const createUnistylesImageBackground = (Component: typeof ImageBackground
             <Component
                 {...props}
                 ref={ref => {
-                    passForwardedRef(props, ref, forwardedRef)
+                    return passForwardedRef(
+                        ref,
+                        forwardedRef,
+                        () => {
+                            // @ts-expect-error - this is hidden from TS
+                            UnistylesShadowRegistry.add(ref, props.style)
+                        },
+                        () => {
+                            // @ts-expect-error - this is hidden from TS
+                            UnistylesShadowRegistry.remove(ref)
 
-                    return () => {
-                        // @ts-ignore
-                        UnistylesShadowRegistry.remove(ref)
-
-                        if (storedImageRef.current) {
-                            // @ts-ignore
-                            UnistylesShadowRegistry.remove(storedImageRef.current)
+                            if (storedImageRef.current) {
+                                // @ts-expect-error - this is hidden from TS
+                                UnistylesShadowRegistry.remove(storedImageRef.current)
+                            }
                         }
-                    }
+                    )
                 }}
                 imageRef={ref => {
                     if (ref) {

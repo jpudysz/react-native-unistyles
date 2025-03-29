@@ -73,17 +73,19 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
     const ShadowNodeFamily* shadowNodeFamily,
     std::vector<std::shared_ptr<UnistyleData>>& unistylesData
 ) {
-    shadow::ShadowLeafUpdates updates;
-    auto parser = parser::Parser(nullptr);
+    this->trafficController.withLock([this, &rt, &unistylesData, shadowNodeFamily](){
+        shadow::ShadowLeafUpdates updates;
+        auto parser = parser::Parser(nullptr);
 
-    std::for_each(unistylesData.begin(), unistylesData.end(), [this, &rt, shadowNodeFamily](std::shared_ptr<UnistyleData> unistyleData){
-        this->_shadowRegistry[&rt][shadowNodeFamily].emplace_back(unistyleData);
+        std::for_each(unistylesData.begin(), unistylesData.end(), [this, &rt, shadowNodeFamily](std::shared_ptr<UnistyleData> unistyleData){
+            this->_shadowRegistry[&rt][shadowNodeFamily].emplace_back(unistyleData);
+        });
+
+        updates[shadowNodeFamily] = parser.parseStylesToShadowTreeStyles(rt, unistylesData);
+        
+        this->trafficController.setUpdates(updates);
+        this->trafficController.resumeUnistylesTraffic();
     });
-
-    updates[shadowNodeFamily] = parser.parseStylesToShadowTreeStyles(rt, unistylesData);
-
-    this->trafficController.setUpdates(updates);
-    this->trafficController.resumeUnistylesTraffic();
 }
 
 void core::UnistylesRegistry::removeDuplicatedUnistyles(jsi::Runtime& rt, const ShadowNodeFamily *shadowNodeFamily, std::vector<core::Unistyle::Shared>& unistyles) {
@@ -111,7 +113,7 @@ void core::UnistylesRegistry::unlinkShadowNodeWithUnistyles(jsi::Runtime& rt, co
     this->trafficController.withLock([this, &rt, shadowNodeFamily](){
         this->_shadowRegistry[&rt].erase(shadowNodeFamily);
         this->trafficController.removeShadowNode(shadowNodeFamily);
-        
+
         if (this->_shadowRegistry[&rt].empty()) {
             this->_shadowRegistry.erase(&rt);
         }
@@ -159,20 +161,22 @@ core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt
 // so we need to rebuild all instances as they may have different variants
 void core::UnistylesRegistry::shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Value& maybePressableId) {
     shadow::ShadowLeafUpdates updates;
-    auto parser = parser::Parser(nullptr);
-    std::optional<std::string> pressableId = maybePressableId.isString()
-        ? std::make_optional(maybePressableId.asString(rt).utf8(rt))
-        : std::nullopt;
+    this->trafficController.withLock([this, &rt, &maybePressableId, unistyle, &updates](){
+        auto parser = parser::Parser(nullptr);
+        std::optional<std::string> pressableId = maybePressableId.isString()
+            ? std::make_optional(maybePressableId.asString(rt).utf8(rt))
+            : std::nullopt;
 
-    for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
-        for (const auto& unistyleData : unistyles) {
-            if (unistyleData->unistyle == unistyle) {
-                updates[family] = parser.parseStylesToShadowTreeStyles(rt, { unistyleData });
+        for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
+            for (const auto& unistyleData : unistyles) {
+                if (unistyleData->unistyle == unistyle) {
+                    updates[family] = parser.parseStylesToShadowTreeStyles(rt, { unistyleData });
+                }
             }
         }
-    }
 
-    this->trafficController.setUpdates(updates);
+        this->trafficController.setUpdates(updates);
+    });
 }
 
 std::vector<std::shared_ptr<core::StyleSheet>> core::UnistylesRegistry::getStyleSheetsToRefresh(jsi::Runtime& rt, std::vector<UnistyleDependency>& unistylesDependencies) {

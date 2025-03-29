@@ -50,10 +50,18 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                     storedRef.current = ref
                 }
 
-                // @ts-expect-error - this is hidden from TS
-                UnistylesShadowRegistry.add(ref, unistyles)
-
-                return passForwardedRef(props, ref, forwardedRef)
+                return passForwardedRef(
+                    ref,
+                    forwardedRef,
+                    () => {
+                        // @ts-expect-error - this is hidden from TS
+                        UnistylesShadowRegistry.add(ref, unistyles)
+                    },
+                    () => {
+                        // @ts-expect-error - this is hidden from TS
+                        UnistylesShadowRegistry.remove(ref)
+                    }
+                )
             }}
             style={state => {
                 const isPropStyleAFunction = typeof style === 'function'

@@ -40,9 +40,8 @@ HybridShadowRegistry.add = (handle, styles) => {
         ? styles.flat()
         : [styles]
 
-    // filter Reanimated styles and styles that are undefined
+    // filter styles that are undefined or with no keys
     const filteredStyles = stylesArray
-        .filter(style => !style?.initial?.updater)
         .filter(style => style && Object.keys(style).length > 0)
         .flat()
         .filter(Boolean)

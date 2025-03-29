@@ -38,15 +38,21 @@ export const createUnistylesElement = (Component: any) => {
                         storedRef.current = getNativeRef(Component, ref)
                     }
 
-                    passForwardedRef(props, ref, forwardedRef)
-
                     // @ts-ignore we don't know the type of the component
                     maybeWarnAboutMultipleUnistyles(props.style, Component.displayName)
 
-                    return () => {
-                        // @ts-ignore
-                        UnistylesShadowRegistry.remove(ref)
-                    }
+                    return passForwardedRef(
+                        ref,
+                        forwardedRef,
+                        () => {
+                            // @ts-ignore this is hidden from TS
+                            UnistylesShadowRegistry.add(ref, props.style)
+                        },
+                        () => {
+                            // @ts-ignore this is hidden from TS
+                            UnistylesShadowRegistry.remove(ref)
+                        }
+                    )
                 }}
             />
         )
