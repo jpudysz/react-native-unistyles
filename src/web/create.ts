@@ -1,12 +1,19 @@
 import type { StyleSheet, StyleSheetWithSuperPowers } from '../types/stylesheet'
 import { UnistylesWeb } from './index'
-import { assignSecrets, error, removeInlineStyles } from './utils'
+import { assignSecrets, error, isServer, removeInlineStyles } from './utils'
 
 type Variants = Record<string, string | boolean | undefined>
 
 export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, id?: string) => {
     if (!id) {
         throw error('Unistyles is not initialized correctly. Please add babel plugin to your babel config.')
+    }
+
+    // For SSR
+    if (!UnistylesWeb.state.isInitialized && !isServer()) {
+        const config = window?.__UNISTYLES_STATE__?.config
+
+        config && UnistylesWeb.state.init(config)
     }
 
     const computedStylesheet = UnistylesWeb.registry.getComputedStylesheet(stylesheet)
