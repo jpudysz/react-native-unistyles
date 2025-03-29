@@ -24,15 +24,24 @@ Unistyles 3.0 is fully compatible with Next.js Server Side Rendering (SSR). We'r
         ```tsx title="Style.tsx" /useServerUnistyles/ /useServerInsertedHTML/ /'use client'/
         'use client'
 
-        import { PropsWithChildren } from 'react'
+        import { PropsWithChildren, useRef } from 'react'
         import { useServerUnistyles } from 'react-native-unistyles/server'
         import { useServerInsertedHTML } from 'next/navigation'
         import './unistyles'
 
         export const Style = ({ children }: PropsWithChildren) => {
+            const isServerInserted = useRef(false)
             const unistyles = useServerUnistyles()
 
-            useServerInsertedHTML(() => unistyles)
+            useServerInsertedHTML(() => {
+                if (isServerInserted.current) {
+                    return null
+                }
+
+                isServerInserted.current = true
+
+                return unistyles
+            })
 
             return <>{children}</>
         }
@@ -113,3 +122,24 @@ Unistyles 3.0 is fully compatible with Next.js Server Side Rendering (SSR). We'r
 
 
 </Seo>
+
+## Troubleshooting
+
+### Hydration error
+
+If you're not using adaptive themes, you might encounter hydration error on your root html element.
+This is because unistyles is adding a className to it based on the current theme.
+
+To fix this simply add `suppressHydrationWarning` to your root html element.
+
+```diff lang="tsx" title="layout.tsx"
+- <html lang="en">
++ <html lang="en" suppressHydrationWarning>
+```
+
+Or you can directly add the className to your root html element.
+
+```diff lang="tsx" title="layout.tsx"
+- <html lang="en">
++ <html lang="en" className="dark">
+```

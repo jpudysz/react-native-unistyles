@@ -1,5 +1,6 @@
 import type { UnistylesValues } from '../../types'
 import { convertUnistyles } from '../convert'
+import type { UnistylesServices } from '../types'
 import { hyphenate, isServer } from '../utils'
 import { convertToCSS } from './core'
 
@@ -33,7 +34,7 @@ export class CSSState {
     private styleTag: HTMLStyleElement | null = null
     private CSS = ''
 
-    constructor() {
+    constructor(private services: UnistylesServices) {
         if (isServer()) {
             return
         }
@@ -159,8 +160,9 @@ export class CSSState {
 
         const mainState = getState(this.mainMap)
         const mqState = getState(this.mqMap)
+        const config = this.services.state.getConfig()
 
-        return { mainState, mqState }
+        return { mainState, mqState, config }
     }
 
     hydrate = ({ mainState, mqState }: ReturnType<typeof this.getState>) => {
