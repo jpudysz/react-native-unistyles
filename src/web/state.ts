@@ -17,6 +17,7 @@ export class UnistylesState {
     CSSVars = true
 
     private matchingBreakpoints = new Map<string, boolean>()
+    private _config: UnistylesConfig = {}
 
     get breakpoint() {
         const [currentBreakpoint] = Array.from(this.matchingBreakpoints)
@@ -37,6 +38,7 @@ export class UnistylesState {
             return
         }
 
+        this._config = config
         this.isInitialized = true
         this.initThemes(config.themes, config.settings?.CSSVars)
         this.initBreakpoints(config.breakpoints)
@@ -153,4 +155,6 @@ export class UnistylesState {
                 })
             })
     }
+
+    getConfig = () => this._config
 }

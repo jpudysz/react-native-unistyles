@@ -11,9 +11,11 @@ export class UnistylesRegistry {
     private readonly stylesCounter = new Map<string, Set<HTMLElement>>()
     private readonly disposeListenersMap = new Map<object, VoidFunction>()
     private readonly dependenciesMap = new Map<StyleSheetWithSuperPowers<StyleSheet>, Set<UnistyleDependency>>()
-    readonly css = new CSSState()
+    readonly css: CSSState
 
-    constructor(private services: UnistylesServices) {}
+    constructor(private services: UnistylesServices) {
+        this.css = new CSSState(services)
+    }
 
     getComputedStylesheet = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, scopedThemeName?: UnistylesTheme) => {
         if (typeof stylesheet !== 'function') {
