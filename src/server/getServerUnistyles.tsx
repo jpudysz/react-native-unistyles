@@ -2,8 +2,8 @@ import React from 'react'
 import { StyleSheet } from 'react-native'
 import { UnistylesWeb } from '../web'
 import { error, isServer } from '../web/utils'
-import { DefaultServerUnistylesSettings, type ServerUnistylesSettings } from './types'
 import { serialize } from './serialize'
+import { DefaultServerUnistylesSettings, type ServerUnistylesSettings } from './types'
 
 export const getServerUnistyles = ({ includeRNWStyles = true }: ServerUnistylesSettings = DefaultServerUnistylesSettings) => {
     if (!isServer()) {
