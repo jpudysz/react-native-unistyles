@@ -370,18 +370,21 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle
 
 // convert dependency map to shadow tree updates
 void parser::Parser::rebuildShadowLeafUpdates(jsi::Runtime& rt, core::DependencyMap& dependencyMap) {
-    shadow::ShadowLeafUpdates updates;
     auto& registry = core::UnistylesRegistry::get();
 
-    for (const auto& [shadowNode, unistyles] : dependencyMap) {
-        // this step is required to parse string colors eg. #000000 to int representation
-        auto rawProps = this->parseStylesToShadowTreeStyles(rt, unistyles);
+    registry.trafficController.withLock([this, &rt, &dependencyMap, &registry](){
+        shadow::ShadowLeafUpdates updates;
+        
+        for (const auto& [shadowNode, unistyles] : dependencyMap) {
+            // this step is required to parse string colors eg. #000000 to int representation
+            auto rawProps = this->parseStylesToShadowTreeStyles(rt, unistyles);
 
-        updates.emplace(shadowNode, std::move(rawProps));
-    }
+            updates.emplace(shadowNode, std::move(rawProps));
+        }
 
-    registry.trafficController.setUpdates(updates);
-    registry.trafficController.resumeUnistylesTraffic();
+        registry.trafficController.setUpdates(updates);
+        registry.trafficController.resumeUnistylesTraffic();
+    });
 }
 
 // first level of StyleSheet, we can expect here different properties than on second level
