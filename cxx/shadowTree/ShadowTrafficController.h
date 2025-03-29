@@ -22,13 +22,11 @@ struct ShadowTrafficController {
 
     inline shadow::ShadowLeafUpdates& getUpdates() {
         // call it only within withLock!
- 
         return _unistylesUpdates;
     }
 
     inline void setUpdates(shadow::ShadowLeafUpdates& newUpdates) {
-        std::lock_guard<std::mutex> lock(_mutex);
-
+        // call it only within withLock!
         auto& targetUpdates = _unistylesUpdates;
 
         // this is important as overriding updates may skip some interim changes
@@ -43,7 +41,7 @@ struct ShadowTrafficController {
             targetUpdates.emplace(pair.first, std::move(pair.second));
         });
     }
-    
+
     inline void removeShadowNode(const ShadowNodeFamily* shadowNodeFamily) {
         // call it only within withLock!
         if (_unistylesUpdates.contains(shadowNodeFamily)) {
@@ -52,19 +50,19 @@ struct ShadowTrafficController {
     }
 
     inline void restore() {
-        std::lock_guard<std::mutex> lock(_mutex);
-        
+        // call it only within withLock!
+
         _unistylesUpdates = {};
         _canCommit = false;
     }
-    
+
     template <typename F>
     inline auto withLock(F&& func) {
         std::lock_guard<std::mutex> lock(_mutex);
-        
+
         return std::forward<F>(func)();
     }
-    
+
 private:
     std::atomic<bool> _canCommit = false;
     shadow::ShadowLeafUpdates _unistylesUpdates{};
