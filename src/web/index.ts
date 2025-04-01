@@ -35,7 +35,7 @@ export const StyleSheet = {
         bottom: 0
     },
     compose: (a: object, b: object) => deepMergeObjects(a, b),
-    flatten: (...styles: Array<object>) => deepMergeObjects(...styles),
+    flatten: (styles: Array<object>) => deepMergeObjects(...styles),
     hairlineWidth: 1
 } as unknown as typeof NativeStyleSheet
 
