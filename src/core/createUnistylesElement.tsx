@@ -1,8 +1,8 @@
 import React from 'react'
+import type { ViewStyle } from 'react-native'
 import type { UnistylesValues } from '../types'
 import { copyComponentProperties } from '../utils'
-import { UnistylesShadowRegistry } from '../web'
-import { isServer } from '../web/utils'
+import { createUnistylesRef } from '../web/utils'
 import { getClassName } from './getClassname'
 import { maybeWarnAboutMultipleUnistyles } from './warn'
 
@@ -12,34 +12,16 @@ type ComponentProps = {
 
 export const createUnistylesElement = (Component: any) => {
     const UnistylesComponent = React.forwardRef<unknown, ComponentProps>((props, forwardedRef) => {
-        let storedRef: HTMLElement | null = null
         const classNames = getClassName(props.style)
+        const ref = createUnistylesRef(classNames, forwardedRef)
+
+        maybeWarnAboutMultipleUnistyles(props.style as ViewStyle, Component.displayName)
 
         return (
             <Component
                 {...props}
                 style={classNames}
-                ref={isServer() ? undefined : (ref: HTMLElement | null) => {
-                    // @ts-ignore we don't know the type of the component
-                    maybeWarnAboutMultipleUnistyles(props.style, Component.displayName)
-
-                    if (!ref) {
-                        // @ts-expect-error hidden from TS
-                        UnistylesShadowRegistry.remove(storedRef, classNames?.hash)
-                    }
-
-                    storedRef = ref
-                    // @ts-expect-error hidden from TS
-                    UnistylesShadowRegistry.add(ref, classNames?.hash)
-
-                    if (typeof forwardedRef === 'function') {
-                        return forwardedRef(ref)
-                    }
-
-                    if (forwardedRef) {
-                        forwardedRef.current = ref
-                    }
-                }}
+                ref={ref}
             />
         )
     })
