@@ -12,7 +12,7 @@ export const serialize = (value: any): string => {
             }
 
             return `{${Object.entries(value)
-                .map(([key, value]) => `${key}:${serialize(value)}`)
+                .map(([key, value]) => `'${key}':${serialize(value)}`)
                 .join(',')}}`
         default:
             return JSON.stringify(value)
