@@ -1,5 +1,5 @@
 {
   "main": "../../../lib/commonjs/components/native/Image.js",
   "module": "../../../lib/module/components/native/Image.js",
-  "react-native": "../../../src/components/native/Image.tsx"
+  "react-native": "../../../src/components/native/Image.native.tsx"
 }
