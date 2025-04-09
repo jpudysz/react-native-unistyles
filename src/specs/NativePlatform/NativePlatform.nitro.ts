@@ -19,7 +19,8 @@ export enum UnistyleDependency {
     FontScale = 11,
     StatusBar = 12,
     NavigationBar = 13,
-    Ime = 14
+    Ime = 14,
+    Rtl = 15
 }
 
 export interface UnistylesNativeMiniRuntime {

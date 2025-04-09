@@ -47,6 +47,8 @@ public extension UnistyleDependency {
         self = .navigationbar
       case "Ime":
         self = .ime
+      case "Rtl":
+        self = .rtl
       default:
         return nil
     }
@@ -87,6 +89,8 @@ public extension UnistyleDependency {
         return "NavigationBar"
       case .ime:
         return "Ime"
+      case .rtl:
+        return "Rtl"
     }
   }
 }
