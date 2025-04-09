@@ -24,6 +24,7 @@ const RTDependencyMap = {
     statusBar: UnistyleDependency.StatusBar,
     pixelRatio: UnistyleDependency.PixelRatio,
     themeName: UnistyleDependency.ThemeName,
+    rtl: UnistyleDependency.Rtl
 } satisfies Partial<Record<keyof UnistylesMiniRuntime, UnistyleDependency>>
 
 export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {

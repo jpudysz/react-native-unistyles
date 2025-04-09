@@ -197,7 +197,8 @@ var UnistyleDependency = {
   FontScale: 11,
   StatusBar: 12,
   NavigationBar: 13,
-  Ime: 14
+  Ime: 14,
+  Rtl: 15
 };
 function getProperty(property) {
   if (!property) {
@@ -279,6 +280,9 @@ function toUnistylesDependency(dependency) {
     }
     case "variants": {
       return UnistyleDependency.Variants;
+    }
+    case "rtl": {
+      return UnistyleDependency.Rtl;
     }
     default:
       return null;
