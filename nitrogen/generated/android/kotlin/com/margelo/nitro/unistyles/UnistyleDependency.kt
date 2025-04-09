@@ -30,7 +30,8 @@ enum class UnistyleDependency {
   FONTSCALE,
   STATUSBAR,
   NAVIGATIONBAR,
-  IME;
+  IME,
+  RTL;
 
   @DoNotStrip
   @Keep
