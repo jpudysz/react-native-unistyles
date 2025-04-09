@@ -26,7 +26,8 @@ const UnistyleDependency = {
     FontScale: 11,
     StatusBar: 12,
     NavigationBar: 13,
-    Ime: 14
+    Ime: 14,
+    Rtl: 15
 }
 
 function getProperty(property: t.ObjectProperty | t.RestElement): Props | undefined {
@@ -120,6 +121,9 @@ function toUnistylesDependency(dependency: string) {
         }
         case 'variants': {
             return UnistyleDependency.Variants
+        }
+        case 'rtl': {
+            return UnistyleDependency.Rtl
         }
         default:
             return null
