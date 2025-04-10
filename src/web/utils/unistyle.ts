@@ -89,16 +89,16 @@ export const getMediaQuery = (query: string, allBreakpoints: Array<string>) => {
 
     const breakpointValue = UnistylesWeb.runtime.breakpoints[query as keyof UnistylesBreakpoints] ?? 0
     const nextBreakpoint = allBreakpoints
-            .filter((b): b is keyof UnistylesBreakpoints => b in UnistylesWeb.runtime.breakpoints)
-            .map(b => UnistylesWeb.runtime.breakpoints[b] as number)
-            .sort((a, b) => a - b)
-            .find(b => b > breakpointValue)
-        const queries = [
-            `(min-width: ${breakpointValue}px)`,
-            nextBreakpoint ? `(max-width: ${nextBreakpoint - 1}px)` : undefined,
-        ].filter(Boolean).join(' and ')
+        .filter((b): b is keyof UnistylesBreakpoints => b in UnistylesWeb.runtime.breakpoints)
+        .map(b => UnistylesWeb.runtime.breakpoints[b] as number)
+        .sort((a, b) => a - b)
+        .find(b => b > breakpointValue)
+    const queries = [
+        `(min-width: ${breakpointValue}px)`,
+        nextBreakpoint ? `(max-width: ${nextBreakpoint - 1}px)` : undefined,
+    ].filter(Boolean).join(' and ')
 
-        return `@media ${queries}`
+    return `@media ${queries}`
 }
 
 export const extractUnistyleDependencies = (value: any) => {

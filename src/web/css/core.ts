@@ -8,7 +8,7 @@ export const convertToCSS = (hash: string, value: Record<string, any>, state: CS
 
             Object.entries(styleValue).forEach(([pseudoStyleKey, pseudoStyleValue]) => {
                 if (typeof pseudoStyleValue === 'object' && pseudoStyleValue !== null) {
-                    const allBreakpoints = Object.keys(pseudoStyleValue)
+                    const allBreakpoints = Object.keys(styleValue)
                     Object.entries(pseudoStyleValue).forEach(([breakpointStyleKey, breakpointStyleValue]) => {
                         const mediaQuery = getMediaQuery(pseudoStyleKey, allBreakpoints)
 
@@ -34,7 +34,7 @@ export const convertToCSS = (hash: string, value: Record<string, any>, state: CS
         }
 
         if (typeof styleValue === 'object') {
-            const allBreakpoints = Object.keys(styleValue)
+            const allBreakpoints = Object.keys(value)
             Object.entries(styleValue).forEach(([breakpointStyleKey, breakpointStyleValue]) => {
                 const mediaQuery = getMediaQuery(styleKey, allBreakpoints)
 
