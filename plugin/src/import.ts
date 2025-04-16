@@ -48,5 +48,5 @@ export function addUnistylesImport(path: NodePath<t.Program>, state: UnistylesPl
 }
 
 export function isInsideNodeModules(state: UnistylesPluginPass) {
-    return state.file.opts.filename?.includes('node_modules')
+    return state.file.opts.filename?.includes('node_modules') && !state.file.replaceWithUnistyles
 }
