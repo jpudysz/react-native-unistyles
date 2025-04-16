@@ -169,7 +169,7 @@ function addUnistylesImport(path2, state) {
   nodesToRemove.forEach((node) => path2.node.body.splice(path2.node.body.indexOf(node), 1));
 }
 function isInsideNodeModules(state) {
-  return state.file.opts.filename?.includes("node_modules");
+  return state.file.opts.filename?.includes("node_modules") && !state.file.replaceWithUnistyles;
 }
 
 // plugin/src/ref.ts
@@ -706,7 +706,7 @@ function index_default() {
           });
         },
         exit(path2, state) {
-          if (isInsideNodeModules(state) && !state.file.replaceWithUnistyles) {
+          if (isInsideNodeModules(state)) {
             return;
           }
           if (state.file.hasAnyUnistyle || state.file.hasVariants || state.file.replaceWithUnistyles || state.file.forceProcessing) {
@@ -750,7 +750,7 @@ function index_default() {
         if (exoticImport) {
           return handleExoticImport(path2, state, exoticImport);
         }
-        if (isInsideNodeModules(state) && !state.file.replaceWithUnistyles) {
+        if (isInsideNodeModules(state)) {
           return;
         }
         const importSource = path2.node.source.value;
