@@ -205,6 +205,21 @@ export function isUnistylesCommonJSRequire(path: NodePath<t.CallExpression>, sta
     return isRequire
 }
 
+export function isReactNativeCommonJSRequire(path: NodePath<t.CallExpression>, state: UnistylesPluginPass) {
+    const isRequire = (
+        t.isIdentifier(path.node.callee) &&
+        path.node.arguments.length > 0 &&
+        t.isStringLiteral(path.node.arguments[0]) &&
+        (path.node.arguments[0]).value === 'react-native'
+    )
+
+    if (isRequire && t.isVariableDeclarator(path.parent) && t.isIdentifier(path.parent.id)) {
+        state.file.reactNativeCommonJSName = path.parent.id.name
+    }
+
+    return isRequire
+}
+
 export function isKindOfStyleSheet(path: NodePath<t.CallExpression>, state: UnistylesPluginPass) {
     if (!state.file.forceProcessing && !state.file.hasUnistylesImport) {
         return false

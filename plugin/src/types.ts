@@ -5,10 +5,12 @@ interface UnistylesState {
     hasAnyUnistyle: boolean,
     hasVariants: boolean,
     hasUnistylesImport: boolean,
+    addUnistylesRequire: boolean,
     forceProcessing: boolean,
     styleSheetLocalName: string,
     tagNumber: number,
     replaceWithUnistyles: boolean
+    reactNativeCommonJSName: string
 }
 
 export interface UnistylesPluginPass {

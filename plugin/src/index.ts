@@ -2,10 +2,10 @@ import type { PluginObj } from '@babel/core'
 import * as t from '@babel/types'
 import { NATIVE_COMPONENTS_PATHS, REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_EXOTIC_PATHS, REPLACE_WITH_UNISTYLES_PATHS } from './consts'
 import { handleExoticImport } from './exotic'
-import { addUnistylesImport, isInsideNodeModules } from './import'
+import { addUnistylesImport, addUnistylesRequire, isInsideNodeModules } from './import'
 import { toPlatformPath } from './paths'
 import { hasStringRef } from './ref'
-import { addDependencies, addStyleSheetTag, getStylesDependenciesFromFunction, getStylesDependenciesFromObject, isKindOfStyleSheet, isUnistylesCommonJSRequire, isUnistylesStyleSheet } from './stylesheet'
+import { addDependencies, addStyleSheetTag, getStylesDependenciesFromFunction, getStylesDependenciesFromObject, isKindOfStyleSheet, isReactNativeCommonJSRequire, isUnistylesCommonJSRequire, isUnistylesStyleSheet } from './stylesheet'
 import type { UnistylesPluginPass } from './types'
 import { extractVariants } from './variants'
 
@@ -22,8 +22,10 @@ export default function (): PluginObj<UnistylesPluginPass> {
 
                     state.file.hasAnyUnistyle = false
                     state.file.hasUnistylesImport = false
+                    state.file.addUnistylesRequire = false
                     state.file.hasVariants = false
                     state.file.styleSheetLocalName = ''
+                    state.file.reactNativeCommonJSName = ''
                     state.file.tagNumber = 0
                     state.reactNativeImports = {}
                     state.file.forceProcessing = state.opts.autoProcessRoot && state.filename
@@ -47,6 +49,10 @@ export default function (): PluginObj<UnistylesPluginPass> {
 
                     if (state.file.hasAnyUnistyle || state.file.hasVariants || state.file.replaceWithUnistyles || state.file.forceProcessing) {
                         addUnistylesImport(path, state)
+                    }
+
+                    if (state.file.addUnistylesRequire) {
+                        addUnistylesRequire(path, state)
                     }
                 }
             },
@@ -143,12 +149,40 @@ export default function (): PluginObj<UnistylesPluginPass> {
                     throw new Error("Detected string based ref which is not supported by Unistyles.")
                 }
             },
+            MemberExpression(path, state) {
+                if (isInsideNodeModules(state)) {
+                    return
+                }
+
+                // is this is commonJS require from react-native?
+                if (!state.file.reactNativeCommonJSName || !t.isIdentifier(path.node.object)) {
+                    return
+                }
+
+                // do we have unistyles import?
+                if (!state.file.styleSheetLocalName) {
+                    // add it later
+                    const uniqueId = path.scope.generateUidIdentifier('reactNativeUnistyles')
+
+                    state.file.styleSheetLocalName = uniqueId.name
+                    state.file.addUnistylesRequire = true
+                }
+
+                if (path.node.object.name === state.file.reactNativeCommonJSName) {
+                    // override with unistyles components
+                    path.node.object.name = state.file.styleSheetLocalName
+                }
+            },
             CallExpression(path, state) {
                 if (isInsideNodeModules(state)) {
                     return
                 }
 
                 if (isUnistylesCommonJSRequire(path, state)) {
+                    return
+                }
+
+                if (isReactNativeCommonJSRequire(path, state)) {
                     return
                 }
 
