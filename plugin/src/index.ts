@@ -5,7 +5,7 @@ import { handleExoticImport } from './exotic'
 import { addUnistylesImport, isInsideNodeModules } from './import'
 import { toPlatformPath } from './paths'
 import { hasStringRef } from './ref'
-import { addDependencies, addStyleSheetTag, getStylesDependenciesFromFunction, getStylesDependenciesFromObject, isKindOfStyleSheet, isUnistylesStyleSheet } from './stylesheet'
+import { addDependencies, addStyleSheetTag, getStylesDependenciesFromFunction, getStylesDependenciesFromObject, isKindOfStyleSheet, isUnistylesCommonJSRequire, isUnistylesStyleSheet } from './stylesheet'
 import type { UnistylesPluginPass } from './types'
 import { extractVariants } from './variants'
 
@@ -145,6 +145,10 @@ export default function (): PluginObj<UnistylesPluginPass> {
             },
             CallExpression(path, state) {
                 if (isInsideNodeModules(state)) {
+                    return
+                }
+
+                if (isUnistylesCommonJSRequire(path, state)) {
                     return
                 }
 
