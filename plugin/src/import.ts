@@ -50,3 +50,16 @@ export function addUnistylesImport(path: NodePath<t.Program>, state: UnistylesPl
 export function isInsideNodeModules(state: UnistylesPluginPass) {
     return state.file.opts.filename?.includes('node_modules') && !state.file.replaceWithUnistyles
 }
+
+export function addUnistylesRequire(path: NodePath<t.Program>, state: UnistylesPluginPass) {
+    const newRequire = t.variableDeclaration('const', [
+        t.variableDeclarator(
+            t.identifier(state.file.styleSheetLocalName),
+            t.callExpression(t.identifier('require'), [
+                t.stringLiteral('react-native-unistyles')
+            ])
+        )
+    ])
+
+    path.node.body.unshift(newRequire)
+}
