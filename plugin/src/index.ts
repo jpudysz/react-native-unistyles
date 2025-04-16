@@ -41,7 +41,7 @@ export default function (): PluginObj<UnistylesPluginPass> {
                     })
                 },
                 exit(path, state) {
-                    if (isInsideNodeModules(state) && !state.file.replaceWithUnistyles) {
+                    if (isInsideNodeModules(state)) {
                         return
                     }
 
@@ -102,7 +102,7 @@ export default function (): PluginObj<UnistylesPluginPass> {
                     return handleExoticImport(path, state, exoticImport)
                 }
 
-                if (isInsideNodeModules(state) && !state.file.replaceWithUnistyles) {
+                if (isInsideNodeModules(state)) {
                     return
                 }
 
