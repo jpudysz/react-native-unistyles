@@ -314,10 +314,20 @@ function stringToUniqueId(str) {
 }
 function isUnistylesStyleSheet(path2, state) {
   const { callee } = path2.node;
-  if (t4.isMemberExpression(callee) && t4.isIdentifier(callee.property)) {
-    return callee.property.name === "create" && t4.isIdentifier(callee.object) && callee.object.name === state.file.styleSheetLocalName;
+  if (!t4.isMemberExpression(callee) || !t4.isIdentifier(callee.property)) {
+    return false;
   }
-  return false;
+  const isImport = callee.property.name === "create" && t4.isIdentifier(callee.object) && callee.object.name === state.file.styleSheetLocalName;
+  const isRequire = state.file.hasUnistylesImport && callee.property.name === "create" && t4.isMemberExpression(callee.object) && t4.isIdentifier(callee.object.property) && t4.isIdentifier(callee.object.object) && callee.object.object.name === state.file.styleSheetLocalName && callee.object.property.name === "StyleSheet";
+  return isImport || isRequire;
+}
+function isUnistylesCommonJSRequire(path2, state) {
+  const isRequire = t4.isIdentifier(path2.node.callee) && path2.node.arguments.length > 0 && t4.isStringLiteral(path2.node.arguments[0]) && path2.node.arguments[0].value === "react-native-unistyles";
+  if (isRequire && t4.isVariableDeclarator(path2.parent) && t4.isIdentifier(path2.parent.id)) {
+    state.file.hasUnistylesImport = true;
+    state.file.styleSheetLocalName = path2.parent.id.name;
+  }
+  return isRequire;
 }
 function isKindOfStyleSheet(path2, state) {
   if (!state.file.forceProcessing && !state.file.hasUnistylesImport) {
@@ -786,6 +796,9 @@ function index_default() {
       },
       CallExpression(path2, state) {
         if (isInsideNodeModules(state)) {
+          return;
+        }
+        if (isUnistylesCommonJSRequire(path2, state)) {
           return;
         }
         if (!isUnistylesStyleSheet(path2, state) && !isKindOfStyleSheet(path2, state)) {
