@@ -21,24 +21,28 @@
   "exports": {
     ".": {
       "types": "./lib/typescript/src/index.d.ts",
-      "module": "./lib/module/index.js",
+      "import": "./lib/module/index.js",
+      "require": "./lib/commonjs/index.js",
       "react-native": "./src/index.ts",
       "default": "./lib/commonjs/index.js"
     },
     "./components/native/*": {
-      "module": "./lib/module/components/native/*",
+      "import": "./lib/module/components/native/*",
+      "require": "./lib/commonjs/components/native/*",
       "react-native": "./src/components/native/*",
       "default": "./lib/commonjs/components/native/*"
     },
     "./plugin": {
-      "module": "./plugin/index.js",
+      "import": "./plugin/index.js",
       "types": "./plugin/index.d.ts",
+      "require": "./plugin/index.js",
       "default": "./plugin/index.js"
     },
     "./package.json": "./package.json",
     "./server": {
       "types": "./lib/typescript/src/server/index.d.ts",
-      "module": "./lib/module/server/index.js",
+      "import": "./lib/module/server/index.js",
+      "require": "./lib/commonjs/server/index.js",
       "react-native": "./src/server.ts",
       "default": "./lib/commonjs/server/index.js"
     }
@@ -53,6 +57,7 @@
     "plugin",
     "web",
     "components",
+    "server",
     "react-native.config.js",
     "Unistyles.podspec",
     "!plugin/__tests__",
