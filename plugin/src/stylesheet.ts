@@ -166,15 +166,43 @@ function stringToUniqueId(str: string) {
 export function isUnistylesStyleSheet(path: NodePath<t.CallExpression>, state: UnistylesPluginPass) {
     const { callee } = path.node
 
-    if (t.isMemberExpression(callee) && t.isIdentifier(callee.property)) {
-        return (
-            callee.property.name === 'create' &&
-            t.isIdentifier(callee.object) &&
-            callee.object.name === state.file.styleSheetLocalName
-        )
+    if (!t.isMemberExpression(callee) || !t.isIdentifier(callee.property)) {
+        return false
     }
 
-    return false
+    const isImport = (
+        callee.property.name === 'create' &&
+        t.isIdentifier(callee.object) &&
+        callee.object.name === state.file.styleSheetLocalName
+    )
+
+    const isRequire = (
+        state.file.hasUnistylesImport &&
+        callee.property.name === 'create' &&
+        t.isMemberExpression(callee.object) &&
+        t.isIdentifier(callee.object.property) &&
+        t.isIdentifier(callee.object.object) &&
+        callee.object.object.name === state.file.styleSheetLocalName &&
+        callee.object.property.name === 'StyleSheet'
+    )
+
+    return isImport || isRequire
+}
+
+export function isUnistylesCommonJSRequire(path: NodePath<t.CallExpression>, state: UnistylesPluginPass) {
+    const isRequire = (
+        t.isIdentifier(path.node.callee) &&
+        path.node.arguments.length > 0 &&
+        t.isStringLiteral(path.node.arguments[0]) &&
+        (path.node.arguments[0] as t.StringLiteral).value === 'react-native-unistyles'
+    )
+
+    if (isRequire && t.isVariableDeclarator(path.parent) && t.isIdentifier(path.parent.id)) {
+        state.file.hasUnistylesImport = true
+        state.file.styleSheetLocalName = path.parent.id.name
+    }
+
+    return isRequire
 }
 
 export function isKindOfStyleSheet(path: NodePath<t.CallExpression>, state: UnistylesPluginPass) {
