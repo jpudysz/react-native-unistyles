@@ -12,7 +12,6 @@ import androidx.core.view.WindowInsetsCompat
 import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.bridge.ReactApplicationContext
 import com.margelo.nitro.unistyles.Insets
-import com.margelo.nitro.unistyles.UnistyleDependency
 import com.margelo.nitro.unistyles.UnistylesNativeMiniRuntime
 
 typealias CxxImeListener = (miniRuntime: UnistylesNativeMiniRuntime) -> Unit
@@ -22,7 +21,7 @@ typealias CxxImeListener = (miniRuntime: UnistylesNativeMiniRuntime) -> Unit
 class NativePlatformInsets(
     private val reactContext: ReactApplicationContext,
     private val getMiniRuntime: () -> UnistylesNativeMiniRuntime,
-    private val diffMiniRuntime: () -> Array<UnistyleDependency>
+    private val onConfigChange: () -> Unit
 ) {
     private var _shouldListenToImeEvents = false
     private val _imeListeners: MutableList<CxxImeListener> = mutableListOf()
@@ -106,7 +105,7 @@ class NativePlatformInsets(
             return
         }
 
-        diffMiniRuntime()
+        this@NativePlatformInsets.onConfigChange()
 
         if (shouldEmitImeEvent) {
             this@NativePlatformInsets.emitImeEvent(this.getMiniRuntime())
