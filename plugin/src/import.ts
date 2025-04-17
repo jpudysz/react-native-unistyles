@@ -54,7 +54,7 @@ export function isInsideNodeModules(state: UnistylesPluginPass) {
 export function addUnistylesRequire(path: NodePath<t.Program>, state: UnistylesPluginPass) {
     Object
         .entries(state.reactNativeImports)
-        .map(([componentName, uniqueName]) => {
+        .forEach(([componentName, uniqueName]) => {
             const newRequire = t.variableDeclaration('const', [
                 t.variableDeclarator(
                     t.identifier(uniqueName),
