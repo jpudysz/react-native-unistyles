@@ -27,7 +27,7 @@ import java.util.Locale
 @Keep
 @DoNotStrip
 class NativePlatformAndroid(private val reactContext: ReactApplicationContext): HybridNativePlatformSpec(), LifecycleEventListener {
-    private val _insets = NativePlatformInsets(reactContext, this::getMiniRuntime) { this.diffMiniRuntime() }
+    private val _insets = NativePlatformInsets(reactContext, this::getMiniRuntime) { this.onConfigChange() }
     private var _miniRuntime: UnistylesNativeMiniRuntime = buildMiniRuntime()
     private val _listener = NativePlatformListener(reactContext, this::getMiniRuntime) { this.diffMiniRuntime() }
 
@@ -261,6 +261,10 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
         }
 
         return changedDependencies
+    }
+
+    private fun onConfigChange() {
+        this._listener.onConfigChange()
     }
 
     override fun registerPlatformListener(callback: (dependencies: Array<UnistyleDependency>, miniRuntime: UnistylesNativeMiniRuntime) -> Unit) {
