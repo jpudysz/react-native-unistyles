@@ -209,11 +209,16 @@ export function isReactNativeCommonJSRequire(path: NodePath<t.CallExpression>, s
     const isRequire = (
         t.isIdentifier(path.node.callee) &&
         path.node.arguments.length > 0 &&
-        t.isStringLiteral(path.node.arguments[0]) &&
-        (path.node.arguments[0]).value === 'react-native'
+        path.node.callee.name === 'require'
+    )
+    const requireImportName = path.node.arguments.find(node => t.isStringLiteral(node))
+    const isReactNativeRequire = (
+        isRequire &&
+        requireImportName &&
+        (requireImportName.value === 'react-native' || requireImportName.value === 'react-native-web/dist/index')
     )
 
-    if (isRequire && t.isVariableDeclarator(path.parent) && t.isIdentifier(path.parent.id)) {
+    if (isReactNativeRequire && t.isVariableDeclarator(path.parent) && t.isIdentifier(path.parent.id)) {
         state.file.reactNativeCommonJSName = path.parent.id.name
     }
 
