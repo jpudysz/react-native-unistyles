@@ -172,7 +172,7 @@ function isInsideNodeModules(state) {
   return state.file.opts.filename?.includes("node_modules") && !state.file.replaceWithUnistyles;
 }
 function addUnistylesRequire(path2, state) {
-  Object.entries(state.reactNativeImports).map(([componentName, uniqueName]) => {
+  Object.entries(state.reactNativeImports).forEach(([componentName, uniqueName]) => {
     const newRequire = t2.variableDeclaration("const", [
       t2.variableDeclarator(
         t2.identifier(uniqueName),
