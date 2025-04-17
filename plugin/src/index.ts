@@ -47,12 +47,12 @@ export default function (): PluginObj<UnistylesPluginPass> {
                         return
                     }
 
-                    if (state.file.hasAnyUnistyle || state.file.hasVariants || state.file.replaceWithUnistyles || state.file.forceProcessing) {
-                        addUnistylesImport(path, state)
+                    if (state.file.addUnistylesRequire) {
+                        return addUnistylesRequire(path, state)
                     }
 
-                    if (state.file.addUnistylesRequire) {
-                        addUnistylesRequire(path, state)
+                    if (state.file.hasAnyUnistyle || state.file.hasVariants || state.file.replaceWithUnistyles || state.file.forceProcessing) {
+                        addUnistylesImport(path, state)
                     }
                 }
             },
@@ -154,24 +154,24 @@ export default function (): PluginObj<UnistylesPluginPass> {
                     return
                 }
 
-                // is this is commonJS require from react-native?
+                // is this is commonJS require from react-native or RNW?
                 if (!state.file.reactNativeCommonJSName || !t.isIdentifier(path.node.object)) {
                     return
                 }
 
-                // do we have unistyles import?
-                if (!state.file.styleSheetLocalName) {
-                    // add it later
-                    const uniqueId = path.scope.generateUidIdentifier('reactNativeUnistyles')
+                if (path.node.object.name !== state.file.reactNativeCommonJSName || !t.isIdentifier(path.node.property)) {
+                    return
+                }
 
-                    state.file.styleSheetLocalName = uniqueId.name
+                if (!state.reactNativeImports[path.node.property.name]) {
+                    const uniqueId = path.scope.generateUidIdentifier(`reactNativeUnistyles_${path.node.property.name}`)
+
+                    state.reactNativeImports[path.node.property.name] = uniqueId.name
                     state.file.addUnistylesRequire = true
                 }
 
-                if (path.node.object.name === state.file.reactNativeCommonJSName) {
-                    // override with unistyles components
-                    path.node.object.name = state.file.styleSheetLocalName
-                }
+                // override with unistyles components
+                path.node.object.name = state.reactNativeImports[path.node.property.name] as string
             },
             CallExpression(path, state) {
                 if (isInsideNodeModules(state)) {
