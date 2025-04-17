@@ -52,14 +52,18 @@ export function isInsideNodeModules(state: UnistylesPluginPass) {
 }
 
 export function addUnistylesRequire(path: NodePath<t.Program>, state: UnistylesPluginPass) {
-    const newRequire = t.variableDeclaration('const', [
-        t.variableDeclarator(
-            t.identifier(state.file.styleSheetLocalName),
-            t.callExpression(t.identifier('require'), [
-                t.stringLiteral('react-native-unistyles')
+    Object
+        .entries(state.reactNativeImports)
+        .forEach(([componentName, uniqueName]) => {
+            const newRequire = t.variableDeclaration('const', [
+                t.variableDeclarator(
+                    t.identifier(uniqueName),
+                    t.callExpression(t.identifier('require'), [
+                        t.stringLiteral(`react-native-unistyles/src/components/native/${componentName}`)
+                    ])
+                )
             ])
-        )
-    ])
 
-    path.node.body.unshift(newRequire)
+            path.node.body.unshift(newRequire)
+        })
 }

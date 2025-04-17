@@ -172,15 +172,17 @@ function isInsideNodeModules(state) {
   return state.file.opts.filename?.includes("node_modules") && !state.file.replaceWithUnistyles;
 }
 function addUnistylesRequire(path2, state) {
-  const newRequire = t2.variableDeclaration("const", [
-    t2.variableDeclarator(
-      t2.identifier(state.file.styleSheetLocalName),
-      t2.callExpression(t2.identifier("require"), [
-        t2.stringLiteral("react-native-unistyles")
-      ])
-    )
-  ]);
-  path2.node.body.unshift(newRequire);
+  Object.entries(state.reactNativeImports).map(([componentName, uniqueName]) => {
+    const newRequire = t2.variableDeclaration("const", [
+      t2.variableDeclarator(
+        t2.identifier(uniqueName),
+        t2.callExpression(t2.identifier("require"), [
+          t2.stringLiteral(`react-native-unistyles/src/components/native/${componentName}`)
+        ])
+      )
+    ]);
+    path2.node.body.unshift(newRequire);
+  });
 }
 
 // plugin/src/ref.ts
@@ -341,8 +343,10 @@ function isUnistylesCommonJSRequire(path2, state) {
   return isRequire;
 }
 function isReactNativeCommonJSRequire(path2, state) {
-  const isRequire = t4.isIdentifier(path2.node.callee) && path2.node.arguments.length > 0 && t4.isStringLiteral(path2.node.arguments[0]) && path2.node.arguments[0].value === "react-native";
-  if (isRequire && t4.isVariableDeclarator(path2.parent) && t4.isIdentifier(path2.parent.id)) {
+  const isRequire = t4.isIdentifier(path2.node.callee) && path2.node.arguments.length > 0 && path2.node.callee.name === "require";
+  const requireImportName = path2.node.arguments.find((node) => t4.isStringLiteral(node));
+  const isReactNativeRequire = isRequire && requireImportName && (requireImportName.value === "react-native" || requireImportName.value === "react-native-web/dist/index");
+  if (isReactNativeRequire && t4.isVariableDeclarator(path2.parent) && t4.isIdentifier(path2.parent.id)) {
     state.file.reactNativeCommonJSName = path2.parent.id.name;
   }
   return isRequire;
@@ -739,11 +743,11 @@ function index_default() {
           if (isInsideNodeModules(state)) {
             return;
           }
+          if (state.file.addUnistylesRequire) {
+            return addUnistylesRequire(path2, state);
+          }
           if (state.file.hasAnyUnistyle || state.file.hasVariants || state.file.replaceWithUnistyles || state.file.forceProcessing) {
             addUnistylesImport(path2, state);
-          }
-          if (state.file.addUnistylesRequire) {
-            addUnistylesRequire(path2, state);
           }
         }
       },
@@ -824,14 +828,15 @@ function index_default() {
         if (!state.file.reactNativeCommonJSName || !t6.isIdentifier(path2.node.object)) {
           return;
         }
-        if (!state.file.styleSheetLocalName) {
-          const uniqueId = path2.scope.generateUidIdentifier("reactNativeUnistyles");
-          state.file.styleSheetLocalName = uniqueId.name;
+        if (path2.node.object.name !== state.file.reactNativeCommonJSName || !t6.isIdentifier(path2.node.property)) {
+          return;
+        }
+        if (!state.reactNativeImports[path2.node.property.name]) {
+          const uniqueId = path2.scope.generateUidIdentifier(`reactNativeUnistyles_${path2.node.property.name}`);
+          state.reactNativeImports[path2.node.property.name] = uniqueId.name;
           state.file.addUnistylesRequire = true;
         }
-        if (path2.node.object.name === state.file.reactNativeCommonJSName) {
-          path2.node.object.name = state.file.styleSheetLocalName;
-        }
+        path2.node.object.name = state.reactNativeImports[path2.node.property.name];
       },
       CallExpression(path2, state) {
         if (isInsideNodeModules(state)) {
