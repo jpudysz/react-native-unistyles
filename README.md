@@ -28,8 +28,7 @@ yarn add react-native-edge-to-edge react-native-nitro-modules@0.25.2
 
 | react-native-unistyles | react-native-nitro-modules |
 |------------------------|----------------------------|
-| 3.0.0-rc.1             | 0.25.2                     |
-| 3.0.0-nightly-20250416 | 0.25.2                     |
+| 3.0.0-rc.2             | 0.25.2                     |
 
 Then follow [installation guides](https://unistyl.es/v3/start/getting-started) for your platform.
 
@@ -78,9 +77,6 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 <a href="https://github.com/oscklm">
      <img src="https://avatars.githubusercontent.com/u/22825865?v=4" height="70px" width="70px" alt="oscklm" />
 </a>
-<a href="https://github.com/guillaumehcht">
-     <img src="https://avatars.githubusercontent.com/u/80776475?v=4" height="70px" width="70px" alt="guillaumehcht" />
-</a>
 <a href="https://github.com/ryanlanciaux">
      <img src="https://avatars.githubusercontent.com/u/85041?v=4" height="70px" width="70px" alt="ryanlanciaux" />
 </a>
@@ -91,40 +87,43 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 ## Past sponsors
 
 <a href="https://github.com/kmartinezmedia">
-     <img src="https://avatars.githubusercontent.com/u/6308123?s=200&v=4" height="70px" width="70px" alt="kmartinezmedia" />
+     <img src="https://avatars.githubusercontent.com/u/6308123?s=200&v=4" height="60px" width="60px" alt="kmartinezmedia" />
 </a>
 <a href="https://github.com/levibuzolic">
-     <img src="https://avatars.githubusercontent.com/u/721323?v=4" height="70px" width="70px" alt="levibuzolic" />
+     <img src="https://avatars.githubusercontent.com/u/721323?v=4" height="60px" width="60px" alt="levibuzolic" />
 </a>
 <a href="https://github.com/claudesortwell">
-     <img src="https://avatars.githubusercontent.com/u/41422239?v=4" height="70px" width="70px" alt="claudesortwell" />
+     <img src="https://avatars.githubusercontent.com/u/41422239?v=4" height="60px" width="60px" alt="claudesortwell" />
 </a>
 <a href="https://github.com/luoxuhai">
-     <img src="https://avatars.githubusercontent.com/u/37284154?v=4" height="70px" width="70px" alt="luoxuhai" />
+     <img src="https://avatars.githubusercontent.com/u/37284154?v=4" height="60px" width="60px" alt="luoxuhai" />
 </a>
 <a href="https://github.com">
-     <img src="https://avatars.githubusercontent.com/u/113348625?v=4" height="70px" width="70px" alt="anonymous" />
+     <img src="https://avatars.githubusercontent.com/u/113348625?v=4" height="60px" width="60px" alt="anonymous" />
 </a>
 <a href="https://github.com/abanobboles">
-     <img src="https://avatars.githubusercontent.com/u/9078953?v=4" height="70px" width="70px" alt="abanobboles" />
+     <img src="https://avatars.githubusercontent.com/u/9078953?v=4" height="60px" width="60px" alt="abanobboles" />
 </a>
 <a href="https://github.com/hyoban">
-     <img src="https://avatars.githubusercontent.com/u/38493346?v=4" height="70px" width="70px" alt="hyoban" />
+     <img src="https://avatars.githubusercontent.com/u/38493346?v=4" height="60px" width="60px" alt="hyoban" />
 </a>
 <a href="https://github.com/giovannilondero">
-     <img src="https://avatars.githubusercontent.com/u/10998991?v=4" height="70px" width="70px" alt="giovannilondero" />
+     <img src="https://avatars.githubusercontent.com/u/10998991?v=4" height="60px" width="60px" alt="giovannilondero" />
 </a>
 <a href="https://github.com/4cc3ssX">
-     <img src="https://avatars.githubusercontent.com/u/57473799?v=4" height="70px" width="70px" alt="4cc3ssX" />
+     <img src="https://avatars.githubusercontent.com/u/57473799?v=4" height="60px" width="60px" alt="4cc3ssX" />
 </a>
 <a href="https://github.com/FilipiRafael">
-     <img src="https://avatars.githubusercontent.com/u/61629642?v=4" height="70px" width="70px" alt="FilipiRafael" />
+     <img src="https://avatars.githubusercontent.com/u/61629642?v=4" height="60px" width="60px" alt="FilipiRafael" />
 </a>
 <a href="https://github.com/dacoto97">
-     <img src="https://avatars.githubusercontent.com/u/16915053?v=4" height="70px" width="70px" alt="dacoto97" />
+     <img src="https://avatars.githubusercontent.com/u/16915053?v=4" height="60px" width="60px" alt="dacoto97" />
 </a>
 <a href="https://github.com/chinamcafee">
-     <img src="https://avatars.githubusercontent.com/u/3439961?v=4" height="70px" width="70px" alt="chinamcafee" />
+     <img src="https://avatars.githubusercontent.com/u/3439961?v=4" height="60px" width="60px" alt="chinamcafee" />
+</a>
+<a href="https://github.com/guillaumehcht">
+     <img src="https://avatars.githubusercontent.com/u/80776475?v=4" height="60px" width="60px" alt="guillaumehcht" />
 </a>
 
 ## Sponsor my work
