@@ -34,7 +34,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             if (intent.action == Intent.ACTION_CONFIGURATION_CHANGED) {
                 Handler(Looper.getMainLooper()).postDelayed({
                     this@UnistylesModule.onConfigChange()
-                }, 10)
+                }, 25)
             }
 
             val newConfig = context.resources.configuration
@@ -70,7 +70,7 @@ class UnistylesModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         if (!this.isCxxReady) {
             return
         }
-        
+
         val colorScheme = this.platform.getColorScheme()
         val contentSizeCategory = this.platform.getContentSizeCategory()
 
