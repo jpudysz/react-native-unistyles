@@ -52,7 +52,10 @@ export class UnistylesShadowRegistry {
                     this.services.registry.addDependenciesToStylesheet(__uni__stylesheet, dependencies)
                 }
 
-                return resultWithVariants as UnistylesValues
+                return {
+                    ...resultWithVariants,
+                    ...resultWithVariants._web
+                } as UnistylesValues
             })
 
             return deepMergeObjects(...allStyles)

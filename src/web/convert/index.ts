@@ -12,10 +12,7 @@ export const convertUnistyles = (value: UnistylesValues) => {
     // Flag to mark if boxShadow is already created
     let hasShadow = false
 
-    const stylesArray = Object.entries({
-        ...value,
-        ...value._web
-    }).flatMap(([unistylesKey, unistylesValue]) => {
+    const stylesArray = Object.entries(value).flatMap(([unistylesKey, unistylesValue]) => {
         // Keys to omit
         if (['_classNames', '_web', 'variants', 'compoundVariants', 'uni__dependencies'].includes(unistylesKey) || unistylesKey.startsWith('unistyles_')) {
             return []
