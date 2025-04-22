@@ -831,6 +831,9 @@ function index_default() {
         if (path2.node.object.name !== state.file.reactNativeCommonJSName || !t6.isIdentifier(path2.node.property)) {
           return;
         }
+        if (!REACT_NATIVE_COMPONENT_NAMES.includes(path2.node.property.name)) {
+          return;
+        }
         if (!state.reactNativeImports[path2.node.property.name]) {
           const uniqueId = path2.scope.generateUidIdentifier(`reactNativeUnistyles_${path2.node.property.name}`);
           state.reactNativeImports[path2.node.property.name] = uniqueId.name;
