@@ -163,6 +163,10 @@ export default function (): PluginObj<UnistylesPluginPass> {
                     return
                 }
 
+                if (!REACT_NATIVE_COMPONENT_NAMES.includes(path.node.property.name)) {
+                    return
+                }
+
                 if (!state.reactNativeImports[path.node.property.name]) {
                     const uniqueId = path.scope.generateUidIdentifier(`reactNativeUnistyles_${path.node.property.name}`)
 
