@@ -4,7 +4,7 @@ import { getClassName } from '../../core'
 import { maybeWarnAboutMultipleUnistyles } from '../../core/warn'
 import type { UnistylesValues } from '../../types'
 import { copyComponentProperties } from '../../utils'
-import { createUnistylesRef, keyInObject } from '../../web/utils'
+import { checkForProp, createUnistylesRef } from '../../web/utils'
 
 type Props = ComponentProps<typeof NativeImage> & {
     style?: UnistylesValues
@@ -14,8 +14,10 @@ type Props = ComponentProps<typeof NativeImage> & {
 const UnistylesImage = forwardRef<unknown, Props>((props, forwardedRef) => {
     const classNames = getClassName(props.style)
     const ref = createUnistylesRef(classNames, forwardedRef)
-    const hasWidthStyle = typeof props.style === 'object' && keyInObject(props.style, 'width')
-    const hasHeightStyle = typeof props.style === 'object' && keyInObject(props.style, 'height')
+    const hasWidthStyle = checkForProp(props.style, 'width')
+    const hasHeightStyle = checkForProp(props.style, 'height')
+
+    console.log(hasWidthStyle, hasHeightStyle)
 
     maybeWarnAboutMultipleUnistyles(props.style as ViewStyle, 'Image')
 
