@@ -17,8 +17,6 @@ const UnistylesImage = forwardRef<unknown, Props>((props, forwardedRef) => {
     const hasWidthStyle = checkForProp(props.style, 'width')
     const hasHeightStyle = checkForProp(props.style, 'height')
 
-    console.log(hasWidthStyle, hasHeightStyle)
-
     maybeWarnAboutMultipleUnistyles(props.style as ViewStyle, 'Image')
 
     return (
