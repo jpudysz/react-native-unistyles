@@ -110,3 +110,19 @@ export const extractUnistyleDependencies = (value: any) => {
 
     return Array.isArray(dependencies) ? dependencies : []
 }
+
+export const checkForProp = (value: any, prop: string): boolean => {
+    if (Array.isArray(value)) {
+        return value.some(nestedValue => checkForProp(nestedValue, prop))
+    }
+
+    if (typeof value === 'object' && value !== null) {
+        return keyInObject(value, prop)
+            ? true
+            : keyInObject(value, '_web')
+                ? checkForProp(value._web, prop)
+                : false
+    }
+
+    return false
+}
