@@ -10,7 +10,7 @@ extension NativeIOSPlatform {
         Publishers
             .MergeMany([windowPublisher, orientationPublisher, colorSchemePublisher])
             .throttle(for: .milliseconds(25), scheduler: RunLoop.main, latest: true)
-            .sink { [weak self] notification in
+            .sink { [weak self] _ in
                 self?.onNativePlatformChange()
             }
             .store(in: &cancellables)
