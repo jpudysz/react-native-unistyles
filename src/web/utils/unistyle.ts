@@ -1,3 +1,4 @@
+import { Animated } from 'react-native'
 import type { UnistylesBreakpoints } from '../../global'
 import { isUnistylesMq, parseMq } from '../../mq'
 import type { UnistyleDependency } from '../../specs/NativePlatform'
@@ -49,13 +50,7 @@ export const extractSecrets = (object: any) => {
         return undefined
     }
 
-    const hiddenSecrets = Object.getOwnPropertyDescriptors(secrets)
-
-    if (Object.keys(hiddenSecrets).length === 0) {
-        return undefined
-    }
-
-    return reduceObject(hiddenSecrets, secret => secret.value)
+    return reduceObject(Object.getOwnPropertyDescriptors(secrets), secret => secret.value)
 }
 
 export const removeInlineStyles = (values: UnistylesValues) => {
@@ -122,6 +117,24 @@ export const checkForProp = (value: any, prop: string): boolean => {
             : keyInObject(value, '_web')
                 ? checkForProp(value._web, prop)
                 : false
+    }
+
+    return false
+}
+
+export const checkForAnimated = (value: any): boolean => {
+    if (Array.isArray(value)) {
+        return value.some(checkForAnimated)
+    }
+
+    if (typeof value === 'object' && value !== null) {
+        const objectValues = Object.values(value)
+        const secrets = extractSecrets(value)
+
+        // @ts-expect-error React Native Web exports Animated.AnimatedNode as Animated.Node
+        return value instanceof Animated.Node ||
+            objectValues.length > 0 && objectValues.some(checkForAnimated) ||
+            secrets && Object.keys(secrets).length === 0
     }
 
     return false
