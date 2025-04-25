@@ -56,10 +56,11 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         maybeWarnAboutMultipleUnistyles(narrowedProps.contentContainerStyle, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
 
         const NativeComponent = Component as ComponentType
+        const [classNames] = styleClassNames ?? []
 
         return (
             <div
-                className={styleClassNames?.hash}
+                className={classNames?.hash}
                 style={{ display: 'contents' }}
             >
                 <NativeComponent {...combinedProps} ref={ref} />
