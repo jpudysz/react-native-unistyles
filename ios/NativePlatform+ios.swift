@@ -313,7 +313,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     }
 
     func setStatusBarHidden(isHidden: Bool) throws {
-        self.onWindowChange(Notification(name: NSNotification.Name("RCTWindowFrameDidChangeNotification")))
+        self.onNativePlatformChange()
     }
 
     // not implemented for iOS as there are no such APIs
