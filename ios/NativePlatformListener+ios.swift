@@ -5,8 +5,10 @@ extension NativeIOSPlatform {
     func setupPlatformListeners() {
         let windowPublisher = NotificationCenter.default.publisher(for: NSNotification.Name("RCTWindowFrameDidChangeNotification"))
         let orientationPublisher = NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)
+        let colorSchemePublisher = NotificationCenter.default.publisher(for: NSNotification.Name("RCTUserInterfaceStyleDidChangeNotification"))
 
-        Publishers.Merge(windowPublisher, orientationPublisher)
+        Publishers
+            .MergeMany([windowPublisher, orientationPublisher, colorSchemePublisher])
             .throttle(for: .milliseconds(25), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] notification in
                 self?.onNativePlatformChange()
