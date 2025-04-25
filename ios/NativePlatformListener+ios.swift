@@ -1,12 +1,15 @@
 import Foundation
+import Combine
 
 extension NativeIOSPlatform {
     func setupPlatformListeners() {
-        NotificationCenter.default.publisher(for: NSNotification.Name("RCTWindowFrameDidChangeNotification"))
-            // add small delay (10ms) to make sure all values are up ot date
-            .delay(for: .milliseconds(10), scheduler: RunLoop.current)
+        let windowPublisher = NotificationCenter.default.publisher(for: NSNotification.Name("RCTWindowFrameDidChangeNotification"))
+        let orientationPublisher = NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)
+
+        Publishers.Merge(windowPublisher, orientationPublisher)
+            .throttle(for: .milliseconds(25), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] notification in
-                self?.onWindowChange(notification)
+                self?.onNativePlatformChange()
             }
             .store(in: &cancellables)
     }
@@ -30,14 +33,14 @@ extension NativeIOSPlatform {
     func emitImeEvent(updatedMiniRuntime: UnistylesNativeMiniRuntime) {
         self.imeListeners.forEach { $0(updatedMiniRuntime) }
     }
-    
+
     func unregisterPlatformListeners() {
         cancellables.removeAll()
         dependencyListeners.removeAll()
         imeListeners.removeAll()
     }
 
-    @objc func onWindowChange(_ notification: Notification) {
+    @objc func onNativePlatformChange() {
         guard let currentMiniRuntime = self.miniRuntime else {
             return
         }
