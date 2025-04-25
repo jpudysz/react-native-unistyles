@@ -37,6 +37,11 @@ export class UnistylesShadowRegistry {
                     return unistyle
                 }
 
+                // Animated styles - shouldn't be processed
+                if (Object.keys(secrets).length === 0) {
+                    return {}
+                }
+
                 const { __uni__key, __uni__stylesheet, __uni__args = [], __uni_variants: variants } = secrets
                 const newComputedStylesheet = this.services.registry.getComputedStylesheet(__uni__stylesheet, scopedTheme)
                 const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))

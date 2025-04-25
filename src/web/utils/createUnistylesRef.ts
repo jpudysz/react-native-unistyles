@@ -1,14 +1,18 @@
 import type React from 'react'
-import type { Nullable } from '../../types'
+import type { Nullable, UnistylesValues } from '../../types'
 import { UnistylesWeb } from '../index'
 import { isServer } from './common'
 
-type ClassNames = {
-    hash: string
-}
+type Styles = readonly [
+    {
+        hash: string
+    },
+    Array<UnistylesValues>
+]
 
-export const createUnistylesRef = <T>(classNames?: ClassNames, forwardedRef?: React.ForwardedRef<T>) => {
+export const createUnistylesRef = <T>(styles?: Styles, forwardedRef?: React.ForwardedRef<T>) => {
     const storedRef = { current: null as Nullable<T> }
+    const [classNames] = styles ?? []
 
     return isServer() ? undefined : (ref: Nullable<T>) => {
         if (!ref) {
