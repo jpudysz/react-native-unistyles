@@ -1,6 +1,6 @@
 import type React from 'react'
 import type { Nullable, UnistylesValues } from '../../types'
-import { UnistylesWeb } from '../index'
+import * as unistyles from '../services'
 import { isServer } from './common'
 
 type Styles = readonly [
@@ -16,11 +16,11 @@ export const createUnistylesRef = <T>(styles?: Styles, forwardedRef?: React.Forw
 
     return isServer() ? undefined : (ref: Nullable<T>) => {
         if (!ref) {
-            UnistylesWeb.shadowRegistry.remove(storedRef, classNames?.hash)
+            unistyles.services.shadowRegistry.remove(storedRef, classNames?.hash)
         }
 
         storedRef.current = ref
-        UnistylesWeb.shadowRegistry.add(ref, classNames?.hash)
+        unistyles.services.shadowRegistry.add(ref, classNames?.hash)
 
         if (typeof forwardedRef === 'function') {
             return forwardedRef(ref)

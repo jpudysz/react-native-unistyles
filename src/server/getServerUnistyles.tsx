@@ -1,6 +1,6 @@
 import React from 'react'
 import { StyleSheet } from 'react-native'
-import { UnistylesWeb } from '../web'
+import * as unistyles from '../web/services'
 import { error, isServer } from '../web/utils'
 import { serialize } from './serialize'
 import { DefaultServerUnistylesSettings, type ServerUnistylesSettings } from './types'
@@ -12,8 +12,8 @@ export const getServerUnistyles = ({ includeRNWStyles = true }: ServerUnistylesS
 
     // @ts-ignore
     const rnwStyle: string | null = includeRNWStyles ? (StyleSheet?.getSheet().textContent ?? '') : null
-    const css = UnistylesWeb.registry.css.getStyles()
-    const state = UnistylesWeb.registry.css.getState()
+    const css = unistyles.services.registry.css.getStyles()
+    const state = unistyles.services.registry.css.getState()
 
     return (
         <>
