@@ -3,8 +3,9 @@ import { UnistylesRegistry } from './registry'
 import { UnistylesRuntime } from './runtime'
 import { UnistylesShadowRegistry } from './shadowRegistry'
 import { UnistylesState } from './state'
+import { isServer } from './utils'
 
-export class UnistylesServices {
+class UnistylesServices {
     runtime: UnistylesRuntime
     registry: UnistylesRegistry
     shadowRegistry: UnistylesShadowRegistry
@@ -26,3 +27,15 @@ export class UnistylesServices {
         this.services.listener = this.listener
     }
 }
+
+declare global {
+    // @ts-ignore
+    var __unistyles__: UnistylesServices
+}
+
+if (isServer() && !globalThis.__unistyles__) {
+    // @ts-ignore
+    globalThis.__unistyles__ = new UnistylesServices()
+}
+
+export const services = isServer() ? globalThis.__unistyles__ : new UnistylesServices()

@@ -1,6 +1,6 @@
 import type { DropShadowValue } from 'react-native'
 import { isUnistylesMq } from '../../../mq'
-import { UnistylesWeb } from '../../index'
+import * as unistyles from '../../services'
 import { hyphenate } from '../../utils'
 import type { Filters } from '../types'
 import { normalizeColor, normalizeNumericValue } from '../utils'
@@ -21,7 +21,7 @@ export const getFilterStyle = (filters: Array<Filters>) => {
             return []
         }
 
-        const breakpoints = Object.keys(dropShadowValue).filter(key => Object.keys(UnistylesWeb.runtime.breakpoints).includes(key) || isUnistylesMq(key))
+        const breakpoints = Object.keys(dropShadowValue).filter(key => Object.keys(unistyles.services.runtime.breakpoints).includes(key) || isUnistylesMq(key))
         const breakpointsDropShadow = Object.fromEntries(breakpoints.map(breakpoint => [breakpoint, getDropShadowStyle(dropShadowValue[breakpoint])]))
 
         if (breakpoints.length === 0) {
