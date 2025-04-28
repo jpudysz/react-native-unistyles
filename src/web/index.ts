@@ -3,22 +3,10 @@ import type { StyleSheet as NativeStyleSheet } from '../specs/StyleSheet'
 import type { Runtime as NativeUnistylesRuntime } from '../specs/UnistylesRuntime'
 import { deepMergeObjects } from '../utils'
 import { create } from './create'
-import { UnistylesServices } from './services'
-import { isServer } from './utils'
+import * as unistyles from './services'
 
-declare global {
-    // @ts-ignore
-    var __unistyles__: UnistylesServices
-}
-
-if (isServer() && !globalThis.__unistyles__) {
-    // @ts-ignore
-    globalThis.__unistyles__ = new UnistylesServices()
-}
-
-export const UnistylesWeb = isServer() ? globalThis.__unistyles__ : new UnistylesServices()
 export const StyleSheet = {
-    configure: UnistylesWeb.state.init,
+    configure: unistyles.services.state.init,
     create: create,
     absoluteFill: {
         position: 'absolute',
@@ -39,8 +27,8 @@ export const StyleSheet = {
     hairlineWidth: 1
 } as unknown as typeof NativeStyleSheet
 
-export const UnistylesRuntime = UnistylesWeb.runtime as unknown as typeof NativeUnistylesRuntime
-export const UnistylesShadowRegistry = UnistylesWeb.shadowRegistry as unknown as typeof NativeUnistylesShadowRegistry
+export const UnistylesRuntime = unistyles.services.runtime as unknown as typeof NativeUnistylesRuntime
+export const UnistylesShadowRegistry = unistyles.services.shadowRegistry as unknown as typeof NativeUnistylesShadowRegistry
 
 export * from './mock'
 

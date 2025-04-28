@@ -1,5 +1,5 @@
 import type { StyleSheet, StyleSheetWithSuperPowers } from '../types/stylesheet'
-import { UnistylesWeb } from './index'
+import * as unistyles from './services'
 import { assignSecrets, error, isServer, removeInlineStyles } from './utils'
 
 type Variants = Record<string, string | boolean | undefined>
@@ -10,13 +10,13 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, id?: s
     }
 
     // For SSR
-    if (!UnistylesWeb.state.isInitialized && !isServer()) {
+    if (!unistyles.services.state.isInitialized && !isServer()) {
         const config = window?.__UNISTYLES_STATE__?.config
 
-        config && UnistylesWeb.state.init(config)
+        config && unistyles.services.state.init(config)
     }
 
-    const computedStylesheet = UnistylesWeb.registry.getComputedStylesheet(stylesheet)
+    const computedStylesheet = unistyles.services.registry.getComputedStylesheet(stylesheet)
     const addSecrets = (value: any, key: string, args = undefined as Array<any> | undefined, variants = {} as Variants) => assignSecrets(value, {
         __uni__key: key,
         __uni__stylesheet: stylesheet,
