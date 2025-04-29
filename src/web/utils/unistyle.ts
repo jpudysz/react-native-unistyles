@@ -1,9 +1,9 @@
 import { Animated } from 'react-native'
 import type { UnistylesBreakpoints } from '../../global'
-import { isUnistylesMq, parseMq } from '../../mq'
-import type { UnistyleDependency } from '../../specs/NativePlatform'
+import type { UnistyleDependency } from '../../specs/NativePlatform/NativePlatform.nitro'
 import { ColorScheme, Orientation } from '../../specs/types'
 import type { StyleSheet, StyleSheetWithSuperPowers, UnistylesValues } from '../../types/stylesheet'
+import { isUnistylesMq, parseMq } from '../../utils'
 import * as unistyles from '../services'
 import { keyInObject, reduceObject } from './common'
 

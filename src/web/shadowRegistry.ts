@@ -1,4 +1,4 @@
-import { UnistyleDependency } from '../specs'
+import { UnistyleDependency } from '../specs/NativePlatform/NativePlatform.nitro'
 import type { UnistylesTheme, UnistylesValues } from '../types'
 import { deepMergeObjects } from '../utils'
 import type { UnistylesServices } from './types'

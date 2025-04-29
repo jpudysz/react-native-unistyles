@@ -34,5 +34,8 @@ jobs:
       - name: Type check files
         run: yarn tsc
 
+      - name: Check for circular dependencies
+        run: yarn circular:check
+
       - name: Run tests
         run: yarn test

@@ -61,7 +61,7 @@ export class CSSState {
     }
 
     add = (hash: string, values: UnistylesValues) => {
-        convertToCSS(hash, convertUnistyles(values), this)
+        convertToCSS(hash, convertUnistyles(values, this.services.runtime), this)
 
         if (this.styleTag) {
             this.styleTag.innerText = this.getStyles()
