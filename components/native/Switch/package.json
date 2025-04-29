@@ -1,5 +1,6 @@
 {
   "main": "../../../lib/commonjs/components/native/Switch.js",
   "module": "../../../lib/module/components/native/Switch.js",
+  "browser": "../../../lib/module/components/native/Switch.js",
   "react-native": "../../../src/components/native/Switch.tsx"
 }

@@ -1,5 +1,6 @@
 {
   "main": "../../../lib/commonjs/components/native/ScrollView.js",
   "module": "../../../lib/module/components/native/ScrollView.js",
+  "browser": "../../../lib/module/components/native/ScrollView.js",
   "react-native": "../../../src/components/native/ScrollView.tsx"
 }

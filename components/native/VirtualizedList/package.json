@@ -1,5 +1,6 @@
 {
   "main": "../../../lib/commonjs/components/native/VirtualizedList.js",
   "module": "../../../lib/module/components/native/VirtualizedList.js",
+  "browser": "../../../lib/module/components/native/VirtualizedList.js",
   "react-native": "../../../src/components/native/VirtualizedList.tsx"
 }

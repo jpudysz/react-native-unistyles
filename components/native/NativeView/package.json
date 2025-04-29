@@ -1,5 +1,6 @@
 {
   "main": "../../../lib/commonjs/components/native/NativeView.js",
   "module": "../../../lib/module/components/native/NativeView.js",
+  "browser": "../../../lib/module/components/native/NativeView.js",
   "react-native": "../../../src/components/native/NativeView.native.tsx"
 }

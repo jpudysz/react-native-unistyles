@@ -17,17 +17,20 @@
   },
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
+  "browser": "lib/module/index.js",
   "types": "lib/typescript/src/index.d.ts",
   "source": "src/index",
   "exports": {
     ".": {
       "types": "./lib/typescript/src/index.d.ts",
       "import": "./lib/module/index.js",
+      "browser": "./lib/module/index.js",
       "react-native": "./src/index.ts",
       "default": "./lib/commonjs/index.js"
     },
     "./components/native/*": {
       "import": "./lib/module/components/native/*",
+      "browser": "./lib/module/components/native/*",
       "react-native": "./src/components/native/*",
       "default": "./lib/commonjs/components/native/*"
     },
@@ -40,6 +43,7 @@
     "./server": {
       "types": "./lib/typescript/src/server/index.d.ts",
       "import": "./lib/module/server/index.js",
+      "browser": "./lib/module/server/index.js",
       "react-native": "./src/server.ts",
       "default": "./lib/commonjs/server/index.js"
     }
