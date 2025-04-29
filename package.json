@@ -13,7 +13,8 @@
     "precommit": "concurrently 'yarn tsc' 'yarn lint' 'yarn check' 'yarn test' 'yarn circular:check'",
     "release": "release-it",
     "plugin:build": "node plugin/esbuild.js",
-    "circular:check": "dpdm --no-warning --no-tree -T --exit-code circular:1 src/**/*.ts"
+    "circular:check": "dpdm --no-warning --no-tree -T --exit-code circular:1 src/**/*.ts",
+    "components:build": "node build-components.js"
   },
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
