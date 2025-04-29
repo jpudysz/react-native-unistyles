@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { isUnistylesMq, isValidMq, parseMq } from '../mq'
+import { isUnistylesMq, isValidMq, parseMq } from '../utils'
 
 export const useMedia = (config: { mq: symbol }) => {
     const disposeRef = useRef(() => {})

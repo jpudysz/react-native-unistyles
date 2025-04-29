@@ -2,7 +2,7 @@ import React from 'react'
 import type { ViewStyle } from 'react-native'
 import type { UnistylesValues } from '../types'
 import { copyComponentProperties } from '../utils'
-import { createUnistylesRef } from '../web/utils'
+import { createUnistylesRef } from '../web/utils/createUnistylesRef'
 import { getClassName } from './getClassname'
 import { maybeWarnAboutMultipleUnistyles } from './warn'
 

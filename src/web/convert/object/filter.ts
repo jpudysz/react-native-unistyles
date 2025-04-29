@@ -1,6 +1,6 @@
 import type { DropShadowValue } from 'react-native'
-import { isUnistylesMq } from '../../../mq'
-import * as unistyles from '../../services'
+import { isUnistylesMq } from '../../../utils'
+import type { UnistylesRuntime } from '../../runtime'
 import { hyphenate } from '../../utils'
 import type { Filters } from '../types'
 import { normalizeColor, normalizeNumericValue } from '../utils'
@@ -12,7 +12,7 @@ const getDropShadowStyle = (dropShadow: DropShadowValue) => {
     return `${normalizeColor(String(color))} ${normalizeNumericValue(offsetX)} ${normalizeNumericValue(offsetY)} ${normalizeNumericValue(standardDeviation)}`
 }
 
-export const getFilterStyle = (filters: Array<Filters>) => {
+export const getFilterStyle = (filters: Array<Filters>, runtime: UnistylesRuntime) => {
     const restFilters = filters.filter(filter => Object.keys(filter)[0] !== 'dropShadow')
     const dropShadow = (() => {
         const dropShadowValue = filters.find(filter => Object.keys(filter)[0] === 'dropShadow')?.dropShadow as Record<string, any>
@@ -21,7 +21,7 @@ export const getFilterStyle = (filters: Array<Filters>) => {
             return []
         }
 
-        const breakpoints = Object.keys(dropShadowValue).filter(key => Object.keys(unistyles.services.runtime.breakpoints).includes(key) || isUnistylesMq(key))
+        const breakpoints = Object.keys(dropShadowValue).filter(key => Object.keys(runtime.breakpoints).includes(key) || isUnistylesMq(key))
         const breakpointsDropShadow = Object.fromEntries(breakpoints.map(breakpoint => [breakpoint, getDropShadowStyle(dropShadowValue[breakpoint])]))
 
         if (breakpoints.length === 0) {

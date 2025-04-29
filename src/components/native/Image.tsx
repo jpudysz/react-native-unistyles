@@ -4,7 +4,8 @@ import { getClassName } from '../../core'
 import { maybeWarnAboutMultipleUnistyles } from '../../core/warn'
 import type { UnistylesValues } from '../../types'
 import { copyComponentProperties } from '../../utils'
-import { checkForProp, createUnistylesRef } from '../../web/utils'
+import { checkForProp } from '../../web/utils'
+import { createUnistylesRef } from '../../web/utils/createUnistylesRef'
 
 type Props = ComponentProps<typeof NativeImage> & {
     style?: UnistylesValues

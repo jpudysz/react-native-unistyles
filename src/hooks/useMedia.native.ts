@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useState } from 'react'
-import { isUnistylesMq, isValidMq, parseMq } from '../mq'
 import { StyleSheet, UnistyleDependency, UnistylesRuntime } from '../specs'
+import { isUnistylesMq, isValidMq, parseMq } from '../utils'
 
 export const useMedia = (config: { mq: symbol }) => {
     const computeIsVisible = (): boolean => {
