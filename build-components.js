@@ -1,4 +1,3 @@
-const fsPromise = require('node:fs/promises')
 const fs = require('node:fs')
 
 const REACT_NATIVE_COMPONENT_NAMES = [
