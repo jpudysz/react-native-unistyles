@@ -1,7 +1,27 @@
 import React from 'react'
 import { Link } from 'expo-router'
-import { Pressable, View, Text } from 'react-native'
+import { Pressable, View, Text, ScrollView, FlatList, SectionList } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
+
+const DATA = [
+  {
+    title: 'Main dishes',
+    data: ['Pizza', 'Burger', 'Risotto'],
+  },
+  {
+    title: 'Sides',
+    data: ['French Fries', 'Onion Rings', 'Fried Shrimps'],
+  },
+  {
+    title: 'Drinks',
+    data: ['Water', 'Coke', 'Beer'],
+  },
+  {
+    title: 'Desserts',
+    data: ['Cheese Cake', 'Ice Cream'],
+  },
+];
+
 
 export default function HomeScreen() {
     styles.useVariants({
@@ -9,20 +29,19 @@ export default function HomeScreen() {
     })
 
     return (
-        <View style={styles.container()}>
-            <View style={styles.test}>
-                <Text style={styles.typography}>
-                    Hello world
-                </Text>
-                <Link href="/explore" asChild>
-                    <Pressable style={styles.button}>
-                        <Text style={styles.typography}>
-                            Explore
-                        </Text>
-                    </Pressable>
-                </Link>
-            </View>
-        </View>
+       <SectionList
+        sections={DATA}
+        keyExtractor={(item, index) => item + index}
+        contentContainerStyle={styles.container()}
+        renderItem={({item}) => (
+          <View>
+            <Text>{item}</Text>
+          </View>
+        )}
+        renderSectionHeader={({section: {title}}) => (
+          <Text>{title}</Text>
+        )}
+      />
     )
 }
 
@@ -31,7 +50,7 @@ const styles = StyleSheet.create(theme => ({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: theme.colors.backgroundColor
+        backgroundColor: 'blue'
     }),
     typography: {
         fontSize: 20,
