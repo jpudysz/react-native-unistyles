@@ -1,12 +1,13 @@
 import type { UnistylesValues } from '../../types'
 import { deepMergeObjects } from '../../utils'
+import type { UnistylesRuntime } from '../runtime'
 import { getBoxShadow, getFilterStyle, getTransformStyle } from './object'
 import { isPseudo } from './pseudo'
 import { getBoxShadowStyle, getTextShadowStyle } from './shadow'
 import { getStyle } from './style'
 import { isBoxShadow, isFilter, isShadow, isTextShadow, isTransform } from './utils'
 
-export const convertUnistyles = (value: UnistylesValues) => {
+export const convertUnistyles = (value: UnistylesValues, runtime: UnistylesRuntime) => {
     // Flag to mark if textShadow is already created
     let hasTextShadow = false
     // Flag to mark if boxShadow is already created
@@ -20,7 +21,7 @@ export const convertUnistyles = (value: UnistylesValues) => {
 
         // Pseudo classes :hover, :before etc.
         if (isPseudo(unistylesKey)) {
-            const flattenValues = convertUnistyles(unistylesValue as UnistylesValues)
+            const flattenValues = convertUnistyles(unistylesValue as UnistylesValues, runtime)
 
             return { [unistylesKey]: flattenValues }
         }
@@ -48,7 +49,7 @@ export const convertUnistyles = (value: UnistylesValues) => {
         }
 
         if (isFilter(unistylesKey, unistylesValue)) {
-            return getFilterStyle(unistylesValue)
+            return getFilterStyle(unistylesValue, runtime)
         }
 
         if (isBoxShadow(unistylesKey, unistylesValue)) {

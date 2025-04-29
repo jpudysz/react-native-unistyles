@@ -5,7 +5,8 @@ import { getClassName } from '../../core'
 import { maybeWarnAboutMultipleUnistyles } from '../../core/warn'
 import type { UnistylesValues } from '../../types'
 import { copyComponentProperties } from '../../utils'
-import { createUnistylesRef, keyInObject } from '../../web/utils'
+import { keyInObject } from '../../web/utils'
+import { createUnistylesRef } from '../../web/utils/createUnistylesRef'
 
 type Props = {
     style?: UnistylesValues

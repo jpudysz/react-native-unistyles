@@ -41,3 +41,28 @@ export const copyComponentProperties = (Component: any, UnistylesComponent: any)
 
     return UnistylesComponent
 }
+
+const IS_UNISTYLES_REGEX = /:([hw])\[(\d+)(?:,\s*(\d+|Infinity))?]/
+const UNISTYLES_WIDTH_REGEX = /:(w)\[(\d+)(?:,\s*(\d+|Infinity))?]/
+const UNISTYLES_HEIGHT_REGEX = /:(h)\[(\d+)(?:,\s*(\d+|Infinity))?]/
+
+export const isUnistylesMq = (mq: string) => IS_UNISTYLES_REGEX.test(mq)
+
+export const parseMq = (mq: string) => {
+    const [, width, fromW, toW] = UNISTYLES_WIDTH_REGEX.exec(mq) || []
+    const [, height, fromH, toH] = UNISTYLES_HEIGHT_REGEX.exec(mq) || []
+
+    return {
+        minWidth: !width || fromW === 'Infinity' ? undefined : Number(fromW),
+        maxWidth: !width || toW === 'Infinity' ? undefined : Number(toW),
+        minHeight: !height || fromH === 'Infinity' ? undefined : Number(fromH),
+        maxHeight: !height || toH === 'Infinity' ? undefined : Number(toH),
+    }
+}
+
+export const isValidMq = (parsedMQ: ReturnType<typeof parseMq>) => {
+    const isWidthValid = parsedMQ.minWidth === undefined || parsedMQ.maxWidth === undefined || parsedMQ.minWidth <= parsedMQ.maxWidth
+    const isHeightValid = parsedMQ.minHeight === undefined || parsedMQ.maxHeight === undefined || parsedMQ.minHeight <= parsedMQ.maxHeight
+
+    return isWidthValid && isHeightValid
+}

@@ -10,9 +10,10 @@
     "check": "biome check --write",
     "check:ci": "biome check",
     "prepare": "husky && bob build && yarn plugin:build",
-    "precommit": "concurrently 'yarn tsc' 'yarn lint' 'yarn check' 'yarn test'",
+    "precommit": "concurrently 'yarn tsc' 'yarn lint' 'yarn check' 'yarn test' 'yarn circular:check'",
     "release": "release-it",
-    "plugin:build": "node plugin/esbuild.js"
+    "plugin:build": "node plugin/esbuild.js",
+    "circular:check": "dpdm --no-warning --no-tree -T --exit-code circular:1 src/**/*.ts"
   },
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
@@ -102,6 +103,7 @@
     "babel-plugin-tester": "11.0.4",
     "commitlint": "19.7.1",
     "concurrently": "9.1.2",
+    "dpdm": "3.14.0",
     "esbuild": "0.25.0",
     "husky": "9.1.7",
     "jest": "29.7.0",
