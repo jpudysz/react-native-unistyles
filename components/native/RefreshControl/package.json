@@ -1,5 +1,6 @@
 {
   "main": "../../../lib/commonjs/components/native/RefreshControl.js",
   "module": "../../../lib/module/components/native/RefreshControl.js",
+  "browser": "../../../lib/module/components/native/RefreshControl.js",
   "react-native": "../../../src/components/native/RefreshControl.tsx"
 }

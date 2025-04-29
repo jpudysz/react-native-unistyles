@@ -1,5 +1,6 @@
 {
   "main": "../../../lib/commonjs/components/native/TouchableOpacity.js",
   "module": "../../../lib/module/components/native/TouchableOpacity.js",
+  "browser": "../../../lib/module/components/native/TouchableOpacity.js",
   "react-native": "../../../src/components/native/TouchableOpacity.tsx"
 }
