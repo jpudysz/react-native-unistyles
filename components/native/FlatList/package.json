@@ -1,5 +1,6 @@
 {
   "main": "../../../lib/commonjs/components/native/FlatList.js",
   "module": "../../../lib/module/components/native/FlatList.js",
+  "browser": "../../../lib/module/components/native/FlatList.js",
   "react-native": "../../../src/components/native/FlatList.tsx"
 }

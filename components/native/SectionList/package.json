@@ -1,5 +1,6 @@
 {
   "main": "../../../lib/commonjs/components/native/SectionList.js",
   "module": "../../../lib/module/components/native/SectionList.js",
+  "browser": "../../../lib/module/components/native/SectionList.js",
   "react-native": "../../../src/components/native/SectionList.tsx"
 }
