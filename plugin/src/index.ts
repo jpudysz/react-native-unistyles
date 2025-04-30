@@ -10,6 +10,13 @@ import type { UnistylesPluginPass } from './types'
 import { extractVariants } from './variants'
 
 export default function (): PluginObj<UnistylesPluginPass> {
+    if (process.env.NODE_ENV === 'test') {
+        return {
+            name: 'babel-react-native-unistyles',
+            visitor: {}
+        }
+    }
+
     return {
         name: 'babel-react-native-unistyles',
         visitor: {
