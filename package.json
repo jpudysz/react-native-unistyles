@@ -3,8 +3,8 @@
   "version": "3.0.0-nightly-20250428",
   "description": "Level up your React Native StyleSheet",
   "scripts": {
-    "test": "jest",
-    "test:coverage": "jest --passWithNoTests --coverage",
+    "test": "NODE_ENV=babel-test jest",
+    "test:coverage": "NODE_ENV=babel-test jest --passWithNoTests --coverage",
     "tsc": "node_modules/typescript/bin/tsc --noEmit",
     "lint": "biome lint",
     "check": "biome check --write",
