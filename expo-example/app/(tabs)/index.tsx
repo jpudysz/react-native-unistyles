@@ -1,12 +1,13 @@
 import React from 'react'
 import { Link } from 'expo-router'
 import { Pressable, View, Text } from 'react-native'
-import { StyleSheet } from 'react-native-unistyles'
+import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
 
 export default function HomeScreen() {
     styles.useVariants({
         variant: 'blue'
     })
+
 
     return (
         <View style={styles.container()}>
@@ -21,6 +22,11 @@ export default function HomeScreen() {
                         </Text>
                     </Pressable>
                 </Link>
+                <Pressable onPress={() => UnistylesRuntime.getTheme()}>
+                    <Text style={styles.typography}>
+                        Press me
+                    </Text>
+                </Pressable>
             </View>
         </View>
     )
