@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "test": "jest"
   },
   "dependencies": {
     "@expo/metro-runtime": "4.0.1",
@@ -29,9 +30,19 @@
     "react-native-worklets": "0.1.0"
   },
   "devDependencies": {
-    "@babel/core": "7.26.9",
+    "@babel/core": "7.26.10",
+    "@testing-library/react-native": "13.2.0",
+    "@types/jest": "29.5.14",
     "@types/react": "18.3.18",
+    "jest": "29.7.0",
+    "jest-expo": "52.0.6",
     "typescript": "5.7.3"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "setupFiles": [
+      "../src/mocks.ts"
+    ]
   },
   "private": true
 }
