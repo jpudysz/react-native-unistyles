@@ -3,7 +3,7 @@
   "version": "3.0.0-nightly-20250428",
   "description": "Level up your React Native StyleSheet",
   "scripts": {
-    "test": "NODE_ENV=babel-test jest",
+    "test": "NODE_ENV=babel-test jest ./plugin",
     "test:coverage": "NODE_ENV=babel-test jest --passWithNoTests --coverage",
     "tsc": "node_modules/typescript/bin/tsc --noEmit",
     "lint": "biome lint",
@@ -28,6 +28,12 @@
       "browser": "./lib/module/index.js",
       "react-native": "./src/index.ts",
       "default": "./lib/commonjs/index.js"
+    },
+    "./mocks": {
+      "import": "./lib/module/mocks.js",
+      "browser": "./lib/module/mocks.js",
+      "react-native": "./src/mocks.ts",
+      "default": "./lib/commonjs/mocks.js"
     },
     "./components/native/*": {
       "import": "./lib/module/components/native/*",
