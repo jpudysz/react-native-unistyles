@@ -715,6 +715,12 @@ function extractVariants(path2, state) {
 
 // plugin/src/index.ts
 function index_default() {
+  if (process.env.NODE_ENV === "test") {
+    return {
+      name: "babel-react-native-unistyles",
+      visitor: {}
+    };
+  }
   return {
     name: "babel-react-native-unistyles",
     visitor: {
