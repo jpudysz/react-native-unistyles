@@ -29,6 +29,7 @@ Pod::Spec.new do |s|
   if ENV["USE_FRAMEWORKS"]
     s.dependency "React-Core"
     add_dependency(s, "React-jsinspector", :framework_name => "jsinspector_modern")
+    add_dependency(s, "React-jsinspectortracing", :framework_name => 'jsinspector_moderntracing')
     add_dependency(s, "React-rendererconsistency", :framework_name => "React_rendererconsistency")
   end
 
