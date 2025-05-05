@@ -1,6 +1,6 @@
 import type { UnistylesBreakpoints } from './global'
+import { UnistylesRuntime } from './specs'
 import type { Nullable } from './types'
-import { UnistylesRuntime } from './web'
 
 type MQValue = keyof UnistylesBreakpoints | number
 
