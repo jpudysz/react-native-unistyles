@@ -11,16 +11,6 @@ type Registry = {
     breakpoints: UnistylesBreakpoints
 }
 
-jest.mock('react-native', () => ({
-    TurboModuleRegistry: {
-        get: () => ({})
-    },
-    StyleSheet: {},
-    Platform: {
-        OS: 'headless'
-    }
-}))
-
 jest.mock('react-native-nitro-modules', () => ({
     NitroModules: {
         createHybridObject: () => ({
@@ -35,6 +25,7 @@ jest.mock('react-native-nitro-modules', () => ({
 }))
 
 jest.mock('react-native-unistyles', () => {
+    const React = require('react')
     const _REGISTRY: Registry = {
         themes: {},
         breakpoints: {}
@@ -70,8 +61,101 @@ jest.mock('react-native-unistyles', () => {
             height: 0
         }
     }
+    const unistylesRuntime = {
+        colorScheme: 'unspecified' as ColorScheme,
+        contentSizeCategory: 'Medium' as IOSContentSizeCategory,
+        orientation: 'portrait' as Orientation,
+        breakpoints: {},
+        dispose: () => { },
+        equals: () => false,
+        name: 'UnistylesRuntimeMock',
+        miniRuntime: miniRuntime,
+        statusBar: {
+            height: 0,
+            width: 0,
+            name: 'StatusBarMock',
+            equals: () => false,
+            setHidden: () => { },
+            setStyle: () => { }
+        },
+        navigationBar: {
+            height: 0,
+            width: 0,
+            name: 'NavigationBarMock',
+            equals: () => false,
+            setHidden: () => { },
+            dispose: () => { }
+        },
+        fontScale: 1,
+        hasAdaptiveThemes: false,
+        pixelRatio: 0,
+        rtl: false,
+        getTheme: () => {
+            return {} as UnistylesTheme
+        },
+        setTheme: () => {},
+        updateTheme: () => {},
+        setRootViewBackgroundColor: () => {},
+        _setRootViewBackgroundColor: () => {},
+        createHybridStatusBar: () => {
+            return {} as UnistylesStatusBar
+        },
+        createHybridNavigationBar: () => {
+            return {} as UnistylesNavigationBar
+        },
+        setAdaptiveThemes: () => {},
+        setImmersiveMode: () => {},
+        insets: {
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            ime: 0
+        },
+        screen: {
+            width: 0,
+            height: 0
+        },
+        breakpoint: undefined
+    } satisfies UnistylesRuntimePrivate
 
     return {
+        Hide: () => null,
+        Display: () => null,
+        ScopedTheme: () => null,
+        withUnistyles: <TComponent,>(Component: TComponent, mapper?: (theme: UnistylesTheme, runtime: typeof miniRuntime) => TComponent) => (props: any) =>
+            React.createElement(Component, {
+                ...mapper?.((Object.values(_REGISTRY.themes).at(0) ?? {}) as UnistylesTheme, miniRuntime),
+                ...props
+            }),
+        mq: {
+            only: {
+                width: () => ({
+                    and: {
+                        height: () => ({})
+                    }
+                }),
+                height: () => ({
+                    and: {
+                        width: () => ({})
+                    }
+                })
+            },
+            width: () => ({
+                and: {
+                    height: () => ({})
+                }
+            }),
+            height: () => ({
+                and: {
+                    width: () => ({})
+                }
+            })
+        },
+        useUnistyles: () => ({
+            theme: Object.values(_REGISTRY.themes).at(0) ?? {},
+            rt: unistylesRuntime
+        }),
         StyleSheet: {
             absoluteFillObject: {
                 position: 'absolute',
@@ -95,10 +179,8 @@ jest.mock('react-native-unistyles', () => {
             },
             create: (styles: any) => {
                 if (typeof styles === 'function') {
-                    const firstTheme = Object.values(_REGISTRY.themes).at(0) ?? {}
-
                     return {
-                        ...styles(firstTheme, miniRuntime),
+                        ...styles(Object.values(_REGISTRY.themes).at(0) ?? {}, miniRuntime),
                         useVariants: () => {}
                     }
                 }
@@ -128,63 +210,7 @@ jest.mock('react-native-unistyles', () => {
             dispose: () => {},
             equals: () => false
         } satisfies UnistylesStyleSheet,
-        UnistylesRuntime: {
-            colorScheme: 'unspecified' as ColorScheme,
-            contentSizeCategory: 'Medium' as IOSContentSizeCategory,
-            orientation: 'portrait' as Orientation,
-            breakpoints: {},
-            dispose: () => { },
-            equals: () => false,
-            name: 'UnistylesRuntimeMock',
-            miniRuntime: miniRuntime,
-            statusBar: {
-                height: 0,
-                width: 0,
-                name: 'StatusBarMock',
-                equals: () => false,
-                setHidden: () => { },
-                setStyle: () => { }
-            },
-            navigationBar: {
-                height: 0,
-                width: 0,
-                name: 'NavigationBarMock',
-                equals: () => false,
-                setHidden: () => { },
-                dispose: () => { }
-            },
-            fontScale: 1,
-            hasAdaptiveThemes: false,
-            pixelRatio: 0,
-            rtl: false,
-            getTheme: () => {
-                return {} as UnistylesTheme
-            },
-            setTheme: () => {},
-            updateTheme: () => {},
-            setRootViewBackgroundColor: () => {},
-            _setRootViewBackgroundColor: () => {},
-            createHybridStatusBar: () => {
-                return {} as UnistylesStatusBar
-            },
-            createHybridNavigationBar: () => {
-                return {} as UnistylesNavigationBar
-            },
-            setAdaptiveThemes: () => {},
-            setImmersiveMode: () => {},
-            insets: {
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                ime: 0
-            },
-            screen: {
-                width: 0,
-                height: 0
-            },
-            breakpoint: undefined
-        } satisfies UnistylesRuntimePrivate
+        UnistylesRuntime: unistylesRuntime
     }
 })
 
