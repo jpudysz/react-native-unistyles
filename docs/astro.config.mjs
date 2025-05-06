@@ -82,17 +82,18 @@ export default defineConfig({
 						{ label: 'Introduction', slug: 'v3/start/introduction' },
                         { label: 'Getting started', slug: 'v3/start/getting-started' },
                         { label: 'Configuration', slug: 'v3/start/configuration' },
-                        { label: 'When to use Unistyles?', slug: 'v3/start/when-to-use-unistyles', badge: 'New!' },
+                        { label: 'When to use Unistyles?', slug: 'v3/start/when-to-use-unistyles'},
                         { label: 'New features', slug: 'v3/start/new-features' },
                         { label: 'Look under the hood', slug: 'v3/start/how-unistyles-works' },
-                        { label: 'Migration guide', slug: 'v3/start/migration-guide' }
+                        { label: 'Migration guide', slug: 'v3/start/migration-guide' },
+                        { label: 'Testing', slug: 'v3/start/testing', badge: 'New!' }
 					],
 				},
                 {
                     label: 'Guides',
                     items: [
                         { label: 'Merging styles', slug: 'v3/guides/merging-styles' },
-                        { label: 'Why my view doesn\'t update?', slug: 'v3/guides/why-my-view-doesnt-update', badge: 'New!' },
+                        { label: 'Why my view doesn\'t update?', slug: 'v3/guides/why-my-view-doesnt-update' },
                         { label: 'Theming', slug: 'v3/guides/theming' },
                         { label: 'Avoiding Keyboard', slug: 'v3/guides/avoiding-keyboard' },
                         { label: 'Expo Router', slug: 'v3/guides/expo-router' },

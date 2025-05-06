@@ -1,0 +1,58 @@
+---
+title: Testing
+description: How to test Unistyles
+---
+
+import { Aside } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Testing Unistyles',
+        description: 'Learn how to test Unistyles'
+    }}
+>
+
+Unistyles provides its own mocks to help you test your components. Follow this guide to learn how to use them.
+
+### Including Mocks
+
+You don't need to mock anything manually, as Unistyles supplies all necessary mocks for its core and for `NitroModules`.
+To use them, simply include `react-native-unistyles/mocks` in your `jest.setup.ts` file.
+
+```tsx title="package.json"
+{
+    "jest": {
+        "preset": "jest-expo",  // or use own config for bare react native
+        "setupFiles": [
+            "react-native-unistyles/mocks"
+        ]
+    }
+}
+```
+
+### Include Unistyles Configuration
+
+Each `StyleSheet` requires a configuration object passed to the `StyleSheet.configure` function. This is also true in the test environment.
+Extend the configuration from the previous step by including the file where you configure Unistyles.
+
+```tsx title="package.json"
+{
+    "jest": {
+        "preset": "jest-expo",
+        "setupFiles": [
+            "react-native-unistyles/mocks",
+            "./unistyles.ts" // provide the correct path to your Unistyles configuration file
+        ]
+    }
+}
+```
+<Aside type="caution">
+You must include configuration file **after** the mocks as they provide all necessary stubs for `StyleSheet.configure`.
+</Aside>
+
+### Babel Plugin
+
+The Babel plugin is automatically disabled in the `jest` test environment or when `NODE_ENV === 'test'`.
+
+</Seo>
