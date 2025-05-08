@@ -5,6 +5,7 @@ import { ColorScheme, Orientation } from '../../specs/types'
 import type { StyleSheet, StyleSheetWithSuperPowers, UnistylesValues } from '../../types/stylesheet'
 import { isUnistylesMq, parseMq } from '../../utils'
 import * as unistyles from '../services'
+import { UNI_GENERATED_KEYS, type UniGeneratedKey, type UniGeneratedStyle } from '../types'
 import { keyInObject, reduceObject } from './common'
 
 export const schemeToTheme = (scheme: ColorScheme) => {
@@ -138,4 +139,8 @@ export const checkForAnimated = (value: any): boolean => {
     }
 
     return false
+}
+
+export const isGeneratedUnistyle = (value: Record<string, any>): value is UniGeneratedStyle => {
+    return Object.keys(value).every(key => UNI_GENERATED_KEYS.includes(key as UniGeneratedKey))
 }
