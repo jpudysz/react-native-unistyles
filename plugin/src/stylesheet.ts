@@ -1,6 +1,7 @@
 import type { NodePath } from '@babel/core'
 import * as t from '@babel/types'
 import type { UnistylesPluginPass } from './types'
+import { toPlatformPath } from './paths'
 
 type Styles = {
     [key: string]: string[]
@@ -215,7 +216,7 @@ export function isReactNativeCommonJSRequire(path: NodePath<t.CallExpression>, s
     const isReactNativeRequire = (
         isRequire &&
         requireImportName &&
-        (requireImportName.value === 'react-native' || requireImportName.value === 'react-native-web/dist/index')
+        (requireImportName.value === 'react-native' || requireImportName.value === toPlatformPath('react-native-web/dist/index'))
     )
 
     if (isReactNativeRequire && t.isVariableDeclarator(path.parent) && t.isIdentifier(path.parent.id)) {
