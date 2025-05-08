@@ -26,9 +26,16 @@ RootShadowNode::Unshared core::UnistylesCommitHook::shadowTreeWillCommit(
         return newRootShadowNode;
     }
 
+    auto& registry = core::UnistylesRegistry::get();
+
+    if (registry.trafficController.shouldStop()) {
+        registry.trafficController.resumeUnistylesTraffic();
+
+        return newRootShadowNode;
+    }
+
     // this is React Native / Reanimated commit
     // merge Unistyles updates before it completes
-    auto& registry = core::UnistylesRegistry::get();
 
     return registry.trafficController.withLock([&](){
         auto& shadowLeafUpdates = registry.trafficController.getUpdates();
