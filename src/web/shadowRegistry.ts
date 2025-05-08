@@ -1,8 +1,8 @@
 import { UnistyleDependency } from '../specs/NativePlatform/NativePlatform.nitro'
 import type { UnistylesTheme, UnistylesValues } from '../types'
 import { deepMergeObjects } from '../utils'
-import type { UnistylesServices } from './types'
-import { extractSecrets, extractUnistyleDependencies } from './utils'
+import type { UniGeneratedStyle, UnistylesServices } from './types'
+import { extractSecrets, extractUnistyleDependencies, isGeneratedUnistyle } from './utils'
 import { getVariants } from './variants'
 
 export class UnistylesShadowRegistry {
@@ -28,6 +28,13 @@ export class UnistylesShadowRegistry {
     }
 
     addStyles = (unistyles: Array<UnistylesValues>, forChild?: boolean) => {
+        const [firstStyle] = unistyles
+
+        // If it is already a generated style, return it
+        if (firstStyle && isGeneratedUnistyle(firstStyle)) {
+            return firstStyle as UniGeneratedStyle
+        }
+
         const getParsedStyles = () => {
             const allStyles = unistyles.map(unistyle => {
                 const secrets = extractSecrets(unistyle)
