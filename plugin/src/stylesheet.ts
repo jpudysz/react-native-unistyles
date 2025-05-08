@@ -1,7 +1,7 @@
 import type { NodePath } from '@babel/core'
 import * as t from '@babel/types'
-import type { UnistylesPluginPass } from './types'
 import { toPlatformPath } from './paths'
+import type { UnistylesPluginPass } from './types'
 
 type Styles = {
     [key: string]: string[]
