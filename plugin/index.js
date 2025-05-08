@@ -83,18 +83,6 @@ var NATIVE_COMPONENTS_PATHS = {
 
 // plugin/src/exotic.ts
 var t = __toESM(require("@babel/types"));
-
-// plugin/src/paths.ts
-var import_node_path = __toESM(require("node:path"));
-var isWindows = process.platform === "win32";
-var toWinPath = (pathString) => {
-  return import_node_path.default.normalize(pathString).replace(/\//g, "\\");
-};
-var toPlatformPath = (pathString) => {
-  return isWindows ? toWinPath(pathString) : pathString;
-};
-
-// plugin/src/exotic.ts
 function handleExoticImport(path2, state, exoticImport) {
   const specifiers = path2.node.specifiers;
   const source = path2.node.source;
@@ -113,7 +101,7 @@ function handleExoticImport(path2, state, exoticImport) {
         const newImport = t.importDeclaration(
           [t.importDefaultSpecifier(t.identifier(specifier.local.name))],
           t.stringLiteral(
-            state.opts.isLocal ? state.file.opts.filename?.split("react-native-unistyles").at(0)?.concat(toPlatformPath(`react-native-unistyles/components/native/${rule.mapTo}`)) ?? "" : toPlatformPath(`react-native-unistyles/components/native/${rule.mapTo}`)
+            state.opts.isLocal ? state.file.opts.filename?.split("react-native-unistyles").at(0)?.concat(`react-native-unistyles/components/native/${rule.mapTo}`) ?? "" : `react-native-unistyles/components/native/${rule.mapTo}`
           )
         );
         path2.replaceWith(newImport);
@@ -121,7 +109,7 @@ function handleExoticImport(path2, state, exoticImport) {
         const newImport = t.importDeclaration(
           [t.importSpecifier(t.identifier(rule.mapTo), t.identifier(rule.mapTo))],
           t.stringLiteral(
-            state.opts.isLocal ? state.file.opts.filename?.split("react-native-unistyles").at(0)?.concat(toPlatformPath(`react-native-unistyles/components/native/${rule.mapTo}`)) ?? "" : toPlatformPath(`react-native-unistyles/components/native/${rule.mapTo}`)
+            state.opts.isLocal ? state.file.opts.filename?.split("react-native-unistyles").at(0)?.concat(`react-native-unistyles/components/native/${rule.mapTo}`) ?? "" : `react-native-unistyles/components/native/${rule.mapTo}`
           )
         );
         path2.node.specifiers = specifiers.filter((s) => s !== specifier);
@@ -152,7 +140,7 @@ function addUnistylesImport(path2, state) {
     }
   });
   names.forEach((name) => {
-    const rnWebImport = path2.node.body.find((node) => t2.isImportDeclaration(node) && node.source.value === toPlatformPath(`react-native-web/dist/exports/${name}`));
+    const rnWebImport = path2.node.body.find((node) => t2.isImportDeclaration(node) && node.source.value === `react-native-web/dist/exports/${name}`);
     if (rnWebImport) {
       rnWebImport.specifiers = [];
     }
@@ -161,7 +149,7 @@ function addUnistylesImport(path2, state) {
     const newImport = t2.importDeclaration(
       [t2.importSpecifier(t2.identifier(localName), t2.identifier(name))],
       t2.stringLiteral(
-        state.opts.isLocal ? toPlatformPath(state.file.opts.filename?.split("react-native-unistyles").at(0)?.concat(`react-native-unistyles/src/components/native/${name}`) ?? "") : toPlatformPath(`react-native-unistyles/components/native/${name}`)
+        state.opts.isLocal ? state.file.opts.filename?.split("react-native-unistyles").at(0)?.concat(`react-native-unistyles/src/components/native/${name}`) ?? "" : `react-native-unistyles/components/native/${name}`
       )
     );
     path2.node.body.unshift(newImport);
@@ -177,13 +165,23 @@ function addUnistylesRequire(path2, state) {
       t2.variableDeclarator(
         t2.identifier(uniqueName),
         t2.callExpression(t2.identifier("require"), [
-          t2.stringLiteral(toPlatformPath(`react-native-unistyles/src/components/native/${componentName}`))
+          t2.stringLiteral(`react-native-unistyles/src/components/native/${componentName}`)
         ])
       )
     ]);
     path2.node.body.unshift(newRequire);
   });
 }
+
+// plugin/src/paths.ts
+var import_node_path = __toESM(require("node:path"));
+var isWindows = process.platform === "win32";
+var toWinPath = (pathString) => {
+  return import_node_path.default.normalize(pathString).replace(/\//g, "\\");
+};
+var toPlatformPath = (pathString) => {
+  return isWindows ? toWinPath(pathString) : pathString;
+};
 
 // plugin/src/ref.ts
 var t3 = __toESM(require("@babel/types"));
@@ -345,7 +343,7 @@ function isUnistylesCommonJSRequire(path2, state) {
 function isReactNativeCommonJSRequire(path2, state) {
   const isRequire = t4.isIdentifier(path2.node.callee) && path2.node.arguments.length > 0 && path2.node.callee.name === "require";
   const requireImportName = path2.node.arguments.find((node) => t4.isStringLiteral(node));
-  const isReactNativeRequire = isRequire && requireImportName && (requireImportName.value === "react-native" || requireImportName.value === toPlatformPath("react-native-web/dist/index"));
+  const isReactNativeRequire = isRequire && requireImportName && (requireImportName.value === "react-native" || requireImportName.value === "react-native-web/dist/index");
   if (isReactNativeRequire && t4.isVariableDeclarator(path2.parent) && t4.isIdentifier(path2.parent.id)) {
     state.file.reactNativeCommonJSName = path2.parent.id.name;
   }
@@ -812,7 +810,7 @@ function index_default() {
             }
           });
         }
-        if (importSource.includes(toPlatformPath("react-native/Libraries"))) {
+        if (importSource.includes("react-native/Libraries")) {
           handleExoticImport(path2, state, NATIVE_COMPONENTS_PATHS);
         }
         if (!state.file.forceProcessing && Array.isArray(state.opts.autoProcessImports)) {
