@@ -85,19 +85,20 @@ var NATIVE_COMPONENTS_PATHS = {
 var t = __toESM(require("@babel/types"));
 
 // plugin/src/paths.ts
+var import_node_path = __toESM(require("node:path"));
 var isWindows = process.platform === "win32";
 var toWinPath = (pathString) => {
-  return pathString;
+  return import_node_path.default.normalize(pathString).replace(/\//g, "\\");
 };
 var toPlatformPath = (pathString) => {
   return isWindows ? toWinPath(pathString) : pathString;
 };
 
 // plugin/src/exotic.ts
-function handleExoticImport(path, state, exoticImport) {
-  const specifiers = path.node.specifiers;
-  const source = path.node.source;
-  if (path.node.importKind !== "value") {
+function handleExoticImport(path2, state, exoticImport) {
+  const specifiers = path2.node.specifiers;
+  const source = path2.node.source;
+  if (path2.node.importKind !== "value") {
     return;
   }
   specifiers.forEach((specifier) => {
@@ -115,7 +116,7 @@ function handleExoticImport(path, state, exoticImport) {
             state.opts.isLocal ? state.file.opts.filename?.split("react-native-unistyles").at(0)?.concat(toPlatformPath(`react-native-unistyles/components/native/${rule.mapTo}`)) ?? "" : toPlatformPath(`react-native-unistyles/components/native/${rule.mapTo}`)
           )
         );
-        path.replaceWith(newImport);
+        path2.replaceWith(newImport);
       } else {
         const newImport = t.importDeclaration(
           [t.importSpecifier(t.identifier(rule.mapTo), t.identifier(rule.mapTo))],
@@ -123,11 +124,11 @@ function handleExoticImport(path, state, exoticImport) {
             state.opts.isLocal ? state.file.opts.filename?.split("react-native-unistyles").at(0)?.concat(toPlatformPath(`react-native-unistyles/components/native/${rule.mapTo}`)) ?? "" : toPlatformPath(`react-native-unistyles/components/native/${rule.mapTo}`)
           )
         );
-        path.node.specifiers = specifiers.filter((s) => s !== specifier);
-        if (path.node.specifiers.length === 0) {
-          path.replaceWith(newImport);
+        path2.node.specifiers = specifiers.filter((s) => s !== specifier);
+        if (path2.node.specifiers.length === 0) {
+          path2.replaceWith(newImport);
         } else {
-          path.insertBefore(newImport);
+          path2.insertBefore(newImport);
         }
       }
       return;
@@ -137,12 +138,12 @@ function handleExoticImport(path, state, exoticImport) {
 
 // plugin/src/import.ts
 var t2 = __toESM(require("@babel/types"));
-function addUnistylesImport(path, state) {
+function addUnistylesImport(path2, state) {
   const localNames = Object.keys(state.reactNativeImports);
   const names = Object.values(state.reactNativeImports);
   const pairs = Object.entries(state.reactNativeImports);
   const nodesToRemove = [];
-  path.node.body.forEach((node) => {
+  path2.node.body.forEach((node) => {
     if (t2.isImportDeclaration(node) && node.source.value === "react-native") {
       node.specifiers = node.specifiers.filter((specifier) => !localNames.some((name) => name === specifier.local.name));
       if (node.specifiers.length === 0) {
@@ -151,7 +152,7 @@ function addUnistylesImport(path, state) {
     }
   });
   names.forEach((name) => {
-    const rnWebImport = path.node.body.find((node) => t2.isImportDeclaration(node) && node.source.value === toPlatformPath(`react-native-web/dist/exports/${name}`));
+    const rnWebImport = path2.node.body.find((node) => t2.isImportDeclaration(node) && node.source.value === toPlatformPath(`react-native-web/dist/exports/${name}`));
     if (rnWebImport) {
       rnWebImport.specifiers = [];
     }
@@ -160,17 +161,17 @@ function addUnistylesImport(path, state) {
     const newImport = t2.importDeclaration(
       [t2.importSpecifier(t2.identifier(localName), t2.identifier(name))],
       t2.stringLiteral(
-        state.opts.isLocal ? state.file.opts.filename?.split("react-native-unistyles").at(0)?.concat(toPlatformPath(`react-native-unistyles/src/components/native/${name}`)) ?? "" : toPlatformPath(`react-native-unistyles/components/native/${name}`)
+        state.opts.isLocal ? toPlatformPath(state.file.opts.filename?.split("react-native-unistyles").at(0)?.concat(`react-native-unistyles/src/components/native/${name}`) ?? "") : toPlatformPath(`react-native-unistyles/components/native/${name}`)
       )
     );
-    path.node.body.unshift(newImport);
+    path2.node.body.unshift(newImport);
   });
-  nodesToRemove.forEach((node) => path.node.body.splice(path.node.body.indexOf(node), 1));
+  nodesToRemove.forEach((node) => path2.node.body.splice(path2.node.body.indexOf(node), 1));
 }
 function isInsideNodeModules(state) {
   return state.file.opts.filename?.includes("node_modules") && !state.file.replaceWithUnistyles;
 }
-function addUnistylesRequire(path, state) {
+function addUnistylesRequire(path2, state) {
   Object.entries(state.reactNativeImports).forEach(([componentName, uniqueName]) => {
     const newRequire = t2.variableDeclaration("const", [
       t2.variableDeclarator(
@@ -180,14 +181,14 @@ function addUnistylesRequire(path, state) {
         ])
       )
     ]);
-    path.node.body.unshift(newRequire);
+    path2.node.body.unshift(newRequire);
   });
 }
 
 // plugin/src/ref.ts
 var t3 = __toESM(require("@babel/types"));
-function hasStringRef(path) {
-  return path.node.openingElement.attributes.find(
+function hasStringRef(path2) {
+  return path2.node.openingElement.attributes.find(
     (attr) => t3.isJSXAttribute(attr) && t3.isJSXIdentifier(attr.name, { name: "ref" }) && t3.isStringLiteral(attr.value)
   );
 }
@@ -324,8 +325,8 @@ function stringToUniqueId(str) {
   const absHash = Math.abs(hash);
   return absHash % 1e9;
 }
-function isUnistylesStyleSheet(path, state) {
-  const { callee } = path.node;
+function isUnistylesStyleSheet(path2, state) {
+  const { callee } = path2.node;
   if (!t4.isMemberExpression(callee) || !t4.isIdentifier(callee.property)) {
     return false;
   }
@@ -333,38 +334,38 @@ function isUnistylesStyleSheet(path, state) {
   const isRequire = state.file.hasUnistylesImport && callee.property.name === "create" && t4.isMemberExpression(callee.object) && t4.isIdentifier(callee.object.property) && t4.isIdentifier(callee.object.object) && callee.object.object.name === state.file.styleSheetLocalName && callee.object.property.name === "StyleSheet";
   return isImport || isRequire;
 }
-function isUnistylesCommonJSRequire(path, state) {
-  const isRequire = t4.isIdentifier(path.node.callee) && path.node.arguments.length > 0 && t4.isStringLiteral(path.node.arguments[0]) && path.node.arguments[0].value === "react-native-unistyles";
-  if (isRequire && t4.isVariableDeclarator(path.parent) && t4.isIdentifier(path.parent.id)) {
+function isUnistylesCommonJSRequire(path2, state) {
+  const isRequire = t4.isIdentifier(path2.node.callee) && path2.node.arguments.length > 0 && t4.isStringLiteral(path2.node.arguments[0]) && path2.node.arguments[0].value === "react-native-unistyles";
+  if (isRequire && t4.isVariableDeclarator(path2.parent) && t4.isIdentifier(path2.parent.id)) {
     state.file.hasUnistylesImport = true;
-    state.file.styleSheetLocalName = path.parent.id.name;
+    state.file.styleSheetLocalName = path2.parent.id.name;
   }
   return isRequire;
 }
-function isReactNativeCommonJSRequire(path, state) {
-  const isRequire = t4.isIdentifier(path.node.callee) && path.node.arguments.length > 0 && path.node.callee.name === "require";
-  const requireImportName = path.node.arguments.find((node) => t4.isStringLiteral(node));
-  const isReactNativeRequire = isRequire && requireImportName && (requireImportName.value === "react-native" || requireImportName.value === "react-native-web/dist/index");
-  if (isReactNativeRequire && t4.isVariableDeclarator(path.parent) && t4.isIdentifier(path.parent.id)) {
-    state.file.reactNativeCommonJSName = path.parent.id.name;
+function isReactNativeCommonJSRequire(path2, state) {
+  const isRequire = t4.isIdentifier(path2.node.callee) && path2.node.arguments.length > 0 && path2.node.callee.name === "require";
+  const requireImportName = path2.node.arguments.find((node) => t4.isStringLiteral(node));
+  const isReactNativeRequire = isRequire && requireImportName && (requireImportName.value === "react-native" || requireImportName.value === toPlatformPath("react-native-web/dist/index"));
+  if (isReactNativeRequire && t4.isVariableDeclarator(path2.parent) && t4.isIdentifier(path2.parent.id)) {
+    state.file.reactNativeCommonJSName = path2.parent.id.name;
   }
   return isRequire;
 }
-function isKindOfStyleSheet(path, state) {
+function isKindOfStyleSheet(path2, state) {
   if (!state.file.forceProcessing && !state.file.hasUnistylesImport) {
     return false;
   }
-  const { callee } = path.node;
+  const { callee } = path2.node;
   return t4.isMemberExpression(callee) && t4.isIdentifier(callee.property) && callee.property.name === "create" && t4.isIdentifier(callee.object);
 }
-function addStyleSheetTag(path, state) {
+function addStyleSheetTag(path2, state) {
   const str = state.filename?.replace(state.cwd, "") ?? "";
   const uniqueId = stringToUniqueId(str) + ++state.file.tagNumber;
-  path.node.arguments.push(t4.numericLiteral(uniqueId));
+  path2.node.arguments.push(t4.numericLiteral(uniqueId));
 }
-function getStylesDependenciesFromObject(path) {
+function getStylesDependenciesFromObject(path2) {
   const detectedStylesWithVariants = /* @__PURE__ */ new Set();
-  const stylesheet = path.node.arguments[0];
+  const stylesheet = path2.node.arguments[0];
   if (t4.isObjectExpression(stylesheet)) {
     stylesheet?.properties.forEach((property) => {
       if (!t4.isObjectProperty(property) || !t4.isIdentifier(property.key)) {
@@ -663,8 +664,8 @@ function addDependencies(state, styleName, unistyle, detectedDependencies) {
 
 // plugin/src/variants.ts
 var t5 = __toESM(require("@babel/types"));
-function extractVariants(path, state) {
-  const maybeVariants = path.node.body.filter((node2) => t5.isExpressionStatement(node2) && t5.isCallExpression(node2.expression) && t5.isMemberExpression(node2.expression.callee));
+function extractVariants(path2, state) {
+  const maybeVariants = path2.node.body.filter((node2) => t5.isExpressionStatement(node2) && t5.isCallExpression(node2.expression) && t5.isMemberExpression(node2.expression.callee));
   if (maybeVariants.length === 0) {
     return;
   }
@@ -687,7 +688,7 @@ function extractVariants(path, state) {
     return;
   }
   const calleeName = callee.object.name;
-  const newUniqueName = path.scope.generateUidIdentifier(calleeName);
+  const newUniqueName = path2.scope.generateUidIdentifier(calleeName);
   const shadowDeclaration = t5.variableDeclaration("const", [
     t5.variableDeclarator(newUniqueName, t5.identifier(calleeName))
   ]);
@@ -698,14 +699,14 @@ function extractVariants(path, state) {
   const finalDeclaration = t5.variableDeclaration("const", [
     t5.variableDeclarator(t5.identifier(calleeName), newCallExpression)
   ]);
-  const pathIndex = path.node.body.findIndex((bodyPath) => bodyPath === targetVariant);
-  const rest = path.node.body.slice(pathIndex + 1);
+  const pathIndex = path2.node.body.findIndex((bodyPath) => bodyPath === targetVariant);
+  const rest = path2.node.body.slice(pathIndex + 1);
   const statement = t5.blockStatement([
     finalDeclaration,
     ...rest
   ]);
-  path.node.body = [
-    ...path.node.body.slice(0, pathIndex),
+  path2.node.body = [
+    ...path2.node.body.slice(0, pathIndex),
     shadowDeclaration,
     statement
   ];
@@ -724,8 +725,8 @@ function index_default() {
     name: "babel-react-native-unistyles",
     visitor: {
       Program: {
-        enter(path, state) {
-          state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS.map(toPlatformPath).concat(state.opts.autoProcessPaths ?? []).some((path2) => state.filename?.includes(path2));
+        enter(path2, state) {
+          state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS.map(toPlatformPath).concat(state.opts.autoProcessPaths ?? []).some((path3) => state.filename?.includes(path3));
           state.file.hasAnyUnistyle = false;
           state.file.hasUnistylesImport = false;
           state.file.addUnistylesRequire = false;
@@ -735,7 +736,7 @@ function index_default() {
           state.file.tagNumber = 0;
           state.reactNativeImports = {};
           state.file.forceProcessing = state.opts.autoProcessRoot && state.filename ? state.filename.includes(toPlatformPath(`${state.file.opts.root}/${state.opts.autoProcessRoot}/`)) : false;
-          path.traverse({
+          path2.traverse({
             BlockStatement(blockPath) {
               if (isInsideNodeModules(state)) {
                 return;
@@ -744,41 +745,41 @@ function index_default() {
             }
           });
         },
-        exit(path, state) {
+        exit(path2, state) {
           if (isInsideNodeModules(state)) {
             return;
           }
           if (state.file.addUnistylesRequire) {
-            return addUnistylesRequire(path, state);
+            return addUnistylesRequire(path2, state);
           }
           if (state.file.hasAnyUnistyle || state.file.hasVariants || state.file.replaceWithUnistyles || state.file.forceProcessing) {
-            addUnistylesImport(path, state);
+            addUnistylesImport(path2, state);
           }
         }
       },
-      FunctionDeclaration(path, state) {
+      FunctionDeclaration(path2, state) {
         if (isInsideNodeModules(state)) {
           return;
         }
-        const componentName = path.node.id ? path.node.id.name : null;
+        const componentName = path2.node.id ? path2.node.id.name : null;
         if (componentName) {
           state.file.hasVariants = false;
         }
       },
-      ClassDeclaration(path, state) {
+      ClassDeclaration(path2, state) {
         if (isInsideNodeModules(state)) {
           return;
         }
-        const componentName = path.node.id ? path.node.id.name : null;
+        const componentName = path2.node.id ? path2.node.id.name : null;
         if (componentName) {
           state.file.hasVariants = false;
         }
       },
-      VariableDeclaration(path, state) {
+      VariableDeclaration(path2, state) {
         if (isInsideNodeModules(state)) {
           return;
         }
-        path.node.declarations.forEach((declaration) => {
+        path2.node.declarations.forEach((declaration) => {
           if (t6.isArrowFunctionExpression(declaration.init) || t6.isFunctionExpression(declaration.init)) {
             const componentName = declaration.id && t6.isIdentifier(declaration.id) ? declaration.id.name : null;
             if (componentName) {
@@ -787,83 +788,83 @@ function index_default() {
           }
         });
       },
-      ImportDeclaration(path, state) {
+      ImportDeclaration(path2, state) {
         const exoticImport = REPLACE_WITH_UNISTYLES_EXOTIC_PATHS.concat(state.opts.autoRemapImports ?? []).find((exotic) => state.filename?.includes(exotic.path));
         if (exoticImport) {
-          return handleExoticImport(path, state, exoticImport);
+          return handleExoticImport(path2, state, exoticImport);
         }
         if (isInsideNodeModules(state)) {
           return;
         }
-        const importSource = path.node.source.value;
+        const importSource = path2.node.source.value;
         if (importSource.includes("react-native-unistyles")) {
           state.file.hasUnistylesImport = true;
-          path.node.specifiers.forEach((specifier) => {
+          path2.node.specifiers.forEach((specifier) => {
             if (t6.isImportSpecifier(specifier) && t6.isIdentifier(specifier.imported) && specifier.imported.name === "StyleSheet") {
               state.file.styleSheetLocalName = specifier.local.name;
             }
           });
         }
         if (importSource === "react-native") {
-          path.node.specifiers.forEach((specifier) => {
+          path2.node.specifiers.forEach((specifier) => {
             if (t6.isImportSpecifier(specifier) && t6.isIdentifier(specifier.imported) && REACT_NATIVE_COMPONENT_NAMES.includes(specifier.imported.name)) {
               state.reactNativeImports[specifier.local.name] = specifier.imported.name;
             }
           });
         }
         if (importSource.includes(toPlatformPath("react-native/Libraries"))) {
-          handleExoticImport(path, state, NATIVE_COMPONENTS_PATHS);
+          handleExoticImport(path2, state, NATIVE_COMPONENTS_PATHS);
         }
         if (!state.file.forceProcessing && Array.isArray(state.opts.autoProcessImports)) {
           state.file.forceProcessing = state.opts.autoProcessImports.includes(importSource);
         }
       },
-      JSXElement(path, state) {
+      JSXElement(path2, state) {
         if (isInsideNodeModules(state)) {
           return;
         }
-        if (hasStringRef(path)) {
+        if (hasStringRef(path2)) {
           throw new Error("Detected string based ref which is not supported by Unistyles.");
         }
       },
-      MemberExpression(path, state) {
+      MemberExpression(path2, state) {
         if (isInsideNodeModules(state)) {
           return;
         }
-        if (!state.file.reactNativeCommonJSName || !t6.isIdentifier(path.node.object)) {
+        if (!state.file.reactNativeCommonJSName || !t6.isIdentifier(path2.node.object)) {
           return;
         }
-        if (path.node.object.name !== state.file.reactNativeCommonJSName || !t6.isIdentifier(path.node.property)) {
+        if (path2.node.object.name !== state.file.reactNativeCommonJSName || !t6.isIdentifier(path2.node.property)) {
           return;
         }
-        if (!REACT_NATIVE_COMPONENT_NAMES.includes(path.node.property.name)) {
+        if (!REACT_NATIVE_COMPONENT_NAMES.includes(path2.node.property.name)) {
           return;
         }
-        if (!state.reactNativeImports[path.node.property.name]) {
-          const uniqueId = path.scope.generateUidIdentifier(`reactNativeUnistyles_${path.node.property.name}`);
-          state.reactNativeImports[path.node.property.name] = uniqueId.name;
+        if (!state.reactNativeImports[path2.node.property.name]) {
+          const uniqueId = path2.scope.generateUidIdentifier(`reactNativeUnistyles_${path2.node.property.name}`);
+          state.reactNativeImports[path2.node.property.name] = uniqueId.name;
           state.file.addUnistylesRequire = true;
         }
-        path.node.object.name = state.reactNativeImports[path.node.property.name];
+        path2.node.object.name = state.reactNativeImports[path2.node.property.name];
       },
-      CallExpression(path, state) {
+      CallExpression(path2, state) {
         if (isInsideNodeModules(state)) {
           return;
         }
-        if (isUnistylesCommonJSRequire(path, state)) {
+        if (isUnistylesCommonJSRequire(path2, state)) {
           return;
         }
-        if (isReactNativeCommonJSRequire(path, state)) {
+        if (isReactNativeCommonJSRequire(path2, state)) {
           return;
         }
-        if (!isUnistylesStyleSheet(path, state) && !isKindOfStyleSheet(path, state)) {
+        if (!isUnistylesStyleSheet(path2, state) && !isKindOfStyleSheet(path2, state)) {
           return;
         }
         state.file.hasAnyUnistyle = true;
-        addStyleSheetTag(path, state);
-        const arg = t6.isAssignmentExpression(path.node.arguments[0]) ? path.node.arguments[0].right : path.node.arguments[0];
+        addStyleSheetTag(path2, state);
+        const arg = t6.isAssignmentExpression(path2.node.arguments[0]) ? path2.node.arguments[0].right : path2.node.arguments[0];
         if (t6.isObjectExpression(arg)) {
-          const detectedDependencies = getStylesDependenciesFromObject(path);
+          const detectedDependencies = getStylesDependenciesFromObject(path2);
           if (detectedDependencies) {
             if (t6.isObjectExpression(arg)) {
               arg.properties.forEach((property) => {
@@ -875,7 +876,7 @@ function index_default() {
           }
         }
         if (t6.isArrowFunctionExpression(arg) || t6.isFunctionExpression(arg)) {
-          const funcPath = t6.isAssignmentExpression(path.node.arguments[0]) ? path.get("arguments.0.right") : path.get("arguments.0");
+          const funcPath = t6.isAssignmentExpression(path2.node.arguments[0]) ? path2.get("arguments.0.right") : path2.get("arguments.0");
           const detectedDependencies = getStylesDependenciesFromFunction(funcPath);
           if (detectedDependencies) {
             const body = t6.isBlockStatement(arg.body) ? arg.body.body.find((statement) => t6.isReturnStatement(statement))?.argument : arg.body;
