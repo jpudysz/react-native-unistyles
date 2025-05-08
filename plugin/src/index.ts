@@ -139,7 +139,7 @@ export default function (): PluginObj<UnistylesPluginPass> {
                     })
                 }
 
-                if (importSource.includes(toPlatformPath('react-native/Libraries'))) {
+                if (importSource.includes('react-native/Libraries')) {
                     handleExoticImport(path, state, NATIVE_COMPONENTS_PATHS)
                 }
 
