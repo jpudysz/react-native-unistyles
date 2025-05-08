@@ -6,6 +6,7 @@ import type { StyleSheet, StyleSheetWithSuperPowers, UnistylesValues } from '../
 import { isUnistylesMq, parseMq } from '../../utils'
 import * as unistyles from '../services'
 import { keyInObject, reduceObject } from './common'
+import { UNI_GENERATED_KEYS, type UniGeneratedKey, type UniGeneratedStyle } from '../types'
 
 export const schemeToTheme = (scheme: ColorScheme) => {
     switch (scheme) {
@@ -138,4 +139,8 @@ export const checkForAnimated = (value: any): boolean => {
     }
 
     return false
+}
+
+export const isGeneratedUnistyle = (value: Record<string, any>): value is UniGeneratedStyle => {
+    return Object.keys(value).every(key => UNI_GENERATED_KEYS.includes(key as UniGeneratedKey))
 }
