@@ -35,12 +35,6 @@
       "react-native": "./src/mocks.ts",
       "default": "./lib/commonjs/mocks.js"
     },
-    "./reanimated": {
-      "import": "./lib/module/reanimated/index.js",
-      "browser": "./lib/module/reanimated/index.js",
-      "react-native": "./src/reanimated/index.ts",
-      "default": "./lib/commonjs/reanimated/index.js"
-    },
     "./components/native/*": {
       "import": "./lib/module/components/native/*",
       "browser": "./lib/module/components/native/*",
@@ -59,6 +53,13 @@
       "browser": "./lib/module/server/index.js",
       "react-native": "./src/server.ts",
       "default": "./lib/commonjs/server/index.js"
+    },
+    "./reanimated": {
+      "types": "./lib/typescript/src/reanimated/index.d.ts",
+      "import": "./lib/module/reanimated/index.js",
+      "browser": "./lib/module/reanimated/index.js",
+      "react-native": "./src/reanimated/index.ts",
+      "default": "./lib/commonjs/reanimated/index.js"
     }
   },
   "files": [
