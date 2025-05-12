@@ -2,7 +2,7 @@ import { UnistyleDependency } from '../specs/NativePlatform/NativePlatform.nitro
 import type { UnistylesTheme, UnistylesValues } from '../types'
 import { deepMergeObjects } from '../utils'
 import type { UniGeneratedStyle, UnistylesServices } from './types'
-import { extractSecrets, extractUnistyleDependencies, isGeneratedUnistyle } from './utils'
+import { extractSecrets, extractUnistyleDependencies, isGeneratedUnistyle, isServer } from './utils'
 import { getVariants } from './variants'
 
 export class UnistylesShadowRegistry {
@@ -104,7 +104,7 @@ export class UnistylesShadowRegistry {
     getScopedTheme = () => this.scopedTheme
 
     remove = (ref: any, hash?: string) => {
-        if (!(ref instanceof HTMLElement) || !hash) {
+        if (isServer() || !(ref instanceof HTMLElement) || !hash) {
             return
         }
 
