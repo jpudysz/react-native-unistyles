@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useSharedValue } from 'react-native-reanimated'
-import { UnistyleDependency, UnistylesRuntime, StyleSheet } from '../specs'
+import { StyleSheet, UnistyleDependency, UnistylesRuntime } from '../specs'
 import type { UnistylesTheme } from '../types'
 
 export const useAnimatedTheme = () => {
