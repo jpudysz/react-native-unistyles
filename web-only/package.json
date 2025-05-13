@@ -3,5 +3,4 @@
     "module": "../lib/module/web-only/index",
     "react-native": "../src/web-only/index",
     "types": "../lib/typescript/src/web-only/index"
-  }
-  
+}
