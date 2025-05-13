@@ -1,0 +1,111 @@
+---
+title: Reanimated
+description: Learn how to use Unistyles 3.0 with Reanimated
+---
+
+import { Aside } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Reanimated',
+        description: 'Learn how to use Unistyles 3.0 with Reanimated'
+    }}
+>
+
+Unistyles works seamlessly with `react-native-reanimated`. Learn best practices for combining both libraries.
+
+<Aside>
+Reanimated works the best with Unistyles in:
+- `react-native-reanimated@3.17.3` and above
+- `react-native-reanimated@4.0.0-beta.3` and above
+</Aside>
+
+### Access theme in worklets
+
+Using the theme from `UnistylesRuntime.getTheme()` will not trigger worklet updates. Importing it from `useUnistyles` will cause a re-render.
+
+That's why to use Unistyles theme in worklets (e.g. in `useAnimatedStyle`), you need to import a special hook from `react-native-unistyles/reanimated`.
+
+```tsx /useAnimatedTheme/
+import { useAnimatedTheme } from 'react-native-unistyles/reanimated'
+import Animated, { useAnimatedStyle, interpolate } from 'react-native-reanimated'
+
+export const MyAnimatedComponent = () => {
+    const theme = useAnimatedTheme()
+    const style = useAnimatedStyle(() => ({
+        backgroundColor: theme.colors.background,
+        // other animated styles
+    }))
+
+    return (
+        <Animated.View style={style} />
+    )
+}
+```
+
+<Aside>
+`useAnimatedTheme` is a first-class `SharedValue`, so you can use it in worklets.
+It also triggers worklet updates if any change occurs and doesn't cause re-renders.
+</Aside>
+
+### Merging styles
+
+When you want to use `Unistyles` styles in `Animated` components, never mix them with `Reanimated` styles:
+
+```tsx /merge-styles/
+import { StyleSheet } from 'react-native-unistyles'
+import Animated, { useAnimatedStyle } from 'react-native-reanimated'
+
+export const MyAnimatedComponent = () => {
+    const style = useAnimatedStyle(() => ({
+        ...styles.container, // never do that! 💥
+        // other animated styles
+    }))
+
+    return (
+        <Animated.View style={style} />
+    )
+}
+
+const style = StyleSheet.create(theme => ({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: theme.colors.background,
+    }
+}))
+```
+
+This will produce a single style with both `Unistyles` C++ state and `Reanimated` animation metadata, which might cause performance issues at the `ShadowTree` level (both libraries will animate and override the same style nodes).
+
+Instead, separate both styles:
+
+```tsx /separate-styles/
+import { StyleSheet } from 'react-native-unistyles'
+import Animated, { useAnimatedStyle } from 'react-native-reanimated'
+
+export const MyAnimatedComponent = () => {
+    const animatedStyles = useAnimatedStyle(() => ({
+        // animated styles
+    }))
+
+    return (
+        <Animated.View style={[styles.container, animatedStyles]} /> // ✅ Good!
+    )
+}
+
+const style = StyleSheet.create(theme => ({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: theme.colors.background,
+    }
+}))
+```
+
+With this approach, both libraries will focus on updating own styles, which will result in better performance.
+
+</Seo>

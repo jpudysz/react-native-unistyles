@@ -3,7 +3,7 @@ title: Custom Web
 description: Learn how to use Unistyles 3.0 without React Native Web
 ---
 
-import { Card } from '@astrojs/starlight/components'
+import { Card, Aside } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
 
 <Seo
@@ -13,8 +13,56 @@ import Seo from '../../../../components/Seo.astro'
     }}
 >
 
-It's possible to render Unistyles without `react-native-web` dependency.
+It's possible to render Unistyles without `react-native-web` dependency by simply creating your own web-only components.
 
-🚧 Work is progress. Guide will be released soon.
+Unfortunately, you still need to install `react-native-web` in order to run your app, because most of the react native libraries are not working without it.
+
+For this we recommend following the guidelines provided by [Expo](https://docs.expo.dev/workflow/web/).
+
+## How to create custom web components
+
+In order to create custom web components, you need to use `getWebProps` function. It takes a `StyleProp` and returns an object with `className` and `ref` properties.
+
+```tsx title="src/components/Header.tsx" /getWebProps/
+import { StyleProp, TextStyle } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import { getWebProps } from 'react-native-unistyles/web-only'
+
+type HeaderProps = {
+    style: StyleProp<TextStyle>
+    children: string
+}
+
+export const Header: React.FC<HeaderProps> = ({ style, children }) => {
+    const { ref, className } = getWebProps(style)
+
+    return (
+        <h1
+            ref={ref}
+            className={className}
+            // (or use spread operator)
+        >
+            {children}
+        </h1>
+    )
+}
+
+const style = StyleSheet.create(theme => ({
+    text: {
+        color: theme.colors.text,
+        _web: {
+            _hover: {
+                color: theme.colors.primary,
+            }
+        }
+    }
+}))
+```
+
+That's it! Now you can use your custom web components in your app.
+
+<Aside type="caution">
+    If you're creating multiplatform app, remember to create a native fallback for your web components.
+</Aside>
 
 </Seo>

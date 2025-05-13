@@ -86,7 +86,7 @@ export default defineConfig({
                         { label: 'New features', slug: 'v3/start/new-features' },
                         { label: 'Look under the hood', slug: 'v3/start/how-unistyles-works' },
                         { label: 'Migration guide', slug: 'v3/start/migration-guide' },
-                        { label: 'Testing', slug: 'v3/start/testing', badge: 'New!' }
+                        { label: 'Testing', slug: 'v3/start/testing' }
 					],
 				},
                 {
@@ -97,8 +97,9 @@ export default defineConfig({
                         { label: 'Theming', slug: 'v3/guides/theming' },
                         { label: 'Avoiding Keyboard', slug: 'v3/guides/avoiding-keyboard' },
                         { label: 'Expo Router', slug: 'v3/guides/expo-router' },
-                        { label: 'React Compiler', slug: 'v3/guides/react-compiler', badge: 'New!' },
-                        { label: 'Custom web', slug: 'v3/guides/custom-web', badge: 'WIP' },
+                        { label: 'React Compiler', slug: 'v3/guides/react-compiler' },
+                        { label: 'Custom web', slug: 'v3/guides/custom-web', badge: 'New!' },
+                        { label: 'Reanimated', slug: 'v3/guides/reanimated', badge: 'New!' },
                         { label: 'Server side rendering', slug: 'v3/guides/server-side-rendering' },
                     ]
                 },
