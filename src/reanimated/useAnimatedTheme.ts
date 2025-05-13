@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useSharedValue, type SharedValue } from 'react-native-reanimated'
+import { type SharedValue, useSharedValue } from 'react-native-reanimated'
 import { UnistyleDependency, UnistylesRuntime } from '../specs'
 import type { UnistylesTheme } from '../types'
 import { services } from '../web/services'
