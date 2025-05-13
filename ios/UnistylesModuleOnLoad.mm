@@ -10,18 +10,11 @@ using namespace margelo::nitro;
 
 RCT_EXPORT_MODULE(Unistyles)
 
-__weak RCTSurfacePresenter* _surfacePresenter;
-@synthesize callInvoker = _callInvoker;
-
 + (BOOL)requiresMainQueueSetup {
     return YES;
 }
 
-- (void)setSurfacePresenter:(id<RCTSurfacePresenterStub>)surfacePresenter {
-    _surfacePresenter = surfacePresenter;
-}
-
-- (void)installJSIBindingsWithRuntime:(jsi::Runtime&)rt {
+- (void)installJSIBindingsWithRuntime:(jsi::Runtime&)rt callInvoker:(const std::shared_ptr<facebook::react::CallInvoker> &)callInvoker {
     // function is called on: first init and every live reload
     // check if this is live reload, if so let's replace UnistylesRuntime with new runtime
     auto hasUnistylesRuntime = HybridObjectRegistry::hasHybridObject("UnistylesRuntime");
@@ -32,18 +25,17 @@ __weak RCTSurfacePresenter* _surfacePresenter;
         HybridObjectRegistry::unregisterHybridObjectConstructor("UnistylesShadowRegistry");
     }
 
-    [self createHybrids:rt];
+    [self createHybrids:rt callInvoker:callInvoker];
 }
 
-- (void)createHybrids:(jsi::Runtime&)rt {
-    auto runOnJSThread = [callInvoker = _callInvoker.callInvoker](std::function<void(jsi::Runtime& rt)> &&callback){
+- (void)createHybrids:(jsi::Runtime&)rt callInvoker:(const std::shared_ptr<facebook::react::CallInvoker> &)callInvoker {
+    auto runOnJSThread = [callInvoker](std::function<void(jsi::Runtime& rt)> &&callback){
         callInvoker->invokeAsync(std::move(callback));
     };
 
     auto nativePlatform = Unistyles::NativePlatform::create().getCxxPart();
     auto unistylesRuntime = std::make_shared<HybridUnistylesRuntime>(nativePlatform, rt, runOnJSThread);
-    auto uiManager = [_surfacePresenter scheduler].uiManager;
-    auto styleSheet = std::make_shared<HybridStyleSheet>(unistylesRuntime, uiManager);
+    auto styleSheet = std::make_shared<HybridStyleSheet>(unistylesRuntime);
 
     HybridObjectRegistry::registerHybridObjectConstructor("UnistylesRuntime", [unistylesRuntime]() -> std::shared_ptr<HybridObject>{
         return unistylesRuntime;

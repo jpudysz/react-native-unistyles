@@ -6,13 +6,9 @@
 
 #import <React/RCTEventEmitter.h>
 #import "TurboUnistyles/TurboUnistyles.h"
-#import <React/RCTSurfacePresenter.h>
-#import <React/RCTScheduler.h>
-#import <React/RCTCallInvoker.h>
-#import <React/RCTCallInvokerModule.h>
 #import <ReactCommon/RCTTurboModuleWithJSIBindings.h>
 
-@interface UnistylesModule: RCTEventEmitter<NativeTurboUnistylesSpec, RCTCallInvokerModule>
+@interface UnistylesModule: RCTEventEmitter<NativeTurboUnistylesSpec>
 @end
 
 @interface UnistylesModule()<RCTTurboModuleWithJSIBindings>

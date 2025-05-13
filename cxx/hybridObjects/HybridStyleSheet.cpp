@@ -87,7 +87,6 @@ jsi::Value HybridStyleSheet::init(jsi::Runtime &rt, const jsi::Value &thisVal, c
     registry.createState(rt);
 
     loadExternalMethods(thisVal, rt);
-    registerHooks(rt);
 
     this->isInitialized = true;
 
@@ -254,18 +253,6 @@ void HybridStyleSheet::loadExternalMethods(const jsi::Value& thisValue, jsi::Run
     auto& state = registry.getState(rt);
 
     state.registerProcessColorFunction(std::move(processColorFn));
-}
-
-void HybridStyleSheet::registerHooks(jsi::Runtime& rt) {
-    // cleanup Shadow updates
-    auto& registry = core::UnistylesRegistry::get();
-    
-    registry.trafficController.withLock([&registry](){
-        registry.trafficController.restore();
-    });
-
-    this->_unistylesCommitHook = std::make_shared<core::UnistylesCommitHook>(this->_uiManager);
-    this->_unistylesMountHook = std::make_shared<core::UnistylesMountHook>(this->_uiManager);
 }
 
 void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies) {

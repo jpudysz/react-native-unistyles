@@ -22,18 +22,12 @@ void shadow::ShadowTreeManager::updateShadowTree(const ShadowTreeRegistry& shado
             // so let's mutate Shadow Tree in single transaction
             auto transaction = [&](const RootShadowNode& oldRootShadowNode) {
                 auto affectedNodes = shadow::ShadowTreeManager::findAffectedNodes(oldRootShadowNode, updates);
-                auto newRootNode = std::static_pointer_cast<RootShadowNode>(shadow::ShadowTreeManager::cloneShadowTree(
+                
+                return  std::static_pointer_cast<RootShadowNode>(shadow::ShadowTreeManager::cloneShadowTree(
                     oldRootShadowNode,
                     updates,
                     affectedNodes
                 ));
-
-                // set unistyles trait
-                auto unistylesRootNode = std::reinterpret_pointer_cast<core::UnistylesCommitShadowNode>(newRootNode);
-
-                unistylesRootNode->addUnistylesCommitTrait();
-
-                return newRootNode;
             };
 
             // commit once!
