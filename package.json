@@ -51,8 +51,15 @@
       "types": "./lib/typescript/src/server/index.d.ts",
       "import": "./lib/module/server/index.js",
       "browser": "./lib/module/server/index.js",
-      "react-native": "./src/server.ts",
+      "react-native": "./src/server/index.ts",
       "default": "./lib/commonjs/server/index.js"
+    },
+    "./web": {
+      "types": "./lib/typescript/src/web-only/index.d.ts",
+      "import": "./lib/module/web-only/index.js",
+      "browser": "./lib/module/web-only/index.js",
+      "react-native": "./src/web-only/index.ts",
+      "default": "./lib/commonjs/web-only/index.js"
     },
     "./reanimated": {
       "types": "./lib/typescript/src/reanimated/index.d.ts",
