@@ -23,8 +23,9 @@ For this we recommend following the guidelines provided by [Expo](https://docs.e
 
 In order to create custom web components, you need to use `getWebProps` function. It takes a `StyleProp` and returns an object with `className` and `ref` properties.
 
-```tsx title="src/components/Header.tsx"
+```tsx title="src/components/Header.tsx" /getWebProps/
 import { Text, StyleProp, TextStyle } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { getWebProps } from 'react-native-unistyles/web-only'
 
 type HeaderProps = {
@@ -33,14 +34,29 @@ type HeaderProps = {
 }
 
 export const Header: React.FC<HeaderProps> = ({ style, children }) => {
-    const unistyleProps = getWebProps(style)
+    const { ref, className } = getWebProps(style)
 
     return (
-        <h1 {...unistyleProps}>
+        <h1
+            ref={ref}
+            className={className}
+            // (or use spread operator)
+        >
             {children}
         </h1>
     )
 }
+
+const style = StyleSheet.create(theme => ({
+    text: {
+        color: theme.colors.text,
+        _web: {
+            _hover: {
+                color: theme.colors.primary,
+            }
+        }
+    }
+}))
 ```
 
 Thats it! Now you can use your custom web components in your app.

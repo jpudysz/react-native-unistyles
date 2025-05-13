@@ -99,6 +99,7 @@ export default defineConfig({
                         { label: 'Expo Router', slug: 'v3/guides/expo-router' },
                         { label: 'React Compiler', slug: 'v3/guides/react-compiler' },
                         { label: 'Custom web', slug: 'v3/guides/custom-web', badge: 'New!' },
+                        { label: 'Reanimated', slug: 'v3/guides/reanimated', badge: 'New!' },
                         { label: 'Server side rendering', slug: 'v3/guides/server-side-rendering' },
                     ]
                 },
