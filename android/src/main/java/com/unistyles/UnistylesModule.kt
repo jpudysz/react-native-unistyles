@@ -5,11 +5,8 @@ import com.facebook.jni.HybridData
 import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.RuntimeExecutor
-import com.facebook.react.fabric.FabricUIManager
 import com.facebook.react.turbomodule.core.interfaces.BindingsInstallerHolder
 import com.facebook.react.turbomodule.core.interfaces.TurboModuleWithJSIBindings
-import com.facebook.react.uimanager.UIManagerHelper
-import com.facebook.react.uimanager.common.UIManagerType
 import com.margelo.nitro.unistyles.HybridNativePlatformSpec
 import com.margelo.nitro.unistyles.unistylesOnLoad.Companion.initializeNative
 
@@ -34,10 +31,8 @@ class UnistylesModule(reactContext: ReactApplicationContext): NativeTurboUnistyl
     private fun initializeHybridData(reactContext: ReactApplicationContext): HybridData {
         val runtimeExecutor = reactContext.catalystInstance?.runtimeExecutor
             ?: throw IllegalStateException("Unistyles: React Native runtime executor is not available. Please follow installation guides.")
-        val fabricUIManager = UIManagerHelper.getUIManager(reactContext, UIManagerType.FABRIC) as? FabricUIManager
-            ?: throw IllegalStateException("Unistyles: Fabric UI Manager is not available. Please follow installation guides.")
 
-        return initHybrid(runtimeExecutor, fabricUIManager, _nativePlatform)
+        return initHybrid(runtimeExecutor, _nativePlatform)
     }
 
     @DoNotStrip
@@ -46,7 +41,6 @@ class UnistylesModule(reactContext: ReactApplicationContext): NativeTurboUnistyl
     @DoNotStrip
     private external fun initHybrid(
         runtimeExecutor: RuntimeExecutor,
-        fabricUIManager: FabricUIManager,
         nativePlatform: HybridNativePlatformSpec
     ): HybridData
 }
