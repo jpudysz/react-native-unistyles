@@ -1,0 +1,1 @@
+export { useAnimatedTheme } from './useAnimatedTheme'

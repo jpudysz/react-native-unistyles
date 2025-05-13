@@ -60,6 +60,13 @@
       "browser": "./lib/module/web-only/index.js",
       "react-native": "./src/web-only/index.ts",
       "default": "./lib/commonjs/web-only/index.js"
+    },
+    "./reanimated": {
+      "types": "./lib/typescript/src/reanimated/index.d.ts",
+      "import": "./lib/module/reanimated/index.js",
+      "browser": "./lib/module/reanimated/index.js",
+      "react-native": "./src/reanimated/index.ts",
+      "default": "./lib/commonjs/reanimated/index.js"
     }
   },
   "files": [
@@ -131,6 +138,7 @@
     "react-native": "0.77.1",
     "react-native-builder-bob": "0.37.0",
     "react-native-nitro-modules": "0.25.2",
+    "react-native-reanimated": "3.17.5",
     "react-native-web": "0.19.13",
     "react-test-renderer": "18.3.1",
     "release-it": "17.11.0",
@@ -141,7 +149,13 @@
     "react": "*",
     "react-native": ">=0.76.0",
     "react-native-edge-to-edge": "*",
-    "react-native-nitro-modules": "*"
+    "react-native-nitro-modules": "*",
+    "react-native-reanimated": "*"
+  },
+  "peerDependenciesMeta": {
+    "react-native-reanimated": {
+      "optional": true
+    }
   },
   "workspaces": [
     "example",
