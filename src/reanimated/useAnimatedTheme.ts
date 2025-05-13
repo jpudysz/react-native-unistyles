@@ -8,7 +8,11 @@ export const useAnimatedTheme = () => {
     const theme = useSharedValue<UnistylesTheme>(UnistylesRuntime.getTheme())
 
     useEffect(() => {
-        services.listener.addListeners([UnistyleDependency.Theme], () => theme.set(UnistylesRuntime.getTheme()))
+        const dispose = services.listener.addListeners([UnistyleDependency.Theme], () => theme.set(UnistylesRuntime.getTheme()))
+
+        return () => {
+            dispose()
+        }
     }, [])
 
     return theme
