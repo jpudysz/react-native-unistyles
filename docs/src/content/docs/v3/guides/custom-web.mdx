@@ -24,7 +24,7 @@ For this we recommend following the guidelines provided by [Expo](https://docs.e
 In order to create custom web components, you need to use `getWebProps` function. It takes a `StyleProp` and returns an object with `className` and `ref` properties.
 
 ```tsx title="src/components/Header.tsx" /getWebProps/
-import { Text, StyleProp, TextStyle } from 'react-native'
+import { StyleProp, TextStyle } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 import { getWebProps } from 'react-native-unistyles/web-only'
 
@@ -59,7 +59,7 @@ const style = StyleSheet.create(theme => ({
 }))
 ```
 
-Thats it! Now you can use your custom web components in your app.
+That's it! Now you can use your custom web components in your app.
 
 <Aside type="caution">
     If you're creating multiplatform app, remember to create a native fallback for your web components.
