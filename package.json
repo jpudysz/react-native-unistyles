@@ -80,6 +80,8 @@
     "web",
     "components",
     "server",
+    "web-only",
+    "reanimated",
     "react-native.config.js",
     "Unistyles.podspec",
     "!plugin/__tests__",
