@@ -34,7 +34,7 @@ import Animated, { useAnimatedStyle, interpolate } from 'react-native-reanimated
 export const MyAnimatedComponent = () => {
     const theme = useAnimatedTheme()
     const style = useAnimatedStyle(() => ({
-        backgroundColor: theme.colors.background,
+        backgroundColor: theme.value.colors.background,
         // other animated styles
     }))
 
