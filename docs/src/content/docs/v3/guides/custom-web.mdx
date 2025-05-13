@@ -25,7 +25,6 @@ In order to create custom web components, you need to use `getWebProps` function
 
 ```tsx title="src/components/Header.tsx" /getWebProps/
 import { StyleProp, TextStyle } from 'react-native'
-import { StyleSheet } from 'react-native-unistyles'
 import { getWebProps } from 'react-native-unistyles/web-only'
 
 type HeaderProps = {
@@ -40,8 +39,30 @@ export const Header: React.FC<HeaderProps> = ({ style, children }) => {
         <h1
             ref={ref}
             className={className}
-            // (or use spread operator)
         >
+            {children}
+        </h1>
+    )
+}
+```
+
+Or merge multiple styles:
+
+```tsx title="src/components/Header.tsx" /getWebProps/
+import { StyleProp, TextStyle } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import { getWebProps } from 'react-native-unistyles/web-only'
+
+type HeaderProps = {
+    customStyle: StyleProp<TextStyle>
+    children: string
+}
+
+export const Header: React.FC<HeaderProps> = ({ customStyle, children }) => {
+    const webProps = getWebProps([customStyle, style.text])
+
+    return (
+        <h1 {...webProps}>
             {children}
         </h1>
     )
