@@ -20,7 +20,7 @@ void shadow::ShadowTreeManager::updateShadowTree(const ShadowTreeRegistry& shado
             // we could iterate via updates and create multiple commits
             // but it can cause performance issues for hundreds of nodes
             // so let's mutate Shadow Tree in single transaction
-            auto transaction = [&](const RootShadowNode& oldRootShadowNode) {
+            auto transaction = [&updates](const RootShadowNode& oldRootShadowNode) {
                 auto affectedNodes = shadow::ShadowTreeManager::findAffectedNodes(oldRootShadowNode, updates);
                 
                 return  std::static_pointer_cast<RootShadowNode>(shadow::ShadowTreeManager::cloneShadowTree(
@@ -65,18 +65,17 @@ void shadow::ShadowTreeManager::updateShadowTree(const ShadowTreeRegistry& shado
 AffectedNodes shadow::ShadowTreeManager::findAffectedNodes(const RootShadowNode& rootNode, ShadowLeafUpdates& updates) {
     AffectedNodes affectedNodes;
 
-    // compute affected nodes (sub tree)
-    std::for_each(updates.begin(), updates.end(), [&](const auto& pair) {
-        const auto& [family, _] = pair;
-        const auto familyAncestors = family->getAncestors(rootNode);
+    for (const auto& [family, _] : updates) {
+        auto familyAncestors = family->getAncestors(rootNode);
 
-        for (const auto& [parentNode, index] : std::ranges::reverse_view(familyAncestors)) {
+        for (auto it = familyAncestors.rbegin(); it != familyAncestors.rend(); ++it) {
+            const auto& [parentNode, index] = *it;
             const auto parentFamily = &parentNode.get().getFamily();
-            std::unordered_set<int>& affectedNode = affectedNodes[parentFamily];
-
-            affectedNode.insert(index);
+            auto [setIt, inserted] = affectedNodes.try_emplace(parentFamily, std::unordered_set<int>{});
+            
+            setIt->second.insert(index);
         }
-    });
+    }
 
     return affectedNodes;
 }
@@ -87,44 +86,53 @@ ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode
     const auto family = &shadowNode.getFamily();
     const auto rawPropsIt = updates.find(family);
     const auto childrenIt = affectedNodes.find(family);
-    auto children = shadowNode.getChildren();
 
-    // for each affected node
+    // Only copy children if we need to update them
+    std::shared_ptr<ShadowNode::ListOfShared> childrenPtr;
+    const auto& originalChildren = shadowNode.getChildren();
+
     if (childrenIt != affectedNodes.end()) {
-        // get all indexes of children and clone it recursively
+        auto children = originalChildren;
+        
         for (const auto index : childrenIt->second) {
             children[index] = cloneShadowTree(*children[index], updates, affectedNodes);
         }
+        
+        childrenPtr = std::make_shared<ShadowNode::ListOfShared>(std::move(children));
+    } else {
+        childrenPtr = std::make_shared<ShadowNode::ListOfShared>(originalChildren);
     }
 
     Props::Shared updatedProps = nullptr;
 
-    // clone props for our target shadow node and place fresh RawProps
     if (rawPropsIt != updates.end()) {
+        const auto& componentDescriptor = shadowNode.getComponentDescriptor();
+
         PropsParserContext propsParserContext{
             shadowNode.getSurfaceId(),
             *shadowNode.getContextContainer()
         };
 
-        // this is important and critical
-        // first of all Android doesn't like nullish props (they work perfectly fine on iOS)
-        // second of all Android props MUST be constructed from previous props, otherwise RawProps::~RawProps error occurs
-        // Meta wants to remove shadowNode.getProps()->rawProps, but for now it's the only viable solution
+        folly::dynamic newProps;
         #ifdef ANDROID
-            auto safeProps = rawPropsIt->second == nullptr ? folly::dynamic::object() : rawPropsIt->second;
-            auto newProps = folly::dynamic::merge(shadowNode.getProps()->rawProps, safeProps);
+            auto safeProps = rawPropsIt->second == nullptr
+                ? folly::dynamic::object()
+                : rawPropsIt->second;
+            newProps = folly::dynamic::merge(props->rawProps, safeProps);
         #else
-            auto newProps = rawPropsIt->second;
+            newProps = rawPropsIt->second;
         #endif
 
-        updatedProps = shadowNode
-            .getComponentDescriptor()
-            .cloneProps(propsParserContext, shadowNode.getProps(), RawProps(newProps));
+        updatedProps = componentDescriptor.cloneProps(
+            propsParserContext,
+            shadowNode.getProps(),
+            RawProps(newProps)
+        );
     }
 
     return shadowNode.clone({
         updatedProps ? updatedProps : ShadowNodeFragment::propsPlaceholder(),
-        std::make_shared<ShadowNode::ListOfShared>(children),
+        childrenPtr,
         shadowNode.getState()
     });
 }

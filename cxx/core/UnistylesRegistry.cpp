@@ -127,31 +127,36 @@ std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(jsi::Ru
 }
 
 core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt, std::vector<UnistyleDependency>& deps) {
-    DependencyMap dependencyMap;
-    std::set<UnistyleDependency> uniqueDependencies(deps.begin(), deps.end());
+    core::DependencyMap dependencyMap;
+
+    std::unordered_set<UnistyleDependency> uniqueDependencies(deps.begin(), deps.end());
 
     for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
+        bool hasAnyOfDependencies = false;
+
+        // Check if any dependency matches
         for (const auto& unistyleData : unistyles) {
-            bool hasAnyOfDependencies = std::any_of(
-                unistyleData->unistyle->dependencies.begin(),
-                unistyleData->unistyle->dependencies.end(),
-                [&uniqueDependencies](UnistyleDependency dep) {
-                    return std::find(uniqueDependencies.begin(), uniqueDependencies.end(), dep) != uniqueDependencies.end();
+            for (const auto& dep : unistyleData->unistyle->dependencies) {
+                if (uniqueDependencies.count(dep)) {
+                    hasAnyOfDependencies = true;
+                    break;
                 }
-            );
-
-            if (!hasAnyOfDependencies) {
-                continue;
             }
-
-            // we need to take in count all unistyles from the shadowNode
-            // as user might be using spreads and not all of them may have dependencies
-            for (const auto& unistyleData : unistyles) {
-                dependencyMap[family].emplace_back(unistyleData);
-            }
-
-            break;
+            
+            if (hasAnyOfDependencies) {
+                break;
+            };
         }
+
+        if (!hasAnyOfDependencies) {
+            continue;
+        }
+
+        dependencyMap[family].insert(
+            dependencyMap[family].end(),
+            unistyles.begin(),
+            unistyles.end()
+        );
     }
 
     return dependencyMap;
@@ -179,40 +184,31 @@ void core::UnistylesRegistry::shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Uni
     });
 }
 
-std::vector<std::shared_ptr<core::StyleSheet>> core::UnistylesRegistry::getStyleSheetsToRefresh(jsi::Runtime& rt, std::vector<UnistyleDependency>& unistylesDependencies) {
-    std::vector<std::shared_ptr<core::StyleSheet>> stylesheetsToRefresh{};
-    auto themeDidChangeIt = std::find(unistylesDependencies.begin(),
-                                      unistylesDependencies.end(),
-                                      UnistyleDependency::THEME);
-    auto themeDidChange = themeDidChangeIt != unistylesDependencies.end();
-    auto runtimeDidChange = (themeDidChange && unistylesDependencies.size() > 1) || unistylesDependencies.size() > 0;
+std::vector<std::shared_ptr<core::StyleSheet>>core::UnistylesRegistry::getStyleSheetsToRefresh(jsi::Runtime& rt, std::vector<UnistyleDependency>& unistylesDependencies) {
+    std::vector<std::shared_ptr<core::StyleSheet>> stylesheetsToRefresh;
+    std::unordered_set<UnistyleDependency> depSet(
+        unistylesDependencies.begin(),
+        unistylesDependencies.end()
+    );
 
-    // if nothing changed, skip further lookup
+    bool themeDidChange = depSet.count(UnistyleDependency::THEME) > 0;
+    bool runtimeDidChange = (themeDidChange && depSet.size() > 1) || !depSet.empty();
+
     if (!themeDidChange && !runtimeDidChange) {
         return stylesheetsToRefresh;
     }
 
     auto& styleSheets = this->_styleSheetRegistry[&rt];
 
-    std::for_each(styleSheets.begin(), styleSheets.end(), [&](std::pair<int, std::shared_ptr<core::StyleSheet>> pair){
-        auto& [_, styleSheet] = pair;
-
+    for (const auto& [_, styleSheet] : styleSheets) {
         if (styleSheet->type == StyleSheetType::ThemableWithMiniRuntime) {
-            for (const auto& unistylePair: styleSheet->unistyles) {
-                auto& [_, unistyle] = unistylePair;
-
-                bool hasAnyOfDependencies = std::any_of(
-                    unistyle->dependencies.begin(),
-                    unistyle->dependencies.end(),
-                    [&unistylesDependencies](UnistyleDependency dep) {
-                        return std::find(unistylesDependencies.begin(), unistylesDependencies.end(), dep) != unistylesDependencies.end();
+            for (const auto& [__, unistyle] : styleSheet->unistyles) {
+                for (const auto& dep : unistyle->dependencies) {
+                    if (depSet.count(dep)) {
+                        stylesheetsToRefresh.emplace_back(styleSheet);
+                        
+                        goto nextStyleSheet;
                     }
-                );
-
-                if (hasAnyOfDependencies) {
-                    stylesheetsToRefresh.emplace_back(styleSheet);
-
-                    return;
                 }
             }
         }
@@ -220,10 +216,13 @@ std::vector<std::shared_ptr<core::StyleSheet>> core::UnistylesRegistry::getStyle
         if (styleSheet->type == StyleSheetType::Themable && themeDidChange) {
             stylesheetsToRefresh.emplace_back(styleSheet);
         }
-    });
+
+        nextStyleSheet:;
+    }
 
     return stylesheetsToRefresh;
 }
+
 
 core::Unistyle::Shared core::UnistylesRegistry::getUnistyleById(jsi::Runtime& rt, std::string unistyleID) {
     for (auto& pair: this->_styleSheetRegistry[&rt]) {
