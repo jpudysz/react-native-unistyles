@@ -8,7 +8,7 @@ using AffectedNodes = std::unordered_map<const ShadowNodeFamily*, std::unordered
 
 void shadow::ShadowTreeManager::updateShadowTree(const ShadowTreeRegistry& shadowTreeRegistry) {
     auto& registry = core::UnistylesRegistry::get();
-    
+
     registry.trafficController.withLock([&](){
         auto updates = registry.trafficController.getUpdates();
 
@@ -22,7 +22,7 @@ void shadow::ShadowTreeManager::updateShadowTree(const ShadowTreeRegistry& shado
             // so let's mutate Shadow Tree in single transaction
             auto transaction = [&updates](const RootShadowNode& oldRootShadowNode) {
                 auto affectedNodes = shadow::ShadowTreeManager::findAffectedNodes(oldRootShadowNode, updates);
-                
+
                 return  std::static_pointer_cast<RootShadowNode>(shadow::ShadowTreeManager::cloneShadowTree(
                     oldRootShadowNode,
                     updates,
@@ -72,7 +72,7 @@ AffectedNodes shadow::ShadowTreeManager::findAffectedNodes(const RootShadowNode&
             const auto& [parentNode, index] = *it;
             const auto parentFamily = &parentNode.get().getFamily();
             auto [setIt, inserted] = affectedNodes.try_emplace(parentFamily, std::unordered_set<int>{});
-            
+
             setIt->second.insert(index);
         }
     }
@@ -93,11 +93,11 @@ ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode
 
     if (childrenIt != affectedNodes.end()) {
         auto children = originalChildren;
-        
+
         for (const auto index : childrenIt->second) {
             children[index] = cloneShadowTree(*children[index], updates, affectedNodes);
         }
-        
+
         childrenPtr = std::make_shared<ShadowNode::ListOfShared>(std::move(children));
     } else {
         childrenPtr = std::make_shared<ShadowNode::ListOfShared>(originalChildren);
@@ -107,6 +107,7 @@ ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode
 
     if (rawPropsIt != updates.end()) {
         const auto& componentDescriptor = shadowNode.getComponentDescriptor();
+        const auto& props = shadowNode.getProps();
 
         PropsParserContext propsParserContext{
             shadowNode.getSurfaceId(),
@@ -125,7 +126,7 @@ ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode
 
         updatedProps = componentDescriptor.cloneProps(
             propsParserContext,
-            shadowNode.getProps(),
+            props,
             RawProps(newProps)
         );
     }
