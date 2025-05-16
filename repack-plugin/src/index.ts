@@ -1,21 +1,21 @@
-import { getModulePaths } from "@callstack/repack";
-import type { Compiler, RspackPluginInstance } from "@rspack/core";
-import type { UnistylesPluginOptions } from "react-native-unistyles/plugin";
+import { getModulePaths } from '@callstack/repack';
+import type { Compiler, RspackPluginInstance } from '@rspack/core';
+import type { UnistylesPluginOptions } from 'react-native-unistyles/plugin';
 
 export const BASE_REPACK_EXCLUDE_PATHS = getModulePaths([
-    "react",
-    "react-native",
-    "@react-native",
-    "react-native-macos",
-    "react-native-windows",
-    "react-native-tvos",
-    "@callstack/react-native-visionos",
-    "@module-federation",
-    "react-native-unistyles",
-    "whatwg-fetch",
-    "@callstack",
-    "react-native-nitro-modules",
-    "@callstack/repack",
+    'react',
+    'react-native',
+    '@react-native',
+    'react-native-macos',
+    'react-native-windows',
+    'react-native-tvos',
+    '@callstack/react-native-visionos',
+    '@module-federation',
+    'react-native-unistyles',
+    'whatwg-fetch',
+    '@callstack',
+    'react-native-nitro-modules',
+    '@callstack/repack',
 ]);
 
 type RuleExcludePaths = ReturnType<typeof getModulePaths>;
@@ -25,51 +25,29 @@ interface ConstructorParams {
     unistylesPluginOptions?: UnistylesPluginOptions;
 }
 
-const getUnistyleModuleRules = (excludePathLoader: RegExp[], unistylesPluginOptions?: UnistylesPluginOptions) => ({
-    exclude: excludePathLoader,
-    oneOf: [
-        {
-            test: /\.[cm]?ts$/,
-            use: {
-                loader: "react-native-unistyles/repack-plugin/loader.js",
-                options: {
-                    babelPlugins: [["@babel/plugin-syntax-typescript", { isTSX: false, allowNamespaces: true }]],
-                    unistylesPluginOptions,
-                },
+
+
+const getUnistyleModuleRules = (excludePathLoader: RegExp[], unistylesPluginOptions?: UnistylesPluginOptions) => {
+    const createRule = (test: RegExp, babelPlugins: any[]) => ({
+        test,
+        use: {
+            loader: 'react-native-unistyles/repack-plugin/loader.js',
+            options: {
+                babelPlugins,
+                unistylesPluginOptions,
             },
         },
-        {
-            test: /\.[cm]?js$/,
-            use: {
-                loader: "react-native-unistyles/repack-plugin/loader.js",
-                options: {
-                    babelPlugins: [["@babel/plugin-syntax-typescript", { isTSX: false, allowNamespaces: true }]],
-                    unistylesPluginOptions,
-                },
-            },
-        },
-        {
-            test: /\.[cm]?tsx$/,
-            use: {
-                loader: "react-native-unistyles/repack-plugin/loader.js",
-                options: {
-                    babelPlugins: [["@babel/plugin-syntax-typescript", { isTSX: true, allowNamespaces: true }]],
-                    unistylesPluginOptions,
-                },
-            },
-        },
-        {
-            test: /\.[cm]?jsx?$/,
-            use: {
-                loader: "react-native-unistyles/repack-plugin/loader.js",
-                options: {
-                    babelPlugins: ["babel-plugin-syntax-hermes-parser"],
-                    unistylesPluginOptions,
-                },
-            },
-        },
-    ],
-});
+    });
+
+    return ({
+        exclude: excludePathLoader,
+        oneOf: [
+            createRule(/\.[cm]?ts$/, [['@babel/plugin-syntax-typescript', { isTSX: false, allowNamespaces: true }]]),
+            createRule(/\.[cm]?js$/, [['@babel/plugin-syntax-typescript', { isTSX: true, allowNamespaces: true }]]),
+            createRule(/\.[cm]?jsx?$/, ['babel-plugin-syntax-hermes-parser']),
+        ],
+    });
+} 
 
 export class RepackUnistylePlugin implements RspackPluginInstance {
     private ruleExcludePaths;
@@ -82,11 +60,5 @@ export class RepackUnistylePlugin implements RspackPluginInstance {
 
     apply(compiler: Compiler) {
         compiler.options.module.rules.push(getUnistyleModuleRules(this.ruleExcludePaths, this.unistylesPluginOptions));
-
-        // ignore the 'setUpTests' warning from reanimated which is not relevant
-        compiler.options.ignoreWarnings = compiler.options.ignoreWarnings ?? [];
-        compiler.options.ignoreWarnings.push((warning) =>
-            /'`setUpTests` is available only in Jest environment\.'/.test(warning.message)
-        );
     }
 }
