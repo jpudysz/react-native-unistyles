@@ -58,7 +58,7 @@ var REPLACE_WITH_UNISTYLES_PATHS = [
 // repack-plugin/src/loader.ts
 var importName = "react-native-unistyles";
 var UNISTYLES_REGEX = new RegExp(
-  [...REACT_NATIVE_COMPONENT_NAMES, ...REPLACE_WITH_UNISTYLES_PATHS].concat(importName).join("|")
+  [...REACT_NATIVE_COMPONENT_NAMES, ...REPLACE_WITH_UNISTYLES_PATHS, importName].join("|")
 );
 function unistylesLoader(source) {
   this.cacheable();
@@ -86,7 +86,9 @@ function unistylesLoader(source) {
         callback(err);
         return;
       }
-      callback(null, result.code, result.map);
+      if (result?.code && result.map) {
+        callback(null, result.code, result.map);
+      }
       return;
     }
   );
