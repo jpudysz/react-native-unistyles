@@ -40,51 +40,26 @@ var BASE_REPACK_EXCLUDE_PATHS = (0, import_repack.getModulePaths)([
   "react-native-nitro-modules",
   "@callstack/repack"
 ]);
-var getUnistyleModuleRules = (excludePathLoader, unistylesPluginOptions) => ({
-  exclude: excludePathLoader,
-  oneOf: [
-    {
-      test: /\.[cm]?ts$/,
-      use: {
-        loader: "react-native-unistyles/repack-plugin/loader.js",
-        options: {
-          babelPlugins: [["@babel/plugin-syntax-typescript", { isTSX: false, allowNamespaces: true }]],
-          unistylesPluginOptions
-        }
-      }
-    },
-    {
-      test: /\.[cm]?js$/,
-      use: {
-        loader: "react-native-unistyles/repack-plugin/loader.js",
-        options: {
-          babelPlugins: [["@babel/plugin-syntax-typescript", { isTSX: false, allowNamespaces: true }]],
-          unistylesPluginOptions
-        }
-      }
-    },
-    {
-      test: /\.[cm]?tsx$/,
-      use: {
-        loader: "react-native-unistyles/repack-plugin/loader.js",
-        options: {
-          babelPlugins: [["@babel/plugin-syntax-typescript", { isTSX: true, allowNamespaces: true }]],
-          unistylesPluginOptions
-        }
-      }
-    },
-    {
-      test: /\.[cm]?jsx?$/,
-      use: {
-        loader: "react-native-unistyles/repack-plugin/loader.js",
-        options: {
-          babelPlugins: ["babel-plugin-syntax-hermes-parser"],
-          unistylesPluginOptions
-        }
+var getUnistyleModuleRules = (excludePathLoader, unistylesPluginOptions) => {
+  const createRule = (test, babelPlugins) => ({
+    test,
+    use: {
+      loader: "react-native-unistyles/repack-plugin/loader.js",
+      options: {
+        babelPlugins,
+        unistylesPluginOptions
       }
     }
-  ]
-});
+  });
+  return {
+    exclude: excludePathLoader,
+    oneOf: [
+      createRule(/\.[cm]?ts$/, [["@babel/plugin-syntax-typescript", { isTSX: false, allowNamespaces: true }]]),
+      createRule(/\.[cm]?js$/, [["@babel/plugin-syntax-typescript", { isTSX: true, allowNamespaces: true }]]),
+      createRule(/\.[cm]?jsx?$/, ["babel-plugin-syntax-hermes-parser"])
+    ]
+  };
+};
 var RepackUnistylePlugin = class {
   ruleExcludePaths;
   unistylesPluginOptions;
@@ -94,10 +69,6 @@ var RepackUnistylePlugin = class {
   }
   apply(compiler) {
     compiler.options.module.rules.push(getUnistyleModuleRules(this.ruleExcludePaths, this.unistylesPluginOptions));
-    compiler.options.ignoreWarnings = compiler.options.ignoreWarnings ?? [];
-    compiler.options.ignoreWarnings.push(
-      (warning) => /'`setUpTests` is available only in Jest environment\.'/.test(warning.message)
-    );
   }
 };
 // Annotate the CommonJS export names for ESM import in node:
