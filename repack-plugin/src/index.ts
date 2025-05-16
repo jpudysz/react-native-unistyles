@@ -43,7 +43,7 @@ const getUnistyleModuleRules = (excludePathLoader: RegExp[], unistylesPluginOpti
         exclude: excludePathLoader,
         oneOf: [
             createRule(/\.[cm]?ts$/, [['@babel/plugin-syntax-typescript', { isTSX: false, allowNamespaces: true }]]),
-            createRule(/\.[cm]?js$/, [['@babel/plugin-syntax-typescript', { isTSX: true, allowNamespaces: true }]]),
+            createRule(/\.[cm]?tsx$/, [['@babel/plugin-syntax-typescript', { isTSX: true, allowNamespaces: true }]]),
             createRule(/\.[cm]?jsx?$/, ['babel-plugin-syntax-hermes-parser']),
         ],
     });

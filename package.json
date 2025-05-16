@@ -52,7 +52,7 @@
       "types": "./repack-plugin/index.d.ts",
       "default": "./repack-plugin/index.js"
     },
-    "./repack-plugin/loader": {
+    "./repack-plugin/loader.js": {
       "import": "./repack-plugin/loader.js",
       "default": "./repack-plugin/loader.js"
     },
