@@ -86,9 +86,7 @@ function unistylesLoader(source) {
         callback(err);
         return;
       }
-      if (result?.code && result.map) {
-        callback(null, result.code, result.map);
-      }
+      callback(null, result.code, result.map);
       return;
     }
   );

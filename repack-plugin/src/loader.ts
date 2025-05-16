@@ -48,9 +48,8 @@ export default function unistylesLoader(this: LoaderContext<UnistylesLoaderOptio
                 return;
             }
 
-            if (result?.code && result.map) {
-                callback(null, result.code, result.map);
-            }
+            //@ts-ignore
+            callback(null, result.code, result.map);
 
             return;
         }
