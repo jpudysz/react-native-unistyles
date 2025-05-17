@@ -1,4 +1,4 @@
-const esbuild = require('esbuild');
+const esbuild = require('esbuild')
 
 esbuild.build({
     entryPoints: ['./repack-plugin/src/index.ts'],
@@ -10,4 +10,4 @@ esbuild.build({
     logLevel: 'warning',
     platform: 'node',
     minify: false,
-});
+})
