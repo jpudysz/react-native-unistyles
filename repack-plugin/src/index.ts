@@ -1,6 +1,7 @@
-import { getModulePaths } from '@callstack/repack';
-import type { Compiler, RspackPluginInstance } from '@rspack/core';
-import type { UnistylesPluginOptions } from 'react-native-unistyles/plugin';
+import { getModulePaths } from '@callstack/repack'
+import type { Compiler, RspackPluginInstance } from '@rspack/core'
+import type { UnistylesPluginOptions } from 'react-native-unistyles/plugin'
+import { unistylesLoader } from './loader'
 
 export const BASE_REPACK_EXCLUDE_PATHS = getModulePaths([
     'react',
@@ -16,28 +17,26 @@ export const BASE_REPACK_EXCLUDE_PATHS = getModulePaths([
     '@callstack',
     'react-native-nitro-modules',
     '@callstack/repack',
-]);
+])
 
-type RuleExcludePaths = ReturnType<typeof getModulePaths>;
+type RuleExcludePaths = ReturnType<typeof getModulePaths>
 
 interface ConstructorParams {
-    ruleExcludePaths?: RuleExcludePaths;
-    unistylesPluginOptions?: UnistylesPluginOptions;
+    ruleExcludePaths?: RuleExcludePaths
+    unistylesPluginOptions?: UnistylesPluginOptions
 }
 
-
-
-const getUnistyleModuleRules = (excludePathLoader: RegExp[], unistylesPluginOptions?: UnistylesPluginOptions) => {
-    const createRule = (test: RegExp, babelPlugins: any[]) => ({
+const getUnistyleModuleRules = (excludePathLoader: Array<RegExp>, unistylesPluginOptions?: UnistylesPluginOptions) => {
+    const createRule = (test: RegExp, babelPlugins: Array<any>) => ({
         test,
         use: {
-            loader: 'react-native-unistyles/repack-plugin/loader.js',
+            loader: 'react-native-unistyles/repack-plugin',
             options: {
                 babelPlugins,
                 unistylesPluginOptions,
             },
         },
-    });
+    })
 
     return ({
         exclude: excludePathLoader,
@@ -46,19 +45,21 @@ const getUnistyleModuleRules = (excludePathLoader: RegExp[], unistylesPluginOpti
             createRule(/\.[cm]?tsx$/, [['@babel/plugin-syntax-typescript', { isTSX: true, allowNamespaces: true }]]),
             createRule(/\.[cm]?jsx?$/, ['babel-plugin-syntax-hermes-parser']),
         ],
-    });
+    })
 } 
 
 export class RepackUnistylePlugin implements RspackPluginInstance {
-    private ruleExcludePaths;
-    private unistylesPluginOptions;
+    private ruleExcludePaths
+    private unistylesPluginOptions
 
     constructor({ ruleExcludePaths = BASE_REPACK_EXCLUDE_PATHS, unistylesPluginOptions }: ConstructorParams = {}) {
-        this.ruleExcludePaths = ruleExcludePaths;
-        this.unistylesPluginOptions = unistylesPluginOptions;
+        this.ruleExcludePaths = ruleExcludePaths
+        this.unistylesPluginOptions = unistylesPluginOptions
     }
 
     apply(compiler: Compiler) {
-        compiler.options.module.rules.push(getUnistyleModuleRules(this.ruleExcludePaths, this.unistylesPluginOptions));
+        compiler.options.module.rules.push(getUnistyleModuleRules(this.ruleExcludePaths, this.unistylesPluginOptions))
     }
 }
+
+export default unistylesLoader

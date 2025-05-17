@@ -1,7 +1,7 @@
 const esbuild = require('esbuild');
 
 esbuild.build({
-    entryPoints: ['./repack-plugin/src/index.ts', './repack-plugin/src/loader.ts'],
+    entryPoints: ['./repack-plugin/src/index.ts'],
     bundle: true,
     outdir: './repack-plugin',
     packages: 'external',
