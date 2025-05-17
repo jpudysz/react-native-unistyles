@@ -21,10 +21,83 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var index_exports = {};
 __export(index_exports, {
   BASE_REPACK_EXCLUDE_PATHS: () => BASE_REPACK_EXCLUDE_PATHS,
-  RepackUnistylePlugin: () => RepackUnistylePlugin
+  RepackUnistylePlugin: () => RepackUnistylePlugin,
+  default: () => index_default
 });
 module.exports = __toCommonJS(index_exports);
 var import_repack = require("@callstack/repack");
+
+// repack-plugin/src/loader.ts
+var import_core = require("@babel/core");
+
+// plugin/src/consts.ts
+var REACT_NATIVE_COMPONENT_NAMES = [
+  "ActivityIndicator",
+  "View",
+  "Text",
+  "Image",
+  "ImageBackground",
+  "KeyboardAvoidingView",
+  "Pressable",
+  "ScrollView",
+  "FlatList",
+  "SectionList",
+  "Switch",
+  "TextInput",
+  "RefreshControl",
+  "TouchableHighlight",
+  "TouchableOpacity",
+  "VirtualizedList",
+  "Animated"
+  // Modal - there is no exposed native handle
+  // TouchableWithoutFeedback - can't accept a ref
+];
+var REPLACE_WITH_UNISTYLES_PATHS = [
+  "react-native-reanimated/src/component",
+  "react-native-reanimated/lib/module/component",
+  "react-native-gesture-handler/lib/module/components",
+  "react-native-gesture-handler/lib/commonjs/components",
+  "react-native-gesture-handler/src/components"
+];
+
+// repack-plugin/src/loader.ts
+var importName = "react-native-unistyles";
+var UNISTYLES_REGEX = new RegExp(
+  [...REACT_NATIVE_COMPONENT_NAMES, ...REPLACE_WITH_UNISTYLES_PATHS, importName].join("|")
+);
+function unistylesLoader(source) {
+  this.cacheable();
+  const callback = this.async();
+  const options = this.getOptions();
+  if (!UNISTYLES_REGEX.test(source)) {
+    callback(null, source);
+    return;
+  }
+  const unistylesOptions = options.unistylesPluginOptions;
+  const unistylesPlugin = unistylesOptions ? ["react-native-unistyles/plugin", unistylesOptions] : "react-native-unistyles/plugin";
+  const babelPlugins = options.babelPlugins ?? [];
+  (0, import_core.transform)(
+    source,
+    {
+      filename: this.resourcePath,
+      babelrc: false,
+      configFile: false,
+      compact: false,
+      comments: true,
+      plugins: [...babelPlugins, unistylesPlugin]
+    },
+    (err, result) => {
+      if (err) {
+        callback(err);
+        return;
+      }
+      callback(null, result.code, result.map);
+      return;
+    }
+  );
+}
+
+// repack-plugin/src/index.ts
 var BASE_REPACK_EXCLUDE_PATHS = (0, import_repack.getModulePaths)([
   "react",
   "react-native",
@@ -44,7 +117,7 @@ var getUnistyleModuleRules = (excludePathLoader, unistylesPluginOptions) => {
   const createRule = (test, babelPlugins) => ({
     test,
     use: {
-      loader: "react-native-unistyles/repack-plugin/loader.js",
+      loader: "react-native-unistyles/repack-plugin",
       options: {
         babelPlugins,
         unistylesPluginOptions
@@ -71,6 +144,7 @@ var RepackUnistylePlugin = class {
     compiler.options.module.rules.push(getUnistyleModuleRules(this.ruleExcludePaths, this.unistylesPluginOptions));
   }
 };
+var index_default = unistylesLoader;
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   BASE_REPACK_EXCLUDE_PATHS,
