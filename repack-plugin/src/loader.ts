@@ -1,9 +1,9 @@
-import { transform } from "@babel/core"
-import type { LoaderContext } from "@rspack/core"
-import type { UnistylesPluginOptions } from "../../plugin"
-import { REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_PATHS } from "../../plugin/src/consts"
+import { transform } from '@babel/core'
+import type { LoaderContext } from '@rspack/core'
+import type { UnistylesPluginOptions } from '../../plugin'
+import { REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_PATHS } from '../../plugin/src/consts'
 
-const importName = "react-native-unistyles"
+const importName = 'react-native-unistyles'
 
 interface UnistylesLoaderOptions {
     babelPlugins?: string[]
@@ -11,7 +11,7 @@ interface UnistylesLoaderOptions {
 }
 
 const UNISTYLES_REGEX = new RegExp(
-    [...REACT_NATIVE_COMPONENT_NAMES, ...REPLACE_WITH_UNISTYLES_PATHS, importName].join("|")
+    [...REACT_NATIVE_COMPONENT_NAMES, ...REPLACE_WITH_UNISTYLES_PATHS, importName].join('|')
 )
 
 export function unistylesLoader(this: LoaderContext<UnistylesLoaderOptions>, source: string) {
@@ -27,8 +27,8 @@ export function unistylesLoader(this: LoaderContext<UnistylesLoaderOptions>, sou
     const unistylesOptions = options.unistylesPluginOptions
 
     const unistylesPlugin = unistylesOptions
-        ? ["react-native-unistyles/plugin", unistylesOptions]
-        : "react-native-unistyles/plugin"
+        ? ['react-native-unistyles/plugin', unistylesOptions]
+        : 'react-native-unistyles/plugin'
 
     const babelPlugins = options.babelPlugins ?? []
 
