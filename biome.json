@@ -1,7 +1,7 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
   "files": {
-    "include": ["src/**/*.ts", "src/**/*.tsx", "plugin/**/*.ts"],
+    "include": ["src/**/*.ts", "src/**/*.tsx", "plugin/**/*.ts", "repack-plugin/**/*.ts"],
     "ignore": ["example", "expo-example", "docs", "lib"]
   },
   "formatter": {
