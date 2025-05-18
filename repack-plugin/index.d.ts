@@ -1,13 +1,9 @@
-import { getModulePaths } from '@callstack/repack'
 import type { Compiler, RspackPluginInstance, LoaderContext } from '@rspack/core'
 import type { UnistylesPluginOptions } from 'react-native-unistyles/plugin'
 
 export declare const BASE_REPACK_EXCLUDE_PATHS: Array<RegExp>
-
-type RuleExcludePaths = ReturnType<typeof getModulePaths>
-
 interface ConstructorParams {
-    ruleExcludePaths?: RuleExcludePaths
+    ruleExcludePaths?: Array<RegExp>
     unistylesPluginOptions?: UnistylesPluginOptions
 }
 
