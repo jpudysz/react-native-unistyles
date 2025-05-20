@@ -34,8 +34,16 @@ export const convertToCSS = (hash: string, value: Record<string, any>, state: CS
         }
 
         if (typeof styleValue === 'object') {
-            const allBreakpoints = Object.keys(value)
             Object.entries(styleValue).forEach(([breakpointStyleKey, breakpointStyleValue]) => {
+                const allBreakpoints = Object.entries(value)
+                    .filter(([_, value]) => {
+                        if (typeof value !== 'object' || value === null) {
+                            return false
+                        }
+
+                        return breakpointStyleKey in value
+                    })
+                    .map(([key]) => key)
                 const mediaQuery = getMediaQuery(styleKey, allBreakpoints)
 
                 state.set({
