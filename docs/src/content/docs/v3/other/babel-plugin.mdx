@@ -14,7 +14,7 @@ import Seo from '../../../../components/Seo.astro'
 >
 
 
-Unistyles 3.0 relies heavily on the Babel plugin, which helps convert your code in a way that allows binding the `ShadowNode` with `Unistyle`. Before reading this guide, make sure to check the [Look under the hood](/v3/start/how-unistyles-works) guide.
+Unistyles 3.0 relies heavily on the Babel plugin, which helps convert your code in a way that allows binding the `ShadowNode` with `Unistyles`. Before reading this guide, make sure to check the [Look under the hood](/v3/start/how-unistyles-works) guide.
 
 Our golden rule is to never introduce any component that could pollute your native view hierarchy. In other words, if you use a `View`, it will be rendered as-is in the native view hierarchy.
 
@@ -257,7 +257,7 @@ import { NativeText } from "react-native/Libraries/Text/TextNativeComponent"
 import View from "react-native/Libraries/Components/View/ViewNativeComponent"
 ```
 
-To convert it to Unistyles, you can use following configuration:
+To convert it to Unistyles, you can use the following configuration:
 
 ```ts
 {
@@ -282,12 +282,12 @@ To convert it to Unistyles, you can use following configuration:
 
 :::caution
 If you use raw `react-native` imports within your code, Unistyles will auto map it to `react-native-unistyles` factories.
-This options should be only used for 3rd party libraries from `node_modules`.
+This option should only be used for 3rd party libraries from `node_modules`.
 :::
 
 #### `autoProcessPaths`
 
-This configuration is unrelated to the `autoProcessRoot`, `autoProcessImports` and `autoRemapImports` options and can be used alongside them.
+This configuration is unrelated to the `autoProcessRoot`, `autoProcessImports`, and `autoRemapImports` options and can be used alongside them.
 By default, the Babel plugin ignores `node_modules`. However, you can extend these paths to attempt converting 3rd components into Unistyles compatible ones.
 Within these paths, we will replace `react-native` imports with `react-native-unistyles` factories that borrow component refs. [Read more](/v3/other/babel-plugin#3-component-factory-borrowing-ref).
 
