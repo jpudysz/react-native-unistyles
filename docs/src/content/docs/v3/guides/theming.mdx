@@ -19,7 +19,7 @@ Theming in `Unistyles` differs from other libraries as it doesn't impose any spe
 
 There is also no limit to the number of themes. You can even register dozens of them eg. when you needs to support some premium ones.
 
-Theming is optional. If you dont't register themes with [StyleSheet.configure](/v3/start/configuration#themes-optional)
+Theming is optional. If you don't register themes with [StyleSheet.configure](/v3/start/configuration#themes-optional)
 the library will use an empty object by default.
 
 ### Create a theme
@@ -146,7 +146,7 @@ const MyComponent = () => {
 ```
 
 :::caution
-`useUnistyles` is not recommended as it will re-render your component on every change of the theme. Lear more about [useUnistyles](/v3/references/use-unistyles)
+`useUnistyles` is not recommended as it will re-render your component on every change of the theme. Learn more about [useUnistyles](/v3/references/use-unistyles)
 :::
 
 ### Get the current theme name
@@ -201,7 +201,7 @@ Setting initial theme and enabling adaptive themes at the same time will throw a
 
 ### Toggle adaptive themes during runtime
 
-To toggle adaptive theme support at any point, use `UnistylesRuntime`:
+To toggle adaptive themes support at any point, use `UnistylesRuntime`:
 
 ```tsx /UnistylesRuntime.setAdaptiveThemes.*/
 import { UnistylesRuntime } from 'react-native-unistyles'
@@ -219,7 +219,7 @@ With adaptive themes disabled, you can now manually change the theme.
 
 ### Check if adaptive themes are enabled
 
-To check if adaptive themes are enabled, again use `UnistylesRuntime`:
+To check if adaptive themes are enabled, use `UnistylesRuntime` again:
 
 ```tsx /UnistylesRuntime.hasAdaptiveThemes/
 import { UnistylesRuntime } from 'react-native-unistyles'
