@@ -25,7 +25,7 @@ To get the most out of Unistyles, it’s important to understand how it works an
 
 ### 1. StyleSheets
 
-A typical app consist of many `StyleSheets`. A `StyleSheet` is a JavaScript object that holds one or many styles. Each style is associated with native view.
+A typical app consists of many `StyleSheets`. A `StyleSheet` is a JavaScript object that holds one or many styles. Each style is associated with a native view.
 What’s more important is that each `StyleSheet` is unique, tailored to the needs of the view, or to a shared component.
 
 <div style="display:flex;justify-content:center;flex-direction:column;align-items:center;">
@@ -64,7 +64,7 @@ const styles = StyleSheet.create((theme, rt) => ({
 
 As you already know, Unistyles has no components. This means your native view hierarchy remains exactly the same as in your original code. The Babel plugin processes your components through our component factory to borrow `refs` and bind the `ShadowNode` with `Unistyle`.
 
-You might be wondering, what is `Unistyle`? We refer to it as your `StyleSheet` style that have been parsed by the Unistyles compiler, and with the attached `C++` state.
+You might be wondering, what is `Unistyle`? We refer to it as your `StyleSheet` style that has been parsed by the Unistyles compiler, and with the attached `C++` state.
 
 <div style="display:flex;justify-content:center;flex-direction:column;align-items:center;">
     <img
@@ -88,7 +88,7 @@ We don’t just extract metadata from your styles. We do the same for your `Styl
         style="margin-bottom:40px;margin-top:20px;"
     />
     <span style="font-size:13px;">
-        C++ StyleSheets that contains parsed styles (Unistyles)
+        C++ StyleSheets that contain parsed styles (Unistyles)
     </span>
 </div>
 
