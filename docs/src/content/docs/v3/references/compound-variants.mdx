@@ -13,14 +13,14 @@ import Seo from '../../../../components/Seo.astro'
     }}
 >
 
-You can extend your `StyleSheets` even more by using `compound variants`.
+You can extend your `StyleSheets` even further by using `compound variants`.
 
 Compound variants are a way of applying additional styles when certain conditions are met.
-This approach simplifies the management of complex styling by reducing redundancy and increasing flexibility of your `StyleSheets`.
+This approach simplifies the management of complex styling by reducing redundancy and increasing the flexibility of your `StyleSheets`.
 
 ### Basic usage
 
-Let's say you created a base `Typography` component with following variants:
+Let's say you created a base `Typography` component with the following variants:
 
 ```tsx /variants/
 const styles = StyleSheet.create(theme => ({
@@ -63,11 +63,11 @@ const styles = StyleSheet.create(theme => ({
 ```
 
 What if you've received a new requirement where the text should be underlined when `isBold` is `true` and `color` is `link`?
-This task could be challenging while using features like [dynamic functions](/v3/references/dynamic-functions/) as you would need to use ifs in your `StyleSheet`.
+This task could be challenging while using features like [dynamic functions](/v3/references/dynamic-functions/) as you would need to use `if` statements in your `StyleSheet`.
 
 ### Usage with Compound variants
 
-With compound variants it can be achieved in a more concise way:
+With compound variants, it can be achieved in a more concise way:
 
 ```tsx /compoundVariants/
 const styles = StyleSheet.create(theme => ({
