@@ -20,19 +20,18 @@ It's also possible to use these values to build responsive layouts based on nati
 
 ### iOS
 
-Unistyles implementation is based on [Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/typography#Specifications)
+Unistyles' implementation is based on [Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/typography#Specifications)
 and the available values are:
 
 `xSmall`, `Small`, `Medium`, `Large`, `xLarge`, `xxLarge`, `xxxLarge`, `unspecified`
 
-In addition to above categories, you can also use the [Accessibility sizes](https://developer.apple.com/documentation/uikit/uicontentsizecategory#2901207), available values are:
+In addition to the above categories, you can also use the [Accessibility sizes](https://developer.apple.com/documentation/uikit/uicontentsizecategory#2901207), and the available values are:
 
 `accessibilityMedium`, `accessibilityLarge`, `accessibilityExtraLarge`, `accessibilityExtraExtraLarge`, `accessibilityExtraExtraExtraLarge`
 
 ### Android
 
-There is no direct equivalent to the iOS content size category on Android. The implementation is based on [Font Scale](https://developer.android.com/reference/android/content/res/Configuration#fontScale)
-and the available values are:
+There is no direct equivalent to the iOS content size category on Android. The implementation is based on [Font Scale](https://developer.android.com/reference/android/content/res/Configuration#fontScale), and the available values are:
 
 `Small`, `Default`, `Large`, `ExtraLarge`, `Huge`
 
@@ -56,7 +55,7 @@ Reading the value will always resolve to `unspecified`.
 
 ### Usage
 
-To get the current `contentSizeCategory` you need to use `UnistylesRuntime`:
+To get the current `contentSizeCategory`, you need to use `UnistylesRuntime`:
 
 ```tsx /contentSizeCategory/
 import { UnistylesRuntime } from 'react-native-unistyles'
@@ -69,7 +68,7 @@ export const ContentSizeCategory = () => (
 )
 ```
 
-For convenience, library exposes two enums to map the values mentioned above:
+For convenience, the library exposes two enums to map the values mentioned above:
 
 ```tsx /AndroidContentSizeCategory/ /IOSContentSizeCategory/
 import { AndroidContentSizeCategory, IOSContentSizeCategory } from 'react-native-unistyles'
