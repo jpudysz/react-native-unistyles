@@ -1704,7 +1704,7 @@ PODS:
     - React-perflogger (= 0.79.1)
     - React-utils (= 0.79.1)
   - SocketRocket (0.7.1)
-  - Unistyles (3.0.0-nightly-20250423):
+  - Unistyles (3.0.0-nightly-20250520):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2034,7 +2034,7 @@ SPEC CHECKSUMS:
   ReactCodegen: 86758c0e13c6b245ff0cd7123cc5e8910d67546a
   ReactCommon: aa48e4fddbc6a0afa19dca39a1b6016c150b5db4
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  Unistyles: 5fb6ee2c5115991601b4bb85ca523e72bf5e63a3
+  Unistyles: abfd0af840f8afadcf924be4500379f1d157892f
   Yoga: d15f5aa644c466e917569ac43b19cbf17975239a
 
 PODFILE CHECKSUM: a5de45e2350a9515567a6e18ca8ceea718b48523
