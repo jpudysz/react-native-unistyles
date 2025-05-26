@@ -1,3 +1,4 @@
+import nodePath from 'node:path'
 import type { PluginObj } from '@babel/core'
 import * as t from '@babel/types'
 import { NATIVE_COMPONENTS_PATHS, REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_EXOTIC_PATHS, REPLACE_WITH_UNISTYLES_PATHS } from './consts'
@@ -22,6 +23,16 @@ export default function (): PluginObj<UnistylesPluginPass> {
         visitor: {
             Program: {
                 enter(path, state) {
+                    if(!state.opts.root) {
+                        throw new Error('Unistyles 🦄: Babel plugin requires `root` option to be set. Please check https://www.unistyl.es/v3/other/babel-plugin#extra-configuration')
+                    }
+
+                    const appRoot = toPlatformPath(nodePath.join(state.file.opts.root as string, state.opts.root))
+
+                    if(state.file.opts.root === appRoot) {
+                        throw new Error('Unistyles 🦄: Root option can\'t resolve to project root as it will include node_modules folder. Please check https://www.unistyl.es/v3/other/babel-plugin#extra-configuration')
+                    }
+
                     state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS
                         .map(toPlatformPath)
                         .concat(state.opts.autoProcessPaths ?? [])
@@ -35,9 +46,7 @@ export default function (): PluginObj<UnistylesPluginPass> {
                     state.file.reactNativeCommonJSName = ''
                     state.file.tagNumber = 0
                     state.reactNativeImports = {}
-                    state.file.forceProcessing = state.opts.autoProcessRoot && state.filename
-                        ? state.filename.includes(toPlatformPath(`${state.file.opts.root}/${state.opts.autoProcessRoot}/`))
-                        : false
+                    state.file.forceProcessing = state.filename?.includes(appRoot) ?? false
 
                     path.traverse({
                         BlockStatement(blockPath) {

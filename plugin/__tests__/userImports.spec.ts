@@ -5,6 +5,7 @@ pluginTester({
     plugin,
     pluginOptions: {
         debug: false,
+        root: 'src',
         autoProcessImports: ['@codemask/styles']
     },
     babelOptions: {
