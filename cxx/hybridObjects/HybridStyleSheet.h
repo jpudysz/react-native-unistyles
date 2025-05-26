@@ -9,15 +9,13 @@
 #include "UnistylesConstants.h"
 #include "Breakpoints.h"
 #include "Parser.h"
-#include "UnistylesCommitHook.h"
-#include "UnistylesMountHook.h"
+#include "ShadowTreeManager.h"
 
 using namespace margelo::nitro::unistyles;
 using namespace facebook::react;
 
 struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
-    HybridStyleSheet(std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime, std::shared_ptr<UIManager> uiManager)
-        : HybridObject(TAG), _unistylesRuntime{unistylesRuntime}, _uiManager{uiManager} {
+    HybridStyleSheet(std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime): HybridObject(TAG), _unistylesRuntime{unistylesRuntime} {
             this->_unistylesRuntime->registerPlatformListener(
                   std::bind(&HybridStyleSheet::onPlatformDependenciesChange, this, std::placeholders::_1)
             );
@@ -67,7 +65,6 @@ private:
     void verifyAndSelectTheme(jsi::Runtime &rt);
     void setThemeFromColorScheme(jsi::Runtime& rt);
     void loadExternalMethods(const jsi::Value& thisValue, jsi::Runtime& rt);
-    void registerHooks(jsi::Runtime& rt);
     void onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies);
     void onPlatformNativeDependenciesChange(std::vector<UnistyleDependency> dependencies, UnistylesNativeMiniRuntime miniRuntime);
     void onImeChange(UnistylesNativeMiniRuntime miniRuntime);
@@ -77,8 +74,6 @@ private:
     double __unid = -1;
     std::vector<std::unique_ptr<const std::function<void(std::vector<UnistyleDependency>&)>>> _changeListeners{};
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
-    std::shared_ptr<core::UnistylesCommitHook> _unistylesCommitHook;
-    std::shared_ptr<core::UnistylesMountHook> _unistylesMountHook;
     std::shared_ptr<UIManager> _uiManager;
 };
 
