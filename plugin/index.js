@@ -33,6 +33,7 @@ __export(index_exports, {
   default: () => index_default
 });
 module.exports = __toCommonJS(index_exports);
+var import_node_path2 = __toESM(require("node:path"));
 var t6 = __toESM(require("@babel/types"));
 
 // plugin/src/consts.ts
@@ -727,6 +728,10 @@ function index_default() {
           if (!state.opts.root) {
             throw new Error("Unistyles \u{1F984}: Babel plugin requires `root` option to be set. Please check https://www.unistyl.es/v3/other/babel-plugin#extra-configuration");
           }
+          const appRoot = toPlatformPath(import_node_path2.default.join(state.file.opts.root, state.opts.root));
+          if (state.file.opts.root === appRoot) {
+            throw new Error("Unistyles \u{1F984}: Root option can't resolve to project root as it will include node_modules folder. Please check https://www.unistyl.es/v3/other/babel-plugin#extra-configuration");
+          }
           state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS.map(toPlatformPath).concat(state.opts.autoProcessPaths ?? []).some((path3) => state.filename?.includes(path3));
           state.file.hasAnyUnistyle = false;
           state.file.hasUnistylesImport = false;
@@ -736,7 +741,7 @@ function index_default() {
           state.file.reactNativeCommonJSName = "";
           state.file.tagNumber = 0;
           state.reactNativeImports = {};
-          state.file.forceProcessing = state.opts.root && state.filename ? state.filename.includes(toPlatformPath(`${state.file.opts.root}/${state.opts.root}/`)) : false;
+          state.file.forceProcessing = state.filename?.includes(appRoot) ?? false;
           path2.traverse({
             BlockStatement(blockPath) {
               if (isInsideNodeModules(state)) {
