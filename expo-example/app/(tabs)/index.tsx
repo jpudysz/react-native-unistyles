@@ -8,12 +8,11 @@ export default function HomeScreen() {
         variant: 'blue'
     })
 
-
     return (
-        <View style={styles.container()}>
+        <View style={styles.container(1)}>
             <View style={styles.test}>
                 <Text style={styles.typography}>
-                    Hello world
+                    Hello world!
                 </Text>
                 <Link href="/explore" asChild>
                     <Pressable style={styles.button}>
@@ -33,8 +32,8 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create(theme => ({
-    container: () => ({
-        flex: 1,
+    container: (flex: number) => ({
+        flex,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: theme.colors.backgroundColor

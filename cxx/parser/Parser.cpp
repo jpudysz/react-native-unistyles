@@ -213,113 +213,115 @@ void parser::Parser::rebuildUnistyleWithVariants(jsi::Runtime& rt, std::shared_p
 }
 
 // rebuild all unistyles that are affected by platform event
-void parser::Parser::rebuildUnistylesInDependencyMap(jsi::Runtime& rt, DependencyMap& dependencyMap, std::vector<std::shared_ptr<core::StyleSheet>>& styleSheets, std::optional<UnistylesNativeMiniRuntime> maybeMiniRuntime) {
-    std::unordered_map<std::shared_ptr<StyleSheet>, jsi::Value> parsedStyleSheetsWithDefaultTheme{};
-    std::unordered_map<std::string, std::unordered_map<std::shared_ptr<StyleSheet>, jsi::Value>> parsedStyleSheetsWithScopedTheme{};
-    std::unordered_map<std::shared_ptr<core::Unistyle>, bool> parsedUnistyles{};
+void parser::Parser::rebuildUnistylesInDependencyMap(
+    jsi::Runtime& rt,
+    DependencyMap& dependencyMap,
+    std::vector<std::shared_ptr<core::StyleSheet>>& styleSheets,
+    std::optional<UnistylesNativeMiniRuntime> maybeMiniRuntime
+) {
+    std::unordered_map<std::shared_ptr<StyleSheet>, jsi::Value> parsedStyleSheetsWithDefaultTheme;
+    std::unordered_map<std::string, std::unordered_map<std::shared_ptr<StyleSheet>, jsi::Value>> parsedStyleSheetsWithScopedTheme;
+    std::unordered_set<std::shared_ptr<core::Unistyle>> parsedUnistyles;
 
-    // parse all stylesheets that depends on changes
-    for (auto styleSheet : styleSheets) {
-        parsedStyleSheetsWithDefaultTheme.emplace(styleSheet, this->unwrapStyleSheet(rt, styleSheet, maybeMiniRuntime));
+    // Parse all stylesheets that depend on changes
+    for (const auto& styleSheet : styleSheets) {
+        parsedStyleSheetsWithDefaultTheme.emplace(
+            styleSheet,
+            this->unwrapStyleSheet(rt, styleSheet, maybeMiniRuntime)
+        );
     }
 
-    // then parse all visible Unistyles managed by Unistyle
+    // Parse all visible Unistyles managed by Unistyle
     for (auto& [shadowNode, unistyles] : dependencyMap) {
-        auto styleSheet = unistyles.begin()->get()->unistyle->parent;
+        auto styleSheet = unistyles.front()->unistyle->parent;
 
-        // stylesheet may be optional for exotic unistyles
-        if (styleSheet != nullptr && !parsedStyleSheetsWithDefaultTheme.contains(styleSheet)) {
-            parsedStyleSheetsWithDefaultTheme.emplace(styleSheet, this->unwrapStyleSheet(rt, styleSheet, maybeMiniRuntime));
+        // Stylesheet may be optional for exotic unistyles
+        if (styleSheet && parsedStyleSheetsWithDefaultTheme.find(styleSheet) == parsedStyleSheetsWithDefaultTheme.end()) {
+            parsedStyleSheetsWithDefaultTheme.emplace(
+                styleSheet,
+                this->unwrapStyleSheet(rt, styleSheet, maybeMiniRuntime)
+            );
         }
 
         for (auto& unistyleData : unistyles) {
             auto& unistyle = unistyleData->unistyle;
 
-            // for RN styles or inline styles, compute styles only once
+            // For RN styles or inline styles, compute styles only once
             if (unistyle->styleKey == helpers::EXOTIC_STYLE_KEY) {
                 if (!unistyleData->parsedStyle.has_value()) {
                     unistyleData->parsedStyle = jsi::Value(rt, unistyle->rawValue).asObject(rt);
-
-                    if (!parsedUnistyles.contains(unistyle)) {
-                        parsedUnistyles.emplace(unistyle, true);
-                    }
+                    parsedUnistyles.insert(unistyle);
                 }
 
                 continue;
             }
 
-            // reference Unistyles StyleSheet as we may mix them for one style
+            // Reference Unistyles StyleSheet as we may mix them for one style
             auto unistyleStyleSheet = unistyle->parent;
 
-            // we may hit now other StyleSheets that are referenced from affected nodes
-            if (unistyleStyleSheet != nullptr && !parsedStyleSheetsWithDefaultTheme.contains(unistyleStyleSheet)) {
-                parsedStyleSheetsWithDefaultTheme.emplace(unistyleStyleSheet, this->unwrapStyleSheet(rt, unistyleStyleSheet, maybeMiniRuntime));
+            // We may hit now other StyleSheets that are referenced from affected nodes
+            if (unistyleStyleSheet && parsedStyleSheetsWithDefaultTheme.find(unistyleStyleSheet) == parsedStyleSheetsWithDefaultTheme.end()) {
+                parsedStyleSheetsWithDefaultTheme.emplace(
+                    unistyleStyleSheet,
+                    this->unwrapStyleSheet(rt, unistyleStyleSheet, maybeMiniRuntime)
+                );
             }
 
             // StyleSheet might have styles that are not affected
-            if (!parsedStyleSheetsWithDefaultTheme[unistyleStyleSheet].asObject(rt).hasProperty(rt, unistyle->styleKey.c_str())) {
+            auto& parsedSheetValue = parsedStyleSheetsWithDefaultTheme[unistyleStyleSheet];
+            auto parsedSheetObj = parsedSheetValue.asObject(rt);
+
+            if (!parsedSheetObj.hasProperty(rt, unistyle->styleKey.c_str())) {
                 continue;
             }
 
-            // for scoped themes we need to parse unistyle exclusively
+            // For scoped themes we need to parse unistyle exclusively
             if (unistyleData->scopedTheme.has_value()) {
-                std::vector<folly::dynamic> arguments = {};
+                auto& scopedThemeName = unistyleData->scopedTheme.value();
+                auto& scopedThemeMap = parsedStyleSheetsWithScopedTheme[scopedThemeName];
 
-                if (unistyleData->dynamicFunctionMetadata.has_value()) {
-                    arguments = unistyleData->dynamicFunctionMetadata.value();
+                jsi::Value parsedStyleSheet = jsi::Value::undefined();
+                auto it = scopedThemeMap.find(unistyle->parent);
+
+                if (it != scopedThemeMap.end()) {
+                    parsedStyleSheet = jsi::Value(rt, it->second);
                 }
 
-                auto parsedStyleSheet = jsi::Value::undefined();
-                auto scopedThemeName = unistyleData->scopedTheme.value();
-
-                // check if we have theme in cache
-                if (parsedStyleSheetsWithScopedTheme.contains(scopedThemeName)) {
-                    if (parsedStyleSheetsWithScopedTheme[scopedThemeName].contains(unistyle->parent)) {
-                        parsedStyleSheet = jsi::Value(rt, parsedStyleSheetsWithScopedTheme[scopedThemeName][unistyle->parent]);
-                    }
-                }
-
-                // if not, let's build it
                 if (parsedStyleSheet.isUndefined()) {
-                    parsedStyleSheet = this->getParsedStyleSheetForScopedTheme(rt, unistyle, unistyleData->scopedTheme.value());
-
-                    if (!parsedStyleSheetsWithScopedTheme.contains(scopedThemeName)) {
-                        parsedStyleSheetsWithScopedTheme.emplace(
-                            scopedThemeName,
-                            std::unordered_map<std::shared_ptr<StyleSheet>, jsi::Value>{}
-                        );
-                    }
-
-                    parsedStyleSheetsWithScopedTheme[scopedThemeName].emplace(
+                    parsedStyleSheet = this->getParsedStyleSheetForScopedTheme(rt, unistyle, scopedThemeName);
+                    scopedThemeMap.emplace(
                         unistyle->parent,
                         jsi::Value(rt, parsedStyleSheet)
                     );
                 }
 
-                this->rebuildUnistyleWithScopedTheme(
-                    rt,
-                    parsedStyleSheet,
-                    unistyleData
-                );
+                this->rebuildUnistyleWithScopedTheme(rt, parsedStyleSheet, unistyleData);
             } else {
-                unistyle->rawValue = parsedStyleSheetsWithDefaultTheme[unistyleStyleSheet].asObject(rt).getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
-                this->rebuildUnistyle(rt, unistyle, unistyleData->variants, unistyleData->dynamicFunctionMetadata);
+                unistyle->rawValue = parsedSheetObj
+                    .getProperty(rt, unistyle->styleKey.c_str())
+                    .asObject(rt);
+                this->rebuildUnistyle(
+                    rt, unistyle, unistyleData->variants,
+                    unistyleData->dynamicFunctionMetadata
+                );
                 unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
                 unistyle->isDirty = true;
             }
 
-            if (!parsedUnistyles.contains(unistyle)) {
-                parsedUnistyles.emplace(unistyle, true);
-            }
+            parsedUnistyles.insert(unistyle);
         }
     }
 
-    // parse whatever left in StyleSheets to be later accessible
-    // for createUnistylesComponent
-    for (auto styleSheet : styleSheets) {
+    // Parse whatever left in StyleSheets to be later accessible
+    for (const auto& styleSheet : styleSheets) {
+        auto& parsedSheetValue = parsedStyleSheetsWithDefaultTheme[styleSheet];
+        auto parsedSheetObj = parsedSheetValue.asObject(rt);
+
         for (auto& [_, unistyle] : styleSheet->unistyles) {
             if (!parsedUnistyles.contains(unistyle)) {
-                unistyle->rawValue = parsedStyleSheetsWithDefaultTheme[styleSheet].asObject(rt).getProperty(rt, unistyle->styleKey.c_str()).asObject(rt);
+                unistyle->rawValue = parsedSheetObj
+                    .getProperty(rt, unistyle->styleKey.c_str())
+                    .asObject(rt);
                 unistyle->isDirty = true;
             }
         }
@@ -372,11 +374,12 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle
 void parser::Parser::rebuildShadowLeafUpdates(jsi::Runtime& rt, core::DependencyMap& dependencyMap) {
     auto& registry = core::UnistylesRegistry::get();
 
-    registry.trafficController.withLock([this, &rt, &dependencyMap, &registry](){
+    registry.trafficController.withLock([this, &rt, &dependencyMap, &registry]() {
         shadow::ShadowLeafUpdates updates;
-        
+        updates.reserve(dependencyMap.size());
+
         for (const auto& [shadowNode, unistyles] : dependencyMap) {
-            // this step is required to parse string colors eg. #000000 to int representation
+            // Parse string colors (e.g., "#000000") to int representation
             auto rawProps = this->parseStylesToShadowTreeStyles(rt, unistyles);
 
             updates.emplace(shadowNode, std::move(rawProps));
@@ -386,6 +389,7 @@ void parser::Parser::rebuildShadowLeafUpdates(jsi::Runtime& rt, core::Dependency
         registry.trafficController.resumeUnistylesTraffic();
     });
 }
+
 
 // first level of StyleSheet, we can expect here different properties than on second level
 // eg. variants, compoundVariants, mq, breakpoints etc.
@@ -884,13 +888,13 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, Unistyle::Shared u
 
             return;
         }
-        
+
         auto isArray = nestedObjectStyle.isArray(rt);
-        
+
         if (!isArray) {
             parsedStyle.setProperty(rt, propertyName.c_str(), this->getValueFromBreakpoints(rt, unistyle, nestedObjectStyle));
         }
-        
+
         // possible with variants and compoundVariants
         if (propertyName == "transform") {
             parsedStyle.setProperty(rt, propertyName.c_str(), parseTransforms(rt, unistyle, nestedObjectStyle));
@@ -928,68 +932,107 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, Unistyle::Shared u
 
 // convert unistyles to folly with int colors
 folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, const std::vector<std::shared_ptr<UnistyleData>>& unistyles) {
-    jsi::Object convertedStyles = jsi::Object(rt);
+    jsi::Object convertedStyles(rt);
     auto& state = core::UnistylesRegistry::get().getState(rt);
 
     for (const auto& unistyleData : unistyles) {
-        // this can happen for exotic stylesheets
         if (!unistyleData->parsedStyle.has_value()) {
             continue;
         }
 
-        helpers::enumerateJSIObject(rt, unistyleData->parsedStyle.value(), [&](const std::string& propertyName, jsi::Value& propertyValue){
-            if (this->isColor(propertyName)) {
-                return convertedStyles.setProperty(rt, propertyName.c_str(), jsi::Value(state.parseColor(propertyValue)));
-            }
+        helpers::enumerateJSIObject(
+            rt,
+            unistyleData->parsedStyle.value(),
+            [this, &rt, &state, &convertedStyles](const std::string& propertyName, jsi::Value& propertyValue) {
+                if (this->isColor(propertyName)) {
+                    convertedStyles.setProperty(
+                        rt,
+                        propertyName.c_str(),
+                        jsi::Value(state.parseColor(propertyValue))
+                    );
 
-            if (!propertyValue.isObject()) {
-                return convertedStyles.setProperty(rt, propertyName.c_str(), propertyValue);
-            }
+                    return;
+                }
 
-            auto objValue = propertyValue.asObject(rt);
+                if (!propertyValue.isObject()) {
+                    convertedStyles.setProperty(
+                        rt,
+                        propertyName.c_str(),
+                        propertyValue
+                    );
 
-            if (!objValue.isArray(rt)) {
-                return convertedStyles.setProperty(rt, propertyName.c_str(), propertyValue);
-            }
+                    return;
+                }
 
-            // parse nested arrays like boxShadow
-            auto arrValue = objValue.asArray(rt);
-            auto parsedArray = jsi::Array(rt, arrValue.length(rt));
+                jsi::Object objValue = propertyValue.asObject(rt);
 
-            helpers::iterateJSIArray(rt, arrValue, [&](size_t i, jsi::Value& nestedValue){
-                if (nestedValue.isObject()) {
-                    jsi::Object obj = jsi::Object(rt);
+                if (!objValue.isArray(rt)) {
+                    convertedStyles.setProperty(
+                        rt,
+                        propertyName.c_str(),
+                        propertyValue
+                    );
 
-                    helpers::enumerateJSIObject(rt, nestedValue.asObject(rt), [&](const std::string& propertyName, jsi::Value& propertyValue){
-                        if (this->isColor(propertyName)) {
-                            obj.setProperty(rt, propertyName.c_str(), state.parseColor(propertyValue));
+                    return;
+                }
+
+                // parse nested arrays like boxShadow
+                jsi::Array arrValue = objValue.asArray(rt);
+                size_t arrLen = arrValue.length(rt);
+                jsi::Array parsedArray(rt, arrLen);
+
+                helpers::iterateJSIArray(
+                    rt,
+                    arrValue,
+                    [this, &rt, &state, &propertyName, &parsedArray](size_t i, jsi::Value& nestedValue) {
+                        if (nestedValue.isObject()) {
+                            jsi::Object obj(rt);
+
+                            helpers::enumerateJSIObject(
+                                rt,
+                                nestedValue.asObject(rt),
+                                [this, &rt, &state, &obj](const std::string& nestedPropName, jsi::Value& nestedPropValue) {
+                                    if (this->isColor(nestedPropName)) {
+                                        obj.setProperty(
+                                            rt,
+                                            nestedPropName.c_str(),
+                                            state.parseColor(nestedPropValue)
+                                        );
+                                    } else {
+                                        obj.setProperty(
+                                            rt,
+                                            nestedPropName.c_str(),
+                                            nestedPropValue
+                                        );
+                                    }
+                                }
+                            );
+
+                            parsedArray.setValueAtIndex(rt, i, obj);
 
                             return;
                         }
 
-                        obj.setProperty(rt, propertyName.c_str(), propertyValue);
-                    });
+                        if (this->isColor(propertyName)) {
+                            parsedArray.setValueAtIndex(
+                                rt,
+                                i,
+                                jsi::Value(state.parseColor(nestedValue))
+                            );
+                        } else {
+                            parsedArray.setValueAtIndex(rt, i, nestedValue);
+                        }
+                    }
+                );
 
-                    parsedArray.setValueAtIndex(rt, i, std::move(obj));
-
-                    return;
-                }
-
-                if (this->isColor(propertyName)) {
-                    parsedArray.setValueAtIndex(rt, i, jsi::Value(state.parseColor(nestedValue)));
-
-                    return;
-                }
-
-                parsedArray.setValueAtIndex(rt, i, nestedValue);
-            });
-
-            return convertedStyles.setProperty(rt, propertyName.c_str(), parsedArray);
-        });
+                convertedStyles.setProperty(rt, propertyName.c_str(), parsedArray);
+            }
+        );
     }
 
-    return jsi::dynamicFromValue(rt, std::move(convertedStyles));
+    return jsi::dynamicFromValue(rt, jsi::Value(rt, convertedStyles));
 }
+
 
 // check is styleKey contains color
 bool parser::Parser::isColor(const std::string& propertyName) {
