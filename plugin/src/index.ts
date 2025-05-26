@@ -22,6 +22,10 @@ export default function (): PluginObj<UnistylesPluginPass> {
         visitor: {
             Program: {
                 enter(path, state) {
+                    if (!state.opts.root) {
+                        throw new Error('Unistyles 🦄: Babel plugin requires `root` option to be set. Please check https://www.unistyl.es/v3/other/babel-plugin#extra-configuration')
+                    }
+
                     state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS
                         .map(toPlatformPath)
                         .concat(state.opts.autoProcessPaths ?? [])
@@ -35,8 +39,8 @@ export default function (): PluginObj<UnistylesPluginPass> {
                     state.file.reactNativeCommonJSName = ''
                     state.file.tagNumber = 0
                     state.reactNativeImports = {}
-                    state.file.forceProcessing = state.opts.autoProcessRoot && state.filename
-                        ? state.filename.includes(toPlatformPath(`${state.file.opts.root}/${state.opts.autoProcessRoot}/`))
+                    state.file.forceProcessing = state.opts.root && state.filename
+                        ? state.filename.includes(toPlatformPath(`${state.file.opts.root}/${state.opts.root}/`))
                         : false
 
                     path.traverse({
