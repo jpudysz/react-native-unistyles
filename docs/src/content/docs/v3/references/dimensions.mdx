@@ -14,7 +14,7 @@ import Seo from '../../../../components/Seo.astro'
 >
 
 
-Unistyles provides rich metadata about your device dimensions. This is useful for creating responsive designs as well as avoiding installing third-part libraries.
+Unistyles provides rich metadata about your device dimensions. This is useful for creating responsive designs as well as avoiding installing third-party libraries.
 Every property listed below can be accessed with [UnistylesRuntime](/v3/references/unistyles-runtime).
 Dimensions are always up to date and are updated based on Unistyles' core logic, e.g., when the device orientation changes.
 
@@ -29,7 +29,7 @@ import { UnistylesRuntime } from 'react-native-unistyles'
 ### Screen dimensions
 
 The most basic dimensions are the screen dimensions. These are the dimensions of the screen that your app is running on.
-You can access them with `screen` prop:
+You can access them with the `screen` prop:
 
 ```tsx /screen/
 import { UnistylesRuntime } from 'react-native-unistyles'
@@ -40,7 +40,7 @@ UnistylesRuntime.screen.height // eg. 760
 
 ### Status bar
 
-You can access status bar dimensions with `statusBar` prop:
+You can access status bar dimensions with the `statusBar` prop:
 
 ```tsx /statusBar/
 import { UnistylesRuntime } from 'react-native-unistyles'

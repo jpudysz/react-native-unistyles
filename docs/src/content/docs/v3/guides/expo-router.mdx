@@ -18,7 +18,7 @@ import Seo from '../../../../components/Seo.astro'
 
 ### Modify main entry
 
-Expo Router resolves routes differently that expected. Also, Unistyles 3.0 is parsing your `StyleSheets` as soon as you import file containing it.
+Expo Router resolves routes differently than expected. Also, Unistyles 3.0 is parsing your `StyleSheets` as soon as you import file containing it.
 This combination may cause some issues. To prevent that you need to modify your main entry file:
 
 ```diff lang="json" title="package.json"
@@ -60,7 +60,7 @@ You can check if you are using static rendering in `app.json`:
 }
 ```
 
-For Expo static rendering, every page will be resolved with the Root HTML file. Unfortunately, this file is hidden, and you need to create it manually.
+For Expo static rendering, every page will be resolved with the root HTML file. Unfortunately, this file is hidden, and you need to create it manually.
 Please follow the [Expo guide](https://docs.expo.dev/router/reference/static-rendering/#root-html) and add a `+html.tsx` file.
 
 In this file, initialize Unistyles by importing the config file:
