@@ -724,6 +724,9 @@ function index_default() {
     visitor: {
       Program: {
         enter(path2, state) {
+          if (!state.opts.root) {
+            throw new Error("Unistyles \u{1F984}: Babel plugin requires `root` option to be set. Please check https://www.unistyl.es/v3/other/babel-plugin#extra-configuration");
+          }
           state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS.map(toPlatformPath).concat(state.opts.autoProcessPaths ?? []).some((path3) => state.filename?.includes(path3));
           state.file.hasAnyUnistyle = false;
           state.file.hasUnistylesImport = false;
@@ -733,7 +736,7 @@ function index_default() {
           state.file.reactNativeCommonJSName = "";
           state.file.tagNumber = 0;
           state.reactNativeImports = {};
-          state.file.forceProcessing = state.opts.autoProcessRoot && state.filename ? state.filename.includes(toPlatformPath(`${state.file.opts.root}/${state.opts.autoProcessRoot}/`)) : false;
+          state.file.forceProcessing = state.opts.root && state.filename ? state.filename.includes(toPlatformPath(`${state.file.opts.root}/${state.opts.root}/`)) : false;
           path2.traverse({
             BlockStatement(blockPath) {
               if (isInsideNodeModules(state)) {
