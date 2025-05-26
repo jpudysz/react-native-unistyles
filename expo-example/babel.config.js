@@ -9,7 +9,8 @@ module.exports = function (api) {
         plugins: [
             [path.join(__dirname, '../plugin'), {
                 debug: true,
-                isLocal: true
+                isLocal: true,
+                root: 'app'
             }],
             [
                 'module-resolver',
