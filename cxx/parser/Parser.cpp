@@ -236,7 +236,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(
         auto styleSheet = unistyles.front()->unistyle->parent;
 
         // Stylesheet may be optional for exotic unistyles
-        if (styleSheet && !parsedStyleSheetsWithDefaultTheme.contains(styleSheet)) {
+        if (styleSheet && parsedStyleSheetsWithDefaultTheme.find(styleSheet) == parsedStyleSheetsWithDefaultTheme.end()) {
             parsedStyleSheetsWithDefaultTheme.emplace(
                 styleSheet,
                 this->unwrapStyleSheet(rt, styleSheet, maybeMiniRuntime)
@@ -252,7 +252,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(
                     unistyleData->parsedStyle = jsi::Value(rt, unistyle->rawValue).asObject(rt);
                     parsedUnistyles.insert(unistyle);
                 }
-                
+
                 continue;
             }
 
@@ -260,7 +260,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(
             auto unistyleStyleSheet = unistyle->parent;
 
             // We may hit now other StyleSheets that are referenced from affected nodes
-            if (unistyleStyleSheet && !parsedStyleSheetsWithDefaultTheme.contains(unistyleStyleSheet)) {
+            if (unistyleStyleSheet && parsedStyleSheetsWithDefaultTheme.find(unistyleStyleSheet) == parsedStyleSheetsWithDefaultTheme.end()) {
                 parsedStyleSheetsWithDefaultTheme.emplace(
                     unistyleStyleSheet,
                     this->unwrapStyleSheet(rt, unistyleStyleSheet, maybeMiniRuntime)
@@ -270,7 +270,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(
             // StyleSheet might have styles that are not affected
             auto& parsedSheetValue = parsedStyleSheetsWithDefaultTheme[unistyleStyleSheet];
             auto parsedSheetObj = parsedSheetValue.asObject(rt);
-            
+
             if (!parsedSheetObj.hasProperty(rt, unistyle->styleKey.c_str())) {
                 continue;
             }
@@ -282,7 +282,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(
 
                 jsi::Value parsedStyleSheet = jsi::Value::undefined();
                 auto it = scopedThemeMap.find(unistyle->parent);
-                
+
                 if (it != scopedThemeMap.end()) {
                     parsedStyleSheet = jsi::Value(rt, it->second);
                 }
@@ -316,7 +316,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(
     for (const auto& styleSheet : styleSheets) {
         auto& parsedSheetValue = parsedStyleSheetsWithDefaultTheme[styleSheet];
         auto parsedSheetObj = parsedSheetValue.asObject(rt);
-        
+
         for (auto& [_, unistyle] : styleSheet->unistyles) {
             if (!parsedUnistyles.contains(unistyle)) {
                 unistyle->rawValue = parsedSheetObj
@@ -888,13 +888,13 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, Unistyle::Shared u
 
             return;
         }
-        
+
         auto isArray = nestedObjectStyle.isArray(rt);
-        
+
         if (!isArray) {
             parsedStyle.setProperty(rt, propertyName.c_str(), this->getValueFromBreakpoints(rt, unistyle, nestedObjectStyle));
         }
-        
+
         // possible with variants and compoundVariants
         if (propertyName == "transform") {
             parsedStyle.setProperty(rt, propertyName.c_str(), parseTransforms(rt, unistyle, nestedObjectStyle));
@@ -950,7 +950,7 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
                         propertyName.c_str(),
                         jsi::Value(state.parseColor(propertyValue))
                     );
-                    
+
                     return;
                 }
 
@@ -960,7 +960,7 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
                         propertyName.c_str(),
                         propertyValue
                     );
-                    
+
                     return;
                 }
 
@@ -972,7 +972,7 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
                         propertyName.c_str(),
                         propertyValue
                     );
-                    
+
                     return;
                 }
 
@@ -1009,7 +1009,7 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
                             );
 
                             parsedArray.setValueAtIndex(rt, i, obj);
-                            
+
                             return;
                         }
 
