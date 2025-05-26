@@ -82,7 +82,7 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
         });
 
         updates[shadowNodeFamily] = parser.parseStylesToShadowTreeStyles(rt, unistylesData);
-        
+
         this->trafficController.setUpdates(updates);
         this->trafficController.resumeUnistylesTraffic();
     });
@@ -142,7 +142,7 @@ core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt
                     break;
                 }
             }
-            
+
             if (hasAnyOfDependencies) {
                 break;
             };
@@ -202,27 +202,30 @@ std::vector<std::shared_ptr<core::StyleSheet>>core::UnistylesRegistry::getStyleS
 
     for (const auto& [_, styleSheet] : styleSheets) {
         if (styleSheet->type == StyleSheetType::ThemableWithMiniRuntime) {
-            for (const auto& [__, unistyle] : styleSheet->unistyles) {
-                for (const auto& dep : unistyle->dependencies) {
-                    if (depSet.count(dep)) {
-                        stylesheetsToRefresh.emplace_back(styleSheet);
-                        
-                        goto nextStyleSheet;
+            auto hasMatchingDependency = [&depSet](const auto& unistyles) {
+                for (const auto& [_, unistyle] : unistyles) {
+                    for (const auto& dep : unistyle->dependencies) {
+                        if (depSet.count(dep)) {
+                            return true;
+                        }
                     }
                 }
+
+                return false;
+            };
+
+            if (hasMatchingDependency(styleSheet->unistyles)) {
+                stylesheetsToRefresh.emplace_back(styleSheet);
             }
         }
 
         if (styleSheet->type == StyleSheetType::Themable && themeDidChange) {
             stylesheetsToRefresh.emplace_back(styleSheet);
         }
-
-        nextStyleSheet:;
     }
 
     return stylesheetsToRefresh;
 }
-
 
 core::Unistyle::Shared core::UnistylesRegistry::getUnistyleById(jsi::Runtime& rt, std::string unistyleID) {
     for (auto& pair: this->_styleSheetRegistry[&rt]) {
