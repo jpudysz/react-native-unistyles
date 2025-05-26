@@ -5,6 +5,7 @@ const pak = require('../package.json')
 const unistylesPluginOptions = {
     debug: true,
     isLocal: true,
+    root: 'src',
     autoProcessImports: ['@lib/theme', './st'],
 }
 

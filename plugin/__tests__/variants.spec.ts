@@ -4,7 +4,8 @@ import plugin from '../src/index'
 pluginTester({
     plugin,
     pluginOptions: {
-        debug: false
+        debug: false,
+        root: 'src'
     },
     babelOptions: {
         plugins: ['@babel/plugin-syntax-jsx'],

@@ -37,11 +37,12 @@ export interface RemapConfig {
 
 export interface UnistylesPluginOptions {
     /**
-     * Example: 'src' or 'apps/mobile'
-     * Add this option if some of your components don't have `react-native-unistyles` import.
-     * Babel plugin will automatically process all files under this root.
+     * Required from RC.5
+     * Example: 'src' or 'app'
+     * Add root folder of your project. All files under this folder will be processed by the Babel plugin.
+     * If you need to process extra folders, use with `autoProcessPaths` option.
      */
-    autoProcessRoot?: string,
+    root: string,
 
     /**
     * Example: ['@codemask/styles']

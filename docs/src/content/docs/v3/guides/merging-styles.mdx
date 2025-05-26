@@ -46,10 +46,9 @@ It's critical to ship Unistyles 3.0 apps without this warning, as it can cause u
 
 ### Reanimated
 
-By default `Animated` components will flatten your styles array. This means that you can only pass **single** unistyle to `Animated` components.
-If you want to get rid of this warning, for `react-native-reanimated` 3.x please follow [this thread](https://github.com/jpudysz/react-native-unistyles/issues/512) to apply a patch.
+In older versions of Reanimated, the `Animated` component was flattening your styles array, causing warnings and only allowing to pass a **single** unistyles to an `Animated` component ([original issue](https://github.com/jpudysz/react-native-unistyles/issues/512)).
 
-Patch is not necessary from `react-native-reanimated` 4.0.0-beta.3 as it was merged to the main branch.
+However, from `react-native-reanimated@3.17.2` or `react-native-reanimated@4.0.0-beta.3`, styles are no longer flattened.
 
 ### Spreading a single Unistyle
 
