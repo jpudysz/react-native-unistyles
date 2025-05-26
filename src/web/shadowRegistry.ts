@@ -20,7 +20,7 @@ export class UnistylesShadowRegistry {
     constructor(private services: UnistylesServices) {}
 
     add = (ref: any, hash?: string) => {
-        if (!(ref instanceof HTMLElement) || !hash) {
+        if (isServer() || !(ref instanceof HTMLElement) || !hash) {
             return
         }
 
