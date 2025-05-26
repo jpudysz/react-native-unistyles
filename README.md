@@ -60,9 +60,6 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 <a href="https://galaxies.dev">
      <img src="https://avatars.githubusercontent.com/u/118431096?s=200&v=4" height="70px" width="70px" alt="galaxies-dev" />
 </a>
-<a href="https://github.com/FTCHD">
-     <img src="https://avatars.githubusercontent.com/u/144691102?v=4" height="70px" width="70px" alt="FTCHD" />
-</a>
 <a href="https://github.com/mobily">
      <img src="https://avatars.githubusercontent.com/u/1467712?v=4" height="70px" width="70px" alt="mobily" />
 </a>
@@ -81,8 +78,8 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 <a href="https://github.com/ryanlanciaux">
      <img src="https://avatars.githubusercontent.com/u/85041?v=4" height="70px" width="70px" alt="ryanlanciaux" />
 </a>
-<a href="https://github.com/loopsware">
-     <img src="https://avatars.githubusercontent.com/u/161434039?s=200&v=4" height="70px" width="70px" alt="loopsware" />
+<a href="https://github.com/avega99">
+     <img src="https://avatars.githubusercontent.com/u/177598670?v=4" height="70px" width="70px" alt="avega99" />
 </a>
 
 ## Past sponsors
@@ -125,6 +122,12 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 </a>
 <a href="https://github.com/guillaumehcht">
      <img src="https://avatars.githubusercontent.com/u/80776475?v=4" height="60px" width="60px" alt="guillaumehcht" />
+</a>
+<a href="https://github.com/loopsware">
+     <img src="https://avatars.githubusercontent.com/u/161434039?s=200&v=4" height="60px" width="60px" alt="loopsware" />
+</a>
+<a href="https://github.com/FTCHD">
+     <img src="https://avatars.githubusercontent.com/u/144691102?v=4" height="60px" width="60px" alt="FTCHD" />
 </a>
 
 ## Sponsor my work
