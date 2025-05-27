@@ -107,13 +107,18 @@ jsi::Value HybridShadowRegistry::unlink(jsi::Runtime &rt, const jsi::Value &this
     return jsi::Value::undefined();
 }
 
+jsi::Value HybridShadowRegistry::flush(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    shadow::ShadowTreeManager::updateShadowTree(UIManagerBinding::getBinding(rt)->getUIManager().getShadowTreeRegistry());
+
+    return jsi::Value::undefined();
+}
+
 jsi::Value HybridShadowRegistry::setScopedTheme(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count == 1, "Unistyles: setScopedTheme expected 1 argument.");
 
     auto& registry = core::UnistylesRegistry::get();
 
     if (args[0].isUndefined()) {
-
         registry.setScopedTheme(std::nullopt);
     }
 
