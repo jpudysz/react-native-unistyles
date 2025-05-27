@@ -9,6 +9,7 @@ interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     // JSI
     link(node: ShadowNode, styles?: Array<Unistyle>): void,
     unlink(node: ShadowNode): void,
+    flush(): void,
     setScopedTheme(themeName?: string): void,
     getScopedTheme(): string | undefined
 }
