@@ -32,7 +32,7 @@ export class CSSState {
     mainMap: MapType = new Map()
     mqMap: MapType = new Map()
     private styleTag: HTMLStyleElement | null = null
-    private CSS = ''
+    private themesCSS = new Map<string, string>()
 
     constructor(private services: UnistylesServices) {
         if (isServer()) {
@@ -62,7 +62,10 @@ export class CSSState {
 
     add = (hash: string, values: UnistylesValues) => {
         convertToCSS(hash, convertUnistyles(values, this.services.runtime), this)
+        this.recreate()
+    }
 
+    recreate = () => {
         if (this.styleTag) {
             this.styleTag.innerText = this.getStyles()
         }
@@ -84,10 +87,10 @@ export class CSSState {
         Object.entries(values).forEach(([key, value]) => convertToCSS(key, value))
 
         if (theme === 'light' || theme === 'dark') {
-            this.CSS += `@media (prefers-color-scheme: ${theme}){:root{${themeVars}}}`
+            this.themesCSS.set(`media ${theme}`, `@media (prefers-color-scheme: ${theme}){:root{${themeVars}}}`)
         }
 
-        this.CSS += `:root.${theme}{${themeVars}}`
+        this.themesCSS.set(theme, `:root.${theme}{${themeVars}}`)
     }
 
     remove = (hash: string) => {
@@ -97,14 +100,13 @@ export class CSSState {
         this.mqMap.forEach(styles => {
             styles.delete(hash)
         })
-
-        if (this.styleTag) {
-            this.styleTag.innerText = this.getStyles()
-        }
+        this.recreate()
     }
 
     getStyles = () => {
-        let styles = this.CSS
+        let styles = Array.from(this.themesCSS.entries()).reduce((acc, [, themeCss]) => {
+            return acc + themeCss
+        }, '')
 
         const generate = (mediaQuery: string, secondLevelMap: Map<string, Map<string, string>>) => {
             if (mediaQuery) {
