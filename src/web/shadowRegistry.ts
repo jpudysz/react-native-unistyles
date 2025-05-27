@@ -118,4 +118,6 @@ export class UnistylesShadowRegistry {
                 this.disposeMap.delete(hash)
             })
     }
+
+    flush = () => {}
 }
