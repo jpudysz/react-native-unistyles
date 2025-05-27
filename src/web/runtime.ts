@@ -4,7 +4,7 @@ import { type AppTheme, type AppThemeName, ColorScheme, Orientation } from '../s
 import { type UnistylesTheme, WebContentSizeCategory } from '../types'
 import { NavigationBar, StatusBar } from './mock'
 import type { UnistylesServices } from './types'
-import { error, isServer, schemeToTheme } from './utils'
+import { convertTheme, error, isServer, schemeToTheme } from './utils'
 
 export class UnistylesRuntime {
     lightMedia = this.getLightMedia()
@@ -204,7 +204,20 @@ export class UnistylesRuntime {
             throw error(`Unistyles: You're trying to update theme "${themeName}" but it wasn't registered.`)
         }
 
-        this.services.state.themes.set(themeName, updater(oldTheme))
+        const newTheme = updater(oldTheme)
+
+        this.services.state.themes.set(themeName, newTheme)
+
+        if (this.services.state.CSSVars) {
+            this.services.state.cssThemes.set(
+                themeName,
+                Object.fromEntries(Object.entries(newTheme).map(([key, value]) => {
+                    return convertTheme(key, value)
+                })) as UnistylesTheme
+            )
+            this.services.registry.css.addTheme(themeName, newTheme)
+            this.services.registry.css.recreate()
+        }
     }
 
     getTheme = (themeName = this.themeName, CSSVars = false) => {
