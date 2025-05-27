@@ -5,7 +5,7 @@ import type { AppBreakpoint, AppTheme, AppThemeName } from '../specs/types'
 import type { UnistylesTheme } from '../types'
 import type { UnionToIntersection } from '../types'
 import type { UnistylesServices } from './types'
-import { error, hyphenate, isServer, schemeToTheme } from './utils'
+import { convertTheme, error, isServer, schemeToTheme } from './utils'
 
 type UnistylesSettings = Partial<UnionToIntersection<Required<UnistylesConfig>['settings']>>
 
@@ -72,22 +72,12 @@ export class UnistylesState {
 
             if (CSSVars) {
                 this.services.registry.css.addTheme(themeName, theme)
-
-                const convertTheme = (key: string, value: any, prev = '-'): [string, any] => {
-                    if (typeof value === 'object' && value !== null) {
-                        return [key, Object.fromEntries(Object.entries(value).map(([nestedKey, nestedValue]) => convertTheme(nestedKey, nestedValue, `${prev}-${key}`)))]
-                    }
-
-                    if (typeof value === 'string') {
-                        return [key, `var(${prev}-${hyphenate(key)})`]
-                    }
-
-                    return [key, value]
-                }
-
-                this.cssThemes.set(themeName, Object.fromEntries(Object.entries(theme).map(([key, value]) => {
-                    return convertTheme(key, value)
-                })) as UnistylesTheme)
+                this.cssThemes.set(
+                    themeName,
+                    Object.fromEntries(Object.entries(theme).map(([key, value]) => {
+                        return convertTheme(key, value)
+                    })) as UnistylesTheme
+                )
             }
         })
     }
