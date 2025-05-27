@@ -6,7 +6,7 @@ import type { StyleSheet, StyleSheetWithSuperPowers, UnistylesValues } from '../
 import { isUnistylesMq, parseMq } from '../../utils'
 import * as unistyles from '../services'
 import { UNI_GENERATED_KEYS, type UniGeneratedKey, type UniGeneratedStyle } from '../types'
-import { keyInObject, reduceObject } from './common'
+import { hyphenate, keyInObject, reduceObject } from './common'
 
 export const schemeToTheme = (scheme: ColorScheme) => {
     switch (scheme) {
@@ -143,4 +143,16 @@ export const checkForAnimated = (value: any): boolean => {
 
 export const isGeneratedUnistyle = (value: Record<string, any>): value is UniGeneratedStyle => {
     return Object.keys(value).every(key => UNI_GENERATED_KEYS.includes(key as UniGeneratedKey))
+}
+
+export const convertTheme = (key: string, value: any, prev = '-'): [string, any] => {
+    if (typeof value === 'object' && value !== null) {
+        return [key, Object.fromEntries(Object.entries(value).map(([nestedKey, nestedValue]) => convertTheme(nestedKey, nestedValue, `${prev}-${key}`)))]
+    }
+
+    if (typeof value === 'string') {
+        return [key, `var(${prev}-${hyphenate(key)})`]
+    }
+
+    return [key, value]
 }
