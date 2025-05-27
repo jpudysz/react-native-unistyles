@@ -3,10 +3,14 @@
 using namespace facebook::react;
 
 double HybridStyleSheet::getHairlineWidth() {
-    auto pixelRatio = this->_unistylesRuntime->getPixelRatio();
-    auto nearestPixel = static_cast<int>(std::trunc(pixelRatio * 0.4));
+    double pixelRatio = this->_unistylesRuntime->getPixelRatio();
+    double hairlineWidth = std::round(pixelRatio * 0.4) / pixelRatio;
 
-    return nearestPixel / pixelRatio;
+    if (hairlineWidth == 0.0) {
+        hairlineWidth = 1.0 / pixelRatio;
+    }
+
+    return hairlineWidth;
 }
 
 double HybridStyleSheet::getUnid() {
