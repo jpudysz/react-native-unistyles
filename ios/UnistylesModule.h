@@ -1,5 +1,6 @@
 #import <React/RCTBridgeModule.h>
 #import <React/RCTEventEmitter.h>
+#include <ReactCommon/CallInvoker.h>
 
 #import <string>
 

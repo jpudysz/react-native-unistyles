@@ -2,7 +2,6 @@
 
 #include "UnistylesModel.h"
 #include "Macros.h"
-#include <ReactCommon/CallInvoker.h>
 #include <jsi/jsi.h>
 
 using namespace facebook;
@@ -11,7 +10,7 @@ using Getter = std::function<jsi::Value(jsi::Runtime& rt, std::string)>;
 using Setter = std::function<std::optional<jsi::Value>(jsi::Runtime& rt, const jsi::Value&)>;
 
 struct JSI_EXPORT UnistylesRuntime : public jsi::HostObject, UnistylesModel {
-    UnistylesRuntime(jsi::Runtime& rt, std::shared_ptr<react::CallInvoker> callInvoker) : UnistylesModel(rt, callInvoker) {
+    UnistylesRuntime(std::function<void(std::function<void(jsi::Runtime&)>&&)> runOnJSThread) : UnistylesModel(runOnJSThread) {
         this->getters = {
             {"screenWidth", BIND_FN(getScreenWidth)},
             {"screenHeight", BIND_FN(getScreenHeight)},

@@ -14,6 +14,10 @@
 }
 
 - (void)dealloc {
+    [self clean];
+}
+
+- (void)clean {
     if (self.unistylesRuntime != nullptr) {
         self.unistylesRuntime = nullptr;
     }
@@ -116,7 +120,7 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         UIApplicationState appState = [UIApplication sharedApplication].applicationState;
 
-        if (appState == UIApplicationStateBackground) {
+        if (appState != UIApplicationStateActive) {
             return;
         }
 
