@@ -36,6 +36,10 @@
 }
 
 - (void)dealloc {
+    [self clean];
+}
+
+- (void)clean {
     if (self.unistylesRuntime != nullptr) {
         self.unistylesRuntime = nullptr;
     }

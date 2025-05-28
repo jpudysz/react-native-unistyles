@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "rootDir": ".",
+    "composite": true,
     "paths": {
       "react-native-unistyles": ["./src/index"]
     },
