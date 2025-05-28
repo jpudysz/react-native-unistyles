@@ -110,7 +110,7 @@ std::vector<std::pair<std::string, double>> UnistylesModel::toSortedBreakpointPa
 // ref: https://github.com/facebook/react-native/pull/43375
 // ref: https://github.com/facebook/react-native/blob/b5fd041917d197f256433a41a126f0dff767c429/packages/react-native/ReactCommon/react/nativemodule/core/ReactCommon/TurboModule.cpp#L42
 void UnistylesModel::emitDeviceEvent(const std::string eventType, EventPayload payload) {
-    this->runOnJSThread([&, payload = std::move(payload)](jsi::Runtime& rt){
+    this->runOnJSThread([this, &eventType, payload = std::move(payload)](jsi::Runtime& rt){
         jsi::Value emitter = rt.global().getProperty(rt, "__rctDeviceEventEmitter");
 
         if (emitter.isUndefined()) {
