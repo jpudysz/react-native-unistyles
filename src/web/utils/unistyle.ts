@@ -142,7 +142,9 @@ export const checkForAnimated = (value: any): boolean => {
 }
 
 export const isGeneratedUnistyle = (value: Record<string, any>): value is UniGeneratedStyle => {
-    return Object.keys(value).every(key => UNI_GENERATED_KEYS.includes(key as UniGeneratedKey))
+    const keys = Object.keys(value)
+
+    return keys.length > 0 && keys.every(key => UNI_GENERATED_KEYS.includes(key as UniGeneratedKey))
 }
 
 export const convertTheme = (key: string, value: any, prev = '-'): [string, any] => {
