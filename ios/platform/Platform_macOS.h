@@ -8,6 +8,7 @@
 
 - (instancetype)init;
 
+- (void)clean;
 - (void)setupListeners;
 - (void)makeShared:(void*)runtime;
 - (void)onWindowChange;

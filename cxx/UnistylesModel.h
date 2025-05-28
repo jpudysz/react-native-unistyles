@@ -1,7 +1,6 @@
 #pragma once
 
 #include <jsi/jsi.h>
-#include <ReactCommon/CallInvoker.h>
 #include <vector>
 #include <map>
 #include <optional>
@@ -51,8 +50,8 @@ struct UnistylesModel {
     void onThemeChange(std::string themeName);
     void onPluginChange();
     void onLayoutChange();
-    jsi::Object parseEventPayload(EventPayload payload);
-    jsi::Object parseEventNestedPayload(EventNestedValue payload);
+    jsi::Object parseEventPayload(jsi::Runtime& rt, const EventPayload& payload);
+    jsi::Object parseEventNestedPayload(jsi::Runtime& rt, const EventNestedValue& payload);
 
     std::function<Screen()> getScreenDimensions;
     std::function<std::string()> getContentSizeCategory;
@@ -118,7 +117,7 @@ struct UnistylesModel {
     std::string colorScheme = UnistylesUnspecifiedScheme;
     std::string contentSizeCategory = UnistylesUnspecifiedScheme;
 
-    UnistylesModel(jsi::Runtime& rt, std::shared_ptr<react::CallInvoker> callInvoker): runtime(rt), callInvoker(callInvoker) {}
+    UnistylesModel(std::function<void(std::function<void(jsi::Runtime&)>&&)> runOnJSThread): runOnJSThread(std::move(runOnJSThread)) {}
 
     bool hasAdaptiveThemes;
     bool supportsAutomaticColorScheme;
@@ -138,6 +137,5 @@ struct UnistylesModel {
     std::vector<std::pair<std::string, double>> toSortedBreakpointPairs(jsi::Runtime&, jsi::Object&);
 
 private:
-    jsi::Runtime& runtime;
-    std::shared_ptr<react::CallInvoker> callInvoker;
+    std::function<void(std::function<void(jsi::Runtime&)>&&)> runOnJSThread;
 };

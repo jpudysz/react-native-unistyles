@@ -110,29 +110,27 @@ std::vector<std::pair<std::string, double>> UnistylesModel::toSortedBreakpointPa
 // ref: https://github.com/facebook/react-native/pull/43375
 // ref: https://github.com/facebook/react-native/blob/b5fd041917d197f256433a41a126f0dff767c429/packages/react-native/ReactCommon/react/nativemodule/core/ReactCommon/TurboModule.cpp#L42
 void UnistylesModel::emitDeviceEvent(const std::string eventType, EventPayload payload) {
-    this->callInvoker->invokeAsync([eventType, payload, this](){
-        jsi::Value emitter = this->runtime.global().getProperty(this->runtime, "__rctDeviceEventEmitter");
+    this->runOnJSThread([&, payload = std::move(payload)](jsi::Runtime& rt){
+        jsi::Value emitter = rt.global().getProperty(rt, "__rctDeviceEventEmitter");
 
         if (emitter.isUndefined()) {
             return;
         }
 
-        jsi::Object emitterObject = emitter.asObject(runtime);
-        jsi::Function emitFunction = emitterObject.getPropertyAsFunction(runtime, "emit");
+        jsi::Object emitterObject = emitter.asObject(rt);
+        jsi::Function emitFunction = emitterObject.getPropertyAsFunction(rt, "emit");
 
         std::vector<jsi::Value> arguments;
-        jsi::Object event = jsi::Object(this->runtime);
+        jsi::Object event = jsi::Object(rt);
+        jsi::Object eventPayload = this->parseEventPayload(rt, payload);
 
-        event.setProperty(this->runtime, "type", jsi::String::createFromUtf8(this->runtime, eventType));
+        event.setProperty(rt, "type", jsi::String::createFromUtf8(rt, std::move(eventType)));
+        event.setProperty(rt, "payload", std::move(eventPayload));
 
-        jsi::Object eventPayload = this->parseEventPayload(payload);
-
-        event.setProperty(this->runtime, "payload", eventPayload);
-
-        arguments.emplace_back(jsi::String::createFromAscii(runtime, "__unistylesOnChange"));
+        arguments.emplace_back(jsi::String::createFromAscii(rt, "__unistylesOnChange"));
         arguments.emplace_back(std::move(event));
 
-        emitFunction.callWithThis(runtime, emitterObject, (const jsi::Value*)arguments.data(), arguments.size());
+        emitFunction.callWithThis(rt, emitterObject, (const jsi::Value*)arguments.data(), arguments.size());
     });
 }
 
@@ -193,36 +191,42 @@ void UnistylesModel::onLayoutChange() {
     this->emitDeviceEvent("layout", payload);
 }
 
-jsi::Object UnistylesModel::parseEventPayload(EventPayload payload) {
-    jsi::Object eventPayload = jsi::Object(this->runtime);
+jsi::Object UnistylesModel::parseEventPayload(jsi::Runtime& rt, const EventPayload& payload) {
+    jsi::Object eventPayload = jsi::Object(rt);
 
     for (const auto& [key, value] : payload) {
         if (std::holds_alternative<std::string>(value)) {
-            eventPayload.setProperty(this->runtime, key.c_str(), jsi::String::createFromUtf8(this->runtime, std::get<std::string>(value)));
+            eventPayload.setProperty(rt, key.c_str(), jsi::String::createFromUtf8(rt, std::get<std::string>(value)));
+            
+            continue;
         }
 
         if (std::holds_alternative<int>(value)) {
-            eventPayload.setProperty(this->runtime, key.c_str(), std::get<int>(value));
+            eventPayload.setProperty(rt, key.c_str(), std::get<int>(value));
+            
+            continue;
         }
 
         if (std::holds_alternative<EventNestedValue>(value)) {
-            eventPayload.setProperty(this->runtime, key.c_str(), this->parseEventNestedPayload(std::get<EventNestedValue>(value)));
+            eventPayload.setProperty(rt, key.c_str(), this->parseEventNestedPayload(rt, std::get<EventNestedValue>(value)));
+            
+            continue;
         }
     }
 
     return eventPayload;
 }
 
-jsi::Object UnistylesModel::parseEventNestedPayload(EventNestedValue payload) {
-    jsi::Object eventPayload = jsi::Object(this->runtime);
+jsi::Object UnistylesModel::parseEventNestedPayload(jsi::Runtime& rt, const EventNestedValue& payload) {
+    jsi::Object eventPayload = jsi::Object(rt);
 
     for (const auto& [key, value] : payload) {
         if (std::holds_alternative<std::string>(value)) {
-            eventPayload.setProperty(this->runtime, key.c_str(), jsi::String::createFromUtf8(this->runtime, std::get<std::string>(value)));
+            eventPayload.setProperty(rt, key.c_str(), jsi::String::createFromUtf8(rt, std::get<std::string>(value)));
         }
 
         if (std::holds_alternative<int>(value)) {
-            eventPayload.setProperty(this->runtime, key.c_str(), std::get<int>(value));
+            eventPayload.setProperty(rt, key.c_str(), std::get<int>(value));
         }
     }
 
