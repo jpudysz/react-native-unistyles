@@ -82,3 +82,5 @@ lib/
 docs/.yarn
 coverage
 docs/dist
+
+tsconfig.tsbuildinfo

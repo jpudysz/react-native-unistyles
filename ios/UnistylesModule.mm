@@ -1,6 +1,5 @@
 #import "UnistylesModule.h"
 #import "UnistylesRuntime.h"
-
 #import <React/RCTBridge+Private.h>
 #import <jsi/jsi.h>
 
@@ -16,8 +15,12 @@ RCT_EXPORT_MODULE(Unistyles)
     if ((self = [super init])) {
         self.platform = [[Platform alloc] init];
     }
-
+    
     return self;
+}
+
+- (void)dealloc {
+    [self.platform clean];
 }
 
 + (BOOL)requiresMainQueueSetup {
@@ -62,8 +65,12 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
 
 void registerUnistylesHostObject(RCTBridge* bridge, UnistylesModule* weakSelf) {
     std::shared_ptr<react::CallInvoker> callInvoker = bridge.jsCallInvoker;
+    auto runOnJSThread = [callInvoker](std::function<void(jsi::Runtime& rt)> &&callback){
+        callInvoker->invokeAsync(std::move(callback));
+    };
+    
     jsi::Runtime* runtime = reinterpret_cast<jsi::Runtime*>(bridge.runtime);
-    auto unistylesRuntime = std::make_shared<UnistylesRuntime>(*runtime, callInvoker);
+    auto unistylesRuntime = std::make_shared<UnistylesRuntime>(runOnJSThread);
 
     [weakSelf.platform makeShared:unistylesRuntime.get()];
 

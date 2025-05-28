@@ -8,6 +8,7 @@
 
 - (instancetype)init;
 
+- (void)clean;
 - (void)makeShared:(void*)runtime;
 - (void)onAppearanceChange:(NSNotification *)notification;
 - (void)onContentSizeCategoryChange:(NSNotification *)notification;
