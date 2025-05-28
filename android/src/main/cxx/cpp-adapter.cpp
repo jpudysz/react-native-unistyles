@@ -27,7 +27,13 @@ Java_com_unistyles_UnistylesModule_nativeInstall(JNIEnv *env, jobject thiz, jlon
         return throwKotlinException(env, "Something went wrong while initializing UnistylesModule");
     }
 
-    unistylesRuntime = std::make_shared<UnistylesRuntime>(*runtime, callInvoker);
+    auto runOnJSThread = [callInvoker](std::function<void(jsi::Runtime&)>&& callback) {
+        callInvoker->invokeAsync([callback = std::move(callback)](jsi::Runtime &rt) {
+            callback(rt);
+        });
+    };
+
+    unistylesRuntime = std::make_shared<UnistylesRuntime>(runOnJSThread);
     makeShared(env, unistylesModule, unistylesRuntime);
 
     jsi::Object hostObject = jsi::Object::createFromHostObject(*runtime, unistylesRuntime);
