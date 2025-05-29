@@ -73,7 +73,8 @@
       "browser": "./lib/module/reanimated/index.js",
       "react-native": "./src/reanimated/index.ts",
       "default": "./lib/commonjs/reanimated/index.js"
-    }
+    },
+    "./src/components/native/*": "./src/components/native/*"
   },
   "files": [
     "src",
