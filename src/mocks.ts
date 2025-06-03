@@ -91,7 +91,7 @@ jest.mock('react-native-unistyles', () => {
         pixelRatio: 0,
         rtl: false,
         getTheme: () => {
-            return {} as UnistylesTheme
+            return (Object.values(_REGISTRY.themes).at(0) ?? {}) as UnistylesTheme
         },
         setTheme: () => {},
         updateTheme: () => {},
