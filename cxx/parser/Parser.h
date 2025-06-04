@@ -40,6 +40,7 @@ private:
     std::vector<UnistyleDependency> parseDependencies(jsi::Runtime &rt, jsi::Object&& dependencies);
     jsi::Value parseTransforms(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Object& obj);
     jsi::Value parseBoxShadow(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Object& obj);
+    jsi::Array parseBoxShadowString(jsi::Runtime& rt, std::string&& boxShadowString);
     jsi::Value parseFilters(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Object& obj);
     jsi::Value getValueFromBreakpoints(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Object& obj);
     jsi::Object parseVariants(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Object& obj, Variants& variants);
