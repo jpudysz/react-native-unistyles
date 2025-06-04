@@ -1,6 +1,7 @@
 import { StyleSheet as NativeStyleSheet, processColor } from 'react-native'
 import type { StyleSheet as NativeStyleSheetType } from 'react-native'
 import { NitroModules } from 'react-native-nitro-modules'
+import { parseBoxShadowString } from '../../core/parseBoxShadow'
 import type { UnistylesBreakpoints, UnistylesThemes } from '../../global'
 import type { CreateUnistylesStyleSheet } from '../../types'
 import type { UnistylesStyleSheet as UnistylesStyleSheetSpec } from './UnistylesStyleSheet.nitro'
@@ -33,7 +34,8 @@ export interface UnistylesStyleSheet extends UnistylesStyleSheetSpec {
     create: CreateUnistylesStyleSheet,
     configure(config: UnistylesConfig): void,
     jsMethods: {
-        processColor: typeof processColor
+        processColor: typeof processColor,
+        parseBoxShadowString: typeof parseBoxShadowString
     }
 }
 
@@ -45,7 +47,8 @@ HybridUnistylesStyleSheet.absoluteFill = NativeStyleSheet.absoluteFill
 HybridUnistylesStyleSheet.flatten = NativeStyleSheet.flatten
 HybridUnistylesStyleSheet.compose = NativeStyleSheet.compose
 HybridUnistylesStyleSheet.jsMethods = {
-    processColor
+    processColor,
+    parseBoxShadowString
 }
 
 HybridUnistylesStyleSheet.init()
