@@ -424,6 +424,13 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared u
             return;
         }
 
+        // special case as we need to convert it to jsi::Array<jsi::Object>
+        if (propertyName == "boxShadow" && propertyValue.isString()) {
+            parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), parseBoxShadowString(rt, propertyValue.asString(rt).utf8(rt)));
+
+            return;
+        }
+
         // primitives
         if (propertyValue.isNumber() || propertyValue.isString() || propertyValue.isUndefined() || propertyValue.isNull()) {
             parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), propertyValue);
@@ -616,6 +623,13 @@ jsi::Value parser::Parser::parseBoxShadow(jsi::Runtime &rt, Unistyle::Shared uni
     }
 
     return result;
+}
+
+jsi::Array parser::Parser::parseBoxShadowString(jsi::Runtime& rt, std::string&& boxShadowString) {
+    auto& registry = core::UnistylesRegistry::get();
+    auto& state = registry.getState(rt);
+
+    return state.parseBoxShadowString(std::move(boxShadowString));
 }
 
 // eg. [{ brightness: 0.5 }, { opacity: 0.25 }]

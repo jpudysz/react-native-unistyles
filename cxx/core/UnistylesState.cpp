@@ -95,6 +95,10 @@ void core::UnistylesState::registerProcessColorFunction(jsi::Function&& fn) {
     this->_processColorFn = std::make_shared<jsi::Function>(std::move(fn));
 }
 
+void core::UnistylesState::registerParseBoxShadowString(jsi::Function&& fn) {
+    this->_parseBoxShadowStringFn = std::make_shared<jsi::Function>(std::move(fn));
+}
+
 int core::UnistylesState::parseColor(jsi::Value& maybeColor) {
     if (!maybeColor.isString()) {
         return 0;
@@ -113,4 +117,10 @@ int core::UnistylesState::parseColor(jsi::Value& maybeColor) {
     }
 
     return this->_colorCache[colorString.utf8(*_rt).c_str()];
+}
+
+jsi::Array core::UnistylesState::parseBoxShadowString(std::string&& boxShadowString) {
+    jsi::Value result = this->_parseBoxShadowStringFn.get()->call(*_rt, boxShadowString);
+
+    return result.asObject(*_rt).asArray(*_rt);
 }
