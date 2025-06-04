@@ -32,11 +32,10 @@ struct UnistylesState {
     jsi::Object getCurrentJSTheme();
     jsi::Object getJSThemeByName(std::string& themeName);
     int parseColor(jsi::Value& color);
-    jsi::Array parseBoxShadowString(std::string&& boxColorString);
+    jsi::Array parseBoxShadowString(std::string&& boxShadowString);
     void computeCurrentBreakpoint(int screenWidth);
     void registerProcessColorFunction(jsi::Function&& fn);
     void registerParseBoxShadowString(jsi::Function&& fn);
-    void parseBoxShadowString(jsi::Function&& fn);
 
 private:
     jsi::Runtime* _rt;
