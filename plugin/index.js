@@ -150,7 +150,7 @@ function addUnistylesImport(path2, state) {
     const newImport = t2.importDeclaration(
       [t2.importSpecifier(t2.identifier(localName), t2.identifier(name))],
       t2.stringLiteral(
-        state.opts.isLocal ? state.file.opts.filename?.split("react-native-unistyles").at(0)?.concat(`react-native-unistyles/components/native/${name}`) ?? "" : `react-native-unistyles/components/native/${name}`
+        state.opts.isLocal ? state.file.opts.filename?.split("react-native-unistyles").at(0)?.concat(`react-native-unistyles/src/components/native/${name}`) ?? "" : `react-native-unistyles/components/native/${name}`
       )
     );
     path2.node.body.unshift(newImport);
