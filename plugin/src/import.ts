@@ -58,7 +58,7 @@ export function addUnistylesRequire(path: NodePath<t.Program>, state: UnistylesP
                 t.variableDeclarator(
                     t.identifier(uniqueName),
                     t.callExpression(t.identifier('require'), [
-                        t.stringLiteral(`react-native-unistyles/src/components/native/${componentName}`)
+                        t.stringLiteral(`react-native-unistyles/components/native/${componentName}`)
                     ])
                 )
             ])
