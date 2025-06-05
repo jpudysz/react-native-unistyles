@@ -12,7 +12,7 @@
     "react-native": "0.80.0-rc.4",
     "react-native-blurhash": "2.1.1",
     "react-native-edge-to-edge": "1.6.1",
-    "react-native-nitro-modules": "0.25.2",
+    "react-native-nitro-modules": "0.26.0",
     "react-native-reanimated": "3.18.0",
     "react-native-unistyles": "workspace:*"
   },
