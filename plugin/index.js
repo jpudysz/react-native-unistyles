@@ -166,7 +166,7 @@ function addUnistylesRequire(path2, state) {
       t2.variableDeclarator(
         t2.identifier(uniqueName),
         t2.callExpression(t2.identifier("require"), [
-          t2.stringLiteral(`react-native-unistyles/src/components/native/${componentName}`)
+          t2.stringLiteral(`react-native-unistyles/components/native/${componentName}`)
         ])
       )
     ]);
