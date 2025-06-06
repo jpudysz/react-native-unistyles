@@ -34,14 +34,14 @@ const buildUnistylesProps = (Component: any, props: ComponentProps, forwardedRef
 }
 
 export const createUnistylesElement = (Component: any) => {
-    const UnistylesComponent = React.forwardRef<unknown, ComponentProps>((props, forwardedRef) => {
+    const UnistylesComponent = (props: any) => {
         return (
             <Component
                 {...props}
-                {...buildUnistylesProps(Component, props, forwardedRef)}
+                {...buildUnistylesProps(Component, props, props.ref)}
             />
         )
-    })
+    }
 
     return copyComponentProperties(Component, UnistylesComponent)
 }
