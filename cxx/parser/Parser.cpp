@@ -603,7 +603,7 @@ jsi::Value parser::Parser::parseTransforms(jsi::Runtime& rt, Unistyle::Shared un
 jsi::Value parser::Parser::parseBoxShadow(jsi::Runtime &rt, Unistyle::Shared unistyle, jsi::Object &obj) {
     std::vector<jsi::Value> parsedBoxShadows{};
 
-    parsedBoxShadows.reserve(2);
+    parsedBoxShadows.reserve(1);
 
     helpers::iterateJSIArray(rt, obj.asArray(rt), [&](size_t i, jsi::Value& value){
         if (!value.isObject()) {
@@ -881,8 +881,8 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, Unistyle::Shared u
     jsi::Object parsedStyle = jsi::Object(rt);
 
     helpers::enumerateJSIObject(rt, nestedObjectStyle, [&](const std::string& propertyName, jsi::Value& propertyValue){
-        // primitives
-        if (propertyValue.isString() || propertyValue.isNumber() || propertyValue.isUndefined() || propertyValue.isNull()) {
+        // primitives, bool is possible for boxShadow inset
+        if (propertyValue.isString() || propertyValue.isNumber() || propertyValue.isUndefined() || propertyValue.isNull() || propertyValue.isBool()) {
             parsedStyle.setProperty(rt, propertyName.c_str(), propertyValue);
 
             return;
