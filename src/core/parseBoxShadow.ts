@@ -37,7 +37,7 @@ const parseBoxShadow = (str: string): BoxShadow | undefined => {
     const maybeColor = colorIndex !== -1
         ? parts[colorIndex]
         : undefined
-    const color = processColor(maybeColor)
+    const color = maybeColor && processColor(maybeColor)
         ? parts[colorIndex]
         : undefined
     const values = parts.filter((_, index) => index !== colorIndex && index !== insetIndex)
@@ -67,9 +67,7 @@ const parseBoxShadow = (str: string): BoxShadow | undefined => {
             : undefined,
         offsetX: Number.parseFloat(offsetX as string),
         offsetY: Number.parseFloat(offsetY as string),
-        blurRadius: blurRadius
-            ? Number.parseFloat(blurRadius as string)
-            : 0,
+        blurRadius: blurRadiusValue ?? 0,
         spreadDistance: spreadRadius
             ? Number.parseFloat(spreadRadius as string)
             : 0,
