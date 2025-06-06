@@ -1,5 +1,5 @@
-import type { ScrollView } from 'react-native'
 import React, { useRef } from 'react'
+import type { ScrollView } from 'react-native'
 import { UnistylesShadowRegistry } from '../specs'
 import { copyComponentProperties } from '../utils'
 import { passForwardedRef } from './passForwardRef'
