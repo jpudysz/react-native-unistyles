@@ -65,6 +65,8 @@ jest.mock('react-native-unistyles', () => {
         colorScheme: 'unspecified' as ColorScheme,
         contentSizeCategory: 'Medium' as IOSContentSizeCategory,
         orientation: 'portrait' as Orientation,
+        isPortrait: true,
+        isLandscape: false,
         breakpoints: {},
         dispose: () => { },
         equals: () => false,
