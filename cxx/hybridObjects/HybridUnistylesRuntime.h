@@ -47,6 +47,8 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     ColorScheme getColorScheme() override;
     bool getHasAdaptiveThemes() override;
     bool getRtl() override;
+    bool getIsLandscape() override;
+    bool getIsPortrait() override;
     Dimensions getScreen() override;
     std::optional<std::string> getThemeName() override;
     std::string getContentSizeCategory() override;

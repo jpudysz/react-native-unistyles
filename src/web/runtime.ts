@@ -76,6 +76,14 @@ export class UnistylesRuntime {
         return screen.orientation.type.includes('portrait') ? Orientation.Portrait : Orientation.Landscape
     }
 
+    get isLandscape() {
+        return this.orientation === Orientation.Landscape
+    }
+
+    get isPortrait() {
+        return this.orientation === Orientation.Portrait
+    }
+
     get theme() {
         return this.getTheme(this.themeName)
     }

@@ -49,6 +49,14 @@ Orientation HybridUnistylesRuntime::getOrientation() {
     return static_cast<Orientation>(orientation);
 };
 
+bool HybridUnistylesRuntime::getIsLandscape() {
+    return this->getOrientation() == Orientation::LANDSCAPE;
+}
+
+bool HybridUnistylesRuntime::getIsPortrait() {
+    return this->getOrientation() == Orientation::PORTRAIT;
+}
+
 double HybridUnistylesRuntime::getPixelRatio() {
     return this->_nativePlatform->getPixelRatio();
 };

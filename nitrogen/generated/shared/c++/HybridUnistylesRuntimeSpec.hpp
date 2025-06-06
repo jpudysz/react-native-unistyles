@@ -72,6 +72,8 @@ namespace margelo::nitro::unistyles {
       virtual double getPixelRatio() = 0;
       virtual double getFontScale() = 0;
       virtual bool getRtl() = 0;
+      virtual bool getIsLandscape() = 0;
+      virtual bool getIsPortrait() = 0;
       virtual UnistylesCxxMiniRuntime getMiniRuntime() = 0;
 
     public:
