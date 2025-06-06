@@ -1,9 +1,11 @@
+import { processColor } from 'react-native'
+
 type BoxShadow = {
     inset?: boolean
     offsetX?: number
     offsetY?: number
     blurRadius?: number
-    spreadRadius?: number
+    spreadDistance?: number
     color?: string
 }
 
@@ -32,7 +34,10 @@ const parseBoxShadow = (str: string): BoxShadow | undefined => {
             : [1, lastIndex]
 
     const colorIndex = maybeColorsIndexes.find(index => !isValue(parts[index])) ?? -1
-    const color = colorIndex !== -1
+    const maybeColor = colorIndex !== -1
+        ? parts[colorIndex]
+        : undefined
+    const color = processColor(maybeColor)
         ? parts[colorIndex]
         : undefined
     const values = parts.filter((_, index) => index !== colorIndex && index !== insetIndex)
@@ -48,18 +53,26 @@ const parseBoxShadow = (str: string): BoxShadow | undefined => {
         return undefined
     }
 
+    const blurRadiusValue = isValue(blurRadius)
+        ? Number.parseFloat(blurRadius as string)
+        : undefined
+
+    if (blurRadiusValue !== undefined && blurRadiusValue < 0) {
+        return undefined
+    }
+
     return {
         inset: insetIndex !== -1
             ? true
             : undefined,
         offsetX: Number.parseFloat(offsetX as string),
         offsetY: Number.parseFloat(offsetY as string),
-        blurRadius: isValue(blurRadius)
+        blurRadius: blurRadius
             ? Number.parseFloat(blurRadius as string)
-            : undefined,
-        spreadRadius: isValue(spreadRadius)
+            : 0,
+        spreadDistance: spreadRadius
             ? Number.parseFloat(spreadRadius as string)
-            : undefined,
+            : 0,
         color
     }
 }
