@@ -881,6 +881,14 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, Unistyle::Shared u
     jsi::Object parsedStyle = jsi::Object(rt);
 
     helpers::enumerateJSIObject(rt, nestedObjectStyle, [&](const std::string& propertyName, jsi::Value& propertyValue){
+        // special case as we need to convert it to jsi::Array<jsi::Object>
+        // possible with variants and compoundVariants
+        if (propertyName == "boxShadow" && propertyValue.isString()) {
+            parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), parseBoxShadowString(rt, propertyValue.asString(rt).utf8(rt)));
+
+            return;
+        }
+
         // primitives, bool is possible for boxShadow inset
         if (propertyValue.isString() || propertyValue.isNumber() || propertyValue.isUndefined() || propertyValue.isNull() || propertyValue.isBool()) {
             parsedStyle.setProperty(rt, propertyName.c_str(), propertyValue);
