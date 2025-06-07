@@ -35,10 +35,8 @@ export const copyComponentProperties = (Component: any, UnistylesComponent: any)
         UnistylesComponent[key] = value
     })
 
-    // Those are not enumerable, so we need to copy them manually
     UnistylesComponent.displayName = Component.displayName
-    UnistylesComponent.name = Component.name
-
+    
     return UnistylesComponent
 }
 
