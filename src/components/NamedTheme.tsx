@@ -1,8 +1,8 @@
 import React, { useLayoutEffect } from 'react'
 import type { PropsWithChildren } from 'react'
 import type { UnistylesThemes } from '../global'
-import { ApplyScopedTheme } from './ApplyScopedTheme'
 import { UnistylesShadowRegistry } from '../specs'
+import { ApplyScopedTheme } from './ApplyScopedTheme'
 
 interface NamedThemeProps extends PropsWithChildren {
     name: keyof UnistylesThemes,
