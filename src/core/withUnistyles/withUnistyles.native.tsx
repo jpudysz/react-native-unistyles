@@ -26,6 +26,7 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
     type PropsWithUnistyles = Partial<TProps> & {
         uniProps?: Mappings<TProps>
     }
+
     const getSecrets = (styleProps: Record<string, any> = {}): MappedSecrets => {
         const styles = Array.isArray(styleProps)
             ? styleProps.flat()

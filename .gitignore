@@ -91,3 +91,4 @@ cxx/tests/hermes-debug/
 cxx/tests/cmake-build-debug-coverage/
 
 src/**/*.js
+tsconfig.tsbuildinfo

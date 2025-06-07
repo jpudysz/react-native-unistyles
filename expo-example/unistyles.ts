@@ -14,6 +14,8 @@ const lightTheme = {
         ...sharedColors,
         backgroundColor: '#ffffff',
         typography: '#000000',
+        red: '#ff6b81',
+        blue: '#3498db',
         accent: sharedColors.blood
     },
     gap: (v: number) => v * 8
@@ -24,6 +26,8 @@ const darkTheme = {
         ...sharedColors,
         backgroundColor: '#000000',
         typography: '#ffffff',
+        red: '#c23616',
+        blue: '#341f97',
         accent: sharedColors.barbie
     },
     gap: (v: number) => v * 8
@@ -34,6 +38,8 @@ const premiumTheme = {
         ...sharedColors,
         backgroundColor: sharedColors.barbie,
         typography: '#76278f',
+        red: '#c0392b',
+        blue: '#2980b9',
         accent: '#000000'
     },
     gap: (v: number) => v * 8
