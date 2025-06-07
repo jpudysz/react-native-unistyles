@@ -1,9 +1,9 @@
 import React, { useLayoutEffect } from 'react'
 import type { PropsWithChildren } from 'react'
 import { useUnistyles } from '../core'
-import { ApplyScopedTheme } from './ApplyScopedTheme'
 import type { UnistylesThemes } from '../global'
 import { UnistylesShadowRegistry } from '../specs'
+import { ApplyScopedTheme } from './ApplyScopedTheme'
 
 interface AdaptiveThemeProps extends PropsWithChildren {
     previousScopedTheme?: string
