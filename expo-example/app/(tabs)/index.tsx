@@ -1,57 +1,8 @@
 import React, { useState } from 'react'
 import { View, Text, Button } from 'react-native'
-import { StyleSheet, useUnistyles } from 'react-native-unistyles'
-import Animated, { interpolateColor, useAnimatedReaction, useAnimatedStyle, useDerivedValue, withTiming } from 'react-native-reanimated'
-import { useEffect, useLayoutEffect } from 'react'
-import { cancelAnimation, useSharedValue, withSpring } from 'react-native-reanimated'
-import type { WithTimingConfig, WithSpringConfig } from 'react-native-reanimate'
-
-type ColorKeys<T> = {
-    [K in keyof T]: K extends string
-        ? K extends `${string}color${string}` | `${string}Color${string}`
-            ? K
-            : never
-        : never
-}[keyof T]
-
-export const useAnimatedVariants = <T extends Record<string, any>>(style: T, animationConfig?: WithTimingConfig | WithSpringConfig) => {
-    const secretKey = Object.keys(style).find(key => key.startsWith('unistyles_'))
-    // @ts-ignore this is hidden from TS
-    const hasVariants = style[secretKey]?.__stylesheetVariants
-
-    if (!hasVariants) {
-        throw new Error('useAnimatedVariants: Style was not created by Unistyles or does not have variants')
-    }
-
-    const progress = useSharedValue(1)
-    const fromValue = useSharedValue(style)
-    const toValue = useSharedValue(style)
-
-    useLayoutEffect(() => {
-        cancelAnimation(progress)
-        progress.value = 0
-
-        fromValue.set(toValue.get())
-        toValue.set(style)
-
-        progress.value = 1
-    }, [style])
-
-    const animateColorProperty = (colorKey: ColorKeys<typeof fromValue.value>) => {
-        'worklet'
-
-        return interpolateColor(
-            progress.value,
-            [0, 1],
-            [fromValue.value[colorKey], toValue.value[colorKey]]
-        )
-    }
-
-    return {
-        animateColorProperty
-    }
-}
-
+import { StyleSheet } from 'react-native-unistyles'
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
+import { useAnimatedVariantColor } from 'react-native-unistyles/reanimated'
 
 export default function HomeScreen() {
     const [variant, setVariant] = useState<'blue' | 'red'>('blue')
@@ -79,11 +30,11 @@ export const ChildComponent = ({ variant }: { variant: 'red' | 'blue' }) => {
         variant
     })
 
-    const { animateColorProperty } = useAnimatedVariants(styles.styleWithVariants)
+    const color = useAnimatedVariantColor(styles.styleWithVariants, 'backgroundColor')
     const animatedStyle = useAnimatedStyle(() => {
         return {
-            backgroundColor: withTiming(animateColorProperty('backgroundColor'), {
-                duration: 3000
+            backgroundColor: withTiming(color.value, {
+                duration: 500
             })
         }
     })
