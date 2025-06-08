@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect } from 'react'
-import { interpolateColor, useDerivedValue, useSharedValue } from 'react-native-reanimated'
+import { interpolateColor, runOnUI, useDerivedValue, useSharedValue } from 'react-native-reanimated'
 import { StyleSheet, UnistyleDependency } from '../specs'
 
 type ColorKeys<T> = {
@@ -26,7 +26,9 @@ export const useAnimatedVariantColor = <T extends Record<string, any>>(style: T,
                 // @ts-ignore
                 const newStyles = style[secretKey]?.uni__getStyles()
 
-                animate(toValue.value, newStyles[colorKey])
+                runOnUI(() => {
+                    animate(toValue.value, newStyles[colorKey])
+                })()
             }
         })
 
