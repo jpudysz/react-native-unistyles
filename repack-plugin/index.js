@@ -54,10 +54,7 @@ var REACT_NATIVE_COMPONENT_NAMES = [
 ];
 var REPLACE_WITH_UNISTYLES_PATHS = [
   "react-native-reanimated/src/component",
-  "react-native-reanimated/lib/module/component",
-  "react-native-gesture-handler/lib/module/components",
-  "react-native-gesture-handler/lib/commonjs/components",
-  "react-native-gesture-handler/src/components"
+  "react-native-reanimated/lib/module/component"
 ];
 
 // repack-plugin/src/loader.ts
