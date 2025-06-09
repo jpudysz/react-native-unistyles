@@ -8,7 +8,7 @@ PODS:
   - hermes-engine (0.80.0-rc.4):
     - hermes-engine/Pre-built (= 0.80.0-rc.4)
   - hermes-engine/Pre-built (0.80.0-rc.4)
-  - NitroModules (0.25.2):
+  - NitroModules (0.26.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -2331,7 +2331,7 @@ PODS:
     - SocketRocket
     - Yoga
   - SocketRocket (0.7.1)
-  - Unistyles (3.0.0-nightly-20250604):
+  - Unistyles (3.0.0-nightly-20250609):
     - boost
     - DoubleConversion
     - fast_float
@@ -2610,7 +2610,7 @@ SPEC CHECKSUMS:
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   hermes-engine: 1072a7bafbd85639139f2078868a83dfd89d331b
-  NitroModules: c141244e7612440915758869a584f713b1ed419f
+  NitroModules: b5f759d2a05356da680bfe43cd20aaa8f689917f
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: b0e5e1f3f12e1052939ed871cb5800acaf22dfc0
   RCTRequired: 3be29c353b6112b1aff83f90b57e907c0771426d
@@ -2678,7 +2678,7 @@ SPEC CHECKSUMS:
   ReactCommon: 9198be3d354ddb8f6c15e2497fe23d7d6aecc72e
   RNReanimated: bc1ddb7a5352648bcf0d592256069833bf935a46
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  Unistyles: 2e38ee1260ba6752bd6fc1ab963c2489547f909a
+  Unistyles: dda209249d961d46eba7ee6e8711f1c614bfb08e
   Yoga: 811c88fda429a3d8f9f242b44e7f261c765020d5
 
 PODFILE CHECKSUM: a5de45e2350a9515567a6e18ca8ceea718b48523

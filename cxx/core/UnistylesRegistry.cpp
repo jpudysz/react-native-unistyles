@@ -42,12 +42,6 @@ core::UnistylesState& core::UnistylesRegistry::getState(jsi::Runtime& rt) {
 void core::UnistylesRegistry::createState(jsi::Runtime& rt) {
     auto it = this->_states.find(&rt);
 
-    // remove old state, so we can swap it with new config
-    // during live reload
-    if (it != this->_states.end()) {
-        this->_states.extract(&rt);
-    }
-
     this->_states.emplace(
         std::piecewise_construct,
         std::forward_as_tuple(&rt),
