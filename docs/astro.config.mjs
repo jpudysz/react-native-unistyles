@@ -116,7 +116,7 @@ export default defineConfig({
                         { label: 'Compound Variants', slug: 'v3/references/compound-variants' },
                         { label: 'Web styles', slug: 'v3/references/web-styles' },
                         { label: 'Web Only Features', slug: 'v3/references/web-only' },
-                        { label: 'Scoped theme', slug: 'v3/references/scoped-theme' },
+                        { label: 'Scoped theme', slug: 'v3/references/scoped-theme', badge: 'Updated!' },
                         { label: 'Update 3rd party views', slug: 'v3/references/3rd-party-views' },
                         { label: 'withUnistyles', slug: 'v3/references/with-unistyles' },
                         { label: 'useUnistyles', slug: 'v3/references/use-unistyles' },

@@ -17,7 +17,7 @@ There are cases where you may want to render specific components or screens with
 
 To address this, Unistyles 3.0 introduces the concept of a `Scoped Theme`, which allows you to assign a fixed theme to a specific component or screen.
 
-### Usage
+### Usage with named theme
 
 To use scoped theme, you need to import `ScopedTheme` component from `react-native-unistyles`:
 
@@ -63,5 +63,39 @@ You can also nest `ScopedTheme` components:
     </View>
 </ScopedTheme>
 ```
+
+### Usage with inverted adaptive theme
+
+
+Starting from RC.5, you can also use `ScopedTheme` with the `invertedAdaptive` prop. This prop cannot be used together with a named `ScopedTheme`, as these options are mutually exclusive. The purpose of `invertedAdaptive` is to apply the opposite adaptive theme to the one that is currently active.
+
+In other words, if your app supports [adaptive themes](/v3/guides/theming#adaptive-themes) and you use `ScopedTheme` with the `invertedAdaptive` prop, it will apply:
+
+```
+the dark theme when the color scheme is light
+the light theme when the color scheme is dark
+```
+
+**Use Cases**:
+
+The `invertedAdaptive` prop is useful in scenarios where you want to highlight a specific section of your app by contrasting it with the current theme. For example:
+
+- **Modal dialogs or popups:** Make a modal stand out by using the opposite theme, drawing the user's attention
+- **Preview components:** Show users how your app looks in both light and dark modes by inverting the theme for a preview section
+- **Special content areas:** Emphasize warnings, tips, or promotional banners by displaying them with a contrasting theme
+
+By using `invertedAdaptive`, you can create visually distinct areas in your app that improve user experience and accessibility.
+
+```tsx /invertedAdaptive/
+<ScopedTheme invertedAdaptive>
+    <View style={styles.container}>
+        <Text style={styles.text}>
+            Text is light when color scheme is dark and dark when color scheme is light
+        </Text>
+    </View>
+</ScopedTheme>
+```
+
+You can also nest other `ScopedThemes` inside `ScopedTheme` with `invertedAdaptive` prop.
 
 </Seo>
