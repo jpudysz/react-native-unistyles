@@ -154,8 +154,11 @@ inline static jsi::Value objectFromUnistyle(jsi::Runtime& rt, std::shared_ptr<Hy
         rt,
         jsi::PropNameID::forUtf8(rt, helpers::GET_STYLES.c_str()),
         0,
-        [unistyle, unistylesRuntime, variants, parsedArguments](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count
+        [unistyleID = unistyle->unid, unistylesRuntime, variants, parsedArguments](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count
     ) {
+        auto& registry = UnistylesRegistry::get();
+        auto unistyle = registry.getUnistyleById(rt, unistyleID);
+
         parser::Parser(unistylesRuntime).rebuildUnistyle(rt, unistyle, variants, parsedArguments);
 
         return jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
