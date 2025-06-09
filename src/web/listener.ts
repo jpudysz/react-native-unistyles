@@ -29,6 +29,7 @@ export class UnistylesListener {
 
             if (this.services.runtime.hasAdaptiveThemes) {
                 this.emitChange(UnistyleDependency.Theme)
+                this.emitChange(UnistyleDependency.ThemeName)
             }
         })
         this.services.runtime.lightMedia?.addEventListener('change', event => {
@@ -40,6 +41,7 @@ export class UnistylesListener {
 
             if (this.services.runtime.hasAdaptiveThemes) {
                 this.emitChange(UnistyleDependency.Theme)
+                this.emitChange(UnistyleDependency.ThemeName)
             }
         })
 
