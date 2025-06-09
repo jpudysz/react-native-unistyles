@@ -17,7 +17,7 @@ import Seo from '../../../../components/Seo.astro'
 This is our decision algorithm to ensure best practices for your app.
 :::
 
-1. If you're using `react-native`, `react-native-reanimated`, or `react-native-gesture-handler` components with `style` prop, avoid doing anything. It will work out of the box.
+1. If you're using `react-native` or `react-native-reanimated` components with `style` prop, avoid doing anything. It will work out of the box.
 
 2. For `react-native` components with `contentContainerStyle` prop, you can use the [withUnistyles](/v3/references/with-unistyles) factory. Wrapping your component in `withUnistyles` will [auto map](/v3/references/with-unistyles#auto-mapping-for-style-and-contentcontainerstyle-props) `contentContainerStyle` prop.
 

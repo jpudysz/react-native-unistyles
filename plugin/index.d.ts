@@ -104,7 +104,7 @@ export interface UnistylesPluginOptions {
     * Defaults to:
     *
     * ```ts
-    * ['react-native-reanimated/src/component', 'react-native-gesture-handler/src/components']
+    * ['react-native-reanimated/src/component']
     * ```
     */
     autoProcessPaths?: Array<string>,

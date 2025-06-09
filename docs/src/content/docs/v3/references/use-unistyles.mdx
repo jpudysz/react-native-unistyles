@@ -23,7 +23,7 @@ Follow our [decision algorithm](/v3/references/3rd-party-views) to learn when to
 
 ### When to use it?
 
-If you're using `react-native`, `react-native-reanimated`, or `react-native-gesture-handler` components, you should avoid this hook. Unistyles updates these views via the ShadowTree without causing **any re-renders**.
+If you're using `react-native`, or `react-native-reanimated` components, you should avoid this hook. Unistyles updates these views via the ShadowTree without causing **any re-renders**.
 
 Consider using this hook only if:
 - You need to update a view in a third-party library like `react-native-blurhash`
