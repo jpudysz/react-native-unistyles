@@ -1,37 +1,47 @@
-import React, { useLayoutEffect } from 'react'
+import React from 'react'
 import type { UnistylesThemes } from '../global'
-import { UnistylesShadowRegistry } from '../specs'
+import { UnistylesRuntime, UnistylesShadowRegistry } from '../specs'
+import { AdaptiveTheme } from './AdaptiveTheme'
+import { NamedTheme } from './NamedTheme'
 
 type ThemeProps = {
-    name: keyof UnistylesThemes
+    name: keyof UnistylesThemes,
+    invertedAdaptive?: boolean
+} | {
+    name?: undefined,
+    invertedAdaptive: true
 }
 
-const Apply = ({ name }: { name?: keyof UnistylesThemes }) => {
-    UnistylesShadowRegistry.setScopedTheme(name)
+export const ScopedTheme: React.FunctionComponent<React.PropsWithChildren<ThemeProps>> = ({
+    name,
+    children,
+    invertedAdaptive
+}) => {
+    const isAdaptiveTheme = invertedAdaptive && UnistylesRuntime.hasAdaptiveThemes
 
-    useLayoutEffect(() => {
-        UnistylesShadowRegistry.setScopedTheme(name)
-    })
+    if (!isAdaptiveTheme && !name) {
+        if (__DEV__) {
+            console.error('ScopedTheme: name or invertedAdaptive must be provided')
+        }
 
-    return null
-}
+        return null
+    }
 
-export const ScopedTheme: React.FunctionComponent<React.PropsWithChildren<ThemeProps>> = ({ name, children }) => {
     const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
-    const mappedChildren = [
-        <Apply key={name} name={name} />,
-        children,
-        <Apply key='dispose' name={previousScopedTheme as keyof UnistylesThemes | undefined} />
-    ]
 
-    useLayoutEffect(() => {
-        // this will affect only scoped styles as other styles are not yet mounted
-        UnistylesShadowRegistry.flush()
-    })
+    return isAdaptiveTheme
+        ? (
+            <AdaptiveTheme previousScopedTheme={previousScopedTheme}>
+                {children}
+            </AdaptiveTheme>
+        )
+        : (
+            <NamedTheme
+                name={name as keyof UnistylesThemes}
+                previousScopedTheme={previousScopedTheme}
+            >
+                {children}
+            </NamedTheme>
+        )
 
-    return (
-        <React.Fragment>
-            {mappedChildren}
-        </React.Fragment>
-    )
 }
