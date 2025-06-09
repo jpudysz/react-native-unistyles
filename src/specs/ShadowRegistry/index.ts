@@ -24,8 +24,13 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
         ?? handle?.viewRef?.current?.__internalInstanceHandle?.stateNode?.node
         ?? handle?._nativeRef?.__internalInstanceHandle?.stateNode?.node
 
+    // @ts-ignore we don't know the type of handle
+    if (!node && handle?.props?.horizontal && handle?.constructor?.name === 'FlatList') {
+        throw new Error('Unistyles: detected an unsupported FlatList with the horizontal prop. This will cause crashes on Android due to a bug in React Native core. Read more: https://github.com/facebook/react-native/issues/51601')
+    }
+
     if (!node) {
-        throw new Error(`Unistyles: Could not find shadow node for one of your components of type ${handle?.__internalInstanceHandle?.elementType ?? 'unknown'}`)
+        throw new Error(`Unistyles: Could not find shadow node for one of your components of type ${handle?.constructor?.name ?? 'unknown'}`)
     }
 
     return node
