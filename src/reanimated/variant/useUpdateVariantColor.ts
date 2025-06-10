@@ -72,8 +72,6 @@ export const useUpdateVariantColor = <T extends Record<string, any>>({
         return () => dispose()
     }, [style, colorKey])
 
-    console.log('render')
-
     useEffect(() => () => dummyDiv.remove(), [])
 
     return {
