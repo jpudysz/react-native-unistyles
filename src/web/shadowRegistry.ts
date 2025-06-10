@@ -49,7 +49,7 @@ export class UnistylesShadowRegistry {
                     return {}
                 }
 
-                const { __uni__key, __uni__stylesheet, __uni__args = [], __uni_variants: variants } = secrets
+                const { __uni__key, __uni__stylesheet, __uni__args = [], __stylesheetVariants: variants } = secrets
                 const newComputedStylesheet = this.services.registry.getComputedStylesheet(__uni__stylesheet, scopedTheme)
                 const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
                 const result = typeof style === 'function'
@@ -94,7 +94,7 @@ export class UnistylesShadowRegistry {
             ? hash.replace(' > *', '')
             : hash
 
-        return { injectedClassName, hash: hashClassname }
+        return { injectedClassName, hash: hashClassname, parsedStyles }
     }
 
     setScopedTheme = (theme?: UnistylesTheme) => {

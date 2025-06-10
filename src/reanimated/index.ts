@@ -1,2 +1,2 @@
 export { useAnimatedTheme } from './useAnimatedTheme'
-export { useAnimatedVariantColor } from './useAnimatedVariantColor'
+export { useAnimatedVariantColor } from './variant'
