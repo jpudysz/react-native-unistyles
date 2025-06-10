@@ -21,7 +21,7 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, id?: s
         __uni__key: key,
         __uni__stylesheet: stylesheet,
         __uni__args: args,
-        __uni_variants: variants
+        __stylesheetVariants: variants
     })
 
     const createStyleSheetStyles = (variants?: Variants) => {

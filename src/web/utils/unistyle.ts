@@ -3,7 +3,8 @@ import type { UnistylesBreakpoints } from '../../global'
 import type { UnistyleDependency } from '../../specs/NativePlatform/NativePlatform.nitro'
 import { ColorScheme, Orientation } from '../../specs/types'
 import type { StyleSheet, StyleSheetWithSuperPowers, UnistylesValues } from '../../types/stylesheet'
-import { isUnistylesMq, parseMq } from '../../utils'
+import { isDefined, isUnistylesMq, parseMq } from '../../utils'
+import type { UnistylesRuntime } from '../runtime'
 import * as unistyles from '../services'
 import { UNI_GENERATED_KEYS, type UniGeneratedKey, type UniGeneratedStyle } from '../types'
 import { hyphenate, keyInObject, reduceObject } from './common'
@@ -22,7 +23,7 @@ export type UnistyleSecrets = {
     __uni__stylesheet: StyleSheetWithSuperPowers<StyleSheet>,
     __uni__key: string,
     __uni__args?: Array<any>,
-    __uni_variants: Record<string, string | boolean | undefined>
+    __stylesheetVariants: Record<string, string | boolean | undefined>
 }
 
 export const assignSecrets = <T>(object: T, secrets: UnistyleSecrets) => {
@@ -157,4 +158,19 @@ export const convertTheme = (key: string, value: any, prev = '-'): [string, any]
     }
 
     return [key, value]
+}
+
+export const getClosestBreakpointValue = <T>(runtime: UnistylesRuntime, values: Partial<Record<keyof UnistylesBreakpoints, T>>) => {
+    const breakpoints = runtime.breakpoints
+    const breakpointValues = Object.entries(values)
+        // Filter out non-breakpoint values
+        .filter((pair): pair is [keyof UnistylesBreakpoints, T] => pair[0] in breakpoints)
+        // Sort in descending order
+        .sort(([a], [b]) => (breakpoints[b] ?? 0) - (breakpoints[a] ?? 0))
+    // Get breakpoint value with highest priority
+    const [_, currentBreakpointValue] = breakpointValues.find(
+        ([key]) => isDefined(runtime.breakpoint) && (breakpoints[key] ?? 0) <= (breakpoints[runtime.breakpoint] ?? 0)
+    ) ?? []
+
+    return currentBreakpointValue
 }

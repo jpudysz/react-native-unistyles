@@ -98,8 +98,8 @@ export default defineConfig({
                         { label: 'Avoiding Keyboard', slug: 'v3/guides/avoiding-keyboard' },
                         { label: 'Expo Router', slug: 'v3/guides/expo-router' },
                         { label: 'React Compiler', slug: 'v3/guides/react-compiler' },
-                        { label: 'Custom web', slug: 'v3/guides/custom-web', badge: 'New!' },
-                        { label: 'Reanimated', slug: 'v3/guides/reanimated', badge: 'New!' },
+                        { label: 'Custom web', slug: 'v3/guides/custom-web' },
+                        { label: 'Reanimated', slug: 'v3/guides/reanimated', badge: 'Updated!' },
                         { label: 'Server side rendering', slug: 'v3/guides/server-side-rendering' },
                     ]
                 },
