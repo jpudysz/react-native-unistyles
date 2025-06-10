@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { runOnUI, useSharedValue } from 'react-native-reanimated'
-import { useUnistyles } from '../../core'
 import { UnistyleDependency } from '../../specs'
 import type { UnistylesValues } from '../../types'
 import { services } from '../../web/services'
@@ -12,7 +11,6 @@ export const useUpdateVariantColor = <T extends Record<string, any>>({
     colorKey,
     style
 }: UseUpdateVariantColorConfig<T>) => {
-    const { rt } = useUnistyles()
     const [dummyDiv] = useState(() => {
         const div = document.createElement('div')
 
@@ -21,10 +19,11 @@ export const useUpdateVariantColor = <T extends Record<string, any>>({
 
         return div
     })
+    const parsedStyles = useMemo(() => {
+        return services.shadowRegistry.addStyles([style]).parsedStyles
+    }, [style])
     const getCurrentColor = useCallback(
         () => {
-            const { parsedStyles } = services.shadowRegistry.addStyles([style])
-
             if (!parsedStyles) {
                 return 'rgb(0, 0, 0)'
             }
@@ -48,13 +47,9 @@ export const useUpdateVariantColor = <T extends Record<string, any>>({
     const toValue = useSharedValue<string>(getCurrentColor())
 
     useEffect(() => {
-        if (services.state.CSSVars) {
-            return
-        }
-
         const dispose = services.listener.addListeners([UnistyleDependency.Theme], () => {
             runOnUI(() => {
-                animateCallback?.(toValue.value, getCurrentColor())
+                animateCallback?.(toValue.get(), getCurrentColor())
             })()
         })
 
@@ -62,8 +57,22 @@ export const useUpdateVariantColor = <T extends Record<string, any>>({
     }, [style, colorKey])
 
     useLayoutEffect(() => {
-        animateCallback?.(toValue.value, getCurrentColor())
-    }, [style, colorKey, rt.breakpoint])
+        animateCallback?.(toValue.get(), getCurrentColor())
+
+        const colorStyle = parsedStyles?.[colorKey as keyof UnistylesValues]
+
+        if (typeof colorStyle !== 'object' || colorStyle === null) {
+            return
+        }
+
+        const dispose = services.listener.addListeners([UnistyleDependency.Breakpoints], () => {
+            animateCallback?.(toValue.get(), getCurrentColor())
+        })
+
+        return () => dispose()
+    }, [style, colorKey])
+
+    console.log('render')
 
     useEffect(() => () => dummyDiv.remove(), [])
 
