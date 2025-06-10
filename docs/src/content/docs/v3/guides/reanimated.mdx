@@ -49,6 +49,56 @@ export const MyAnimatedComponent = () => {
 It also triggers worklet updates if any change occurs and doesn't cause re-renders.
 </Aside>
 
+### Animating variant colors
+
+Starting from RC.5, it's possible to reuse Unistyles variant colors and animate them using the `useAnimatedStyle` hook.
+
+Define your variants with a `color` property:
+
+<Aside>
+You can animate any prop that contains a `color` property.
+</Aside>
+
+```tsx /backgroundColor/
+const styles = StyleSheet.create((theme, rt) => ({
+    styleWithVariants: {
+        height: 100,
+        width: 100,
+        variants: {
+            variant: {
+                red: {
+                    backgroundColor: theme.colors.primary
+                },
+                blue: {
+                    backgroundColor: theme.colors.secondary
+                }
+            }
+        }
+    }
+}))
+```
+
+In this case, `styleWithVariants` can transition the `backgroundColor` property from `primary` to `secondary` and vice versa.
+
+Import the `useAnimatedVariantColor` hook to animate variant colors:
+
+```tsx
+import { useAnimatedVariantColor } from 'react-native-unistyles/reanimated'
+
+// Select backgroundColor from styles.styleWithVariants (TypeScript will infer all possible color properties)
+const color = useAnimatedVariantColor(styles.styleWithVariants, 'backgroundColor')
+const animatedStyle = useAnimatedStyle(() => {
+    return {
+        // color is a SharedValue that can be animated however you want
+        backgroundColor: withTiming(color.value, {
+            duration: 500
+        })
+    }
+})
+```
+
+`useAnimatedVariantColor` also respects theme and breakpoint changes and will animate to the new color automatically.
+
 ### Merging styles
 
 When you want to use `Unistyles` styles in `Animated` components, never mix them with `Reanimated` styles:
