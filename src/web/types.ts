@@ -1,3 +1,4 @@
+import type { UnistylesValues } from '../types'
 import type { UnistylesListener } from './listener'
 import type { UnistylesRegistry } from './registry'
 import type { UnistylesRuntime } from './runtime'
@@ -15,4 +16,6 @@ export type UnistylesServices = {
 export const UNI_GENERATED_KEYS = ['$$css', 'hash', 'injectedClassName'] as const
 export type UniGeneratedKey = typeof UNI_GENERATED_KEYS[number]
 
-export type UniGeneratedStyle = Record<UniGeneratedKey, string>
+export type UniGeneratedStyle = Record<UniGeneratedKey, string> & {
+    parsedStyles?: UnistylesValues
+}

@@ -89,7 +89,10 @@ const styles = StyleSheet.create((theme, rt) => ({
                     backgroundColor: theme.colors.red
                 },
                 blue: {
-                    backgroundColor: theme.colors.blue
+                    backgroundColor: {
+                        xs: theme.colors.blue,
+                        md: theme.colors.sky
+                    }
                 }
             }
         }
