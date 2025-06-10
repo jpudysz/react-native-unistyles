@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect } from 'react'
 import { useSharedValue } from 'react-native-reanimated'
-import type { UseUpdateVariantColorConfig } from './types'
 import { StyleSheet, UnistyleDependency } from '../../specs'
+import type { UseUpdateVariantColorConfig } from './types'
 
 export const useUpdateVariantColor = <T extends Record<string, any>>({
     colorKey,
