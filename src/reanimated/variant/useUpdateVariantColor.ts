@@ -54,7 +54,7 @@ export const useUpdateVariantColor = <T extends Record<string, any>>({
 
         const dispose = services.listener.addListeners([UnistyleDependency.Theme], () => {
             runOnUI(() => {
-                animateCallback(toValue.value, getCurrentColor())
+                animateCallback?.(toValue.value, getCurrentColor())
             })()
         })
 
@@ -62,7 +62,7 @@ export const useUpdateVariantColor = <T extends Record<string, any>>({
     }, [style, colorKey])
 
     useLayoutEffect(() => {
-        animateCallback(toValue.value, getCurrentColor())
+        animateCallback?.(toValue.value, getCurrentColor())
     }, [style, colorKey, rt.breakpoint])
 
     useEffect(() => () => dummyDiv.remove(), [])
