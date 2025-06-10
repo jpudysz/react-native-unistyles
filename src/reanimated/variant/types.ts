@@ -7,7 +7,7 @@ export type ColorKeys<T> = {
 }[keyof T]
 
 export type UseUpdateVariantColorConfig<T extends Record<string, any>> = {
-    animateCallback: (from: string, to: string) => void,
+    animateCallback?: (from: string, to: string) => void,
     colorKey: ColorKeys<T>,
     style: T,
     secretKey: string | undefined
