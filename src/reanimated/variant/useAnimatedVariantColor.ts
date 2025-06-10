@@ -22,15 +22,15 @@ export const useAnimatedVariantColor = <T extends Record<string, any>>(style: T,
     const animate = (from: string, to: string) => {
         'worklet'
 
-        fromValue.value = from
-        toValue.value = to
+        fromValue.set(from)
+        toValue.set(to)
     }
 
     const derivedColor = useDerivedValue(() => {
         return interpolateColor(
             progress.value,
             [0, 1],
-            [fromValue.value, toValue.value]
+            [fromValue.get(), toValue.get()]
         )
     })
 

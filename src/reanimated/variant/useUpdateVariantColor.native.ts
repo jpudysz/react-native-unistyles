@@ -18,8 +18,8 @@ export const useUpdateVariantColor = <T extends Record<string, any>>({
                 // @ts-ignore
                 const newStyles = style[secretKey]?.uni__getStyles()
 
-                fromValue.value = toValue.value
-                toValue.value = newStyles[colorKey]
+                fromValue.set(toValue.value)
+                toValue.set(newStyles[colorKey])
             }
         })
 
@@ -27,8 +27,8 @@ export const useUpdateVariantColor = <T extends Record<string, any>>({
     }, [style, colorKey])
 
     useLayoutEffect(() => {
-        fromValue.value = toValue.value
-        toValue.value = style[colorKey]
+        fromValue.set(toValue.value)
+        toValue.set(style[colorKey])
     }, [style, colorKey])
 
     return {
