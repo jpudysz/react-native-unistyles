@@ -17,9 +17,14 @@ export const ScopedTheme: React.FunctionComponent<React.PropsWithChildren<ThemeP
     children,
     invertedAdaptive
 }) => {
-    const isAdaptiveTheme = invertedAdaptive && UnistylesRuntime.hasAdaptiveThemes
+    const hasAdaptiveThemes = UnistylesRuntime.hasAdaptiveThemes
+    const isAdaptiveTheme = invertedAdaptive && hasAdaptiveThemes
 
-    if (!isAdaptiveTheme && !name) {
+    if (invertedAdaptive && !hasAdaptiveThemes) {
+        return children
+    }
+
+    if (!invertedAdaptive && !name) {
         if (__DEV__) {
             console.error('ScopedTheme: name or invertedAdaptive must be provided')
         }
