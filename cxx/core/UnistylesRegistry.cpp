@@ -244,3 +244,10 @@ const std::optional<std::string> core::UnistylesRegistry::getScopedTheme() {
 void core::UnistylesRegistry::setScopedTheme(std::optional<std::string> themeName) {
     this->_scopedTheme = std::move(themeName);
 }
+
+void core::UnistylesRegistry::destroy() {
+    this->_states.clear();
+    this->_styleSheetRegistry.clear();
+    this->_shadowRegistry.clear();
+    this->_scopedTheme = std::nullopt;
+}

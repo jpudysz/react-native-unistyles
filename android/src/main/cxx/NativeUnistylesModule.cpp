@@ -25,7 +25,8 @@ jni::local_ref<UnistylesModule::jhybriddata> UnistylesModule::initHybrid(
 void UnistylesModule::registerNatives() {
     javaClassStatic()->registerNatives({
         makeNativeMethod("getBindingsInstaller", UnistylesModule::getBindingsInstaller),
-        makeNativeMethod("initHybrid", UnistylesModule::initHybrid)
+        makeNativeMethod("initHybrid", UnistylesModule::initHybrid),
+        makeNativeMethod("invalidateNative", invalidateNative),
     });
 }
 
