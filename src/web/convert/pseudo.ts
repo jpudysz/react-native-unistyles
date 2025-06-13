@@ -1,26 +1,12 @@
-export const pseudos = [
-    '_-moz-broken',
-    '_-moz-drag-over',
-    '_-moz-first-node',
-    '_-moz-handler-blocked',
-    '_-moz-handler-crashed',
-    '_-moz-handler-disabled',
-    '_-moz-last-node',
-    '_-moz-loading',
-    '_-moz-locale-dir(ltr)',
-    '_-moz-locale-dir(rtl)',
-    '_-moz-only-whitespace',
-    '_-moz-submit-invalid',
-    '_-moz-suppressed',
-    '_-moz-user-disabled',
-    '_-moz-window-inactive',
+// All non experimental pseudo clasess and elements
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes
+const pseudoClasses = [
     '_active',
     '_any-link',
     '_autofill',
-    '_blank',
     '_buffering',
     '_checked',
-    '_current',
     '_default',
     '_defined',
     '_dir(',
@@ -33,8 +19,8 @@ export const pseudos = [
     '_focus',
     '_focus-visible',
     '_focus-within',
-    '_fullscreen',
     '_future',
+    '_has-slotted',
     '_has(',
     '_host',
     '_host-context(',
@@ -49,7 +35,6 @@ export const pseudos = [
     '_last-of-type',
     '_left',
     '_link',
-    '_local-link',
     '_modal',
     '_muted',
     '_not(',
@@ -59,6 +44,7 @@ export const pseudos = [
     '_nth-of-type(',
     '_only-child',
     '_only-of-type',
+    '_open',
     '_optional',
     '_out-of-range',
     '_past',
@@ -71,45 +57,27 @@ export const pseudos = [
     '_read-write',
     '_required',
     '_right',
+    '_root',
     '_scope',
     '_seeking',
     '_stalled',
     '_state(',
     '_target',
-    '_target-within',
     '_user-invalid',
     '_user-valid',
     '_valid',
     '_visited',
     '_volume-locked',
-    '_where(',
-    '_-moz-color-swatch',
-    '_-moz-focus-inner',
-    '_-moz-list-bullet',
-    '_-moz-list-number',
-    '_-moz-meter-bar',
-    '_-moz-progress-bar',
-    '_-moz-range-progress',
-    '_-moz-range-thumb',
-    '_-moz-range-track',
-    '_-webkit-inner-spin-button',
-    '_-webkit-meter-barDeprecated',
-    '_-webkit-meter-even-less-good-value',
-    '_-webkit-meter-inner-element',
-    '_-webkit-meter-optimum-value',
-    '_-webkit-meter-suboptimum-value',
-    '_-webkit-progress-bar',
-    '_-webkit-progress-inner-element',
-    '_-webkit-progress-value',
-    '_-webkit-scrollbar',
-    '_-webkit-search-cancel-button',
-    '_-webkit-search-results-button',
-    '_-webkit-slider-runnable-track',
-    '_-webkit-slider-thumb',
+    '_where',
+] as const
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements
+const pseudoElements = [
     '_after',
     '_backdrop',
     '_before',
     '_cue',
+    '_details-content',
     '_file-selector-button',
     '_first-letter',
     '_first-line',
@@ -123,15 +91,18 @@ export const pseudos = [
     '_spelling-error',
     '_target-text',
     '_view-transition',
-    '_view-transition-group',
-    '_view-transition-image-pair',
-    '_view-transition-new',
-    '_view-transition-old',
+    '_view-transition-group(',
+    '_view-transition-image-pair(',
+    '_view-transition-new(',
+    '_view-transition-old(',
 ] as const
-
-export const isPseudo = (selector: string) => pseudos.some(pseudo => selector.startsWith(pseudo))
 
 type AddDynamicSelector<T extends string> = T extends `${infer U}(` ? `${U}(${string})` : T
 
-export type Pseudo = AddDynamicSelector<typeof pseudos[number]>
+export type Pseudo = AddDynamicSelector<(typeof pseudoClasses)[number] | (typeof pseudoElements)[number]>
 
+export const isPseudoClass = (selector: string) => pseudoClasses.some(pseudo => selector.startsWith(pseudo))
+
+export const isPseudoElement = (selector: string) => pseudoElements.some(pseudo => selector.startsWith(pseudo))
+
+export const isPseudo = (selector: string) => isPseudoClass(selector) || isPseudoElement(selector)

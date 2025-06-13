@@ -1,10 +1,12 @@
+import { isPseudoClass } from '../convert/pseudo'
 import { getMediaQuery } from '../utils'
 import type { CSSState } from './state'
 
 export const convertToCSS = (hash: string, value: Record<string, any>, state: CSSState) => {
     Object.entries(value).forEach(([styleKey, styleValue]) => {
         if (styleKey[0] === '_') {
-            const pseudoClassName = styleKey.replace('_', `${hash}:`)
+            const isStylePseudoClass = isPseudoClass(styleKey)
+            const pseudoClassName = `${hash}${isStylePseudoClass ? ':' : '::'}${styleKey.slice(1)}`
 
             Object.entries(styleValue).forEach(([pseudoStyleKey, pseudoStyleValue]) => {
                 if (typeof pseudoStyleValue === 'object' && pseudoStyleValue !== null) {
