@@ -24,6 +24,10 @@ class UnistylesModule(reactContext: ReactApplicationContext): NativeTurboUnistyl
         }
     }
 
+    override fun invalidate() {
+        invalidateNative()
+    }
+
     init {
         mHybridData = initializeHybridData(reactContext)
     }
@@ -43,4 +47,7 @@ class UnistylesModule(reactContext: ReactApplicationContext): NativeTurboUnistyl
         runtimeExecutor: RuntimeExecutor,
         nativePlatform: HybridNativePlatformSpec
     ): HybridData
+
+    @DoNotStrip
+    private external fun invalidateNative()
 }
