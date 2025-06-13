@@ -52,4 +52,9 @@ RCT_EXPORT_MODULE(Unistyles)
     return std::make_shared<facebook::react::NativeTurboUnistylesSpecJSI>(params);
 }
 
+- (void)invalidate {
+    core::UnistylesRegistry::get().destroy();
+    [super invalidate];
+}
+
 @end

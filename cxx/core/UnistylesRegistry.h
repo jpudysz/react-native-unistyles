@@ -27,7 +27,7 @@ struct UnistylesRegistry: public StyleSheetRegistry {
 
     UnistylesRegistry(const UnistylesRegistry&) = delete;
     UnistylesRegistry(const UnistylesRegistry&&) = delete;
-    
+
     bool shouldUsePointsForBreakpoints = false;
 
     void registerTheme(jsi::Runtime& rt, std::string name, jsi::Value& theme);
@@ -49,6 +49,7 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     void removeDuplicatedUnistyles(jsi::Runtime& rt, const ShadowNodeFamily* shadowNodeFamily, std::vector<core::Unistyle::Shared>& unistyles);
     void setScopedTheme(std::optional<std::string> themeName);
     core::Unistyle::Shared getUnistyleById(jsi::Runtime& rt, std::string unistyleID);
+    void destroy();
 
 private:
     UnistylesRegistry() = default;
