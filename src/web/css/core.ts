@@ -6,7 +6,7 @@ export const convertToCSS = (hash: string, value: Record<string, any>, state: CS
     Object.entries(value).forEach(([styleKey, styleValue]) => {
         if (styleKey[0] === '_') {
             const isStylePseudoClass = isPseudoClass(styleKey)
-            const pseudoClassName = styleKey.replace('_', `${hash}${isStylePseudoClass ? ':' : '::'}`)
+            const pseudoClassName = `${hash}${isStylePseudoClass ? ':' : '::'}${styleKey.slice(1)}`
 
             Object.entries(styleValue).forEach(([pseudoStyleKey, pseudoStyleValue]) => {
                 if (typeof pseudoStyleValue === 'object' && pseudoStyleValue !== null) {
