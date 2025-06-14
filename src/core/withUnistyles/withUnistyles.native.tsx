@@ -75,8 +75,8 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
             addDependencies(Array.from(new Set([...styleSecrets.dependencies, ...contentContainerStyleSecrets.dependencies])))
         }, [narrowedProps.style, narrowedProps.contentContainerStyle])
 
-        const mappingsProps = mappings ? mappings(proxifiedTheme, proxifiedRuntime) : {}
-        const unistyleProps = narrowedProps.uniProps ? narrowedProps.uniProps(proxifiedTheme, proxifiedRuntime) : {}
+        const { key: mappingsKey, ...mappingsProps } = mappings ? mappings(proxifiedTheme, proxifiedRuntime) : {}
+        const { key: uniPropsKey, ...unistyleProps } = narrowedProps.uniProps ? narrowedProps.uniProps(proxifiedTheme, proxifiedRuntime) : {}
 
         const styleSecrets = getSecrets(narrowedProps.style)
         const contentContainerStyleSecrets = getSecrets(narrowedProps.contentContainerStyle)
@@ -91,6 +91,12 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
             } : {},
         } as any
 
-        return <NativeComponent {...finalProps as TProps} ref={ref} />
+        return (
+            <NativeComponent
+                key={uniPropsKey || mappingsKey}
+                {...finalProps as TProps}
+                ref={ref}
+            />
+        )
     })
 }
