@@ -27,16 +27,15 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         const contentContainerStyleClassNames = getClassName(narrowedProps.contentContainerStyle)
         const { proxifiedRuntime, proxifiedTheme } = useProxifiedUnistyles()
 
-        const mappingsProps = mappings ? mappings(proxifiedTheme, proxifiedRuntime) : {}
-        const unistyleProps = narrowedProps.uniProps ? narrowedProps.uniProps(proxifiedTheme, proxifiedRuntime) : {}
-
+        const { key: mappingsKey, ...mappingsProps } = mappings ? mappings(proxifiedTheme, proxifiedRuntime) : {}
+        const { key: uniPropsKey, ...unistyleProps } = narrowedProps.uniProps ? narrowedProps.uniProps(proxifiedTheme, proxifiedRuntime) : {}
 
         const emptyStyles = narrowedProps.style
             ? Object.fromEntries(
-                  Object.entries(Object.getOwnPropertyDescriptors(narrowedProps.style))
-                      .filter(([key]) => !key.startsWith("unistyles") && !key.startsWith("_"))
-                      .map(([key]) => [key, undefined])
-              )
+                Object.entries(Object.getOwnPropertyDescriptors(narrowedProps.style))
+                    .filter(([key]) => !key.startsWith("unistyles") && !key.startsWith("_"))
+                    .map(([key]) => [key, undefined])
+            )
             : undefined
 
         const combinedProps = {
@@ -63,7 +62,11 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
                 className={classNames?.hash}
                 style={{ display: 'contents' }}
             >
-                <NativeComponent {...combinedProps} ref={ref} />
+                <NativeComponent
+                    key={uniPropsKey || mappingsKey}
+                    {...combinedProps}
+                    ref={ref}
+                />
             </div>
         )
     })
