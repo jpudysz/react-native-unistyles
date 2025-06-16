@@ -30,10 +30,12 @@ class NativePlatformInsets(
     init {
         // get initial insets
         reactContext.currentActivity?.let { activity ->
-            val insets = ViewCompat.getRootWindowInsets(activity.window.decorView)
+            activity.findViewById<View>(android.R.id.content)?.let { mainView ->
+                val insets = ViewCompat.getRootWindowInsets(mainView)
 
-            insets?.let { windowInsets ->
-                setInsets(windowInsets, activity.window, null, true)
+                insets?.let { windowInsets ->
+                    setInsets(windowInsets, activity.window, null, true)
+                }
             }
         }
     }
