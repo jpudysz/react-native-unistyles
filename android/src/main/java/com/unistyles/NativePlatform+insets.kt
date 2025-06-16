@@ -166,7 +166,7 @@ class NativePlatformInsets(
 
     fun stopInsetsListener() {
         reactContext.currentActivity?.let { activity ->
-            activity.window?.decorView?.let { view ->
+            activity.findViewById<View>(android.R.id.content)?.let { view ->
                 ViewCompat.setOnApplyWindowInsetsListener(view, null)
             }
         }
