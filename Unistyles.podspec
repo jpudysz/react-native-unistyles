@@ -1,4 +1,5 @@
 require "json"
+require_relative './rn_version.rb'
 
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 
@@ -27,9 +28,19 @@ Pod::Spec.new do |s|
   ]
 
   if ENV["USE_FRAMEWORKS"]
+    RN_VERSION = get_rn_version(ENV['REACT_NATIVE_PATH']) || 999
+
     s.dependency "React-Core"
     add_dependency(s, "React-jsinspector", :framework_name => "jsinspector_modern")
-    add_dependency(s, "React-jsinspectortracing", :framework_name => 'jsinspector_moderntracing')
+
+    if RN_VERSION >= 79
+      add_dependency(s, "React-jsinspectortracing", :framework_name => 'jsinspector_moderntracing')
+    end
+
+    if RN_VERSION >= 80
+      add_dependency(s, "React-jsinspectorcdp", :framework_name => 'jsinspector_moderncdp')
+    end
+
     add_dependency(s, "React-rendererconsistency", :framework_name => "React_rendererconsistency")
   end
 
