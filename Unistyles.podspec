@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
   ]
 
   if ENV["USE_FRAMEWORKS"]
-    RN_VERSION = get_rn_version(ENV['REACT_NATIVE_PATH']) || 999
+    RN_VERSION = get_rn_version(ENV['REACT_NATIVE_PATH']) || 1
 
     s.dependency "React-Core"
     add_dependency(s, "React-jsinspector", :framework_name => "jsinspector_modern")
