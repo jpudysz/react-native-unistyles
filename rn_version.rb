@@ -22,7 +22,7 @@ def get_rn_version(rn_path)
 
     rn_pkg = JSON.parse(File.read(rn_pkg_json))
     rn_version = rn_pkg['version']
-    parsed_version = rn_version.split('.')[1].to_i
+    parsed_version = Gem::Version.new(rn_version).segments[1]
 
     parsed_version
 end
