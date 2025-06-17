@@ -215,6 +215,7 @@ export class UnistylesRuntime {
         const newTheme = updater(oldTheme)
 
         this.services.state.themes.set(themeName, newTheme)
+        this.services.listener.emitChange(UnistyleDependency.Theme)
 
         if (this.services.state.CSSVars) {
             this.services.state.cssThemes.set(
