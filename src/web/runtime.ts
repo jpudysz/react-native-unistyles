@@ -49,6 +49,12 @@ export class UnistylesRuntime {
     }
 
     get themeName() {
+        const scopedTheme = this.services.shadowRegistry.getScopedTheme()
+
+        if (scopedTheme) {
+            return scopedTheme
+        }
+
         if (this.services.state.hasAdaptiveThemes) {
             return schemeToTheme(this.colorScheme) as AppThemeName
         }
