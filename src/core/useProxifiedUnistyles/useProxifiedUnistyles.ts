@@ -45,7 +45,13 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
 
                 setTheme(UnistylesRuntime.getTheme(scopedTheme))
             },
-            updateRuntime: () => runtimeChanged()
+            updateRuntime: (hasThemeNameChange: boolean) => {
+                if (hasThemeNameChange && scopedTheme) {
+                    return
+                }
+
+                runtimeChanged()
+            }
         })
     }
 
