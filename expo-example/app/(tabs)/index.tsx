@@ -24,13 +24,16 @@ export default function HomeScreen() {
     return (
         <View style={styles.container}>
             <ScopedText prefix="Root" expected="adaptive" />
-            <ScopedTheme name={count % 2 === 0 ? 'dark' : 'light'}>
+            <ScopedTheme name={count % 2 === 0 ? 'dark' as const : 'light' as const}>
                 <ScopedText prefix="ScopedText" expected={count % 2 === 0 ? 'dark' : 'light'} />
             </ScopedTheme>
             <ScopedTheme name="light">
                 <ScopedText prefix="ScopedText" expected="light" />
                 <ScopedTheme name="premium">
                     <ScopedText prefix="ScopedText" expected="premium" />
+                    <ScopedTheme reset>
+                        <ScopedText prefix="ResetText" expected="adaptive" />
+                    </ScopedTheme>
                 </ScopedTheme>
             </ScopedTheme>
             <ScopedTheme invertedAdaptive>
