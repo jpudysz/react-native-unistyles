@@ -1,5 +1,6 @@
 // based on react-native-web normalizer
 // https://github.com/necolas/react-native-web
+/// <reference path="module.d.ts" />
 import normalizeColors from '@react-native/normalize-colors'
 import type { BoxShadowValue } from 'react-native'
 import type { TransformStyles } from '../../types/core'
@@ -30,7 +31,7 @@ export const normalizeColor = (color: string, opacity = 1) => {
         return color
     }
 
-    const hex = integer.toString(16).padStart(8, '0')
+    const hex = integer.toString(16).padStart(8, '0') as string
 
     if (hex.length === 8) {
         const [r = 0, g = 0, b = 0, a = 1] = hex
