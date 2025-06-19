@@ -6,47 +6,54 @@ import { NamedTheme } from './NamedTheme'
 
 type ThemeProps = {
     name: keyof UnistylesThemes,
-    invertedAdaptive?: boolean
+    invertedAdaptive?: never
+    reset?: never
 } | {
-    name?: undefined,
-    invertedAdaptive: true
+    name?: never,
+    invertedAdaptive: boolean,
+    reset?: never
+} | {
+    name?: never,
+    invertedAdaptive?: never,
+    reset: boolean
 }
 
 export const ScopedTheme: React.FunctionComponent<React.PropsWithChildren<ThemeProps>> = ({
     name,
     children,
-    invertedAdaptive
+    invertedAdaptive,
+    reset
 }) => {
     const hasAdaptiveThemes = UnistylesRuntime.hasAdaptiveThemes
     const isAdaptiveTheme = invertedAdaptive && hasAdaptiveThemes
-
-    if (invertedAdaptive && !hasAdaptiveThemes) {
-        return children
-    }
-
-    if (!invertedAdaptive && !name) {
-        if (__DEV__) {
-            console.error('ScopedTheme: name or invertedAdaptive must be provided')
-        }
-
-        return null
-    }
-
     const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
 
-    return isAdaptiveTheme
-        ? (
-            <AdaptiveTheme previousScopedTheme={previousScopedTheme}>
-                {children}
-            </AdaptiveTheme>
-        )
-        : (
-            <NamedTheme
-                name={name as keyof UnistylesThemes}
-                previousScopedTheme={previousScopedTheme}
-            >
-                {children}
-            </NamedTheme>
-        )
-
+    switch (true) {
+        case name !== undefined:
+            return (
+                <NamedTheme
+                    name={name as keyof UnistylesThemes}
+                    previousScopedTheme={previousScopedTheme}
+                >
+                    {children}
+                </NamedTheme>
+            )
+        case isAdaptiveTheme:
+            return (
+                <AdaptiveTheme previousScopedTheme={previousScopedTheme}>
+                    {children}
+                </AdaptiveTheme>
+            )
+        case reset:
+            return (
+                <NamedTheme
+                    name={undefined}
+                    previousScopedTheme={previousScopedTheme}
+                >
+                    {children}
+                </NamedTheme>
+            )
+        default:
+            return children
+    }
 }

@@ -20,8 +20,15 @@ Dimensions HybridUnistylesRuntime::getScreen() {
 };
 
 std::optional<std::string> HybridUnistylesRuntime::getThemeName() {
-    auto& state = core::UnistylesRegistry::get().getState(*_rt);
-
+    auto& registry = core::UnistylesRegistry::get();
+    auto maybeScopedTheme = registry.getScopedTheme();
+    
+    if (maybeScopedTheme.has_value()) {
+        return maybeScopedTheme.value();
+    }
+    
+    auto& state = registry.getState(*_rt);
+    
     return state.getCurrentThemeName();
 };
 

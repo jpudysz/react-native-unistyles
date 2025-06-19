@@ -28,7 +28,7 @@ const RTDependencyMap = {
 } satisfies Partial<Record<keyof UnistylesMiniRuntime, UnistyleDependency>>
 
 export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
-    const scopedTheme = forcedTheme ?? UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme
+    const [scopedTheme, setScopedTheme] = useState(forcedTheme ?? UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme)
     const [dependencies] = useState(() => new Set<number>())
     const [theme, setTheme] = useState(UnistylesRuntime.getTheme(scopedTheme))
     const [_, runtimeChanged] = useReducer(() => ({}), {})
@@ -45,7 +45,13 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
 
                 setTheme(UnistylesRuntime.getTheme(scopedTheme))
             },
-            updateRuntime: () => runtimeChanged()
+            updateRuntime: (hasThemeNameChange: boolean) => {
+                if (hasThemeNameChange && scopedTheme) {
+                    return
+                }
+
+                runtimeChanged()
+            }
         })
     }
 
@@ -54,6 +60,13 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
 
         return () => disposeRef.current?.()
     }, [dependencies.size])
+
+
+    const maybeNewScopedTheme = UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme
+
+    if (scopedTheme && maybeNewScopedTheme && scopedTheme !== maybeNewScopedTheme) {
+        setScopedTheme(maybeNewScopedTheme)
+    }
 
     const proxifiedTheme = new Proxy(theme, {
         get: (target, prop) => {
@@ -82,6 +95,10 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
 
             if (prop in RTDependencyMap) {
                 dependencies.add(RTDependencyMap[prop as keyof typeof RTDependencyMap])
+            }
+
+            if (prop === 'themeName' && scopedTheme) {
+                return scopedTheme
             }
 
             return target[prop as keyof typeof target]

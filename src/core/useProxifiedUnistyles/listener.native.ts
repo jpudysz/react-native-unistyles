@@ -10,7 +10,9 @@ export const listener = ({ dependencies, updateTheme, updateRuntime }: ListenerP
         }
 
         if (changedDependencies.some((dependency: UnistyleDependency) => dependencies.includes(dependency))) {
-            updateRuntime()
+            const hasThemeNameChange = changedDependencies.includes(UnistyleDependency.ThemeName)
+
+            updateRuntime(hasThemeNameChange)
         }
     })
 

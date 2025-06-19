@@ -14,7 +14,7 @@ export const AdaptiveTheme: React.FunctionComponent<AdaptiveThemeProps> = ({
     previousScopedTheme
 }) => {
     const { rt } = useUnistyles()
-    const name = (rt.themeName === 'dark' ? 'light' : 'dark') as keyof UnistylesThemes
+    const name = (rt.colorScheme === 'dark' ? 'light' : 'dark') as keyof UnistylesThemes
     const mappedChildren = [
         <ApplyScopedTheme key={name} name={name} />,
         children,
