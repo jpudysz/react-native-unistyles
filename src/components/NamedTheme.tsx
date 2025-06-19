@@ -5,7 +5,7 @@ import { UnistylesShadowRegistry } from '../specs'
 import { ApplyScopedTheme } from './ApplyScopedTheme'
 
 interface NamedThemeProps extends PropsWithChildren {
-    name: keyof UnistylesThemes,
+    name: keyof UnistylesThemes | undefined,
     previousScopedTheme?: string
 }
 
@@ -15,7 +15,7 @@ export const NamedTheme: React.FunctionComponent<NamedThemeProps> = ({
     previousScopedTheme
 }) => {
     const mappedChildren = [
-        <ApplyScopedTheme key={name} name={name} />,
+        <ApplyScopedTheme key='apply' name={name} />,
         children,
         <ApplyScopedTheme key='dispose' name={previousScopedTheme as keyof UnistylesThemes | undefined} />
     ]
