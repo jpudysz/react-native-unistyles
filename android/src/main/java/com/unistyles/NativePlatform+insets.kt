@@ -23,21 +23,14 @@ class NativePlatformInsets(
     private val getMiniRuntime: () -> UnistylesNativeMiniRuntime,
     private val onConfigChange: () -> Unit
 ) {
+    private var _didGetInsets = false
     private var _shouldListenToImeEvents = false
     private val _imeListeners: MutableList<CxxImeListener> = mutableListOf()
     private var _insets: Insets = Insets(0.0, 0.0, 0.0, 0.0, 0.0)
 
     init {
-        // get initial insets
-        reactContext.currentActivity?.let { activity ->
-            activity.findViewById<View>(android.R.id.content)?.let { mainView ->
-                val insets = ViewCompat.getRootWindowInsets(mainView)
-
-                insets?.let { windowInsets ->
-                    setInsets(windowInsets, activity.window, null, true)
-                }
-            }
-        }
+        // for SDK below 35, it's possible to get it synchronously
+        this.getInitialInsets(true)
     }
 
     fun onDestroy() {
@@ -54,6 +47,23 @@ class NativePlatformInsets(
             this._insets.right / density,
             this._insets.ime / density
         )
+    }
+
+    fun getInitialInsets(skipUpdate: Boolean = false) {
+        if (_didGetInsets) {
+            return
+        }
+
+        reactContext.currentActivity?.let { activity ->
+            activity.findViewById<View>(android.R.id.content)?.let { mainView ->
+                val insets = ViewCompat.getRootWindowInsets(mainView)
+
+                insets?.let { windowInsets ->
+                    setInsets(windowInsets, activity.window, null, skipUpdate)
+                    _didGetInsets = true
+                }
+            }
+        }
     }
 
     fun setInsets(insetsCompat: WindowInsetsCompat, window: Window, animatedBottomInsets: Double?, skipUpdate: Boolean = false) {
