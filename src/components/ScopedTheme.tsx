@@ -10,12 +10,12 @@ type ThemeProps = {
     reset?: never
 } | {
     name?: never,
-    invertedAdaptive: true,
+    invertedAdaptive: boolean,
     reset?: never
 } | {
     name?: never,
     invertedAdaptive?: never,
-    reset: true
+    reset: boolean
 }
 
 export const ScopedTheme: React.FunctionComponent<React.PropsWithChildren<ThemeProps>> = ({
@@ -26,20 +26,18 @@ export const ScopedTheme: React.FunctionComponent<React.PropsWithChildren<ThemeP
 }) => {
     const hasAdaptiveThemes = UnistylesRuntime.hasAdaptiveThemes
     const isAdaptiveTheme = invertedAdaptive && hasAdaptiveThemes
-
-    if (!invertedAdaptive && !name && !reset) {
-        if (__DEV__) {
-            console.error('ScopedTheme: name, reset or invertedAdaptive must be provided')
-        }
-
-        return null
-    }
-
     const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
 
     switch (true) {
-        case invertedAdaptive && !hasAdaptiveThemes:
-            return children
+        case name !== undefined:
+            return (
+                <NamedTheme
+                    name={name as keyof UnistylesThemes}
+                    previousScopedTheme={previousScopedTheme}
+                >
+                    {children}
+                </NamedTheme>
+            )
         case isAdaptiveTheme:
             return (
                 <AdaptiveTheme previousScopedTheme={previousScopedTheme}>
@@ -55,16 +53,8 @@ export const ScopedTheme: React.FunctionComponent<React.PropsWithChildren<ThemeP
                     {children}
                 </NamedTheme>
             )
-        case name !== undefined:
-            return (
-                <NamedTheme
-                    name={name as keyof UnistylesThemes}
-                    previousScopedTheme={previousScopedTheme}
-                >
-                    {children}
-                </NamedTheme>
-            )
+        case invertedAdaptive && !hasAdaptiveThemes:
         default:
-            return null
+            return children
     }
 }
