@@ -41,6 +41,7 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
     }
 
     override fun onHostResume() {
+        _insets.getInitialInsets(false)
         _insets.startInsetsListener()
     }
 
