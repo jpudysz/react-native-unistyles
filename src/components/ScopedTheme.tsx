@@ -53,7 +53,6 @@ export const ScopedTheme: React.FunctionComponent<React.PropsWithChildren<ThemeP
                     {children}
                 </NamedTheme>
             )
-        case invertedAdaptive && !hasAdaptiveThemes:
         default:
             return children
     }
