@@ -216,7 +216,7 @@ You can change this behaviour with options below:
 
 ### `root` (required)
 
-All files under this folder will be processed by the Babel plugin.
+All files within the specified root folder will be processed by the Babel plugin.
 If you need to process extra folders, use with `autoProcessPaths` option.
 
 ```js
@@ -228,16 +228,16 @@ If you need to process extra folders, use with `autoProcessPaths` option.
 Folder name will be resolved with `process.cwd()`.
 
 <Aside type="note">
-If you use monorepos, or project with Expo Router most likely you have multiple root folders.
+If you use monorepo or a project with Expo Router, you most likely have multiple root folders.
 
 In that case:
-- set `root` to folder with your components eg. `@myapp/ui` or `components`
-- use `autoProcessImports` config to whitelist your folder (check example below)
+- set `root` to the folder containing your components eg. `@myapp/ui` or `components`
+- use the `autoProcessImports` option to whitelist your folder (check example below)
 </Aside>
 
 ### `autoProcessImports`
 
-This configuration should be used when you want process files containing specific imports.
+This configuration should be used when you want to process files containing specific imports.
 It can be useful for monorepos that use Unistyles with absolute paths, such as `@codemask/styles`.
 
 ```js
@@ -248,7 +248,7 @@ It can be useful for monorepos that use Unistyles with absolute paths, such as `
 
 ### `autoRemapImports`
 
-This is the most powerful option, but most likely you won't need to use it.
+This is the most powerful option, but most likely, you won't need to use it.
 It allows you to remap uncommon imports to Unistyles components.
 
 This may happen if a 3rd library does not import `react-native` components directly, but instead uses its own factory or a relative path.

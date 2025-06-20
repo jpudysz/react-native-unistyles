@@ -17,7 +17,7 @@ Unistyles is highly extensible and can be used to build UI kits and various othe
 
 ## Using Unistyles in your library
 
-`StyleSheet.configure` **must** be invoked as soon as possible, before user's code references any `StyleSheet` from your library.
+`StyleSheet.configure` **must** be invoked as soon as possible, before any user code references any `StyleSheet` from your library.
 
 You can then call `StyleSheet.configure` multiple times to override configurations.
 However, keep in mind that `StyleSheet.configure` makes a roundtrip to C++, which can add a few `ms` to your app's startup time.
@@ -58,7 +58,7 @@ Building a UI kit for both React Native and Web couldn’t be easier. Unistyles 
 Make sure to instruct your users to add [autoProcessPaths](/v3/other/babel-plugin#extra-configuration) babel option.
 It will whitelist your `ui-kit` and process your files even though there are in `node_modules` folder.
 
-You can also consider publishing your UI kit with bebel transforms in place. Keep in mind that it could break [testing](/v3/start/testing) views with your components.
+You can also consider publishing your UI kit with babel transforms in place. Keep in mind that it could break [testing](/v3/start/testing) views with your components.
 
 ## Why to choose Unistyles?
 
