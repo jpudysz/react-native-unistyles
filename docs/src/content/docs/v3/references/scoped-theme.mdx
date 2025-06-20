@@ -67,7 +67,7 @@ You can also nest `ScopedTheme` components:
 ### Usage with inverted adaptive theme
 
 
-Starting from RC.5, you can also use `ScopedTheme` with the `invertedAdaptive` prop. This prop cannot be used together with a named `ScopedTheme`, as these options are mutually exclusive. The purpose of `invertedAdaptive` is to apply the opposite adaptive theme to the one that is currently active.
+You can also use `ScopedTheme` with the `invertedAdaptive` prop. This prop cannot be used together with a named `ScopedTheme`, as these options are mutually exclusive. The purpose of `invertedAdaptive` is to apply the opposite adaptive theme to the one that is currently active.
 
 In other words, if your app supports [adaptive themes](/v3/guides/theming#adaptive-themes) and you use `ScopedTheme` with the `invertedAdaptive` prop, it will apply:
 
@@ -97,5 +97,115 @@ By using `invertedAdaptive`, you can create visually distinct areas in your app 
 ```
 
 You can also nest other `ScopedThemes` inside `ScopedTheme` with `invertedAdaptive` prop.
+
+### Reset
+
+If you wrap multiple children in `ScopedTheme` you can disable scoped theme for some of them by using `reset` prop:
+
+```tsx /reset/
+<ScopedTheme name="dark">
+    <View style={styles.container}>
+        <Text style={styles.text}>
+            I will be dark!
+        </Text>
+    </View>
+    <ScopedTheme reset>
+        <View style={styles.container}>
+            <Text style={styles.text}>
+                I will be light again!
+            </Text>
+        </View>
+    </ScopedTheme>
+    <View style={styles.container}>
+        <Text style={styles.text}>
+            I'm dark again
+        </Text>
+    </View>
+</ScopedTheme>
+```
+
+### Reading current scoped theme
+
+Information about the current `ScopedTheme` is temporary and only available during the component render phase.
+
+For the following example, `themeName` will be different based on the place where we access it:
+
+```tsx /themeName/
+import { UnistylesRuntime, ScopedTheme } from 'react-native-unistyles'
+
+const MyComponent = () => {
+    // themeName will be 'light' here 💥
+    const themeName = UnistylesRuntime.themeName
+
+    return (
+        <ScopedTheme name="dark">
+            <ScopedText>
+                I'm scoped
+            </ScopedText>
+        </ScopedTheme>
+    )
+}
+
+const ScopedText = ({ children }) => {
+    // themeName will be 'dark' here ✅
+    // because we're "inside" of the ScopedTheme
+    const themeName = UnistylesRuntime.themeName
+
+    return (
+        <Text style={styles.text}>
+            {children}
+        </Text>
+    )
+}
+```
+
+If you want to react to the changes in the scoped theme you can use `useUnistyles` hook or `withUnistyles` helper:
+
+```tsx /useUnistyles/
+import { useUnistyles, ScopedTheme } from 'react-native-unistyles'
+
+// My parent is wrapped with ScopedTheme invertedAdaptive
+const ScopedComponent = () => {
+    // reading themeName from `useUnistyles` will always log
+    // correctly parent scoped theme name 🤯
+    const { rt } = useUnistyles()
+
+    return (
+        <Text>
+            {rt.themeName} // light for dark mode, dark for light mode
+        </Text>
+    )
+}
+
+// JSX
+<ScopedTheme invertedAdaptive>
+    <ScopedComponent />
+</ScopedTheme>
+```
+
+Same goes to `withUnistyles`:
+
+```tsx /withUnistyles/
+import { withUnistyles, ScopedTheme } from 'react-native-unistyles'
+
+const ScopedTextInput = withUnistyles(TextInput, (theme, rt) => ({
+    // I will always take in count parent scoped theme
+    color: rt.themeName === 'light'
+        ? theme.colors.text
+        : theme.colors.background
+}))
+
+// My parent is wrapped with ScopedTheme invertedAdaptive
+const ScopedComponent = () => {
+    return (
+        <ScopedTextInput />
+    )
+}
+
+// JSX
+<ScopedTheme invertedAdaptive>
+    <ScopedComponent />
+</ScopedTheme>
+```
 
 </Seo>

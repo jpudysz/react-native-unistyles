@@ -26,7 +26,6 @@ Example:
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'red',
         fontSize: 32,
     },
     text: {
@@ -41,19 +40,22 @@ const styles = StyleSheet.create({
 })
 ```
 
-This produces the following CSS output:
+Will produce following CSS output:
 
 ```css
+# because flex: 1 is shared across multiple styles
 .unistyles_1u0egm6 {
   flex: 1;
 }
 
+# to cover "container" fontSize
 @media (min-width: 0px) {
   .unistyles_kaoph5 {
     font-size: 32px;
   }
 }
 
+# to cover "text" fontSize
 @media (min-width: 1200px) {
   .unistyles_kaoph5 {
     font-size: 40px;
