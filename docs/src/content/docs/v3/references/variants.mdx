@@ -3,7 +3,7 @@ title: Variants
 description: Learn about variants in Unistyles 3.0
 ---
 
-import { Card } from '@astrojs/starlight/components'
+import { Card, Aside } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
 
 <Seo
@@ -211,7 +211,9 @@ styles.useVariants(undefined) // will use default variant (if any)
 styles.useVariants({}) // will use default variant (if any)
 ```
 
-Passing an object with named keys and `undefined` will work the same way dafaulting to the `default` option:
+<Aside type="caution" title="Default variant">
+If you don't explicitly call `styles.useVariants`, the Unistyles C++ parser will ignore your variants and will not resolve to the `default` variant, even if it is present.
+</Aside>
 
 ```tsx /undefined/
 styles.useVariants({
