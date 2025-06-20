@@ -3,7 +3,7 @@ title: For library authors
 description: How to use Unistyles 3.0 in your library
 ---
 
-import { Card } from '@astrojs/starlight/components'
+import { Card, Aside } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
 
 <Seo
@@ -17,7 +17,7 @@ Unistyles is highly extensible and can be used to build UI kits and various othe
 
 ## Using Unistyles in your library
 
-`StyleSheet.configure` **must** be invoked as soon as possible, before the metro bundler references any `StyleSheet` from your library.
+`StyleSheet.configure` **must** be invoked as soon as possible, before user's code references any `StyleSheet` from your library.
 
 You can then call `StyleSheet.configure` multiple times to override configurations.
 However, keep in mind that `StyleSheet.configure` makes a roundtrip to C++, which can add a few `ms` to your app's startup time.
@@ -37,11 +37,15 @@ reducing boilerplate code and making your library more user-friendly.
 
 Unistyles won't re-render your components unless you want to. While it requires enabling the New Architecture, we believe this trade-off is worthwhile, as more apps are expected to transition to the New Architecture in the coming months.
 
+<Aside>
+As of June 2nd, 2025, Old Architecture is [frozen](https://github.com/reactwg/react-native-new-architecture/discussions/290). It means it is the best time to rely on New Architecture.
+</Aside>
+
 ## Minimum requirements
 
 Unistyles is compatible with:
-- React Native version >=0.76
-- TypeScript >5.0
+- React Native version >= 0.78
+- TypeScript > 5.0
 - iOS 15.0+
 - Android 7+
 
@@ -53,6 +57,8 @@ Building a UI kit for both React Native and Web couldn’t be easier. Unistyles 
 
 Make sure to instruct your users to add [autoProcessPaths](/v3/other/babel-plugin#extra-configuration) babel option.
 It will whitelist your `ui-kit` and process your files even though there are in `node_modules` folder.
+
+You can also consider publishing your UI kit with bebel transforms in place. Keep in mind that it could break [testing](/v3/start/testing) views with your components.
 
 ## Why to choose Unistyles?
 
