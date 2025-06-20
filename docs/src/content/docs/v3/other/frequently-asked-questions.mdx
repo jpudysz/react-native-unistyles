@@ -41,4 +41,19 @@ If your app still doesn’t automatically switch themes, ensure that:
 - You have phone with iOS 15+ or Android 10+
 - Your device supports dark mode
 
+
+### ld.lld: error: Undefined symbols margelo::nitro::\*
+
+This error occurs due to the strong caching mechanism in Android Studio. The cache can even survive the `expo prebuild --clean` command in Expo projects.
+
+To clean the cache, please follow these steps:
+
+```sh
+cd android
+./gradlew clean
+git clean -dfX
+```
+
+Now, try rebuilding your app.
+
 </Seo>
