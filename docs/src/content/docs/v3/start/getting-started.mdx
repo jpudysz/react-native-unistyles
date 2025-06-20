@@ -13,29 +13,29 @@ import Seo from '../../../../components/Seo.astro'
     }}
 >
 
-We put a lot of effort into making Unistyles as easy to use as possible. You no longer need the `useStyle` hook or wrap your app in provider. Unistyles integrates seamlessly with your existing code, so you can start using it immediately.
+We put a lot of effort into making Unistyles as easy to use as possible. You no longer need the `useStyle` hook or wrap your app in React Provider. Unistyles integrates seamlessly with your existing code, so you can start using it immediately.
 
 ### Prerequisites
 
-Unistyles 3.0 is tightly integrated with `Fabric` and the latest version of React Native. Therefore, you must use the **New Architecture** and at least **React Native 0.78.0**. Additionally, Unistyles relies on `react-native-nitro-modules` and `react-native-edge-to-edge`.
+Unistyles 3.0 is tightly integrated with `Fabric` and the latest versions of React Native. Therefore, you must use the **New Architecture** and at least **React Native 0.78.0**. Additionally, Unistyles relies on `react-native-nitro-modules` and `react-native-edge-to-edge`.
 
 <Aside>Learn more about how Unistyles leverages Nitro Modules and React Native Edge to Edge [here](/v3/other/dependencies).</Aside>
 
 **Table of requirements:**
-|  | Required | Note |
-| -------- | ------- | ---- |
-| React Native | 0.78.0+     |     |
-| New Architecture    | enabled     | no option to opt-out   |
-| Expo SDK    | 53+     | (if you use Expo)    |
-| Xcode    | 16+ (recommended 16.3+)    | Required by Nitro Modules    |
-
+|                    | Required                  | Note                        |
+|--------------------|---------------------------|-----------------------------|
+| React Native       | 0.78.0+                   |                             |
+| New Architecture   | enabled                   | no option to opt-out        |
+| Expo SDK           | 53+                       | (if you use Expo)           |
+| Xcode              | 16+ (recommended 16.3+)   | Required by Nitro Modules   |
+| Platform           | iOS / Android / Web / SSR | Follow instructions below |
 
 Since Unistyles relies on `Fabric`, it cannot run on the `Old Architecture` or older versions of React Native. If you can’t meet these requirements, you can use Unistyles 2.0+, which is compatible with those versions.
 
 ### Installation
 
 ```shell title="Install Unistyles and its dependencies"
-yarn add react-native-unistyles@next
+yarn add react-native-unistyles
 yarn add react-native-nitro-modules react-native-edge-to-edge
 ```
 
@@ -62,7 +62,9 @@ module.exports = function (api) {
         // other plugins
         ['react-native-unistyles/plugin', {
             // pass root folder of your application
-            // all files under this folder will be processed by the Babel plugin.
+            // all files under this folder will be processed by the Babel plugin
+            // if you need to include more folders, or customize discovery process
+            // check available babel options
             root: 'src'
         }]
     ]
@@ -71,11 +73,9 @@ module.exports = function (api) {
 ```
 
 <Aside>
-Learn more on how the Babel plugin works [here](/v3/other/babel-plugin).
+Check Babel plugin extra configuration options [here](/v3/other/babel-plugin#extra-configuration).
 
-If you're using React Compiler, check [this guide](/v3/guides/react-compiler) for more details.
-
-Check extra configuration options [here](/v3/other/babel-plugin#extra-configuration).
+Learn why you need Babel plugin [here](/v3/other/babel-plugin).
 </Aside>
 
 Finish installation based on your platform:
@@ -85,6 +85,9 @@ Finish installation based on your platform:
     ```shell
     yarn expo prebuild --clean
     ```
+    <Aside type="caution" title="Do you use Expo Router?">
+      Finish installation for Expo Router [here](/v3/guides/expo-router).
+    </Aside>
     <Aside type="caution" title="Dev client only">
       Unistyles includes custom native code, which means it does not support **Expo Go.**
     </Aside>
@@ -102,6 +105,12 @@ Finish installation based on your platform:
   </TabItem>
   <TabItem label="SSR">
     Unistyles offers first-class support for Next.js Server Side Rendering. To run the project, we recommend following the guidelines provided by [Next.JS](https://nextjs.org/docs).
+
+    Then follow [SSR guide](/v3/guides/server-side-rendering).
+
+    <Aside type="caution" title="Babel only">
+      You need to disabled SWC and rely on Babel for transpiling your code.
+    </Aside>
   </TabItem>
 </Tabs>
 

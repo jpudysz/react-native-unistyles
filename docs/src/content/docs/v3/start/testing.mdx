@@ -55,4 +55,16 @@ You must include configuration file **after** the mocks as they provide all nece
 
 The Babel plugin is automatically disabled in the `jest` test environment or when `NODE_ENV === 'test'`.
 
+### Understanding role of mocks
+
+Mocks contain basic logic to correctly execute Unistyles code.
+The Jest environment does not provide a `screen` (width and height), pixel ratio, or any other values from `UnistylesRuntime`.
+
+You should never test how Unistyles parses your styles, whether your component has certain styles, or if it is visible.
+These tests can result in false positives.
+
+Instead, configure E2E tests using eg. Playwright or Maestro.
+
+In these environments, you can test how Unistyles parses your styles and how your app looks like.
+
 </Seo>
