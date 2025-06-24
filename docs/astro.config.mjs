@@ -71,7 +71,7 @@ export default defineConfig({
             },
 			sidebar: [
                 {
-                    label: 'Tutorial', slug: 'v3/tutorial/intro', badge: 'WIP',
+                    label: 'Tutorial', slug: 'v3/tutorial/intro', badge: 'New!'
                 },
                 {
                     label: 'LLMS', slug: 'v3/llms/info', badge: 'Hot!',
