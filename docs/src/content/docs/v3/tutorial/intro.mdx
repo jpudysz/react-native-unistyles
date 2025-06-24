@@ -1,18 +1,180 @@
 ---
 title: Tutorial
-description: Check out official Unistyles 3.0 tutorial
+description: Learn how to build a cross-platform app from scratch with Unistyles 3.0, Expo, and Reanimated
+next: false
 ---
 
-import { Card } from '@astrojs/starlight/components'
+import { LinkCard, Aside } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
 
 <Seo
     seo={{
         title: 'Tutorial',
-        description: 'Introduction - tutorial react-native-unistyles'
+        description: 'Learn how to build a cross-platform app from scratch with Unistyles 3.0, Expo, and Reanimated'
     }}
 >
 
-🚧 Work is progress. Tutorial will be released soon.
+In this tutorial, we'll build a simple, cross-platform app that targets `iOS`, `Android`, and `Web`.
+Our stack will be `Expo`, `Reanimated`, and of course, `Unistyles` for powerful, performant styling.
+
+[TODO IMAGE]
+
+### Create new project
+
+First, let's scaffold a new Expo project using the command line:
+
+```bash
+npx create-expo-app@latest unistyles-tutorial
+cd unistyles-tutorial
+```
+
+Next, install Unistyles, its dependencies, and Reanimated:
+
+```bash
+yarn add react-native-reanimated react-native-unistyles react-native-nitro-modules react-native-edge-to-edge
+```
+
+<Aside type="tip">
+For best results and to ensure compatibility, we recommend using the `react-native-nitro-modules` version specified in the Unistyles
+[compatibility table](https://github.com/jpudysz/react-native-unistyles?tab=readme-ov-file#installation).
+</Aside>
+
+Finally, generate the native project folders required for the app to run:
+
+```bash
+yarn expo prebuild --clean
+```
+
+### Configure Babel Plugins
+
+Both `Unistyles` and `Reanimated` require babel plugin to work.  Since a `babel.config.js` file isn't created by default, we can generate it by running:
+
+```bash
+npx expo customize babel.config.js
+```
+
+Now, add the `unistyles` and `reanimated` plugins to your `babel.config.js`:
+
+```diff
+module.exports = function (api) {
+  api.cache(true);
+  return {
+    presets: ['babel-preset-expo'],
++    plugins: [
++        ['react-native-unistyles/plugin', {
++            root: 'app'
++        }],
++        ['react-native-reanimated/plugin']
++    ]
+  };
+};
+```
+
+<Aside type="tip">
+To learn more about the Unistyles Babel plugin and its configuration options, check out the [documentation](/v3/other/babel-plugin).
+</Aside>
+
+### Modify app entry point
+
+To use features like themes and breakpoints, Unistyles must be configured before your application code runs.
+This ensures that all stylesheets are created with the correct theme and device context.
+
+First, update your `package.json`:
+
+```diff
+{
+-   "main": "expo-router/entry"
++   "main": "index.ts"
+}
+```
+
+Next, create a new `index.ts` file in your project's root directory. This file will load the standard Expo Router entry point, and then import your Unistyles configuration:
+
+```ts
+import 'expo-router/entry'
+import './unistyles'
+```
+
+We'll create the `unistyles.ts` file in the next step.
+
+### Configure Unistyles
+
+This is where the magic happens! Create a `unistyles.ts` file in your project's root. Here, we'll define our `themes`, `breakpoints`, and register them with Unistyles.
+
+```ts
+import { StyleSheet } from 'react-native-unistyles'
+
+const lightTheme = {
+    colors: {
+        background: '#fff',
+        typography: '#000',
+        primary: '#00a8ff',
+        secondary: '#0097e6',
+    },
+    gap: (v: number) => v * 8,
+}
+
+const darkTheme = {
+    colors: {
+        background: '#000',
+        typography: '#fff',
+        primary: '#273c75',
+        secondary: '#192a56',
+    },
+    gap: (v: number) => v * 8,
+}
+
+const appThemes = {
+    light: lightTheme,
+    dark: darkTheme
+}
+
+const breakpoints = {
+    xs: 0,
+    sm: 300,
+    md: 500,
+    lg: 800,
+    xl: 1200,
+}
+
+type AppBreakpoints = typeof breakpoints
+type AppThemes = typeof appThemes
+
+declare module 'react-native-unistyles' {
+    export interface UnistylesThemes extends AppThemes {}
+    export interface UnistylesBreakpoints extends AppBreakpoints {}
+}
+
+StyleSheet.configure({
+    settings: {
+        adaptiveThemes: true
+    },
+    themes: {
+        light: lightTheme,
+        dark: darkTheme,
+    },
+    breakpoints,
+})
+```
+
+That's a lot to take in, so let's break it down:
+
+**Themes**: We defined light and dark themes. There are no restrictions on a theme's structure; you can add any properties you need, from colors to spacing functions.
+
+**Breakpoints**: We defined a set of breakpoints for responsive design. The only requirement is that one breakpoint must be 0.
+
+**Types**: We extended the Unistyles module with our custom `AppThemes` and `AppBreakpoints` types. This is the key to unlocking full auto-completion and type-safety across your entire app.
+
+**Configuration**: Finally, we called `StyleSheet.configure` function to set all the options. We also enabled `adaptiveThemes`, which will cause Unistyles to automatically transition between themes based on device color scheme.
+
+<Aside>
+To learn more about configuration options, check out the [configuration](/v3/start/configuration) page.
+</Aside>
+
+<LinkCard
+    title="Cleanup project"
+    href="/v3/tutorial/cleanup"
+/>
+
 
 </Seo>
