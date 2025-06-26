@@ -15,7 +15,7 @@ import Seo from '../../../../components/Seo.astro'
 >
 
 In this tutorial, we'll build a simple, cross-platform app that targets `iOS`, `Android`, and `Web`.
-Our stack will be `Expo`, `Reanimated`, and of course, `Unistyles` for powerful, performant styling.
+Our stack will be `Expo`, `Reanimated`, and, of course, `Unistyles` for powerful, performant styling.
 
 [TODO IMAGE]
 
@@ -47,7 +47,7 @@ yarn expo prebuild --clean
 
 ### Configure Babel Plugins
 
-Both `Unistyles` and `Reanimated` require babel plugin to work.  Since a `babel.config.js` file isn't created by default, we can generate it by running:
+Both `Unistyles` and `Reanimated` require a Babel plugin to work.  Since a `babel.config.js` file isn't created by default, we can generate it by running:
 
 ```bash
 npx expo customize babel.config.js
@@ -55,7 +55,7 @@ npx expo customize babel.config.js
 
 Now, add the `unistyles` and `reanimated` plugins to your `babel.config.js`:
 
-```diff
+```diff lang="ts"
 module.exports = function (api) {
   api.cache(true);
   return {
@@ -81,7 +81,7 @@ This ensures that all stylesheets are created with the correct theme and device 
 
 First, update your `package.json`:
 
-```diff
+```diff lang="json"
 {
 -   "main": "expo-router/entry"
 +   "main": "index.ts"
@@ -110,6 +110,7 @@ const lightTheme = {
         typography: '#000',
         primary: '#00a8ff',
         secondary: '#0097e6',
+        tint: 'todo'
     },
     gap: (v: number) => v * 8,
 }
@@ -120,6 +121,7 @@ const darkTheme = {
         typography: '#fff',
         primary: '#273c75',
         secondary: '#192a56',
+        tint: 'todo'
     },
     gap: (v: number) => v * 8,
 }
@@ -165,15 +167,15 @@ That's a lot to take in, so let's break it down:
 
 **Types**: We extended the Unistyles module with our custom `AppThemes` and `AppBreakpoints` types. This is the key to unlocking full auto-completion and type-safety across your entire app.
 
-**Configuration**: Finally, we called `StyleSheet.configure` function to set all the options. We also enabled `adaptiveThemes`, which will cause Unistyles to automatically transition between themes based on device color scheme.
+**Configuration**: Finally, we called the `StyleSheet.configure` function to set all the options. We also enabled `adaptiveThemes`, which will cause Unistyles to automatically transition between themes based on device color scheme.
 
 <Aside>
 To learn more about configuration options, check out the [configuration](/v3/start/configuration) page.
 </Aside>
 
 <LinkCard
-    title="Cleanup project"
-    href="/v3/tutorial/cleanup"
+    title="Cleanup screens"
+    href="/v3/tutorial/cleanup-screens"
 />
 
 
