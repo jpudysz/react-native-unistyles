@@ -13,4 +13,449 @@ import Seo from '../../../../components/Seo.astro'
     }}
 >
 
+Now that our screens are adapted, let's refactor the default components.
+This is where we'll see the true power of Unistyles in cleaning up component logic.
+We'll focus on `ThemedText` and `ThemedView`. The other files can be removed.
+
+After cleaning up, your components folder should look like this:
+
+<FileTree>
+
+- app/
+- components/
+    - ui/
+        - IconSymbol.ios.tsx
+        - IconSymbol.tsx
+        - TabBarBackground.ios.tsx
+        - TabBarBackground.tsx
+    - ThemedText.tsx
+    - ThemedView.tsx
+
+</FileTree>
+
+### ThemedText
+
+The default `ThemedText` component is a perfect candidate for a Unistyles refactor. It contains conditional style logic directly in the JSX—a pattern we can significantly improve.
+
+First, let's swap the `StyleSheet` import and remove unnecessary `useThemeColor` hook.
+
+```diff lang="tsx" title="components/ThemedText.tsx"
+- import { StyleSheet, Text, type TextProps } from 'react-native';
++ import { Text, type TextProps } from 'react-native';
++ import { StyleSheet } from 'react-native-unistyles';
+- import { useThemeColor } from '@/hooks/useThemeColor';
+```
+
+The original component used the `useThemeColor` hook to get a color based on the current theme.
+We'll replace this imperative logic with a dynamic function in our stylesheet.
+A dynamic function is a Unistyles feature that allows a style to accept arguments.
+Let's create one called `textColor` to handle the `lightColor` and `darkColor` props.
+
+```diff lang="tsx" title="components/ThemedText.tsx"
+export function ThemedText({
+  style,
+  lightColor,
+  darkColor,
+  type = 'default',
+  ...rest
+}: ThemedTextProps) {
+- const color = useThemeColor({ light: lightColor, dark: darkColor });
+
+  return (
+    <Text
+      style={[
+-        { color },
++        styles.textColor(lightColor, darkColor),
+        type === 'default' ? styles.default : undefined,
+        type === 'title' ? styles.title : undefined,
+        type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
+        type === 'subtitle' ? styles.subtitle : undefined,
+        type === 'link' ? styles.link : undefined,
+        style,
+      ]}
+      {...rest}
+    />
+  );
+}
+
+const styles = StyleSheet.create({
+  default: {
+    fontSize: 16,
+    lineHeight: 24,
+  },
++  textColor: (lightColor: string, darkColor: string) => ({
++     // todo
++  }),
+  defaultSemiBold: {
+    fontSize: 16,
+    lineHeight: 24,
+    fontWeight: '600',
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    lineHeight: 32,
+  },
+  subtitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  link: {
+    lineHeight: 30,
+    fontSize: 16,
+    color: '#0a7ea4',
+  },
+});
+```
+
+To implement this, we need to know the current color scheme. Unistyles provides access to this via the runtime object (which we'll alias as rt).
+
+When creating a StyleSheet, you can pass a function that receives both the `theme` and the `rt` as arguments.
+The `rt` object contains useful device metadata, including `rt.colorScheme`.
+
+Because we are accessing a runtime value, Unistyles is smart enough to know this style depends on the color scheme and will automatically update it when it changes—without re-rendering the component!
+Let's complete our dynamic function:
+
+```diff title="components/ThemedText.tsx" lang="tsx"
+export function ThemedText({
+  style,
+  lightColor,
+  darkColor,
+  type = 'default',
+  ...rest
+}: ThemedTextProps) {
+  return (
+    <Text
+      style={[
+        styles.textColor(lightColor, darkColor),
+        type === 'default' ? styles.default : undefined,
+        type === 'title' ? styles.title : undefined,
+        type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
+        type === 'subtitle' ? styles.subtitle : undefined,
+        type === 'link' ? styles.link : undefined,
+        style,
+      ]}
+      {...rest}
+    />
+  );
+}
+
+- const styles = StyleSheet.create({
++ const styles = StyleSheet.create((theme, rt) => ({
+  default: {
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  textColor: (lightColor: string, darkColor: string) => ({
+-    // todo
++    color: rt.colorScheme === 'dark' ? darkColor : lightColor,
+  }),
+  defaultSemiBold: {
+    fontSize: 16,
+    lineHeight: 24,
+    fontWeight: '600',
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    lineHeight: 32,
+  },
+  subtitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  link: {
+    lineHeight: 30,
+    fontSize: 16,
+    color: '#0a7ea4',
+  },
+- })
++ }));
+```
+
+Next, let's tackle the chain of conditional checks for the type prop.
+This is a classic use case for variants. Variants allow you to move all of this style logic out of your component and into the stylesheet.
+
+```diff lang="tsx" title="components/ThemedText.tsx"
+export function ThemedText({
+  style,
+  lightColor,
+  darkColor,
+  type = 'default',
+  ...rest
+}: ThemedTextProps) {
+  return (
+    <Text
+      style={[
+        styles.textColor(lightColor, darkColor),
+-        type === 'default' ? styles.default : undefined,
+-        type === 'title' ? styles.title : undefined,
+-        type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
+-        type === 'subtitle' ? styles.subtitle : undefined,
+-        type === 'link' ? styles.link : undefined,
+        style,
+      ]}
+      {...rest}
+    />
+  );
+}
+
+const styles = StyleSheet.create((theme, rt) => ({
+-  default: {
+-    fontSize: 16,
+-    lineHeight: 24,
+-  },
+  textColor: (lightColor?: string, darkColor?: string) => ({
+    color: rt.colorScheme === 'dark' ? darkColor : lightColor,
+  }),
+-  defaultSemiBold: {
+-    fontSize: 16,
+-    lineHeight: 24,
+-    fontWeight: '600',
+-  },
+-  title: {
+-    fontSize: 32,
+-    fontWeight: 'bold',
+-    lineHeight: 32,
+-  },
+-  subtitle: {
+-    fontSize: 20,
+-    fontWeight: 'bold',
+-  },
+-  link: {
+-    lineHeight: 30,
+-    fontSize: 16,
+-    color: '#0a7ea4',
+-  },
+}));
+```
+
+```diff lang="tsx" title="components/ThemedText.tsx"
+export function ThemedText({
+  style,
+  lightColor,
+  darkColor,
+  type = 'default',
+  ...rest
+}: ThemedTextProps) {
++ styles.useVariants({ type })
+
+  return (
+    <Text
+      style={[
+        styles.textColor(lightColor, darkColor),
++        styles.textType,
+        style,
+      ]}
+      {...rest}
+    />
+  );
+}
+
+const styles = StyleSheet.create((theme, rt) => ({
++  textType: {
++    variants: {
++        type: {
++            default: {
++                fontSize: 16,
++                lineHeight: 24,
++            },
++            defaultSemiBold: {
++                fontSize: 16,
++                lineHeight: 24,
++                fontWeight: '600',
++            },
++            title: {
++                fontSize: 32,
++                fontWeight: 'bold',
++                lineHeight: 32,
++            },
++            subtitle: {
++                fontSize: 20,
++                fontWeight: 'bold',
++            },
++            link: {
++                lineHeight: 30,
++                fontSize: 16,
++                color: '#0a7ea4',
++            },
++        }
++    }
++  },
+  textColor: (lightColor?: string, darkColor?: string) => ({
+    color: rt.colorScheme === 'dark' ? darkColor : lightColor,
+  }),
+}));
+```
+
+Notice how much cleaner the component is! We simply pass the type prop to the useStyles hook, and Unistyles applies the correct styles from our variants block.
+
+To make this component perfectly type-safe, we can use the `UnistylesVariants` helper type. It automatically infers all possible variant props from your stylesheet.
+
+```tsx title="components/ThemedText.tsx"
+export type ThemedTextProps = TextProps & {
+  lightColor?: string;
+  darkColor?: string;
+  type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link';
+};
+```
+
+Instead of specifying `type` prop, we can use `UnistylesVariants` genric type:
+
+```diff title="components/ThemedText.tsx" lang="tsx"
+- import { StyleSheet } from 'react-native-unistyles';
++ import { StyleSheet, type UnistylesVariants } from 'react-native-unistyles';
+
+- export type ThemedTextProps = TextProps & {
++ export type ThemedTextProps = TextProps & UnistylesVariants<typeof styles> & {
+  lightColor?: string;
+  darkColor?: string;
+-  type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link';
+};
+
+export function ThemedText({
+  style,
+  lightColor,
+  darkColor,
+-  type = 'default',
+  ...rest
+}: ThemedTextProps) {
+```
+
+Our component is clean, but we can make it even better. Why are we passing `lightColor` and `darkColor` as props when Unistyles already has access to our full theme?
+
+Let's remove those props and use the theme object directly.
+
+```diff title="components/ThemedText.tsx" lang="tsx"
+import { Text, type TextProps } from 'react-native';
+import { StyleSheet, type UnistylesVariants } from 'react-native-unistyles';
+
++ export type ThemedTextProps = TextProps & UnistylesVariants<typeof styles>
+- export type ThemedTextProps = TextProps & UnistylesVariants<typeof styles> & {
+-  lightColor?: string;
+-  darkColor?: string;
+- };
+
+export function ThemedText({
+  style,
+-  lightColor,
+-  darkColor,
+  ...rest
+}: ThemedTextProps) {
+  return (
+    <Text
+      style={[
+-        styles.textColor(lightColor, darkColor),
++        styles.textColor,
+        styles.textType,
+        style,
+      ]}
+      {...rest}
+    />
+  );
+}
+
++ const styles = StyleSheet.create(theme => ({
+- const styles = StyleSheet.create((theme, rt) => ({
+-  textColor: (lightColor?: string, darkColor?: string) => ({
+-    color: rt.colorScheme === 'dark' ? darkColor : lightColor,
+-  }),
++  textColor: {
++    color: theme.colors.typography
++  },
+  textType: {
+    variants: {
+      type: {
+        default: {
+          fontSize: 16,
+          lineHeight: 24,
+        },
+        title: {
+          fontSize: 32,
+          fontWeight: 'bold',
+          lineHeight: 32,
+        },
+        subtitle: {
+          fontSize: 20,
+          fontWeight: 'bold',
+        },
+        link: {
+          lineHeight: 30,
+          fontSize: 16,
+ -         color: '#0a7ea4',
+ +         color: theme.colors.link
+        },
+      }
+    }
+  }
+}));
+```
+
+This is the final, fully refactored `ThemedText` component. It's declarative, type-safe, and completely decoupled from style logic.
+
+### ThemedView - your turn!
+
+Now for the `ThemedView` component. This one is much simpler.
+Based on what you've learned, try refactoring it yourself to use the theme.colors.background property.
+
+Once you're done, check your work against the solution below:
+
+```tsx title="components/ThemedView.tsx"
+import { View, type ViewProps } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
+
+export type ThemedViewProps = ViewProps;
+
+export function ThemedView({ style, ...otherProps }: ThemedViewProps) {
+  return <View style={[styles.container, style]} {...otherProps} />;
+}
+
+const styles = StyleSheet.create(theme => ({
+  container: {
+    backgroundColor: theme.colors.background,
+  }
+}));
+```
+
+### Constants and hooks
+
+Lastly, we can remove the `constants` and `hooks` folders, as they are now redundant.
+Your final project structure should be clean and organized.
+
+<FileTree>
+
+- app/
+    - (tabs)/
+        - index.tsx
+        - explore.tsx
+        - _layout.tsx
+    - +not_found.tsx
+    - _layout.tsx
+- assets/
+    - fonts/
+    - images/
+- components/
+    - ui/
+        - IconSymbol.ios.tsx
+        - IconSymbol.tsx
+        - TabBarBackground.ios.tsx
+        - TabBarBackground.tsx
+    - ThemedText.tsx
+    - ThemedView.tsx
+
+</FileTree>
+
+If you run the app now, it should look and function correctly, but its internal styling logic is now far more powerful and maintainable.
+
+[IMAGE]
+
+<LinkCard
+    title="Part 2: Cleanup screens"
+    href="/v3/tutorial/cleanup-screens"
+/>
+<LinkCard
+    title="Part 4: Variants and Compound variants"
+    href="/v3/tutorial/variants"
+/>
+
 </Seo>

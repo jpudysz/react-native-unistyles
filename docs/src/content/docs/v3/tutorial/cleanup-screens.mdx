@@ -82,11 +82,60 @@ For the `index.tsx` and `explore.tsx` files, the process is the same: we simply 
 
 ```diff title="app/(tabs)/index.tsx" lang="tsx"
 -import { Platform, StyleSheet } from 'react-native';
-+import { Platform } from 'react-native';
 +import { StyleSheet } from 'react-native-unistyles';
 ```
 
-Repeat this simple change for the `(tabs)/explore.tsx` file.
+For the JSX, we won't need all these boilerplate components, so we can keep it as simple as possible:
+
+```tsx title="app/(tabs)/index.tsx"
+import { StyleSheet } from 'react-native-unistyles';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
+
+export default function HomeScreen() {
+  return (
+      <ThemedView style={styles.container}>
+        <ThemedText type="title">
+          Home Screen
+        </ThemedText>
+      </ThemedView>
+  );
+}
+
+const styles = StyleSheet.create(theme => ({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+}));
+```
+
+Repeat the same steps for the `(tabs)/explore.tsx` file.
+
+```tsx title="app/(tabs)/explore.tsx"
+import { StyleSheet } from 'react-native-unistyles';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
+
+export default function TabTwoScreen() {
+  return (
+      <ThemedView style={styles.container}>
+        <ThemedText type="title">
+          Explore Screen
+        </ThemedText>
+      </ThemedView>
+  );
+}
+
+const styles = StyleSheet.create(theme => ({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+}));
+```
 
 The most interesting file here is `_layout.tsx`, which configures the `Tabs` navigator. The default code uses the `useColorScheme` hook to dynamically set the `tabBarActiveTintColor`.
 Since `@react-navigation` components aren't aware of the Unistyles C++ core, they can't be updated automatically. We need a way to get the current theme data into our component and trigger a re-render when the theme changes.
@@ -153,7 +202,11 @@ export default function TabLayout() {
 With these changes, you can now switch your device's color scheme, and you'll see the tab bar's tint color update instantly, powered by Unistyles!
 
 <LinkCard
-    title="Cleanup components"
+    title="Part 1: Intro"
+    href="/v3/tutorial/intro"
+/>
+<LinkCard
+    title="Part 3: Cleanup components"
     href="/v3/tutorial/cleanup-components"
 />
 
