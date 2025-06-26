@@ -7,14 +7,16 @@ import { createUnistylesRef } from '../web/utils/createUnistylesRef'
 import { getClassName } from './getClassname'
 import { maybeWarnAboutMultipleUnistyles } from './warn'
 
-const STYLE_PROPS = ['style', 'contentContainerStyle', 'columnWrapperStyle'] as const
+const STYLE_PROPS = ['contentContainerStyle', 'columnWrapperStyle'] as const
+
+type StyleProp = typeof STYLE_PROPS[number] | 'style'
 
 type ComponentProps = {
-    [K in typeof STYLE_PROPS[number]]?: UnistylesValues
+    [K in StyleProp]?: UnistylesValues
 }
 
 const buildUnistylesProps = (Component: any, props: ComponentProps, forwardedRef: React.ForwardedRef<unknown>) => {
-    const componentStyleProps = STYLE_PROPS.filter(styleProp => styleProp in props)
+    const componentStyleProps = ['style' as const, ...STYLE_PROPS.filter(styleProp => styleProp in props)]
     const classNames = Object.fromEntries(componentStyleProps.map(styleProp => [styleProp, getClassName(props[styleProp])]))
     const refs = componentStyleProps.map(styleProp => {
         return createUnistylesRef(
