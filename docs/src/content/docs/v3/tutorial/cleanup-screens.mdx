@@ -1,0 +1,160 @@
+---
+title: "Part 2: Cleanup screens"
+description: Learn how to build a cross-platform app from scratch with Unistyles 3.0, Expo, and Reanimated
+---
+
+import { FileTree, Aside, LinkCard } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Tutorial',
+        description: 'Learn how to build a cross-platform app from scratch with Unistyles 3.0, Expo, and Reanimated'
+    }}
+>
+
+Before we start building our own features, let's adapt the default Expo Router template.
+The starter project includes its own theming and styling logic, which we'll replace with the more powerful Unistyles approach.
+
+### App folder
+
+Let's start with the root layout file for the entire application.
+
+<FileTree>
+
+- app/
+  - (tabs)/
+  - _layout.tsx
+  - +not_found.tsx
+</FileTree>
+
+This file sets up the root `Stack` navigator and uses React Navigation's `ThemeProvider` along with a `useColorScheme` hook.
+We no longer need these, as Unistyles will now manage the app's theme state globally.
+
+Let's remove the old theming logic:
+
+```diff title="app/_layout.tsx" lang="tsx"
++import React from 'react';
+-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import 'react-native-reanimated';
+
+-import { useColorScheme } from '@/hooks/useColorScheme';
+
+export default function RootLayout() {
+-  const colorScheme = useColorScheme();
+  const [loaded] = useFonts({
+    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+  });
+
+  if (!loaded) {
+    // Async font loading only occurs in development.
+    return null;
+  }
+
+  return (
++    <React.Fragment>
+-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+      <StatusBar style="auto" />
+-    </ThemeProvider>
++    </React.Fragment>
+  );
+}
+```
+
+Next, for the `+not_found.tsx` file, we only need to swap the `StyleSheet` import to use Unistyles:
+
+```diff title="app/+not_found.tsx" lang="tsx"
++import { StyleSheet } from 'react-native-unistyles';
+-import { StyleSheet } from 'react-native';
+```
+
+### (tabs) folder
+
+This folder contains the layout and screens for your `TabsNavigator`.
+For the `index.tsx` and `explore.tsx` files, the process is the same: we simply need to replace the standard `StyleSheet` import with the one from Unistyles.
+
+```diff title="app/(tabs)/index.tsx" lang="tsx"
+-import { Platform, StyleSheet } from 'react-native';
++import { Platform } from 'react-native';
++import { StyleSheet } from 'react-native-unistyles';
+```
+
+Repeat this simple change for the `(tabs)/explore.tsx` file.
+
+The most interesting file here is `_layout.tsx`, which configures the `Tabs` navigator. The default code uses the `useColorScheme` hook to dynamically set the `tabBarActiveTintColor`.
+Since `@react-navigation` components aren't aware of the Unistyles C++ core, they can't be updated automatically. We need a way to get the current theme data into our component and trigger a re-render when the theme changes.
+This is the perfect use case for the `useUnistyles` hook. It subscribes the component to theme changes, giving you access to the theme object and ensuring the component re-renders when the theme is updated.
+
+<Aside>
+The `useUnistyles` hook is powerful but should be used selectively, primarily for integrating with third-party components that need to react to theme changes.
+To help you decide when to use it, we've created a [decision algorithm](/v3/references/3rd-party-views)
+</Aside>
+
+Let's refactor tab layout to use our new theme:
+
+```diff title="app/(tabs)/_layout.tsx" lang="tsx"
+import { Tabs } from 'expo-router';
+import React from 'react';
+import { Platform } from 'react-native';
+
+import { HapticTab } from '@/components/HapticTab';
+import { IconSymbol } from '@/components/ui/IconSymbol';
+import TabBarBackground from '@/components/ui/TabBarBackground';
+import { Colors } from '@/constants/Colors';
+- import { useColorScheme } from '@/hooks/useColorScheme';
++ import { useUnistyles } from 'react-native-unistyles';
+
+export default function TabLayout() {
+-  const colorScheme = useColorScheme();
++  const { theme } = useUnistyles();
+
+  return (
+    <Tabs
+      screenOptions={{
+-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
++        tabBarActiveTintColor: theme.colors.tint,
+        headerShown: false,
+        tabBarButton: HapticTab,
+        tabBarBackground: TabBarBackground,
+        tabBarStyle: Platform.select({
+          ios: {
+            // Use a transparent background on iOS to show the blur effect
+            position: 'absolute',
+          },
+          default: {},
+        }),
+      }}>
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="explore"
+        options={{
+          title: 'Explore',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+        }}
+      />
+    </Tabs>
+  );
+}
+```
+
+With these changes, you can now switch your device's color scheme, and you'll see the tab bar's tint color update instantly, powered by Unistyles!
+
+<LinkCard
+    title="Cleanup components"
+    href="/v3/tutorial/cleanup-components"
+/>
+
+</Seo>
