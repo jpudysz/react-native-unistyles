@@ -15,7 +15,7 @@
 ## Installation
 
 ```shell
-yarn add react-native-unistyles@next
+yarn add react-native-unistyles
 ```
 
 Install dependencies:

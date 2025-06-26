@@ -71,7 +71,7 @@ export default defineConfig({
             },
 			sidebar: [
                 {
-                    label: 'Tutorial', slug: 'v3/tutorial/intro', badge: 'WIP',
+                    label: 'Tutorial', slug: 'v3/tutorial/intro', badge: 'New!'
                 },
                 {
                     label: 'LLMS', slug: 'v3/llms/info', badge: 'Hot!',
@@ -99,7 +99,7 @@ export default defineConfig({
                         { label: 'Expo Router', slug: 'v3/guides/expo-router' },
                         { label: 'React Compiler', slug: 'v3/guides/react-compiler' },
                         { label: 'Custom web', slug: 'v3/guides/custom-web' },
-                        { label: 'Reanimated', slug: 'v3/guides/reanimated', badge: 'Updated!' },
+                        { label: 'Reanimated', slug: 'v3/guides/reanimated' },
                         { label: 'Server side rendering', slug: 'v3/guides/server-side-rendering' },
                     ]
                 },
