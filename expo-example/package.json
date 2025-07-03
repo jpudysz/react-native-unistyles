@@ -43,7 +43,8 @@
   "jest": {
     "preset": "jest-expo",
     "setupFiles": [
-      "../src/mocks.ts"
+      "../src/mocks.ts",
+      "./unistyles.ts"
     ]
   },
   "private": true
