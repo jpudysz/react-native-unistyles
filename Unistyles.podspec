@@ -1,5 +1,5 @@
 require "json"
-require_relative './rn_version.rb'
+require_relative './get_rn_version.rb'
 
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 
