@@ -217,4 +217,27 @@ jest.mock('react-native-unistyles', () => {
     }
 })
 
+jest.mock('react-native-unistyles/reanimated', () => {
+    const unistyles = require('react-native-unistyles')
+    const mockedSharedValue = (value: any) => ({
+        value
+    })
 
+    return {
+        useAnimatedTheme: () => {
+            const theme = unistyles.useUnistyles().theme
+            const sharedTheme = mockedSharedValue(theme)
+
+            return sharedTheme
+        },
+        useAnimatedVariantColor: () => {
+            const fromValue = mockedSharedValue('#000000')
+            const toValue = mockedSharedValue('#FFFFFF')
+
+            return {
+                fromValue,
+                toValue
+            }
+        },
+    }
+})
