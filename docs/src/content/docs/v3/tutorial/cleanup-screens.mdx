@@ -5,6 +5,7 @@ description: Learn how to build a cross-platform app from scratch with Unistyles
 
 import { FileTree, Aside, LinkCard } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
+import { TutorialNavigation, CompareChanges } from '../../../../components'
 
 <Seo
     seo={{
@@ -201,13 +202,19 @@ export default function TabLayout() {
 
 With these changes, you can now switch your device's color scheme, and you'll see the tab bar's tint color update instantly, powered by Unistyles!
 
-<LinkCard
-    title="Part 1: Intro"
-    href="/v3/tutorial/intro"
+<CompareChanges 
+  commitUrl="https://github.com/jpudysz/react-native-unistyles/commit/f7g8h9i0j1k2345"
 />
-<LinkCard
-    title="Part 3: Cleanup components"
-    href="/v3/tutorial/cleanup-components"
+
+<TutorialNavigation
+    prev={{
+        title: "Part 1: Intro",
+        href: "/v3/tutorial/intro"
+    }}
+    next={{
+        title: "Part 3: Cleanup components",
+        href: "/v3/tutorial/cleanup-components"
+    }}
 />
 
 </Seo>
