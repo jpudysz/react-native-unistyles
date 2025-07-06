@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
   },
-+  textColor: (lightColor: string, darkColor: string) => ({
++  textColor: (lightColor?: string, darkColor?: string) => ({
 +     // todo
 +  }),
   defaultSemiBold: {
@@ -115,8 +115,9 @@ Learn more about dynamic functions and how they work in the dedicated [guide](/v
 
 To implement this, we need to know the current color scheme. Unistyles provides access to this via the runtime object (which we'll alias as rt).
 
-When creating a StyleSheet, you can pass a function that receives both the `theme` and the `rt` as arguments.
-The `rt` object contains useful device metadata, including `rt.colorScheme`.
+What's unique compared to React Native `StyleSheet` is that with Unistyles your `StyleSheet` can be converted to a function that receives both the `theme` and the `rt` as arguments.
+First argument - `theme` is the current, always up-to-date theme object.
+Second argument - `rt` is the runtime object, containing useful device metadata, including `rt.colorScheme`.
 
 <Aside>
 If you're interested in learning more about the `rt` object, check out the [mini runtime guide](/v3/references/mini-runtime).
@@ -330,11 +331,12 @@ export function ThemedText({
   lightColor,
   darkColor,
 -  type = 'default',
++  type,
   ...rest
 }: ThemedTextProps) {
 ```
 
-Our component is clean, but we can make it even better! Why are we passing `lightColor` and `darkColor` as props when Unistyles already has access to our full theme?
+Our component is clean, but we can make it even better! Why are we passing `lightColor` and `darkColor` as props when Unistyles already has access to our app theme?
 
 Let's remove those props and use the theme object directly.
 
@@ -394,8 +396,8 @@ export function ThemedText({
         link: {
           lineHeight: 30,
           fontSize: 16,
- -         color: '#0a7ea4',
- +         color: theme.colors.link
+-          color: '#0a7ea4',
++          color: theme.colors.link
         },
       }
     }
@@ -405,7 +407,7 @@ export function ThemedText({
 
 **Why did we remove the extra code?**
 
-We no longer pass `lightColor` or `darkColor` as props because those colours now come straight from the theme (typography color). When you change the `colorScheme` or update the theme, Unistyles automatically injects the new values into your `StyleSheet`, so there’s nothing to manage manually. Keeping all theming logic inside the `StyleSheet` avoids duplicated work and makes the code easier to maintain.
+We no longer pass as props `lightColor` and `darkColor` because those colours now come straight from the theme (typography color). When you change the `colorScheme` or update the theme, Unistyles automatically injects the new values into your `StyleSheet`, so there’s nothing to manage manually. Keeping all theming logic inside the `StyleSheet` avoids duplicated work and makes the code easier to maintain.
 
 For the same reason, the `dynamic function` is no longer needed - we’ve replaced it with a regular style object.
 
@@ -470,9 +472,7 @@ Your final project structure should be clean and organized.
 
 If you run the app now, it should look and function correctly, but its internal styling logic is now far more powerful and maintainable.
 
-[IMAGE]
-
-<CompareChanges 
+<CompareChanges
   commitUrl="https://github.com/jpudysz/react-native-unistyles/commit/m3n4o5p6q7r8901"
 />
 

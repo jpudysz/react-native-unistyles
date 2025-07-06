@@ -7,6 +7,7 @@ next: false
 import { LinkCard, Aside } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
 import { TutorialNavigation, CompareChanges } from '../../../../components'
+import TutorialPreviewImage from '../../../../assets/tutorial-preview.jpg'
 
 <Seo
     seo={{
@@ -18,7 +19,7 @@ import { TutorialNavigation, CompareChanges } from '../../../../components'
 In this tutorial, we'll build a simple, cross-platform app that targets `iOS`, `Android`, and `Web`.
 Our stack will be `Expo`, `Reanimated`, and of course `Unistyles` for powerful, performant styling.
 
-[TODO IMAGE]
+<img src={TutorialPreviewImage.src} alt="ios app preview" style={{objectFit: 'cover'}} />
 
 ### Create new project
 
@@ -107,25 +108,41 @@ import { StyleSheet } from 'react-native-unistyles'
 
 const lightTheme = {
     colors: {
-        background: '#fff',
-        typography: '#000',
-        primary: '#00a8ff',
-        secondary: '#0097e6',
-        tint: 'todo'
+        background: '#FCFAF8',
+        foreground: '#EDEAE6',
+        typography: '#1B140C',
+        dimmed: '#ECE8E4',
+        tint: '#9A734C',
+        activeTint: '#1B140C',
+        accents: {
+            banana: '#F6E58D',
+            pumpkin: '#FFBE76',
+            apple: '#FF7979',
+            grass: '#BADC58',
+            storm: '#686DE0'
+        }
     },
     gap: (v: number) => v * 8,
-}
+} as const
 
 const darkTheme = {
     colors: {
-        background: '#000',
-        typography: '#fff',
-        primary: '#273c75',
-        secondary: '#192a56',
-        tint: 'todo'
+        background: '#221A11',
+        foreground: '#332618',
+        typography: '#FFFFFF',
+        dimmed: '#A8A198',
+        tint: '#C9AD92',
+        activeTint: '#FFFFFF',
+        accents: {
+            banana: '#f9CA24',
+            pumpkin: '#F0932B',
+            apple: '#EB4D4B',
+            grass: '#6AB04C',
+            storm: '#4834D4'
+        }
     },
     gap: (v: number) => v * 8,
-}
+} as const
 
 const appThemes = {
     light: lightTheme,
@@ -163,6 +180,7 @@ StyleSheet.configure({
 That's a lot to take in, so let's break it down:
 
 **Themes**: We defined light and dark themes. There are no restrictions on a theme's structure, you can add any properties you need, from colors to spacing functions.
+In our case we defined a custom palette with different accents and one helper function `gap` for spacing.
 
 **Breakpoints**: We defined a set of breakpoints for responsive design. The only requirement is that one breakpoint must be 0.
 
@@ -174,7 +192,7 @@ That's a lot to take in, so let's break it down:
 To learn more about configuration options, check out the [configuration](/v3/start/configuration) page.
 </Aside>
 
-<CompareChanges 
+<CompareChanges
   commitUrl="https://github.com/jpudysz/react-native-unistyles/commit/a1b2c3d4e5f6789"
 />
 
