@@ -137,12 +137,6 @@ export default defineConfig({
                     ]
                 },
                 {
-                    label: 'Examples',
-                    items: [
-                        { label: 'All examples', slug: 'v3/examples/examples', badge: 'WIP' },
-                    ]
-                },
-                {
                     label: 'Unistyles 2.0 documentation', link: 'https://v2.unistyl.es'
                 },
                 {

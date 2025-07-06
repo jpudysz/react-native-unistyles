@@ -5,7 +5,7 @@ description: Learn how to build a cross-platform app from scratch with Unistyles
 
 import { FileTree, Aside, LinkCard } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
-import { TutorialNavigation, CompareChanges } from '../../../../components'
+import { TutorialNavigation } from '../../../../components'
 import TutorialPreviewImage from '../../../../assets/tutorial-2.jpg'
 
 <Seo
@@ -212,9 +212,6 @@ With these changes, you can now switch your device's color scheme, and you'll se
 
 <img src={TutorialPreviewImage.src} alt="ios app preview" style={{objectFit: 'cover'}} />
 
-<CompareChanges
-  commitUrl="https://github.com/jpudysz/react-native-unistyles/commit/f7g8h9i0j1k2345"
-/>
 
 <TutorialNavigation
     prev={{
