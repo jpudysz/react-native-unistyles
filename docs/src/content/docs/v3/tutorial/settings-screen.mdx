@@ -6,7 +6,7 @@ next: false
 
 import { LinkCard, Aside, FileTree } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
-import { TutorialNavigation, CompareChanges } from '../../../../components'
+import { TutorialNavigation } from '../../../../components'
 import TutorialPreviewImage from '../../../../assets/tutorial-5.jpeg'
 
 <Seo
@@ -353,10 +353,6 @@ export default function SettingsScreen() {
 <img src={TutorialPreviewImage.src} alt="ios app preview" style={{objectFit: 'cover'}} width={300} />
 
 Perfect! Your settings screen now has interactive tiles that provide immediate visual feedback and navigate to the appropriate modal screens. In the next part, we'll implement the functionality for these modals and show how to dynamically update themes and accent colors.
-
-<CompareChanges
-  commitUrl="https://github.com/jpudysz/react-native-unistyles/commit/s9t0u1v2w3x4567"
-/>
 
 <TutorialNavigation
     prev={{

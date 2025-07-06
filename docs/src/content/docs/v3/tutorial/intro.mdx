@@ -6,7 +6,7 @@ next: false
 
 import { LinkCard, Aside } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
-import { TutorialNavigation, CompareChanges } from '../../../../components'
+import { TutorialNavigation } from '../../../../components'
 import TutorialPreviewImage from '../../../../assets/tutorial-preview.jpg'
 
 <Seo
@@ -16,8 +16,10 @@ import TutorialPreviewImage from '../../../../assets/tutorial-preview.jpg'
     }}
 >
 
-In this tutorial, we'll build a simple, cross-platform app that targets `iOS`, `Android`, and `Web`.
+In this `1 hour` long tutorial, we'll build a simple, cross-platform app that targets `iOS`, `Android`, and `Web`.
 Our stack will be `Expo`, `Reanimated`, and of course `Unistyles` for powerful, performant styling.
+
+During this tutorial, we will cover most of the Unistyles features and best practices.
 
 <img src={TutorialPreviewImage.src} alt="ios app preview" style={{objectFit: 'cover'}} />
 
@@ -191,10 +193,6 @@ In our case we defined a custom palette with different accents and one helper fu
 <Aside>
 To learn more about configuration options, check out the [configuration](/v3/start/configuration) page.
 </Aside>
-
-<CompareChanges
-  commitUrl="https://github.com/jpudysz/react-native-unistyles/commit/a1b2c3d4e5f6789"
-/>
 
 <TutorialNavigation
     next={{

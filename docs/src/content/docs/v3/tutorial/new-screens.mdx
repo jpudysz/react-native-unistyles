@@ -6,7 +6,7 @@ next: false
 
 import { LinkCard, Aside, FileTree } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
-import { TutorialNavigation, CompareChanges } from '../../../../components'
+import { TutorialNavigation } from '../../../../components'
 import TutorialPreviewImage from '../../../../assets/tutorial-3.jpeg'
 import TutorialPreviewImage2 from '../../../../assets/tutorial-4.jpeg'
 
@@ -390,10 +390,6 @@ export default function TabLayout() {
 Congratulations! You've successfully set up the basic screen structure and navigation for the app. The boilerplate is out of the way, and we're ready to start bringing the designs to life in the next part!
 
 <img src={TutorialPreviewImage2.src} alt="iOS app preview showing playlist screen" width={300} style={{objectFit: 'cover'}} />
-
-<CompareChanges
-  commitUrl="https://github.com/jpudysz/react-native-unistyles/commit/s9t0u1v2w3x4567"
-/>
 
 <TutorialNavigation
     prev={{
