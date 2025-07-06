@@ -6,6 +6,7 @@ next: false
 
 import { LinkCard, Aside } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
+import { TutorialNavigation, CompareChanges } from '../../../../components'
 
 <Seo
     seo={{
@@ -15,5 +16,16 @@ import Seo from '../../../../components/Seo.astro'
 >
 
 TODO
+
+<CompareChanges 
+  commitUrl="https://github.com/jpudysz/react-native-unistyles/commit/s9t0u1v2w3x4567"
+/>
+
+<TutorialNavigation
+    prev={{
+        title: "Part 3: Cleanup components",
+        href: "/v3/tutorial/cleanup-components"
+    }}
+/>
 
 </Seo>

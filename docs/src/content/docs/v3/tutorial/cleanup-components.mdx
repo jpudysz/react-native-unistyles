@@ -5,6 +5,7 @@ description: Learn how to build a cross-platform app from scratch with Unistyles
 
 import { FileTree, Aside, LinkCard } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
+import { TutorialNavigation, CompareChanges } from '../../../../components'
 
 <Seo
     seo={{
@@ -35,7 +36,7 @@ After cleaning up, your components folder should look like this:
 
 ### ThemedText
 
-The default `ThemedText` component is a perfect candidate for a Unistyles refactor. It contains conditional style logic directly in the JSX—a pattern we can significantly improve.
+The default `ThemedText` component is a perfect candidate for a Unistyles refactor. It contains conditional style logic directly in the JSX - a pattern we can significantly improve.
 
 First, let's swap the `StyleSheet` import and remove unnecessary `useThemeColor` hook.
 
@@ -108,12 +109,21 @@ const styles = StyleSheet.create({
 });
 ```
 
+<Aside>
+Learn more about dynamic functions and how they work in the dedicated [guide](/v3/references/dynamic-functions).
+</Aside>
+
 To implement this, we need to know the current color scheme. Unistyles provides access to this via the runtime object (which we'll alias as rt).
 
 When creating a StyleSheet, you can pass a function that receives both the `theme` and the `rt` as arguments.
 The `rt` object contains useful device metadata, including `rt.colorScheme`.
 
-Because we are accessing a runtime value, Unistyles is smart enough to know this style depends on the color scheme and will automatically update it when it changes—without re-rendering the component!
+<Aside>
+If you're interested in learning more about the `rt` object, check out the [mini runtime guide](/v3/references/mini-runtime).
+</Aside>
+
+Because we are accessing a runtime value, Unistyles is smart enough to know this style depends on the color scheme and will automatically update it when it changes - without re-rendering the component!
+
 Let's complete our dynamic function:
 
 ```diff title="components/ThemedText.tsx" lang="tsx"
@@ -288,9 +298,11 @@ const styles = StyleSheet.create((theme, rt) => ({
 }));
 ```
 
-Notice how much cleaner the component is! We simply pass the type prop to the useStyles hook, and Unistyles applies the correct styles from our variants block.
+Notice how much cleaner the component is! We simply pass the `type` prop to the `useVariants` hook, and Unistyles applies the correct styles from our variants block.
 
 To make this component perfectly type-safe, we can use the `UnistylesVariants` helper type. It automatically infers all possible variant props from your stylesheet.
+
+Currently, our component has following props:
 
 ```tsx title="components/ThemedText.tsx"
 export type ThemedTextProps = TextProps & {
@@ -300,7 +312,7 @@ export type ThemedTextProps = TextProps & {
 };
 ```
 
-Instead of specifying `type` prop, we can use `UnistylesVariants` genric type:
+Instead of specifying `type` prop manually, we can use `UnistylesVariants` genric type:
 
 ```diff title="components/ThemedText.tsx" lang="tsx"
 - import { StyleSheet } from 'react-native-unistyles';
@@ -322,7 +334,7 @@ export function ThemedText({
 }: ThemedTextProps) {
 ```
 
-Our component is clean, but we can make it even better. Why are we passing `lightColor` and `darkColor` as props when Unistyles already has access to our full theme?
+Our component is clean, but we can make it even better! Why are we passing `lightColor` and `darkColor` as props when Unistyles already has access to our full theme?
 
 Let's remove those props and use the theme object directly.
 
@@ -391,7 +403,18 @@ export function ThemedText({
 }));
 ```
 
+**Why did we remove the extra code?**
+
+We no longer pass `lightColor` or `darkColor` as props because those colours now come straight from the theme (typography color). When you change the `colorScheme` or update the theme, Unistyles automatically injects the new values into your `StyleSheet`, so there’s nothing to manage manually. Keeping all theming logic inside the `StyleSheet` avoids duplicated work and makes the code easier to maintain.
+
+For the same reason, the `dynamic function` is no longer needed - we’ve replaced it with a regular style object.
+
+
 This is the final, fully refactored `ThemedText` component. It's declarative, type-safe, and completely decoupled from style logic.
+
+<Aside>
+Curious to learn more about variants? Check out the [variants guide](/v3/references/variants).
+</Aside>
 
 ### ThemedView - your turn!
 
@@ -449,13 +472,19 @@ If you run the app now, it should look and function correctly, but its internal 
 
 [IMAGE]
 
-<LinkCard
-    title="Part 2: Cleanup screens"
-    href="/v3/tutorial/cleanup-screens"
+<CompareChanges 
+  commitUrl="https://github.com/jpudysz/react-native-unistyles/commit/m3n4o5p6q7r8901"
 />
-<LinkCard
-    title="Part 4: Variants and Compound variants"
-    href="/v3/tutorial/variants"
+
+<TutorialNavigation
+    prev={{
+        title: "Part 2: Cleanup screens",
+        href: "/v3/tutorial/cleanup-screens"
+    }}
+    next={{
+        title: "Part 4: Variants and Compound variants",
+        href: "/v3/tutorial/variants"
+    }}
 />
 
 </Seo>

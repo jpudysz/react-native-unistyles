@@ -6,6 +6,7 @@ next: false
 
 import { LinkCard, Aside } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
+import { TutorialNavigation, CompareChanges } from '../../../../components'
 
 <Seo
     seo={{
@@ -15,7 +16,7 @@ import Seo from '../../../../components/Seo.astro'
 >
 
 In this tutorial, we'll build a simple, cross-platform app that targets `iOS`, `Android`, and `Web`.
-Our stack will be `Expo`, `Reanimated`, and, of course, `Unistyles` for powerful, performant styling.
+Our stack will be `Expo`, `Reanimated`, and of course `Unistyles` for powerful, performant styling.
 
 [TODO IMAGE]
 
@@ -161,7 +162,7 @@ StyleSheet.configure({
 
 That's a lot to take in, so let's break it down:
 
-**Themes**: We defined light and dark themes. There are no restrictions on a theme's structure; you can add any properties you need, from colors to spacing functions.
+**Themes**: We defined light and dark themes. There are no restrictions on a theme's structure, you can add any properties you need, from colors to spacing functions.
 
 **Breakpoints**: We defined a set of breakpoints for responsive design. The only requirement is that one breakpoint must be 0.
 
@@ -173,9 +174,15 @@ That's a lot to take in, so let's break it down:
 To learn more about configuration options, check out the [configuration](/v3/start/configuration) page.
 </Aside>
 
-<LinkCard
-    title="Part 2: Cleanup screens"
-    href="/v3/tutorial/cleanup-screens"
+<CompareChanges 
+  commitUrl="https://github.com/jpudysz/react-native-unistyles/commit/a1b2c3d4e5f6789"
+/>
+
+<TutorialNavigation
+    next={{
+        title: "Part 2: Cleanup screens",
+        href: "/v3/tutorial/cleanup-screens"
+    }}
 />
 
 
