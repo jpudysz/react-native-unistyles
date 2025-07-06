@@ -10,6 +10,8 @@ import { TutorialNavigation, CompareChanges } from '../../../../components'
 import TutorialPreviewImage from '../../../../assets/tutorial-10.jpg'
 import TutorialPreviewImage2 from '../../../../assets/tutorial-11.jpg'
 import TutorialPreviewImage3 from '../../../../assets/tutorial-12.png'
+import TutorialPreviewImage4 from '../../../../assets/tutorial-13.jpg'
+import TutorialPreviewImage5 from '../../../../assets/tutorial-14.png'
 
 <Seo
     seo={{
@@ -380,9 +382,153 @@ Read more about Expo Router setup in [this guide](/v3/guides/expo-router).
 
 After adding this file, your app will render correctly on the web! You might notice a few minor issues like the playlist not being scrollable in some browsers or the app accent button being too close to the edge on wide screens, but the core functionality works beautifully.
 
-We will enhance the responsive design using Unistyles' breakpoints and media queries to create layouts that adapt to different screen sizes.
+Before we wrap up this section, let's explore how Unistyles handles responsive design, a crucial feature for cross-platform apps that also target the web.
 
-[TODO]
+### Breakpoints and Media Queries
+
+When your app needs to scale from a phone in your pocket to a large desktop monitor, you face new challenges.
+Unistyles provides powerful, built-in tools to help you create adaptive and responsive layouts with ease.
+
+The most direct way to create responsive styles is by using **breakpoint objects**.
+You can turn any style value into an object where the keys are your predefined breakpoint names (`xs`, `sm`, `md`, etc.) and the values are the styles for that specific breakpoint.
+
+Let's apply this to our `SongTile` component to make the album art larger on bigger screens.
+
+```diff lang="tsx" title="components/SongTile.tsx"
+// ... JSX remains the same
+
+const style = StyleSheet.create(theme => ({
+    container: {
+        flexDirection: 'row',
+        gap: theme.gap(2),
+        alignItems: 'center'
+    },
+    image: {
+-        width: 80,
+-        height: 80,
++    width: {
++            xs: 80,
++            md: 120,
++            lg: 200
++        },
++        height: {
++            xs: 80,
++            md: 120,
++            lg: 200
++        },
+        borderRadius: theme.gap(2)
+    },
+    textContainer: {
+        flex: 1
+    }
+}))
+```
+
+With this change, the width and height of the image will automatically adjust based on the screen width. Unistyles handles the media query logic for you.
+
+<img src={TutorialPreviewImage4.src} alt="Responsive image" />
+
+<Aside>
+Learn more about configuring and using `breakpoints` [here](/v3/references/breakpoints).
+</Aside>
+
+For more complex or specific conditions, breakpoint objects might not be enough. This is where the mq (media query) utility shines.
+It gives you granular control to apply styles based on precise width and height conditions.
+
+Let's modify our `PlayerScreen` to adopt a more traditional web layout on larger screens - a centered content:
+
+```diff lang="tsx" title="app/(tabs)/player/[songId].tsx"
+- import { StyleSheet } from 'react-native-unistyles'
++ import { mq, StyleSheet } from 'react-native-unistyles'
+
+// ... JSX remains the same
+
+const styles = StyleSheet.create((theme, rt) => ({
+    centerContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+      },
+      container: {
+        flex: 1,
+        gap: theme.gap(2),
+        alignItems: 'center',
++        justifyContent: {
++            [mq.only.width(600)]: 'center'
++        },
+        marginTop: rt.insets.top + theme.gap(3),
+      },
+      image: {
+        width: 200,
+        height: 200,
+        borderRadius: theme.gap(2)
+      }
+}));
+```
+
+Using the `mq` utility, you can target both width and height media queries. Importantly, these are automatically transformed into genuine CSS media queries, which offloads the computations from JavaScript for improved performance.
+
+<Aside>
+Dive deeper into the `mq` utility and its helpers [here](/v3/references/breakpoints#mq).
+</Aside>
+
+### Web styling features
+
+While Unistyles excels at universal styling, there are times you'll want to leverage platform-specific features.
+On the web, this often means using CSS pseudo-selectors like `:hover` and `:active` for a more native web experience and better performance.
+
+Unistyles makes this incredibly simple with the `_web` property.
+
+Let's look at our `SettingTile.tsx` component. On native platforms, a common pattern to handle press states is to provide a function to your style definition, which receives the component's state.
+
+```diff lang="tsx" title="components/SettingTile.tsx"
+// ... JSX remains the same
+
+const styles = StyleSheet.create({
+    container: (state: PressableStateCallbackType) => ({
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        opacity: state.pressed ? 0.75 : 1,
+    })
+})
+```
+
+This works perfectly on iOS and Android, but on the web, it relies on JavaScript to update the style.
+We can achieve a smoother and more performant result by using native CSS pseudo-selectors.
+
+To do this, we'll modify our container style and add a _web key. Inside this _web object, we can use special keys like _hover and _active that Unistyles will automatically convert to CSS pseudo-selectors.
+
+```diff lang="tsx" title="components/SettingTile.tsx"
+const styles = StyleSheet.create({
+    container: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        opacity: state.pressed ? 0.75 : 1,
++        _web: {
++            _hover: {
++                opacity: 0.75
++            },
++            _active: {
++                opacity: 0.5
++            }
++        }
+    }
+})
+```
+
+Notice how we replaced the JavaScript-driven opacity logic with `_hover` and `_active` selectors inside the `_web` block.
+
+Now, when you hover over the tile on a web browser, the opacity change is handled entirely by CSS, providing instant feedback.
+
+<img src={TutorialPreviewImage5.src} alt="Hover effect"/>
+
+This is just the beginning! The _web property also allows you to add CSS animations and even target styles using custom class names.
+
+<Aside>
+Learn more about all the web-specific features [here](/v3/references/web-only).
+</Aside>
 
 ### What We've Built Together
 
