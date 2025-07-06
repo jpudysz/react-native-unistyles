@@ -6,6 +6,7 @@ description: Learn how to build a cross-platform app from scratch with Unistyles
 import { FileTree, Aside, LinkCard } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
 import { TutorialNavigation, CompareChanges } from '../../../../components'
+import TutorialPreviewImage from '../../../../assets/tutorial-2.jpg'
 
 <Seo
     seo={{
@@ -152,12 +153,12 @@ Let's refactor tab layout to use our new theme:
 ```diff title="app/(tabs)/_layout.tsx" lang="tsx"
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
+-import { Platform } from 'react-native';
 
-import { HapticTab } from '@/components/HapticTab';
+- import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
+- import TabBarBackground from '@/components/ui/TabBarBackground';
+- import { Colors } from '@/constants/Colors';
 - import { useColorScheme } from '@/hooks/useColorScheme';
 + import { useUnistyles } from 'react-native-unistyles';
 
@@ -169,17 +170,24 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
 -        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-+        tabBarActiveTintColor: theme.colors.tint,
++        tabBarInactiveTintColor: theme.colors.tint,
++        tabBarActiveTintColor: theme.colors.activeTint,
++        sceneStyle: {
++          backgroundColor: theme.colors.background
++        },
++        tabBarStyle: {
++          backgroundColor: theme.colors.foreground
++        },
         headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
+-        tabBarButton: HapticTab,
+-        tabBarBackground: TabBarBackground,
+-        tabBarStyle: Platform.select({
+-          ios: {
+-            // Use a transparent background on iOS to show the blur effect
+-            position: 'absolute',
+-          },
+-          default: {},
+-        }),
       }}>
       <Tabs.Screen
         name="index"
@@ -202,7 +210,9 @@ export default function TabLayout() {
 
 With these changes, you can now switch your device's color scheme, and you'll see the tab bar's tint color update instantly, powered by Unistyles!
 
-<CompareChanges 
+<img src={TutorialPreviewImage.src} alt="ios app preview" style={{objectFit: 'cover'}} />
+
+<CompareChanges
   commitUrl="https://github.com/jpudysz/react-native-unistyles/commit/f7g8h9i0j1k2345"
 />
 
