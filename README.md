@@ -28,8 +28,7 @@ yarn add react-native-edge-to-edge react-native-nitro-modules@0.26.2
 
 | react-native-unistyles | react-native-nitro-modules |
 |------------------------|----------------------------|
-| 3.0.0-rc.5             | 0.26.2                     |
-| 3.0.0-nightly-20250619 | 0.26.2                     |
+| 3.0.0                  | 0.26.2                     |
 
 Then follow [installation guides](https://unistyl.es/v3/start/getting-started) for your platform.
 
