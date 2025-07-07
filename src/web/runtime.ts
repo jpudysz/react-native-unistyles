@@ -189,9 +189,14 @@ export class UnistylesRuntime {
     }
 
     setAdaptiveThemes = (isEnabled: boolean) => {
-        this.services.state.hasAdaptiveThemes = isEnabled
+        if (this.services.state.hasAdaptiveThemes === isEnabled) {
+            return
+        }
+
+        this.services.listener.emitChange(UnistyleDependency.AdaptiveThemes)
 
         if (!isEnabled) {
+            this.services.state.hasAdaptiveThemes = isEnabled
             this.rootElement?.classList.add(this.themeName ?? '')
 
             return
@@ -199,6 +204,7 @@ export class UnistylesRuntime {
 
         this.rootElement?.classList.remove(this.themeName ?? '')
         this.setTheme(schemeToTheme(this.colorScheme) as AppThemeName)
+        this.services.state.hasAdaptiveThemes = isEnabled
     }
 
     setRootViewBackgroundColor = (color: string) => {
