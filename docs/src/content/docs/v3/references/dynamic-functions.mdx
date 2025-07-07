@@ -3,7 +3,7 @@ title: Dynamic Functions
 description: Learn about dynamic functions in Unistyles 3.0
 ---
 
-import { Card } from '@astrojs/starlight/components'
+import { Aside } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
 
 <Seo
@@ -54,5 +54,10 @@ const styles = StyleSheet.create(theme => ({
     })
 }))
 ```
+
+<Aside type="caution" title="Serializable arguments">
+Keep in mind that a dynamic function can accept only serializable arguments.
+These arguments will be passed to C++, so anything that can be represented as `folly::dynamic` is supported (such as strings, numbers, booleans, arrays, objects, etc.).
+</Aside>
 
 </Seo>
