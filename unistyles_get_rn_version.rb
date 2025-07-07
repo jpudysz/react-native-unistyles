@@ -1,6 +1,6 @@
 require 'json'
 
-def get_rn_version(rn_path)
+def unistyles_get_rn_version(rn_path)
     rn_path = rn_path || '../node_modules/react-native'
 
     maybe_rn_pkg_json = File.expand_path(File.join(rn_path, 'package.json'))
