@@ -1,5 +1,5 @@
 require "json"
-require_relative './get_rn_version.rb'
+require_relative './unistyles_get_rn_version.rb'
 
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 
@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
   ]
 
   if ENV["USE_FRAMEWORKS"]
-    RN_VERSION = get_rn_version(ENV['REACT_NATIVE_PATH']) || 999
+    RN_VERSION = unistyles_get_rn_version(ENV['REACT_NATIVE_PATH']) || 999
 
     s.dependency "React-Core"
     add_dependency(s, "React-jsinspector", :framework_name => "jsinspector_modern")
