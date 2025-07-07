@@ -91,7 +91,7 @@
     "react-native.config.js",
     "Unistyles.podspec",
     "repack-plugin",
-    "get_rn_version.rb",
+    "unistyles_get_rn_version.rb",
     "!repack-plugin/__tests__",
     "!repack-plugin/src",
     "!repack-plugin/esbuild.js",
