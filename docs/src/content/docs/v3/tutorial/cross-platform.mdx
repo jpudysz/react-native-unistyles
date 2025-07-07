@@ -109,10 +109,10 @@ import { StyleSheet, useUnistyles } from 'react-native-unistyles'
 
 export default function SettingsAccentScreen() {
     const { theme } = useUnistyles()
-+   const { setPreferredAccent, preferredAccent } = useStore()
++    const { setPreferredAccent, preferredAccent } = useStore()
     const allAccents = theme.colors.accents
-+   const [selectedAccent, setSelectedAccent] = useState(preferredAccent)
--   const [selectedAccent, setSelectedAccent] = useState('banana')
++    const [selectedAccent, setSelectedAccent] = useState(preferredAccent)
+-    const [selectedAccent, setSelectedAccent] = useState('banana')
 
     return (
         <View style={styles.container}>
@@ -183,11 +183,11 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
     accent,
     onPress
 }) => {
-+   const { preferredAccent } = useStore()
++    const { preferredAccent } = useStore()
 
     style.useVariants({
-+       accent: accent ?? preferredAccent
--       accent: accent
++        accent: accent ?? preferredAccent
+-        accent: accent
     })
 
     const color = useAnimatedVariantColor(style.buttonColor, 'backgroundColor')
@@ -225,10 +225,10 @@ import { StyleSheet } from 'react-native-unistyles'
 import { useUnistyles } from 'react-native-unistyles'
 
 export const PlayerControls = () => {
-+   const { preferredAccent } = useStore()
++    const { preferredAccent } = useStore()
     const { theme } = useUnistyles()
-+   const accent = theme.colors.accents[preferredAccent]
--   const accent = theme.colors.accents['banana']
++    const accent = theme.colors.accents[preferredAccent]
+-    const accent = theme.colors.accents['banana']
 
     return (
         <View style={styles.actions}>
@@ -343,7 +343,7 @@ This happens because Expo Router uses static rendering by default, and Unistyles
 
 To fix this, we need to create a custom HTML root file that ensures Unistyles is initialized correctly:
 
-```tsx title="app/+html.tsx"
+```tsx title="app/+html.tsx" /import '../unistyles'/
 import { ScrollViewStyleReset } from 'expo-router/html'
 import { type PropsWithChildren } from 'react'
 import '../unistyles'
@@ -391,6 +391,8 @@ Unistyles provides powerful, built-in tools to help you create adaptive and resp
 
 The most direct way to create responsive styles is by using **breakpoint objects**.
 You can turn any style value into an object where the keys are your predefined breakpoint names (`xs`, `sm`, `md`, etc.) and the values are the styles for that specific breakpoint.
+This enables you to easily create responsive layouts, but only for the properties you need.
+
 
 Let's apply this to our `SongTile` component to make the album art larger on bigger screens.
 
@@ -406,16 +408,16 @@ const style = StyleSheet.create(theme => ({
     image: {
 -        width: 80,
 -        height: 80,
-+    width: {
-+            xs: 80,
-+            md: 120,
-+            lg: 200
-+        },
-+        height: {
-+            xs: 80,
-+            md: 120,
-+            lg: 200
-+        },
++         width: {
++             xs: 80,
++             md: 120,
++             lg: 200
++         },
++         height: {
++             xs: 80,
++             md: 120,
++             lg: 200
++         },
         borderRadius: theme.gap(2)
     },
     textContainer: {
@@ -469,7 +471,7 @@ const styles = StyleSheet.create((theme, rt) => ({
 Using the `mq` utility, you can target both width and height media queries. Importantly, these are automatically transformed into genuine CSS media queries, which offloads the computations from JavaScript for improved performance.
 
 <Aside>
-Dive deeper into the `mq` utility and its helpers [here](/v3/references/breakpoints#mq).
+Dive deeper into the `mq` utility and its helpers [here](/v3/references/media-queries).
 </Aside>
 
 ### Web styling features
@@ -497,7 +499,7 @@ const styles = StyleSheet.create({
 This works perfectly on iOS and Android, but on the web, it relies on JavaScript to update the style.
 We can achieve a smoother and more performant result by using native CSS pseudo-selectors.
 
-To do this, we'll modify our container style and add a _web key. Inside this _web object, we can use special keys like _hover and _active that Unistyles will automatically convert to CSS pseudo-selectors.
+To do this, we'll modify our container style and add a `_web` key. Inside this `_web` object, we can use special keys like `_hover` and `_active` that Unistyles will automatically convert to CSS pseudo-selectors.
 
 ```diff lang="tsx" title="components/SettingTile.tsx"
 const styles = StyleSheet.create({
@@ -518,13 +520,13 @@ const styles = StyleSheet.create({
 })
 ```
 
-Notice how we replaced the JavaScript-driven opacity logic with `_hover` and `_active` selectors inside the `_web` block.
+Styles inside the `_web` block will take precedence over the JavaScript-driven opacity logic, replacing it with `_hover` and `_active` selectors.
 
 Now, when you hover over the tile on a web browser, the opacity change is handled entirely by CSS, providing instant feedback.
 
 <img src={TutorialPreviewImage5.src} alt="Hover effect"/>
 
-This is just the beginning! The _web property also allows you to add CSS animations and even target styles using custom class names.
+This is just the beginning! The `_web` property also allows you to add CSS animations and even target styles using custom class names.
 
 <Aside>
 Learn more about all the web-specific features [here](/v3/references/web-only).
