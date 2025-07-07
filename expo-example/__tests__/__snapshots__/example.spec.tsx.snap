@@ -37,7 +37,7 @@ exports[`Example test should pass 1`] = `
         }
       }
     >
-      Hello world
+      Hello world!
     </Text>
     <View
       accessibilityState={

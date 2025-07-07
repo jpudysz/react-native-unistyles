@@ -1,6 +1,6 @@
 {
   "name": "react-native-unistyles",
-  "version": "3.0.0-nightly-20250619",
+  "version": "3.0.0-nightly-20250703",
   "description": "Level up your React Native StyleSheet",
   "scripts": {
     "test": "NODE_ENV=babel-test jest ./plugin",
@@ -91,7 +91,7 @@
     "react-native.config.js",
     "Unistyles.podspec",
     "repack-plugin",
-    "rn_version.rb",
+    "get_rn_version.rb",
     "!repack-plugin/__tests__",
     "!repack-plugin/src",
     "!repack-plugin/esbuild.js",
