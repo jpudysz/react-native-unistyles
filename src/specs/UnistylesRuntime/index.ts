@@ -44,7 +44,6 @@ const HybridUnistylesRuntime = NitroModules
 
 HybridUnistylesRuntime.statusBar = HybridUnistylesRuntime.createHybridStatusBar()
 HybridUnistylesRuntime.navigationBar = HybridUnistylesRuntime.createHybridNavigationBar()
-HybridUnistylesRuntime._setRootViewBackgroundColor = HybridUnistylesRuntime.setRootViewBackgroundColor
 
 HybridUnistylesRuntime.setRootViewBackgroundColor = (color?: string) => {
     const parsedColor = processColor(color) ?? 0
