@@ -107,7 +107,7 @@ This component combines everything we've learned: `useVariants` for the radio se
 
 Let's add this component to the theme settings screen:
 
-```diff lang="tsx" title="app/(settings)/settings-theme.tsx"
+```diff lang="tsx" title="app/settings/settings-theme.tsx"
 - import { ThemedText } from '@/components/ThemedText'
 + import { SettingOptionRadio } from '@/components/SettingOptionRadio'
 + import React from 'react'
@@ -204,7 +204,7 @@ Before proceeding further, notice that we used `keyof UnistylesTheme` (as label 
 
 Let's update the theme settings screen to include theme previews:
 
-```diff lang="tsx" title="app/(settings)/settings-theme.tsx"
+```diff lang="tsx" title="app/settings/settings-theme.tsx"
 import { SettingOptionRadio } from '@/components/SettingOptionRadio'
 + import { ThemeColor } from '@/components/ThemeColor'
 import React from 'react'
@@ -266,7 +266,7 @@ It seems that we need to also update `react-navigation` Header to use Unistyles 
 
 Now let's add the full functionality using `UnistylesRuntime` and `useUnistyles`:
 
-```diff lang="tsx" title="app/(settings)/settings-theme.tsx"
+```diff lang="tsx" title="app/settings/settings-theme.tsx"
 import { SettingOptionRadio } from '@/components/SettingOptionRadio'
 import { ThemeColor } from '@/components/ThemeColor'
 import React from 'react'
@@ -524,7 +524,7 @@ For a comprehensive explanation, please refer to our dedicated guide on [Merging
 
 Let's create the final modal screen for accent selection and animate the accent selection:
 
-```tsx title="app/(settings)/settings-accent.tsx"
+```tsx title="app/settings/settings-accent.tsx"
 import { Button } from '@/components/Button'
 import { ThemedText } from '@/components/ThemedText'
 import { router } from 'expo-router'

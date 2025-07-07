@@ -164,9 +164,9 @@ This pattern makes your components more readable and eliminates the need for mul
 
 Now let's implement the actual settings screen with our new `SettingTile` component.
 
-Update your `app/(settings)/index.tsx`:
+Update your `app/settings/index.tsx`:
 
-```diff lang="tsx" title="app/(settings)/index.tsx"
+```diff lang="tsx" title="app/settings/index.tsx"
 + import { SettingTile } from '@/components/SettingTile'
 import { ThemedText } from '@/components/ThemedText'
 + import { ScrollView, View } from 'react-native'
@@ -260,7 +260,7 @@ For views that either don't use the `style` prop or aren't React Native componen
 
 In order to update background color of `ScrollView`, we need to wrap it with `withUnistyles`:
 
-```diff lang="tsx" title="app/(settings)/index.tsx"
+```diff lang="tsx" title="app/settings/index.tsx"
 import { SettingTile } from '@/components/SettingTile'
 import { ThemedText } from '@/components/ThemedText'
 import { ScrollView, View } from 'react-native'
@@ -322,18 +322,20 @@ Remember these key points about `withUnistyles`:
 
 Finally, let's wire up the `onPress` callbacks to navigate to our modal screens:
 
-```diff lang="tsx" title="app/(settings)/index.tsx"
+```diff lang="tsx" title="app/settings/index.tsx"
 import { SettingTile } from '@/components/SettingTile'
 import { ThemedText } from '@/components/ThemedText'
 import { ScrollView, View } from 'react-native'
 import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
 + import { router } from 'expo-router'
 
+const StyledScrollView = withUnistyles(ScrollView)
+
 export default function SettingsScreen() {
     const systemTheme = UnistylesRuntime.hasAdaptiveThemes
 
     return (
-        <ScrollView contentContainerStyle={styles.scrollView}>
+        <StyledScrollView contentContainerStyle={styles.scrollView}>
             <ThemedText type="title">
                 Appearance
             </ThemedText>
@@ -353,7 +355,7 @@ export default function SettingsScreen() {
 +                   onPress={() => router.push('/(tabs)/settings/settings-accent')}
                 />
             </View>
-        </ScrollView>
+        </StyledScrollView>
     );
 }
 ```

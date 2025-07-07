@@ -98,7 +98,7 @@ Now we need to update our accent settings screen to actually save the user's cho
 
 Let's update the settings screen to use our StanJS store:
 
-```diff lang="tsx" title="app/(settings)/settings-accent.tsx"
+```diff lang="tsx" title="app/settings/settings-accent.tsx"
 import { Button } from '@/components/Button'
 import { ThemedText } from '@/components/ThemedText'
 + import { useStore } from '@/store'
