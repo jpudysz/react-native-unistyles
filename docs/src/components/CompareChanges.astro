@@ -1,0 +1,101 @@
+---
+import { Icon } from '@astrojs/starlight/components';
+
+export interface Props {
+  commitUrl: string;
+}
+
+const { commitUrl } = Astro.props;
+
+// Extract commit hash from URL
+const getCommitHash = () => {
+  const match = commitUrl.match(/commit\/([a-f0-9]{7,40})/);
+  return match ? match[1].substring(0, 7) : 'commit';
+};
+
+// Extract repository name from URL
+const getRepositoryName = () => {
+  const match = commitUrl.match(/github\.com\/([^\/]+\/[^\/]+)/);
+  return match ? match[1] : 'repository';
+};
+
+const displayCommitHash = getCommitHash();
+const displayRepository = getRepositoryName();
+---
+
+<div class="compare-changes">
+  <div class="compare-header">
+    <Icon name="github" />
+    <span class="compare-title">Compare changes with commit</span>
+  </div>
+  <a href={commitUrl} target="_blank" rel="noopener noreferrer" class="compare-link">
+    {displayRepository}@{displayCommitHash}
+  </a>
+</div>
+
+<style>
+  .compare-changes {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--sl-color-gray-6);
+    border-radius: 0.375rem;
+    background: var(--sl-color-bg);
+    margin: 1rem 0;
+    position: relative;
+  }
+
+  .compare-changes::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--sl-color-accent) 0%, transparent 100%);
+    opacity: 0.6;
+    border-radius: 0.375rem 0.375rem 0 0;
+  }
+
+  .compare-header {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .compare-title {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--sl-color-gray-2);
+    line-height: 1;
+  }
+
+  .compare-link {
+    font-family: var(--sl-font-mono);
+    font-size: 0.75rem;
+    color: var(--sl-color-gray-2);
+    text-decoration: none;
+    padding: 0.125rem 0;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+  }
+
+  .compare-link:hover {
+    color: var(--sl-color-accent);
+    text-decoration: underline;
+  }
+
+  .compare-link:focus {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
+  }
+
+  /* GitHub icon styling */
+  .compare-header :global(svg) {
+    color: var(--sl-color-gray-3);
+    width: 1rem;
+    height: 1rem;
+  }
+</style>

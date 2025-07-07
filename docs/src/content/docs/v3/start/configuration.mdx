@@ -136,6 +136,13 @@ StyleSheet.configure({
 
 That’s it! You can now use all the features of Unistyles in your project!
 
+<Aside>
+Don't forget to import this config somewhere in your project, for example in `index.ts` file.
+You **must** call `StyleSheet.configure` **before** any `StyleSheet.create` call.
+
+For expo router users, please refer to the [Expo Router guide](/v3/guides/expo-router).
+</Aside>
+
 ### Full example
 
 ```tsx title="unistyles.ts"
@@ -187,12 +194,5 @@ StyleSheet.configure({
 })
 
 ```
-
-<Aside>
-Don't forget to import this config somewhere in your project, for example in `index.ts` file.
-You **must** call `StyleSheet.configure` **before** any `StyleSheet.create` call.
-
-For expo router users, please refer to the [Expo Router guide](/v3/guides/expo-router).
-</Aside>
 
 </Seo>

@@ -62,7 +62,7 @@ export default defineConfig({
             description: 'React Native StyleSheet 3.0',
             customCss: ['./src/styles/docs.css'],
             logo: {
-                src: './public/favicon.svg'
+                src: './public/favicon.png'
             },
             social: {
                 github: 'https://github.com/jpudysz/react-native-unistyles',
@@ -71,7 +71,7 @@ export default defineConfig({
             },
 			sidebar: [
                 {
-                    label: 'Tutorial', slug: 'v3/tutorial/intro', badge: 'WIP',
+                    label: 'Tutorial', slug: 'v3/tutorial/intro', badge: 'New!'
                 },
                 {
                     label: 'LLMS', slug: 'v3/llms/info', badge: 'Hot!',
@@ -99,7 +99,7 @@ export default defineConfig({
                         { label: 'Expo Router', slug: 'v3/guides/expo-router' },
                         { label: 'React Compiler', slug: 'v3/guides/react-compiler' },
                         { label: 'Custom web', slug: 'v3/guides/custom-web' },
-                        { label: 'Reanimated', slug: 'v3/guides/reanimated', badge: 'Updated!' },
+                        { label: 'Reanimated', slug: 'v3/guides/reanimated' },
                         { label: 'Server side rendering', slug: 'v3/guides/server-side-rendering' },
                     ]
                 },
@@ -134,12 +134,6 @@ export default defineConfig({
                         { label: 'For library authors', slug: 'v3/other/for-library-authors' },
                         { label: 'For sponsors', slug: 'v3/other/for-sponsors' },
                         { label: 'FAQ', slug: 'v3/other/frequently-asked-questions' },
-                    ]
-                },
-                {
-                    label: 'Examples',
-                    items: [
-                        { label: 'All examples', slug: 'v3/examples/examples', badge: 'WIP' },
                     ]
                 },
                 {
