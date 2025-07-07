@@ -24,13 +24,13 @@ Our application will feature three primary screens, with the Settings screen als
 -   **PlaylistScreen**: The main screen to display a list of songs
 -   **PlayerScreen**: A screen to display the currently playing song
 -   **SettingsScreen**: A screen with options to customize the app
-    -   **ThemeSettingsModalScreen**: A modal for changing the app's theme
-    -   **AccentColorSettingsModalScreen**: A modal for changing the app's accent color
+    -   **SettingsThemeScreen**: A modal for changing the app's theme
+    -   **SettingsAccentScreen**: A modal for changing the app's accent color
 
 ### PlaylistScreen
 
 First, let's repurpose the existing `app/(tabs)/index.tsx` file to become our `PlaylistScreen`.
-This involves changing the component name from `TabTwoScreen` to `PlaylistScreen` and wrapping the content in a `ScrollView`:
+This involves changing the component name from `HomeScreen` to `PlaylistScreen` and wrapping the content in a `ScrollView`:
 
 ```diff lang="tsx" title="app/(tabs)/index.tsx"
 + import { ScrollView } from 'react-native';
@@ -171,7 +171,7 @@ const styles = StyleSheet.create((theme, rt) => ({
 ```
 
 <Aside>
-Don't worry about the TabBar icons and routing just yet; we'll fix that soon!
+Don't worry about the TabBar icons and routing just yet - we'll fix that soon!
 </Aside>
 
 ### SettingsScreen
@@ -332,7 +332,7 @@ You should now be able to navigate to all three screens, each with a different t
 
 ### TabBar
 
-Currently, our `TabBar` doesn't reflect our new screen structure. Let's update `app/(tabs)/_layout.tsx` to correctly register our routes and assign new icons.
+Currently, `TabBar` doesn't reflect our new screen structure. Let's update `app/(tabs)/_layout.tsx` to correctly register our routes and assign new icons.
 
 ```diff lang="tsx" title="app/(tabs)/_layout.tsx"
 import { IconSymbol } from '@/components/ui/IconSymbol'

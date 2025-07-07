@@ -26,7 +26,7 @@ Let's start by creating a reusable `SettingTile` component. This component will 
 
 Create a new file `components/SettingTile.tsx`:
 
-```tsx title="components/SettingTile.tsx"
+```tsx title="components/SettingTile.tsx" /PressableStateCallbackType/
 import { Pressable, PressableStateCallbackType, View } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 import { ThemedText } from './ThemedText'
@@ -228,16 +228,16 @@ Here's where things get interesting. Notice we're using `UnistylesRuntime.hasAda
 
 **What's the difference?**
 
-- **`rt` (mini runtime)**: is only available inside `StyleSheet.create()` function. It contains device metadata like insets, screen dimensions, and color scheme that are relevant for styling.
+- **`rt` (mini runtime)**: is only available inside `StyleSheet.create()` function or `useUnistyles` hook. It contains device metadata like insets, screen dimensions, and color scheme that are relevant for styling
 
-- **`UnistylesRuntime`**: A global object accessible **anywhere** in your app, not just in stylesheets. It contains all the same information as `rt` plus additional methods and properties.
+- **`UnistylesRuntime`**: A global object accessible **anywhere** in your app, not just in stylesheets or components. It contains all the same information as `rt` plus additional methods (setters)
 
 The key difference is that `UnistylesRuntime` is **not a hook** - it won't cause your component to re-render when values change. This is by design for performance reasons.
 
 If you need your component to re-render when runtime values change, you should use the `useUnistyles` hook instead:
 
 ```tsx
-// This will not re-render when theme changes
+// This will not re-render when runtime changes
 const isSystemTheme = UnistylesRuntime.hasAdaptiveThemes
 
 // This will re-render when runtime changes
@@ -309,6 +309,14 @@ const styles = StyleSheet.create((theme, rt) => ({
     },
 }));
 ```
+
+That's it! No additional mappings are required in `withUnistyles` as `contentContainerStyle` is handled automatically.
+
+
+Remember these key points about `withUnistyles`:
+
+- It intelligently re-renders your component only when its style dependencies change, optimizing performance
+- It accepts a mapping function as a second argument, allowing you to map `theme` or `rt` values to the component's props
 
 ### Add Modal Navigation
 
