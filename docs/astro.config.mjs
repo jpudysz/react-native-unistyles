@@ -62,7 +62,7 @@ export default defineConfig({
             description: 'React Native StyleSheet 3.0',
             customCss: ['./src/styles/docs.css'],
             logo: {
-                src: './public/favicon.svg'
+                src: './public/favicon.png'
             },
             social: {
                 github: 'https://github.com/jpudysz/react-native-unistyles',

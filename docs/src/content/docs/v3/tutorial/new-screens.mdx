@@ -136,7 +136,7 @@ Expo Router uses a file-based routing system. To create a dynamic route for our 
 
 - app/
     - (tabs)/
-        - (player)/
+        - player/
             - [songId].tsx
         - _layout.tsx
         - index.tsx
@@ -183,13 +183,13 @@ First, set up the required files and folders:
 <FileTree>
 
 - app/
-    - (settings)/
+    - settings/
         - _layout.tsx
         - index.tsx
         - settings-theme.tsx
         - settings-accent.tsx
     - (tabs)/
-        - (player)/
+        - player/
             - [songId].tsx
         - _layout.tsx
         - index.tsx
@@ -204,7 +204,7 @@ This is a standard Expo Router stack layout. Let's add the code for each of thes
 
 This file configures the stack navigator for the settings section, defining the main screen and the two modal screens.
 
-```tsx title="app/(settings)/_layout.tsx"
+```tsx title="app/settings/_layout.tsx"
 import { Stack } from 'expo-router'
 import React from 'react'
 import { useUnistyles } from 'react-native-unistyles'
@@ -252,7 +252,7 @@ export default function SettingsLayout() {
 
 This is the main `SettingsScreen`. The code is almost identical to our other screens for now.
 
-```tsx title="app/(settings)/index.tsx"
+```tsx title="app/settings/index.tsx"
 import { ThemedText } from '@/components/ThemedText'
 import { ScrollView } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
@@ -280,7 +280,7 @@ const styles = StyleSheet.create((theme, rt) => ({
 
 The modal screens for changing the theme and accent color are also simple placeholders. Notice the component names and titles are updated for each.
 
-```tsx title="app/(settings)/settings-theme.tsx"
+```tsx title="app/settings/settings-theme.tsx"
 import { ThemedText } from '@/components/ThemedText'
 import { ScrollView } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
@@ -304,7 +304,7 @@ const styles = StyleSheet.create((theme, rt) => ({
 }));
 ```
 
-```tsx title="app/(settings)/settings-accent.tsx"
+```tsx title="app/settings/settings-accent.tsx"
 import { ThemedText } from '@/components/ThemedText'
 import { ScrollView } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
