@@ -5,12 +5,15 @@ def unistyles_get_rn_version(rn_path)
 
     maybe_rn_pkg_json = File.expand_path(File.join(rn_path, 'package.json'))
     maybe_local_rn_pkg_json = File.expand_path('./node_modules/react-native/package.json')
+    maybe_react_native_pkg_json = File.expand_path('../react-native/package.json')
 
     rn_pkg_json =
         if File.exist?(maybe_rn_pkg_json)
             maybe_rn_pkg_json
         elsif File.exist?(maybe_local_rn_pkg_json)
             maybe_local_rn_pkg_json
+        elsif File.exist?(maybe_react_native_pkg_json)
+            maybe_react_native_pkg_json
         else
             nil
         end
