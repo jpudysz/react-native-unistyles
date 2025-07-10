@@ -7,7 +7,8 @@ import type { UnionToIntersection } from '../types'
 import type { UnistylesServices } from './types'
 import { convertTheme, error, isServer, schemeToTheme } from './utils'
 
-type UnistylesSettings = Partial<UnionToIntersection<Required<UnistylesConfig>['settings']>>
+type RemoveNevers<T> = { [K in keyof T as T[K] extends (never | undefined) ? never : K]: T[K] } & {}
+type UnistylesSettings = Partial<UnionToIntersection<RemoveNevers<Required<UnistylesConfig>['settings']>>>
 
 export class UnistylesState {
     isInitialized = false
@@ -110,6 +111,12 @@ export class UnistylesState {
             }
 
             this.themeName = initialTheme
+
+            return
+        }
+
+        if (this.themes.size === 1) {
+            this.themeName = this.themes.keys().next().value as never
         }
     }
 
