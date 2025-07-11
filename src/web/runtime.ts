@@ -242,11 +242,29 @@ export class UnistylesRuntime {
     }
 
     getTheme = (themeName = this.themeName, CSSVars = false) => {
+        const hasSomeThemes = this.services.state.themes.size > 0
+
+        if (!hasSomeThemes) {
+            return new Proxy({} as UnistylesTheme, {
+                get: () => {
+                    throw error('One of your stylesheets is trying to get the theme, but no theme has been selected yet. Did you forget to call StyleSheet.configure? If you called it, make sure you did so before any StyleSheet.create.')
+                }
+            })
+        }
+
+        if (!themeName) {
+            return new Proxy({} as UnistylesTheme, {
+                get: () => {
+                    throw error('One of your stylesheets is trying to get the theme, but no theme has been selected yet. Did you forget to select an initial theme?')
+                }
+            })
+        }
+
         const theme = CSSVars
             ? this.services.state.cssThemes.get(themeName ?? '')
             : this.services.state.themes.get(themeName ?? '')
 
-        if (!themeName || !theme) {
+        if (!theme) {
             return new Proxy({} as UnistylesTheme, {
                 get: () => {
                     throw error(`You're trying to get theme "${themeName}" but it wasn't registered.`)
