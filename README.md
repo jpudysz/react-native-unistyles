@@ -80,6 +80,9 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 <a href="https://github.com/jordmccord">
      <img src="https://avatars.githubusercontent.com/u/7591840?v=4" height="70px" width="70px" alt="jordmccord" />
 </a>
+<a href="https://github.com/kerwanp">
+     <img src="https://avatars.githubusercontent.com/u/36955373?v=4" height="70px" width="70px" alt="kerwanp" />
+</a>
 
 ## Past sponsors
 
