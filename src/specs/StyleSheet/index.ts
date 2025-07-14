@@ -8,7 +8,7 @@ import type { UnistylesStyleSheet as UnistylesStyleSheetSpec } from './Unistyles
 
 type UnistylesThemeSettings = {
     initialTheme: (() => keyof UnistylesThemes) | keyof UnistylesThemes
-    adaptiveThemes?: never
+    adaptiveThemes?: never | false
 } | {
     adaptiveThemes: boolean
     initialTheme?: never
