@@ -314,4 +314,68 @@ inline void debugPrintJSIObject(jsi::Runtime& rt, std::string& name, jsi::Object
     log.call(rt, "===/" + name + "===");
 }
 
+inline void debugPrintFollyDynamic(jsi::Runtime& rt, const std::string& name, const folly::dynamic& obj) {
+    auto console = rt.global().getPropertyAsObject(rt, "console");
+    auto log = console.getPropertyAsFunction(rt, "log");
+    
+    std::function<void(const std::string&, const folly::dynamic&)> parser = [&](const std::string& key, const folly::dynamic& value) {
+        if (value.isBool()) {
+            std::string output = key + ": " + (value.getBool() ? "true" : "false");
+            log.call(rt, output);
+            return;
+        }
+
+        if (value.isNumber()) {
+            std::string output = key + ": " + std::to_string(value.asDouble());
+            log.call(rt, output);
+            return;
+        }
+
+        if (value.isString()) {
+            std::string output = key + ": " + value.getString();
+            log.call(rt, output);
+            return;
+        }
+
+        if (value.isNull()) {
+            std::string output = key + ": null";
+            log.call(rt, output);
+            return;
+        }
+
+        if (value.isArray()) {
+            for (size_t i = 0; i < value.size(); i++) {
+                std::string arrayKey = key + ": Array[" + std::to_string(i) + "]";
+                log.call(rt, arrayKey);
+                parser(arrayKey, value[i]);
+                std::string endKey = key + ": Array[end]";
+                log.call(rt, endKey);
+            }
+            return;
+        }
+
+        if (value.isObject()) {
+            for (const auto& pair : value.items()) {
+                parser(pair.first.asString(), pair.second);
+            }
+            return;
+        }
+
+        std::string output = key + ": [Unknown type]";
+        log.call(rt, output);
+    };
+
+    log.call(rt, "===" + name + "===");
+
+    if (obj.isObject()) {
+        for (const auto& pair : obj.items()) {
+            parser(pair.first.asString(), pair.second);
+        }
+    } else {
+        parser(name, obj);
+    }
+
+    log.call(rt, "===/" + name + "===");
+}
+
 }
