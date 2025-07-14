@@ -139,6 +139,20 @@ const styles = StyleSheet.create(theme => ({
 }));
 ```
 
+<Aside title="Accessing the Theme">
+Have you noticed how we access the theme object?
+
+```tsx /theme/
+const styles = StyleSheet.create(theme => ({ ... }))
+```
+
+This approach is slightly different from the standard React Native `StyleSheet.create` API.
+With Unistyles, your `StyleSheet.create` function will be automatically re-invoked whenever the theme changes, ensuring your styles are always up-to-date.
+
+**If you're following the tutorial on the web, you might see an error because additional configuration is required for web support.
+For now, focus on iOS. We'll show you how to get it working on the web later.**
+</Aside>
+
 The most interesting file here is `_layout.tsx`, which configures the `Tabs` navigator. The default code uses the `useColorScheme` hook to dynamically set the `tabBarActiveTintColor`.
 Since `@react-navigation` components aren't aware of the Unistyles C++ core, they can't be updated automatically. We need a way to get the current theme data into our component and trigger a re-render when the theme changes.
 This is the perfect use case for the `useUnistyles` hook. It subscribes the component to theme changes, giving you access to the theme object and ensuring the component re-renders when the theme is updated.
