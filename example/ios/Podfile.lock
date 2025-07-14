@@ -2331,7 +2331,7 @@ PODS:
     - SocketRocket
     - Yoga
   - SocketRocket (0.7.1)
-  - Unistyles (3.0.0-nightly-20250613):
+  - Unistyles (3.0.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -2678,7 +2678,7 @@ SPEC CHECKSUMS:
   ReactCommon: b028d09a66e60ebd83ca59d8cc9a1216360db147
   RNReanimated: bc1ddb7a5352648bcf0d592256069833bf935a46
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  Unistyles: bb3bf4963083b85127207c42d6fd5df2b35bc63a
+  Unistyles: 18a8be1f8f58856842736a474e7373ed6eb98ff6
   Yoga: 0c4b7d2aacc910a1f702694fa86be830386f4ceb
 
 PODFILE CHECKSUM: a5de45e2350a9515567a6e18ca8ceea718b48523
