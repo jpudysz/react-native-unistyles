@@ -729,7 +729,7 @@ function index_default() {
           if (state.file.opts.root === appRoot) {
             throw new Error("Unistyles \u{1F984}: Root option can't resolve to project root as it will include node_modules folder. Please check https://www.unistyl.es/v3/other/babel-plugin#extra-configuration");
           }
-          state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS.map(toPlatformPath).concat(state.opts.autoProcessPaths ?? []).some((path3) => state.filename?.includes(path3));
+          state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS.concat(state.opts.autoProcessPaths ?? []).map(toPlatformPath).some((path3) => state.filename?.includes(path3));
           state.file.hasAnyUnistyle = false;
           state.file.hasUnistylesImport = false;
           state.file.addUnistylesRequire = false;
