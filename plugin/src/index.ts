@@ -34,8 +34,8 @@ export default function (): PluginObj<UnistylesPluginPass> {
                     }
 
                     state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS
-                        .map(toPlatformPath)
                         .concat(state.opts.autoProcessPaths ?? [])
+                        .map(toPlatformPath)
                         .some(path => state.filename?.includes(path))
 
                     state.file.hasAnyUnistyle = false
