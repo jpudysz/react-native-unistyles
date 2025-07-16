@@ -81,7 +81,7 @@ namespace margelo::nitro::unistyles {
       virtual void setTheme(const std::string& themeName) = 0;
       virtual void setAdaptiveThemes(bool isEnabled) = 0;
       virtual void setImmersiveMode(bool isEnabled) = 0;
-      virtual void setRootViewBackgroundColor(double color) = 0;
+      virtual void nativeSetRootViewBackgroundColor(double color) = 0;
 
     protected:
       // Hybrid Setup
