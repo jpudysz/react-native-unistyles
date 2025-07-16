@@ -186,7 +186,7 @@ void HybridUnistylesRuntime::setImmersiveMode(bool isEnabled) {
     this->_nativePlatform->setImmersiveMode(isEnabled);
 };
 
-void HybridUnistylesRuntime::setRootViewBackgroundColor(double color) {
+void HybridUnistylesRuntime::nativeSetRootViewBackgroundColor(double color) {
     this->_nativePlatform->setRootViewBackgroundColor(color);
 }
 

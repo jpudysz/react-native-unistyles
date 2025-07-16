@@ -23,7 +23,7 @@ export interface UnistylesRuntimePrivate extends Omit<UnistylesRuntimeSpec, 'set
     setTheme(themeName: AppThemeName): void
     updateTheme(themeName: AppThemeName, updater: (currentTheme: AppTheme) => AppTheme): void,
     setRootViewBackgroundColor(color?: string): void,
-    _setRootViewBackgroundColor(color?: Color): void
+    nativeSetRootViewBackgroundColor(color?: Color): void
 
     // constructors
     createHybridStatusBar(): UnistylesStatusBar,
@@ -35,7 +35,7 @@ type PrivateMethods =
     | 'createHybridNavigationBar'
     | 'dispose'
     | 'miniRuntime'
-    | '_setRootViewBackgroundColor'
+    | 'nativeSetRootViewBackgroundColor'
 
 type UnistylesRuntime = Omit<UnistylesRuntimePrivate, PrivateMethods>
 
@@ -44,12 +44,11 @@ const HybridUnistylesRuntime = NitroModules
 
 HybridUnistylesRuntime.statusBar = HybridUnistylesRuntime.createHybridStatusBar()
 HybridUnistylesRuntime.navigationBar = HybridUnistylesRuntime.createHybridNavigationBar()
-HybridUnistylesRuntime._setRootViewBackgroundColor = HybridUnistylesRuntime.setRootViewBackgroundColor
 
 HybridUnistylesRuntime.setRootViewBackgroundColor = (color?: string) => {
     const parsedColor = processColor(color) ?? 0
 
-    HybridUnistylesRuntime._setRootViewBackgroundColor(parsedColor)
+    HybridUnistylesRuntime.nativeSetRootViewBackgroundColor(parsedColor)
 }
 
 if (isIOS) {
