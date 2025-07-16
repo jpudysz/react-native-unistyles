@@ -98,7 +98,7 @@ jest.mock('react-native-unistyles', () => {
         setTheme: () => {},
         updateTheme: () => {},
         setRootViewBackgroundColor: () => {},
-        _setRootViewBackgroundColor: () => {},
+        nativeSetRootViewBackgroundColor: () => {},
         createHybridStatusBar: () => {
             return {} as UnistylesStatusBar
         },
