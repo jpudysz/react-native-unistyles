@@ -694,7 +694,7 @@ jsi::Value parser::Parser::getValueFromBreakpoints(jsi::Runtime& rt, Unistyle::S
         auto mq = core::UnistylesMQ{propertyName};
 
         if (mq.isMQ()) {
-            unistyle->addDependency(UnistyleDependency::BREAKPOINTS);
+            unistyle->addBreakpointDependnecy();
         }
 
         if (mq.isWithinTheWidthAndHeight(dimensions)) {
@@ -707,7 +707,7 @@ jsi::Value parser::Parser::getValueFromBreakpoints(jsi::Runtime& rt, Unistyle::S
     bool hasOrientationBreakpoint = obj.hasProperty(rt, currentOrientation);
 
     if (hasOrientationBreakpoint) {
-        unistyle->addDependency(UnistyleDependency::BREAKPOINTS);
+        unistyle->addBreakpointDependnecy();
     }
 
     if (!hasBreakpoints && hasOrientationBreakpoint) {
@@ -718,7 +718,7 @@ jsi::Value parser::Parser::getValueFromBreakpoints(jsi::Runtime& rt, Unistyle::S
         return jsi::Value::undefined();
     }
 
-    unistyle->addDependency(UnistyleDependency::BREAKPOINTS);
+    unistyle->addBreakpointDependnecy();
 
     // if you're still here it means that there is no
     // matching mq nor default breakpoint, let's find the user defined breakpoint
