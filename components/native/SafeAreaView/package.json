@@ -1,0 +1,6 @@
+{
+  "main": "../../../lib/commonjs/components/native/SafeAreaView.js",
+  "module": "../../../lib/module/components/native/SafeAreaView.js",
+  "browser": "../../../lib/module/components/native/SafeAreaView.js",
+  "react-native": "../../../src/components/native/SafeAreaView.tsx"
+}
