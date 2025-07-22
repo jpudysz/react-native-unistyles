@@ -69,13 +69,13 @@ namespace margelo::nitro::unistyles::bridge::swift {
    */
   class Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_Wrapper final {
   public:
-    explicit Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_Wrapper(std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>&& func): _function(std::make_shared<std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>>(std::move(func))) {}
+    explicit Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_Wrapper(std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>&& func): _function(std::make_unique<std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>>(std::move(func))) {}
     inline void call(std::vector<UnistyleDependency> dependencies, UnistylesNativeMiniRuntime miniRuntime) const {
       _function->operator()(dependencies, miniRuntime);
     }
   private:
-    std::shared_ptr<std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>> _function;
-  };
+    std::unique_ptr<std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>> _function;
+  } SWIFT_NONCOPYABLE;
   Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime create_Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime(void* _Nonnull swiftClosureWrapper);
   inline Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_Wrapper wrap_Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime(Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime value) {
     return Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_Wrapper(std::move(value));
@@ -91,13 +91,13 @@ namespace margelo::nitro::unistyles::bridge::swift {
    */
   class Func_void_UnistylesNativeMiniRuntime_Wrapper final {
   public:
-    explicit Func_void_UnistylesNativeMiniRuntime_Wrapper(std::function<void(const UnistylesNativeMiniRuntime& /* miniRuntime */)>&& func): _function(std::make_shared<std::function<void(const UnistylesNativeMiniRuntime& /* miniRuntime */)>>(std::move(func))) {}
+    explicit Func_void_UnistylesNativeMiniRuntime_Wrapper(std::function<void(const UnistylesNativeMiniRuntime& /* miniRuntime */)>&& func): _function(std::make_unique<std::function<void(const UnistylesNativeMiniRuntime& /* miniRuntime */)>>(std::move(func))) {}
     inline void call(UnistylesNativeMiniRuntime miniRuntime) const {
       _function->operator()(miniRuntime);
     }
   private:
-    std::shared_ptr<std::function<void(const UnistylesNativeMiniRuntime& /* miniRuntime */)>> _function;
-  };
+    std::unique_ptr<std::function<void(const UnistylesNativeMiniRuntime& /* miniRuntime */)>> _function;
+  } SWIFT_NONCOPYABLE;
   Func_void_UnistylesNativeMiniRuntime create_Func_void_UnistylesNativeMiniRuntime(void* _Nonnull swiftClosureWrapper);
   inline Func_void_UnistylesNativeMiniRuntime_Wrapper wrap_Func_void_UnistylesNativeMiniRuntime(Func_void_UnistylesNativeMiniRuntime value) {
     return Func_void_UnistylesNativeMiniRuntime_Wrapper(std::move(value));
