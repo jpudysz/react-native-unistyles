@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'expo-router'
-import { Pressable, View, Text } from 'react-native'
+import { Pressable, View, Text, SafeAreaView } from 'react-native'
 import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
 
 export default function HomeScreen() {
@@ -9,7 +9,7 @@ export default function HomeScreen() {
     })
 
     return (
-        <View style={styles.container(1)}>
+        <SafeAreaView style={styles.container}>
             <View style={styles.test}>
                 <Text style={styles.typography}>
                     Hello world!
@@ -27,17 +27,17 @@ export default function HomeScreen() {
                     </Text>
                 </Pressable>
             </View>
-        </View>
+        </SafeAreaView>
     )
 }
 
 const styles = StyleSheet.create(theme => ({
-    container: (flex: number) => ({
-        flex,
+    container: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: theme.colors.backgroundColor
-    }),
+    },
     typography: {
         fontSize: 20,
         fontWeight: 'bold',
