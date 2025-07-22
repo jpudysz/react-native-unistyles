@@ -19,7 +19,8 @@ const REACT_NATIVE_COMPONENT_NAMES = [
     'VirtualizedList',
     'Animated',
     'NativeView',
-    'NativeText'
+    'NativeText',
+    'SafeAreaView'
 ]
 
 fs.rmSync('./components', { recursive: true, force: true })
