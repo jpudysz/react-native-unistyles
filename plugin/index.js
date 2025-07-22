@@ -54,7 +54,8 @@ var REACT_NATIVE_COMPONENT_NAMES = [
   "TouchableHighlight",
   "TouchableOpacity",
   "VirtualizedList",
-  "Animated"
+  "Animated",
+  "SafeAreaView"
   // Modal - there is no exposed native handle
   // TouchableWithoutFeedback - can't accept a ref
 ];
