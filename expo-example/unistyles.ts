@@ -47,9 +47,9 @@ const premiumTheme = {
 
 const breakpoints = {
     xs: 0,
-    sm: 300,
-    md: 500,
-    lg: 800,
+    sm: 500,
+    md: 750,
+    lg: 950,
     xl: 1200
 }
 
