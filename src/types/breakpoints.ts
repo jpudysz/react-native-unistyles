@@ -1,7 +1,6 @@
-import type { ColorValue, OpaqueColorValue } from 'react-native'
 import type { SafeReturnType } from './common'
 import type { TransformStyles } from './core'
-import type { BreakpointsOrMediaQueries, ToDeepUnistyles } from './stylesheet'
+import type { BreakpointsOrMediaQueries, ToDeepUnistyles, UnistylesValues } from './stylesheet'
 
 type ExtractTransformArray<T> = T extends object
     ? { [K in keyof T]: ExtractBreakpoints<T[K]> }
@@ -10,16 +9,14 @@ type ExtractTransformArray<T> = T extends object
 type ExtractBreakpoints<T> = T extends object
     ? keyof T extends BreakpointsOrMediaQueries
         ? T[keyof T]
-        : T extends Array<ToDeepUnistyles<TransformStyles>>
-            ? Array<ExtractTransformArray<T[number]>>
-            : {
-                [K in keyof T]: ExtractBreakpoints<T[K]>
-            }
-    : T
+        : T
+    : T extends Array<ToDeepUnistyles<TransformStyles>>
+        ? Array<ExtractTransformArray<T[number]>>
+        : T
 
 type ParseNestedObject<T, ShouldFlatten> = T extends (...args: infer A) => infer R
     ? (...args: A) => ParseNestedObject<R, false>
-    : T extends object
+    : T extends UnistylesValues
         ? T extends { variants: infer R, compoundVariants: infer C }
             // // if intersection of Base, Variants and Compound Variants is never, then flatten variants and compound variants to generic "string"
             ? (ParseVariants<FlattenVariants<R, false>> & FlattenCompoundVariants<C, false> & ParseNestedObject<Omit<T, 'variants' | 'compoundVariants'>, false>) extends never
@@ -33,10 +30,8 @@ type ParseNestedObject<T, ShouldFlatten> = T extends (...args: infer A) => infer
                 : T extends { compoundVariants: object }
                     ? ParseNestedObject<Omit<T, 'compoundVariants'>, false>
                     : {
-                        [K in keyof T as K extends '_web' ? never : K]: T[K] extends object
-                            ? T[K] extends OpaqueColorValue
-                                ? ColorValue
-                                : ExtractBreakpoints<T[K]>
+                        [K in keyof T as K extends '_web' ? never : K]: K extends keyof UnistylesValues
+                            ? ExtractBreakpoints<UnistylesValues[K]>
                             : T[K] extends string
                                 ? ShouldFlatten extends true
                                     ? string

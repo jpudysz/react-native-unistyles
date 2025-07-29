@@ -1,11 +1,18 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Example test should pass 1`] = `
-<View
+<RCTSafeAreaView
   style={
     {
       "alignItems": "center",
-      "backgroundColor": "#ffffff",
+      "backgroundColor": {
+        "md": {
+          "semantic": [
+            "systemBlue",
+          ],
+        },
+        "xs": "lightgray",
+      },
       "flex": 1,
       "justifyContent": "center",
     }
@@ -14,7 +21,24 @@ exports[`Example test should pass 1`] = `
   <View
     style={
       {
+        "compoundVariants": [
+          {
+            "size": "md",
+            "styles": {
+              "borderColor": "purple",
+            },
+            "variant": "red",
+          },
+        ],
         "variants": {
+          "size": {
+            "md": {
+              "height": 100,
+            },
+            "sm": {
+              "height": 50,
+            },
+          },
           "variant": {
             "blue": {
               "backgroundColor": "blue",
@@ -139,5 +163,47 @@ exports[`Example test should pass 1`] = `
       </Text>
     </View>
   </View>
-</View>
+  <View
+    style={
+      {
+        "backgroundColor": {
+          "md": "green",
+          "xs": "orange",
+        },
+        "flexDirection": {
+          "md": "row",
+          "xs": "column",
+        },
+        "height": 100,
+        "width": {
+          "md": 800,
+          "xs": 200,
+        },
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#000000",
+          "fontSize": 20,
+          "fontWeight": "bold",
+        }
+      }
+    >
+      I change at different breakpoints!
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#000000",
+          "fontSize": 20,
+          "fontWeight": "bold",
+        }
+      }
+    >
+      Change size or rotate device to test.
+    </Text>
+  </View>
+</RCTSafeAreaView>
 `;
