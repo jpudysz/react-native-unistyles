@@ -208,4 +208,82 @@ const ScopedComponent = () => {
 </ScopedTheme>
 ```
 
+### Scoped Theme with Suspense
+
+When using `ScopedTheme` with React's `Suspense`, there's an important consideration about component placement due to how React handles suspension and re-rendering.
+
+React Suspense works by catching promises thrown by child components that are waiting for data. When this happens:
+
+1. React pauses rendering and shows the fallback content
+2. Components that successfully rendered before the suspension may be reused
+3. Parent components might not re-render when the suspended data becomes available
+
+This means if you place `ScopedTheme` above a component that suspends, the scoped theme might not be applied correctly when the component finally renders:
+
+
+```tsx
+// ❌ This won't work correctly
+<Suspense fallback={<Loading />}>
+    <ScopedTheme name="dark">
+        <SuspendedComponent /> {/* ScopedTheme already rendered before suspension */}
+    </ScopedTheme>
+</Suspense>
+```
+
+Unistyles ScopedTheme is only available during render phase, we decided to not use `React.Context` to keep the API performant and easy to use.
+
+To fix this issue, you can move the `ScopedTheme` inside the suspended component:
+
+```tsx
+// ✅ Place ScopedTheme inside the component that suspends
+const SuspendedComponent = () => {
+    const data = useSuspenseQuery(); // This throws a promise
+
+    return (
+        <ScopedTheme name="dark">
+            <View style={styles.container}>
+                <Text style={styles.text}>
+                    {data.title}
+                </Text>
+            </View>
+        </ScopedTheme>
+    );
+};
+
+<Suspense fallback={<Loading />}>
+    <SuspendedComponent />
+</Suspense>
+```
+
+The key is to ensure that `ScopedTheme` is rendered **after** the suspension occurs, so that when React re-renders the suspended component tree, the scoped theme context is properly established.
+
+This pattern ensures that your themed components will render with the correct theme once the suspended data becomes available.
+
+### Scoped Theme and Hot Module Reloading (HMR)
+
+When working with `ScopedTheme` in development, you might notice that Hot Module Reloading doesn't always update the theme when you make changes to child components. This is a limitation of Metro's Fast Refresh system.
+
+Unlike Webpack, Metro's Fast Refresh only re-runs code in the file you're actively editing and its direct imports. It doesn't have a global event system that can notify parent components when child modules change.
+
+Metro provides these HMR functions:
+
+```tsx
+module.hot.accept(fn)   // fires if *this* module is updated
+module.hot.dispose(fn)  // fires just before *this* module is replaced
+```
+
+However, **neither of these runs** when other modules change. This means that changes in child components won't trigger a re-render of their parent `ScopedTheme`:
+
+```tsx
+<ScopedTheme name="light">
+    <ChildComponent /> {/* Changes in this file won't trigger ScopedTheme to update */}
+</ScopedTheme>
+```
+
+#### Why We Don't Use React Context
+
+The "ideal" solution would be to use React Context for theme propagation, which would work seamlessly with HMR. However, we've chosen performance over convenience. Using React Context would introduce additional re-renders and overhead that could impact your app's performance, especially in complex component trees.
+
+We prioritize keeping the API fast and lightweight, even if it means accepting some development-time limitations with HMR.
+
 </Seo>
