@@ -10,6 +10,7 @@ export type {
 export type {
     CreateUnistylesStyleSheet,
     StyleSheet,
+    StyleSheetValues,
     AllAvailableKeys,
     UnistylesValues,
     UnistyleText,

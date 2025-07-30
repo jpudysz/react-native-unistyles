@@ -58,10 +58,12 @@ type FlatUnistylesValues = {
     }
 }
 
-export type UnistylesValues = FlatUnistylesValues & {
-} & VariantsAndCompoundVariants & {
+export type StyleSheetValues = FlatUnistylesValues & {
     [propName in NestedKeys]?: UnistyleNestedStyles[propName]
-} & {
+}
+
+export type UnistylesValues = StyleSheetValues & {
+} & VariantsAndCompoundVariants & {
     _web?: ToDeepUnistyles<CSSProperties> & CustomClassName & {
         [propName in Pseudo]?: ToDeepUnistyles<CSSProperties>
     }

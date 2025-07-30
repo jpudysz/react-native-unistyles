@@ -35,16 +35,25 @@ const styles = StyleSheet.create(theme => ({
 Now, you can pass **any** number of arguments, and all with TypeScript hints:
 
 ```tsx /maxWidth/ /isOdd/
-export const Example = ({ maxWidth, isOdd, children }) => {
+import type { PropsWithChildren } from 'react';
+import { View } from 'react-native';
+import { StyleSheet, type StyleSheetValues } from 'react-native-unistyles';
+
+type ExampleProps = {
+    maxWidth?: StyleSheetValues['maxWidth'];
+    isOdd?: boolean;
+};
+
+export const Example = ({ maxWidth, isOdd, children }: PropsWithChildren<ExampleProps>) => {
     return (
-        <View style={styles.container(maxWidth, isOdd)}>
+        <View style={styles.container({ maxWidth, isOdd })}>
             {children}
         </View>
     )
 }
 
 const styles = StyleSheet.create(theme => ({
-    container: (maxWidth: number, isOdd: boolean) => ({
+    container: ({ maxWidth, isOdd }: ExampleProps) => ({
         backgroundColor: theme.colors.background,
         flex: 1,
         justifyContent: 'center',
