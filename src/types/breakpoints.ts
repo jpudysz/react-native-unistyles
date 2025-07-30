@@ -1,7 +1,6 @@
-import type { ColorValue, OpaqueColorValue } from 'react-native'
 import type { SafeReturnType } from './common'
 import type { TransformStyles } from './core'
-import type { BreakpointsOrMediaQueries, ToDeepUnistyles } from './stylesheet'
+import type { BreakpointsOrMediaQueries, ToDeepUnistyles, UnistylesValue } from './stylesheet'
 
 type ExtractTransformArray<T> = T extends object
     ? { [K in keyof T]: ExtractBreakpoints<T[K]> }
@@ -34,14 +33,14 @@ type ParseNestedObject<T, ShouldFlatten> = T extends (...args: infer A) => infer
                     ? ParseNestedObject<Omit<T, 'compoundVariants'>, false>
                     : {
                         [K in keyof T as K extends '_web' ? never : K]: T[K] extends object
-                            ? T[K] extends OpaqueColorValue
-                                ? ColorValue
-                                : ExtractBreakpoints<T[K]>
+                            ? ExtractBreakpoints<T[K]>
                             : T[K] extends string
                                 ? ShouldFlatten extends true
                                     ? string
                                     : T[K]
-                                : T[K]
+                                : T[K] extends UnistylesValue<infer V>
+                                    ? V
+                                    : T[K]
                     }
         : T
 

@@ -41,10 +41,12 @@ type VariantsAndCompoundVariants = {
     compoundVariants?: Array<CompoundVariant>
 }
 
+export type UnistylesValue<T> = T | {
+    [key in BreakpointsOrMediaQueries]?: T
+}
+
 export type ToDeepUnistyles<T> = {
-    [K in keyof T]?: T[K] | {
-        [key in BreakpointsOrMediaQueries]?: T[K]
-    }
+    [K in keyof T]?: UnistylesValue<T[K]>
 }
 
 type AllAvailableStyles = UnistyleView & UnistyleText & UnistyleImage & UnistyleNestedStyles
@@ -58,10 +60,12 @@ type FlatUnistylesValues = {
     }
 }
 
-export type UnistylesValues = FlatUnistylesValues & {
-} & VariantsAndCompoundVariants & {
+export type StyleSheetValues = FlatUnistylesValues & {
     [propName in NestedKeys]?: UnistyleNestedStyles[propName]
-} & {
+}
+
+export type UnistylesValues = StyleSheetValues & {
+} & VariantsAndCompoundVariants & {
     _web?: ToDeepUnistyles<CSSProperties> & CustomClassName & {
         [propName in Pseudo]?: ToDeepUnistyles<CSSProperties>
     }

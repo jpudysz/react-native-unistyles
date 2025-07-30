@@ -13,6 +13,7 @@ export type {
     AllAvailableKeys,
     UnistylesValues,
     UnistyleText,
+    UnistylesValue,
     UnistyleView,
     UnistyleImage
 } from './stylesheet'
