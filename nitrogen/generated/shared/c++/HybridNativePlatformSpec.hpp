@@ -32,9 +32,9 @@ namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 #include <string>
 #include "Dimensions.hpp"
 #include "UnistylesNativeMiniRuntime.hpp"
-#include <functional>
-#include <vector>
 #include "UnistyleDependency.hpp"
+#include <vector>
+#include <functional>
 
 namespace margelo::nitro::unistyles {
 

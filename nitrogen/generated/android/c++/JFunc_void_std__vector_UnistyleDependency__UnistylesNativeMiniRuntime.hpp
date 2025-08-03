@@ -10,10 +10,10 @@
 #include <fbjni/fbjni.h>
 #include <functional>
 
-#include <functional>
-#include <vector>
 #include "UnistyleDependency.hpp"
+#include <vector>
 #include "UnistylesNativeMiniRuntime.hpp"
+#include <functional>
 #include "JUnistyleDependency.hpp"
 #include "JUnistylesNativeMiniRuntime.hpp"
 #include "ColorScheme.hpp"

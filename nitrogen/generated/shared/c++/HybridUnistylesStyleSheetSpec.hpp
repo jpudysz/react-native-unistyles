@@ -17,8 +17,8 @@
 namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 
 #include <functional>
-#include <vector>
 #include "UnistyleDependency.hpp"
+#include <vector>
 
 namespace margelo::nitro::unistyles {
 
