@@ -437,6 +437,12 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared u
 
             return;
         }
+        
+        if (propertyValue.isBool() && propertyName == "includeFontPadding") {
+            parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), propertyValue);
+            
+            return;
+        }
 
         // at this point ignore non objects
         if (!propertyValue.isObject()) {
