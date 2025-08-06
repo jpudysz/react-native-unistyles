@@ -36,7 +36,8 @@ const styles = StyleSheet.create(theme => ({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: theme.colors.backgroundColor
+        backgroundColor: theme.colors.backgroundColor,
+        includeFontPadding: true
     },
     typography: {
         fontSize: 20,
