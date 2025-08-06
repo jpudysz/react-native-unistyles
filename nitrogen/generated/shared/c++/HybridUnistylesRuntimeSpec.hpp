@@ -26,8 +26,8 @@ namespace margelo::nitro::unistyles { struct UnistylesCxxMiniRuntime; }
 
 #include "ColorScheme.hpp"
 #include "Dimensions.hpp"
-#include <optional>
 #include <string>
+#include <optional>
 #include <unordered_map>
 #include "Insets.hpp"
 #include "Orientation.hpp"

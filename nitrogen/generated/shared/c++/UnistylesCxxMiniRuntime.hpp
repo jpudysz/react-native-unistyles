@@ -25,8 +25,8 @@ namespace margelo::nitro::unistyles { struct Dimensions; }
 // Forward declaration of `Insets` to properly resolve imports.
 namespace margelo::nitro::unistyles { struct Insets; }
 
-#include <optional>
 #include <string>
+#include <optional>
 #include "ColorScheme.hpp"
 #include "Dimensions.hpp"
 #include "Insets.hpp"

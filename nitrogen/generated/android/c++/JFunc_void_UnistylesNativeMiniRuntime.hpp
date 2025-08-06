@@ -10,8 +10,8 @@
 #include <fbjni/fbjni.h>
 #include <functional>
 
-#include <functional>
 #include "UnistylesNativeMiniRuntime.hpp"
+#include <functional>
 #include "JUnistylesNativeMiniRuntime.hpp"
 #include "ColorScheme.hpp"
 #include "JColorScheme.hpp"
