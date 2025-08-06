@@ -31,9 +31,9 @@ namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 #include "JDimensions.hpp"
 #include "UnistylesNativeMiniRuntime.hpp"
 #include "JUnistylesNativeMiniRuntime.hpp"
-#include <functional>
-#include <vector>
 #include "UnistyleDependency.hpp"
+#include <vector>
+#include <functional>
 #include "JFunc_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime.hpp"
 #include "JUnistyleDependency.hpp"
 #include "JFunc_void_UnistylesNativeMiniRuntime.hpp"
@@ -53,6 +53,11 @@ namespace margelo::nitro::unistyles {
   size_t JHybridNativePlatformSpec::getExternalMemorySize() noexcept {
     static const auto method = javaClassStatic()->getMethod<jlong()>("getMemorySize");
     return method(_javaPart);
+  }
+
+  void JHybridNativePlatformSpec::dispose() noexcept {
+    static const auto method = javaClassStatic()->getMethod<void()>("dispose");
+    method(_javaPart);
   }
 
   // Properties

@@ -36,11 +36,11 @@ namespace margelo::nitro::unistyles::bridge::swift {
   }
   void* _Nonnull get_std__shared_ptr_margelo__nitro__unistyles__HybridNativePlatformSpec_(std__shared_ptr_margelo__nitro__unistyles__HybridNativePlatformSpec_ cppType) {
     std::shared_ptr<margelo::nitro::unistyles::HybridNativePlatformSpecSwift> swiftWrapper = std::dynamic_pointer_cast<margelo::nitro::unistyles::HybridNativePlatformSpecSwift>(cppType);
-  #ifdef NITRO_DEBUG
+    #ifdef NITRO_DEBUG
     if (swiftWrapper == nullptr) [[unlikely]] {
       throw std::runtime_error("Class \"HybridNativePlatformSpec\" is not implemented in Swift!");
     }
-  #endif
+    #endif
     Unistyles::HybridNativePlatformSpec_cxx& swiftPart = swiftWrapper->getSwiftPart();
     return swiftPart.toUnsafe();
   }

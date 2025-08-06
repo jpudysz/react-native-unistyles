@@ -31,9 +31,9 @@ namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 #include <string>
 #include "Dimensions.hpp"
 #include "UnistylesNativeMiniRuntime.hpp"
-#include <functional>
-#include <vector>
 #include "UnistyleDependency.hpp"
+#include <vector>
+#include <functional>
 
 #include "Unistyles-Swift-Cxx-Umbrella.hpp"
 
@@ -63,9 +63,11 @@ namespace margelo::nitro::unistyles {
     }
 
   public:
-    // Get memory pressure
     inline size_t getExternalMemorySize() noexcept override {
       return _swiftPart.getMemorySize();
+    }
+    void dispose() noexcept override {
+      _swiftPart.dispose();
     }
 
   public:

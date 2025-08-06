@@ -35,8 +35,9 @@ public protocol HybridNativePlatformSpec_protocol: HybridObject {
 }
 
 /// See ``HybridNativePlatformSpec``
-public class HybridNativePlatformSpec_base {
+open class HybridNativePlatformSpec_base {
   private weak var cxxWrapper: HybridNativePlatformSpec_cxx? = nil
+  public init() { }
   public func getCxxWrapper() -> HybridNativePlatformSpec_cxx {
   #if DEBUG
     guard self is HybridNativePlatformSpec else {
