@@ -15,11 +15,7 @@ import com.facebook.proguard.annotations.DoNotStrip
  */
 @DoNotStrip
 @Keep
-enum class Orientation {
-  PORTRAIT,
-  LANDSCAPE;
-
-  @DoNotStrip
-  @Keep
-  private val _ordinal = ordinal
+enum class Orientation(@DoNotStrip @Keep val value: Int) {
+  PORTRAIT(0),
+  LANDSCAPE(1);
 }
