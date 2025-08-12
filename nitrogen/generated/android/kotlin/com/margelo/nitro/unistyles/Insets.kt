@@ -21,10 +21,20 @@ data class Insets
   @DoNotStrip
   @Keep
   constructor(
+    @DoNotStrip
+    @Keep
     val top: Double,
+    @DoNotStrip
+    @Keep
     val bottom: Double,
+    @DoNotStrip
+    @Keep
     val left: Double,
+    @DoNotStrip
+    @Keep
     val right: Double,
+    @DoNotStrip
+    @Keep
     val ime: Double
   ) {
   /* main constructor */

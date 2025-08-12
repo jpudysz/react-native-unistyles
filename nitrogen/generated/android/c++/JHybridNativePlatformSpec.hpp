@@ -29,6 +29,7 @@ namespace margelo::nitro::unistyles {
     // C++ constructor (called from Java via `initHybrid()`)
     explicit JHybridNativePlatformSpec(jni::alias_ref<jhybridobject> jThis) :
       HybridObject(HybridNativePlatformSpec::TAG),
+      HybridBase(jThis),
       _javaPart(jni::make_global(jThis)) {}
 
   public:
