@@ -21,7 +21,11 @@ data class Dimensions
   @DoNotStrip
   @Keep
   constructor(
+    @DoNotStrip
+    @Keep
     val width: Double,
+    @DoNotStrip
+    @Keep
     val height: Double
   ) {
   /* main constructor */
