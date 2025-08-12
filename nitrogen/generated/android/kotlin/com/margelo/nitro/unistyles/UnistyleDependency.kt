@@ -15,25 +15,21 @@ import com.facebook.proguard.annotations.DoNotStrip
  */
 @DoNotStrip
 @Keep
-enum class UnistyleDependency {
-  THEME,
-  THEMENAME,
-  ADAPTIVETHEMES,
-  BREAKPOINTS,
-  VARIANTS,
-  COLORSCHEME,
-  DIMENSIONS,
-  ORIENTATION,
-  CONTENTSIZECATEGORY,
-  INSETS,
-  PIXELRATIO,
-  FONTSCALE,
-  STATUSBAR,
-  NAVIGATIONBAR,
-  IME,
-  RTL;
-
-  @DoNotStrip
-  @Keep
-  private val _ordinal = ordinal
+enum class UnistyleDependency(@DoNotStrip @Keep val value: Int) {
+  THEME(0),
+  THEMENAME(1),
+  ADAPTIVETHEMES(2),
+  BREAKPOINTS(3),
+  VARIANTS(4),
+  COLORSCHEME(5),
+  DIMENSIONS(6),
+  ORIENTATION(7),
+  CONTENTSIZECATEGORY(8),
+  INSETS(9),
+  PIXELRATIO(10),
+  FONTSCALE(11),
+  STATUSBAR(12),
+  NAVIGATIONBAR(13),
+  IME(14),
+  RTL(15);
 }

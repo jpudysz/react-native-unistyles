@@ -15,12 +15,8 @@ import com.facebook.proguard.annotations.DoNotStrip
  */
 @DoNotStrip
 @Keep
-enum class ColorScheme {
-  DARK,
-  LIGHT,
-  UNSPECIFIED;
-
-  @DoNotStrip
-  @Keep
-  private val _ordinal = ordinal
+enum class ColorScheme(@DoNotStrip @Keep val value: Int) {
+  DARK(0),
+  LIGHT(1),
+  UNSPECIFIED(2);
 }

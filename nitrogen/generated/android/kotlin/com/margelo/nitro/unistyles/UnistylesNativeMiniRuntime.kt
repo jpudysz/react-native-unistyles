@@ -21,16 +21,38 @@ data class UnistylesNativeMiniRuntime
   @DoNotStrip
   @Keep
   constructor(
+    @DoNotStrip
+    @Keep
     val colorScheme: ColorScheme,
+    @DoNotStrip
+    @Keep
     val screen: Dimensions,
+    @DoNotStrip
+    @Keep
     val contentSizeCategory: String,
+    @DoNotStrip
+    @Keep
     val insets: Insets,
+    @DoNotStrip
+    @Keep
     val pixelRatio: Double,
+    @DoNotStrip
+    @Keep
     val fontScale: Double,
+    @DoNotStrip
+    @Keep
     val rtl: Boolean,
+    @DoNotStrip
+    @Keep
     val statusBar: Dimensions,
+    @DoNotStrip
+    @Keep
     val navigationBar: Dimensions,
+    @DoNotStrip
+    @Keep
     val isPortrait: Boolean,
+    @DoNotStrip
+    @Keep
     val isLandscape: Boolean
   ) {
   /* main constructor */
