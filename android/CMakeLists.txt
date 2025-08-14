@@ -5,7 +5,6 @@ project(unistyles)
 file(GLOB_RECURSE CORE_SRC RELATIVE ${CMAKE_SOURCE_DIR} "../cxx/**/*.cpp")
 file(GLOB_RECURSE PLATFORM_SRC RELATIVE ${CMAKE_SOURCE_DIR} "./src/main/cxx/*.cpp")
 
-# TODO: remove me with new version of Nitro
 if(ReactAndroid_VERSION_MINOR GREATER_EQUAL 80)
     target_compile_reactnative_options(unistyles PRIVATE)
 endif()
