@@ -108,7 +108,7 @@ Props::Shared shadow::ShadowTreeManager::computeUpdatedProps(const ShadowNode &s
 }
 
 
-std::shared_ptr<ShadowNode> shadow::ShadowTreeManager::cloneShadowTree(const RootShadowNode& rootNode, ShadowLeafUpdates& updates, AffectedNodes& affectedNodes) {
+std::shared_ptr<ShadowNode> shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode &shadowNode, ShadowLeafUpdates& updates, AffectedNodes& affectedNodes) {
 #if REACT_NATIVE_VERSION_MINOR >= 81
     std::unordered_set<const ShadowNodeFamily*> familiesToUpdate;
 
@@ -127,17 +127,16 @@ std::shared_ptr<ShadowNode> shadow::ShadowTreeManager::cloneShadowTree(const Roo
         });
     };
 
-    return std::static_pointer_cast<RootShadowNode>(rootNode.cloneMultiple(familiesToUpdate, callback));
+    return std::static_pointer_cast<RootShadowNode>(shadowNode.cloneMultiple(familiesToUpdate, callback));
 #else
     // based on Reanimated algorithm
     // clone affected nodes recursively, inject props and commit tree
-    const auto family = &rootNode.getFamily();
-    const auto rawPropsIt = updates.find(family);
+    const auto family = &shadowNode.getFamily();
     const auto childrenIt = affectedNodes.find(family);
 
     // Only copy children if we need to update them
     std::shared_ptr<std::vector<std::shared_ptr<const ShadowNode>>> childrenPtr;
-    const auto& originalChildren = rootNode.getChildren();
+    const auto& originalChildren = shadowNode.getChildren();
 
     if (childrenIt != affectedNodes.end()) {
         auto children = originalChildren;
@@ -151,13 +150,12 @@ std::shared_ptr<ShadowNode> shadow::ShadowTreeManager::cloneShadowTree(const Roo
         childrenPtr = std::make_shared<std::vector<std::shared_ptr<const ShadowNode>>>(originalChildren);
     }
 
-    Props::Shared updatedProps = computeUpdatedProps(rootNode, updates);
+    Props::Shared updatedProps = computeUpdatedProps(shadowNode, updates);
 
-    return rootNode.clone({
-        updatedProps,
-        childrenPtr,
-        rootNode.getState()
-        false
+    return shadowNode.clone({
+        .props = updatedProps,
+        .children = childrenPtr,
+        .state = shadowNode.getState()
     });
 #endif
 }
