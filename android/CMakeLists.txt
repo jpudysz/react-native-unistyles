@@ -10,7 +10,6 @@ if(ReactAndroid_VERSION_MINOR GREATER_EQUAL 80)
     target_compile_reactnative_options(unistyles PRIVATE)
 endif()
 
-
 add_library(unistyles
     SHARED
     ${CORE_SRC}

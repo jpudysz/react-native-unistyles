@@ -96,8 +96,6 @@ Props::Shared shadow::ShadowTreeManager::computeUpdatedProps(const ShadowNode &s
         *shadowNode.getContextContainer()
     };
 
-    // Just use the new props directly without merging with existing rawProps
-    // This avoids dependency on RN_SERIALIZABLE_STATE flag
     folly::dynamic newProps = rawPropsIt->second == nullptr
         ? folly::dynamic::object()
         : rawPropsIt->second;
@@ -109,8 +107,6 @@ Props::Shared shadow::ShadowTreeManager::computeUpdatedProps(const ShadowNode &s
     );
 }
 
-// based on Reanimated algorithm
-// clone affected nodes recursively, inject props and commit tree
 std::shared_ptr<ShadowNode> shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode &shadowNode, ShadowLeafUpdates& updates, AffectedNodes& affectedNodes) {
 #if REACT_NATIVE_VERSION_MINOR >= 81
     std::unordered_set<const ShadowNodeFamily*> familiesToUpdate;
@@ -131,6 +127,8 @@ std::shared_ptr<ShadowNode> shadow::ShadowTreeManager::cloneShadowTree(const Sha
 
     return shadowNode.cloneMultiple(familiesToUpdate, callback);
 #elif
+    // based on Reanimated algorithm
+    // clone affected nodes recursively, inject props and commit tree
     const auto family = &shadowNode.getFamily();
     const auto rawPropsIt = updates.find(family);
     const auto childrenIt = affectedNodes.find(family);
