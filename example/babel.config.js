@@ -28,7 +28,7 @@ module.exports = api => {
                     }
                 }
             ],
-            'react-native-reanimated/plugin'
+            'react-native-worklets/plugin'
         ]
     }
 }

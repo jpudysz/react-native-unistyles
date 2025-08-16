@@ -6,7 +6,7 @@ using namespace facebook;
 
 using AffectedNodes = std::unordered_map<const ShadowNodeFamily*, std::unordered_set<int>>;
 
-void shadow::ShadowTreeManager::updateShadowTree(const ShadowTreeRegistry& shadowTreeRegistry) {
+void shadow::ShadowTreeManager::updateShadowTree(jsi::Runtime& rt) {
     auto& registry = core::UnistylesRegistry::get();
 
     registry.trafficController.withLock([&](){
@@ -16,6 +16,17 @@ void shadow::ShadowTreeManager::updateShadowTree(const ShadowTreeRegistry& shado
             return;
         }
 
+#if REACT_NATIVE_VERSION_MINOR >= 81
+        std::unordered_map<Tag, folly::dynamic> tagToProps;
+
+        for (const auto& [family, props] : updates) {
+            tagToProps.insert({family->getTag(), props});
+        }
+        
+        UIManagerBinding::getBinding(rt)->getUIManager().updateShadowTree(tagToProps);
+#else
+        const auto& shadowTreeRegistry = UIManagerBinding::getBinding(rt)->getUIManager().getShadowTreeRegistry();
+        
         shadowTreeRegistry.enumerate([&updates](const ShadowTree& shadowTree, bool& stop){
             // we could iterate via updates and create multiple commits
             // but it can cause performance issues for hundreds of nodes
@@ -36,12 +47,12 @@ void shadow::ShadowTreeManager::updateShadowTree(const ShadowTreeRegistry& shado
             // mountSynchronously: must be true as this is update from C++ not React
             shadowTree.commit(transaction, {false, true});
 
-
             // for now we're assuming single surface, can be improved in the future
             // stop = true means stop enumerating next shadow tree
             // so in other words first shadow tree is our desired tree
             stop = true;
         });
+#endif
     });
 }
 
@@ -80,15 +91,41 @@ AffectedNodes shadow::ShadowTreeManager::findAffectedNodes(const RootShadowNode&
     return affectedNodes;
 }
 
-// based on Reanimated algorithm
-// clone affected nodes recursively, inject props and commit tree
-ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode &shadowNode, ShadowLeafUpdates& updates, AffectedNodes& affectedNodes) {
+Props::Shared shadow::ShadowTreeManager::computeUpdatedProps(const ShadowNode &shadowNode, ShadowLeafUpdates& updates) {
     const auto family = &shadowNode.getFamily();
     const auto rawPropsIt = updates.find(family);
+
+    if (rawPropsIt == updates.end()) {
+        return ShadowNodeFragment::propsPlaceholder();
+    }
+
+    const auto& componentDescriptor = shadowNode.getComponentDescriptor();
+    const auto& props = shadowNode.getProps();
+
+    PropsParserContext propsParserContext{
+        shadowNode.getSurfaceId(),
+        *shadowNode.getContextContainer()
+    };
+
+    folly::dynamic newProps = rawPropsIt->second == nullptr
+        ? folly::dynamic::object()
+        : rawPropsIt->second;
+
+    return componentDescriptor.cloneProps(
+        propsParserContext,
+        props,
+        RawProps(newProps)
+    );
+}
+
+// based on Reanimated algorithm
+// clone affected nodes recursively, inject props and commit tree
+std::shared_ptr<ShadowNode> shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode &shadowNode, ShadowLeafUpdates& updates, AffectedNodes& affectedNodes) {
+    const auto family = &shadowNode.getFamily();
     const auto childrenIt = affectedNodes.find(family);
 
     // Only copy children if we need to update them
-    std::shared_ptr<ShadowNode::ListOfShared> childrenPtr;
+    std::shared_ptr<std::vector<std::shared_ptr<const ShadowNode>>> childrenPtr;
     const auto& originalChildren = shadowNode.getChildren();
 
     if (childrenIt != affectedNodes.end()) {
@@ -98,42 +135,16 @@ ShadowNode::Unshared shadow::ShadowTreeManager::cloneShadowTree(const ShadowNode
             children[index] = cloneShadowTree(*children[index], updates, affectedNodes);
         }
 
-        childrenPtr = std::make_shared<ShadowNode::ListOfShared>(std::move(children));
+        childrenPtr = std::make_shared<std::vector<std::shared_ptr<const ShadowNode>>>(std::move(children));
     } else {
-        childrenPtr = std::make_shared<ShadowNode::ListOfShared>(originalChildren);
+        childrenPtr = std::make_shared<std::vector<std::shared_ptr<const ShadowNode>>>(originalChildren);
     }
 
-    Props::Shared updatedProps = nullptr;
-
-    if (rawPropsIt != updates.end()) {
-        const auto& componentDescriptor = shadowNode.getComponentDescriptor();
-        const auto& props = shadowNode.getProps();
-
-        PropsParserContext propsParserContext{
-            shadowNode.getSurfaceId(),
-            *shadowNode.getContextContainer()
-        };
-
-        folly::dynamic newProps;
-        #ifdef ANDROID
-            auto safeProps = rawPropsIt->second == nullptr
-                ? folly::dynamic::object()
-                : rawPropsIt->second;
-            newProps = folly::dynamic::merge(props->rawProps, safeProps);
-        #else
-            newProps = rawPropsIt->second;
-        #endif
-
-        updatedProps = componentDescriptor.cloneProps(
-            propsParserContext,
-            props,
-            RawProps(newProps)
-        );
-    }
+    Props::Shared updatedProps = computeUpdatedProps(shadowNode, updates);
 
     return shadowNode.clone({
-        updatedProps ? updatedProps : ShadowNodeFragment::propsPlaceholder(),
-        childrenPtr,
-        shadowNode.getState()
+        .props = updatedProps,
+        .children = childrenPtr,
+        .state = shadowNode.getState()
     });
 }
