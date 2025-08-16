@@ -38,26 +38,24 @@ namespace margelo::nitro::unistyles {
 
 namespace margelo::nitro {
 
-  using namespace margelo::nitro::unistyles;
-
   // C++ ColorScheme <> JS ColorScheme (union)
   template <>
-  struct JSIConverter<ColorScheme> final {
-    static inline ColorScheme fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
+  struct JSIConverter<margelo::nitro::unistyles::ColorScheme> final {
+    static inline margelo::nitro::unistyles::ColorScheme fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
       std::string unionValue = JSIConverter<std::string>::fromJSI(runtime, arg);
       switch (hashString(unionValue.c_str(), unionValue.size())) {
-        case hashString("dark"): return ColorScheme::DARK;
-        case hashString("light"): return ColorScheme::LIGHT;
-        case hashString("unspecified"): return ColorScheme::UNSPECIFIED;
+        case hashString("dark"): return margelo::nitro::unistyles::ColorScheme::DARK;
+        case hashString("light"): return margelo::nitro::unistyles::ColorScheme::LIGHT;
+        case hashString("unspecified"): return margelo::nitro::unistyles::ColorScheme::UNSPECIFIED;
         default: [[unlikely]]
           throw std::invalid_argument("Cannot convert \"" + unionValue + "\" to enum ColorScheme - invalid value!");
       }
     }
-    static inline jsi::Value toJSI(jsi::Runtime& runtime, ColorScheme arg) {
+    static inline jsi::Value toJSI(jsi::Runtime& runtime, margelo::nitro::unistyles::ColorScheme arg) {
       switch (arg) {
-        case ColorScheme::DARK: return JSIConverter<std::string>::toJSI(runtime, "dark");
-        case ColorScheme::LIGHT: return JSIConverter<std::string>::toJSI(runtime, "light");
-        case ColorScheme::UNSPECIFIED: return JSIConverter<std::string>::toJSI(runtime, "unspecified");
+        case margelo::nitro::unistyles::ColorScheme::DARK: return JSIConverter<std::string>::toJSI(runtime, "dark");
+        case margelo::nitro::unistyles::ColorScheme::LIGHT: return JSIConverter<std::string>::toJSI(runtime, "light");
+        case margelo::nitro::unistyles::ColorScheme::UNSPECIFIED: return JSIConverter<std::string>::toJSI(runtime, "unspecified");
         default: [[unlikely]]
           throw std::invalid_argument("Cannot convert ColorScheme to JS - invalid value: "
                                     + std::to_string(static_cast<int>(arg)) + "!");

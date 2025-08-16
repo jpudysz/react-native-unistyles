@@ -33,7 +33,7 @@ open class HybridNativePlatformSpec_cxx {
   /**
    * Holds a weak pointer to the C++ class that wraps the Swift class.
    */
-  private var __cxxPart: bridge.std__weak_ptr_margelo__nitro__unistyles__HybridNativePlatformSpec_
+  private var __cxxPart: bridge.std__weak_ptr_HybridNativePlatformSpec_
 
   /**
    * Create a new `HybridNativePlatformSpec_cxx` that wraps the given `HybridNativePlatformSpec`.
@@ -72,15 +72,15 @@ open class HybridNativePlatformSpec_cxx {
 
   /**
    * Gets (or creates) the C++ part of this Hybrid Object.
-   * The C++ part is a `std::shared_ptr<margelo::nitro::unistyles::HybridNativePlatformSpec>`.
+   * The C++ part is a `std::shared_ptr<HybridNativePlatformSpec>`.
    */
-  public func getCxxPart() -> bridge.std__shared_ptr_margelo__nitro__unistyles__HybridNativePlatformSpec_ {
+  public func getCxxPart() -> bridge.std__shared_ptr_HybridNativePlatformSpec_ {
     let cachedCxxPart = self.__cxxPart.lock()
     if cachedCxxPart.__convertToBool() {
       return cachedCxxPart
     } else {
-      let newCxxPart = bridge.create_std__shared_ptr_margelo__nitro__unistyles__HybridNativePlatformSpec_(self.toUnsafe())
-      __cxxPart = bridge.weakify_std__shared_ptr_margelo__nitro__unistyles__HybridNativePlatformSpec_(newCxxPart)
+      let newCxxPart = bridge.create_std__shared_ptr_HybridNativePlatformSpec_(self.toUnsafe())
+      __cxxPart = bridge.weakify_std__shared_ptr_HybridNativePlatformSpec_(newCxxPart)
       return newCxxPart
     }
   }
