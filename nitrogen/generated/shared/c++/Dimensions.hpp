@@ -41,19 +41,17 @@ namespace margelo::nitro::unistyles {
 
 namespace margelo::nitro {
 
-  using namespace margelo::nitro::unistyles;
-
   // C++ Dimensions <> JS Dimensions (object)
   template <>
-  struct JSIConverter<Dimensions> final {
-    static inline Dimensions fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
+  struct JSIConverter<margelo::nitro::unistyles::Dimensions> final {
+    static inline margelo::nitro::unistyles::Dimensions fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
       jsi::Object obj = arg.asObject(runtime);
-      return Dimensions(
+      return margelo::nitro::unistyles::Dimensions(
         JSIConverter<double>::fromJSI(runtime, obj.getProperty(runtime, "width")),
         JSIConverter<double>::fromJSI(runtime, obj.getProperty(runtime, "height"))
       );
     }
-    static inline jsi::Value toJSI(jsi::Runtime& runtime, const Dimensions& arg) {
+    static inline jsi::Value toJSI(jsi::Runtime& runtime, const margelo::nitro::unistyles::Dimensions& arg) {
       jsi::Object obj(runtime);
       obj.setProperty(runtime, "width", JSIConverter<double>::toJSI(runtime, arg.width));
       obj.setProperty(runtime, "height", JSIConverter<double>::toJSI(runtime, arg.height));

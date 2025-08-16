@@ -46,16 +46,14 @@ namespace margelo::nitro::unistyles {
 
 namespace margelo::nitro {
 
-  using namespace margelo::nitro::unistyles;
-
   // C++ UnistyleDependency <> JS UnistyleDependency (enum)
   template <>
-  struct JSIConverter<UnistyleDependency> final {
-    static inline UnistyleDependency fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
+  struct JSIConverter<margelo::nitro::unistyles::UnistyleDependency> final {
+    static inline margelo::nitro::unistyles::UnistyleDependency fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
       int enumValue = JSIConverter<int>::fromJSI(runtime, arg);
-      return static_cast<UnistyleDependency>(enumValue);
+      return static_cast<margelo::nitro::unistyles::UnistyleDependency>(enumValue);
     }
-    static inline jsi::Value toJSI(jsi::Runtime& runtime, UnistyleDependency arg) {
+    static inline jsi::Value toJSI(jsi::Runtime& runtime, margelo::nitro::unistyles::UnistyleDependency arg) {
       int enumValue = static_cast<int>(arg);
       return JSIConverter<int>::toJSI(runtime, enumValue);
     }
