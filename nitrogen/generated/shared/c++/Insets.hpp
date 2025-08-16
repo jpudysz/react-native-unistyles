@@ -44,14 +44,12 @@ namespace margelo::nitro::unistyles {
 
 namespace margelo::nitro {
 
-  using namespace margelo::nitro::unistyles;
-
   // C++ Insets <> JS Insets (object)
   template <>
-  struct JSIConverter<Insets> final {
-    static inline Insets fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
+  struct JSIConverter<margelo::nitro::unistyles::Insets> final {
+    static inline margelo::nitro::unistyles::Insets fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
       jsi::Object obj = arg.asObject(runtime);
-      return Insets(
+      return margelo::nitro::unistyles::Insets(
         JSIConverter<double>::fromJSI(runtime, obj.getProperty(runtime, "top")),
         JSIConverter<double>::fromJSI(runtime, obj.getProperty(runtime, "bottom")),
         JSIConverter<double>::fromJSI(runtime, obj.getProperty(runtime, "left")),
@@ -59,7 +57,7 @@ namespace margelo::nitro {
         JSIConverter<double>::fromJSI(runtime, obj.getProperty(runtime, "ime"))
       );
     }
-    static inline jsi::Value toJSI(jsi::Runtime& runtime, const Insets& arg) {
+    static inline jsi::Value toJSI(jsi::Runtime& runtime, const margelo::nitro::unistyles::Insets& arg) {
       jsi::Object obj(runtime);
       obj.setProperty(runtime, "top", JSIConverter<double>::toJSI(runtime, arg.top));
       obj.setProperty(runtime, "bottom", JSIConverter<double>::toJSI(runtime, arg.bottom));
