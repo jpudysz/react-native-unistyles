@@ -16,7 +16,7 @@ using namespace facebook;
 using AffectedNodes = std::unordered_map<const ShadowNodeFamily *, std::unordered_set<int>>;
 
 struct ShadowTreeManager {
-    static void updateShadowTree(const ShadowTreeRegistry& shadowTreeRegistry);
+    static void updateShadowTree(jsi::Runtime& rt);
     static AffectedNodes findAffectedNodes(const RootShadowNode& rootNode, ShadowLeafUpdates& updates);
     static std::shared_ptr<ShadowNode> cloneShadowTree(const ShadowNode& shadowNode, ShadowLeafUpdates& updates, AffectedNodes& affectedNodes);
     static Props::Shared computeUpdatedProps(const ShadowNode &shadowNode, ShadowLeafUpdates& updates);
