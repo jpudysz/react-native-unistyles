@@ -108,7 +108,7 @@ jsi::Value HybridShadowRegistry::unlink(jsi::Runtime &rt, const jsi::Value &this
 }
 
 jsi::Value HybridShadowRegistry::flush(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
-    shadow::ShadowTreeManager::updateShadowTree(UIManagerBinding::getBinding(rt)->getUIManager().getShadowTreeRegistry());
+    shadow::ShadowTreeManager::updateShadowTree(rt);
 
     return jsi::Value::undefined();
 }

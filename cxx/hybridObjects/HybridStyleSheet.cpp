@@ -296,7 +296,7 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
     parser.rebuildShadowLeafUpdates(rt, dependencyMap);
 
     this->notifyJSListeners(dependencies);
-    shadow::ShadowTreeManager::updateShadowTree(UIManagerBinding::getBinding(rt)->getUIManager().getShadowTreeRegistry());
+    shadow::ShadowTreeManager::updateShadowTree(rt);
 }
 
 void HybridStyleSheet::onPlatformNativeDependenciesChange(std::vector<UnistyleDependency> dependencies, UnistylesNativeMiniRuntime miniRuntime) {
@@ -352,7 +352,7 @@ void HybridStyleSheet::onPlatformNativeDependenciesChange(std::vector<UnistyleDe
         parser.rebuildShadowLeafUpdates(rt, dependencyMap);
 
         this->notifyJSListeners(unistyleDependencies);
-        shadow::ShadowTreeManager::updateShadowTree(UIManagerBinding::getBinding(rt)->getUIManager().getShadowTreeRegistry());
+        shadow::ShadowTreeManager::updateShadowTree(rt);
     });
 }
 
@@ -381,7 +381,7 @@ void HybridStyleSheet::onImeChange(UnistylesNativeMiniRuntime miniRuntime) {
         parser.rebuildShadowLeafUpdates(rt, dependencyMap);
 
         this->notifyJSListeners(dependencies);
-        shadow::ShadowTreeManager::updateShadowTree(UIManagerBinding::getBinding(rt)->getUIManager().getShadowTreeRegistry());
+        shadow::ShadowTreeManager::updateShadowTree(rt);
     });
 }
 
