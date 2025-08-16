@@ -21,18 +21,28 @@ void shadow::ShadowTreeManager::updateShadowTree(jsi::Runtime& rt) {
 
         for (const auto& [family, props] : updates) {
             tagToProps.insert({family->getTag(), props});
+
+            // Store in native props system to preserve during Reanimated cloning
+            const_cast<ShadowNodeFamily*>(family)->nativeProps_DEPRECATED =
+                std::make_unique<folly::dynamic>(props);
         }
-        
+
         UIManagerBinding::getBinding(rt)->getUIManager().updateShadowTree(tagToProps);
 #else
         const auto& shadowTreeRegistry = UIManagerBinding::getBinding(rt)->getUIManager().getShadowTreeRegistry();
-        
+
         shadowTreeRegistry.enumerate([&updates](const ShadowTree& shadowTree, bool& stop){
             // we could iterate via updates and create multiple commits
             // but it can cause performance issues for hundreds of nodes
             // so let's mutate Shadow Tree in single transaction
             auto transaction = [&updates](const RootShadowNode& oldRootShadowNode) {
                 auto affectedNodes = shadow::ShadowTreeManager::findAffectedNodes(oldRootShadowNode, updates);
+
+                for (const auto& [family, props] : updates) {
+                    // Merge props to fix glitches caused by REA updates
+                    const_cast<ShadowNodeFamily*>(family)->nativeProps_DEPRECATED =
+                        std::make_unique<folly::dynamic>(props);
+                }
 
                 return  std::static_pointer_cast<RootShadowNode>(shadow::ShadowTreeManager::cloneShadowTree(
                     oldRootShadowNode,
