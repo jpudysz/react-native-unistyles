@@ -37,24 +37,22 @@ namespace margelo::nitro::unistyles {
 
 namespace margelo::nitro {
 
-  using namespace margelo::nitro::unistyles;
-
   // C++ Orientation <> JS Orientation (union)
   template <>
-  struct JSIConverter<Orientation> final {
-    static inline Orientation fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
+  struct JSIConverter<margelo::nitro::unistyles::Orientation> final {
+    static inline margelo::nitro::unistyles::Orientation fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
       std::string unionValue = JSIConverter<std::string>::fromJSI(runtime, arg);
       switch (hashString(unionValue.c_str(), unionValue.size())) {
-        case hashString("portrait"): return Orientation::PORTRAIT;
-        case hashString("landscape"): return Orientation::LANDSCAPE;
+        case hashString("portrait"): return margelo::nitro::unistyles::Orientation::PORTRAIT;
+        case hashString("landscape"): return margelo::nitro::unistyles::Orientation::LANDSCAPE;
         default: [[unlikely]]
           throw std::invalid_argument("Cannot convert \"" + unionValue + "\" to enum Orientation - invalid value!");
       }
     }
-    static inline jsi::Value toJSI(jsi::Runtime& runtime, Orientation arg) {
+    static inline jsi::Value toJSI(jsi::Runtime& runtime, margelo::nitro::unistyles::Orientation arg) {
       switch (arg) {
-        case Orientation::PORTRAIT: return JSIConverter<std::string>::toJSI(runtime, "portrait");
-        case Orientation::LANDSCAPE: return JSIConverter<std::string>::toJSI(runtime, "landscape");
+        case margelo::nitro::unistyles::Orientation::PORTRAIT: return JSIConverter<std::string>::toJSI(runtime, "portrait");
+        case margelo::nitro::unistyles::Orientation::LANDSCAPE: return JSIConverter<std::string>::toJSI(runtime, "landscape");
         default: [[unlikely]]
           throw std::invalid_argument("Cannot convert Orientation to JS - invalid value: "
                                     + std::to_string(static_cast<int>(arg)) + "!");

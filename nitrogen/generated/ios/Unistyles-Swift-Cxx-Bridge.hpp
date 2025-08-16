@@ -103,17 +103,17 @@ namespace margelo::nitro::unistyles::bridge::swift {
     return Func_void_UnistylesNativeMiniRuntime_Wrapper(std::move(value));
   }
   
-  // pragma MARK: std::shared_ptr<margelo::nitro::unistyles::HybridNativePlatformSpec>
+  // pragma MARK: std::shared_ptr<HybridNativePlatformSpec>
   /**
-   * Specialized version of `std::shared_ptr<margelo::nitro::unistyles::HybridNativePlatformSpec>`.
+   * Specialized version of `std::shared_ptr<HybridNativePlatformSpec>`.
    */
-  using std__shared_ptr_margelo__nitro__unistyles__HybridNativePlatformSpec_ = std::shared_ptr<margelo::nitro::unistyles::HybridNativePlatformSpec>;
-  std::shared_ptr<margelo::nitro::unistyles::HybridNativePlatformSpec> create_std__shared_ptr_margelo__nitro__unistyles__HybridNativePlatformSpec_(void* _Nonnull swiftUnsafePointer);
-  void* _Nonnull get_std__shared_ptr_margelo__nitro__unistyles__HybridNativePlatformSpec_(std__shared_ptr_margelo__nitro__unistyles__HybridNativePlatformSpec_ cppType);
+  using std__shared_ptr_HybridNativePlatformSpec_ = std::shared_ptr<HybridNativePlatformSpec>;
+  std::shared_ptr<HybridNativePlatformSpec> create_std__shared_ptr_HybridNativePlatformSpec_(void* _Nonnull swiftUnsafePointer);
+  void* _Nonnull get_std__shared_ptr_HybridNativePlatformSpec_(std__shared_ptr_HybridNativePlatformSpec_ cppType);
   
-  // pragma MARK: std::weak_ptr<margelo::nitro::unistyles::HybridNativePlatformSpec>
-  using std__weak_ptr_margelo__nitro__unistyles__HybridNativePlatformSpec_ = std::weak_ptr<margelo::nitro::unistyles::HybridNativePlatformSpec>;
-  inline std__weak_ptr_margelo__nitro__unistyles__HybridNativePlatformSpec_ weakify_std__shared_ptr_margelo__nitro__unistyles__HybridNativePlatformSpec_(const std::shared_ptr<margelo::nitro::unistyles::HybridNativePlatformSpec>& strong) { return strong; }
+  // pragma MARK: std::weak_ptr<HybridNativePlatformSpec>
+  using std__weak_ptr_HybridNativePlatformSpec_ = std::weak_ptr<HybridNativePlatformSpec>;
+  inline std__weak_ptr_HybridNativePlatformSpec_ weakify_std__shared_ptr_HybridNativePlatformSpec_(const std::shared_ptr<HybridNativePlatformSpec>& strong) { return strong; }
   
   // pragma MARK: Result<Insets>
   using Result_Insets_ = Result<Insets>;

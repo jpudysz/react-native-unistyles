@@ -29,12 +29,12 @@ namespace margelo::nitro::unistyles::bridge::swift {
     };
   }
   
-  // pragma MARK: std::shared_ptr<margelo::nitro::unistyles::HybridNativePlatformSpec>
-  std::shared_ptr<margelo::nitro::unistyles::HybridNativePlatformSpec> create_std__shared_ptr_margelo__nitro__unistyles__HybridNativePlatformSpec_(void* _Nonnull swiftUnsafePointer) {
+  // pragma MARK: std::shared_ptr<HybridNativePlatformSpec>
+  std::shared_ptr<HybridNativePlatformSpec> create_std__shared_ptr_HybridNativePlatformSpec_(void* _Nonnull swiftUnsafePointer) {
     Unistyles::HybridNativePlatformSpec_cxx swiftPart = Unistyles::HybridNativePlatformSpec_cxx::fromUnsafe(swiftUnsafePointer);
     return std::make_shared<margelo::nitro::unistyles::HybridNativePlatformSpecSwift>(swiftPart);
   }
-  void* _Nonnull get_std__shared_ptr_margelo__nitro__unistyles__HybridNativePlatformSpec_(std__shared_ptr_margelo__nitro__unistyles__HybridNativePlatformSpec_ cppType) {
+  void* _Nonnull get_std__shared_ptr_HybridNativePlatformSpec_(std__shared_ptr_HybridNativePlatformSpec_ cppType) {
     std::shared_ptr<margelo::nitro::unistyles::HybridNativePlatformSpecSwift> swiftWrapper = std::dynamic_pointer_cast<margelo::nitro::unistyles::HybridNativePlatformSpecSwift>(cppType);
     #ifdef NITRO_DEBUG
     if (swiftWrapper == nullptr) [[unlikely]] {

@@ -58,38 +58,36 @@ namespace margelo::nitro::unistyles {
 
 namespace margelo::nitro {
 
-  using namespace margelo::nitro::unistyles;
-
   // C++ UnistylesNativeMiniRuntime <> JS UnistylesNativeMiniRuntime (object)
   template <>
-  struct JSIConverter<UnistylesNativeMiniRuntime> final {
-    static inline UnistylesNativeMiniRuntime fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
+  struct JSIConverter<margelo::nitro::unistyles::UnistylesNativeMiniRuntime> final {
+    static inline margelo::nitro::unistyles::UnistylesNativeMiniRuntime fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
       jsi::Object obj = arg.asObject(runtime);
-      return UnistylesNativeMiniRuntime(
-        JSIConverter<ColorScheme>::fromJSI(runtime, obj.getProperty(runtime, "colorScheme")),
-        JSIConverter<Dimensions>::fromJSI(runtime, obj.getProperty(runtime, "screen")),
+      return margelo::nitro::unistyles::UnistylesNativeMiniRuntime(
+        JSIConverter<margelo::nitro::unistyles::ColorScheme>::fromJSI(runtime, obj.getProperty(runtime, "colorScheme")),
+        JSIConverter<margelo::nitro::unistyles::Dimensions>::fromJSI(runtime, obj.getProperty(runtime, "screen")),
         JSIConverter<std::string>::fromJSI(runtime, obj.getProperty(runtime, "contentSizeCategory")),
-        JSIConverter<Insets>::fromJSI(runtime, obj.getProperty(runtime, "insets")),
+        JSIConverter<margelo::nitro::unistyles::Insets>::fromJSI(runtime, obj.getProperty(runtime, "insets")),
         JSIConverter<double>::fromJSI(runtime, obj.getProperty(runtime, "pixelRatio")),
         JSIConverter<double>::fromJSI(runtime, obj.getProperty(runtime, "fontScale")),
         JSIConverter<bool>::fromJSI(runtime, obj.getProperty(runtime, "rtl")),
-        JSIConverter<Dimensions>::fromJSI(runtime, obj.getProperty(runtime, "statusBar")),
-        JSIConverter<Dimensions>::fromJSI(runtime, obj.getProperty(runtime, "navigationBar")),
+        JSIConverter<margelo::nitro::unistyles::Dimensions>::fromJSI(runtime, obj.getProperty(runtime, "statusBar")),
+        JSIConverter<margelo::nitro::unistyles::Dimensions>::fromJSI(runtime, obj.getProperty(runtime, "navigationBar")),
         JSIConverter<bool>::fromJSI(runtime, obj.getProperty(runtime, "isPortrait")),
         JSIConverter<bool>::fromJSI(runtime, obj.getProperty(runtime, "isLandscape"))
       );
     }
-    static inline jsi::Value toJSI(jsi::Runtime& runtime, const UnistylesNativeMiniRuntime& arg) {
+    static inline jsi::Value toJSI(jsi::Runtime& runtime, const margelo::nitro::unistyles::UnistylesNativeMiniRuntime& arg) {
       jsi::Object obj(runtime);
-      obj.setProperty(runtime, "colorScheme", JSIConverter<ColorScheme>::toJSI(runtime, arg.colorScheme));
-      obj.setProperty(runtime, "screen", JSIConverter<Dimensions>::toJSI(runtime, arg.screen));
+      obj.setProperty(runtime, "colorScheme", JSIConverter<margelo::nitro::unistyles::ColorScheme>::toJSI(runtime, arg.colorScheme));
+      obj.setProperty(runtime, "screen", JSIConverter<margelo::nitro::unistyles::Dimensions>::toJSI(runtime, arg.screen));
       obj.setProperty(runtime, "contentSizeCategory", JSIConverter<std::string>::toJSI(runtime, arg.contentSizeCategory));
-      obj.setProperty(runtime, "insets", JSIConverter<Insets>::toJSI(runtime, arg.insets));
+      obj.setProperty(runtime, "insets", JSIConverter<margelo::nitro::unistyles::Insets>::toJSI(runtime, arg.insets));
       obj.setProperty(runtime, "pixelRatio", JSIConverter<double>::toJSI(runtime, arg.pixelRatio));
       obj.setProperty(runtime, "fontScale", JSIConverter<double>::toJSI(runtime, arg.fontScale));
       obj.setProperty(runtime, "rtl", JSIConverter<bool>::toJSI(runtime, arg.rtl));
-      obj.setProperty(runtime, "statusBar", JSIConverter<Dimensions>::toJSI(runtime, arg.statusBar));
-      obj.setProperty(runtime, "navigationBar", JSIConverter<Dimensions>::toJSI(runtime, arg.navigationBar));
+      obj.setProperty(runtime, "statusBar", JSIConverter<margelo::nitro::unistyles::Dimensions>::toJSI(runtime, arg.statusBar));
+      obj.setProperty(runtime, "navigationBar", JSIConverter<margelo::nitro::unistyles::Dimensions>::toJSI(runtime, arg.navigationBar));
       obj.setProperty(runtime, "isPortrait", JSIConverter<bool>::toJSI(runtime, arg.isPortrait));
       obj.setProperty(runtime, "isLandscape", JSIConverter<bool>::toJSI(runtime, arg.isLandscape));
       return obj;
@@ -99,15 +97,15 @@ namespace margelo::nitro {
         return false;
       }
       jsi::Object obj = value.getObject(runtime);
-      if (!JSIConverter<ColorScheme>::canConvert(runtime, obj.getProperty(runtime, "colorScheme"))) return false;
-      if (!JSIConverter<Dimensions>::canConvert(runtime, obj.getProperty(runtime, "screen"))) return false;
+      if (!JSIConverter<margelo::nitro::unistyles::ColorScheme>::canConvert(runtime, obj.getProperty(runtime, "colorScheme"))) return false;
+      if (!JSIConverter<margelo::nitro::unistyles::Dimensions>::canConvert(runtime, obj.getProperty(runtime, "screen"))) return false;
       if (!JSIConverter<std::string>::canConvert(runtime, obj.getProperty(runtime, "contentSizeCategory"))) return false;
-      if (!JSIConverter<Insets>::canConvert(runtime, obj.getProperty(runtime, "insets"))) return false;
+      if (!JSIConverter<margelo::nitro::unistyles::Insets>::canConvert(runtime, obj.getProperty(runtime, "insets"))) return false;
       if (!JSIConverter<double>::canConvert(runtime, obj.getProperty(runtime, "pixelRatio"))) return false;
       if (!JSIConverter<double>::canConvert(runtime, obj.getProperty(runtime, "fontScale"))) return false;
       if (!JSIConverter<bool>::canConvert(runtime, obj.getProperty(runtime, "rtl"))) return false;
-      if (!JSIConverter<Dimensions>::canConvert(runtime, obj.getProperty(runtime, "statusBar"))) return false;
-      if (!JSIConverter<Dimensions>::canConvert(runtime, obj.getProperty(runtime, "navigationBar"))) return false;
+      if (!JSIConverter<margelo::nitro::unistyles::Dimensions>::canConvert(runtime, obj.getProperty(runtime, "statusBar"))) return false;
+      if (!JSIConverter<margelo::nitro::unistyles::Dimensions>::canConvert(runtime, obj.getProperty(runtime, "navigationBar"))) return false;
       if (!JSIConverter<bool>::canConvert(runtime, obj.getProperty(runtime, "isPortrait"))) return false;
       if (!JSIConverter<bool>::canConvert(runtime, obj.getProperty(runtime, "isLandscape"))) return false;
       return true;
