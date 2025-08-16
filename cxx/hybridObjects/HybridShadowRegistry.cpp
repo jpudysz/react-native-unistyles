@@ -6,7 +6,7 @@ using namespace facebook::react;
 jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count == 2, "Unistyles: Invalid babel transform 'ShadowRegistry link' expected 2 arguments.");
 
-    ShadowNode::Shared shadowNodeWrapper = shadowNodeFromValue(rt, args[0]);
+    auto shadowNodeWrapper = getShadowNodeFromRef(rt, args[0]);
 
     std::vector<core::Unistyle::Shared> unistyleWrappers = core::unistyleFromValue(rt, args[1]);
     std::vector<std::vector<folly::dynamic>> arguments;
@@ -98,7 +98,7 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
 jsi::Value HybridShadowRegistry::unlink(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count == 1, "Unistyles: Invalid babel transform 'ShadowRegistry unlink' expected 1 argument.");
 
-    ShadowNode::Shared shadowNodeWrapper = shadowNodeFromValue(rt, args[0]);
+    auto shadowNodeWrapper = getShadowNodeFromRef(rt, args[0]);
 
     auto& registry = core::UnistylesRegistry::get();
 
@@ -108,7 +108,7 @@ jsi::Value HybridShadowRegistry::unlink(jsi::Runtime &rt, const jsi::Value &this
 }
 
 jsi::Value HybridShadowRegistry::flush(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
-    shadow::ShadowTreeManager::updateShadowTree(UIManagerBinding::getBinding(rt)->getUIManager().getShadowTreeRegistry());
+    shadow::ShadowTreeManager::updateShadowTree(rt);
 
     return jsi::Value::undefined();
 }
@@ -136,4 +136,12 @@ jsi::Value HybridShadowRegistry::getScopedTheme(jsi::Runtime &rt, const jsi::Val
     return maybeScopedTheme.has_value()
         ? jsi::String::createFromUtf8(rt, maybeScopedTheme.value())
         : jsi::Value::undefined();
+}
+
+std::shared_ptr<const core::ShadowNode> HybridShadowRegistry::getShadowNodeFromRef(jsi::Runtime& rt, const jsi::Value& maybeRef) {
+#if REACT_NATIVE_VERSION_MINOR >= 81
+    return Bridging<std::shared_ptr<const ShadowNode>>::fromJs(rt, maybeRef);
+#else
+    return shadowNodeFromValue(rt, maybeRef);
+#endif
 }

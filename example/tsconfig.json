@@ -6,5 +6,6 @@
     "paths": {
       "react-native-unistyles": ["../src"]
     }
-  }
+  },
+  "exclude": ["**/node_modules", "**/Pods"]
 }

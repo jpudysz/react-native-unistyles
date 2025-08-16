@@ -6,6 +6,7 @@
 #include "UnistylesState.h"
 #include "UnistylesRegistry.h"
 #include "ShadowTreeManager.h"
+#include <cxxreact/ReactNativeVersion.h>
 
 namespace margelo::nitro::unistyles {
 
@@ -45,6 +46,8 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
             prototype.registerRawHybridMethod("getScopedTheme", 0, &HybridShadowRegistry::getScopedTheme);
         });
     };
+    
+    std::shared_ptr<const core::ShadowNode> getShadowNodeFromRef(jsi::Runtime& rt, const jsi::Value& maybeRef);
 
 private:
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;

@@ -5,6 +5,10 @@ project(unistyles)
 file(GLOB_RECURSE CORE_SRC RELATIVE ${CMAKE_SOURCE_DIR} "../cxx/**/*.cpp")
 file(GLOB_RECURSE PLATFORM_SRC RELATIVE ${CMAKE_SOURCE_DIR} "./src/main/cxx/*.cpp")
 
+if(ReactAndroid_VERSION_MINOR GREATER_EQUAL 80)
+    target_compile_reactnative_options(unistyles PRIVATE)
+endif()
+
 add_library(unistyles
     SHARED
     ${CORE_SRC}
@@ -35,6 +39,6 @@ set_target_properties(unistyles PROPERTIES
 
 # For React Native 0.76 and above, we don't need to link anything
 # as NitroModules will automatically add ReactAndroid::reactnative prefab
-if (ReactAndroid_VERSION_MINOR LESS 76)
-    message(FATAL_ERROR "Unistyles 3.0 requires min. React Native version to be 0.76")
+if (ReactAndroid_VERSION_MINOR LESS 78)
+    message(FATAL_ERROR "Unistyles 3.0 requires min. React Native version to be 0.78")
 endif ()
