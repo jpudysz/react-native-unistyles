@@ -213,7 +213,15 @@
     },
     "plugins": {
       "@release-it/conventional-changelog": {
-        "preset": "angular"
+        "preset": "angular",
+        "types": [
+          {"type": "feat", "section": "Features"},
+          {"type": "fix", "section": "Bug Fixes"},
+          {"type": "perf", "section": "Performance Improvements"},
+          {"type": "chore", "section": "Maintenance"},
+          {"type": "docs", "section": "Documentation"},
+          {"type": "refactor", "section": "Code Refactoring"}
+        ]
       }
     }
   },
