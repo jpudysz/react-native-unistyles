@@ -213,7 +213,6 @@
     },
     "plugins": {
       "@release-it/conventional-changelog": {
-        "preset": "angular",
         "writerOpts": {
           "groupBy": "type",
           "commitGroupsSort": ["feat", "fix", "perf", "refactor", "docs", "chore"],
