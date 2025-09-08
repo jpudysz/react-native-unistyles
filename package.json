@@ -213,13 +213,19 @@
     },
     "plugins": {
       "@release-it/conventional-changelog": {
+        "preset": "angular",
+        "writerOpts": {
+          "groupBy": "type",
+          "commitGroupsSort": ["feat", "fix", "perf", "refactor", "docs", "chore"],
+          "commitsSort": ["scope", "subject"]
+        },
         "types": [
           {"type": "feat", "section": "Features"},
           {"type": "fix", "section": "Bug Fixes"},
           {"type": "perf", "section": "Performance Improvements"},
-          {"type": "chore", "section": "Maintenance"},
+          {"type": "refactor", "section": "Code Refactoring"},
           {"type": "docs", "section": "Documentation"},
-          {"type": "refactor", "section": "Code Refactoring"}
+          {"type": "chore", "section": "Maintenance"}
         ]
       }
     }
