@@ -1,6 +1,6 @@
 {
   "name": "react-native-unistyles",
-  "version": "3.0.10",
+  "version": "3.0.11",
   "description": "Level up your React Native StyleSheet",
   "scripts": {
     "test": "NODE_ENV=babel-test jest ./plugin",
@@ -215,16 +215,44 @@
       "@release-it/conventional-changelog": {
         "writerOpts": {
           "groupBy": "type",
-          "commitGroupsSort": ["feat", "fix", "perf", "refactor", "docs", "chore"],
-          "commitsSort": ["scope", "subject"]
+          "commitGroupsSort": [
+            "feat",
+            "fix",
+            "perf",
+            "refactor",
+            "docs",
+            "chore"
+          ],
+          "commitsSort": [
+            "scope",
+            "subject"
+          ]
         },
         "types": [
-          {"type": "feat", "section": "Features"},
-          {"type": "fix", "section": "Bug Fixes"},
-          {"type": "perf", "section": "Performance Improvements"},
-          {"type": "refactor", "section": "Code Refactoring"},
-          {"type": "docs", "section": "Documentation"},
-          {"type": "chore", "section": "Maintenance"}
+          {
+            "type": "feat",
+            "section": "Features"
+          },
+          {
+            "type": "fix",
+            "section": "Bug Fixes"
+          },
+          {
+            "type": "perf",
+            "section": "Performance Improvements"
+          },
+          {
+            "type": "refactor",
+            "section": "Code Refactoring"
+          },
+          {
+            "type": "docs",
+            "section": "Documentation"
+          },
+          {
+            "type": "chore",
+            "section": "Maintenance"
+          }
         ]
       }
     }
