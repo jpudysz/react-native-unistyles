@@ -213,7 +213,6 @@
     },
     "plugins": {
       "@release-it/conventional-changelog": {
-        "preset": "angular",
         "types": [
           {"type": "feat", "section": "Features"},
           {"type": "fix", "section": "Bug Fixes"},
