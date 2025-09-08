@@ -21,14 +21,14 @@ yarn add react-native-unistyles
 Install dependencies:
 
 ```shell
-yarn add react-native-edge-to-edge react-native-nitro-modules@0.28.0
+yarn add react-native-edge-to-edge react-native-nitro-modules@0.29.3
 ```
 
 > To avoid unexpected behavior, always use a fixed version of `react-native-nitro-modules`
 
 | react-native-unistyles | react-native-nitro-modules |
 |------------------------|----------------------------|
-| 3.0.0                  | 0.28.0                     |
+| 3.0.0                  | 0.29.3                     |
 
 Then follow [installation guides](https://unistyl.es/v3/start/getting-started) for your platform.
 
