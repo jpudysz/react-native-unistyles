@@ -53,7 +53,7 @@ namespace margelo::nitro::unistyles::bridge::swift {
    * Specialized version of `std::vector<UnistyleDependency>`.
    */
   using std__vector_UnistyleDependency_ = std::vector<UnistyleDependency>;
-  inline std::vector<UnistyleDependency> create_std__vector_UnistyleDependency_(size_t size) {
+  inline std::vector<UnistyleDependency> create_std__vector_UnistyleDependency_(size_t size) noexcept {
     std::vector<UnistyleDependency> vector;
     vector.reserve(size);
     return vector;
@@ -70,14 +70,14 @@ namespace margelo::nitro::unistyles::bridge::swift {
   class Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_Wrapper final {
   public:
     explicit Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_Wrapper(std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>&& func): _function(std::make_unique<std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>>(std::move(func))) {}
-    inline void call(std::vector<UnistyleDependency> dependencies, UnistylesNativeMiniRuntime miniRuntime) const {
+    inline void call(std::vector<UnistyleDependency> dependencies, UnistylesNativeMiniRuntime miniRuntime) const noexcept {
       _function->operator()(dependencies, miniRuntime);
     }
   private:
     std::unique_ptr<std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>> _function;
   } SWIFT_NONCOPYABLE;
-  Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime create_Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime(void* _Nonnull swiftClosureWrapper);
-  inline Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_Wrapper wrap_Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime(Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime value) {
+  Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime create_Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime(void* _Nonnull swiftClosureWrapper) noexcept;
+  inline Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_Wrapper wrap_Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime(Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime value) noexcept {
     return Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_Wrapper(std::move(value));
   }
   
@@ -92,14 +92,14 @@ namespace margelo::nitro::unistyles::bridge::swift {
   class Func_void_UnistylesNativeMiniRuntime_Wrapper final {
   public:
     explicit Func_void_UnistylesNativeMiniRuntime_Wrapper(std::function<void(const UnistylesNativeMiniRuntime& /* miniRuntime */)>&& func): _function(std::make_unique<std::function<void(const UnistylesNativeMiniRuntime& /* miniRuntime */)>>(std::move(func))) {}
-    inline void call(UnistylesNativeMiniRuntime miniRuntime) const {
+    inline void call(UnistylesNativeMiniRuntime miniRuntime) const noexcept {
       _function->operator()(miniRuntime);
     }
   private:
     std::unique_ptr<std::function<void(const UnistylesNativeMiniRuntime& /* miniRuntime */)>> _function;
   } SWIFT_NONCOPYABLE;
-  Func_void_UnistylesNativeMiniRuntime create_Func_void_UnistylesNativeMiniRuntime(void* _Nonnull swiftClosureWrapper);
-  inline Func_void_UnistylesNativeMiniRuntime_Wrapper wrap_Func_void_UnistylesNativeMiniRuntime(Func_void_UnistylesNativeMiniRuntime value) {
+  Func_void_UnistylesNativeMiniRuntime create_Func_void_UnistylesNativeMiniRuntime(void* _Nonnull swiftClosureWrapper) noexcept;
+  inline Func_void_UnistylesNativeMiniRuntime_Wrapper wrap_Func_void_UnistylesNativeMiniRuntime(Func_void_UnistylesNativeMiniRuntime value) noexcept {
     return Func_void_UnistylesNativeMiniRuntime_Wrapper(std::move(value));
   }
   
@@ -108,91 +108,91 @@ namespace margelo::nitro::unistyles::bridge::swift {
    * Specialized version of `std::shared_ptr<HybridNativePlatformSpec>`.
    */
   using std__shared_ptr_HybridNativePlatformSpec_ = std::shared_ptr<HybridNativePlatformSpec>;
-  std::shared_ptr<HybridNativePlatformSpec> create_std__shared_ptr_HybridNativePlatformSpec_(void* _Nonnull swiftUnsafePointer);
-  void* _Nonnull get_std__shared_ptr_HybridNativePlatformSpec_(std__shared_ptr_HybridNativePlatformSpec_ cppType);
+  std::shared_ptr<HybridNativePlatformSpec> create_std__shared_ptr_HybridNativePlatformSpec_(void* _Nonnull swiftUnsafePointer) noexcept;
+  void* _Nonnull get_std__shared_ptr_HybridNativePlatformSpec_(std__shared_ptr_HybridNativePlatformSpec_ cppType) noexcept;
   
   // pragma MARK: std::weak_ptr<HybridNativePlatformSpec>
   using std__weak_ptr_HybridNativePlatformSpec_ = std::weak_ptr<HybridNativePlatformSpec>;
-  inline std__weak_ptr_HybridNativePlatformSpec_ weakify_std__shared_ptr_HybridNativePlatformSpec_(const std::shared_ptr<HybridNativePlatformSpec>& strong) { return strong; }
+  inline std__weak_ptr_HybridNativePlatformSpec_ weakify_std__shared_ptr_HybridNativePlatformSpec_(const std::shared_ptr<HybridNativePlatformSpec>& strong) noexcept { return strong; }
   
   // pragma MARK: Result<Insets>
   using Result_Insets_ = Result<Insets>;
-  inline Result_Insets_ create_Result_Insets_(const Insets& value) {
+  inline Result_Insets_ create_Result_Insets_(const Insets& value) noexcept {
     return Result<Insets>::withValue(value);
   }
-  inline Result_Insets_ create_Result_Insets_(const std::exception_ptr& error) {
+  inline Result_Insets_ create_Result_Insets_(const std::exception_ptr& error) noexcept {
     return Result<Insets>::withError(error);
   }
   
   // pragma MARK: Result<ColorScheme>
   using Result_ColorScheme_ = Result<ColorScheme>;
-  inline Result_ColorScheme_ create_Result_ColorScheme_(ColorScheme value) {
+  inline Result_ColorScheme_ create_Result_ColorScheme_(ColorScheme value) noexcept {
     return Result<ColorScheme>::withValue(std::move(value));
   }
-  inline Result_ColorScheme_ create_Result_ColorScheme_(const std::exception_ptr& error) {
+  inline Result_ColorScheme_ create_Result_ColorScheme_(const std::exception_ptr& error) noexcept {
     return Result<ColorScheme>::withError(error);
   }
   
   // pragma MARK: Result<double>
   using Result_double_ = Result<double>;
-  inline Result_double_ create_Result_double_(double value) {
+  inline Result_double_ create_Result_double_(double value) noexcept {
     return Result<double>::withValue(std::move(value));
   }
-  inline Result_double_ create_Result_double_(const std::exception_ptr& error) {
+  inline Result_double_ create_Result_double_(const std::exception_ptr& error) noexcept {
     return Result<double>::withError(error);
   }
   
   // pragma MARK: Result<Orientation>
   using Result_Orientation_ = Result<Orientation>;
-  inline Result_Orientation_ create_Result_Orientation_(Orientation value) {
+  inline Result_Orientation_ create_Result_Orientation_(Orientation value) noexcept {
     return Result<Orientation>::withValue(std::move(value));
   }
-  inline Result_Orientation_ create_Result_Orientation_(const std::exception_ptr& error) {
+  inline Result_Orientation_ create_Result_Orientation_(const std::exception_ptr& error) noexcept {
     return Result<Orientation>::withError(error);
   }
   
   // pragma MARK: Result<std::string>
   using Result_std__string_ = Result<std::string>;
-  inline Result_std__string_ create_Result_std__string_(const std::string& value) {
+  inline Result_std__string_ create_Result_std__string_(const std::string& value) noexcept {
     return Result<std::string>::withValue(value);
   }
-  inline Result_std__string_ create_Result_std__string_(const std::exception_ptr& error) {
+  inline Result_std__string_ create_Result_std__string_(const std::exception_ptr& error) noexcept {
     return Result<std::string>::withError(error);
   }
   
   // pragma MARK: Result<Dimensions>
   using Result_Dimensions_ = Result<Dimensions>;
-  inline Result_Dimensions_ create_Result_Dimensions_(const Dimensions& value) {
+  inline Result_Dimensions_ create_Result_Dimensions_(const Dimensions& value) noexcept {
     return Result<Dimensions>::withValue(value);
   }
-  inline Result_Dimensions_ create_Result_Dimensions_(const std::exception_ptr& error) {
+  inline Result_Dimensions_ create_Result_Dimensions_(const std::exception_ptr& error) noexcept {
     return Result<Dimensions>::withError(error);
   }
   
   // pragma MARK: Result<bool>
   using Result_bool_ = Result<bool>;
-  inline Result_bool_ create_Result_bool_(bool value) {
+  inline Result_bool_ create_Result_bool_(bool value) noexcept {
     return Result<bool>::withValue(std::move(value));
   }
-  inline Result_bool_ create_Result_bool_(const std::exception_ptr& error) {
+  inline Result_bool_ create_Result_bool_(const std::exception_ptr& error) noexcept {
     return Result<bool>::withError(error);
   }
   
   // pragma MARK: Result<void>
   using Result_void_ = Result<void>;
-  inline Result_void_ create_Result_void_() {
+  inline Result_void_ create_Result_void_() noexcept {
     return Result<void>::withValue();
   }
-  inline Result_void_ create_Result_void_(const std::exception_ptr& error) {
+  inline Result_void_ create_Result_void_(const std::exception_ptr& error) noexcept {
     return Result<void>::withError(error);
   }
   
   // pragma MARK: Result<UnistylesNativeMiniRuntime>
   using Result_UnistylesNativeMiniRuntime_ = Result<UnistylesNativeMiniRuntime>;
-  inline Result_UnistylesNativeMiniRuntime_ create_Result_UnistylesNativeMiniRuntime_(const UnistylesNativeMiniRuntime& value) {
+  inline Result_UnistylesNativeMiniRuntime_ create_Result_UnistylesNativeMiniRuntime_(const UnistylesNativeMiniRuntime& value) noexcept {
     return Result<UnistylesNativeMiniRuntime>::withValue(value);
   }
-  inline Result_UnistylesNativeMiniRuntime_ create_Result_UnistylesNativeMiniRuntime_(const std::exception_ptr& error) {
+  inline Result_UnistylesNativeMiniRuntime_ create_Result_UnistylesNativeMiniRuntime_(const std::exception_ptr& error) noexcept {
     return Result<UnistylesNativeMiniRuntime>::withError(error);
   }
 
