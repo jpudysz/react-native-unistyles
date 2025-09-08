@@ -1,7 +1,7 @@
+import { StyleSheet as RNStyleSheet } from 'react-native'
 import type { UnistylesShadowRegistry as NativeUnistylesShadowRegistry } from '../specs/ShadowRegistry'
 import type { StyleSheet as NativeStyleSheet } from '../specs/StyleSheet'
 import type { Runtime as NativeUnistylesRuntime } from '../specs/UnistylesRuntime'
-import { deepMergeObjects } from '../utils'
 import { create } from './create'
 import * as unistyles from './services'
 
@@ -22,8 +22,8 @@ export const StyleSheet = {
         right: 0,
         bottom: 0
     },
-    compose: (a: object, b: object) => deepMergeObjects(a, b),
-    flatten: (...styles: Array<object>) => deepMergeObjects(...styles),
+    compose: (a: object, b: object) => RNStyleSheet.compose(a, b),
+    flatten: (...styles: Array<object>) => RNStyleSheet.flatten(...styles),
     hairlineWidth: 1
 } as unknown as typeof NativeStyleSheet
 
