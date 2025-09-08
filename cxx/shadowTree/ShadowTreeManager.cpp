@@ -27,7 +27,7 @@ void shadow::ShadowTreeManager::updateShadowTree(jsi::Runtime& rt) {
                 std::make_unique<folly::dynamic>(props);
         }
 
-        UIManagerBinding::getBinding(rt)->getUIManager().updateShadowTree(tagToProps);
+        UIManagerBinding::getBinding(rt)->getUIManager().updateShadowTree(std::move(tagToProps));
 #else
         const auto& shadowTreeRegistry = UIManagerBinding::getBinding(rt)->getUIManager().getShadowTreeRegistry();
 
