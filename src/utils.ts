@@ -28,7 +28,7 @@ export const deepMergeObjects = <T extends Record<PropertyKey, any>>(...sources:
 export const copyComponentProperties = (Component: any, UnistylesComponent: any) => {
     Object.entries(Component).forEach(([key, value]) => {
         // Filter out the keys we don't want to copy
-        if (['$$typeof', 'render'].includes(key)) {
+        if (['$$typeof', 'render', 'contextType'].includes(key)) {
             return
         }
 
