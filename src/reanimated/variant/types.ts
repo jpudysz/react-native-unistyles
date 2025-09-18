@@ -1,10 +1,14 @@
-export type ColorKeys<T> = {
-    [K in keyof T]: K extends string
-        ? K extends `${string}color${string}` | `${string}Color${string}`
+type KeysOfUnion<T> = T extends T ? keyof T : never
+
+export type ColorKeys<T> = KeysOfUnion<T> extends infer K
+    ? K extends string
+        ? K extends `${string}Color${string}`
             ? K
-            : never
+            : K extends `${string}color${string}`
+                ? K
+                : never
         : never
-}[keyof T]
+    : never
 
 export type UseUpdateVariantColorConfig<T extends Record<string, any>> = {
     animateCallback?: (from: string, to: string) => void,

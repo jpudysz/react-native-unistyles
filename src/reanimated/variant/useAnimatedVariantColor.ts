@@ -7,7 +7,7 @@ export const useAnimatedVariantColor = <T extends Record<string, any>>(style: T,
     // @ts-ignore this is hidden from TS
     const hasVariants = style[secretKey]?.__stylesheetVariants
 
-    if (!hasVariants || !colorKey.toLowerCase().includes('color')) {
+    if (!hasVariants || !(colorKey as string).toLowerCase().includes('color')) {
         throw new Error('useAnimatedVariantColor: Style was not created by Unistyles, does not have variants or has no color property')
     }
 
