@@ -63,11 +63,19 @@ type FlattenCompoundVariants<T, ShouldFlatten> = T extends Array<infer _>
         ? ParseNestedObject<S, ShouldFlatten>
         : never
 
+type IsEmptyVariant<T> = T extends object
+    ? keyof T extends never
+        ? true
+        : never
+    : never
+
 type ParseVariants<T> = T extends object
     ? T[keyof T] extends object
         ? UnionToIntersection<ParseVariants<T[keyof T]>> extends never
-            ? ParseVariants<T[keyof T]>
-            : UnionToIntersection<ParseVariants<T[keyof T]>>
+            ? NonNullable<ParseVariants<T[keyof T]>>
+            : IsEmptyVariant<T[keyof T]> extends never
+                ? ParseVariants<T[keyof T]>
+                : UnionToIntersection<ParseVariants<T[keyof T]>>
         : T
     : T
 
