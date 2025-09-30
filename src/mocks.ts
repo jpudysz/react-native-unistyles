@@ -220,6 +220,8 @@ jest.mock('react-native-unistyles', () => {
 jest.mock('react-native-unistyles/reanimated', () => {
     const unistyles = require('react-native-unistyles')
     const mockedSharedValue = (value: any) => ({
+        get: () => value,
+        set: (value: any) => {},
         value
     })
 
