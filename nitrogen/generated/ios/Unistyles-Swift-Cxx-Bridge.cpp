@@ -14,7 +14,7 @@
 namespace margelo::nitro::unistyles::bridge::swift {
 
   // pragma MARK: std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>
-  Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime create_Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime(void* _Nonnull swiftClosureWrapper) noexcept {
+  Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime create_Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime(void* NON_NULL swiftClosureWrapper) noexcept {
     auto swiftClosure = Unistyles::Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime::fromUnsafe(swiftClosureWrapper);
     return [swiftClosure = std::move(swiftClosure)](const std::vector<UnistyleDependency>& dependencies, const UnistylesNativeMiniRuntime& miniRuntime) mutable -> void {
       swiftClosure.call(dependencies, miniRuntime);
@@ -22,7 +22,7 @@ namespace margelo::nitro::unistyles::bridge::swift {
   }
   
   // pragma MARK: std::function<void(const UnistylesNativeMiniRuntime& /* miniRuntime */)>
-  Func_void_UnistylesNativeMiniRuntime create_Func_void_UnistylesNativeMiniRuntime(void* _Nonnull swiftClosureWrapper) noexcept {
+  Func_void_UnistylesNativeMiniRuntime create_Func_void_UnistylesNativeMiniRuntime(void* NON_NULL swiftClosureWrapper) noexcept {
     auto swiftClosure = Unistyles::Func_void_UnistylesNativeMiniRuntime::fromUnsafe(swiftClosureWrapper);
     return [swiftClosure = std::move(swiftClosure)](const UnistylesNativeMiniRuntime& miniRuntime) mutable -> void {
       swiftClosure.call(miniRuntime);
@@ -30,11 +30,11 @@ namespace margelo::nitro::unistyles::bridge::swift {
   }
   
   // pragma MARK: std::shared_ptr<HybridNativePlatformSpec>
-  std::shared_ptr<HybridNativePlatformSpec> create_std__shared_ptr_HybridNativePlatformSpec_(void* _Nonnull swiftUnsafePointer) noexcept {
+  std::shared_ptr<HybridNativePlatformSpec> create_std__shared_ptr_HybridNativePlatformSpec_(void* NON_NULL swiftUnsafePointer) noexcept {
     Unistyles::HybridNativePlatformSpec_cxx swiftPart = Unistyles::HybridNativePlatformSpec_cxx::fromUnsafe(swiftUnsafePointer);
     return std::make_shared<margelo::nitro::unistyles::HybridNativePlatformSpecSwift>(swiftPart);
   }
-  void* _Nonnull get_std__shared_ptr_HybridNativePlatformSpec_(std__shared_ptr_HybridNativePlatformSpec_ cppType) noexcept {
+  void* NON_NULL get_std__shared_ptr_HybridNativePlatformSpec_(std__shared_ptr_HybridNativePlatformSpec_ cppType) noexcept {
     std::shared_ptr<margelo::nitro::unistyles::HybridNativePlatformSpecSwift> swiftWrapper = std::dynamic_pointer_cast<margelo::nitro::unistyles::HybridNativePlatformSpecSwift>(cppType);
     #ifdef NITRO_DEBUG
     if (swiftWrapper == nullptr) [[unlikely]] {
