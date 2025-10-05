@@ -230,6 +230,18 @@ export function isKindOfStyleSheet(path: NodePath<t.CallExpression>, state: Unis
         return false
     }
 
+    if (path.node.arguments.length !== 1) {
+        return false
+    }
+
+    if (!t.isObjectExpression(path.node.arguments[0])) {
+        return false
+    }
+
+    if (!path.node.arguments[0].properties.some(property => t.isObjectProperty(property) && t.isObjectExpression(property.value))) {
+        return false
+    }
+
     const { callee } = path.node
 
     return (
