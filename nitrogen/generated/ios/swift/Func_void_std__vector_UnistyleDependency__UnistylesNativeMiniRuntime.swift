@@ -23,7 +23,11 @@ public final class Func_void_std__vector_UnistyleDependency__UnistylesNativeMini
 
   @inline(__always)
   public func call(dependencies: bridge.std__vector_UnistyleDependency_, miniRuntime: UnistylesNativeMiniRuntime) -> Void {
-    self.closure(dependencies.map({ __item in __item }), miniRuntime)
+    self.closure({ () -> [UnistyleDependency] in
+      let __data = bridge.get_data_std__vector_UnistyleDependency_(dependencies)
+      let __size = dependencies.size()
+      return Array(UnsafeBufferPointer(start: __data, count: __size))
+    }(), miniRuntime)
   }
 
   /**
