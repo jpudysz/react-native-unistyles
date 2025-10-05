@@ -352,6 +352,15 @@ function isKindOfStyleSheet(path2, state) {
   if (!state.file.forceProcessing && !state.file.hasUnistylesImport) {
     return false;
   }
+  if (path2.node.arguments.length !== 1) {
+    return false;
+  }
+  if (!t4.isObjectExpression(path2.node.arguments[0])) {
+    return false;
+  }
+  if (!path2.node.arguments[0].properties.some((property) => t4.isObjectProperty(property) && t4.isObjectExpression(property.value))) {
+    return false;
+  }
   const { callee } = path2.node;
   return t4.isMemberExpression(callee) && t4.isIdentifier(callee.property) && callee.property.name === "create" && t4.isIdentifier(callee.object);
 }
