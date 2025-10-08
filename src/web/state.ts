@@ -43,10 +43,7 @@ export class UnistylesState {
         this.isInitialized = true
         this.initThemes(config.themes, config.settings?.CSSVars)
         this.initBreakpoints(config.breakpoints)
-
-        if (config.settings) {
-            this.initSettings(config.settings as UnistylesSettings)
-        }
+        this.initSettings(config.settings as UnistylesSettings | undefined)
 
         if (isServer()) {
             return
@@ -83,15 +80,15 @@ export class UnistylesState {
         })
     }
 
-    private initSettings = (settings: UnistylesSettings) => {
+    private initSettings = (settings?: UnistylesSettings) => {
         this.hasAdaptiveThemes = settings?.adaptiveThemes ?? false
 
-        if (settings.initialTheme && settings.adaptiveThemes) {
+        if (settings?.initialTheme && settings.adaptiveThemes) {
             throw error('You\'re trying to set initial theme and enable adaptiveThemes, but these options are mutually exclusive.')
         }
 
         // Adaptive themes
-        if (settings.adaptiveThemes) {
+        if (settings?.adaptiveThemes) {
             if (!this.themes.get('light') || !this.themes.get('dark')) {
                 throw error(`You're trying to enable adaptiveThemes, but you didn't register both 'light' and 'dark' themes.`)
             }
@@ -101,7 +98,7 @@ export class UnistylesState {
             return
         }
 
-        if (settings.initialTheme) {
+        if (settings?.initialTheme) {
             const initialTheme = typeof settings.initialTheme === 'function'
                 ? settings.initialTheme()
                 : settings.initialTheme
