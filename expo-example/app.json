@@ -35,7 +35,8 @@
             "deploymentTarget": "15.3"
           }
         }
-      ]
+      ],
+      "expo-router"
     ],
     "web": {
       "favicon": "./assets/images/favicon.png",

@@ -7,6 +7,7 @@ module.exports = function (api) {
     return {
         presets: ['babel-preset-expo'],
         plugins: [
+            "react-native-worklets/plugin",
             [path.join(__dirname, '../plugin'), {
                 debug: true,
                 isLocal: true,
