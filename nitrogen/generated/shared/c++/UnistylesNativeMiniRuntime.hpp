@@ -17,6 +17,11 @@
 #else
 #error NitroModules cannot be found! Are you sure you installed NitroModules properly?
 #endif
+#if __has_include(<NitroModules/JSIHelpers.hpp>)
+#include <NitroModules/JSIHelpers.hpp>
+#else
+#error NitroModules cannot be found! Are you sure you installed NitroModules properly?
+#endif
 
 // Forward declaration of `ColorScheme` to properly resolve imports.
 namespace margelo::nitro::unistyles { enum class ColorScheme; }
@@ -97,6 +102,9 @@ namespace margelo::nitro {
         return false;
       }
       jsi::Object obj = value.getObject(runtime);
+      if (!nitro::isPlainObject(runtime, obj)) {
+        return false;
+      }
       if (!JSIConverter<margelo::nitro::unistyles::ColorScheme>::canConvert(runtime, obj.getProperty(runtime, "colorScheme"))) return false;
       if (!JSIConverter<margelo::nitro::unistyles::Dimensions>::canConvert(runtime, obj.getProperty(runtime, "screen"))) return false;
       if (!JSIConverter<std::string>::canConvert(runtime, obj.getProperty(runtime, "contentSizeCategory"))) return false;
