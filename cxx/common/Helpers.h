@@ -5,6 +5,7 @@
 #include <folly/dynamic.h>
 #include "NativePlatform.h"
 #include <unordered_set>
+#include "UnistylesConstants.h"
 
 using namespace facebook;
 
@@ -179,7 +180,7 @@ inline std::vector<folly::dynamic> parseDynamicFunctionArguments(jsi::Runtime& r
         }
 
         if (arg.isUndefined()) {
-            parsedArgument.push_back(folly::dynamic());
+            parsedArgument.push_back(folly::dynamic(UNDEFINED_MARKER));
 
             continue;
         }
@@ -205,6 +206,14 @@ inline std::vector<folly::dynamic> parseDynamicFunctionArguments(jsi::Runtime& r
     }
 
     return parsedArgument;
+}
+
+inline jsi::Value dynamicToJSIValue(jsi::Runtime& rt, const folly::dynamic& arg) {
+    if (arg.isString() && arg.asString() == UNDEFINED_MARKER) {
+        return jsi::Value::undefined();
+    }
+
+    return jsi::valueFromDynamic(rt, arg);
 }
 
 inline jsi::Array functionArgumentsToArray(jsi::Runtime& rt, const jsi::Value* args, size_t count) {
@@ -317,7 +326,7 @@ inline void debugPrintJSIObject(jsi::Runtime& rt, std::string& name, jsi::Object
 inline void debugPrintFollyDynamic(jsi::Runtime& rt, const std::string& name, const folly::dynamic& obj) {
     auto console = rt.global().getPropertyAsObject(rt, "console");
     auto log = console.getPropertyAsFunction(rt, "log");
-    
+
     std::function<void(const std::string&, const folly::dynamic&)> parser = [&](const std::string& key, const folly::dynamic& value) {
         if (value.isBool()) {
             std::string output = key + ": " + (value.getBool() ? "true" : "false");
