@@ -98,7 +98,7 @@ void parser::Parser::rebuildUnistyleWithScopedTheme(jsi::Runtime& rt, jsi::Value
     for (int i = 0; i < arguments.size(); i++) {
         folly::dynamic& arg = arguments.at(i);
 
-        args.emplace_back(jsi::valueFromDynamic(rt, arg));
+        args.emplace_back(helpers::dynamicToJSIValue(rt, arg));
     }
 
     const jsi::Value *argStart = args.data();
@@ -193,7 +193,7 @@ void parser::Parser::rebuildUnistyleWithVariants(jsi::Runtime& rt, std::shared_p
     for (int i = 0; i < arguments.size(); i++) {
         folly::dynamic& arg = arguments.at(i);
 
-        args.emplace_back(jsi::valueFromDynamic(rt, arg));
+        args.emplace_back(helpers::dynamicToJSIValue(rt, arg));
     }
 
     const jsi::Value *argStart = args.data();
@@ -350,7 +350,7 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle
         for (int i = 0; i < dynamicFunctionMetadata.size(); i++) {
             folly::dynamic& arg = dynamicFunctionMetadata.at(i);
 
-            args.emplace_back(jsi::valueFromDynamic(rt, arg));
+            args.emplace_back(helpers::dynamicToJSIValue(rt, arg));
         }
 
         const jsi::Value *argStart = args.data();
