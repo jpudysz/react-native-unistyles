@@ -111,7 +111,7 @@ namespace margelo::nitro::unistyles::bridge::swift {
    */
   using std__shared_ptr_HybridNativePlatformSpec_ = std::shared_ptr<HybridNativePlatformSpec>;
   std::shared_ptr<HybridNativePlatformSpec> create_std__shared_ptr_HybridNativePlatformSpec_(void* NON_NULL swiftUnsafePointer) noexcept;
-  void* NON_NULL get_std__shared_ptr_HybridNativePlatformSpec_(std__shared_ptr_HybridNativePlatformSpec_ cppType) noexcept;
+  void* NON_NULL get_std__shared_ptr_HybridNativePlatformSpec_(std__shared_ptr_HybridNativePlatformSpec_ cppType);
   
   // pragma MARK: std::weak_ptr<HybridNativePlatformSpec>
   using std__weak_ptr_HybridNativePlatformSpec_ = std::weak_ptr<HybridNativePlatformSpec>;
