@@ -107,6 +107,7 @@ jest.mock('react-native-unistyles', () => {
         },
         setAdaptiveThemes: () => {},
         setImmersiveMode: () => {},
+        setImmersiveModeNative: () => {},
         insets: {
             top: 0,
             left: 0,

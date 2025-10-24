@@ -16,7 +16,7 @@ namespace margelo::nitro::unistyles {
     registerHybrids(this, [](Prototype& prototype) {
       prototype.registerHybridGetter("width", &HybridUnistylesStatusBarSpec::getWidth);
       prototype.registerHybridGetter("height", &HybridUnistylesStatusBarSpec::getHeight);
-      prototype.registerHybridMethod("setHidden", &HybridUnistylesStatusBarSpec::setHidden);
+      prototype.registerHybridMethod("setHiddenNative", &HybridUnistylesStatusBarSpec::setHiddenNative);
     });
   }
 

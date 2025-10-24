@@ -182,7 +182,7 @@ jsi::Value HybridUnistylesRuntime::updateTheme(jsi::Runtime &rt, const jsi::Valu
     return jsi::Value::undefined();
 }
 
-void HybridUnistylesRuntime::setImmersiveMode(bool isEnabled) {
+void HybridUnistylesRuntime::setImmersiveModeNative(bool isEnabled) {
     this->_nativePlatform->setImmersiveMode(isEnabled);
 };
 

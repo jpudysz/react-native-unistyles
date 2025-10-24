@@ -1,6 +1,6 @@
 import { processColor } from 'react-native'
 import { NitroModules } from 'react-native-nitro-modules'
-import { isIOS } from '../../common'
+import { isAndroid, isIOS } from '../../common'
 import type { UnistylesThemes } from '../../global'
 import type { AndroidContentSizeCategory, IOSContentSizeCategory, UnistylesTheme } from '../../types'
 import type { UnistylesNavigationBar } from '../NavigtionBar'
@@ -24,6 +24,7 @@ export interface UnistylesRuntimePrivate extends Omit<UnistylesRuntimeSpec, 'set
     updateTheme(themeName: AppThemeName, updater: (currentTheme: AppTheme) => AppTheme): void,
     setRootViewBackgroundColor(color?: string): void,
     nativeSetRootViewBackgroundColor(color?: Color): void
+    setImmersiveMode(isEnabled: boolean): void
 
     // constructors
     createHybridStatusBar(): UnistylesStatusBar,
@@ -36,6 +37,7 @@ type PrivateMethods =
     | 'dispose'
     | 'miniRuntime'
     | 'nativeSetRootViewBackgroundColor'
+    | 'setImmersiveModeNative'
 
 type UnistylesRuntime = Omit<UnistylesRuntimePrivate, PrivateMethods>
 
@@ -53,6 +55,10 @@ HybridUnistylesRuntime.setRootViewBackgroundColor = (color?: string) => {
 
 if (isIOS) {
     HybridUnistylesRuntime.setImmersiveMode = (isEnabled: boolean) => HybridUnistylesRuntime.statusBar.setHidden(isEnabled, 'fade')
+}
+
+if (isAndroid) {
+    HybridUnistylesRuntime.setImmersiveMode = HybridUnistylesRuntime.setImmersiveModeNative
 }
 
 attachStatusBarJSMethods(HybridUnistylesRuntime.statusBar)
