@@ -291,9 +291,13 @@ open class HybridNativePlatformSpec_cxx {
       try self.__implementation.registerPlatformListener(callback: { () -> ([UnistyleDependency], UnistylesNativeMiniRuntime) -> Void in
         let __wrappedFunction = bridge.wrap_Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime(callback)
         return { (__dependencies: [UnistyleDependency], __miniRuntime: UnistylesNativeMiniRuntime) -> Void in
-          __wrappedFunction.call(__dependencies.withUnsafeBufferPointer { __pointer -> bridge.std__vector_UnistyleDependency_ in
-            return bridge.copy_std__vector_UnistyleDependency_(__pointer.baseAddress!, __dependencies.count)
-          }, __miniRuntime)
+          __wrappedFunction.call({ () -> bridge.std__vector_UnistyleDependency_ in
+            var __vector = bridge.create_std__vector_UnistyleDependency_(__dependencies.count)
+            for __item in __dependencies {
+              __vector.push_back(__item)
+            }
+            return __vector
+          }(), __miniRuntime)
         }
       }())
       return bridge.create_Result_void_()

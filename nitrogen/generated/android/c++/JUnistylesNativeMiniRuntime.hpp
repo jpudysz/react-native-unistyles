@@ -80,7 +80,11 @@ namespace margelo::nitro::unistyles {
      */
     [[maybe_unused]]
     static jni::local_ref<JUnistylesNativeMiniRuntime::javaobject> fromCpp(const UnistylesNativeMiniRuntime& value) {
-      return newInstance(
+      using JSignature = JUnistylesNativeMiniRuntime(jni::alias_ref<JColorScheme>, jni::alias_ref<JDimensions>, jni::alias_ref<jni::JString>, jni::alias_ref<JInsets>, double, double, jboolean, jni::alias_ref<JDimensions>, jni::alias_ref<JDimensions>, jboolean, jboolean);
+      static const auto clazz = javaClassStatic();
+      static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
+      return create(
+        clazz,
         JColorScheme::fromCpp(value.colorScheme),
         JDimensions::fromCpp(value.screen),
         jni::make_jstring(value.contentSizeCategory),
