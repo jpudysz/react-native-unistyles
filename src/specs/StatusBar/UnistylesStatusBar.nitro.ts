@@ -5,5 +5,5 @@ export interface UnistylesStatusBar extends HybridObject<{ ios: 'c++', android: 
     readonly width: number,
     readonly height: number,
 
-    setHidden(isHidden: boolean): void,
+    setHiddenNative(isHidden: boolean): void,
 }

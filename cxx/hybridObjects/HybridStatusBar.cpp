@@ -8,6 +8,6 @@ double HybridStatusBar::getHeight() {
     return this->_nativePlatform->getStatusBarDimensions().height;
 }
 
-void HybridStatusBar::setHidden(bool isHidden) {
+void HybridStatusBar::setHiddenNative(bool isHidden) {
     this->_nativePlatform->setStatusBarHidden(isHidden);
 }

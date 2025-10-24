@@ -49,7 +49,7 @@ namespace margelo::nitro::unistyles {
 
     public:
       // Methods
-      virtual void setHidden(bool isHidden) = 0;
+      virtual void setHiddenNative(bool isHidden) = 0;
 
     protected:
       // Hybrid Setup
