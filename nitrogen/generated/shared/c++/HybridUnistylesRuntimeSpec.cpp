@@ -31,7 +31,7 @@ namespace margelo::nitro::unistyles {
       prototype.registerHybridGetter("miniRuntime", &HybridUnistylesRuntimeSpec::getMiniRuntime);
       prototype.registerHybridMethod("setTheme", &HybridUnistylesRuntimeSpec::setTheme);
       prototype.registerHybridMethod("setAdaptiveThemes", &HybridUnistylesRuntimeSpec::setAdaptiveThemes);
-      prototype.registerHybridMethod("setImmersiveMode", &HybridUnistylesRuntimeSpec::setImmersiveMode);
+      prototype.registerHybridMethod("setImmersiveModeNative", &HybridUnistylesRuntimeSpec::setImmersiveModeNative);
       prototype.registerHybridMethod("nativeSetRootViewBackgroundColor", &HybridUnistylesRuntimeSpec::nativeSetRootViewBackgroundColor);
     });
   }

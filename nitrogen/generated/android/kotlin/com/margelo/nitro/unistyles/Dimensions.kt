@@ -9,7 +9,6 @@ package com.margelo.nitro.unistyles
 
 import androidx.annotation.Keep
 import com.facebook.proguard.annotations.DoNotStrip
-import com.margelo.nitro.core.*
 
 
 /**
@@ -17,16 +16,24 @@ import com.margelo.nitro.core.*
  */
 @DoNotStrip
 @Keep
-data class Dimensions
+data class Dimensions(
   @DoNotStrip
   @Keep
-  constructor(
+  val width: Double,
+  @DoNotStrip
+  @Keep
+  val height: Double
+) {
+  private companion object {
+    /**
+     * Constructor called from C++
+     */
     @DoNotStrip
     @Keep
-    val width: Double,
-    @DoNotStrip
-    @Keep
-    val height: Double
-  ) {
-  /* main constructor */
+    @Suppress("unused")
+    @JvmStatic
+    private fun fromCpp(width: Double, height: Double): Dimensions {
+      return Dimensions(width, height)
+    }
+  }
 }

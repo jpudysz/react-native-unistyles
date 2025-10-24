@@ -6,8 +6,7 @@ export type StatusBarHiddenAnimation = 'none' | 'fade' | 'slide'
 
 interface PrivateUnistylesStatusBar extends Omit<UnistylesStatusBarSpec, 'setBackgroundColor' | 'setHidden'> {
     setStyle(style: StatusBarStyle, animated?: boolean): void,
-    setHidden(isHidden: boolean, animation?: StatusBarHiddenAnimation): void,
-    _setHidden(isHidden: boolean, animation?: StatusBarHiddenAnimation): void,
+    setHidden(isHidden: boolean, animation?: StatusBarHiddenAnimation): void
 }
 
 export const attachStatusBarJSMethods = (hybridObject: UnistylesStatusBar) => {
@@ -24,15 +23,14 @@ export const attachStatusBarJSMethods = (hybridObject: UnistylesStatusBar) => {
 
     const privateHybrid = hybridObject as PrivateUnistylesStatusBar
 
-    privateHybrid._setHidden = hybridObject.setHidden
     hybridObject.setHidden = (isHidden: boolean, animation?: StatusBarHiddenAnimation) => {
         NativeStatusBar.setHidden(isHidden, animation)
-        privateHybrid._setHidden(isHidden)
+        privateHybrid.setHiddenNative(isHidden)
     }
 }
 
 type PrivateMethods =
-    | '_setHidden'
     | 'dispose'
+    | 'setHiddenNative'
 
 export type UnistylesStatusBar = Omit<PrivateUnistylesStatusBar, PrivateMethods>

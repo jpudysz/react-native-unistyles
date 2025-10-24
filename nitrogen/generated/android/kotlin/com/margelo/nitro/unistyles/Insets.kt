@@ -9,7 +9,6 @@ package com.margelo.nitro.unistyles
 
 import androidx.annotation.Keep
 import com.facebook.proguard.annotations.DoNotStrip
-import com.margelo.nitro.core.*
 
 
 /**
@@ -17,25 +16,33 @@ import com.margelo.nitro.core.*
  */
 @DoNotStrip
 @Keep
-data class Insets
+data class Insets(
   @DoNotStrip
   @Keep
-  constructor(
+  val top: Double,
+  @DoNotStrip
+  @Keep
+  val bottom: Double,
+  @DoNotStrip
+  @Keep
+  val left: Double,
+  @DoNotStrip
+  @Keep
+  val right: Double,
+  @DoNotStrip
+  @Keep
+  val ime: Double
+) {
+  private companion object {
+    /**
+     * Constructor called from C++
+     */
     @DoNotStrip
     @Keep
-    val top: Double,
-    @DoNotStrip
-    @Keep
-    val bottom: Double,
-    @DoNotStrip
-    @Keep
-    val left: Double,
-    @DoNotStrip
-    @Keep
-    val right: Double,
-    @DoNotStrip
-    @Keep
-    val ime: Double
-  ) {
-  /* main constructor */
+    @Suppress("unused")
+    @JvmStatic
+    private fun fromCpp(top: Double, bottom: Double, left: Double, right: Double, ime: Double): Insets {
+      return Insets(top, bottom, left, right, ime)
+    }
+  }
 }

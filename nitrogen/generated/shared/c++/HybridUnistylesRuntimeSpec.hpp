@@ -80,7 +80,7 @@ namespace margelo::nitro::unistyles {
       // Methods
       virtual void setTheme(const std::string& themeName) = 0;
       virtual void setAdaptiveThemes(bool isEnabled) = 0;
-      virtual void setImmersiveMode(bool isEnabled) = 0;
+      virtual void setImmersiveModeNative(bool isEnabled) = 0;
       virtual void nativeSetRootViewBackgroundColor(double color) = 0;
 
     protected:

@@ -35,7 +35,6 @@ namespace Unistyles { class HybridNativePlatformSpec_cxx; }
 #include "Orientation.hpp"
 #include "UnistyleDependency.hpp"
 #include "UnistylesNativeMiniRuntime.hpp"
-#include <NitroModules/FastVectorCopy.hpp>
 #include <NitroModules/Result.hpp>
 #include <exception>
 #include <functional>
@@ -54,11 +53,10 @@ namespace margelo::nitro::unistyles::bridge::swift {
    * Specialized version of `std::vector<UnistyleDependency>`.
    */
   using std__vector_UnistyleDependency_ = std::vector<UnistyleDependency>;
-  inline std::vector<UnistyleDependency> copy_std__vector_UnistyleDependency_(const UnistyleDependency* CONTIGUOUS_MEMORY NON_NULL data, size_t size) noexcept {
-    return margelo::nitro::FastVectorCopy<UnistyleDependency>(data, size);
-  }
-  inline const UnistyleDependency* CONTIGUOUS_MEMORY NON_NULL get_data_std__vector_UnistyleDependency_(const std::vector<UnistyleDependency>& vector) noexcept {
-    return vector.data();
+  inline std::vector<UnistyleDependency> create_std__vector_UnistyleDependency_(size_t size) noexcept {
+    std::vector<UnistyleDependency> vector;
+    vector.reserve(size);
+    return vector;
   }
   
   // pragma MARK: std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>

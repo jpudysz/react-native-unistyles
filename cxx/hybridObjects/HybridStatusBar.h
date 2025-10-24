@@ -11,7 +11,7 @@ struct HybridStatusBar: public HybridUnistylesStatusBarSpec {
 
     double getWidth() override;
     double getHeight() override;
-    void setHidden(bool isHidden) override;
+    void setHiddenNative(bool isHidden) override;
 
 private:
     std::shared_ptr<HybridNativePlatformSpec> _nativePlatform;
