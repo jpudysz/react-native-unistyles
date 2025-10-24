@@ -64,7 +64,7 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
 
     void setTheme(const std::string &themeName) override;
     void setAdaptiveThemes(bool isEnabled) override;
-    void setImmersiveMode(bool isEnabled) override;
+    void setImmersiveModeNative(bool isEnabled) override;
     void nativeSetRootViewBackgroundColor(double color) override;
     UnistylesCxxMiniRuntime getMiniRuntime() override;
     std::unordered_map<std::string, double> getBreakpoints() override;

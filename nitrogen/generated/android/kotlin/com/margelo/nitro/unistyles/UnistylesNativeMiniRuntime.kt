@@ -9,7 +9,6 @@ package com.margelo.nitro.unistyles
 
 import androidx.annotation.Keep
 import com.facebook.proguard.annotations.DoNotStrip
-import com.margelo.nitro.core.*
 
 
 /**
@@ -17,43 +16,51 @@ import com.margelo.nitro.core.*
  */
 @DoNotStrip
 @Keep
-data class UnistylesNativeMiniRuntime
+data class UnistylesNativeMiniRuntime(
   @DoNotStrip
   @Keep
-  constructor(
+  val colorScheme: ColorScheme,
+  @DoNotStrip
+  @Keep
+  val screen: Dimensions,
+  @DoNotStrip
+  @Keep
+  val contentSizeCategory: String,
+  @DoNotStrip
+  @Keep
+  val insets: Insets,
+  @DoNotStrip
+  @Keep
+  val pixelRatio: Double,
+  @DoNotStrip
+  @Keep
+  val fontScale: Double,
+  @DoNotStrip
+  @Keep
+  val rtl: Boolean,
+  @DoNotStrip
+  @Keep
+  val statusBar: Dimensions,
+  @DoNotStrip
+  @Keep
+  val navigationBar: Dimensions,
+  @DoNotStrip
+  @Keep
+  val isPortrait: Boolean,
+  @DoNotStrip
+  @Keep
+  val isLandscape: Boolean
+) {
+  private companion object {
+    /**
+     * Constructor called from C++
+     */
     @DoNotStrip
     @Keep
-    val colorScheme: ColorScheme,
-    @DoNotStrip
-    @Keep
-    val screen: Dimensions,
-    @DoNotStrip
-    @Keep
-    val contentSizeCategory: String,
-    @DoNotStrip
-    @Keep
-    val insets: Insets,
-    @DoNotStrip
-    @Keep
-    val pixelRatio: Double,
-    @DoNotStrip
-    @Keep
-    val fontScale: Double,
-    @DoNotStrip
-    @Keep
-    val rtl: Boolean,
-    @DoNotStrip
-    @Keep
-    val statusBar: Dimensions,
-    @DoNotStrip
-    @Keep
-    val navigationBar: Dimensions,
-    @DoNotStrip
-    @Keep
-    val isPortrait: Boolean,
-    @DoNotStrip
-    @Keep
-    val isLandscape: Boolean
-  ) {
-  /* main constructor */
+    @Suppress("unused")
+    @JvmStatic
+    private fun fromCpp(colorScheme: ColorScheme, screen: Dimensions, contentSizeCategory: String, insets: Insets, pixelRatio: Double, fontScale: Double, rtl: Boolean, statusBar: Dimensions, navigationBar: Dimensions, isPortrait: Boolean, isLandscape: Boolean): UnistylesNativeMiniRuntime {
+      return UnistylesNativeMiniRuntime(colorScheme, screen, contentSizeCategory, insets, pixelRatio, fontScale, rtl, statusBar, navigationBar, isPortrait, isLandscape)
+    }
+  }
 }

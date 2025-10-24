@@ -47,7 +47,11 @@ namespace margelo::nitro::unistyles {
      */
     [[maybe_unused]]
     static jni::local_ref<JDimensions::javaobject> fromCpp(const Dimensions& value) {
-      return newInstance(
+      using JSignature = JDimensions(double, double);
+      static const auto clazz = javaClassStatic();
+      static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
+      return create(
+        clazz,
         value.width,
         value.height
       );
