@@ -355,6 +355,22 @@ function isKindOfStyleSheet(path2, state) {
   if (path2.node.arguments.length !== 1) {
     return false;
   }
+  if (t4.isArrowFunctionExpression(path2.node.arguments[0])) {
+    const arrowFunc = path2.node.arguments[0];
+    if (arrowFunc.params.length > 2) {
+      return false;
+    }
+    if (t4.isObjectExpression(arrowFunc.body) && arrowFunc.body.properties.length > 0) {
+      return true;
+    }
+    if (t4.isBlockStatement(arrowFunc.body)) {
+      const returnStatements = getReturnStatementsFromBody(arrowFunc.body);
+      return returnStatements.some(
+        (ret) => ret.argument && t4.isObjectExpression(ret.argument) && ret.argument.properties.length > 0
+      );
+    }
+    return false;
+  }
   if (!t4.isObjectExpression(path2.node.arguments[0])) {
     return false;
   }

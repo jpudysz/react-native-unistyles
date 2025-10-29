@@ -234,6 +234,30 @@ export function isKindOfStyleSheet(path: NodePath<t.CallExpression>, state: Unis
         return false
     }
 
+    if (t.isArrowFunctionExpression(path.node.arguments[0])) {
+        const arrowFunc = path.node.arguments[0]
+
+        if (arrowFunc.params.length > 2) {
+            return false
+        }
+
+        if (t.isObjectExpression(arrowFunc.body) && arrowFunc.body.properties.length > 0) {
+            return true
+        }
+
+        if (t.isBlockStatement(arrowFunc.body)) {
+            const returnStatements = getReturnStatementsFromBody(arrowFunc.body)
+
+            return returnStatements.some(ret =>
+                ret.argument &&
+                t.isObjectExpression(ret.argument) &&
+                ret.argument.properties.length > 0
+            )
+        }
+
+        return false
+    }
+
     if (!t.isObjectExpression(path.node.arguments[0])) {
         return false
     }
