@@ -5,9 +5,9 @@ PODS:
   - FBLazyVector (0.82.0)
   - fmt (11.0.2)
   - glog (0.3.5)
-  - hermes-engine (0.82.0-rc.0):
-    - hermes-engine/Pre-built (= 0.82.0-rc.0)
-  - hermes-engine/Pre-built (0.82.0-rc.0)
+  - hermes-engine (0.82.0):
+    - hermes-engine/Pre-built (= 0.82.0)
+  - hermes-engine/Pre-built (0.82.0)
   - NitroModules (0.31.2):
     - boost
     - DoubleConversion
@@ -2529,7 +2529,7 @@ PODS:
     - SocketRocket
     - Yoga
   - SocketRocket (0.7.1)
-  - Unistyles (3.0.15):
+  - Unistyles (3.0.16):
     - boost
     - DoubleConversion
     - fast_float
@@ -2809,7 +2809,7 @@ SPEC CHECKSUMS:
   FBLazyVector: 41b4dd99afd0aad861444ee141abdedaa6c3d238
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
-  hermes-engine: 813c22b2349dbec2cc9d22d64969f17f88cb1034
+  hermes-engine: 8642d8f14a548ab718ec112e9bebdfdd154138b5
   NitroModules: 2862238ccf1a30c3e3c20fb10ae297ce26168718
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: 22bf66112da540a7d40e536366ddd8557934fca1
@@ -2879,7 +2879,7 @@ SPEC CHECKSUMS:
   RNReanimated: 0bd3c054dd0bbb705b3547b7024b1add248ba3eb
   RNWorklets: e8335dff9d27004709f58316985769040cd1e8f2
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  Unistyles: e68bc1c58dfcf5cfabcc42f586c7d7044ae6db55
+  Unistyles: 0ae76bb71ddf3f0e6e4ede27ed7de31e3948b256
   Yoga: edeb9900b9e5bb5b27b9a6a2d5914e4fe4033c1b
 
 PODFILE CHECKSUM: 3aa3b5f5253be927d355cf1499f60c53140eb9a3
