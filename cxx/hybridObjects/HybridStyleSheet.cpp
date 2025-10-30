@@ -251,9 +251,9 @@ void HybridStyleSheet::loadExternalMethods(const jsi::Value& thisValue, jsi::Run
     auto maybeProcessColorFn = jsMethods.asObject(rt).getProperty(rt, "processColor");
 
     helpers::assertThat(rt, maybeProcessColorFn.isObject(), "Unistyles: Can't load processColor function from JS.");
-    
+
     auto maybeParseBoxShadowStringFn = jsMethods.asObject(rt).getProperty(rt, "parseBoxShadowString");
-    
+
     helpers::assertThat(rt, maybeParseBoxShadowStringFn.isObject(), "Unistyles: Can't load parseBoxShadowString function from JS.");
 
     auto processColorFn = maybeProcessColorFn.asObject(rt).asFunction(rt);
@@ -386,25 +386,36 @@ void HybridStyleSheet::onImeChange(UnistylesNativeMiniRuntime miniRuntime) {
 }
 
 void HybridStyleSheet::notifyJSListeners(std::vector<UnistyleDependency>& dependencies) {
-    if (!dependencies.empty()) {
-        std::for_each(this->_changeListeners.begin(), this->_changeListeners.end(), [&](auto& listener){
-            (*listener)(dependencies);
-        });
+    if (dependencies.empty()) {
+        return;
+    }
+
+    std::vector<std::function<void(std::vector<UnistyleDependency>&)>> callbacks;
+    {
+        std::lock_guard<std::mutex> lock(this->_listenersMutex);
+        callbacks.reserve(this->_changeListeners.size());
+
+        for (auto& [id, listener] : this->_changeListeners) {
+            callbacks.push_back(*listener);
+        }
+    }
+
+    for (auto& callback : callbacks) {
+        callback(dependencies);
     }
 }
 
 std::function<void ()> HybridStyleSheet::addChangeListener(const std::function<void (const std::vector<UnistyleDependency>&)>& onChanged) {
+    static size_t nextListenerId = 0;
+
+    std::lock_guard<std::mutex> lock(this->_listenersMutex);
+
+    size_t id = nextListenerId++;
     auto listener = std::make_unique<std::function<void(std::vector<UnistyleDependency>&)>>(onChanged);
+    this->_changeListeners[id] = std::move(listener);
 
-    this->_changeListeners.push_back(std::move(listener));
-
-    return [this, listenerPtr = this->_changeListeners.back().get()](){
-        auto it = std::find_if(this->_changeListeners.begin(), this->_changeListeners.end(), [listenerPtr](auto& ptr) {
-            return ptr.get() == listenerPtr;
-        });
-
-        if (it != this->_changeListeners.end()) {
-            this->_changeListeners.erase(it);
-        }
+    return [this, id](){
+        std::lock_guard<std::mutex> lock(this->_listenersMutex);
+        this->_changeListeners.erase(id);
     };
 }
