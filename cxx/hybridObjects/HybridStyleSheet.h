@@ -2,6 +2,8 @@
 
 #include <cmath>
 #include <jsi/jsi.h>
+#include <mutex>
+#include <unordered_map>
 #include "HybridUnistylesRuntime.h"
 #include "HybridUnistylesStyleSheetSpec.hpp"
 #include "RNStyle.h"
@@ -72,7 +74,8 @@ private:
 
     bool isInitialized = false;
     double __unid = -1;
-    std::vector<std::unique_ptr<const std::function<void(std::vector<UnistyleDependency>&)>>> _changeListeners{};
+    std::unordered_map<size_t, std::unique_ptr<std::function<void(std::vector<UnistyleDependency>&)>>> _changeListeners{};
+    std::mutex _listenersMutex;
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
     std::shared_ptr<UIManager> _uiManager;
 };
