@@ -355,14 +355,33 @@ function isKindOfStyleSheet(path2, state) {
   if (path2.node.arguments.length !== 1) {
     return false;
   }
-  if (!t4.isObjectExpression(path2.node.arguments[0])) {
-    return false;
-  }
-  if (!path2.node.arguments[0].properties.some((property) => t4.isObjectProperty(property) && t4.isObjectExpression(property.value))) {
-    return false;
-  }
   const { callee } = path2.node;
-  return t4.isMemberExpression(callee) && t4.isIdentifier(callee.property) && callee.property.name === "create" && t4.isIdentifier(callee.object);
+  const isCreateCall = t4.isMemberExpression(callee) && t4.isIdentifier(callee.property) && callee.property.name === "create" && (t4.isIdentifier(callee.object) || t4.isMemberExpression(callee.object));
+  if (!isCreateCall) {
+    return false;
+  }
+  const argument = path2.node.arguments[0];
+  if (t4.isArrowFunctionExpression(argument)) {
+    if (argument.params.length > 2) {
+      return false;
+    }
+    if (t4.isObjectExpression(argument.body) && argument.body.properties.length > 0) {
+      return true;
+    }
+    if (t4.isBlockStatement(argument.body)) {
+      const returnStatements = getReturnStatementsFromBody(argument.body);
+      return returnStatements.some(
+        (ret) => ret.argument && t4.isObjectExpression(ret.argument) && ret.argument.properties.length > 0
+      );
+    }
+    return false;
+  }
+  if (t4.isObjectExpression(argument)) {
+    return argument.properties.some(
+      (property) => t4.isObjectProperty(property) && t4.isObjectExpression(property.value)
+    );
+  }
+  return false;
 }
 function addStyleSheetTag(path2, state) {
   const str = state.filename?.replace(state.cwd, "") ?? "";
