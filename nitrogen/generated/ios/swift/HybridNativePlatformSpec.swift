@@ -34,6 +34,13 @@ public protocol HybridNativePlatformSpec_protocol: HybridObject {
   func unregisterPlatformListeners() throws -> Void
 }
 
+public extension HybridNativePlatformSpec_protocol {
+  /// Default implementation of ``HybridObject.toString``
+  func toString() -> String {
+    return "[HybridObject NativePlatform]"
+  }
+}
+
 /// See ``HybridNativePlatformSpec``
 open class HybridNativePlatformSpec_base {
   private weak var cxxWrapper: HybridNativePlatformSpec_cxx? = nil

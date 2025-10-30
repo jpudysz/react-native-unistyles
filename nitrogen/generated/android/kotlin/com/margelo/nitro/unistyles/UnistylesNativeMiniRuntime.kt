@@ -51,6 +51,8 @@ data class UnistylesNativeMiniRuntime(
   @Keep
   val isLandscape: Boolean
 ) {
+  /* primary constructor */
+
   private companion object {
     /**
      * Constructor called from C++

@@ -24,6 +24,8 @@ data class Dimensions(
   @Keep
   val height: Double
 ) {
+  /* primary constructor */
+
   private companion object {
     /**
      * Constructor called from C++
