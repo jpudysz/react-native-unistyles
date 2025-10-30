@@ -356,7 +356,7 @@ function isKindOfStyleSheet(path2, state) {
     return false;
   }
   const { callee } = path2.node;
-  const isCreateCall = t4.isMemberExpression(callee) && t4.isIdentifier(callee.property) && callee.property.name === "create" && t4.isIdentifier(callee.object);
+  const isCreateCall = t4.isMemberExpression(callee) && t4.isIdentifier(callee.property) && callee.property.name === "create" && (t4.isIdentifier(callee.object) || t4.isMemberExpression(callee.object));
   if (!isCreateCall) {
     return false;
   }
