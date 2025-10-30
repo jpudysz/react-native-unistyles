@@ -34,7 +34,7 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Node.ks
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
