@@ -234,22 +234,49 @@ export function isKindOfStyleSheet(path: NodePath<t.CallExpression>, state: Unis
         return false
     }
 
-    if (!t.isObjectExpression(path.node.arguments[0])) {
-        return false
-    }
-
-    if (!path.node.arguments[0].properties.some(property => t.isObjectProperty(property) && t.isObjectExpression(property.value))) {
-        return false
-    }
-
     const { callee } = path.node
-
-    return (
+    const isCreateCall = (
         t.isMemberExpression(callee) &&
         t.isIdentifier(callee.property) &&
         callee.property.name === 'create' &&
-        t.isIdentifier(callee.object)
+        (t.isIdentifier(callee.object) || t.isMemberExpression(callee.object))
     )
+
+    if (!isCreateCall) {
+        return false
+    }
+
+    const argument = path.node.arguments[0]
+
+    if (t.isArrowFunctionExpression(argument)) {
+        if (argument.params.length > 2) {
+            return false
+        }
+
+        if (t.isObjectExpression(argument.body) && argument.body.properties.length > 0) {
+            return true
+        }
+
+        if (t.isBlockStatement(argument.body)) {
+            const returnStatements = getReturnStatementsFromBody(argument.body)
+
+            return returnStatements.some(ret =>
+                ret.argument &&
+                t.isObjectExpression(ret.argument) &&
+                ret.argument.properties.length > 0
+            )
+        }
+
+        return false
+    }
+
+    if (t.isObjectExpression(argument)) {
+        return argument.properties.some(property =>
+            t.isObjectProperty(property) && t.isObjectExpression(property.value)
+        )
+    }
+
+    return false
 }
 
 export function addStyleSheetTag(path: NodePath<t.CallExpression>, state: UnistylesPluginPass) {
