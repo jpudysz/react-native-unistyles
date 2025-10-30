@@ -239,7 +239,7 @@ export function isKindOfStyleSheet(path: NodePath<t.CallExpression>, state: Unis
         t.isMemberExpression(callee) &&
         t.isIdentifier(callee.property) &&
         callee.property.name === 'create' &&
-        t.isIdentifier(callee.object)
+        (t.isIdentifier(callee.object) || t.isMemberExpression(callee.object))
     )
 
     if (!isCreateCall) {
