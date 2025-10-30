@@ -234,19 +234,31 @@ export function isKindOfStyleSheet(path: NodePath<t.CallExpression>, state: Unis
         return false
     }
 
-    if (t.isArrowFunctionExpression(path.node.arguments[0])) {
-        const arrowFunc = path.node.arguments[0]
+    const { callee } = path.node
+    const isCreateCall = (
+        t.isMemberExpression(callee) &&
+        t.isIdentifier(callee.property) &&
+        callee.property.name === 'create' &&
+        t.isIdentifier(callee.object)
+    )
 
-        if (arrowFunc.params.length > 2) {
+    if (!isCreateCall) {
+        return false
+    }
+
+    const argument = path.node.arguments[0]
+
+    if (t.isArrowFunctionExpression(argument)) {
+        if (argument.params.length > 2) {
             return false
         }
 
-        if (t.isObjectExpression(arrowFunc.body) && arrowFunc.body.properties.length > 0) {
+        if (t.isObjectExpression(argument.body) && argument.body.properties.length > 0) {
             return true
         }
 
-        if (t.isBlockStatement(arrowFunc.body)) {
-            const returnStatements = getReturnStatementsFromBody(arrowFunc.body)
+        if (t.isBlockStatement(argument.body)) {
+            const returnStatements = getReturnStatementsFromBody(argument.body)
 
             return returnStatements.some(ret =>
                 ret.argument &&
@@ -258,22 +270,13 @@ export function isKindOfStyleSheet(path: NodePath<t.CallExpression>, state: Unis
         return false
     }
 
-    if (!t.isObjectExpression(path.node.arguments[0])) {
-        return false
+    if (t.isObjectExpression(argument)) {
+        return argument.properties.some(property =>
+            t.isObjectProperty(property) && t.isObjectExpression(property.value)
+        )
     }
 
-    if (!path.node.arguments[0].properties.some(property => t.isObjectProperty(property) && t.isObjectExpression(property.value))) {
-        return false
-    }
-
-    const { callee } = path.node
-
-    return (
-        t.isMemberExpression(callee) &&
-        t.isIdentifier(callee.property) &&
-        callee.property.name === 'create' &&
-        t.isIdentifier(callee.object)
-    )
+    return false
 }
 
 export function addStyleSheetTag(path: NodePath<t.CallExpression>, state: UnistylesPluginPass) {
