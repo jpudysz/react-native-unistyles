@@ -33,6 +33,8 @@ data class Insets(
   @Keep
   val ime: Double
 ) {
+  /* primary constructor */
+
   private companion object {
     /**
      * Constructor called from C++
