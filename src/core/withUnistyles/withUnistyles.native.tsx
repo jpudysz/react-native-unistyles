@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, type ComponentType, useRef } from 'react'
+import React, { forwardRef, useEffect, type ComponentType, useRef, type ComponentProps, type ComponentRef } from 'react'
 import { type UnistyleDependency, UnistylesShadowRegistry } from '../../specs'
 import type { UnistylesTheme } from '../../types'
 import { deepMergeObjects } from '../../utils'
