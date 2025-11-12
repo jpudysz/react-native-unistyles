@@ -77,6 +77,9 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 <a href="https://github.com/rauchg">
      <img src="https://avatars.githubusercontent.com/u/13041?v=4" height="70px" width="70px" alt="rauchg" />
 </a>
+<a href="https://github.com/oliverloops">
+     <img src="https://avatars.githubusercontent.com/u/33361399?v=4" height="70px" width="70px" alt="oliverloops" />
+</a>
 
 ## Past sponsors
 
