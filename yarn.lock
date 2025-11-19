@@ -10295,7 +10295,7 @@ __metadata:
     react: 19.1.1
     react-native: 0.82.0
     react-native-edge-to-edge: 1.6.1
-    react-native-nitro-modules: 0.31.4
+    react-native-nitro-modules: 0.31.8
     react-native-reanimated: 4.0.2
     react-native-unistyles: "workspace:*"
     react-native-worklets: 0.4.1
@@ -10457,7 +10457,7 @@ __metadata:
     react-native: 0.81.4
     react-native-edge-to-edge: 1.6.0
     react-native-gesture-handler: 2.28.0
-    react-native-nitro-modules: 0.31.4
+    react-native-nitro-modules: 0.31.8
     react-native-reanimated: 4.1.3
     react-native-safe-area-context: 5.6.0
     react-native-screens: 4.16.0
@@ -16244,18 +16244,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nitrogen@npm:0.31.4":
-  version: 0.31.4
-  resolution: "nitrogen@npm:0.31.4"
+"nitrogen@npm:0.31.8":
+  version: 0.31.8
+  resolution: "nitrogen@npm:0.31.8"
   dependencies:
     chalk: ^5.3.0
-    react-native-nitro-modules: ^0.31.4
+    react-native-nitro-modules: ^0.31.8
     ts-morph: ^27.0.0
     yargs: ^18.0.0
     zod: ^4.0.5
   bin:
     nitrogen: lib/index.js
-  checksum: 566abe01767d03860834b7b95093f1de5d7d7e010a556508e727afafc7476765d146452047adeee3aeaa5b0d361c504762695d8d3d6386e77f0091ff53e00d9c
+  checksum: 00c53f2d7ba5a82f2dd78cc8cb797fa7224b25ec45ac53bb0464abb2a96eea4e8b847a632f3bd11d95b80d3fd54cfdc726121318b0ddd8238d42d23a566efad9
   languageName: node
   linkType: hard
 
@@ -17716,13 +17716,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-nitro-modules@npm:0.31.4, react-native-nitro-modules@npm:^0.31.4":
-  version: 0.31.4
-  resolution: "react-native-nitro-modules@npm:0.31.4"
+"react-native-nitro-modules@npm:0.31.8, react-native-nitro-modules@npm:^0.31.8":
+  version: 0.31.8
+  resolution: "react-native-nitro-modules@npm:0.31.8"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 9d251ec788eafb5c66033a1f376e2a8f9dfc8962a22e8511f6451bc50bf324549fd4e5113ee5bed59a993c0afc3288e8722d854239a33c00faae26848a211fde
+  checksum: 3976b93015011585112c939ba762240b4cd913435de1a5321d18bbb719624fbfcf8ceca68575b5a03528211d02e36982043363fee8d3c874ac358c2f055f7fdf
   languageName: node
   linkType: hard
 
@@ -17848,11 +17848,11 @@ __metadata:
     husky: 9.1.7
     jest: 29.7.0
     metro-react-native-babel-preset: 0.77.0
-    nitrogen: 0.31.4
+    nitrogen: 0.31.8
     react: 19.1.0
     react-native: 0.79.2
     react-native-builder-bob: 0.40.10
-    react-native-nitro-modules: 0.31.4
+    react-native-nitro-modules: 0.31.8
     react-native-reanimated: 3.17.5
     react-native-web: 0.20.0
     react-test-renderer: 19.1.0
