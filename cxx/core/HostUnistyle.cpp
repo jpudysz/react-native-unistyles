@@ -17,6 +17,10 @@ std::vector<jsi::PropNameID> HostUnistyle::getPropertyNames(jsi::Runtime& rt) {
     return propertyNames;
 }
 
+HostUnistyle::~HostUnistyle() {
+    this->_stylesheet->unistyles.clear();
+}
+
 jsi::Value HostUnistyle::get(jsi::Runtime& rt, const jsi::PropNameID& propNameId) {
     auto propertyName = propNameId.utf8(rt);
 
