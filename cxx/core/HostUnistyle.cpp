@@ -18,7 +18,9 @@ std::vector<jsi::PropNameID> HostUnistyle::getPropertyNames(jsi::Runtime& rt) {
 }
 
 HostUnistyle::~HostUnistyle() {
-    this->_stylesheet->unistyles.clear();
+    if (this->_ownsStyleSheet) {
+        this->_stylesheet->unistyles.clear();
+    }
 }
 
 jsi::Value HostUnistyle::get(jsi::Runtime& rt, const jsi::PropNameID& propNameId) {
@@ -96,23 +98,23 @@ jsi::Function HostUnistyle::createAddVariantsProxyFunction(jsi::Runtime& rt) {
             this->_stylesheet->type,
             jsi::Value(rt, this->_stylesheet->rawValue).asObject(rt)
         );
-        
+
         parser.buildUnistyles(rt, stylesheetCopy);
         parser.parseUnistyles(rt, stylesheetCopy);
-        
+
         helpers::enumerateJSIObject(rt, thisVal.asObject(rt), [this, &parser, &rt, &variants, stylesheetCopy](const std::string& name, jsi::Value& value){
             if (name == helpers::ADD_VARIANTS_FN || !stylesheetCopy->unistyles.contains(name)) {
                 return;
             }
 
             auto unistyle = stylesheetCopy->unistyles[name];
-            
+
             if (unistyle->dependsOn(UnistyleDependency::VARIANTS)) {
                 parser.rebuildUnistyle(rt, unistyle, variants, std::nullopt);
             }
         });
 
-        auto style = std::make_shared<core::HostUnistyle>(stylesheetCopy, this->_unistylesRuntime, variants);
+        auto style = std::make_shared<core::HostUnistyle>(stylesheetCopy, this->_unistylesRuntime, variants, true);
         auto styleHostObject = jsi::Object::createFromHostObject(rt, style);
 
         return styleHostObject;
