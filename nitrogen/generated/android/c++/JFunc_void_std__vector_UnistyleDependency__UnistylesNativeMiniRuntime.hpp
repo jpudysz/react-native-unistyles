@@ -47,7 +47,8 @@ namespace margelo::nitro::unistyles {
         jni::local_ref<jni::JArrayClass<JUnistyleDependency>> __array = jni::JArrayClass<JUnistyleDependency>::newArray(__size);
         for (size_t __i = 0; __i < __size; __i++) {
           const auto& __element = dependencies[__i];
-          __array->setElement(__i, *JUnistyleDependency::fromCpp(__element));
+          auto __elementJni = JUnistyleDependency::fromCpp(__element);
+          __array->setElement(__i, *__elementJni);
         }
         return __array;
       }(), JUnistylesNativeMiniRuntime::fromCpp(miniRuntime));

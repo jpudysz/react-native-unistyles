@@ -10,6 +10,7 @@
 // Include C++ implementation defined types
 #include "HybridNativePlatformSpecSwift.hpp"
 #include "Unistyles-Swift-Cxx-Umbrella.hpp"
+#include <NitroModules/NitroDefines.hpp>
 
 namespace margelo::nitro::unistyles::bridge::swift {
 
