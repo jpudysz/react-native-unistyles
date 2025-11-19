@@ -1,6 +1,6 @@
-import React, { forwardRef, useEffect, type ComponentType, useRef } from 'react'
+import React, { forwardRef, useEffect, useRef, type ComponentProps, type ComponentRef, type ComponentType } from 'react'
 import { type UnistyleDependency, UnistylesShadowRegistry } from '../../specs'
-import type { UnistylesTheme } from '../../types'
+import type { UnistylesTheme, UnistylesValues } from '../../types'
 import { deepMergeObjects } from '../../utils'
 import { useProxifiedUnistyles } from '../useProxifiedUnistyles'
 import { maybeWarnAboutMultipleUnistyles } from '../warn'
@@ -25,6 +25,10 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
     type TProps = GenericComponentProps<TComponent>
     type PropsWithUnistyles = Partial<TProps> & {
         uniProps?: Mappings<TProps>
+    }
+    type UnistyleStyles = {
+        style?: UnistylesValues,
+        contentContainerStyle?: UnistylesValues
     }
 
     const getSecrets = (styleProps: Record<string, any> = {}): MappedSecrets => {
@@ -57,7 +61,7 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
     }
 
     return forwardRef<GenericComponentRef<TComponent>, PropsWithUnistyles>((props, ref) => {
-        const narrowedProps = props as PropsWithUnistyles
+        const narrowedProps = props as PropsWithUnistyles & UnistyleStyles
         const NativeComponent = Component as ComponentType
 
         // @ts-ignore we don't know the type of the component
@@ -94,7 +98,7 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         return (
             <NativeComponent
                 key={uniPropsKey || mappingsKey}
-                {...finalProps as TProps}
+                {...finalProps}
                 ref={ref}
             />
         )
