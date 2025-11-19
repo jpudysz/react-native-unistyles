@@ -9,8 +9,9 @@ namespace margelo::nitro::unistyles::core {
 using Variants = std::vector<std::pair<std::string, std::string>>;
 
 struct JSI_EXPORT HostUnistyle : public jsi::HostObject {
-    HostUnistyle(std::shared_ptr<StyleSheet> stylesheet, std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime, Variants& variants)
-        : _stylesheet(stylesheet), _unistylesRuntime{unistylesRuntime}, _variants{std::move(variants)} {};
+    HostUnistyle(std::shared_ptr<StyleSheet> stylesheet, std::shared_ptr<HybridUnistylesRuntime> unistylesRuntime, Variants& variants, bool ownsStyleSheet = false)
+        : _stylesheet(stylesheet), _unistylesRuntime{unistylesRuntime}, _variants{std::move(variants)}, _ownsStyleSheet(ownsStyleSheet) {};
+    ~HostUnistyle();
 
     std::vector<jsi::PropNameID> getPropertyNames(jsi::Runtime& rt);
     jsi::Value get(jsi::Runtime& rt, const jsi::PropNameID& propNameId);
@@ -19,6 +20,7 @@ struct JSI_EXPORT HostUnistyle : public jsi::HostObject {
     jsi::Function createAddVariantsProxyFunction(jsi::Runtime& rt);
 
 private:
+    bool _ownsStyleSheet;
     Variants _variants;
     std::shared_ptr<StyleSheet> _stylesheet;
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
