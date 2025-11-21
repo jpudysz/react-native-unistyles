@@ -35,6 +35,7 @@ namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 #include <vector>
 #include <functional>
 #include "JFunc_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime.hpp"
+#include <NitroModules/JNICallable.hpp>
 #include "JUnistyleDependency.hpp"
 #include "JFunc_void_UnistylesNativeMiniRuntime.hpp"
 
