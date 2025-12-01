@@ -251,7 +251,8 @@ function toUnistylesDependency(dependency) {
     case "themeName": {
       return UnistyleDependency.ThemeName;
     }
-    case "adaptiveThemes": {
+    case "adaptiveThemes":
+    case "hasAdaptiveThemes": {
       return UnistyleDependency.AdaptiveThemes;
     }
     case "breakpoint": {
@@ -679,7 +680,7 @@ function addDependencies(state, styleName, unistyle, detectedDependencies) {
         target.properties.push(
           t4.objectProperty(
             t4.identifier("uni__dependencies"),
-            t4.arrayExpression(uniqueDependencies.filter((dep) => dep !== void 0).map((dep) => t4.numericLiteral(dep)))
+            t4.arrayExpression(uniqueDependencies.filter((dep) => dep !== void 0 && dep !== null).map((dep) => t4.numericLiteral(dep)))
           )
         );
       });

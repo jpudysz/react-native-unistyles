@@ -1010,6 +1010,53 @@ pluginTester({
                     664955593
                 )
             `
+        },
+        {
+            title: 'Should correctly detect hasAdaptiveThemes dependency',
+            code: `
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View style={styles.container}>
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: {
+                        backgroundColor: theme.colors.secondary,
+                        paddingHorizontal: rt.hasAdaptiveThemes ? 8 : 0
+                    }
+                }))
+            `,
+            output: `
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import { View } from 'react-native-unistyles/components/native/View'
+
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    return (
+                        <View style={styles.container}>
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create(
+                    (theme, rt) => ({
+                        container: {
+                            backgroundColor: theme.colors.secondary,
+                            paddingHorizontal: rt.hasAdaptiveThemes ? 8 : 0,
+                            uni__dependencies: [0, 2]
+                        }
+                    }),
+                    664955593
+                )
+            `
         }
     ]
 })
