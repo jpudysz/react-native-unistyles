@@ -23,6 +23,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    environment: npm-publish
     permissions:
       contents: write
       id-token: write
@@ -37,8 +38,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: yarn
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Configure git
         run: |
@@ -237,11 +239,6 @@ jobs:
           echo "  Tag: ${{ inputs.npm_tag }}"
           echo "  Already published: ${{ steps.check_published.outputs.published }}"
           npm pack --dry-run
-
-      - name: Setup NPM authentication
-        if: ${{ !inputs.dry_run && steps.check_published.outputs.published == 'false' }}
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
       - name: Publish to NPM
         if: ${{ !inputs.dry_run && steps.check_published.outputs.published == 'false' }}
