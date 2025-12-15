@@ -100,6 +100,9 @@ jsi::Value HybridStyleSheet::init(jsi::Runtime &rt, const jsi::Value &thisVal, c
 void HybridStyleSheet::parseSettings(jsi::Runtime &rt, jsi::Object settings) {
     auto& registry = core::UnistylesRegistry::get();
 
+    // set defafults
+    registry.shouldUsePointsForBreakpoints = false;
+
     helpers::enumerateJSIObject(rt, settings, [&](const std::string& propertyName, jsi::Value& propertyValue){
         if (propertyName == "adaptiveThemes") {
             helpers::assertThat(rt, propertyValue.isBool(), "StyleSheet.configure's adaptiveThemes must be of boolean type.");
