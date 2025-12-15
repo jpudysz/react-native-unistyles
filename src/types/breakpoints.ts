@@ -26,7 +26,6 @@ type ParseNestedObject<T, ShouldFlatten> = T extends (...args: infer A) => infer
     ? (...args: A) => ParseNestedObject<R, false>
     : T extends object
         ? T extends { variants: infer R, compoundVariants: infer C }
-            // // if intersection of Base, Variants and Compound Variants is never, then flatten variants and compound variants to generic "string"
             ? (ParseVariants<FlattenVariants<R, false>> & FlattenCompoundVariants<C, false> & ParseNestedObject<Omit<T, 'variants' | 'compoundVariants'>, false>) extends never
                 ? ParseVariants<FlattenVariants<R, true>> & FlattenCompoundVariants<C, true> & ParseNestedObject<Omit<T, 'variants' | 'compoundVariants'>, false>
                 : ParseVariants<FlattenVariants<R, false>> & FlattenCompoundVariants<C, false> & ParseNestedObject<Omit<T, 'variants' | 'compoundVariants'>, false>
@@ -69,9 +68,27 @@ type FlattenCompoundVariants<T, ShouldFlatten> = T extends Array<infer _>
         ? ParseNestedObject<S, ShouldFlatten>
         : never
 
-type IsEmptyVariant<T> = T extends object
-    ? keyof T extends never
-        ? true
+type IsNonEmpty<T> = T extends object ? (keyof T extends never ? false : true) : false
+
+type IntersectCategoryValues<T> = T extends object
+    ? T extends Array<any>
+        ? T
+        : UnionToIntersection<T[keyof T]> extends infer R
+            ? R extends never
+                ? T[keyof T]
+                : R
+            : never
+    : never
+
+type MergeVariantCategories<T> = T extends object
+    ? UnionToIntersection<
+        {
+            [K in keyof T]: IsNonEmpty<T[K]> extends true ? T[K] : never
+        }[keyof T]
+    > extends infer R
+        ? R extends never
+            ? NonNullable<T[keyof T]>
+            : R
         : never
     : never
 
@@ -79,11 +96,9 @@ type ParseVariants<T> = T extends object
     ? T[keyof T] extends object
         ? T[keyof T] extends Array<any>
             ? T
-            : UnionToIntersection<ParseVariants<T[keyof T]>> extends never
-                ? NonNullable<ParseVariants<T[keyof T]>>
-                : IsEmptyVariant<T[keyof T]> extends never
-                    ? ParseVariants<T[keyof T]>
-                    : UnionToIntersection<ParseVariants<T[keyof T]>>
+            : MergeVariantCategories<{
+                [K in keyof T]: T[K] extends object ? IntersectCategoryValues<T[K]> : never
+            }>
         : T
     : T
 
