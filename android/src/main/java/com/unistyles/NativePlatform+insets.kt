@@ -139,7 +139,7 @@ class NativePlatformInsets(
                 if (Build.VERSION.SDK_INT >= 30) {
                     ViewCompat.setWindowInsetsAnimationCallback(
                         mainView,
-                        object : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP) {
+                        object : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_CONTINUE_ON_SUBTREE) {
                             override fun onProgress(
                                 insets: WindowInsetsCompat,
                                 runningAnimations: List<WindowInsetsAnimationCompat>
