@@ -72,7 +72,29 @@ extension NativeIOSPlatform {
         // Interpolate between 'from' and 'to'
         keyboardAnimation.animatedImeInset = keyboardAnimation.from + (keyboardAnimation.to - keyboardAnimation.from) * CGFloat(easedProgress)
 
-        self.miniRuntime?.insets.ime = keyboardAnimation.animatedImeInset
+        guard let current = self.miniRuntime else { return }
+
+        let newInsets = Insets(
+            top: current.insets.top,
+            bottom: current.insets.bottom,
+            left: current.insets.left,
+            right: current.insets.right,
+            ime: Double(keyboardAnimation.animatedImeInset)
+        )
+
+        self.miniRuntime = UnistylesNativeMiniRuntime(
+            colorScheme: current.colorScheme,
+            screen: current.screen,
+            contentSizeCategory: current.contentSizeCategory,
+            insets: newInsets,
+            pixelRatio: current.pixelRatio,
+            fontScale: current.fontScale,
+            rtl: current.rtl,
+            statusBar: current.statusBar,
+            navigationBar: current.navigationBar,
+            isPortrait: current.isPortrait,
+            isLandscape: current.isLandscape
+        )
         self.emitImeEvent(updatedMiniRuntime: self.miniRuntime!)
 
         if linearProgress >= 1 {
