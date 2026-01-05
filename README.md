@@ -62,9 +62,6 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 <a href="https://github.com/biw">
      <img src="https://avatars.githubusercontent.com/u/6139501?v=4" height="70px" width="70px" alt="biw" />
 </a>
-<a href="https://github.com/happyfloat">
-     <img src="https://avatars.githubusercontent.com/u/186333704?s=200&v=4" height="70px" width="70px" alt="happyfloat" />
-</a>
 <a href="https://github.com/ryanlanciaux">
      <img src="https://avatars.githubusercontent.com/u/85041?v=4" height="70px" width="70px" alt="ryanlanciaux" />
 </a>
@@ -74,14 +71,8 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 <a href="https://github.com/kerwanp">
      <img src="https://avatars.githubusercontent.com/u/36955373?v=4" height="70px" width="70px" alt="kerwanp" />
 </a>
-<a href="https://github.com/rauchg">
-     <img src="https://avatars.githubusercontent.com/u/13041?v=4" height="70px" width="70px" alt="rauchg" />
-</a>
 <a href="https://github.com/oliverloops">
      <img src="https://avatars.githubusercontent.com/u/33361399?v=4" height="70px" width="70px" alt="oliverloops" />
-</a>
-<a href="https://github.com/cargurus-oss-fund">
-     <img src="https://avatars.githubusercontent.com/u/108300759?v=4" height="70px" width="70px" alt="cargurus-oss-fund" />
 </a>
 
 ## Past sponsors
@@ -142,6 +133,15 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 </a>
 <a href="https://github.com/mwarger">
      <img src="https://avatars.githubusercontent.com/u/686823?v=4" height="60px" width="60px" alt="mwarger" />
+</a>
+<a href="https://github.com/happyfloat">
+     <img src="https://avatars.githubusercontent.com/u/186333704?s=200&v=4" height="60px" width="60px" alt="happyfloat" />
+</a>
+<a href="https://github.com/cargurus-oss-fund">
+     <img src="https://avatars.githubusercontent.com/u/108300759?v=4" height="60px" width="60px" alt="cargurus-oss-fund" />
+</a>
+<a href="https://github.com/rauchg">
+     <img src="https://avatars.githubusercontent.com/u/13041?v=4" height="60px" width="60px" alt="rauchg" />
 </a>
 
 ## Sponsor my work
