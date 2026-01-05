@@ -1,23 +1,16 @@
 import Foundation
 
-extension Dimensions: Equatable {
-    public static func == (lhs: Dimensions, rhs: Dimensions) -> Bool {
-        return lhs.width == rhs.width && lhs.height == rhs.height
-    }
+func dimensionsEqual(_ lhs: Dimensions, _ rhs: Dimensions) -> Bool {
+    return lhs.width == rhs.width && lhs.height == rhs.height
 }
 
-extension Insets: Equatable {
-    public static func == (lhs: Insets, rhs: Insets) -> Bool {
-        if (lhs.top != rhs.top || lhs.bottom != rhs.bottom) {
-            return false
-        }
-
-        if (lhs.left != rhs.left || lhs.right != rhs.right) {
-            return false
-        }
-
-        return lhs.ime == rhs.ime
+func insetsEqual(_ lhs: Insets, _ rhs: Insets) -> Bool {
+    if (lhs.ime != rhs.ime) {
+        return false
     }
+    
+    return lhs.top == rhs.top && lhs.bottom == rhs.bottom &&
+           lhs.left == rhs.left && lhs.right == rhs.right
 }
 
 extension UnistylesNativeMiniRuntime {
@@ -28,7 +21,7 @@ extension UnistylesNativeMiniRuntime {
             dependencies.append(UnistyleDependency.colorscheme)
         }
 
-        if (lhs.screen != rhs.screen) {
+        if !dimensionsEqual(lhs.screen, rhs.screen) {
             dependencies.append(UnistyleDependency.dimensions)
         }
 
@@ -45,7 +38,7 @@ extension UnistylesNativeMiniRuntime {
             dependencies.append(UnistyleDependency.contentsizecategory)
         }
 
-        if (lhs.insets != rhs.insets) {
+        if !insetsEqual(lhs.insets, rhs.insets) {
             dependencies.append(UnistyleDependency.insets)
         }
 
@@ -53,7 +46,7 @@ extension UnistylesNativeMiniRuntime {
             dependencies.append(UnistyleDependency.fontscale)
         }
 
-        if (lhs.statusBar != rhs.statusBar) {
+        if !dimensionsEqual(lhs.statusBar, rhs.statusBar) {
             dependencies.append(UnistyleDependency.statusbar)
         }
 
