@@ -71,9 +71,10 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 <a href="https://github.com/kerwanp">
      <img src="https://avatars.githubusercontent.com/u/36955373?v=4" height="70px" width="70px" alt="kerwanp" />
 </a>
-<a href="https://github.com/oliverloops">
-     <img src="https://avatars.githubusercontent.com/u/33361399?v=4" height="70px" width="70px" alt="oliverloops" />
+<a href="https://github.com/andkindness">
+     <img src="https://avatars.githubusercontent.com/u/143941782?v=4" height="70px" width="70px" alt="andkindness" />
 </a>
+
 
 ## Past sponsors
 
@@ -142,6 +143,9 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 </a>
 <a href="https://github.com/rauchg">
      <img src="https://avatars.githubusercontent.com/u/13041?v=4" height="60px" width="60px" alt="rauchg" />
+</a>
+<a href="https://github.com/oliverloops">
+     <img src="https://avatars.githubusercontent.com/u/33361399?v=4" height="60px" width="60px" alt="oliverloops" />
 </a>
 
 ## Sponsor my work
