@@ -47,14 +47,14 @@ open class HybridNativePlatformSpec_base {
   public init() { }
   public func getCxxWrapper() -> HybridNativePlatformSpec_cxx {
   #if DEBUG
-    guard self is HybridNativePlatformSpec else {
+    guard self is any HybridNativePlatformSpec else {
       fatalError("`self` is not a `HybridNativePlatformSpec`! Did you accidentally inherit from `HybridNativePlatformSpec_base` instead of `HybridNativePlatformSpec`?")
     }
   #endif
     if let cxxWrapper = self.cxxWrapper {
       return cxxWrapper
     } else {
-      let cxxWrapper = HybridNativePlatformSpec_cxx(self as! HybridNativePlatformSpec)
+      let cxxWrapper = HybridNativePlatformSpec_cxx(self as! any HybridNativePlatformSpec)
       self.cxxWrapper = cxxWrapper
       return cxxWrapper
     }
