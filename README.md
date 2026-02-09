@@ -59,9 +59,6 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 <a href="https://galaxies.dev">
      <img src="https://avatars.githubusercontent.com/u/118431096?s=200&v=4" height="70px" width="70px" alt="galaxies-dev" />
 </a>
-<a href="https://github.com/biw">
-     <img src="https://avatars.githubusercontent.com/u/6139501?v=4" height="70px" width="70px" alt="biw" />
-</a>
 <a href="https://github.com/ryanlanciaux">
      <img src="https://avatars.githubusercontent.com/u/85041?v=4" height="70px" width="70px" alt="ryanlanciaux" />
 </a>
@@ -146,6 +143,9 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 </a>
 <a href="https://github.com/oliverloops">
      <img src="https://avatars.githubusercontent.com/u/33361399?v=4" height="60px" width="60px" alt="oliverloops" />
+</a>
+<a href="https://github.com/biw">
+     <img src="https://avatars.githubusercontent.com/u/6139501?v=4" height="60px" width="60px" alt="biw" />
 </a>
 
 ## Sponsor my work
