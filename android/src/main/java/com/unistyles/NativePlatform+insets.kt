@@ -91,13 +91,27 @@ class NativePlatformInsets(
         }
 
         val insets = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+        val imeInsetValue = insetsCompat.getInsets(WindowInsetsCompat.Type.ime()).bottom
+
+        // When a keyboard management library (e.g. react-native-keyboard-controller) is active,
+        // systemBars().bottom can get polluted with the IME height on certain interactions
+        // (like double-tapping to select text). Detect this by checking if systemBars bottom
+        // is >= IME bottom (normally systemBars bottom is just the nav bar, much smaller than IME).
+        // Fall back to getInsetsIgnoringVisibility which returns stable nav bar values.
+        val bottomInset = if (imeInsetValue > 0 && insets.bottom >= imeInsetValue) {
+            insetsCompat.getInsetsIgnoringVisibility(
+                WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout()
+            ).bottom
+        } else {
+            insets.bottom
+        }
 
         // Android 10 and below - set bottom insets to 0 while keyboard is visible and use default bottom insets otherwise
         // Android 11 and above - animate bottom insets while keyboard is appearing and disappearing
         val imeInsets = when {
             animatedBottomInsets != null && Build.VERSION.SDK_INT >= 30 -> animatedBottomInsets
             Build.VERSION.SDK_INT < 30 -> {
-                val nextBottomInset = insetsCompat.getInsets(WindowInsetsCompat.Type.ime()).bottom - insets.bottom
+                val nextBottomInset = imeInsetValue - bottomInset
                 maxOf(nextBottomInset, 0).toDouble()
             }
             else -> 0.0
@@ -107,7 +121,7 @@ class NativePlatformInsets(
 
         this._insets = Insets(
             statusBarTopInset.toDouble(),
-            insets.bottom.toDouble(),
+            bottomInset.toDouble(),
             insets.left.toDouble(),
             insets.right.toDouble(),
             imeInsets
