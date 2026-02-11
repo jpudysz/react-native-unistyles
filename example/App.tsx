@@ -137,7 +137,12 @@ const styles = StyleSheet.create((theme, rt) => ({
         padding: theme.gap(2),
         borderRadius: theme.gap(1),
         borderColor: theme.colors.typography,
-        marginBottom: rt.insets.bottom + 10
+        marginBottom: rt.insets.bottom + 10,
+        filter: [
+            {
+                dropShadow: '2px 4px 1px red'
+            }
+        ],
     },
     animated: {
         width: 100,
