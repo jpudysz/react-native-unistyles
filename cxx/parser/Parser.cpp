@@ -1,11 +1,68 @@
 #include "Parser.h"
 #include "UnistyleWrapper.h"
+#include <iomanip>
+#include <sstream>
+#include <react/renderer/css/CSSFilter.h>
+#include <react/renderer/css/CSSValueParser.h>
 
 using namespace margelo::nitro::unistyles;
 using namespace facebook;
 using namespace facebook::react;
 
 using Variants = std::vector<std::pair<std::string, std::string>>;
+
+namespace {
+
+bool isSupportedLength(const CSSLength& length) {
+    return length.unit == CSSLengthUnit::Px;
+}
+
+std::string cssColorToRgbaString(const CSSColor& color) {
+    std::ostringstream stream;
+
+    stream << "rgba("
+           << static_cast<int>(color.r) << ", "
+           << static_cast<int>(color.g) << ", "
+           << static_cast<int>(color.b) << ", "
+           << std::fixed << std::setprecision(3)
+           << (static_cast<float>(color.a) / 255.0f)
+           << ")";
+
+    return stream.str();
+}
+
+std::optional<jsi::Object> parseDropShadowString(jsi::Runtime& rt, const std::string& dropShadowString) {
+    auto maybeParsedDropShadow = parseCSSProperty<CSSDropShadowFilter>(std::string("drop-shadow(") + dropShadowString + ")");
+
+    if (!std::holds_alternative<CSSDropShadowFilter>(maybeParsedDropShadow)) {
+        return std::nullopt;
+    }
+
+    auto parsedDropShadow = std::get<CSSDropShadowFilter>(maybeParsedDropShadow);
+
+    if (
+        !isSupportedLength(parsedDropShadow.offsetX) ||
+        !isSupportedLength(parsedDropShadow.offsetY) ||
+        !isSupportedLength(parsedDropShadow.standardDeviation)
+    ) {
+        return std::nullopt;
+    }
+
+    jsi::Object shadowObject(rt);
+
+    shadowObject.setProperty(rt, "offsetX", parsedDropShadow.offsetX.value);
+    shadowObject.setProperty(rt, "offsetY", parsedDropShadow.offsetY.value);
+    shadowObject.setProperty(rt, "standardDeviation", parsedDropShadow.standardDeviation.value);
+    shadowObject.setProperty(
+        rt,
+        "color",
+        jsi::String::createFromUtf8(rt, cssColorToRgbaString(parsedDropShadow.color))
+    );
+
+    return shadowObject;
+}
+
+}
 
 // called only once while processing StyleSheet.create
 void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet) {
@@ -651,8 +708,42 @@ jsi::Value parser::Parser::parseFilters(jsi::Runtime &rt, Unistyle::Shared unist
 
         auto parsedResult = this->parseSecondLevel(rt, unistyle, value);
 
+        if (!parsedResult.isObject()) {
+            return;
+        }
+
+        auto parsedResultObject = parsedResult.asObject(rt);
+        auto filterPropertyNames = parsedResultObject.getPropertyNames(rt);
+        auto filterPropertyCount = filterPropertyNames.size(rt);
+
+        for (size_t index = 0; index < filterPropertyCount; index++) {
+            auto filterName = filterPropertyNames.getValueAtIndex(rt, index).asString(rt).utf8(rt);
+
+            if (filterName != "dropShadow") {
+                continue;
+            }
+
+            auto filterValue = parsedResultObject.getProperty(rt, filterName.c_str());
+
+            if (filterValue.isString()) {
+                auto maybeParsedDropShadow = parseDropShadowString(rt, filterValue.asString(rt).utf8(rt));
+
+                if (!maybeParsedDropShadow.has_value()) {
+                    return;
+                }
+
+                auto dropShadowObject = std::move(maybeParsedDropShadow.value());
+                parsedResultObject.setProperty(rt, filterName.c_str(), std::move(dropShadowObject));
+                continue;
+            }
+
+            if (!filterValue.isObject()) {
+                return;
+            }
+        }
+
         // take only one filter per object
-        jsi::Array propertyNames = parsedResult.asObject(rt).getPropertyNames(rt);
+        jsi::Array propertyNames = parsedResultObject.getPropertyNames(rt);
         size_t length = propertyNames.size(rt);
 
         // ignore no filters
@@ -660,7 +751,7 @@ jsi::Value parser::Parser::parseFilters(jsi::Runtime &rt, Unistyle::Shared unist
             return;
         }
 
-        parsedFilters.emplace_back(std::move(parsedResult));
+        parsedFilters.emplace_back(std::move(parsedResultObject));
     });
 
     // create jsi::Array result with correct filters
@@ -973,11 +1064,19 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
             unistyleData->parsedStyle.value(),
             [this, &rt, &state, &convertedStyles](const std::string& propertyName, jsi::Value& propertyValue) {
                 if (this->isColor(propertyName)) {
-                    convertedStyles.setProperty(
-                        rt,
-                        propertyName.c_str(),
-                        jsi::Value(state.parseColor(propertyValue))
-                    );
+                    if (propertyValue.isString()) {
+                        convertedStyles.setProperty(
+                            rt,
+                            propertyName.c_str(),
+                            jsi::Value(state.parseColor(propertyValue))
+                        );
+                    } else {
+                        convertedStyles.setProperty(
+                            rt,
+                            propertyName.c_str(),
+                            propertyValue
+                        );
+                    }
 
                     return;
                 }
@@ -1021,10 +1120,60 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
                                 nestedValue.asObject(rt),
                                 [this, &rt, &state, &obj](const std::string& nestedPropName, jsi::Value& nestedPropValue) {
                                     if (this->isColor(nestedPropName)) {
+                                        if (nestedPropValue.isString()) {
+                                            obj.setProperty(
+                                                rt,
+                                                nestedPropName.c_str(),
+                                                state.parseColor(nestedPropValue)
+                                            );
+                                        } else {
+                                            obj.setProperty(
+                                                rt,
+                                                nestedPropName.c_str(),
+                                                nestedPropValue
+                                            );
+                                        }
+                                    } else if (nestedPropValue.isObject()) {
+                                        auto nestedObj = nestedPropValue.asObject(rt);
+
+                                        if (nestedObj.isArray(rt) || nestedObj.isFunction(rt)) {
+                                            obj.setProperty(
+                                                rt,
+                                                nestedPropName.c_str(),
+                                                nestedPropValue
+                                            );
+
+                                            return;
+                                        }
+
+                                        jsi::Object parsedNestedObj(rt);
+
+                                        helpers::enumerateJSIObject(
+                                            rt,
+                                            nestedObj,
+                                            [this, &rt, &state, &parsedNestedObj](const std::string& secondLevelPropName, jsi::Value& secondLevelPropValue) {
+                                                if (this->isColor(secondLevelPropName) && secondLevelPropValue.isString()) {
+                                                    parsedNestedObj.setProperty(
+                                                        rt,
+                                                        secondLevelPropName.c_str(),
+                                                        state.parseColor(secondLevelPropValue)
+                                                    );
+
+                                                    return;
+                                                }
+
+                                                parsedNestedObj.setProperty(
+                                                    rt,
+                                                    secondLevelPropName.c_str(),
+                                                    secondLevelPropValue
+                                                );
+                                            }
+                                        );
+
                                         obj.setProperty(
                                             rt,
                                             nestedPropName.c_str(),
-                                            state.parseColor(nestedPropValue)
+                                            parsedNestedObj
                                         );
                                     } else {
                                         obj.setProperty(
@@ -1042,11 +1191,15 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
                         }
 
                         if (this->isColor(propertyName)) {
-                            parsedArray.setValueAtIndex(
-                                rt,
-                                i,
-                                jsi::Value(state.parseColor(nestedValue))
-                            );
+                            if (nestedValue.isString()) {
+                                parsedArray.setValueAtIndex(
+                                    rt,
+                                    i,
+                                    jsi::Value(state.parseColor(nestedValue))
+                                );
+                            } else {
+                                parsedArray.setValueAtIndex(rt, i, nestedValue);
+                            }
                         } else {
                             parsedArray.setValueAtIndex(rt, i, nestedValue);
                         }
