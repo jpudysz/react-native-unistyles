@@ -67,6 +67,8 @@ class NativePlatformInsets(
     }
 
     fun setInsets(insetsCompat: WindowInsetsCompat, window: Window, animatedBottomInsets: Double?, skipUpdate: Boolean = false) {
+        val previousInsets = this._insets
+
         // below Android 11, we need to use window flags to detect status bar visibility
         val isStatusBarVisible = when(Build.VERSION.SDK_INT) {
             in 30..Int.MAX_VALUE -> {
@@ -117,8 +119,6 @@ class NativePlatformInsets(
             else -> 0.0
         }
 
-        val shouldEmitImeEvent = Build.VERSION.SDK_INT < 30 && imeInsets != this._insets.ime || animatedBottomInsets != null && Build.VERSION.SDK_INT >= 30
-
         this._insets = Insets(
             statusBarTopInset.toDouble(),
             bottomInset.toDouble(),
@@ -126,15 +126,26 @@ class NativePlatformInsets(
             insets.right.toDouble(),
             imeInsets
         )
+        val didInsetsChange = !previousInsets.isEqualTo(this._insets)
+        val didImeChange = previousInsets.ime != this._insets.ime
+        val shouldEmitImeEvent =
+            didImeChange && (
+                Build.VERSION.SDK_INT < 30 ||
+                    animatedBottomInsets != null && Build.VERSION.SDK_INT >= 30
+                )
 
         if (skipUpdate) {
             return
         }
 
-        this@NativePlatformInsets.onConfigChange()
+        if (didInsetsChange) {
+            this@NativePlatformInsets.onConfigChange()
+        }
 
         if (shouldEmitImeEvent) {
-            this@NativePlatformInsets.emitImeEvent(this.getMiniRuntime())
+            this@NativePlatformInsets.emitImeEvent(
+                this.getMiniRuntime().copy(insets = this.getInsets())
+            )
         }
     }
 
@@ -162,7 +173,9 @@ class NativePlatformInsets(
                                     return insets
                                 }
 
-                                runningAnimations.firstOrNull()?.let {
+                                runningAnimations.firstOrNull { animation ->
+                                    animation.typeMask and WindowInsetsCompat.Type.ime() != 0
+                                }?.let {
                                     val bottomInset = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom.toDouble() - this@NativePlatformInsets._insets.bottom
                                     val nextBottomInset = if (bottomInset < 0) {
                                         0.0
