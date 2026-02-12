@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
 import { type UnistylesMiniRuntime, UnistylesRuntime, UnistylesShadowRegistry } from '../../specs'
 // It's imported that way because of circular dependency
 import { UnistyleDependency } from '../../specs/NativePlatform'
@@ -33,6 +33,8 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
     const [theme, setTheme] = useState(UnistylesRuntime.getTheme(scopedTheme))
     const [_, runtimeChanged] = useReducer(() => ({}), {})
     const disposeRef = useRef<VoidFunction>(undefined)
+    const syncedDependenciesSizeRef = useRef(-1)
+    const syncedScopedThemeRef = useRef<UnistylesTheme | undefined>(undefined)
 
     const reinitListener = () => {
         disposeRef.current?.()
@@ -56,11 +58,8 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
     }
 
     useEffect(() => {
-        reinitListener()
-
         return () => disposeRef.current?.()
-    }, [dependencies.size])
-
+    }, [disposeRef])
 
     const maybeNewScopedTheme = UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme
 
@@ -105,6 +104,20 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
         }
     })
 
+    useLayoutEffect(() => {
+        const sameDeps = syncedDependenciesSizeRef.current === dependencies.size
+        const sameScopedTheme = syncedScopedThemeRef.current === scopedTheme
+
+        if (sameDeps && sameScopedTheme) {
+            return
+        }
+
+        syncedDependenciesSizeRef.current = dependencies.size
+        syncedScopedThemeRef.current = scopedTheme
+
+        reinitListener()
+    }, [proxifiedTheme, proxifiedRuntime, scopedTheme])
+
     return {
         proxifiedTheme,
         proxifiedRuntime,
@@ -119,6 +132,8 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
                 return
             }
 
+            syncedDependenciesSizeRef.current = dependencies.size
+            syncedScopedThemeRef.current = scopedTheme
             reinitListener()
         }
     }
