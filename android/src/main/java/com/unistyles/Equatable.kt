@@ -11,8 +11,7 @@ fun Dimensions.isEqualTo(other: Dimensions): Boolean {
 
 fun Insets.isEqualTo(other: Insets): Boolean {
     return this.top == other.top && this.bottom == other.bottom &&
-        this.left == other.left && this.right == other.right &&
-        this.ime == other.ime
+        this.left == other.left && this.right == other.right
 }
 
 fun NativePlatformAndroid.diffMiniRuntimes(lhs: UnistylesNativeMiniRuntime, rhs: UnistylesNativeMiniRuntime): Array<UnistyleDependency> {
