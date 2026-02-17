@@ -18,8 +18,10 @@ You are migrating a React Native codebase from react-native-unistyles v2 to v3. 
 ## Prerequisites
 
 - React Native 0.78.0+ with New Architecture enabled
-- Expo SDK 53+ (if using Expo)
-- React 19+
+- React 19+ (enforced at runtime by Unistyles)
+- `react-native-nitro-modules` (native bridge dependency)
+- `react-native-edge-to-edge` (required for Android edge-to-edge insets)
+- Expo SDK 53+ (if using Expo; not compatible with Expo Go — requires dev client or prebuild)
 - Xcode 16+ (iOS)
 
 ## Migration Workflow
