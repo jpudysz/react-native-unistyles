@@ -17,7 +17,7 @@ You are migrating a React Native codebase from react-native-unistyles v2 to v3. 
 
 ## Prerequisites
 
-- React Native 0.78.0+ with New Architecture enabled
+- React Native 0.78.0+ with New Architecture **mandatory** (enabled by default from RN 0.83+)
 - React 19+ (enforced at runtime by Unistyles)
 - `react-native-nitro-modules` (native bridge dependency)
 - `react-native-edge-to-edge` (required for Android edge-to-edge insets)
@@ -74,9 +74,12 @@ If using React Compiler, the Unistyles plugin MUST come BEFORE React Compiler in
 
 **Removed settings:** `plugins`, `experimentalCSSMediaQueries` (now always on), `windowResizeDebounceTimeMs` (no debounce), `disableAnimatedInsets` (insets no longer re-render).
 
-### Step 3: Replace createStyleSheet with StyleSheet.create
+### Step 3: Replace all StyleSheet imports and createStyleSheet
+
+Unistyles `StyleSheet` is a full polyfill of React Native's `StyleSheet` — it includes `hairlineWidth`, `compose`, `flatten`, `absoluteFill`, and `absoluteFillObject`. You should replace **all** `import { StyleSheet } from 'react-native'` with `import { StyleSheet } from 'react-native-unistyles'` so you have a single import.
 
 ```diff
+- import { StyleSheet } from 'react-native'
 - import { createStyleSheet } from 'react-native-unistyles'
 + import { StyleSheet } from 'react-native-unistyles'
 
@@ -252,6 +255,59 @@ require('./unistyles.config') // your StyleSheet.configure call
 
 The Babel plugin auto-disables in test environments (`NODE_ENV=test`).
 
+## Expo Router Integration
+
+If the project uses Expo Router, extra steps are needed because Expo Router resolves routes before Unistyles can initialize.
+
+**1. Change the main entry point** in `package.json`:
+
+```json
+{ "main": "index.ts" }
+```
+
+**2. Create `index.ts`** that imports Unistyles config before the router:
+
+```ts
+import 'expo-router/entry'
+import './unistyles' // your StyleSheet.configure() file
+```
+
+**3. For static rendering (Expo SDK 52+):** import the Unistyles config in `+html.tsx` as well:
+
+```tsx
+import '../unistyles' // ensures Unistyles initializes for each static page
+
+import { ScrollViewStyleReset } from 'expo-router/html';
+import { type PropsWithChildren } from 'react';
+
+// This file is web-only and used to configure the root HTML for every
+// web page during static rendering.
+// The contents of this function only run in Node.js environments and
+// do not have access to the DOM or browser APIs.
+export default function Root({ children }: PropsWithChildren) {
+  return (
+    <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+        {/*
+          Disable body scrolling on web. This makes ScrollView components work closer to how they do on native.
+          However, body scrolling is often nice to have for mobile web. If you want to enable it, remove this line.
+        */}
+        <ScrollViewStyleReset />
+
+        {/* Add any additional <head> elements that you want globally available on web... */}
+      </head>
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+See https://www.unistyl.es/v3/guides/expo-router for full details.
+
 ## Quick Reference: v2 API to v3
 
 | v2 | v3 |
@@ -270,6 +326,7 @@ The Babel plugin auto-disables in test environments (`NODE_ENV=test`).
 | `UnistylesRuntime.hairlineWidth` | `StyleSheet.hairlineWidth` |
 | `statusBar.setColor()` | Removed |
 | `navigationBar.setColor()` | Removed |
+| `import { StyleSheet } from 'react-native'` | `import { StyleSheet } from 'react-native-unistyles'` (full polyfill) |
 
 ## Decision Tree: Third-Party Components
 
@@ -282,11 +339,13 @@ When a third-party component needs theme values or Unistyles styles:
 
 ## Critical Rules
 
-1. **NEVER spread styles** - always use array syntax `[styles.a, styles.b]`
-2. **Babel plugin is REQUIRED** - without it, styles won't be reactive
-3. **Import from `react-native-unistyles`** directly - re-exporting `StyleSheet` from barrel files breaks the Babel plugin
-4. **`styles.useVariants()` must be called before accessing styles** in the component render
-5. **React 19+ is required** - v3 uses the new React architecture
+1. **New Architecture is mandatory** - enable it explicitly (default from RN 0.83+)
+2. **NEVER spread styles** - always use array syntax `[styles.a, styles.b]`
+3. **Babel plugin is REQUIRED** - without it, styles won't be reactive
+4. **Import `StyleSheet` from `react-native-unistyles` only** - it polyfills all RN StyleSheet APIs (`hairlineWidth`, `compose`, `flatten`, `absoluteFill`, etc.), so remove any `import { StyleSheet } from 'react-native'`
+5. **Never re-export `StyleSheet`** from barrel files - the Babel plugin won't detect it
+6. **`styles.useVariants()` must be called before accessing styles** in the component render
+7. **React 19+ is required** - v3 uses the new React architecture
 
 ## Reference Files
 
