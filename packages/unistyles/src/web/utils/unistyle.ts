@@ -108,6 +108,28 @@ export const getMediaQuery = (query: string, allBreakpoints: Array<string>) => {
     return `@media ${queries}`
 }
 
+export const getContainerQuery = (query: string, _allBreakpoints: Array<string>, containerName: string) => {
+    if (Object.values(Orientation).includes(query as Orientation)) {
+        return `@container ${containerName} (orientation: ${query})`
+    }
+
+    if (isUnistylesMq(query)) {
+        const { minWidth, maxWidth, minHeight, maxHeight } = parseMq(query)
+
+        const queries = [
+            minWidth ? `(min-width: ${minWidth}px)` : undefined,
+            maxWidth ? `(max-width: ${maxWidth}px)` : undefined,
+            minHeight ? `(min-height: ${minHeight}px)` : undefined,
+            maxHeight ? `(max-height: ${maxHeight}px)` : undefined
+        ].filter(Boolean).join(' and ')
+        return `@container ${containerName} ${queries}`
+    }
+
+    const breakpointValue = unistyles.services.runtime.breakpoints[query as keyof UnistylesBreakpoints] ?? 0
+
+    return `@container ${containerName} (min-width: ${breakpointValue}px)`
+}
+
 export const extractUnistyleDependencies = (value: any) => {
     if (!value) {
         return []

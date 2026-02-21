@@ -1,9 +1,9 @@
 import type { CSSState } from './state'
 
 import { isPseudoClass } from '../convert/pseudo'
-import { getMediaQuery } from '../utils'
+import { getContainerQuery, getMediaQuery } from '../utils'
 
-export const convertToCSS = (hash: string, value: Record<string, any>, state: CSSState) => {
+export const convertToCSS = (hash: string, value: Record<string, any>, state: CSSState, containerName?: string) => {
     Object.entries(value).forEach(([styleKey, styleValue]) => {
         if (styleKey[0] === '_') {
             const isStylePseudoClass = isPseudoClass(styleKey)
@@ -13,13 +13,16 @@ export const convertToCSS = (hash: string, value: Record<string, any>, state: CS
                 if (typeof pseudoStyleValue === 'object' && pseudoStyleValue !== null) {
                     const allBreakpoints = Object.keys(styleValue)
                     Object.entries(pseudoStyleValue).forEach(([breakpointStyleKey, breakpointStyleValue]) => {
-                        const mediaQuery = getMediaQuery(pseudoStyleKey, allBreakpoints)
+                        const query = containerName
+                            ? getContainerQuery(pseudoStyleKey, allBreakpoints, containerName)
+                            : getMediaQuery(pseudoStyleKey, allBreakpoints)
 
                         state.set({
-                            mediaQuery,
+                            mediaQuery: query,
                             className: pseudoClassName,
                             propertyKey: breakpointStyleKey,
                             value: breakpointStyleValue,
+                            isMq: !!containerName,
                         })
                     })
 
@@ -47,13 +50,16 @@ export const convertToCSS = (hash: string, value: Record<string, any>, state: CS
                         return breakpointStyleKey in value
                     })
                     .map(([key]) => key)
-                const mediaQuery = getMediaQuery(styleKey, allBreakpoints)
+                const query = containerName
+                    ? getContainerQuery(styleKey, allBreakpoints, containerName)
+                    : getMediaQuery(styleKey, allBreakpoints)
 
                 state.set({
-                    mediaQuery,
+                    mediaQuery: query,
                     className: hash,
                     propertyKey: breakpointStyleKey,
                     value: breakpointStyleValue,
+                    isMq: !!containerName,
                 })
             })
 

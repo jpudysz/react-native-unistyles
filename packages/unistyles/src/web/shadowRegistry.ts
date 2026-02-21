@@ -16,6 +16,7 @@ export class UnistylesShadowRegistry {
     // END MOCKS
 
     private scopedTheme: UnistylesTheme | undefined = undefined
+    private _containerName: string | undefined = undefined
     private disposeMap = new Map<string, VoidFunction>()
 
     constructor(private services: UnistylesServices) {}
@@ -75,10 +76,11 @@ export class UnistylesShadowRegistry {
             return deepMergeObjects(...allStyles)
         }
 
-        // Copy scoped theme to not use referenced value
+        // Copy scoped theme and container name to not use referenced values
         const scopedTheme = this.scopedTheme
+        const containerName = this._containerName
         const parsedStyles = getParsedStyles()
-        const { hash, existingHash } = this.services.registry.add(parsedStyles, forChild)
+        const { hash, existingHash } = this.services.registry.add(parsedStyles, forChild, containerName)
         const injectedClassNames = parsedStyles?._web?._classNames ?? []
         const injectedClassName = Array.isArray(injectedClassNames) ? injectedClassNames.join(' ') : injectedClassNames
         const dependencies = extractUnistyleDependencies(parsedStyles)
@@ -90,7 +92,7 @@ export class UnistylesShadowRegistry {
             this.disposeMap.set(
                 hash,
                 this.services.listener.addListeners(filteredDependencies, () => {
-                    this.services.registry.applyStyles(hash, getParsedStyles())
+                    this.services.registry.applyStyles(hash, getParsedStyles(), containerName)
                 }),
             )
         }
@@ -105,6 +107,12 @@ export class UnistylesShadowRegistry {
     }
 
     getScopedTheme = () => this.scopedTheme
+
+    setContainerName = (name?: string) => {
+        this._containerName = name
+    }
+
+    getContainerName = () => this._containerName
 
     remove = (ref: any, hash?: string) => {
         if (isServer() || !(ref instanceof HTMLElement) || !hash) {
