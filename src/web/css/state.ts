@@ -60,8 +60,8 @@ export class CSSState {
         thirdLevelMap.set(propertyKey, value)
     }
 
-    add = (hash: string, values: UnistylesValues) => {
-        convertToCSS(hash, convertUnistyles(values, this.services.runtime), this)
+    add = (hash: string, values: UnistylesValues, containerName?: string) => {
+        convertToCSS(hash, convertUnistyles(values, this.services.runtime), this, containerName)
         this.recreate()
     }
 

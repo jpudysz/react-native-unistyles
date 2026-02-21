@@ -98,24 +98,27 @@ export class UnistylesRegistry {
         return Promise.resolve(false)
     }
 
-    add = (value: UnistylesValues, forChild?: boolean) => {
+    add = (value: UnistylesValues, forChild?: boolean, containerName?: string) => {
         const generatedHash = generateHash(value)
-        const hash = forChild
+        const baseHash = forChild
             ? `${generatedHash} > *`
             : generatedHash
+        const cacheKey = containerName
+            ? `${baseHash}__cq__${containerName}`
+            : baseHash
 
-        if (!this.stylesCache.has(hash)) {
-            this.applyStyles(hash, value)
-            this.stylesCache.add(hash)
+        if (!this.stylesCache.has(cacheKey)) {
+            this.applyStyles(baseHash, value, containerName)
+            this.stylesCache.add(cacheKey)
 
-            return { hash, existingHash: false }
+            return { hash: baseHash, existingHash: false }
         }
 
-        return { hash, existingHash: true }
+        return { hash: baseHash, existingHash: true }
     }
 
-    applyStyles = (hash: string, value: UnistylesValues) => {
-        this.css.add(hash, value)
+    applyStyles = (hash: string, value: UnistylesValues, containerName?: string) => {
+        this.css.add(hash, value, containerName)
     }
 
     reset = () => {

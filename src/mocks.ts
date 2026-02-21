@@ -126,6 +126,7 @@ jest.mock('react-native-unistyles', () => {
         Hide: () => null,
         Display: () => null,
         ScopedTheme: () => null,
+        UnistylesBreakpointContainerProvider: ({ children }: { children: any }) => children,
         withUnistyles: <TComponent,>(Component: TComponent, mapper?: (theme: UnistylesTheme, runtime: typeof miniRuntime) => TComponent) => (props: any) =>
             React.createElement(Component, {
                 ...mapper?.((Object.values(_REGISTRY.themes).at(0) ?? {}) as UnistylesTheme, miniRuntime),

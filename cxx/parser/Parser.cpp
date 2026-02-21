@@ -174,6 +174,43 @@ void parser::Parser::rebuildUnistyleWithScopedTheme(jsi::Runtime& rt, jsi::Value
     unistyleFn->unprocessedValue = std::move(sharedUnprocessedValue);
 }
 
+void parser::Parser::rebuildUnistyleForContainerSize(jsi::Runtime& rt, std::shared_ptr<core::UnistyleData> unistyleData, Dimensions containerDimensions) {
+    this->_containerDimensions = containerDimensions;
+
+    if (unistyleData->unistyle->type == UnistyleType::Object) {
+        unistyleData->parsedStyle = this->parseFirstLevel(rt, unistyleData->unistyle, unistyleData->variants);
+        this->_containerDimensions = std::nullopt;
+
+        return;
+    }
+
+    if (unistyleData->unistyle->type == UnistyleType::DynamicFunction && unistyleData->dynamicFunctionMetadata.has_value()) {
+        auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyleData->unistyle);
+        auto dynamicFunctionMetadata = unistyleData->dynamicFunctionMetadata.value();
+        std::vector<jsi::Value> args{};
+
+        args.reserve(dynamicFunctionMetadata.size());
+
+        for (int i = 0; i < dynamicFunctionMetadata.size(); i++) {
+            folly::dynamic& arg = dynamicFunctionMetadata.at(i);
+
+            args.emplace_back(helpers::dynamicToJSIValue(rt, arg));
+        }
+
+        const jsi::Value *argStart = args.data();
+
+        auto functionResult = unistyleFn->rawValue
+            .asFunction(rt)
+            .call(rt, argStart, dynamicFunctionMetadata.size())
+            .asObject(rt);
+
+        unistyleFn->unprocessedValue = std::move(functionResult);
+        unistyleData->parsedStyle = this->parseFirstLevel(rt, unistyleFn, unistyleData->variants);
+    }
+
+    this->_containerDimensions = std::nullopt;
+}
+
 jsi::Object parser::Parser::unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, std::optional<UnistylesNativeMiniRuntime> maybeMiniRuntime) {
     // firstly we need to get object representation of user's StyleSheet
     // StyleSheet can be a function or an object
@@ -276,6 +313,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(
     std::vector<std::shared_ptr<core::StyleSheet>>& styleSheets,
     std::optional<UnistylesNativeMiniRuntime> maybeMiniRuntime
 ) {
+    auto& registry = core::UnistylesRegistry::get();
     std::unordered_map<std::shared_ptr<StyleSheet>, jsi::Value> parsedStyleSheetsWithDefaultTheme;
     std::unordered_map<std::string, std::unordered_map<std::shared_ptr<StyleSheet>, jsi::Value>> parsedStyleSheetsWithScopedTheme;
     std::unordered_set<std::shared_ptr<core::Unistyle>> parsedUnistyles;
@@ -302,6 +340,14 @@ void parser::Parser::rebuildUnistylesInDependencyMap(
 
         for (auto& unistyleData : unistyles) {
             auto& unistyle = unistyleData->unistyle;
+
+            if (unistyleData->containerBreakpointId.has_value()) {
+                this->_containerDimensions = registry.getContainerSize(
+                    unistyleData->containerBreakpointId.value()
+                );
+            } else {
+                this->_containerDimensions = std::nullopt;
+            }
 
             // For RN styles or inline styles, compute styles only once
             if (unistyle->styleKey == helpers::EXOTIC_STYLE_KEY) {
@@ -368,6 +414,8 @@ void parser::Parser::rebuildUnistylesInDependencyMap(
             parsedUnistyles.insert(unistyle);
         }
     }
+
+    this->_containerDimensions = std::nullopt;
 
     // Parse whatever left in StyleSheets to be later accessible
     for (const auto& styleSheet : styleSheets) {
@@ -771,12 +819,25 @@ jsi::Value parser::Parser::getValueFromBreakpoints(jsi::Runtime& rt, Unistyle::S
 
     auto sortedBreakpoints = state.getSortedBreakpointPairs();
     auto hasBreakpoints = !sortedBreakpoints.empty();
-    auto currentBreakpoint = state.getCurrentBreakpointName();
-    auto rawDimensions = this->_unistylesRuntime->getScreen();
-    auto pixelRatio = this->_unistylesRuntime->getPixelRatio();
-    auto dimensions = registry.shouldUsePointsForBreakpoints
-        ? Dimensions(rawDimensions.width / pixelRatio, rawDimensions.height / pixelRatio)
-        : rawDimensions;
+
+    Dimensions dimensions;
+    std::optional<std::string> currentBreakpoint;
+
+    if (this->_containerDimensions.has_value()) {
+        dimensions = this->_containerDimensions.value();
+        currentBreakpoint = hasBreakpoints
+            ? std::make_optional(helpers::getBreakpointFromScreenWidth(
+                static_cast<int>(dimensions.width), sortedBreakpoints))
+            : std::nullopt;
+    } else {
+        auto rawDimensions = this->_unistylesRuntime->getScreen();
+        auto pixelRatio = this->_unistylesRuntime->getPixelRatio();
+        dimensions = registry.shouldUsePointsForBreakpoints
+            ? Dimensions(rawDimensions.width / pixelRatio, rawDimensions.height / pixelRatio)
+            : rawDimensions;
+        currentBreakpoint = state.getCurrentBreakpointName();
+    }
+
     auto currentOrientation = dimensions.width > dimensions.height
         ? "landscape"
         : "portrait";
