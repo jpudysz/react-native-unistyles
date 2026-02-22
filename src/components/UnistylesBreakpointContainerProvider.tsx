@@ -62,6 +62,7 @@ export const UnistylesBreakpointContainerProvider: React.FunctionComponent<Conta
     const containerStyle: React.CSSProperties = {
         display: 'flex',
         flexDirection: 'column',
+        containerType: 'inline-size',
         containerName,
         ...(style as React.CSSProperties)
     }
