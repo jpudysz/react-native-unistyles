@@ -29,7 +29,12 @@ struct UnistylesModule : public jni::HybridClass<UnistylesModule> {
         jni::alias_ref<JHybridNativePlatformSpec::javaobject> nativePlatform
     );
     static void invalidateNative(jni::alias_ref<jhybridobject> jThis) {
-        core::UnistylesRegistry::get().destroy();
+        auto* self = jThis->cthis();
+
+        if (self->_runtime) {
+            core::UnistylesRegistry::get().destroyState(self->_runtime);
+            self->_runtime = nullptr;
+        }
     }
 
     static jni::local_ref<BindingsInstallerHolder::javaobject> getBindingsInstaller(jni::alias_ref<UnistylesModule::javaobject> jThis);
@@ -37,6 +42,7 @@ struct UnistylesModule : public jni::HybridClass<UnistylesModule> {
 private:
     RuntimeExecutor _runtimeExecutor;
     std::shared_ptr<HybridNativePlatformSpec> _nativePlatform;
+    jsi::Runtime* _runtime = nullptr;
 };
 
 }
