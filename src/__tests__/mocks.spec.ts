@@ -1,6 +1,8 @@
+import type { CreateUnistylesStyleSheet } from '../types'
+
 require('../mocks')
 
-const unistyles = require('react-native-unistyles') as { StyleSheet: { create: (styles: any) => any } }
+const unistyles = require('react-native-unistyles') as { StyleSheet: { create: CreateUnistylesStyleSheet } }
 
 describe('StyleSheet.create mock', () => {
     it('should strip variants from style entries', () => {
@@ -48,6 +50,32 @@ describe('StyleSheet.create mock', () => {
 
         expect(styles.container).toEqual({ flex: 1 })
         expect(styles.container).not.toHaveProperty('variants')
+    })
+
+    it('should strip variants from dynamic functions', () => {
+        const styles = unistyles.StyleSheet.create(() => ({
+            container: () => ({
+                flex: 1,
+                variants: {
+                    color: {
+                        primary: { backgroundColor: 'blue' },
+                        secondary: { backgroundColor: 'gray' }
+                    }
+                },
+                compoundVariants: [
+                    {
+                        size: 'small',
+                        styles: { margin: 2 }
+                    }
+                ]
+            })
+        }))
+
+        const container = styles.container()
+
+        expect(container).toEqual({ flex: 1 })
+        expect(container).not.toHaveProperty('variants')
+        expect(container).not.toHaveProperty('compoundVariants')
     })
 
     it('should preserve styles without variants unchanged', () => {

@@ -126,7 +126,14 @@ jest.mock('react-native-unistyles', () => {
         const result: Record<string, any> = {}
 
         for (const [name, style] of Object.entries(styleEntries)) {
-            if (style !== null && typeof style === 'object' && !Array.isArray(style)) {
+            if (typeof style === 'function') {
+                result[name] = (...args: Array<any>) => {
+                    const resolved = style(...args)
+                    const { variants, compoundVariants, ...rest } = resolved
+
+                    return rest
+                }
+            } else if (style !== null && typeof style === 'object' && !Array.isArray(style)) {
                 const { variants, compoundVariants, ...rest } = style
 
                 result[name] = rest
