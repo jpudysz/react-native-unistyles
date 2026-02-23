@@ -50,6 +50,7 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     void setScopedTheme(std::optional<std::string> themeName);
     core::Unistyle::Shared getUnistyleById(jsi::Runtime& rt, std::string unistyleID);
     void destroy();
+    void destroyState(jsi::Runtime* rt);
 
 private:
     UnistylesRegistry() = default;
