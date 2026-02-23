@@ -25,6 +25,7 @@ class UnistylesModule(reactContext: ReactApplicationContext): NativeTurboUnistyl
     }
 
     override fun invalidate() {
+        _nativePlatform.onDestroy()
         invalidateNative()
     }
 
