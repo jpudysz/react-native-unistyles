@@ -3,7 +3,7 @@
   "version": "3.0.24",
   "description": "Level up your React Native StyleSheet",
   "scripts": {
-    "test": "NODE_ENV=babel-test jest ./plugin",
+    "test": "NODE_ENV=babel-test jest ./plugin ./src/__tests__",
     "test:coverage": "NODE_ENV=babel-test jest --passWithNoTests --coverage",
     "tsc": "node_modules/typescript/bin/tsc --noEmit",
     "lint": "biome lint",

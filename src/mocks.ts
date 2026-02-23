@@ -122,6 +122,29 @@ jest.mock('react-native-unistyles', () => {
         breakpoint: undefined
     } satisfies UnistylesRuntimePrivate
 
+    const stripVariants = (styleEntries: Record<string, any>): any => {
+        const result: Record<string, any> = {}
+
+        for (const [name, style] of Object.entries(styleEntries)) {
+            if (typeof style === 'function') {
+                result[name] = (...args: Array<any>) => {
+                    const resolved = style(...args)
+                    const { variants, compoundVariants, ...rest } = resolved
+
+                    return rest
+                }
+            } else if (style !== null && typeof style === 'object' && !Array.isArray(style)) {
+                const { variants, compoundVariants, ...rest } = style
+
+                result[name] = rest
+            } else {
+                result[name] = style
+            }
+        }
+
+        return result
+    }
+
     return {
         Hide: () => null,
         Display: () => null,
@@ -181,15 +204,12 @@ jest.mock('react-native-unistyles', () => {
                 return styles
             },
             create: (styles: any) => {
-                if (typeof styles === 'function') {
-                    return {
-                        ...styles(Object.values(_REGISTRY.themes).at(0) ?? {}, miniRuntime),
-                        useVariants: () => {}
-                    }
-                }
+                const resolved = typeof styles === 'function'
+                    ? styles(Object.values(_REGISTRY.themes).at(0) ?? {}, miniRuntime)
+                    : styles
 
                 return {
-                    ...styles,
+                    ...stripVariants(resolved),
                     useVariants: () => {}
                 }
             },
