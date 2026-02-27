@@ -5,6 +5,8 @@ import * as t from '@babel/types'
 import type { RemapConfig } from '../index'
 import type { UnistylesPluginPass } from './types'
 
+import { getComponentPath } from './import'
+
 export function handleExoticImport(
     path: NodePath<t.ImportDeclaration>,
     state: UnistylesPluginPass,
@@ -32,28 +34,14 @@ export function handleExoticImport(
             if (t.isImportDefaultSpecifier(specifier)) {
                 const newImport = t.importDeclaration(
                     [t.importDefaultSpecifier(t.identifier(specifier.local.name))],
-                    t.stringLiteral(
-                        state.opts.isLocal
-                            ? (state.file.opts.filename
-                                  ?.split('react-native-unistyles')
-                                  .at(0)
-                                  ?.concat(`react-native-unistyles/components/native/${rule.mapTo}`) ?? '')
-                            : `react-native-unistyles/components/native/${rule.mapTo}`,
-                    ),
+                    t.stringLiteral(getComponentPath(state, rule.mapTo)),
                 )
 
                 path.replaceWith(newImport)
             } else {
                 const newImport = t.importDeclaration(
                     [t.importSpecifier(t.identifier(rule.mapTo), t.identifier(rule.mapTo))],
-                    t.stringLiteral(
-                        state.opts.isLocal
-                            ? (state.file.opts.filename
-                                  ?.split('react-native-unistyles')
-                                  .at(0)
-                                  ?.concat(`react-native-unistyles/components/native/${rule.mapTo}`) ?? '')
-                            : `react-native-unistyles/components/native/${rule.mapTo}`,
-                    ),
+                    t.stringLiteral(getComponentPath(state, rule.mapTo)),
                 )
 
                 path.node.specifiers = specifiers.filter((s) => s !== specifier)

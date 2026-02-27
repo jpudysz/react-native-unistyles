@@ -81,57 +81,26 @@ var NATIVE_COMPONENTS_PATHS = {
 };
 
 // plugin/src/exotic.ts
-var t = __toESM(require("@babel/types"));
-function handleExoticImport(path2, state, exoticImport) {
-  const specifiers = path2.node.specifiers;
-  const source = path2.node.source;
-  if (path2.node.importKind !== "value") {
-    return;
-  }
-  specifiers.forEach((specifier) => {
-    for (const rule of exoticImport.imports) {
-      const hasMatchingImportType = !rule.isDefault && t.isImportSpecifier(specifier) || rule.isDefault && t.isImportDefaultSpecifier(specifier);
-      const hasMatchingImportName = rule.isDefault || !rule.isDefault && rule.name === specifier.local.name;
-      const hasMatchingPath = rule.path === source.value;
-      if (!hasMatchingImportType || !hasMatchingImportName || !hasMatchingPath) {
-        continue;
-      }
-      if (t.isImportDefaultSpecifier(specifier)) {
-        const newImport = t.importDeclaration(
-          [t.importDefaultSpecifier(t.identifier(specifier.local.name))],
-          t.stringLiteral(
-            state.opts.isLocal ? state.file.opts.filename?.split("react-native-unistyles").at(0)?.concat(`react-native-unistyles/components/native/${rule.mapTo}`) ?? "" : `react-native-unistyles/components/native/${rule.mapTo}`
-          )
-        );
-        path2.replaceWith(newImport);
-      } else {
-        const newImport = t.importDeclaration(
-          [t.importSpecifier(t.identifier(rule.mapTo), t.identifier(rule.mapTo))],
-          t.stringLiteral(
-            state.opts.isLocal ? state.file.opts.filename?.split("react-native-unistyles").at(0)?.concat(`react-native-unistyles/components/native/${rule.mapTo}`) ?? "" : `react-native-unistyles/components/native/${rule.mapTo}`
-          )
-        );
-        path2.node.specifiers = specifiers.filter((s) => s !== specifier);
-        if (path2.node.specifiers.length === 0) {
-          path2.replaceWith(newImport);
-        } else {
-          path2.insertBefore(newImport);
-        }
-      }
-      return;
-    }
-  });
-}
+var t2 = __toESM(require("@babel/types"));
 
 // plugin/src/import.ts
-var t2 = __toESM(require("@babel/types"));
+var t = __toESM(require("@babel/types"));
+function getComponentPath(state, name) {
+  if (!state.opts.isLocal) {
+    return `react-native-unistyles/components/native/${name}`;
+  }
+  if (state.opts.localPath) {
+    return `${state.opts.localPath}/src/components/native/${name}`;
+  }
+  return state.file.opts.filename?.split("react-native-unistyles").at(0)?.concat(`react-native-unistyles/src/components/native/${name}`) ?? "";
+}
 function addUnistylesImport(path2, state) {
   const localNames = Object.keys(state.reactNativeImports);
   const names = Object.values(state.reactNativeImports);
   const pairs = Object.entries(state.reactNativeImports);
   const nodesToRemove = [];
   path2.node.body.forEach((node) => {
-    if (t2.isImportDeclaration(node) && node.source.value === "react-native") {
+    if (t.isImportDeclaration(node) && node.source.value === "react-native") {
       node.specifiers = node.specifiers.filter(
         (specifier) => !localNames.some((name) => name === specifier.local.name)
       );
@@ -142,18 +111,16 @@ function addUnistylesImport(path2, state) {
   });
   names.forEach((name) => {
     const rnWebImport = path2.node.body.find(
-      (node) => t2.isImportDeclaration(node) && node.source.value === `react-native-web/dist/exports/${name}`
+      (node) => t.isImportDeclaration(node) && node.source.value === `react-native-web/dist/exports/${name}`
     );
     if (rnWebImport) {
       rnWebImport.specifiers = [];
     }
   });
   pairs.forEach(([localName, name]) => {
-    const newImport = t2.importDeclaration(
-      [t2.importSpecifier(t2.identifier(localName), t2.identifier(name))],
-      t2.stringLiteral(
-        state.opts.isLocal ? state.file.opts.filename?.split("react-native-unistyles").at(0)?.concat(`react-native-unistyles/src/components/native/${name}`) ?? "" : `react-native-unistyles/components/native/${name}`
-      )
+    const newImport = t.importDeclaration(
+      [t.importSpecifier(t.identifier(localName), t.identifier(name))],
+      t.stringLiteral(getComponentPath(state, name))
     );
     path2.node.body.unshift(newImport);
   });
@@ -164,15 +131,53 @@ function isInsideNodeModules(state) {
 }
 function addUnistylesRequire(path2, state) {
   Object.entries(state.reactNativeImports).forEach(([componentName, uniqueName]) => {
-    const newRequire = t2.variableDeclaration("const", [
-      t2.variableDeclarator(
-        t2.identifier(uniqueName),
-        t2.callExpression(t2.identifier("require"), [
-          t2.stringLiteral(`react-native-unistyles/components/native/${componentName}`)
+    const newRequire = t.variableDeclaration("const", [
+      t.variableDeclarator(
+        t.identifier(uniqueName),
+        t.callExpression(t.identifier("require"), [
+          t.stringLiteral(`react-native-unistyles/components/native/${componentName}`)
         ])
       )
     ]);
     path2.node.body.unshift(newRequire);
+  });
+}
+
+// plugin/src/exotic.ts
+function handleExoticImport(path2, state, exoticImport) {
+  const specifiers = path2.node.specifiers;
+  const source = path2.node.source;
+  if (path2.node.importKind !== "value") {
+    return;
+  }
+  specifiers.forEach((specifier) => {
+    for (const rule of exoticImport.imports) {
+      const hasMatchingImportType = !rule.isDefault && t2.isImportSpecifier(specifier) || rule.isDefault && t2.isImportDefaultSpecifier(specifier);
+      const hasMatchingImportName = rule.isDefault || !rule.isDefault && rule.name === specifier.local.name;
+      const hasMatchingPath = rule.path === source.value;
+      if (!hasMatchingImportType || !hasMatchingImportName || !hasMatchingPath) {
+        continue;
+      }
+      if (t2.isImportDefaultSpecifier(specifier)) {
+        const newImport = t2.importDeclaration(
+          [t2.importDefaultSpecifier(t2.identifier(specifier.local.name))],
+          t2.stringLiteral(getComponentPath(state, rule.mapTo))
+        );
+        path2.replaceWith(newImport);
+      } else {
+        const newImport = t2.importDeclaration(
+          [t2.importSpecifier(t2.identifier(rule.mapTo), t2.identifier(rule.mapTo))],
+          t2.stringLiteral(getComponentPath(state, rule.mapTo))
+        );
+        path2.node.specifiers = specifiers.filter((s) => s !== specifier);
+        if (path2.node.specifiers.length === 0) {
+          path2.replaceWith(newImport);
+        } else {
+          path2.insertBefore(newImport);
+        }
+      }
+      return;
+    }
   });
 }
 

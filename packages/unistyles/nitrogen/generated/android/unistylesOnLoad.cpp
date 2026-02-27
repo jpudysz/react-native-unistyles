@@ -22,19 +22,22 @@
 namespace margelo::nitro::unistyles {
 
 int initialize(JavaVM* vm) {
+  return facebook::jni::initialize(vm, []() {
+    ::margelo::nitro::unistyles::registerAllNatives();
+  });
+}
+
+void registerAllNatives() {
   using namespace margelo::nitro;
   using namespace margelo::nitro::unistyles;
-  using namespace facebook;
 
-  return facebook::jni::initialize(vm, [] {
     // Register native JNI methods
-    margelo::nitro::unistyles::JHybridNativePlatformSpec::registerNatives();
-    margelo::nitro::unistyles::JFunc_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_cxx::registerNatives();
-    margelo::nitro::unistyles::JFunc_void_UnistylesNativeMiniRuntime_cxx::registerNatives();
+  margelo::nitro::unistyles::JHybridNativePlatformSpec::registerNatives();
+  margelo::nitro::unistyles::JFunc_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_cxx::registerNatives();
+  margelo::nitro::unistyles::JFunc_void_UnistylesNativeMiniRuntime_cxx::registerNatives();
 
-    // Register Nitro Hybrid Objects
-    
-  });
+  // Register Nitro Hybrid Objects
+  
 }
 
 } // namespace margelo::nitro::unistyles

@@ -6,20 +6,29 @@
 ///
 
 #include <jni.h>
+#include <functional>
 #include <NitroModules/NitroDefines.hpp>
 
 namespace margelo::nitro::unistyles {
 
+  [[deprecated("Use registerNatives() instead.")]]
+  int initialize(JavaVM* vm);
+
   /**
-   * Initializes the native (C++) part of unistyles, and autolinks all Hybrid Objects.
-   * Call this in your `JNI_OnLoad` function (probably inside `cpp-adapter.cpp`).
+   * Register the native (C++) part of unistyles, and autolinks all Hybrid Objects.
+   * Call this in your `JNI_OnLoad` function (probably inside `cpp-adapter.cpp`),
+   * inside a `facebook::jni::initialize(vm, ...)` call.
    * Example:
    * ```cpp (cpp-adapter.cpp)
    * JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
-   *   return margelo::nitro::unistyles::initialize(vm);
+   *   return facebook::jni::initialize(vm, []() {
+   *     // register all unistyles HybridObjects
+   *     margelo::nitro::unistyles::registerNatives();
+   *     // any other custom registrations go here.
+   *   });
    * }
    * ```
    */
-  int initialize(JavaVM* vm);
+  void registerAllNatives();
 
 } // namespace margelo::nitro::unistyles

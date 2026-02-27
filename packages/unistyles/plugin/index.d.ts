@@ -120,4 +120,10 @@ export interface UnistylesPluginOptions {
      * path resolution, don't use it!
      */
     isLocal?: boolean
+
+    /**
+     * Absolute path to the local package root.
+     * Used with `isLocal` for monorepo development to resolve component imports.
+     */
+    localPath?: string
 }

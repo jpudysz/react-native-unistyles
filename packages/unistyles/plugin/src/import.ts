@@ -4,6 +4,23 @@ import * as t from '@babel/types'
 
 import type { UnistylesPluginPass } from './types'
 
+export function getComponentPath(state: UnistylesPluginPass, name: string): string {
+    if (!state.opts.isLocal) {
+        return `react-native-unistyles/components/native/${name}`
+    }
+
+    if (state.opts.localPath) {
+        return `${state.opts.localPath}/src/components/native/${name}`
+    }
+
+    return (
+        state.file.opts.filename
+            ?.split('react-native-unistyles')
+            .at(0)
+            ?.concat(`react-native-unistyles/src/components/native/${name}`) ?? ''
+    )
+}
+
 export function addUnistylesImport(path: NodePath<t.Program>, state: UnistylesPluginPass) {
     const localNames = Object.keys(state.reactNativeImports)
     const names = Object.values(state.reactNativeImports)
@@ -40,14 +57,7 @@ export function addUnistylesImport(path: NodePath<t.Program>, state: UnistylesPl
     pairs.forEach(([localName, name]) => {
         const newImport = t.importDeclaration(
             [t.importSpecifier(t.identifier(localName), t.identifier(name))],
-            t.stringLiteral(
-                state.opts.isLocal
-                    ? (state.file.opts.filename
-                          ?.split('react-native-unistyles')
-                          .at(0)
-                          ?.concat(`react-native-unistyles/src/components/native/${name}`) ?? '')
-                    : `react-native-unistyles/components/native/${name}`,
-            ),
+            t.stringLiteral(getComponentPath(state, name)),
         )
 
         path.node.body.unshift(newImport)
