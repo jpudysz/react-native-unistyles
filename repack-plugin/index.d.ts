@@ -1,4 +1,4 @@
-import type {Compiler,LoaderContext,RspackPluginInstance } from '@rspack/core'
+import type { Compiler, LoaderContext, RspackPluginInstance } from '@rspack/core'
 import type { UnistylesPluginOptions } from 'react-native-unistyles/plugin'
 
 export declare const BASE_REPACK_EXCLUDE_PATHS: Array<RegExp>
@@ -14,6 +14,6 @@ export declare class RepackUnistylePlugin implements RspackPluginInstance {
     apply(compiler: Compiler): void
 }
 
-declare function unistylesLoader(this: LoaderContext<UnistylesLoaderOptions>, source: string): void;
+declare function unistylesLoader(this: LoaderContext<UnistylesLoaderOptions>, source: string): void
 
 export default unistylesLoader

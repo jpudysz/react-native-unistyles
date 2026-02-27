@@ -1,9 +1,10 @@
-import { UnistyleDependency } from '../specs/NativePlatform'
 import type { UnistylesMiniRuntime } from '../specs/UnistylesRuntime'
+import type { UnistylesServices } from './types'
+
+import { UnistyleDependency } from '../specs/NativePlatform'
 import { type AppTheme, type AppThemeName, ColorScheme, Orientation } from '../specs/types'
 import { type UnistylesTheme, WebContentSizeCategory } from '../types'
 import { NavigationBar, StatusBar } from './mock'
-import type { UnistylesServices } from './types'
 import { convertTheme, error, isServer, schemeToTheme } from './utils'
 
 export class UnistylesRuntime {
@@ -102,13 +103,13 @@ export class UnistylesRuntime {
         if (isServer()) {
             return {
                 width: 0,
-                height: 0
+                height: 0,
             }
         }
 
         return {
             width: window.innerWidth,
-            height: window.innerHeight
+            height: window.innerHeight,
         }
     }
 
@@ -122,7 +123,7 @@ export class UnistylesRuntime {
             bottom: 0,
             left: 0,
             right: 0,
-            ime: 0
+            ime: 0,
         }
     }
 
@@ -156,14 +157,14 @@ export class UnistylesRuntime {
             insets: this.insets,
             statusBar: {
                 width: this.statusBar.width,
-                height: this.statusBar.height
+                height: this.statusBar.height,
             },
             navigationBar: {
                 width: this.navigationBar.width,
                 height: this.navigationBar.height,
             },
             rtl: this.rtl,
-            hasAdaptiveThemes: this.hasAdaptiveThemes
+            hasAdaptiveThemes: this.hasAdaptiveThemes,
         }
     }
 
@@ -232,9 +233,11 @@ export class UnistylesRuntime {
         if (this.services.state.CSSVars) {
             this.services.state.cssThemes.set(
                 themeName,
-                Object.fromEntries(Object.entries(newTheme).map(([key, value]) => {
-                    return convertTheme(key, value)
-                })) as UnistylesTheme
+                Object.fromEntries(
+                    Object.entries(newTheme).map(([key, value]) => {
+                        return convertTheme(key, value)
+                    }),
+                ) as UnistylesTheme,
             )
             this.services.registry.css.addTheme(themeName, newTheme)
             this.services.registry.css.recreate()
@@ -247,16 +250,20 @@ export class UnistylesRuntime {
         if (!hasSomeThemes) {
             return new Proxy({} as UnistylesTheme, {
                 get: () => {
-                    throw error('One of your stylesheets is trying to get the theme, but no theme has been selected yet. Did you forget to call StyleSheet.configure? If you called it, make sure you did so before any StyleSheet.create.')
-                }
+                    throw error(
+                        'One of your stylesheets is trying to get the theme, but no theme has been selected yet. Did you forget to call StyleSheet.configure? If you called it, make sure you did so before any StyleSheet.create.',
+                    )
+                },
             })
         }
 
         if (!themeName) {
             return new Proxy({} as UnistylesTheme, {
                 get: () => {
-                    throw error('One of your stylesheets is trying to get the theme, but no theme has been selected yet. Did you forget to select an initial theme?')
-                }
+                    throw error(
+                        'One of your stylesheets is trying to get the theme, but no theme has been selected yet. Did you forget to select an initial theme?',
+                    )
+                },
             })
         }
 
@@ -268,7 +275,7 @@ export class UnistylesRuntime {
             return new Proxy({} as UnistylesTheme, {
                 get: () => {
                     throw error(`You're trying to get theme "${themeName}" but it wasn't registered.`)
-                }
+                },
             })
         }
 

@@ -8,33 +8,33 @@ export type ShadowNode = {
 
 export type ViewHandle = {
     __internalInstanceHandle?: {
-        stateNode?: StateNode,
+        stateNode?: StateNode
         elementType?: string
-    },
+    }
     getScrollResponder?: () => {
-        getNativeScrollRef?: () => ({
+        getNativeScrollRef?: () => {
             __internalInstanceHandle?: {
                 stateNode?: StateNode
             }
-        })
-    },
-    getNativeScrollRef?: () => ({
+        }
+    }
+    getNativeScrollRef?: () => {
         __internalInstanceHandle?: {
             stateNode?: StateNode
         }
-    }),
+    }
     _viewRef?: {
         __internalInstanceHandle?: {
             stateNode?: StateNode
         }
-    },
+    }
     viewRef?: {
         current?: {
             __internalInstanceHandle?: {
                 stateNode?: StateNode
             }
         }
-    },
+    }
     _nativeRef?: {
         __internalInstanceHandle?: {
             stateNode?: StateNode
@@ -43,7 +43,7 @@ export type ViewHandle = {
 }
 
 export type Unistyle = {
-    __unid?: number,
+    __unid?: number
     initial?: {
         updater?: () => void
     }

@@ -1,17 +1,18 @@
 import { pluginTester } from 'babel-plugin-tester'
+
 import plugin from '../src/index'
 
 pluginTester({
     plugin,
     pluginOptions: {
         debug: false,
-        root: 'src'
+        root: 'src',
     },
     babelOptions: {
         plugins: ['@babel/plugin-syntax-jsx'],
         generatorOpts: {
-            retainLines: true
-        }
+            retainLines: true,
+        },
     },
     tests: [
         {
@@ -75,7 +76,7 @@ pluginTester({
                     }),
                     664955593
                 )
-            `
+            `,
         },
         {
             title: 'Should detect dependencies in breakpoints',
@@ -130,7 +131,7 @@ pluginTester({
                     }),
                     664955593
                 )
-            `
+            `,
         },
         {
             title: 'Should detect dependencies in calculations',
@@ -179,7 +180,7 @@ pluginTester({
                     }),
                     664955593
                 )
-            `
+            `,
         },
         {
             title: 'Should detect dependencies in _web',
@@ -355,7 +356,7 @@ pluginTester({
                     }),
                     664955593
                 )
-            `
+            `,
         },
         {
             title: 'Should allow user to use arrow functions with body for dynamic functions',
@@ -418,7 +419,7 @@ pluginTester({
                     }),
                     664955593
                 )
-            `
+            `,
         },
         {
             title: 'Should correctly detect IME insets dependency',
@@ -465,7 +466,7 @@ pluginTester({
                     }),
                     664955593
                 )
-            `
+            `,
         },
         {
             title: 'Should correctly detect dependency from Array accessor',
@@ -512,7 +513,7 @@ pluginTester({
                     }),
                     664955593
                 )
-            `
+            `,
         },
         {
             title: 'Should correctly detect dependency from unary operator',
@@ -565,7 +566,7 @@ pluginTester({
                     }),
                     664955593
                 )
-            `
+            `,
         },
         {
             title: 'Should correctly detect dependencies from if else statements',
@@ -655,7 +656,7 @@ pluginTester({
                     }),
                     664955593
                 )
-            `
+            `,
         },
         {
             title: 'Should correctly detect dependency in square brackets',
@@ -707,7 +708,7 @@ pluginTester({
                     }),
                     664955593
                 )
-            `
+            `,
         },
         {
             title: 'Should correctly detect inline spread',
@@ -759,7 +760,7 @@ pluginTester({
                     }),
                     664955593
                 )
-            `
+            `,
         },
         {
             title: 'Should correctly detect inline theme dependencies',
@@ -801,7 +802,7 @@ pluginTester({
                     }),
                     664955593
                 )
-            `
+            `,
         },
         {
             title: 'Should correctly detect destructured dependencies',
@@ -857,7 +858,7 @@ pluginTester({
                     }),
                     664955593
                 )
-            `
+            `,
         },
         {
             title: 'Should correctly detect dependencies in weirdest syntax',
@@ -956,7 +957,7 @@ pluginTester({
                     },
                     664955593
                 )
-            `
+            `,
         },
         {
             title: 'Should correctly detect ime from destructured insets',
@@ -1009,7 +1010,7 @@ pluginTester({
                     }),
                     664955593
                 )
-            `
+            `,
         },
         {
             title: 'Should correctly detect hasAdaptiveThemes dependency',
@@ -1056,7 +1057,7 @@ pluginTester({
                     }),
                     664955593
                 )
-            `
-        }
-    ]
+            `,
+        },
+    ],
 })

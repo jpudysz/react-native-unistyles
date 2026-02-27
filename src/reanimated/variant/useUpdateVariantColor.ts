@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { runOnUI, useSharedValue } from 'react-native-reanimated'
-import { UnistyleDependency } from '../../specs'
+
 import type { UnistylesValues } from '../../types'
+import type { UseUpdateVariantColorConfig } from './types'
+
+import { UnistyleDependency } from '../../specs'
 import { services } from '../../web/services'
 import { getClosestBreakpointValue } from '../../web/utils'
-import type { UseUpdateVariantColorConfig } from './types'
 
 export const useUpdateVariantColor = <T extends Record<string, any>>({
     animateCallback,
     colorKey,
-    style
+    style,
 }: UseUpdateVariantColorConfig<T>) => {
     const [dummyDiv] = useState(() => {
         const div = document.createElement('div')
@@ -22,27 +24,25 @@ export const useUpdateVariantColor = <T extends Record<string, any>>({
     const parsedStyles = useMemo(() => {
         return services.shadowRegistry.addStyles([style]).parsedStyles
     }, [style])
-    const getCurrentColor = useCallback(
-        () => {
-            if (!parsedStyles) {
-                return 'rgb(0, 0, 0)'
-            }
+    const getCurrentColor = useCallback(() => {
+        if (!parsedStyles) {
+            return 'rgb(0, 0, 0)'
+        }
 
-            const currentColor = parsedStyles[colorKey as keyof UnistylesValues] as string | Record<string, string>
-            const currentColorVar = typeof currentColor === 'string'
+        const currentColor = parsedStyles[colorKey as keyof UnistylesValues] as string | Record<string, string>
+        const currentColorVar =
+            typeof currentColor === 'string'
                 ? currentColor
-                : getClosestBreakpointValue<string>(services.runtime, currentColor) ?? 'rgb(0, 0, 0)'
+                : (getClosestBreakpointValue<string>(services.runtime, currentColor) ?? 'rgb(0, 0, 0)')
 
-            if (currentColorVar.startsWith('var(--')) {
-                dummyDiv.style.color = currentColorVar
+        if (currentColorVar.startsWith('var(--')) {
+            dummyDiv.style.color = currentColorVar
 
-                return getComputedStyle(dummyDiv).color
-            }
+            return getComputedStyle(dummyDiv).color
+        }
 
-            return currentColorVar
-        },
-        [style, colorKey]
-    )
+        return currentColorVar
+    }, [style, colorKey])
     const fromValue = useSharedValue<string>(getCurrentColor())
     const toValue = useSharedValue<string>(getCurrentColor())
 
@@ -76,6 +76,6 @@ export const useUpdateVariantColor = <T extends Record<string, any>>({
 
     return {
         fromValue,
-        toValue
+        toValue,
     }
 }

@@ -4,7 +4,7 @@ export const passForwardedRef = <T>(
     ref: T,
     forwardedRef: React.ForwardedRef<T>,
     onMount?: () => void,
-    onUnmount?: () => void
+    onUnmount?: () => void,
 ) => {
     const passForwardedRef = () => {
         if (typeof forwardedRef === 'function') {

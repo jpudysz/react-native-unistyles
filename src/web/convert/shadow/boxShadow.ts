@@ -19,12 +19,12 @@ export const getBoxShadowStyle = (styles: Record<string, any>) => {
     // If no breakpoints were used return styles without media queries
     if (breakpoints.length === 0) {
         return {
-            boxShadow: createBoxShadowValue(styles as BoxShadow)
+            boxShadow: createBoxShadowValue(styles as BoxShadow),
         }
     }
 
     // Create boxShadow for each breakpoint
-    const breakpointStyles = breakpoints.map(breakpoint => {
+    const breakpointStyles = breakpoints.map((breakpoint) => {
         const color = extractShadowValue('shadowColor', breakpoint, styles)
         const { width, height } = extractShadowValue('shadowOffset', breakpoint, styles)
         const radius = extractShadowValue('shadowRadius', breakpoint, styles)
@@ -36,12 +36,12 @@ export const getBoxShadowStyle = (styles: Record<string, any>) => {
                     shadowColor: color,
                     shadowOffset: {
                         width,
-                        height
+                        height,
                     },
                     shadowRadius: radius,
-                    shadowOpacity: opacity
-                })
-            }
+                    shadowOpacity: opacity,
+                }),
+            },
         }
     })
 

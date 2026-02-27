@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
 import type { BoxShadowValue, FilterFunction, ImageStyle, TextStyle, ViewStyle } from 'react-native'
+
 import type { UnistylesBreakpoints } from '../global'
 import type { UnistylesMiniRuntime } from '../specs'
 import type { Pseudo } from '../web/convert/pseudo'
@@ -15,10 +16,10 @@ export type UnistyleText = Omit<TextStyle, NestedKeys>
 export type UnistyleImage = Omit<ImageStyle, NestedKeys>
 
 type UnistyleNestedStyles = {
-    shadowOffset?: ToDeepUnistyles<ShadowOffset>,
-    textShadowOffset?: ToDeepUnistyles<ShadowOffset>,
-    transform?: Array<ToDeepUnistyles<TransformStyles>>,
-    boxShadow?: Array<ToDeepUnistyles<BoxShadowValue>> | string,
+    shadowOffset?: ToDeepUnistyles<ShadowOffset>
+    textShadowOffset?: ToDeepUnistyles<ShadowOffset>
+    transform?: Array<ToDeepUnistyles<TransformStyles>>
+    boxShadow?: Array<ToDeepUnistyles<BoxShadowValue>> | string
     filter?: Array<ToDeepUnistyles<FilterFunction>> | string
 }
 
@@ -37,14 +38,16 @@ type CompoundVariant = {
 }
 
 type VariantsAndCompoundVariants = {
-    variants?: VariantsObject,
+    variants?: VariantsObject
     compoundVariants?: Array<CompoundVariant>
 }
 
 export type ToDeepUnistyles<T> = {
-    [K in keyof T]?: T[K] | {
-        [key in BreakpointsOrMediaQueries]?: T[K]
-    }
+    [K in keyof T]?:
+        | T[K]
+        | {
+              [key in BreakpointsOrMediaQueries]?: T[K]
+          }
 }
 
 type AllAvailableStyles = UnistyleView & UnistyleText & UnistyleImage & UnistyleNestedStyles
@@ -53,19 +56,21 @@ export type AllAvailableKeys = keyof (UnistyleView & UnistyleText & UnistyleImag
 export type BreakpointsOrMediaQueries = keyof UnistylesBreakpoints | symbol
 
 type FlatUnistylesValues = {
-    [propName in AllAvailableKeys]?: AllAvailableStyles[propName] | {
-        [key in BreakpointsOrMediaQueries]?: AllAvailableStyles[propName]
-    }
+    [propName in AllAvailableKeys]?:
+        | AllAvailableStyles[propName]
+        | {
+              [key in BreakpointsOrMediaQueries]?: AllAvailableStyles[propName]
+          }
 }
 
-export type UnistylesValues = FlatUnistylesValues & {
-} & VariantsAndCompoundVariants & {
-    [propName in NestedKeys]?: UnistyleNestedStyles[propName]
-} & {
-    _web?: ToDeepUnistyles<CSSProperties> & CustomClassName & {
-        [propName in Pseudo]?: ToDeepUnistyles<CSSProperties>
+export type UnistylesValues = FlatUnistylesValues & {} & VariantsAndCompoundVariants & {
+        [propName in NestedKeys]?: UnistyleNestedStyles[propName]
+    } & {
+        _web?: ToDeepUnistyles<CSSProperties> &
+            CustomClassName & {
+                [propName in Pseudo]?: ToDeepUnistyles<CSSProperties>
+            }
     }
-}
 
 export type StyleSheet = {
     [styleName: string]: UnistylesValues | ((...args: any) => UnistylesValues)
@@ -79,6 +84,9 @@ type UseVariantsFn<T> = {
     useVariants: (variants: ExtractVariantNames<T>) => void
 }
 
-const create = <S extends StyleSheet>(stylesheet: StyleSheetWithSuperPowers<S>): (ReactNativeStyleSheet<S> & UseVariantsFn<typeof stylesheet>) => stylesheet as (ReactNativeStyleSheet<S> & UseVariantsFn<typeof stylesheet>)
+const create = <S extends StyleSheet>(
+    stylesheet: StyleSheetWithSuperPowers<S>,
+): ReactNativeStyleSheet<S> & UseVariantsFn<typeof stylesheet> =>
+    stylesheet as ReactNativeStyleSheet<S> & UseVariantsFn<typeof stylesheet>
 
 export type CreateUnistylesStyleSheet = typeof create

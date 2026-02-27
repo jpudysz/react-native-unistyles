@@ -1,5 +1,7 @@
-import React, { useRef } from 'react'
 import type { ScrollView } from 'react-native'
+
+import React, { useRef } from 'react'
+
 import { UnistylesShadowRegistry } from '../specs'
 import { copyComponentProperties } from '../utils'
 import { passForwardedRef } from './passForwardRef'
@@ -41,7 +43,7 @@ export const createUnistylesElement = (Component: any) => {
                         () => {
                             // @ts-ignore this is hidden from TS
                             UnistylesShadowRegistry.remove(ref)
-                        }
+                        },
                     )
                 }}
             />

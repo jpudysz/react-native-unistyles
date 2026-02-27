@@ -11,7 +11,7 @@ export enum IOSContentSizeCategory {
     Medium = 'Medium',
     Small = 'Small',
     ExtraSmall = 'xSmall',
-    Unspecified = 'unspecified'
+    Unspecified = 'unspecified',
 }
 
 export enum AndroidContentSizeCategory {
@@ -21,7 +21,7 @@ export enum AndroidContentSizeCategory {
     ExtraLarge = 'ExtraLarge',
     Huge = 'Huge',
     ExtraHuge = 'ExtraHuge',
-    ExtraExtraHuge = 'ExtraExtraHuge'
+    ExtraExtraHuge = 'ExtraExtraHuge',
 }
 
 export enum WebContentSizeCategory {

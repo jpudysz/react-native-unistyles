@@ -1,17 +1,18 @@
 import { pluginTester } from 'babel-plugin-tester'
+
 import plugin from '../src/index'
 
 pluginTester({
     plugin,
     pluginOptions: {
         debug: false,
-        root: 'src'
+        root: 'src',
     },
     babelOptions: {
         plugins: ['@babel/plugin-syntax-jsx'],
         generatorOpts: {
-            retainLines: true
-        }
+            retainLines: true,
+        },
     },
     tests: [
         {
@@ -50,7 +51,7 @@ pluginTester({
                     },
                     75510584
                 )
-            `
-        }
-    ]
+            `,
+        },
+    ],
 })
