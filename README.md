@@ -1,6 +1,6 @@
 [<img alt="react-native-unistyles" src="assets/banner3.png">](https://unistyl.es/)
 
-![GitHub package.json version](https://img.shields.io/github/package-json/v/jpudysz/react-native-unistyles?style=for-the-badge)
+[![npm version](https://img.shields.io/npm/v/react-native-unistyles?style=for-the-badge)](https://www.npmjs.com/package/react-native-unistyles)
 [![npm downloads](https://img.shields.io/npm/dm/react-native-unistyles?style=for-the-badge)](https://www.npmjs.com/package/react-native-unistyles)
 [![npm downloads](https://img.shields.io/npm/dt/react-native-unistyles?style=for-the-badge)](https://www.npmjs.com/package/react-native-unistyles)
 [![License: MIT](https://img.shields.io/badge/License-MIT-44CD11.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -24,11 +24,10 @@ Install dependencies:
 yarn add react-native-edge-to-edge react-native-nitro-modules@0.33.9
 ```
 
-> To avoid unexpected behavior, always use a fixed version of `react-native-nitro-modules`
-
-| react-native-unistyles | react-native-nitro-modules |
-|------------------------|----------------------------|
-| 3.0.0                  | 0.33.9                     |
+| react-native-unistyles | Minimum react-native-nitro-modules |
+|------------------------|-------------------------------------|
+| >= 3.0.0               | 0.33.9                              |
+| >= 3.1.0               | 0.34.0                              |
 
 Then follow [installation guides](https://unistyl.es/v3/start/getting-started) for your platform.
 

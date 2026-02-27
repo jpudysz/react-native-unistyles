@@ -64,11 +64,11 @@ export default defineConfig({
             logo: {
                 src: './public/favicon.png'
             },
-            social: {
-                github: 'https://github.com/jpudysz/react-native-unistyles',
-                'x.com': 'https://x.com/jpudysz',
-                discord: 'https://discord.gg/akGHf27P4C'
-            },
+            social: [
+                { icon: 'github', label: 'GitHub', href: 'https://github.com/jpudysz/react-native-unistyles' },
+                { icon: 'x.com', label: 'X', href: 'https://x.com/jpudysz' },
+                { icon: 'discord', label: 'Discord', href: 'https://discord.gg/akGHf27P4C' },
+            ],
 			sidebar: [
                 {
                     label: 'Tutorial', slug: 'v3/tutorial/intro', badge: 'New!'

@@ -1,7 +1,8 @@
 const path = require('path')
-const escape = require('escape-string-regexp')
 const { getDefaultConfig } = require('@expo/metro-config')
-const exclusionList = require('metro-config/private/defaults/exclusionList')
+const { default: exclusionList } = require(
+    require.resolve('metro-config').replace('index.js', 'defaults/exclusionList.js'),
+)
 const pak = require('../../packages/unistyles/package.json')
 
 const monorepoRoot = path.resolve(__dirname, '../..')
@@ -20,10 +21,11 @@ const config = {
     // So we block them at the root, and alias them to the versions in example's node_modules
     resolver: {
         ...defaultConfig.resolver,
-        blacklistRE: exclusionList(
-            modules.map(
-                module => new RegExp(`^${escape(path.join(libraryRoot, 'node_modules', module))}\\/.*$`)
-            )
+        blockList: exclusionList(
+            modules.map(module => {
+                const escaped = path.join(libraryRoot, 'node_modules', module).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+                return new RegExp(`^${escaped}\\/.*$`)
+            })
         ),
         extraNodeModules: modules.reduce((acc, name) => ({
             ...acc,

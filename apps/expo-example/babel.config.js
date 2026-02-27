@@ -11,6 +11,7 @@ module.exports = function (api) {
             [path.join(__dirname, '../../packages/unistyles/plugin'), {
                 debug: true,
                 isLocal: true,
+                localPath: path.join(__dirname, '../../packages/unistyles'),
                 root: 'app'
             }],
             [
