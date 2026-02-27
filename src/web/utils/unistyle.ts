@@ -34,14 +34,12 @@ export const assignSecrets = <T>(object: T, secrets: UnistyleSecrets) => {
     // @ts-expect-error assign hidden secrets
     object[`unistyles_${secretsId}`] = {}
     // @ts-expect-error assign hidden secrets
-    Object.defineProperties(
-        object[`unistyles_${secretsId}`],
-        reduceObject(secrets, (secret) => ({
-            value: secret,
-            enumerable: false,
-            configurable: true,
-        })),
-    )
+    // prettier-ignore
+    Object.defineProperties(object[`unistyles_${secretsId}`], reduceObject(secrets, (secret) => ({
+        value: secret,
+        enumerable: false,
+        configurable: true,
+    })))
 
     return object
 }
@@ -144,11 +142,8 @@ export const checkForAnimated = (value: any): boolean => {
         const secrets = extractSecrets(value)
 
         // @ts-expect-error React Native Web exports Animated.AnimatedNode as Animated.Node
-        return (
-            value instanceof Animated.Node ||
-            (objectValues.length > 0 && objectValues.some(checkForAnimated)) ||
-            (secrets && Object.keys(secrets).length === 0)
-        )
+        // prettier-ignore
+        return value instanceof Animated.Node || objectValues.length > 0 && objectValues.some(checkForAnimated) || secrets && Object.keys(secrets).length === 0
     }
 
     return false

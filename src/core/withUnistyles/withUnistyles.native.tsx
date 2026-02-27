@@ -66,15 +66,11 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         const NativeComponent = Component as ComponentType
 
         // @ts-ignore we don't know the type of the component
-        maybeWarnAboutMultipleUnistyles(
-            narrowedProps.style,
-            `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`,
-        )
+        // prettier-ignore
+        maybeWarnAboutMultipleUnistyles(narrowedProps.style, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
         // @ts-ignore we don't know the type of the component
-        maybeWarnAboutMultipleUnistyles(
-            narrowedProps.contentContainerStyle,
-            `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`,
-        )
+        // prettier-ignore
+        maybeWarnAboutMultipleUnistyles(narrowedProps.contentContainerStyle, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
 
         const scopedTheme = useRef(UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme)
         const { proxifiedRuntime, proxifiedTheme, addDependencies } = useProxifiedUnistyles(scopedTheme.current)

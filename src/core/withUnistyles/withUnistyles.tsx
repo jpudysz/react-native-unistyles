@@ -61,15 +61,11 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         } as any
 
         // @ts-ignore
-        maybeWarnAboutMultipleUnistyles(
-            narrowedProps.style,
-            `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`,
-        )
+        // prettier-ignore
+        maybeWarnAboutMultipleUnistyles(narrowedProps.style, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
         // @ts-ignore
-        maybeWarnAboutMultipleUnistyles(
-            narrowedProps.contentContainerStyle,
-            `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`,
-        )
+        // prettier-ignore
+        maybeWarnAboutMultipleUnistyles(narrowedProps.contentContainerStyle, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
 
         const NativeComponent = Component as ComponentType
         const [classNames] = styleClassNames ?? []
