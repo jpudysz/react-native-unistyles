@@ -6,7 +6,7 @@ import { handleExoticImport } from './exotic'
 import { addUnistylesImport, addUnistylesRequire, isInsideNodeModules } from './import'
 import { toPlatformPath } from './paths'
 import { hasStringRef } from './ref'
-import { addDependencies, addStyleSheetTag, getStylesDependenciesFromFunction, getStylesDependenciesFromObject, isKindOfStyleSheet, isReactNativeCommonJSRequire, isUnistylesCommonJSRequire, isUnistylesStyleSheet } from './stylesheet'
+import { addDependencies, getStylesDependenciesFromFunction, getStylesDependenciesFromObject, isKindOfStyleSheet, isReactNativeCommonJSRequire, isUnistylesCommonJSRequire, isUnistylesStyleSheet } from './stylesheet'
 import type { UnistylesPluginPass } from './types'
 import { extractVariants } from './variants'
 
@@ -44,7 +44,6 @@ export default function (): PluginObj<UnistylesPluginPass> {
                     state.file.hasVariants = false
                     state.file.styleSheetLocalName = ''
                     state.file.reactNativeCommonJSName = ''
-                    state.file.tagNumber = 0
                     state.reactNativeImports = {}
                     state.file.forceProcessing = state.filename?.includes(appRoot) ?? false
 
@@ -211,8 +210,6 @@ export default function (): PluginObj<UnistylesPluginPass> {
                 }
 
                 state.file.hasAnyUnistyle = true
-
-                addStyleSheetTag(path, state)
 
                 const arg = t.isAssignmentExpression(path.node.arguments[0])
                     ? path.node.arguments[0].right

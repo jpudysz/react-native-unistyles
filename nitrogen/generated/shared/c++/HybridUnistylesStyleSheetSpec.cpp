@@ -15,7 +15,6 @@ namespace margelo::nitro::unistyles {
     // load custom methods/properties
     registerHybrids(this, [](Prototype& prototype) {
       prototype.registerHybridGetter("hairlineWidth", &HybridUnistylesStyleSheetSpec::getHairlineWidth);
-      prototype.registerHybridGetter("unid", &HybridUnistylesStyleSheetSpec::getUnid);
       prototype.registerHybridMethod("addChangeListener", &HybridUnistylesStyleSheetSpec::addChangeListener);
     });
   }
