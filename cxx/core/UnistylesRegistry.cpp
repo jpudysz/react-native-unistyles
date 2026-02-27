@@ -251,3 +251,10 @@ void core::UnistylesRegistry::destroy() {
     this->_shadowRegistry.clear();
     this->_scopedTheme = std::nullopt;
 }
+
+void core::UnistylesRegistry::destroyState(jsi::Runtime* rt) {
+    this->_states.erase(rt);
+    this->_styleSheetRegistry.erase(rt);
+    this->_shadowRegistry.erase(rt);
+    this->_scopedTheme = std::nullopt;
+}
