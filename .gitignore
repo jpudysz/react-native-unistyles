@@ -85,3 +85,14 @@ packages/unistyles/cxx/tests/cmake-build-debug-coverage/
 
 packages/unistyles/src/**/*.js
 tsconfig.tsbuildinfo
+
+# Yarn PnP cache
+.yarn/cache/
+.yarn/releases/
+.yarn/plugins/
+
+# CocoaPods
+**/ios/Pods/
+
+# Next.js
+.next/
