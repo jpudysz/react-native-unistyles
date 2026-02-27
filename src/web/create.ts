@@ -1,6 +1,6 @@
 import type { StyleSheet, StyleSheetWithSuperPowers } from '../types/stylesheet'
 import * as unistyles from './services'
-import { assignSecrets, error, isServer, removeInlineStyles } from './utils'
+import { assignSecrets, isServer, removeInlineStyles } from './utils'
 
 type Variants = Record<string, string | boolean | undefined>
 
