@@ -9,7 +9,6 @@ interface UnistylesState {
     addUnistylesRequire: boolean
     forceProcessing: boolean
     styleSheetLocalName: string
-    tagNumber: number
     replaceWithUnistyles: boolean
     reactNativeCommonJSName: string
 }

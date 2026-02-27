@@ -233,7 +233,6 @@ jest.mock('react-native-unistyles', () => {
                 parseBoxShadowString: () => [],
             },
             hairlineWidth: 1,
-            unid: -1,
             addChangeListener: () => () => {},
             init: () => {},
             name: 'StyleSheetMock',

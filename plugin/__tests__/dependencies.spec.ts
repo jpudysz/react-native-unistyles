@@ -59,23 +59,20 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    (theme, rt) => ({
-                        container: {
-                            variants: {
-                                size: {
-                                    small: {
-                                        backgroundColor: theme.colors.blue,
-                                        paddingTop: theme.gap(10),
-                                        marginBottom: rt.insets.bottom === 0 ? theme.gap(20) : theme.gap(30)
-                                    }
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: {
+                        variants: {
+                            size: {
+                                small: {
+                                    backgroundColor: theme.colors.blue,
+                                    paddingTop: theme.gap(10),
+                                    marginBottom: rt.insets.bottom === 0 ? theme.gap(20) : theme.gap(30)
                                 }
-                            },
-                            uni__dependencies: [0, 9, 4]
-                        }
-                    }),
-                    664955593
-                )
+                            }
+                        },
+                        uni__dependencies: [0, 9, 4]
+                    }
+                }))
             `,
         },
         {
@@ -117,20 +114,17 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    (theme, rt) => ({
-                        container: {
-                            backgroundColor: {
-                                sm: theme.colors.blue
-                            },
-                            padding: {
-                                xs: rt.insets.top
-                            },
-                            uni__dependencies: [0, 9]
-                        }
-                    }),
-                    664955593
-                )
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: {
+                        backgroundColor: {
+                            sm: theme.colors.blue
+                        },
+                        padding: {
+                            xs: rt.insets.top
+                        },
+                        uni__dependencies: [0, 9]
+                    }
+                }))
             `,
         },
         {
@@ -169,17 +163,14 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    (theme, rt) => ({
-                        container: {
-                            marginTop: theme.gap(2) + rt.insets.bottom,
-                            marginBottom: theme.gap(2) * rt.statusBar.height,
-                            paddingTop: theme.gap(2) - rt.navigationBar.height,
-                            uni__dependencies: [0, 9, 12, 13]
-                        }
-                    }),
-                    664955593
-                )
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: {
+                        marginTop: theme.gap(2) + rt.insets.bottom,
+                        marginBottom: theme.gap(2) * rt.statusBar.height,
+                        paddingTop: theme.gap(2) - rt.navigationBar.height,
+                        uni__dependencies: [0, 9, 12, 13]
+                    }
+                }))
             `,
         },
         {
@@ -279,83 +270,80 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    (theme, rt) => ({
-                        container: {
-                            flex: 1,
-                            display: 'flex'
-                        },
-                        static: {
-                            backgroundColor: 'pink'
-                        },
-                        staticText: {
-                            color: 'red'
-                        },
-                        theme: {
-                            backgroundColor: theme.colors.backgroundColor,
-                            uni__dependencies: [0]
-                        },
-                        themeText: {
-                            color: theme.colors.typography,
-                            uni__dependencies: [0]
-                        },
-                        themeButtonsContainer: {
-                            marginTop: 20,
-                            flexDirection: 'row',
-                            gap: 10
-                        },
-                        dynamic: state => ({
-                            backgroundColor: state % 2 === 0 ? theme.colors.fog : theme.colors.oak,
-                            uni__dependencies: [0]
-                        }),
-                        whiteText: {
-                            color: 'white',
-                            textAlign: 'center'
-                        },
-                        hover: {
-                            backgroundColor: theme.colors.blood,
-                            cursor: 'pointer',
-                            _web: {
-                                _hover: {
-                                    backgroundColor: theme.colors.sky,
-                                    paddingTop: rt.insets.top
-                                }
-                            },
-                            uni__dependencies: [0, 9]
-                        },
-                        breakpoint: {
-                            backgroundColor: {
-                                xs: theme.colors.blood,
-                                md: theme.colors.sky,
-                                xl: theme.colors.aloes
-                            },
-                            transform: [
-                                {
-                                    translateX: {
-                                        xs: rt.fontScale * 10,
-                                        md: rt.pixelRatio * 10
-                                    }
-                                }
-                            ],
-
-                            position: 'relative',
-                            _web: {
-                                _after: {
-                                    fontWeight: 'bold',
-                                    content: rt.breakpoint,
-                                    color: 'white',
-                                    position: 'absolute',
-                                    top: '60%',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)',
-                                    backgroundColor: rt.colorScheme === 'dark' ? 'black' : 'white'
-                                }
-                            },
-                            uni__dependencies: [0, 11, 10, 3, 5]
-                        }
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: {
+                        flex: 1,
+                        display: 'flex'
+                    },
+                    static: {
+                        backgroundColor: 'pink'
+                    },
+                    staticText: {
+                        color: 'red'
+                    },
+                    theme: {
+                        backgroundColor: theme.colors.backgroundColor,
+                        uni__dependencies: [0]
+                    },
+                    themeText: {
+                        color: theme.colors.typography,
+                        uni__dependencies: [0]
+                    },
+                    themeButtonsContainer: {
+                        marginTop: 20,
+                        flexDirection: 'row',
+                        gap: 10
+                    },
+                    dynamic: state => ({
+                        backgroundColor: state % 2 === 0 ? theme.colors.fog : theme.colors.oak,
+                        uni__dependencies: [0]
                     }),
-                    664955593
-                )
+                    whiteText: {
+                        color: 'white',
+                        textAlign: 'center'
+                    },
+                    hover: {
+                        backgroundColor: theme.colors.blood,
+                        cursor: 'pointer',
+                        _web: {
+                            _hover: {
+                                backgroundColor: theme.colors.sky,
+                                paddingTop: rt.insets.top
+                            }
+                        },
+                        uni__dependencies: [0, 9]
+                    },
+                    breakpoint: {
+                        backgroundColor: {
+                            xs: theme.colors.blood,
+                            md: theme.colors.sky,
+                            xl: theme.colors.aloes
+                        },
+                        transform: [
+                            {
+                                translateX: {
+                                    xs: rt.fontScale * 10,
+                                    md: rt.pixelRatio * 10
+                                }
+                            }
+                        ],
+
+                        position: 'relative',
+                        _web: {
+                            _after: {
+                                fontWeight: 'bold',
+                                content: rt.breakpoint,
+                                color: 'white',
+                                position: 'absolute',
+                                top: '60%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                backgroundColor: rt.colorScheme === 'dark' ? 'black' : 'white'
+                            }
+                        },
+                        uni__dependencies: [0, 11, 10, 3, 5]
+                    }
+                }))
             `,
         },
         {
@@ -401,24 +389,21 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    (theme, rt) => ({
-                        container: () => {
-                            const b = 2 + 2
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: () => {
+                        const b = 2 + 2
 
-                            return {
-                                backgroundColor: {
-                                    sm: theme.colors.blue
-                                },
-                                padding: {
-                                    xs: rt.insets.top + b
-                                },
-                                uni__dependencies: [0, 9]
-                            }
+                        return {
+                            backgroundColor: {
+                                sm: theme.colors.blue
+                            },
+                            padding: {
+                                xs: rt.insets.top + b
+                            },
+                            uni__dependencies: [0, 9]
                         }
-                    }),
-                    664955593
-                )
+                    }
+                }))
             `,
         },
         {
@@ -456,16 +441,13 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    (theme, rt) => ({
-                        container: {
-                            backgroundColor: theme.colors.background,
-                            paddingBottom: rt.insets.ime,
-                            uni__dependencies: [0, 14]
-                        }
-                    }),
-                    664955593
-                )
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: {
+                        backgroundColor: theme.colors.background,
+                        paddingBottom: rt.insets.ime,
+                        uni__dependencies: [0, 14]
+                    }
+                }))
             `,
         },
         {
@@ -503,16 +485,13 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    (theme, rt) => ({
-                        container: (headerColors, colorMap) => ({
-                            backgroundColor: headerColors[rt.colorScheme],
-                            paddingBottom: colorMap[theme.colors.primary],
-                            uni__dependencies: [0, 5]
-                        })
-                    }),
-                    664955593
-                )
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: (headerColors, colorMap) => ({
+                        backgroundColor: headerColors[rt.colorScheme],
+                        paddingBottom: colorMap[theme.colors.primary],
+                        uni__dependencies: [0, 5]
+                    })
+                }))
             `,
         },
         {
@@ -553,19 +532,16 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    (theme, rt) => ({
-                        container: {
-                            transform: [
-                                {
-                                    translateY: -rt.insets.ime
-                                }
-                            ],
-                            uni__dependencies: [14]
-                        }
-                    }),
-                    664955593
-                )
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: {
+                        transform: [
+                            {
+                                translateY: -rt.insets.ime
+                            }
+                        ],
+                        uni__dependencies: [14]
+                    }
+                }))
             `,
         },
         {
@@ -623,39 +599,36 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    (theme, rt) => ({
-                        container: someRandomInt => {
-                            if (someRandomInt === 5) {
-                                return {
-                                    backgroundColor: theme.colors.background,
-                                    uni__dependencies: [0, 9, 11]
-                                }
-                            }
-
-                            if (someRandomInt === 10) {
-                                return {
-                                    backgroundColor: theme.colors.barbie,
-                                    paddingBottom: rt.insets.bottom,
-                                    uni__dependencies: [0, 9, 11]
-                                }
-                            }
-
-                            if (someRandomInt === 15) {
-                                return {
-                                    fontSize: rt.fontScale * 10,
-                                    uni__dependencies: [0, 9, 11]
-                                }
-                            } else {
-                                return {
-                                    backgroundColor: theme.colors.blood,
-                                    uni__dependencies: [0, 9, 11]
-                                }
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: someRandomInt => {
+                        if (someRandomInt === 5) {
+                            return {
+                                backgroundColor: theme.colors.background,
+                                uni__dependencies: [0, 9, 11]
                             }
                         }
-                    }),
-                    664955593
-                )
+
+                        if (someRandomInt === 10) {
+                            return {
+                                backgroundColor: theme.colors.barbie,
+                                paddingBottom: rt.insets.bottom,
+                                uni__dependencies: [0, 9, 11]
+                            }
+                        }
+
+                        if (someRandomInt === 15) {
+                            return {
+                                fontSize: rt.fontScale * 10,
+                                uni__dependencies: [0, 9, 11]
+                            }
+                        } else {
+                            return {
+                                backgroundColor: theme.colors.blood,
+                                uni__dependencies: [0, 9, 11]
+                            }
+                        }
+                    }
+                }))
             `,
         },
         {
@@ -695,19 +668,16 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    (theme, rt) => ({
-                        container: {
-                            backgroundColor: theme.palette.purple[500],
-                            uni__dependencies: [0]
-                        },
-                        container2: {
-                            paddingBottom: theme.spacing[rt.breakpoint],
-                            uni__dependencies: [0, 3]
-                        }
-                    }),
-                    664955593
-                )
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: {
+                        backgroundColor: theme.palette.purple[500],
+                        uni__dependencies: [0]
+                    },
+                    container2: {
+                        paddingBottom: theme.spacing[rt.breakpoint],
+                        uni__dependencies: [0, 3]
+                    }
+                }))
             `,
         },
         {
@@ -747,19 +717,16 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    theme => ({
-                        container: {
-                            ...theme.components.container,
-                            uni__dependencies: [0]
-                        },
-                        container2: {
-                            ...theme.components.text,
-                            uni__dependencies: [0]
-                        }
-                    }),
-                    664955593
-                )
+                const styles = StyleSheet.create(theme => ({
+                    container: {
+                        ...theme.components.container,
+                        uni__dependencies: [0]
+                    },
+                    container2: {
+                        ...theme.components.text,
+                        uni__dependencies: [0]
+                    }
+                }))
             `,
         },
         {
@@ -795,13 +762,10 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    theme => ({
-                        container: { ...theme.components.container, uni__dependencies: [0] },
-                        container2: { ...theme.components.text.nested.deep, uni__dependencies: [0] }
-                    }),
-                    664955593
-                )
+                const styles = StyleSheet.create(theme => ({
+                    container: { ...theme.components.container, uni__dependencies: [0] },
+                    container2: { ...theme.components.text.nested.deep, uni__dependencies: [0] }
+                }))
             `,
         },
         {
@@ -843,21 +807,18 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    ({ components: { test } }, { insets: { ime }, screen: { height }, statusBar }) => ({
-                        container: {
-                            backgroundColor: test,
-                            uni__dependencies: [0]
-                        },
-                        container2: {
-                            paddingBottom: ime,
-                            height,
-                            width: statusBar.width,
-                            uni__dependencies: [14, 6, 12]
-                        }
-                    }),
-                    664955593
-                )
+                const styles = StyleSheet.create(({ components: { test } }, { insets: { ime }, screen: { height }, statusBar }) => ({
+                    container: {
+                        backgroundColor: test,
+                        uni__dependencies: [0]
+                    },
+                    container2: {
+                        paddingBottom: ime,
+                        height,
+                        width: statusBar.width,
+                        uni__dependencies: [14, 6, 12]
+                    }
+                }))
             `,
         },
         {
@@ -954,8 +915,7 @@ pluginTester({
                                 uni__dependencies: [14, 12]
                             })
                         }
-                    },
-                    664955593
+                    }
                 )
             `,
         },
@@ -997,19 +957,16 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    (theme, { insets }) => ({
-                        keyboardAvoidingView: {
-                            flex: 1,
-                            paddingTop: insets.top + 16,
-                            paddingLeft: insets.left + 16,
-                            paddingRight: insets.right + 16,
-                            paddingBottom: insets.ime || insets.bottom + 50,
-                            uni__dependencies: [9, 14]
-                        }
-                    }),
-                    664955593
-                )
+                const styles = StyleSheet.create((theme, { insets }) => ({
+                    keyboardAvoidingView: {
+                        flex: 1,
+                        paddingTop: insets.top + 16,
+                        paddingLeft: insets.left + 16,
+                        paddingRight: insets.right + 16,
+                        paddingBottom: insets.ime || insets.bottom + 50,
+                        uni__dependencies: [9, 14]
+                    }
+                }))
             `,
         },
         {
@@ -1047,16 +1004,13 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    (theme, rt) => ({
-                        container: {
-                            backgroundColor: theme.colors.secondary,
-                            paddingHorizontal: rt.hasAdaptiveThemes ? 8 : 0,
-                            uni__dependencies: [0, 2]
-                        }
-                    }),
-                    664955593
-                )
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: {
+                        backgroundColor: theme.colors.secondary,
+                        paddingHorizontal: rt.hasAdaptiveThemes ? 8 : 0,
+                        uni__dependencies: [0, 2]
+                    }
+                }))
             `,
         },
     ],

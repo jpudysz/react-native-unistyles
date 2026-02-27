@@ -50,14 +50,11 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    {
-                        container: {
-                            flex: 1
-                        }
-                    },
-                    467105429
-                )
+                const styles = StyleSheet.create({
+                    container: {
+                        flex: 1
+                    }
+                })
             `,
         },
         {
@@ -94,14 +91,11 @@ pluginTester({
                     )
                 }
 
-                const styles = s.create(
-                    {
-                        container: {
-                            flex: 1
-                        }
-                    },
-                    467105429
-                )
+                const styles = s.create({
+                    container: {
+                        flex: 1
+                    }
+                })
             `,
         },
     ],

@@ -157,19 +157,6 @@ function getReturnStatementsFromBody(node: t.BlockStatement | t.Statement, resul
     return results
 }
 
-function stringToUniqueId(str: string) {
-    let hash = 0
-
-    for (let i = 0; i < str.length; i++) {
-        hash = (hash << 5) - hash + str.charCodeAt(i)
-        hash |= 0
-    }
-
-    const absHash = Math.abs(hash)
-
-    return absHash % 1000000000
-}
-
 export function isUnistylesStyleSheet(path: NodePath<t.CallExpression>, state: UnistylesPluginPass) {
     const { callee } = path.node
 
@@ -274,13 +261,6 @@ export function isKindOfStyleSheet(path: NodePath<t.CallExpression>, state: Unis
     }
 
     return false
-}
-
-export function addStyleSheetTag(path: NodePath<t.CallExpression>, state: UnistylesPluginPass) {
-    const str = state.filename?.replace(state.cwd, '') ?? ''
-    const uniqueId = stringToUniqueId(str) + ++state.file.tagNumber
-
-    path.node.arguments.push(t.numericLiteral(uniqueId))
 }
 
 export function getStylesDependenciesFromObject(path: NodePath<t.CallExpression>) {

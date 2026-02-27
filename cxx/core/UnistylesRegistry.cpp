@@ -6,6 +6,8 @@ using namespace margelo::nitro::unistyles;
 using namespace facebook;
 using namespace facebook::react;
 
+std::atomic<int> core::UnistylesRegistry::_nextStyleSheetTag{0};
+
 void core::UnistylesRegistry::registerTheme(jsi::Runtime& rt, std::string name, jsi::Value& theme) {
     auto& state = this->getState(rt);
 
@@ -114,10 +116,13 @@ void core::UnistylesRegistry::unlinkShadowNodeWithUnistyles(jsi::Runtime& rt, co
     });
 }
 
-std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(jsi::Runtime& rt, int unid, core::StyleSheetType type, jsi::Object&& rawValue) {
-    this->_styleSheetRegistry[&rt][unid] = std::make_shared<core::StyleSheet>(unid, type, std::move(rawValue));
+std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(jsi::Runtime& rt, core::StyleSheetType type, jsi::Object&& rawValue) {
+    int tag = _nextStyleSheetTag.fetch_add(1);
 
-    return this->_styleSheetRegistry[&rt][unid];
+    auto sheet = std::make_shared<core::StyleSheet>(tag, type, std::move(rawValue));
+    this->_styleSheetRegistry[&rt][tag] = sheet;
+
+    return sheet;
 }
 
 core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt, std::vector<UnistyleDependency>& deps) {
@@ -250,6 +255,7 @@ void core::UnistylesRegistry::destroy() {
     this->_styleSheetRegistry.clear();
     this->_shadowRegistry.clear();
     this->_scopedTheme = std::nullopt;
+    _nextStyleSheetTag.store(0);
 }
 
 void core::UnistylesRegistry::destroyState(jsi::Runtime* rt) {
