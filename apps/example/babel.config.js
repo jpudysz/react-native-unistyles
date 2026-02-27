@@ -1,7 +1,7 @@
 const path = require('path')
-const pak = require('../package.json')
+const pak = require('../../packages/unistyles/package.json')
 
-/** @type {import('../plugin').UnistylesPluginOptions} */
+/** @type {import('../../packages/unistyles/plugin').UnistylesPluginOptions} */
 const unistylesPluginOptions = {
     debug: true,
     isLocal: true,
@@ -16,7 +16,7 @@ module.exports = api => {
         presets: ['module:@react-native/babel-preset'],
         plugins: [
             [
-                path.join(__dirname, '../plugin'),
+                path.join(__dirname, '../../packages/unistyles/plugin'),
                 unistylesPluginOptions
             ],
             [
@@ -24,7 +24,7 @@ module.exports = api => {
                 {
                     alias: {
                         // For development, we want to alias the library to the source
-                        [pak.name]: path.join(__dirname, '../', pak.source)
+                        [pak.name]: path.join(__dirname, '../../packages/unistyles/', pak.source)
                     }
                 }
             ],

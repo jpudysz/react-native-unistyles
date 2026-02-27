@@ -29,7 +29,9 @@
     "@types/react": "19.1.12",
     "babel-jest": "30.0.5",
     "babel-plugin-module-resolver": "5.0.2",
+    "escape-string-regexp": "4.0.0",
     "jest": "30.0.5",
+    "metro-config": "0.82.5",
     "react-test-renderer": "19.1.1",
     "typescript": "5.9.2"
   },

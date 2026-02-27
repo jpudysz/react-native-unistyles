@@ -1,7 +1,7 @@
 {
   "singleQuote": true,
   "semi": false,
-  "ignorePatterns": ["plugin/index.js"],
+  "ignorePatterns": ["**/plugin/index.js", "**/repack-plugin/index.js", "apps/**"],
   "sortImports": {
     "groups": [
       "type-import",

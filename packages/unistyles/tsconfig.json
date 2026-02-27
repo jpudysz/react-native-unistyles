@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig",
+  "compilerOptions": {
+    "rootDir": ".",
+    "paths": {
+      "react-native-unistyles": ["./src/index"]
+    }
+  },
+  "exclude": [
+    "plugin",
+    "repack-plugin",
+    "lib"
+  ]
+}

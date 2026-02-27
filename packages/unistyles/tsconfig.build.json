@@ -1,8 +1,7 @@
-
 {
   "extends": "./tsconfig",
   "compilerOptions": {
     "noEmit": false
   },
-  "exclude": ["example", "expo-example", "plugin", "docs"]
+  "exclude": ["plugin", "repack-plugin", "lib"]
 }

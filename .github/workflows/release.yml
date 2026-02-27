@@ -35,11 +35,13 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: yarn
           registry-url: 'https://registry.npmjs.org'
 
       - name: Configure git
@@ -48,19 +50,19 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Build library
-        run: yarn prepare
+        run: bun run --cwd packages/unistyles prepare
 
       - name: Check linting and formatting
-        run: yarn precommit
+        run: bun run --cwd packages/unistyles precommit
 
       - name: Determine version
         id: determine_version
         run: |
-          PACKAGE_NAME=$(cat package.json | grep '"name"' | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | xargs)
-          CURRENT_VERSION=$(cat package.json | grep '"version"' | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | xargs)
+          PACKAGE_NAME=$(cat packages/unistyles/package.json | grep '"name"' | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | xargs)
+          CURRENT_VERSION=$(cat packages/unistyles/package.json | grep '"version"' | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | xargs)
 
           VERSION_INPUT="${{ inputs.version }}"
 
@@ -91,7 +93,7 @@ jobs:
               fi
 
               # Update package.json
-              sed -i "s/\"version\": \"$CURRENT_VERSION\"/\"version\": \"$NEW_VERSION\"/" package.json
+              sed -i "s/\"version\": \"$CURRENT_VERSION\"/\"version\": \"$NEW_VERSION\"/" packages/unistyles/package.json
               echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
               echo "version_changed=true" >> $GITHUB_OUTPUT
             else
@@ -101,7 +103,7 @@ jobs:
             fi
           elif [ -n "$VERSION_INPUT" ]; then
             echo "Using specified version: $VERSION_INPUT"
-            sed -i "s/\"version\": \"$CURRENT_VERSION\"/\"version\": \"$VERSION_INPUT\"/" package.json
+            sed -i "s/\"version\": \"$CURRENT_VERSION\"/\"version\": \"$VERSION_INPUT\"/" packages/unistyles/package.json
             echo "version=$VERSION_INPUT" >> $GITHUB_OUTPUT
             echo "version_changed=true" >> $GITHUB_OUTPUT
           else
@@ -113,7 +115,7 @@ jobs:
       - name: Check if version already published
         id: check_published
         run: |
-          PACKAGE_NAME=$(cat package.json | grep '"name"' | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | xargs)
+          PACKAGE_NAME=$(cat packages/unistyles/package.json | grep '"name"' | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | xargs)
           VERSION="${{ steps.determine_version.outputs.version }}"
 
           if npm view "$PACKAGE_NAME@$VERSION" version 2>/dev/null; then
@@ -220,7 +222,7 @@ jobs:
       - name: Commit version bump (if version was updated)
         if: ${{ steps.determine_version.outputs.version_changed == 'true' && !inputs.dry_run }}
         run: |
-          git add package.json
+          git add packages/unistyles/package.json
           git commit -m "chore: bump version to ${{ steps.determine_version.outputs.version }}" || echo "No changes to commit"
           git push origin main
 
@@ -233,6 +235,7 @@ jobs:
 
       - name: Publish to NPM (Dry Run)
         if: ${{ inputs.dry_run }}
+        working-directory: packages/unistyles
         run: |
           echo "🔍 DRY RUN MODE - Would publish with:"
           echo "  Version: ${{ steps.determine_version.outputs.version }}"
@@ -242,6 +245,7 @@ jobs:
 
       - name: Publish to NPM
         if: ${{ !inputs.dry_run && steps.check_published.outputs.published == 'false' }}
+        working-directory: packages/unistyles
         run: |
           npm publish --tag ${{ inputs.npm_tag }} --provenance --access public
 
