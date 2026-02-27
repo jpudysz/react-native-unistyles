@@ -1,0 +1,31 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "plugins": ["react", "typescript"],
+  "rules": {
+    "typescript/no-empty-interface": "off",
+    "typescript/no-explicit-any": "off",
+    "typescript/ban-types": "off",
+    "typescript/triple-slash-reference": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "eslint/no-shadow": "off",
+    "eslint/no-unused-vars": [
+      "error",
+      {
+        "ignoreRestSiblings": true,
+        "varsIgnorePattern": "^_",
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "eslint/no-unused-expressions": [
+      "error",
+      {
+        "allowShortCircuit": true
+      }
+    ]
+  },
+  "ignorePatterns": ["example/**", "expo-example/**", "docs/**", "lib/**", "**/*.js"]
+}

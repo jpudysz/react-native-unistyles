@@ -1,5 +1,7 @@
-import React from 'react'
 import type { ImageBackground, ImageBackgroundProps } from 'react-native'
+
+import React from 'react'
+
 import { UnistylesShadowRegistry } from '../specs'
 import { copyComponentProperties } from '../utils'
 import { passForwardedRef } from './passForwardRef'
@@ -15,7 +17,7 @@ export const createUnistylesImageBackground = (Component: typeof ImageBackground
         return (
             <Component
                 {...props}
-                ref={ref => {
+                ref={(ref) => {
                     return passForwardedRef(
                         ref,
                         forwardedRef,
@@ -26,10 +28,10 @@ export const createUnistylesImageBackground = (Component: typeof ImageBackground
                         () => {
                             // @ts-expect-error - this is hidden from TS
                             UnistylesShadowRegistry.remove(ref)
-                        }
+                        },
                     )
                 }}
-                imageRef={ref => {
+                imageRef={(ref) => {
                     // @ts-expect-error web types are not compatible with RN styles
                     UnistylesShadowRegistry.add(ref, props.imageStyle)
 

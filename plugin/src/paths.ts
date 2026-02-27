@@ -7,7 +7,5 @@ const toWinPath = (pathString: string) => {
 }
 
 export const toPlatformPath = (pathString: string) => {
-    return isWindows
-        ? toWinPath(pathString)
-        : pathString
+    return isWindows ? toWinPath(pathString) : pathString
 }

@@ -1,5 +1,7 @@
 import type { NodePath } from '@babel/core'
+
 import * as t from '@babel/types'
+
 import type { UnistylesPluginPass } from './types'
 
 export function addUnistylesImport(path: NodePath<t.Program>, state: UnistylesPluginPass) {
@@ -9,10 +11,12 @@ export function addUnistylesImport(path: NodePath<t.Program>, state: UnistylesPl
     const nodesToRemove: Array<t.ImportDeclaration> = []
 
     // remove rn-imports
-    path.node.body.forEach(node => {
+    path.node.body.forEach((node) => {
         // user might have multiple imports like import type, import
         if (t.isImportDeclaration(node) && node.source.value === 'react-native') {
-            node.specifiers = node.specifiers.filter(specifier => !localNames.some(name => name === specifier.local.name))
+            node.specifiers = node.specifiers.filter(
+                (specifier) => !localNames.some((name) => name === specifier.local.name),
+            )
 
             if (node.specifiers.length === 0) {
                 nodesToRemove.push(node)
@@ -21,8 +25,11 @@ export function addUnistylesImport(path: NodePath<t.Program>, state: UnistylesPl
     })
 
     // remove RNWeb imports
-    names.forEach(name => {
-        const rnWebImport = path.node.body.find((node): node is t.ImportDeclaration => t.isImportDeclaration(node) && node.source.value === `react-native-web/dist/exports/${name}`)
+    names.forEach((name) => {
+        const rnWebImport = path.node.body.find(
+            (node): node is t.ImportDeclaration =>
+                t.isImportDeclaration(node) && node.source.value === `react-native-web/dist/exports/${name}`,
+        )
 
         if (rnWebImport) {
             rnWebImport.specifiers = []
@@ -33,17 +40,21 @@ export function addUnistylesImport(path: NodePath<t.Program>, state: UnistylesPl
     pairs.forEach(([localName, name]) => {
         const newImport = t.importDeclaration(
             [t.importSpecifier(t.identifier(localName), t.identifier(name))],
-            t.stringLiteral(state.opts.isLocal
-                ? state.file.opts.filename?.split('react-native-unistyles').at(0)?.concat(`react-native-unistyles/src/components/native/${name}`) ?? ''
-                : `react-native-unistyles/components/native/${name}`
-            )
+            t.stringLiteral(
+                state.opts.isLocal
+                    ? (state.file.opts.filename
+                          ?.split('react-native-unistyles')
+                          .at(0)
+                          ?.concat(`react-native-unistyles/src/components/native/${name}`) ?? '')
+                    : `react-native-unistyles/components/native/${name}`,
+            ),
         )
 
         path.node.body.unshift(newImport)
     })
 
     // cleanup
-    nodesToRemove.forEach(node => path.node.body.splice(path.node.body.indexOf(node), 1))
+    nodesToRemove.forEach((node) => path.node.body.splice(path.node.body.indexOf(node), 1))
 }
 
 export function isInsideNodeModules(state: UnistylesPluginPass) {
@@ -51,18 +62,16 @@ export function isInsideNodeModules(state: UnistylesPluginPass) {
 }
 
 export function addUnistylesRequire(path: NodePath<t.Program>, state: UnistylesPluginPass) {
-    Object
-        .entries(state.reactNativeImports)
-        .forEach(([componentName, uniqueName]) => {
-            const newRequire = t.variableDeclaration('const', [
-                t.variableDeclarator(
-                    t.identifier(uniqueName),
-                    t.callExpression(t.identifier('require'), [
-                        t.stringLiteral(`react-native-unistyles/components/native/${componentName}`)
-                    ])
-                )
-            ])
+    Object.entries(state.reactNativeImports).forEach(([componentName, uniqueName]) => {
+        const newRequire = t.variableDeclaration('const', [
+            t.variableDeclarator(
+                t.identifier(uniqueName),
+                t.callExpression(t.identifier('require'), [
+                    t.stringLiteral(`react-native-unistyles/components/native/${componentName}`),
+                ]),
+            ),
+        ])
 
-            path.node.body.unshift(newRequire)
-        })
+        path.node.body.unshift(newRequire)
+    })
 }

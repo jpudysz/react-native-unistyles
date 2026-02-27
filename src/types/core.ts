@@ -12,32 +12,32 @@ import type {
     SkewXTransform,
     SkewYTransform,
     TranslateXTransform,
-    TranslateYTransform
+    TranslateYTransform,
 } from 'react-native/Libraries/StyleSheet/StyleSheetTypes'
+
 import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
 
 export type ShadowOffset = {
-    width: number,
+    width: number
     height: number
 }
 
-export type TransformStyles =
-    & PerspectiveTransform
-    & RotateTransform
-    & RotateXTransform
-    & RotateYTransform
-    & RotateZTransform
-    & ScaleTransform
-    & ScaleXTransform
-    & ScaleYTransform
-    & TranslateXTransform
-    & TranslateYTransform
-    & SkewXTransform
-    & SkewYTransform
-    & MatrixTransform
+export type TransformStyles = PerspectiveTransform &
+    RotateTransform &
+    RotateXTransform &
+    RotateYTransform &
+    RotateZTransform &
+    ScaleTransform &
+    ScaleXTransform &
+    ScaleYTransform &
+    TranslateXTransform &
+    TranslateYTransform &
+    SkewXTransform &
+    SkewYTransform &
+    MatrixTransform
 
 export type ScreenSize = {
-    width: number,
+    width: number
     height: number
 }
 

@@ -1,6 +1,7 @@
+import type { CSSState } from './state'
+
 import { isPseudoClass } from '../convert/pseudo'
 import { getMediaQuery } from '../utils'
-import type { CSSState } from './state'
 
 export const convertToCSS = (hash: string, value: Record<string, any>, state: CSSState) => {
     Object.entries(value).forEach(([styleKey, styleValue]) => {

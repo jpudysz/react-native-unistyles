@@ -1,6 +1,8 @@
-import { getModulePaths } from '@callstack/repack'
 import type { Compiler, RspackPluginInstance } from '@rspack/core'
 import type { UnistylesPluginOptions } from 'react-native-unistyles/plugin'
+
+import { getModulePaths } from '@callstack/repack'
+
 import { unistylesLoader } from './loader'
 
 export const BASE_REPACK_EXCLUDE_PATHS = getModulePaths([
@@ -38,15 +40,15 @@ const getUnistyleModuleRules = (excludePathLoader: Array<RegExp>, unistylesPlugi
         },
     })
 
-    return ({
+    return {
         exclude: excludePathLoader,
         oneOf: [
             createRule(/\.[cm]?ts$/, [['@babel/plugin-syntax-typescript', { isTSX: false, allowNamespaces: true }]]),
             createRule(/\.[cm]?tsx$/, [['@babel/plugin-syntax-typescript', { isTSX: true, allowNamespaces: true }]]),
             createRule(/\.[cm]?jsx?$/, ['babel-plugin-syntax-hermes-parser']),
         ],
-    })
-} 
+    }
+}
 
 export class RepackUnistylePlugin implements RspackPluginInstance {
     private ruleExcludePaths

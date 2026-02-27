@@ -18,7 +18,7 @@ export const REACT_NATIVE_COMPONENT_NAMES = [
     'TouchableOpacity',
     'VirtualizedList',
     'Animated',
-    'SafeAreaView'
+    'SafeAreaView',
     // Modal - there is no exposed native handle
     // TouchableWithoutFeedback - can't accept a ref
 ]
@@ -30,7 +30,7 @@ export const REACT_NATIVE_COMPONENT_NAMES = [
  */
 export const REPLACE_WITH_UNISTYLES_PATHS = [
     'react-native-reanimated/src/component',
-    'react-native-reanimated/lib/module/component'
+    'react-native-reanimated/lib/module/component',
 ]
 
 /**
@@ -47,12 +47,12 @@ export const NATIVE_COMPONENTS_PATHS: Pick<RemapConfig, 'imports'> = {
             name: 'NativeText',
             isDefault: false,
             path: 'react-native/Libraries/Text/TextNativeComponent',
-            mapTo: 'NativeText'
+            mapTo: 'NativeText',
         },
         {
             isDefault: true,
             path: 'react-native/Libraries/Components/View/ViewNativeComponent',
-            mapTo: 'NativeView'
-        }
-    ]
+            mapTo: 'NativeView',
+        },
+    ],
 }

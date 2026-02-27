@@ -1,6 +1,7 @@
 import type { UnistylesValues } from '../../types'
-import { deepMergeObjects } from '../../utils'
 import type { UnistylesRuntime } from '../runtime'
+
+import { deepMergeObjects } from '../../utils'
 import { getBoxShadow, getFilterStyle, getTransformStyle } from './object'
 import { isPseudo } from './pseudo'
 import { getBoxShadowStyle, getTextShadowStyle } from './shadow'
@@ -15,7 +16,10 @@ export const convertUnistyles = (value: UnistylesValues, runtime: UnistylesRunti
 
     const stylesArray = Object.entries(value).flatMap(([unistylesKey, unistylesValue]) => {
         // Keys to omit
-        if (['_classNames', '_web', 'variants', 'compoundVariants', 'uni__dependencies'].includes(unistylesKey) || unistylesKey.startsWith('unistyles_')) {
+        if (
+            ['_classNames', '_web', 'variants', 'compoundVariants', 'uni__dependencies'].includes(unistylesKey) ||
+            unistylesKey.startsWith('unistyles_')
+        ) {
             return []
         }
 

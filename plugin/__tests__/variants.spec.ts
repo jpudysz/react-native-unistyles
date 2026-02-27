@@ -1,17 +1,18 @@
 import { pluginTester } from 'babel-plugin-tester'
+
 import plugin from '../src/index'
 
 pluginTester({
     plugin,
     pluginOptions: {
         debug: false,
-        root: 'src'
+        root: 'src',
     },
     babelOptions: {
         plugins: ['@babel/plugin-syntax-jsx'],
         generatorOpts: {
-            retainLines: true
-        }
+            retainLines: true,
+        },
     },
     tests: [
         {
@@ -97,7 +98,7 @@ pluginTester({
                         uni__dependencies: [0, 4]
                     }
                 }))
-            `
+            `,
         },
         {
             title: 'Should respect user names',
@@ -141,7 +142,7 @@ pluginTester({
                 }
 
                 const s = StyleSheet.create({})
-            `
+            `,
         },
         {
             title: 'Should create multiple nested scoped',
@@ -213,7 +214,7 @@ pluginTester({
                 }
 
                 const styles = StyleSheet.create({})
-            `
-        }
-    ]
+            `,
+        },
+    ],
 })

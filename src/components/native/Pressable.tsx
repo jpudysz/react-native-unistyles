@@ -1,15 +1,18 @@
+import type { PressableProps as Props, View } from 'react-native'
+
 import React, { forwardRef } from 'react'
 import { Pressable as NativePressableReactNative } from 'react-native'
-import type { PressableProps as Props, View } from 'react-native'
+
+import type { UnistylesValues } from '../../types'
+
 import { getClassName } from '../../core'
 import { UnistylesShadowRegistry } from '../../specs'
-import type { UnistylesValues } from '../../types'
 import { isServer } from '../../web/utils'
 
 type Variants = Record<string, string | boolean | undefined>
 type WebPressableState = {
-    pressed: boolean,
-    hovered: boolean,
+    pressed: boolean
+    hovered: boolean
     focused: boolean
 }
 
@@ -17,7 +20,7 @@ type WebPressableStyle = ((state: WebPressableState) => UnistylesValues) | Unist
 
 type PressableProps = Props & {
     variants?: Variants
-    style?: WebPressableStyle,
+    style?: WebPressableStyle
 }
 
 export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, forwardedRef) => {
@@ -28,23 +31,25 @@ export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, 
     return (
         <NativePressableReactNative
             {...props}
-            ref={isServer() ? undefined : ref => {
-                storedRef = ref as unknown as HTMLElement
-                // @ts-expect-error hidden from TS
-                UnistylesShadowRegistry.add(storedRef, classNames?.hash)
+            ref={
+                isServer()
+                    ? undefined
+                    : (ref) => {
+                          storedRef = ref as unknown as HTMLElement
+                          // @ts-expect-error hidden from TS
+                          UnistylesShadowRegistry.add(storedRef, classNames?.hash)
 
-                if (typeof forwardedRef === 'function') {
-                    return forwardedRef(ref)
-                }
+                          if (typeof forwardedRef === 'function') {
+                              return forwardedRef(ref)
+                          }
 
-                if (forwardedRef) {
-                    forwardedRef.current = ref
-                }
-            }}
-            style={state => {
-                const styleResult = typeof style === 'function'
-                    ? style(state as WebPressableState)
-                    : style
+                          if (forwardedRef) {
+                              forwardedRef.current = ref
+                          }
+                      }
+            }
+            style={(state) => {
+                const styleResult = typeof style === 'function' ? style(state as WebPressableState) : style
                 const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
 
                 UnistylesShadowRegistry.setScopedTheme(scopedTheme)

@@ -1,5 +1,7 @@
 import { useLayoutEffect } from 'react'
+
 import type { UnistylesThemes } from '../global'
+
 import { UnistylesShadowRegistry } from '../specs'
 
 type ApplyScopedThemeProps = {

@@ -1,17 +1,18 @@
 import { pluginTester } from 'babel-plugin-tester'
+
 import plugin from '../src/index'
 
 pluginTester({
     plugin,
     pluginOptions: {
         debug: false,
-        root: 'src'
+        root: 'src',
     },
     babelOptions: {
         plugins: ['@babel/plugin-syntax-jsx'],
         generatorOpts: {
-            retainLines: true
-        }
+            retainLines: true,
+        },
     },
     tests: [
         {
@@ -53,7 +54,7 @@ pluginTester({
                         backgroundColor: 'red'
                     }
                 })
-            `
+            `,
         },
         {
             title: 'Should add dependencies to StyleSheet if user is using theme',
@@ -95,7 +96,7 @@ pluginTester({
                         uni__dependencies: [0]
                     }
                 }))
-            `
+            `,
         },
         {
             title: 'Should add dependencies to StyleSheet even if user did rename import',
@@ -137,7 +138,7 @@ pluginTester({
                         uni__dependencies: [0]
                     }
                 }))
-            `
+            `,
         },
         {
             title: 'Should detect variants for object StyleSheet',
@@ -181,7 +182,7 @@ pluginTester({
                         uni__dependencies: [4]
                     }
                 })
-            `
+            `,
         },
         {
             title: 'Should detect variants for object StyleSheet and dynamic function',
@@ -225,7 +226,7 @@ pluginTester({
                         uni__dependencies: [4]
                     })
                 })
-            `
+            `,
         },
         {
             title: 'Should detect miniRuntime dependency',
@@ -271,10 +272,10 @@ pluginTester({
                         uni__dependencies: [9, 4]
                     })
                 }))
-            `
+            `,
         },
         {
-            title: 'Should detect miniRuntime and theme dependencies even if user renamed it\'s names',
+            title: "Should detect miniRuntime and theme dependencies even if user renamed it's names",
             code: `
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
@@ -317,7 +318,7 @@ pluginTester({
                         uni__dependencies: [0, 5, 4]
                     })
                 }))
-            `
+            `,
         },
         {
             title: 'Should detect dependencies in function',
@@ -367,7 +368,7 @@ pluginTester({
                         })
                     }
                 })
-            `
+            `,
         },
         {
             title: 'Should handle two stylesheets in the same file',
@@ -436,7 +437,7 @@ pluginTester({
                         })
                     }
                 })
-            `
+            `,
         },
         {
             title: 'Should use same local name as user name while replacing imports',
@@ -480,7 +481,7 @@ pluginTester({
                 const styles = StyleSheet.create({
                     inputContainer: {}
                 })
-            `
+            `,
         },
         {
             title: 'Should support style names of javascript array/object prototype functions using object',
@@ -501,7 +502,7 @@ pluginTester({
                     constructor: {},
                     toString: {}
                 })
-            `
+            `,
         },
         {
             title: 'Should support style names of javascript array/object prototype functions using function',
@@ -522,7 +523,7 @@ pluginTester({
                     constructor: {},
                     toString: {}
                 }))
-            `
-        }
-    ]
+            `,
+        },
+    ],
 })

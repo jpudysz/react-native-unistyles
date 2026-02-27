@@ -1,12 +1,5 @@
 export type { Optional, Nullable, UnionToIntersection } from './common'
-export type {
-    NestedStylePairs,
-    UnistylesTheme,
-    ScreenSize,
-    NestedStyle,
-    RNValue,
-    RNStyle
-} from './core'
+export type { NestedStylePairs, UnistylesTheme, ScreenSize, NestedStyle, RNValue, RNStyle } from './core'
 export type {
     CreateUnistylesStyleSheet,
     StyleSheet,
@@ -14,7 +7,7 @@ export type {
     UnistylesValues,
     UnistyleText,
     UnistyleView,
-    UnistyleImage
+    UnistyleImage,
 } from './stylesheet'
 export type { ReactNativeStyleSheet } from './breakpoints'
 export type { ExtractVariantNames, UnistylesVariants } from './variants'

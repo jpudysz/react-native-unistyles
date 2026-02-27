@@ -1,2 +1,1 @@
-
 export { getWebProps } from './getWebProps'

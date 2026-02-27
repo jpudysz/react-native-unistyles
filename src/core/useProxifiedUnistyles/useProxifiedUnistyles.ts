@@ -1,8 +1,10 @@
 import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
+
+import type { UnistylesTheme } from '../../types'
+
 import { type UnistylesMiniRuntime, UnistylesRuntime, UnistylesShadowRegistry } from '../../specs'
 // It's imported that way because of circular dependency
 import { UnistyleDependency } from '../../specs/NativePlatform'
-import type { UnistylesTheme } from '../../types'
 import { listener } from './listener'
 
 const getMiniRuntime = (): UnistylesMiniRuntime => {
@@ -24,11 +26,13 @@ const RTDependencyMap = {
     statusBar: UnistyleDependency.StatusBar,
     pixelRatio: UnistyleDependency.PixelRatio,
     themeName: UnistyleDependency.ThemeName,
-    rtl: UnistyleDependency.Rtl
+    rtl: UnistyleDependency.Rtl,
 } satisfies Partial<Record<keyof UnistylesMiniRuntime, UnistyleDependency>>
 
 export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
-    const [scopedTheme, setScopedTheme] = useState(forcedTheme ?? UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme)
+    const [scopedTheme, setScopedTheme] = useState(
+        forcedTheme ?? (UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme),
+    )
     const [dependencies] = useState(() => new Set<number>())
     const [theme, setTheme] = useState(UnistylesRuntime.getTheme(scopedTheme))
     const [_, runtimeChanged] = useReducer(() => ({}), {})
@@ -53,7 +57,7 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
                 }
 
                 runtimeChanged()
-            }
+            },
         })
     }
 
@@ -72,7 +76,7 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
             dependencies.add(UnistyleDependency.Theme)
 
             return target[prop]
-        }
+        },
     })
     const proxifiedRuntime = new Proxy(getMiniRuntime(), {
         get: (target, prop) => {
@@ -88,7 +92,7 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
                         dependencies.add(UnistyleDependency.Insets)
 
                         return target[prop as keyof typeof target]
-                    }
+                    },
                 })
             }
 
@@ -101,7 +105,7 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
             }
 
             return target[prop as keyof typeof target]
-        }
+        },
     })
 
     useLayoutEffect(() => {
@@ -124,7 +128,7 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
         addDependencies: (newDependencies: Array<UnistyleDependency>) => {
             const dependenciesSize = dependencies.size
 
-            newDependencies.forEach(dependency => {
+            newDependencies.forEach((dependency) => {
                 dependencies.add(dependency)
             })
 
@@ -135,6 +139,6 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
             syncedDependenciesSizeRef.current = dependencies.size
             syncedScopedThemeRef.current = scopedTheme
             reinitListener()
-        }
+        },
     }
 }
