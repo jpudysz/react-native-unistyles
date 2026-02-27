@@ -27,5 +27,5 @@
       }
     ]
   },
-  "ignorePatterns": ["example/**", "expo-example/**", "docs/**", "lib/**", "**/*.js"]
+  "ignorePatterns": ["**/lib/**", "**/*.js", "apps/**"]
 }

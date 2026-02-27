@@ -1,9 +1,5 @@
 {
   "compilerOptions": {
-    "rootDir": ".",
-    "paths": {
-      "react-native-unistyles": ["./src/index"]
-    },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "esModuleInterop": true,
@@ -28,11 +24,5 @@
     "noEmit": true,
     "target": "esnext",
     "verbatimModuleSyntax": true
-  },
-  "exclude": [
-    "example",
-    "expo-example",
-    "docs",
-    "lib"
-  ]
+  }
 }

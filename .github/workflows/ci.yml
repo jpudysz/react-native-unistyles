@@ -16,26 +16,28 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: yarn
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Lint files
-        run: yarn lint
+        run: bun run lint
 
       - name: Check files formatting
-        run: yarn check:ci
+        run: bun run check:ci
 
       - name: Type check files
-        run: yarn tsc
+        run: bun run tsc
 
       - name: Check for circular dependencies
-        run: yarn circular:check
+        run: bun run --cwd packages/unistyles circular:check
 
       - name: Run tests
-        run: yarn test
+        run: bun run test
