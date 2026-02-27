@@ -1,5 +1,6 @@
-import { hyphenate } from '../utils'
 import type { CSSState } from './state'
+
+import { hyphenate } from '../utils'
 
 export const safeGetMap = (map: Map<string, Map<string, any>>, key: string) => {
     const nextLevelMap = map.get(key)

@@ -1,17 +1,18 @@
 import { pluginTester } from 'babel-plugin-tester'
+
 import plugin from '../src/index'
 
 pluginTester({
     plugin,
     pluginOptions: {
         debug: false,
-        root: 'src'
+        root: 'src',
     },
     babelOptions: {
         plugins: ['@babel/plugin-syntax-jsx'],
         generatorOpts: {
-            retainLines: true
-        }
+            retainLines: true,
+        },
     },
     tests: [
         {
@@ -72,7 +73,7 @@ pluginTester({
                         uni__dependencies: [0, 9, 4]
                     }
                 }))
-            `
+            `,
         },
         {
             title: 'Should detect dependencies in breakpoints',
@@ -124,7 +125,7 @@ pluginTester({
                         uni__dependencies: [0, 9]
                     }
                 }))
-            `
+            `,
         },
         {
             title: 'Should detect dependencies in calculations',
@@ -170,7 +171,7 @@ pluginTester({
                         uni__dependencies: [0, 9, 12, 13]
                     }
                 }))
-            `
+            `,
         },
         {
             title: 'Should detect dependencies in _web',
@@ -343,7 +344,7 @@ pluginTester({
                         uni__dependencies: [0, 11, 10, 3, 5]
                     }
                 }))
-            `
+            `,
         },
         {
             title: 'Should allow user to use arrow functions with body for dynamic functions',
@@ -403,7 +404,7 @@ pluginTester({
                         }
                     }
                 }))
-            `
+            `,
         },
         {
             title: 'Should correctly detect IME insets dependency',
@@ -447,7 +448,7 @@ pluginTester({
                         uni__dependencies: [0, 14]
                     }
                 }))
-            `
+            `,
         },
         {
             title: 'Should correctly detect dependency from Array accessor',
@@ -491,7 +492,7 @@ pluginTester({
                         uni__dependencies: [0, 5]
                     })
                 }))
-            `
+            `,
         },
         {
             title: 'Should correctly detect dependency from unary operator',
@@ -541,7 +542,7 @@ pluginTester({
                         uni__dependencies: [14]
                     }
                 }))
-            `
+            `,
         },
         {
             title: 'Should correctly detect dependencies from if else statements',
@@ -628,7 +629,7 @@ pluginTester({
                         }
                     }
                 }))
-            `
+            `,
         },
         {
             title: 'Should correctly detect dependency in square brackets',
@@ -677,7 +678,7 @@ pluginTester({
                         uni__dependencies: [0, 3]
                     }
                 }))
-            `
+            `,
         },
         {
             title: 'Should correctly detect inline spread',
@@ -726,7 +727,7 @@ pluginTester({
                         uni__dependencies: [0]
                     }
                 }))
-            `
+            `,
         },
         {
             title: 'Should correctly detect inline theme dependencies',
@@ -765,7 +766,7 @@ pluginTester({
                     container: { ...theme.components.container, uni__dependencies: [0] },
                     container2: { ...theme.components.text.nested.deep, uni__dependencies: [0] }
                 }))
-            `
+            `,
         },
         {
             title: 'Should correctly detect destructured dependencies',
@@ -818,7 +819,7 @@ pluginTester({
                         uni__dependencies: [14, 6, 12]
                     }
                 }))
-            `
+            `,
         },
         {
             title: 'Should correctly detect dependencies in weirdest syntax',
@@ -916,7 +917,7 @@ pluginTester({
                         }
                     }
                 )
-            `
+            `,
         },
         {
             title: 'Should correctly detect ime from destructured insets',
@@ -966,7 +967,7 @@ pluginTester({
                         uni__dependencies: [9, 14]
                     }
                 }))
-            `
+            `,
         },
         {
             title: 'Should correctly detect hasAdaptiveThemes dependency',
@@ -1010,7 +1011,7 @@ pluginTester({
                         uni__dependencies: [0, 2]
                     }
                 }))
-            `
-        }
-    ]
+            `,
+        },
+    ],
 })

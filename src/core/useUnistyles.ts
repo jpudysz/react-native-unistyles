@@ -1,4 +1,5 @@
 import type { UnistylesTheme } from '../types'
+
 import { useProxifiedUnistyles } from './useProxifiedUnistyles'
 
 export const useUnistyles = () => {
@@ -6,6 +7,6 @@ export const useUnistyles = () => {
 
     return {
         theme: proxifiedTheme as UnistylesTheme,
-        rt: proxifiedRuntime
+        rt: proxifiedRuntime,
     }
 }

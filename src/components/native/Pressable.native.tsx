@@ -1,6 +1,8 @@
+import type { PressableProps as Props, View } from 'react-native'
+
 import React, { forwardRef, useLayoutEffect, useRef } from 'react'
 import { Pressable as NativePressableReactNative } from 'react-native'
-import type { PressableProps as Props, View } from 'react-native'
+
 import { passForwardedRef } from '../../core'
 import { UnistylesShadowRegistry } from '../../specs'
 
@@ -9,9 +11,7 @@ type PressableProps = Props & {
 }
 
 const getStyles = (styleProps: Record<string, any> = {}) => {
-    const unistyleKey = Object
-        .keys(styleProps)
-        .find(key => key.startsWith('unistyles_'))
+    const unistyleKey = Object.keys(styleProps).find((key) => key.startsWith('unistyles_'))
 
     if (!unistyleKey) {
         return styleProps
@@ -20,7 +20,7 @@ const getStyles = (styleProps: Record<string, any> = {}) => {
     return {
         // styles without C++ state
         ...styleProps[unistyleKey].uni__getStyles(),
-        [unistyleKey]: styleProps[unistyleKey]
+        [unistyleKey]: styleProps[unistyleKey],
     }
 }
 
@@ -40,7 +40,7 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
     return (
         <NativePressableReactNative
             {...props}
-            ref={ref => {
+            ref={(ref) => {
                 const isPropStyleAFunction = typeof style === 'function'
                 const unistyles = isPropStyleAFunction
                     ? style.call(style, { pressed: false })
@@ -60,10 +60,10 @@ export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ..
                     () => {
                         // @ts-expect-error - this is hidden from TS
                         UnistylesShadowRegistry.remove(ref)
-                    }
+                    },
                 )
             }}
-            style={state => {
+            style={(state) => {
                 const isPropStyleAFunction = typeof style === 'function'
                 const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
 

@@ -1,8 +1,10 @@
 import React, { type ComponentProps, forwardRef } from 'react'
 import { type ImageStyle, Image as NativeImage, type StyleProp, type ViewStyle } from 'react-native'
+
+import type { UnistylesValues } from '../../types'
+
 import { getClassName } from '../../core'
 import { maybeWarnAboutMultipleUnistyles } from '../../core/warn'
-import type { UnistylesValues } from '../../types'
 import { copyComponentProperties } from '../../utils'
 import { checkForProp } from '../../web/utils'
 import { createUnistylesRef } from '../../web/utils/createUnistylesRef'
@@ -23,12 +25,14 @@ const UnistylesImage = forwardRef<unknown, Props>((props, forwardedRef) => {
     return (
         <NativeImage
             {...props}
-            style={[
-                classNames,
-                // Clear inline width and height extracted from source
-                hasWidthStyle && { width: '' },
-                hasHeightStyle && { height: '' }
-            ] as StyleProp<ImageStyle>}
+            style={
+                [
+                    classNames,
+                    // Clear inline width and height extracted from source
+                    hasWidthStyle && { width: '' },
+                    hasHeightStyle && { height: '' },
+                ] as StyleProp<ImageStyle>
+            }
             ref={ref}
         />
     )

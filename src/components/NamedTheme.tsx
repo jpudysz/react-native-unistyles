@@ -1,23 +1,22 @@
-import React, { useLayoutEffect } from 'react'
 import type { PropsWithChildren } from 'react'
+
+import React, { useLayoutEffect } from 'react'
+
 import type { UnistylesThemes } from '../global'
+
 import { UnistylesShadowRegistry } from '../specs'
 import { ApplyScopedTheme } from './ApplyScopedTheme'
 
 interface NamedThemeProps extends PropsWithChildren {
-    name: keyof UnistylesThemes | undefined,
+    name: keyof UnistylesThemes | undefined
     previousScopedTheme?: string
 }
 
-export const NamedTheme: React.FunctionComponent<NamedThemeProps> = ({
-    name,
-    children,
-    previousScopedTheme
-}) => {
+export const NamedTheme: React.FunctionComponent<NamedThemeProps> = ({ name, children, previousScopedTheme }) => {
     const mappedChildren = [
-        <ApplyScopedTheme key='apply' name={name} />,
+        <ApplyScopedTheme key="apply" name={name} />,
         children,
-        <ApplyScopedTheme key='dispose' name={previousScopedTheme as keyof UnistylesThemes | undefined} />
+        <ApplyScopedTheme key="dispose" name={previousScopedTheme as keyof UnistylesThemes | undefined} />,
     ]
 
     useLayoutEffect(() => {
@@ -25,9 +24,5 @@ export const NamedTheme: React.FunctionComponent<NamedThemeProps> = ({
         UnistylesShadowRegistry.flush()
     })
 
-    return (
-        <React.Fragment>
-            {mappedChildren}
-        </React.Fragment>
-    )
+    return <React.Fragment>{mappedChildren}</React.Fragment>
 }

@@ -1,5 +1,7 @@
 import type { NodePath } from '@babel/core'
+
 import * as t from '@babel/types'
+
 import type { UnistylesPluginPass } from './types'
 
 type Styles = {
@@ -27,7 +29,7 @@ const UnistyleDependency = {
     StatusBar: 12,
     NavigationBar: 13,
     Ime: 14,
-    Rtl: 15
+    Rtl: 15,
 }
 
 function getProperty(property: t.ObjectProperty | t.RestElement): Props | undefined {
@@ -36,19 +38,21 @@ function getProperty(property: t.ObjectProperty | t.RestElement): Props | undefi
     }
 
     if (t.isIdentifier(property)) {
-        const prop = (property as t.Identifier)
+        const prop = property as t.Identifier
 
         return {
-            properties: [prop.name]
+            properties: [prop.name],
         }
     }
 
     if (t.isObjectPattern(property)) {
         const prop = property as t.ObjectPattern
-        const matchingProperties = prop.properties.flatMap(p => getProperty(p))
+        const matchingProperties = prop.properties.flatMap((p) => getProperty(p))
 
         return {
-            properties: matchingProperties.flatMap(properties => properties?.properties).filter((prop): prop is string => prop !== undefined)
+            properties: matchingProperties
+                .flatMap((properties) => properties?.properties)
+                .filter((prop): prop is string => prop !== undefined),
         }
     }
 
@@ -56,17 +60,19 @@ function getProperty(property: t.ObjectProperty | t.RestElement): Props | undefi
         const prop = property.key as t.Identifier
 
         return {
-            properties: [prop.name]
+            properties: [prop.name],
         }
     }
 
     if (t.isObjectProperty(property) && t.isObjectPattern(property.value)) {
-        const matchingProperties = property.value.properties.flatMap(p => getProperty(p))
+        const matchingProperties = property.value.properties.flatMap((p) => getProperty(p))
         const prop = property.key as t.Identifier
 
         return {
             parent: prop.name,
-            properties: matchingProperties.flatMap(properties => properties?.properties).filter((prop): prop is string => prop !== undefined)
+            properties: matchingProperties
+                .flatMap((properties) => properties?.properties)
+                .filter((prop): prop is string => prop !== undefined),
         }
     }
 
@@ -137,7 +143,7 @@ function getReturnStatementsFromBody(node: t.BlockStatement | t.Statement, resul
     }
 
     if (t.isBlockStatement(node)) {
-        node.body.forEach(child => getReturnStatementsFromBody(child, results))
+        node.body.forEach((child) => getReturnStatementsFromBody(child, results))
     }
 
     if (t.isIfStatement(node)) {
@@ -158,13 +164,12 @@ export function isUnistylesStyleSheet(path: NodePath<t.CallExpression>, state: U
         return false
     }
 
-    const isImport = (
+    const isImport =
         callee.property.name === 'create' &&
         t.isIdentifier(callee.object) &&
         callee.object.name === state.file.styleSheetLocalName
-    )
 
-    const isRequire = (
+    const isRequire =
         state.file.hasUnistylesImport &&
         callee.property.name === 'create' &&
         t.isMemberExpression(callee.object) &&
@@ -172,18 +177,16 @@ export function isUnistylesStyleSheet(path: NodePath<t.CallExpression>, state: U
         t.isIdentifier(callee.object.object) &&
         callee.object.object.name === state.file.styleSheetLocalName &&
         callee.object.property.name === 'StyleSheet'
-    )
 
     return isImport || isRequire
 }
 
 export function isUnistylesCommonJSRequire(path: NodePath<t.CallExpression>, state: UnistylesPluginPass) {
-    const isRequire = (
+    const isRequire =
         t.isIdentifier(path.node.callee) &&
         path.node.arguments.length > 0 &&
         t.isStringLiteral(path.node.arguments[0]) &&
         (path.node.arguments[0] as t.StringLiteral).value === 'react-native-unistyles'
-    )
 
     if (isRequire && t.isVariableDeclarator(path.parent) && t.isIdentifier(path.parent.id)) {
         state.file.hasUnistylesImport = true
@@ -194,17 +197,13 @@ export function isUnistylesCommonJSRequire(path: NodePath<t.CallExpression>, sta
 }
 
 export function isReactNativeCommonJSRequire(path: NodePath<t.CallExpression>, state: UnistylesPluginPass) {
-    const isRequire = (
-        t.isIdentifier(path.node.callee) &&
-        path.node.arguments.length > 0 &&
-        path.node.callee.name === 'require'
-    )
-    const requireImportName = path.node.arguments.find(node => t.isStringLiteral(node))
-    const isReactNativeRequire = (
+    const isRequire =
+        t.isIdentifier(path.node.callee) && path.node.arguments.length > 0 && path.node.callee.name === 'require'
+    const requireImportName = path.node.arguments.find((node) => t.isStringLiteral(node))
+    const isReactNativeRequire =
         isRequire &&
         requireImportName &&
         (requireImportName.value === 'react-native' || requireImportName.value === 'react-native-web/dist/index')
-    )
 
     if (isReactNativeRequire && t.isVariableDeclarator(path.parent) && t.isIdentifier(path.parent.id)) {
         state.file.reactNativeCommonJSName = path.parent.id.name
@@ -223,12 +222,11 @@ export function isKindOfStyleSheet(path: NodePath<t.CallExpression>, state: Unis
     }
 
     const { callee } = path.node
-    const isCreateCall = (
+    const isCreateCall =
         t.isMemberExpression(callee) &&
         t.isIdentifier(callee.property) &&
         callee.property.name === 'create' &&
         (t.isIdentifier(callee.object) || t.isMemberExpression(callee.object))
-    )
 
     if (!isCreateCall) {
         return false
@@ -248,10 +246,8 @@ export function isKindOfStyleSheet(path: NodePath<t.CallExpression>, state: Unis
         if (t.isBlockStatement(argument.body)) {
             const returnStatements = getReturnStatementsFromBody(argument.body)
 
-            return returnStatements.some(ret =>
-                ret.argument &&
-                t.isObjectExpression(ret.argument) &&
-                ret.argument.properties.length > 0
+            return returnStatements.some(
+                (ret) => ret.argument && t.isObjectExpression(ret.argument) && ret.argument.properties.length > 0,
             )
         }
 
@@ -259,8 +255,8 @@ export function isKindOfStyleSheet(path: NodePath<t.CallExpression>, state: Unis
     }
 
     if (t.isObjectExpression(argument)) {
-        return argument.properties.some(property =>
-            t.isObjectProperty(property) && t.isObjectExpression(property.value)
+        return argument.properties.some(
+            (property) => t.isObjectProperty(property) && t.isObjectExpression(property.value),
         )
     }
 
@@ -268,40 +264,48 @@ export function isKindOfStyleSheet(path: NodePath<t.CallExpression>, state: Unis
 }
 
 export function getStylesDependenciesFromObject(path: NodePath<t.CallExpression>) {
-    const detectedStylesWithVariants = new Set<{ label: string, key: string }>()
+    const detectedStylesWithVariants = new Set<{ label: string; key: string }>()
     const stylesheet = path.node.arguments[0]
 
     if (t.isObjectExpression(stylesheet)) {
-        stylesheet?.properties.forEach(property => {
+        stylesheet?.properties.forEach((property) => {
             if (!t.isObjectProperty(property) || !t.isIdentifier(property.key)) {
                 return
             }
 
             if (t.isObjectProperty(property)) {
                 if (t.isObjectExpression(property.value)) {
-                    property.value.properties.forEach(innerProp => {
-                        if (t.isObjectProperty(innerProp) && t.isIdentifier(innerProp.key) && t.isIdentifier(property.key) && innerProp.key.name === 'variants') {
+                    property.value.properties.forEach((innerProp) => {
+                        if (
+                            t.isObjectProperty(innerProp) &&
+                            t.isIdentifier(innerProp.key) &&
+                            t.isIdentifier(property.key) &&
+                            innerProp.key.name === 'variants'
+                        ) {
                             detectedStylesWithVariants.add({
                                 label: 'variants',
-                                key: property.key.name
+                                key: property.key.name,
                             })
                         }
                     })
-
                 }
             }
 
             if (t.isArrowFunctionExpression(property.value)) {
                 if (t.isObjectExpression(property.value.body)) {
-                    property.value.body.properties.forEach(innerProp => {
-                        if (t.isObjectProperty(innerProp) && t.isIdentifier(innerProp.key) && t.isIdentifier(property.key) && innerProp.key.name === 'variants') {
+                    property.value.body.properties.forEach((innerProp) => {
+                        if (
+                            t.isObjectProperty(innerProp) &&
+                            t.isIdentifier(innerProp.key) &&
+                            t.isIdentifier(property.key) &&
+                            innerProp.key.name === 'variants'
+                        ) {
                             detectedStylesWithVariants.add({
                                 label: 'variants',
-                                key: property.key.name
+                                key: property.key.name,
                             })
                         }
                     })
-
                 }
             }
         })
@@ -311,10 +315,7 @@ export function getStylesDependenciesFromObject(path: NodePath<t.CallExpression>
 
     return variants.reduce<Styles>((acc, { key, label }) => {
         if (acc[key]) {
-            acc[key] = [
-                ...acc[key],
-                label
-            ]
+            acc[key] = [...acc[key], label]
 
             return acc
         }
@@ -358,7 +359,7 @@ export function getStylesDependenciesFromFunction(funcPath: NodePath<t.Node> | A
     // user used 'theme' without destructuring
     if (t.isIdentifier(themeParam)) {
         themeNames.push({
-            properties: [themeParam.name]
+            properties: [themeParam.name],
         })
     }
 
@@ -379,7 +380,7 @@ export function getStylesDependenciesFromFunction(funcPath: NodePath<t.Node> | A
     // user used 'rt' without destructuring
     if (t.isIdentifier(rtParam)) {
         rtNames.push({
-            properties: [rtParam.name]
+            properties: [rtParam.name],
         })
     }
 
@@ -398,7 +399,7 @@ export function getStylesDependenciesFromFunction(funcPath: NodePath<t.Node> | A
                         returnedObjectPath = argumentPath
                     }
                 }
-            }
+            },
         })
     }
 
@@ -409,11 +410,11 @@ export function getStylesDependenciesFromFunction(funcPath: NodePath<t.Node> | A
         return
     }
 
-    const detectedStylesWithVariants = new Set<{ label: string, key: string }>()
+    const detectedStylesWithVariants = new Set<{ label: string; key: string }>()
     const properties = returnedObjectPath.get('properties') as NodePath[]
 
     // detect variants via Scope
-    properties.forEach(propPath => {
+    properties.forEach((propPath) => {
         // get style name
         const stylePath = propPath.get('key')
 
@@ -433,7 +434,7 @@ export function getStylesDependenciesFromFunction(funcPath: NodePath<t.Node> | A
         }
 
         if (valuePath.isObjectExpression()) {
-            const hasVariants = valuePath.get('properties').some(innerProp => {
+            const hasVariants = valuePath.get('properties').some((innerProp) => {
                 const innerKey = innerProp.get('key')
 
                 if (Array.isArray(innerKey)) {
@@ -446,42 +447,47 @@ export function getStylesDependenciesFromFunction(funcPath: NodePath<t.Node> | A
             if (hasVariants) {
                 detectedStylesWithVariants.add({
                     label: 'variants',
-                    key: styleKey
+                    key: styleKey,
                 })
             }
         }
 
         if (valuePath.isArrowFunctionExpression()) {
             if (t.isObjectExpression(valuePath.node.body)) {
-                const hasVariants = valuePath.node.body.properties.some(innerProp => {
-                    return t.isObjectProperty(innerProp) && t.isIdentifier(innerProp.key) && innerProp.key.name === 'variants'
+                const hasVariants = valuePath.node.body.properties.some((innerProp) => {
+                    return (
+                        t.isObjectProperty(innerProp) &&
+                        t.isIdentifier(innerProp.key) &&
+                        innerProp.key.name === 'variants'
+                    )
                 })
 
                 if (hasVariants) {
                     detectedStylesWithVariants.add({
                         label: 'variants',
-                        key: styleKey
+                        key: styleKey,
                     })
                 }
             }
         }
     })
 
-    const detectedStylesWithTheme = new Set<{ label: string, key: string }>()
+    const detectedStylesWithTheme = new Set<{ label: string; key: string }>()
 
     // detect theme dependencies via Scope
     themeNames.forEach(({ properties }) => {
-        properties.forEach(property => {
+        properties.forEach((property) => {
             const binding = funcPath.scope.getBinding(property)
 
             if (!binding) {
                 return
             }
 
-            binding.referencePaths.forEach(refPath => {
+            binding.referencePaths.forEach((refPath) => {
                 // find key of the style that we are referring to
-                const containerProp = refPath
-                    .findParent(parent => parent.isObjectProperty() && parent.parentPath === returnedObjectPath)
+                const containerProp = refPath.findParent(
+                    (parent) => parent.isObjectProperty() && parent.parentPath === returnedObjectPath,
+                )
 
                 if (!containerProp) {
                     return
@@ -494,33 +500,29 @@ export function getStylesDependenciesFromFunction(funcPath: NodePath<t.Node> | A
                 }
 
                 const keyValue = keyNode.isLiteral()
-                    ? (keyNode.isStringLiteral() || keyNode.isNumericLiteral() || keyNode.isBooleanLiteral())
+                    ? keyNode.isStringLiteral() || keyNode.isNumericLiteral() || keyNode.isBooleanLiteral()
                         ? String(keyNode.node.value)
                         : null
                     : null
 
-                const styleKey = keyNode.isIdentifier()
-                    ? keyNode.node.name
-                    : keyValue
+                const styleKey = keyNode.isIdentifier() ? keyNode.node.name : keyValue
 
                 if (styleKey) {
                     detectedStylesWithTheme.add({
                         label: 'theme',
-                        key: styleKey
+                        key: styleKey,
                     })
                 }
             })
         })
     })
 
-    const detectedStylesWithRt = new Set<{ label: string, key: string }>()
-    const localRtName = t.isIdentifier(rtParam)
-        ? rtParam.name
-        : undefined
+    const detectedStylesWithRt = new Set<{ label: string; key: string }>()
+    const localRtName = t.isIdentifier(rtParam) ? rtParam.name : undefined
 
     // detect rt dependencies via Scope
     rtNames.forEach(({ properties, parent }) => {
-        properties.forEach(property => {
+        properties.forEach((property) => {
             const rtBinding = funcPath.scope.getBinding(property)
 
             if (!rtBinding) {
@@ -544,7 +546,7 @@ export function getStylesDependenciesFromFunction(funcPath: NodePath<t.Node> | A
                 validRtName = parent
             }
 
-            rtBinding.referencePaths.forEach(refPath => {
+            rtBinding.referencePaths.forEach((refPath) => {
                 // to detect rt dependencies we need to get parameter not rt itself
                 // eg. rt.screen.width -> screen
                 // rt.insets.top -> insets
@@ -577,7 +579,6 @@ export function getStylesDependenciesFromFunction(funcPath: NodePath<t.Node> | A
                             usedLabel === 'insets' &&
                             (memberExpr.parentPath.isBinaryExpression() || memberExpr.parentPath.isLogicalExpression())
                         ) {
-
                             const secondPropPath = memberExpr.node.property
 
                             if (t.isIdentifier(secondPropPath) && secondPropPath.name === 'ime') {
@@ -588,8 +589,9 @@ export function getStylesDependenciesFromFunction(funcPath: NodePath<t.Node> | A
                 }
 
                 // find key of the style that we are referring to
-                const containerProp = refPath
-                    .findParent(parent => parent.isObjectProperty() && parent.parentPath === returnedObjectPath)
+                const containerProp = refPath.findParent(
+                    (parent) => parent.isObjectProperty() && parent.parentPath === returnedObjectPath,
+                )
 
                 if (!containerProp) {
                     return
@@ -602,19 +604,17 @@ export function getStylesDependenciesFromFunction(funcPath: NodePath<t.Node> | A
                 }
 
                 const keyValue = keyNode.isLiteral()
-                    ? (keyNode.isStringLiteral() || keyNode.isNumericLiteral() || keyNode.isBooleanLiteral())
+                    ? keyNode.isStringLiteral() || keyNode.isNumericLiteral() || keyNode.isBooleanLiteral()
                         ? String(keyNode.node.value)
                         : null
                     : null
 
-                const styleKey = keyNode.isIdentifier()
-                    ? keyNode.node.name
-                    : keyValue
+                const styleKey = keyNode.isIdentifier() ? keyNode.node.name : keyValue
 
                 if (styleKey) {
                     detectedStylesWithRt.add({
                         label: usedLabel,
-                        key: styleKey
+                        key: styleKey,
                     })
                 }
             })
@@ -630,10 +630,7 @@ export function getStylesDependenciesFromFunction(funcPath: NodePath<t.Node> | A
         .concat(variants)
         .reduce<Styles>((acc, { key, label }) => {
             if (acc[key]) {
-                acc[key] = [
-                    ...acc[key],
-                    label,
-                ]
+                acc[key] = [...acc[key], label]
 
                 return acc
             }
@@ -644,14 +641,25 @@ export function getStylesDependenciesFromFunction(funcPath: NodePath<t.Node> | A
         }, {})
 }
 
-export function addDependencies(state: UnistylesPluginPass, styleName: string, unistyle: t.ObjectProperty, detectedDependencies: string[]) {
+export function addDependencies(
+    state: UnistylesPluginPass,
+    styleName: string,
+    unistyle: t.ObjectProperty,
+    detectedDependencies: string[],
+) {
     const debugMessage = (deps: (number | null)[]) => {
         if (state.opts.debug) {
             const mappedDeps = deps
-                .map(dep => Object.keys(UnistyleDependency).find(key => UnistyleDependency[key as keyof typeof UnistyleDependency] === dep))
+                .map((dep) =>
+                    Object.keys(UnistyleDependency).find(
+                        (key) => UnistyleDependency[key as keyof typeof UnistyleDependency] === dep,
+                    ),
+                )
                 .join(', ')
 
-            console.log(`${state.filename?.replace(`${state.file.opts.root}/`, '')}: styles.${styleName}: [${mappedDeps}]`)
+            console.log(
+                `${state.filename?.replace(`${state.file.opts.root}/`, '')}: styles.${styleName}: [${mappedDeps}]`,
+            )
         }
     }
 
@@ -672,11 +680,9 @@ export function addDependencies(state: UnistylesPluginPass, styleName: string, u
 
             if (t.isBlockStatement(unistyle.value.body)) {
                 targets = getReturnStatementsFromBody(unistyle.value.body)
-                    .map(node => {
+                    .map((node) => {
                         if (t.isIdentifier(node.argument)) {
-                            node.argument = t.objectExpression([
-                                t.spreadElement(node.argument)
-                            ])
+                            node.argument = t.objectExpression([t.spreadElement(node.argument)])
                         }
 
                         return node.argument
@@ -697,12 +703,16 @@ export function addDependencies(state: UnistylesPluginPass, styleName: string, u
         }
 
         if (targets.length > 0) {
-            targets.forEach(target => {
+            targets.forEach((target) => {
                 target.properties.push(
                     t.objectProperty(
                         t.identifier('uni__dependencies'),
-                        t.arrayExpression(uniqueDependencies.filter((dep): dep is number => dep !== undefined && dep !== null).map(dep => t.numericLiteral(dep)))
-                    )
+                        t.arrayExpression(
+                            uniqueDependencies
+                                .filter((dep): dep is number => dep !== undefined && dep !== null)
+                                .map((dep) => t.numericLiteral(dep)),
+                        ),
+                    ),
                 )
             })
         }

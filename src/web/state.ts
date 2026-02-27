@@ -1,13 +1,14 @@
 import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
-import { UnistyleDependency } from '../specs/NativePlatform'
 import type { UnistylesConfig } from '../specs/StyleSheet'
 import type { AppBreakpoint, AppTheme, AppThemeName } from '../specs/types'
 import type { UnistylesTheme } from '../types'
 import type { UnionToIntersection } from '../types'
 import type { UnistylesServices } from './types'
+
+import { UnistyleDependency } from '../specs/NativePlatform'
 import { convertTheme, error, isServer, schemeToTheme } from './utils'
 
-type RemoveNevers<T> = { [K in keyof T as T[K] extends (never | undefined) ? never : K]: T[K] }
+type RemoveNevers<T> = { [K in keyof T as T[K] extends never | undefined ? never : K]: T[K] }
 type UnistylesSettings = Partial<UnionToIntersection<RemoveNevers<Required<UnistylesConfig>['settings']>>>
 
 export class UnistylesState {
@@ -21,9 +22,10 @@ export class UnistylesState {
     private _config: UnistylesConfig = {}
 
     get breakpoint() {
-        const [currentBreakpoint] = Array.from(this.matchingBreakpoints)
-            .reverse()
-            .find(([_key, value]) => value) ?? []
+        const [currentBreakpoint] =
+            Array.from(this.matchingBreakpoints)
+                .reverse()
+                .find(([_key, value]) => value) ?? []
 
         return currentBreakpoint as AppBreakpoint | undefined
     }
@@ -72,9 +74,11 @@ export class UnistylesState {
                 this.services.registry.css.addTheme(themeName, theme)
                 this.cssThemes.set(
                     themeName,
-                    Object.fromEntries(Object.entries(theme).map(([key, value]) => {
-                        return convertTheme(key, value)
-                    })) as UnistylesTheme
+                    Object.fromEntries(
+                        Object.entries(theme).map(([key, value]) => {
+                            return convertTheme(key, value)
+                        }),
+                    ) as UnistylesTheme,
                 )
             }
         })
@@ -84,13 +88,17 @@ export class UnistylesState {
         this.hasAdaptiveThemes = settings?.adaptiveThemes ?? false
 
         if (settings?.initialTheme && settings.adaptiveThemes) {
-            throw error('You\'re trying to set initial theme and enable adaptiveThemes, but these options are mutually exclusive.')
+            throw error(
+                "You're trying to set initial theme and enable adaptiveThemes, but these options are mutually exclusive.",
+            )
         }
 
         // Adaptive themes
         if (settings?.adaptiveThemes) {
             if (!this.themes.get('light') || !this.themes.get('dark')) {
-                throw error(`You're trying to enable adaptiveThemes, but you didn't register both 'light' and 'dark' themes.`)
+                throw error(
+                    `You're trying to enable adaptiveThemes, but you didn't register both 'light' and 'dark' themes.`,
+                )
             }
 
             this.themeName = schemeToTheme(this.services.runtime.colorScheme) as AppThemeName
@@ -99,9 +107,8 @@ export class UnistylesState {
         }
 
         if (settings?.initialTheme) {
-            const initialTheme = typeof settings.initialTheme === 'function'
-                ? settings.initialTheme()
-                : settings.initialTheme
+            const initialTheme =
+                typeof settings.initialTheme === 'function' ? settings.initialTheme() : settings.initialTheme
 
             if (!this.themes.get(initialTheme)) {
                 throw error(`You're trying to select theme "${initialTheme}" but it wasn't registered.`)
@@ -126,11 +133,11 @@ export class UnistylesState {
         const breakpointsEntries = Object.entries(breakpoints)
 
         if (breakpointsEntries.length === 0) {
-            throw error('StyleSheet.configure\'s breakpoints can\'t be empty.')
+            throw error("StyleSheet.configure's breakpoints can't be empty.")
         }
 
         if (breakpointsEntries?.[0]?.[1] !== 0) {
-            throw error('StyleSheet.configure\'s first breakpoint must start from 0.')
+            throw error("StyleSheet.configure's first breakpoint must start from 0.")
         }
 
         breakpointsEntries
@@ -143,7 +150,7 @@ export class UnistylesState {
                 const mediaQuery = window.matchMedia(`(min-width: ${value}px)`)
                 this.matchingBreakpoints.set(breakpoint, mediaQuery.matches)
 
-                mediaQuery.addEventListener('change', event => {
+                mediaQuery.addEventListener('change', (event) => {
                     this.matchingBreakpoints.set(breakpoint, event.matches)
                     this.services.listener.emitChange(UnistyleDependency.Breakpoints)
                 })

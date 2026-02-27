@@ -2,8 +2,8 @@ import type { UnistylesBreakpoints, UnistylesThemes } from './global'
 import type { UnistylesNavigationBar } from './specs/NavigtionBar'
 import type { UnistylesStatusBar } from './specs/StatusBar'
 import type { UnistylesConfig, UnistylesStyleSheet } from './specs/StyleSheet'
-import type { UnistylesRuntimePrivate } from './specs/UnistylesRuntime'
 import type { ColorScheme, Orientation } from './specs/types'
+import type { UnistylesRuntimePrivate } from './specs/UnistylesRuntime'
 import type { IOSContentSizeCategory, UnistylesTheme } from './types'
 
 type Registry = {
@@ -20,15 +20,15 @@ jest.mock('react-native-nitro-modules', () => ({
                 setStyle: () => {},
             }),
             createHybridNavigationBar: () => {},
-        })
-    }
+        }),
+    },
 }))
 
 jest.mock('react-native-unistyles', () => {
     const React = require('react')
     const _REGISTRY: Registry = {
         themes: {},
-        breakpoints: {}
+        breakpoints: {},
     }
     const miniRuntime = {
         themeName: undefined,
@@ -41,7 +41,7 @@ jest.mock('react-native-unistyles', () => {
             left: 0,
             right: 0,
             bottom: 0,
-            ime: 0
+            ime: 0,
         },
         pixelRatio: 1,
         fontScale: 1,
@@ -50,16 +50,16 @@ jest.mock('react-native-unistyles', () => {
         isPortrait: true,
         navigationBar: {
             width: 0,
-            height: 0
+            height: 0,
         },
         screen: {
             width: 0,
-            height: 0
+            height: 0,
         },
         statusBar: {
             width: 0,
-            height: 0
-        }
+            height: 0,
+        },
     }
     const unistylesRuntime = {
         colorScheme: 'unspecified' as ColorScheme,
@@ -68,7 +68,7 @@ jest.mock('react-native-unistyles', () => {
         isPortrait: true,
         isLandscape: false,
         breakpoints: {},
-        dispose: () => { },
+        dispose: () => {},
         equals: () => false,
         name: 'UnistylesRuntimeMock',
         miniRuntime: miniRuntime,
@@ -77,16 +77,16 @@ jest.mock('react-native-unistyles', () => {
             width: 0,
             name: 'StatusBarMock',
             equals: () => false,
-            setHidden: () => { },
-            setStyle: () => { }
+            setHidden: () => {},
+            setStyle: () => {},
         },
         navigationBar: {
             height: 0,
             width: 0,
             name: 'NavigationBarMock',
             equals: () => false,
-            setHidden: () => { },
-            dispose: () => { }
+            setHidden: () => {},
+            dispose: () => {},
         },
         fontScale: 1,
         hasAdaptiveThemes: false,
@@ -113,13 +113,13 @@ jest.mock('react-native-unistyles', () => {
             left: 0,
             right: 0,
             bottom: 0,
-            ime: 0
+            ime: 0,
         },
         screen: {
             width: 0,
-            height: 0
+            height: 0,
         },
-        breakpoint: undefined
+        breakpoint: undefined,
     } satisfies UnistylesRuntimePrivate
 
     const stripVariants = (styleEntries: Record<string, any>): any => {
@@ -149,38 +149,43 @@ jest.mock('react-native-unistyles', () => {
         Hide: () => null,
         Display: () => null,
         ScopedTheme: () => null,
-        withUnistyles: <TComponent,>(Component: TComponent, mapper?: (theme: UnistylesTheme, runtime: typeof miniRuntime) => TComponent) => (props: any) =>
-            React.createElement(Component, {
-                ...mapper?.((Object.values(_REGISTRY.themes).at(0) ?? {}) as UnistylesTheme, miniRuntime),
-                ...props
-            }),
+        withUnistyles:
+            <TComponent>(
+                Component: TComponent,
+                mapper?: (theme: UnistylesTheme, runtime: typeof miniRuntime) => TComponent,
+            ) =>
+            (props: any) =>
+                React.createElement(Component, {
+                    ...mapper?.((Object.values(_REGISTRY.themes).at(0) ?? {}) as UnistylesTheme, miniRuntime),
+                    ...props,
+                }),
         mq: {
             only: {
                 width: () => ({
                     and: {
-                        height: () => ({})
-                    }
+                        height: () => ({}),
+                    },
                 }),
                 height: () => ({
                     and: {
-                        width: () => ({})
-                    }
-                })
+                        width: () => ({}),
+                    },
+                }),
             },
             width: () => ({
                 and: {
-                    height: () => ({})
-                }
+                    height: () => ({}),
+                },
             }),
             height: () => ({
                 and: {
-                    width: () => ({})
-                }
-            })
+                    width: () => ({}),
+                },
+            }),
         },
         useUnistyles: () => ({
             theme: Object.values(_REGISTRY.themes).at(0) ?? {},
-            rt: unistylesRuntime
+            rt: unistylesRuntime,
         }),
         StyleSheet: {
             absoluteFillObject: {
@@ -188,14 +193,14 @@ jest.mock('react-native-unistyles', () => {
                 left: 0,
                 right: 0,
                 top: 0,
-                bottom: 0
+                bottom: 0,
             },
             absoluteFill: {
                 position: 'absolute',
                 left: 0,
                 right: 0,
                 top: 0,
-                bottom: 0
+                bottom: 0,
             } as unknown as UnistylesStyleSheet['absoluteFill'],
             compose: (styles: any) => {
                 return styles
@@ -204,13 +209,14 @@ jest.mock('react-native-unistyles', () => {
                 return styles
             },
             create: (styles: any) => {
-                const resolved = typeof styles === 'function'
-                    ? styles(Object.values(_REGISTRY.themes).at(0) ?? {}, miniRuntime)
-                    : styles
+                const resolved =
+                    typeof styles === 'function'
+                        ? styles(Object.values(_REGISTRY.themes).at(0) ?? {}, miniRuntime)
+                        : styles
 
                 return {
                     ...stripVariants(resolved),
-                    useVariants: () => {}
+                    useVariants: () => {},
                 }
             },
             configure: (config: UnistylesConfig) => {
@@ -224,16 +230,16 @@ jest.mock('react-native-unistyles', () => {
             },
             jsMethods: {
                 processColor: () => null,
-                parseBoxShadowString: () => []
+                parseBoxShadowString: () => [],
             },
             hairlineWidth: 1,
             addChangeListener: () => () => {},
             init: () => {},
             name: 'StyleSheetMock',
             dispose: () => {},
-            equals: () => false
+            equals: () => false,
         } satisfies UnistylesStyleSheet,
-        UnistylesRuntime: unistylesRuntime
+        UnistylesRuntime: unistylesRuntime,
     }
 })
 
@@ -242,7 +248,7 @@ jest.mock('react-native-unistyles/reanimated', () => {
     const mockedSharedValue = (value: any) => ({
         get: () => value,
         set: (_value: any) => {},
-        value
+        value,
     })
 
     return {
@@ -258,7 +264,7 @@ jest.mock('react-native-unistyles/reanimated', () => {
 
             return {
                 fromValue,
-                toValue
+                toValue,
             }
         },
     }

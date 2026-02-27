@@ -1,7 +1,8 @@
-import { UnistyleDependency } from '../specs/NativePlatform/NativePlatform.nitro'
 import type { UnistylesTheme, UnistylesValues } from '../types'
-import { deepMergeObjects } from '../utils'
 import type { UniGeneratedStyle, UnistylesServices } from './types'
+
+import { UnistyleDependency } from '../specs/NativePlatform/NativePlatform.nitro'
+import { deepMergeObjects } from '../utils'
 import { extractSecrets, extractUnistyleDependencies, isGeneratedUnistyle, isServer } from './utils'
 import { getVariants } from './variants'
 
@@ -36,7 +37,7 @@ export class UnistylesShadowRegistry {
         }
 
         const getParsedStyles = () => {
-            const allStyles = unistyles.map(unistyle => {
+            const allStyles = unistyles.map((unistyle) => {
                 const secrets = extractSecrets(unistyle)
 
                 // Regular style
@@ -50,11 +51,12 @@ export class UnistylesShadowRegistry {
                 }
 
                 const { __uni__key, __uni__stylesheet, __uni__args = [], __stylesheetVariants: variants } = secrets
-                const newComputedStylesheet = this.services.registry.getComputedStylesheet(__uni__stylesheet, scopedTheme)
-                const style = newComputedStylesheet[__uni__key] as (UnistylesValues | ((...args: any) => UnistylesValues))
-                const result = typeof style === 'function'
-                    ? style(...__uni__args)
-                    : style
+                const newComputedStylesheet = this.services.registry.getComputedStylesheet(
+                    __uni__stylesheet,
+                    scopedTheme,
+                )
+                const style = newComputedStylesheet[__uni__key] as UnistylesValues | ((...args: any) => UnistylesValues)
+                const result = typeof style === 'function' ? style(...__uni__args) : style
                 const variantsResult = getVariants(result, variants)
                 const resultWithVariants = deepMergeObjects(result, variantsResult)
                 const dependencies = extractUnistyleDependencies(resultWithVariants)
@@ -66,7 +68,7 @@ export class UnistylesShadowRegistry {
 
                 return {
                     ...resultWithVariants,
-                    ...resultWithVariants._web
+                    ...resultWithVariants._web,
                 } as UnistylesValues
             })
 
@@ -81,18 +83,19 @@ export class UnistylesShadowRegistry {
         const injectedClassName = Array.isArray(injectedClassNames) ? injectedClassNames.join(' ') : injectedClassNames
         const dependencies = extractUnistyleDependencies(parsedStyles)
         const filteredDependencies = this.services.state.CSSVars
-            ? dependencies.filter(dependency => dependency !== UnistyleDependency.Theme)
+            ? dependencies.filter((dependency) => dependency !== UnistyleDependency.Theme)
             : dependencies
 
         if (!existingHash) {
-            this.disposeMap.set(hash, this.services.listener.addListeners(filteredDependencies, () => {
-                this.services.registry.applyStyles(hash, getParsedStyles())
-            }))
+            this.disposeMap.set(
+                hash,
+                this.services.listener.addListeners(filteredDependencies, () => {
+                    this.services.registry.applyStyles(hash, getParsedStyles())
+                }),
+            )
         }
 
-        const hashClassname = forChild
-            ? hash.replace(' > *', '')
-            : hash
+        const hashClassname = forChild ? hash.replace(' > *', '') : hash
 
         return { injectedClassName, hash: hashClassname, parsedStyles }
     }
@@ -108,15 +111,14 @@ export class UnistylesShadowRegistry {
             return
         }
 
-        this.services.registry.remove(ref, hash)
-            .then(removed => {
-                if (!removed) {
-                    return
-                }
+        this.services.registry.remove(ref, hash).then((removed) => {
+            if (!removed) {
+                return
+            }
 
-                this.disposeMap.get(hash)?.()
-                this.disposeMap.delete(hash)
-            })
+            this.disposeMap.get(hash)?.()
+            this.disposeMap.delete(hash)
+        })
     }
 
     flush = () => {}

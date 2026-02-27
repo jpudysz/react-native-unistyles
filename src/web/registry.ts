@@ -1,8 +1,9 @@
 import type { UnistyleDependency, UnistylesMiniRuntime } from '../specs'
 import type { UnistylesTheme, UnistylesValues } from '../types'
 import type { StyleSheet, StyleSheetWithSuperPowers } from '../types/stylesheet'
-import { CSSState } from './css'
 import type { UnistylesServices } from './types'
+
+import { CSSState } from './css'
 import { error, extractUnistyleDependencies, generateHash } from './utils'
 
 export class UnistylesRegistry {
@@ -26,7 +27,9 @@ export class UnistylesRegistry {
             const scopedTheme = this.services.runtime.getTheme(scopedThemeName)
 
             if (!scopedTheme) {
-                throw error(`Unistyles: You're trying to use scoped theme '${scopedThemeName}' but it wasn't registered.`)
+                throw error(
+                    `Unistyles: You're trying to use scoped theme '${scopedThemeName}' but it wasn't registered.`,
+                )
             }
 
             return stylesheet(scopedTheme, this.services.runtime.miniRuntime)
@@ -38,9 +41,12 @@ export class UnistylesRegistry {
             return computedStylesheet
         }
 
-        const currentTheme = this.services.runtime.getTheme(this.services.runtime.themeName, this.services.state.CSSVars)
+        const currentTheme = this.services.runtime.getTheme(
+            this.services.runtime.themeName,
+            this.services.state.CSSVars,
+        )
         const createdStylesheet = stylesheet(currentTheme, this.services.runtime.miniRuntime)
-        const dependencies = Object.values(createdStylesheet).flatMap(value => extractUnistyleDependencies(value))
+        const dependencies = Object.values(createdStylesheet).flatMap((value) => extractUnistyleDependencies(value))
 
         this.addDependenciesToStylesheet(stylesheet, dependencies)
         this.stylesheets.set(stylesheet, createdStylesheet)
@@ -48,17 +54,20 @@ export class UnistylesRegistry {
         return createdStylesheet
     }
 
-    addDependenciesToStylesheet = (stylesheet: (theme: UnistylesTheme, miniRuntime: UnistylesMiniRuntime) => StyleSheet, dependencies: Array<UnistyleDependency>) => {
+    addDependenciesToStylesheet = (
+        stylesheet: (theme: UnistylesTheme, miniRuntime: UnistylesMiniRuntime) => StyleSheet,
+        dependencies: Array<UnistyleDependency>,
+    ) => {
         this.disposeListenersMap.get(stylesheet)?.()
 
         const dependenciesMap = this.dependenciesMap.get(stylesheet) ?? new Set(dependencies)
 
-        dependencies.forEach(dependency => dependenciesMap.add(dependency))
+        dependencies.forEach((dependency) => dependenciesMap.add(dependency))
 
         const dispose = this.services.listener.addStylesheetListeners(Array.from(dependenciesMap), () => {
             const newComputedStylesheet = stylesheet(
                 this.services.runtime.getTheme(this.services.runtime.themeName, this.services.state.CSSVars),
-                this.services.runtime.miniRuntime
+                this.services.runtime.miniRuntime,
             )
 
             this.stylesheets.set(stylesheet, newComputedStylesheet)
@@ -100,9 +109,7 @@ export class UnistylesRegistry {
 
     add = (value: UnistylesValues, forChild?: boolean) => {
         const generatedHash = generateHash(value)
-        const hash = forChild
-            ? `${generatedHash} > *`
-            : generatedHash
+        const hash = forChild ? `${generatedHash} > *` : generatedHash
 
         if (!this.stylesCache.has(hash)) {
             this.applyStyles(hash, value)

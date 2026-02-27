@@ -1,12 +1,15 @@
 import type { UnistylesValues } from '../types'
+
 import { deepMergeObjects } from '../utils'
 import { keyInObject } from './utils'
 
 type StylesWithVariants = {
-    variants: Record<string, string | boolean | undefined>,
-    compoundVariants?: Array<Record<string, string | boolean | undefined> & {
-        styles: Record<string, any>
-    }>
+    variants: Record<string, string | boolean | undefined>
+    compoundVariants?: Array<
+        Record<string, string | boolean | undefined> & {
+            styles: Record<string, any>
+        }
+    >
 }
 const hasVariants = (value: any): value is StylesWithVariants => {
     return keyInObject(value, 'variants')
@@ -28,15 +31,20 @@ export const getVariants = (styles: UnistylesValues, selectedVariants: Record<st
         return selectedVariantStyles
     })
 
-    const compoundVariantStyles = styles.compoundVariants?.flatMap(compoundVariant => {
-        const { styles, ...conditions } = compoundVariant
+    const compoundVariantStyles =
+        styles.compoundVariants?.flatMap((compoundVariant) => {
+            const { styles, ...conditions } = compoundVariant
 
-        if (Object.entries(conditions).some(([variant, value]) => String(selectedVariants[variant]) !== String(value))) {
-            return []
-        }
+            if (
+                Object.entries(conditions).some(
+                    ([variant, value]) => String(selectedVariants[variant]) !== String(value),
+                )
+            ) {
+                return []
+            }
 
-        return styles
-    }) ?? []
+            return styles
+        }) ?? []
 
     return deepMergeObjects(...variantStyles, ...compoundVariantStyles)
 }

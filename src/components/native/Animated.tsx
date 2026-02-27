@@ -1,4 +1,5 @@
 import { Animated as RNAnimated } from 'react-native'
+
 import { FlatList } from './FlatList'
 import { Image } from './Image'
 import { ScrollView } from './ScrollView'
@@ -13,5 +14,5 @@ export const Animated = {
     FlatList: RNAnimated.createAnimatedComponent(FlatList),
     Image: RNAnimated.createAnimatedComponent(Image),
     ScrollView: RNAnimated.createAnimatedComponent(ScrollView),
-    SectionList: RNAnimated.createAnimatedComponent(SectionList)
+    SectionList: RNAnimated.createAnimatedComponent(SectionList),
 }

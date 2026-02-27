@@ -1,18 +1,22 @@
-import { UnistyleDependency } from '../specs/NativePlatform'
 import type { UnistylesServices } from './types'
+
+import { UnistyleDependency } from '../specs/NativePlatform'
 
 type Listener = (dependency: UnistyleDependency) => void
 
 export class UnistylesListener {
     private isInitialized = false
     private listeners = Array.from({ length: Object.keys(UnistyleDependency).length / 2 }, () => new Set<Listener>())
-    private stylesheetListeners = Array.from({ length: Object.keys(UnistyleDependency).length / 2 }, () => new Set<Listener>())
+    private stylesheetListeners = Array.from(
+        { length: Object.keys(UnistyleDependency).length / 2 },
+        () => new Set<Listener>(),
+    )
 
     constructor(private services: UnistylesServices) {}
 
     emitChange = (dependency: UnistyleDependency) => {
-        this.stylesheetListeners[dependency]?.forEach(listener => listener(dependency))
-        this.listeners[dependency]?.forEach(listener => listener(dependency))
+        this.stylesheetListeners[dependency]?.forEach((listener) => listener(dependency))
+        this.listeners[dependency]?.forEach((listener) => listener(dependency))
     }
 
     initListeners = () => {
@@ -22,7 +26,7 @@ export class UnistylesListener {
 
         this.isInitialized = true
 
-        this.services.runtime.darkMedia?.addEventListener('change', event => {
+        this.services.runtime.darkMedia?.addEventListener('change', (event) => {
             if (!event.matches) {
                 return
             }
@@ -34,7 +38,7 @@ export class UnistylesListener {
                 this.emitChange(UnistyleDependency.ThemeName)
             }
         })
-        this.services.runtime.lightMedia?.addEventListener('change', event => {
+        this.services.runtime.lightMedia?.addEventListener('change', (event) => {
             if (!event.matches) {
                 return
             }
@@ -52,18 +56,18 @@ export class UnistylesListener {
     }
 
     addListeners = (dependencies: Array<UnistyleDependency>, listener: Listener) => {
-        dependencies.forEach(dependency => this.listeners[dependency]?.add(listener))
+        dependencies.forEach((dependency) => this.listeners[dependency]?.add(listener))
 
         return () => {
-            dependencies.forEach(dependency => this.listeners[dependency]?.delete(listener))
+            dependencies.forEach((dependency) => this.listeners[dependency]?.delete(listener))
         }
     }
 
     addStylesheetListeners = (dependencies: Array<UnistyleDependency>, listener: Listener) => {
-        dependencies.forEach(dependency => this.stylesheetListeners[dependency]?.add(listener))
+        dependencies.forEach((dependency) => this.stylesheetListeners[dependency]?.add(listener))
 
         return () => {
-            dependencies.forEach(dependency => this.stylesheetListeners[dependency]?.delete(listener))
+            dependencies.forEach((dependency) => this.stylesheetListeners[dependency]?.delete(listener))
         }
     }
 }
