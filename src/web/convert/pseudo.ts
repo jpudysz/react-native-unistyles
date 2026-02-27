@@ -101,8 +101,8 @@ type AddDynamicSelector<T extends string> = T extends `${infer U}(` ? `${U}(${st
 
 export type Pseudo = AddDynamicSelector<(typeof pseudoClasses)[number] | (typeof pseudoElements)[number]>
 
-export const isPseudoClass = (selector: string) => pseudoClasses.some(pseudo => selector.startsWith(pseudo))
+export const isPseudoClass = (selector: string) => pseudoClasses.some((pseudo) => selector.startsWith(pseudo))
 
-export const isPseudoElement = (selector: string) => pseudoElements.some(pseudo => selector.startsWith(pseudo))
+export const isPseudoElement = (selector: string) => pseudoElements.some((pseudo) => selector.startsWith(pseudo))
 
 export const isPseudo = (selector: string) => isPseudoClass(selector) || isPseudoElement(selector)

@@ -1,4 +1,5 @@
 import { pluginTester } from 'babel-plugin-tester'
+
 import plugin from '../src/index'
 
 pluginTester({
@@ -6,13 +7,13 @@ pluginTester({
     pluginOptions: {
         debug: false,
         root: 'src',
-        autoProcessImports: ['@codemask/styles']
+        autoProcessImports: ['@codemask/styles'],
     },
     babelOptions: {
         plugins: ['@babel/plugin-syntax-jsx'],
         generatorOpts: {
-            retainLines: true
-        }
+            retainLines: true,
+        },
     },
     tests: [
         {
@@ -57,7 +58,7 @@ pluginTester({
                     },
                     467105429
                 )
-            `
+            `,
         },
         {
             title: 'Should respect user imports event if then changed the name',
@@ -101,7 +102,7 @@ pluginTester({
                     },
                     467105429
                 )
-            `
-        }
-    ]
+            `,
+        },
+    ],
 })

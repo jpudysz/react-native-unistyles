@@ -1,17 +1,18 @@
 import { pluginTester } from 'babel-plugin-tester'
+
 import plugin from '../src/index'
 
 pluginTester({
     plugin,
     pluginOptions: {
         debug: false,
-        root: 'src'
+        root: 'src',
     },
     babelOptions: {
         plugins: ['@babel/plugin-syntax-jsx'],
         generatorOpts: {
-            retainLines: true
-        }
+            retainLines: true,
+        },
     },
     tests: [
         {
@@ -56,7 +57,7 @@ pluginTester({
                     },
                     798826926
                 )
-            `
+            `,
         },
         {
             title: 'Should add dependencies to StyleSheet if user is using theme',
@@ -101,7 +102,7 @@ pluginTester({
                     }),
                     798826926
                 )
-            `
+            `,
         },
         {
             title: 'Should add dependencies to StyleSheet even if user did rename import',
@@ -146,7 +147,7 @@ pluginTester({
                     }),
                     798826926
                 )
-            `
+            `,
         },
         {
             title: 'Should detect variants for object StyleSheet',
@@ -193,7 +194,7 @@ pluginTester({
                     },
                     798826926
                 )
-            `
+            `,
         },
         {
             title: 'Should detect variants for object StyleSheet and dynamic function',
@@ -240,7 +241,7 @@ pluginTester({
                     },
                     798826926
                 )
-            `
+            `,
         },
         {
             title: 'Should detect miniRuntime dependency',
@@ -289,10 +290,10 @@ pluginTester({
                     }),
                     798826926
                 )
-            `
+            `,
         },
         {
-            title: 'Should detect miniRuntime and theme dependencies even if user renamed it\'s names',
+            title: "Should detect miniRuntime and theme dependencies even if user renamed it's names",
             code: `
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
@@ -338,7 +339,7 @@ pluginTester({
                     }),
                     798826926
                 )
-            `
+            `,
         },
         {
             title: 'Should detect dependencies in function',
@@ -388,7 +389,7 @@ pluginTester({
                         })
                     }
                 }, 798826926)
-            `
+            `,
         },
         {
             title: 'Should generate two different ids for 2 stylesheets in the same file',
@@ -457,7 +458,7 @@ pluginTester({
                         })
                     }
                 }, 798826927)
-            `
+            `,
         },
         {
             title: 'Should use same local name as user name while replacing imports',
@@ -504,7 +505,7 @@ pluginTester({
                     },
                     798826926
                 )
-            `
+            `,
         },
         {
             title: 'Should support style names of javascript array/object prototype functions using object',
@@ -528,7 +529,7 @@ pluginTester({
                     },
                     798826926
                 )
-            `
+            `,
         },
         {
             title: 'Should support style names of javascript array/object prototype functions using function',
@@ -552,7 +553,7 @@ pluginTester({
                     }),
                     798826926
                 )
-            `
-        }
-    ]
+            `,
+        },
+    ],
 })

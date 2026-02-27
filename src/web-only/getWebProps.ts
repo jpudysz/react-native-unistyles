@@ -1,6 +1,8 @@
 import type { StyleProp } from 'react-native'
-import { getClassName } from '../core'
+
 import type { RNStyle, UnistylesValues } from '../types'
+
+import { getClassName } from '../core'
 import { createUnistylesRef } from '../web/utils/createUnistylesRef'
 
 export const getWebProps = <T>(style: StyleProp<RNStyle>, forwardedRef?: React.ForwardedRef<T>) => {
@@ -9,10 +11,7 @@ export const getWebProps = <T>(style: StyleProp<RNStyle>, forwardedRef?: React.F
     const [generatedStyles] = styles ?? []
 
     return {
-        className: [
-            generatedStyles?.hash,
-            generatedStyles?.injectedClassName,
-        ].filter(Boolean).join(' '),
-        ref
+        className: [generatedStyles?.hash, generatedStyles?.injectedClassName].filter(Boolean).join(' '),
+        ref,
     }
 }

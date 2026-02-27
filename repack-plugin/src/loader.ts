@@ -1,6 +1,9 @@
-import { transform } from '@babel/core'
 import type { LoaderContext } from '@rspack/core'
+
+import { transform } from '@babel/core'
+
 import type { UnistylesPluginOptions } from '../../plugin'
+
 import { REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_PATHS } from '../../plugin/src/consts'
 
 const importName = 'react-native-unistyles'
@@ -11,7 +14,7 @@ interface UnistylesLoaderOptions {
 }
 
 const UNISTYLES_REGEX = new RegExp(
-    [...REACT_NATIVE_COMPONENT_NAMES, ...REPLACE_WITH_UNISTYLES_PATHS, importName].join('|')
+    [...REACT_NATIVE_COMPONENT_NAMES, ...REPLACE_WITH_UNISTYLES_PATHS, importName].join('|'),
 )
 
 export function unistylesLoader(this: LoaderContext<UnistylesLoaderOptions>, source: string) {
@@ -51,6 +54,6 @@ export function unistylesLoader(this: LoaderContext<UnistylesLoaderOptions>, sou
             //@ts-ignore
             callback(null, result.code, result.map)
             return
-        }
+        },
     )
 }

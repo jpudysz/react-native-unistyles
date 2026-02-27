@@ -13,19 +13,19 @@ describe('StyleSheet.create mock', () => {
                 variants: {
                     size: {
                         small: { padding: 4 },
-                        large: { padding: 16 }
-                    }
+                        large: { padding: 16 },
+                    },
                 },
                 compoundVariants: [
                     {
                         size: 'small',
-                        styles: { margin: 2 }
-                    }
-                ]
+                        styles: { margin: 2 },
+                    },
+                ],
             },
             text: {
-                fontSize: 14
-            }
+                fontSize: 14,
+            },
         })
 
         expect(styles.container).toEqual({ flex: 1, backgroundColor: 'red' })
@@ -42,10 +42,10 @@ describe('StyleSheet.create mock', () => {
                 variants: {
                     color: {
                         primary: { backgroundColor: 'blue' },
-                        secondary: { backgroundColor: 'gray' }
-                    }
-                }
-            }
+                        secondary: { backgroundColor: 'gray' },
+                    },
+                },
+            },
         }))
 
         expect(styles.container).toEqual({ flex: 1 })
@@ -59,16 +59,16 @@ describe('StyleSheet.create mock', () => {
                 variants: {
                     color: {
                         primary: { backgroundColor: 'blue' },
-                        secondary: { backgroundColor: 'gray' }
-                    }
+                        secondary: { backgroundColor: 'gray' },
+                    },
                 },
                 compoundVariants: [
                     {
                         size: 'small',
-                        styles: { margin: 2 }
-                    }
-                ]
-            })
+                        styles: { margin: 2 },
+                    },
+                ],
+            }),
         }))
 
         const container = styles.container()
@@ -82,8 +82,8 @@ describe('StyleSheet.create mock', () => {
         const styles = unistyles.StyleSheet.create({
             container: {
                 flex: 1,
-                padding: 16
-            }
+                padding: 16,
+            },
         })
 
         expect(styles.container).toEqual({ flex: 1, padding: 16 })
