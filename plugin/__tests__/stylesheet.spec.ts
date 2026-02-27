@@ -49,14 +49,11 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    {
-                        container: {
-                            backgroundColor: 'red'
-                        }
-                    },
-                    798826926
-                )
+                const styles = StyleSheet.create({
+                    container: {
+                        backgroundColor: 'red'
+                    }
+                })
             `,
         },
         {
@@ -93,15 +90,12 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    theme => ({
-                        container: {
-                            backgroundColor: theme.colors.background,
-                            uni__dependencies: [0]
-                        }
-                    }),
-                    798826926
-                )
+                const styles = StyleSheet.create(theme => ({
+                    container: {
+                        backgroundColor: theme.colors.background,
+                        uni__dependencies: [0]
+                    }
+                }))
             `,
         },
         {
@@ -138,15 +132,12 @@ pluginTester({
                     )
                 }
 
-                const styles = ST.create(
-                    theme => ({
-                        container: {
-                            backgroundColor: theme.colors.background,
-                            uni__dependencies: [0]
-                        }
-                    }),
-                    798826926
-                )
+                const styles = ST.create(theme => ({
+                    container: {
+                        backgroundColor: theme.colors.background,
+                        uni__dependencies: [0]
+                    }
+                }))
             `,
         },
         {
@@ -184,16 +175,13 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    {
-                        container: {
-                            backgroundColor: 'red',
-                            variants: {},
-                            uni__dependencies: [4]
-                        }
-                    },
-                    798826926
-                )
+                const styles = StyleSheet.create({
+                    container: {
+                        backgroundColor: 'red',
+                        variants: {},
+                        uni__dependencies: [4]
+                    }
+                })
             `,
         },
         {
@@ -231,16 +219,13 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    {
-                        container: () => ({
-                            backgroundColor: 'red',
-                            variants: {},
-                            uni__dependencies: [4]
-                        })
-                    },
-                    798826926
-                )
+                const styles = StyleSheet.create({
+                    container: () => ({
+                        backgroundColor: 'red',
+                        variants: {},
+                        uni__dependencies: [4]
+                    })
+                })
             `,
         },
         {
@@ -279,17 +264,14 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    (_, rt) => ({
-                        container: () => ({
-                            backgroundColor: 'red',
-                            variants: {},
-                            paddingTop: rt.insets.top,
-                            uni__dependencies: [9, 4]
-                        })
-                    }),
-                    798826926
-                )
+                const styles = StyleSheet.create((_, rt) => ({
+                    container: () => ({
+                        backgroundColor: 'red',
+                        variants: {},
+                        paddingTop: rt.insets.top,
+                        uni__dependencies: [9, 4]
+                    })
+                }))
             `,
         },
         {
@@ -328,17 +310,14 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    (hhsa, dee) => ({
-                        container: () => ({
-                            backgroundColor: hhsa.colors.background,
-                            variants: {},
-                            paddingTop: dee.colorScheme === 'dark' ? 0 : 10,
-                            uni__dependencies: [0, 5, 4]
-                        })
-                    }),
-                    798826926
-                )
+                const styles = StyleSheet.create((hhsa, dee) => ({
+                    container: () => ({
+                        backgroundColor: hhsa.colors.background,
+                        variants: {},
+                        paddingTop: dee.colorScheme === 'dark' ? 0 : 10,
+                        uni__dependencies: [0, 5, 4]
+                    })
+                }))
             `,
         },
         {
@@ -388,11 +367,11 @@ pluginTester({
                             uni__dependencies: [0, 9, 4]
                         })
                     }
-                }, 798826926)
+                })
             `,
         },
         {
-            title: 'Should generate two different ids for 2 stylesheets in the same file',
+            title: 'Should handle two stylesheets in the same file',
             code: `
                 import { View, Text } from 'react-native'
                 import { StyleSheet } from 'react-native-unistyles'
@@ -447,7 +426,7 @@ pluginTester({
                             uni__dependencies: [0, 9, 4]
                         })
                     }
-                }, 798826926)
+                })
                 const styles2 = StyleSheet.create((theme, rt) => {
                     return {
                         container: () => ({
@@ -457,7 +436,7 @@ pluginTester({
                             uni__dependencies: [0, 9, 4]
                         })
                     }
-                }, 798826927)
+                })
             `,
         },
         {
@@ -499,12 +478,9 @@ pluginTester({
                     )
                 }
 
-                const styles = StyleSheet.create(
-                    {
-                        inputContainer: {}
-                    },
-                    798826926
-                )
+                const styles = StyleSheet.create({
+                    inputContainer: {}
+                })
             `,
         },
         {
@@ -520,15 +496,12 @@ pluginTester({
             `,
             output: `
                 import { StyleSheet } from 'react-native-unistyles'
-                const styles = StyleSheet.create(
-                    {
-                        map: {},
-                        length: {},
-                        constructor: {},
-                        toString: {}
-                    },
-                    798826926
-                )
+                const styles = StyleSheet.create({
+                    map: {},
+                    length: {},
+                    constructor: {},
+                    toString: {}
+                })
             `,
         },
         {
@@ -544,15 +517,12 @@ pluginTester({
             `,
             output: `
                 import { StyleSheet } from 'react-native-unistyles'
-                const styles = StyleSheet.create(
-                    theme => ({
-                        map: {},
-                        length: {},
-                        constructor: {},
-                        toString: {}
-                    }),
-                    798826926
-                )
+                const styles = StyleSheet.create(theme => ({
+                    map: {},
+                    length: {},
+                    constructor: {},
+                    toString: {}
+                }))
             `,
         },
     ],

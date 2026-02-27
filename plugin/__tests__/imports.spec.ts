@@ -43,14 +43,11 @@ pluginTester({
                     return <View style={styles.container} />
                 }
 
-                const styles = StyleSheet.create(
-                    {
-                        container: {
-                            flex: 1
-                        }
-                    },
-                    75510584
-                )
+                const styles = StyleSheet.create({
+                    container: {
+                        flex: 1
+                    }
+                })
             `,
         },
     ],

@@ -57,7 +57,6 @@ struct HybridStyleSheet: public HybridUnistylesStyleSheetSpec {
     };
 
     double getHairlineWidth() override;
-    double getUnid() override;
     std::function<void ()> addChangeListener(const std::function<void (const std::vector<UnistyleDependency> &)>& onChanged) override;
 
 private:
@@ -73,7 +72,6 @@ private:
     void notifyJSListeners(std::vector<UnistyleDependency>& dependencies);
 
     bool isInitialized = false;
-    double __unid = -1;
     std::unordered_map<size_t, std::unique_ptr<std::function<void(std::vector<UnistyleDependency>&)>>> _changeListeners{};
     std::mutex _listenersMutex;
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;

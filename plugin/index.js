@@ -314,15 +314,6 @@ function getReturnStatementsFromBody(node, results = []) {
   }
   return results;
 }
-function stringToUniqueId(str) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash << 5) - hash + str.charCodeAt(i);
-    hash |= 0;
-  }
-  const absHash = Math.abs(hash);
-  return absHash % 1e9;
-}
 function isUnistylesStyleSheet(path2, state) {
   const { callee } = path2.node;
   if (!t4.isMemberExpression(callee) || !t4.isIdentifier(callee.property)) {
@@ -383,11 +374,6 @@ function isKindOfStyleSheet(path2, state) {
     );
   }
   return false;
-}
-function addStyleSheetTag(path2, state) {
-  const str = state.filename?.replace(state.cwd, "") ?? "";
-  const uniqueId = stringToUniqueId(str) + ++state.file.tagNumber;
-  path2.node.arguments.push(t4.numericLiteral(uniqueId));
 }
 function getStylesDependenciesFromObject(path2) {
   const detectedStylesWithVariants = /* @__PURE__ */ new Set();
@@ -766,7 +752,6 @@ function index_default() {
           state.file.hasVariants = false;
           state.file.styleSheetLocalName = "";
           state.file.reactNativeCommonJSName = "";
-          state.file.tagNumber = 0;
           state.reactNativeImports = {};
           state.file.forceProcessing = state.filename?.includes(appRoot) ?? false;
           path2.traverse({
@@ -894,7 +879,6 @@ function index_default() {
           return;
         }
         state.file.hasAnyUnistyle = true;
-        addStyleSheetTag(path2, state);
         const arg = t6.isAssignmentExpression(path2.node.arguments[0]) ? path2.node.arguments[0].right : path2.node.arguments[0];
         if (t6.isObjectExpression(arg)) {
           const detectedDependencies = getStylesDependenciesFromObject(path2);
