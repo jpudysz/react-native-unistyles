@@ -1,5 +1,5 @@
 const path = require('path')
-const pak = require('../package.json')
+const pak = require('../../packages/unistyles/package.json')
 
 module.exports = function (api) {
     api.cache(true)
@@ -8,7 +8,7 @@ module.exports = function (api) {
         presets: ['babel-preset-expo'],
         plugins: [
             "react-native-worklets/plugin",
-            [path.join(__dirname, '../plugin'), {
+            [path.join(__dirname, '../../packages/unistyles/plugin'), {
                 debug: true,
                 isLocal: true,
                 root: 'app'
@@ -18,8 +18,8 @@ module.exports = function (api) {
                 {
                     alias: {
                         // For development, we want to alias the library to the source
-                        "react-native-unistyles/reanimated": path.join(__dirname, '../src/reanimated'),
-                        [pak.name]: path.join(__dirname, '../', pak.source)
+                        "react-native-unistyles/reanimated": path.join(__dirname, '../../packages/unistyles/src/reanimated'),
+                        [pak.name]: path.join(__dirname, '../../packages/unistyles/', pak.source)
                     }
                 }
             ]

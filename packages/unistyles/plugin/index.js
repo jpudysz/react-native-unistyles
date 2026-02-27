@@ -33,8 +33,8 @@ __export(index_exports, {
   default: () => index_default
 });
 module.exports = __toCommonJS(index_exports);
-var import_node_path2 = __toESM(require("node:path"));
 var t6 = __toESM(require("@babel/types"));
+var import_node_path2 = __toESM(require("node:path"));
 
 // plugin/src/consts.ts
 var REACT_NATIVE_COMPONENT_NAMES = [
@@ -132,14 +132,18 @@ function addUnistylesImport(path2, state) {
   const nodesToRemove = [];
   path2.node.body.forEach((node) => {
     if (t2.isImportDeclaration(node) && node.source.value === "react-native") {
-      node.specifiers = node.specifiers.filter((specifier) => !localNames.some((name) => name === specifier.local.name));
+      node.specifiers = node.specifiers.filter(
+        (specifier) => !localNames.some((name) => name === specifier.local.name)
+      );
       if (node.specifiers.length === 0) {
         nodesToRemove.push(node);
       }
     }
   });
   names.forEach((name) => {
-    const rnWebImport = path2.node.body.find((node) => t2.isImportDeclaration(node) && node.source.value === `react-native-web/dist/exports/${name}`);
+    const rnWebImport = path2.node.body.find(
+      (node) => t2.isImportDeclaration(node) && node.source.value === `react-native-web/dist/exports/${name}`
+    );
     if (rnWebImport) {
       rnWebImport.specifiers = [];
     }
@@ -412,10 +416,7 @@ function getStylesDependenciesFromObject(path2) {
   const variants = Array.from(detectedStylesWithVariants);
   return variants.reduce((acc, { key, label }) => {
     if (acc[key]) {
-      acc[key] = [
-        ...acc[key],
-        label
-      ];
+      acc[key] = [...acc[key], label];
       return acc;
     }
     acc[key] = [label];
@@ -532,7 +533,9 @@ function getStylesDependenciesFromFunction(funcPath) {
         return;
       }
       binding.referencePaths.forEach((refPath) => {
-        const containerProp = refPath.findParent((parent) => parent.isObjectProperty() && parent.parentPath === returnedObjectPath);
+        const containerProp = refPath.findParent(
+          (parent) => parent.isObjectProperty() && parent.parentPath === returnedObjectPath
+        );
         if (!containerProp) {
           return;
         }
@@ -593,7 +596,9 @@ function getStylesDependenciesFromFunction(funcPath) {
             }
           }
         }
-        const containerProp = refPath.findParent((parent2) => parent2.isObjectProperty() && parent2.parentPath === returnedObjectPath);
+        const containerProp = refPath.findParent(
+          (parent2) => parent2.isObjectProperty() && parent2.parentPath === returnedObjectPath
+        );
         if (!containerProp) {
           return;
         }
@@ -617,10 +622,7 @@ function getStylesDependenciesFromFunction(funcPath) {
   const rt = Array.from(detectedStylesWithRt);
   return theme.concat(rt).concat(variants).reduce((acc, { key, label }) => {
     if (acc[key]) {
-      acc[key] = [
-        ...acc[key],
-        label
-      ];
+      acc[key] = [...acc[key], label];
       return acc;
     }
     acc[key] = [label];
@@ -630,8 +632,14 @@ function getStylesDependenciesFromFunction(funcPath) {
 function addDependencies(state, styleName, unistyle, detectedDependencies) {
   const debugMessage = (deps) => {
     if (state.opts.debug) {
-      const mappedDeps = deps.map((dep) => Object.keys(UnistyleDependency).find((key) => UnistyleDependency[key] === dep)).join(", ");
-      console.log(`${state.filename?.replace(`${state.file.opts.root}/`, "")}: styles.${styleName}: [${mappedDeps}]`);
+      const mappedDeps = deps.map(
+        (dep) => Object.keys(UnistyleDependency).find(
+          (key) => UnistyleDependency[key] === dep
+        )
+      ).join(", ");
+      console.log(
+        `${state.filename?.replace(`${state.file.opts.root}/`, "")}: styles.${styleName}: [${mappedDeps}]`
+      );
     }
   };
   const styleDependencies = detectedDependencies.map(toUnistylesDependency);
@@ -646,9 +654,7 @@ function addDependencies(state, styleName, unistyle, detectedDependencies) {
       if (t4.isBlockStatement(unistyle.value.body)) {
         targets = getReturnStatementsFromBody(unistyle.value.body).map((node) => {
           if (t4.isIdentifier(node.argument)) {
-            node.argument = t4.objectExpression([
-              t4.spreadElement(node.argument)
-            ]);
+            node.argument = t4.objectExpression([t4.spreadElement(node.argument)]);
           }
           return node.argument;
         }).filter((node) => t4.isObjectExpression(node));
@@ -666,7 +672,9 @@ function addDependencies(state, styleName, unistyle, detectedDependencies) {
         target.properties.push(
           t4.objectProperty(
             t4.identifier("uni__dependencies"),
-            t4.arrayExpression(uniqueDependencies.filter((dep) => dep !== void 0 && dep !== null).map((dep) => t4.numericLiteral(dep)))
+            t4.arrayExpression(
+              uniqueDependencies.filter((dep) => dep !== void 0 && dep !== null).map((dep) => t4.numericLiteral(dep))
+            )
           )
         );
       });
@@ -677,7 +685,9 @@ function addDependencies(state, styleName, unistyle, detectedDependencies) {
 // plugin/src/variants.ts
 var t5 = __toESM(require("@babel/types"));
 function extractVariants(path2, state) {
-  const maybeVariants = path2.node.body.filter((node2) => t5.isExpressionStatement(node2) && t5.isCallExpression(node2.expression) && t5.isMemberExpression(node2.expression.callee));
+  const maybeVariants = path2.node.body.filter(
+    (node2) => t5.isExpressionStatement(node2) && t5.isCallExpression(node2.expression) && t5.isMemberExpression(node2.expression.callee)
+  );
   if (maybeVariants.length === 0) {
     return;
   }
@@ -713,15 +723,8 @@ function extractVariants(path2, state) {
   ]);
   const pathIndex = path2.node.body.findIndex((bodyPath) => bodyPath === targetVariant);
   const rest = path2.node.body.slice(pathIndex + 1);
-  const statement = t5.blockStatement([
-    finalDeclaration,
-    ...rest
-  ]);
-  path2.node.body = [
-    ...path2.node.body.slice(0, pathIndex),
-    shadowDeclaration,
-    statement
-  ];
+  const statement = t5.blockStatement([finalDeclaration, ...rest]);
+  path2.node.body = [...path2.node.body.slice(0, pathIndex), shadowDeclaration, statement];
   state.file.hasVariants = true;
 }
 
@@ -739,13 +742,19 @@ function index_default() {
       Program: {
         enter(path2, state) {
           if (!state.opts.root) {
-            throw new Error("Unistyles \u{1F984}: Babel plugin requires `root` option to be set. Please check https://www.unistyl.es/v3/other/babel-plugin#extra-configuration");
+            throw new Error(
+              "Unistyles \u{1F984}: Babel plugin requires `root` option to be set. Please check https://www.unistyl.es/v3/other/babel-plugin#extra-configuration"
+            );
           }
           const appRoot = toPlatformPath(import_node_path2.default.join(state.file.opts.root, state.opts.root));
           if (state.file.opts.root === appRoot) {
-            throw new Error("Unistyles \u{1F984}: Root option can't resolve to project root as it will include node_modules folder. Please check https://www.unistyl.es/v3/other/babel-plugin#extra-configuration");
+            throw new Error(
+              "Unistyles \u{1F984}: Root option can't resolve to project root as it will include node_modules folder. Please check https://www.unistyl.es/v3/other/babel-plugin#extra-configuration"
+            );
           }
-          state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS.concat(state.opts.autoProcessPaths ?? []).map(toPlatformPath).some((path3) => state.filename?.includes(path3));
+          state.file.replaceWithUnistyles = REPLACE_WITH_UNISTYLES_PATHS.concat(
+            state.opts.autoProcessPaths ?? []
+          ).map(toPlatformPath).some((path3) => state.filename?.includes(path3));
           state.file.hasAnyUnistyle = false;
           state.file.hasUnistylesImport = false;
           state.file.addUnistylesRequire = false;
@@ -807,7 +816,9 @@ function index_default() {
         });
       },
       ImportDeclaration(path2, state) {
-        const exoticImport = REPLACE_WITH_UNISTYLES_EXOTIC_PATHS.concat(state.opts.autoRemapImports ?? []).find((exotic) => state.filename?.includes(exotic.path));
+        const exoticImport = REPLACE_WITH_UNISTYLES_EXOTIC_PATHS.concat(state.opts.autoRemapImports ?? []).find(
+          (exotic) => state.filename?.includes(exotic.path)
+        );
         if (exoticImport) {
           return handleExoticImport(path2, state, exoticImport);
         }
@@ -886,7 +897,12 @@ function index_default() {
             if (t6.isObjectExpression(arg)) {
               arg.properties.forEach((property) => {
                 if (t6.isObjectProperty(property) && t6.isIdentifier(property.key) && Object.prototype.hasOwnProperty.call(detectedDependencies, property.key.name)) {
-                  addDependencies(state, property.key.name, property, detectedDependencies[property.key.name] ?? []);
+                  addDependencies(
+                    state,
+                    property.key.name,
+                    property,
+                    detectedDependencies[property.key.name] ?? []
+                  );
                 }
               });
             }
@@ -900,7 +916,12 @@ function index_default() {
             if (t6.isObjectExpression(body)) {
               body.properties.forEach((property) => {
                 if (t6.isObjectProperty(property) && t6.isIdentifier(property.key) && Object.prototype.hasOwnProperty.call(detectedDependencies, property.key.name)) {
-                  addDependencies(state, property.key.name, property, detectedDependencies[property.key.name] ?? []);
+                  addDependencies(
+                    state,
+                    property.key.name,
+                    property,
+                    detectedDependencies[property.key.name] ?? []
+                  );
                 }
               });
             }
