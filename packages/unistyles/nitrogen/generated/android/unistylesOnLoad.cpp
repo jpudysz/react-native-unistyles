@@ -31,7 +31,7 @@ void registerAllNatives() {
   using namespace margelo::nitro;
   using namespace margelo::nitro::unistyles;
 
-    // Register native JNI methods
+  // Register native JNI methods
   margelo::nitro::unistyles::JHybridNativePlatformSpec::registerNatives();
   margelo::nitro::unistyles::JFunc_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_cxx::registerNatives();
   margelo::nitro::unistyles::JFunc_void_UnistylesNativeMiniRuntime_cxx::registerNatives();
