@@ -119,9 +119,10 @@ void core::UnistylesRegistry::unlinkShadowNodeWithUnistyles(jsi::Runtime& rt, co
 std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(jsi::Runtime& rt, core::StyleSheetType type, jsi::Object&& rawValue) {
     int tag = _nextStyleSheetTag.fetch_add(1);
 
-    this->_styleSheetRegistry[&rt][tag] = std::make_shared<core::StyleSheet>(tag, type, std::move(rawValue));
+    auto sheet = std::make_shared<core::StyleSheet>(tag, type, std::move(rawValue));
+    this->_styleSheetRegistry[&rt][tag] = sheet;
 
-    return this->_styleSheetRegistry[&rt][tag];
+    return sheet;
 }
 
 core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt, std::vector<UnistyleDependency>& deps) {
