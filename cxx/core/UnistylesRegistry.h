@@ -1,6 +1,7 @@
 #pragma once
 
 #include "set"
+#include <atomic>
 #include <jsi/jsi.h>
 #include <folly/dynamic.h>
 #include <react/renderer/uimanager/UIManager.h>
@@ -41,7 +42,7 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     std::vector<std::shared_ptr<core::StyleSheet>> getStyleSheetsToRefresh(jsi::Runtime& rt, std::vector<UnistyleDependency>& unistylesDependencies);
     void linkShadowNodeWithUnistyle(jsi::Runtime& rt, const ShadowNodeFamily*, std::vector<std::shared_ptr<UnistyleData>>& unistylesData);
     void unlinkShadowNodeWithUnistyles(jsi::Runtime& rt, const ShadowNodeFamily*);
-    std::shared_ptr<core::StyleSheet> addStyleSheet(jsi::Runtime& rt, int tag, core::StyleSheetType type, jsi::Object&& rawValue);
+    std::shared_ptr<core::StyleSheet> addStyleSheet(jsi::Runtime& rt, core::StyleSheetType type, jsi::Object&& rawValue);
     DependencyMap buildDependencyMap(jsi::Runtime& rt, std::vector<UnistyleDependency>& deps);
     void shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Value& maybePressableId);
     shadow::ShadowTrafficController trafficController{};
@@ -55,6 +56,7 @@ struct UnistylesRegistry: public StyleSheetRegistry {
 private:
     UnistylesRegistry() = default;
 
+    static std::atomic<int> _nextStyleSheetTag;
     std::optional<std::string> _scopedTheme{};
     std::unordered_map<jsi::Runtime*, UnistylesState> _states{};
     std::unordered_map<jsi::Runtime*, std::unordered_map<int, std::shared_ptr<core::StyleSheet>>> _styleSheetRegistry{};

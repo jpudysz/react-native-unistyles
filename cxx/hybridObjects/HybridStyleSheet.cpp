@@ -13,27 +13,15 @@ double HybridStyleSheet::getHairlineWidth() {
     return hairlineWidth;
 }
 
-double HybridStyleSheet::getUnid() {
-    return this->__unid;
-}
-
 jsi::Value HybridStyleSheet::create(jsi::Runtime& rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
-    if (count == 1) {
-        helpers::assertThat(rt, false, "Unistyles is not initialized correctly. Please add babel plugin to your babel config.");
-    }
-
-    // second argument is hidden, so validation is perfectly fine
-    helpers::assertThat(rt, count == 2, "StyleSheet.create expected to be called with one argument.");
+    helpers::assertThat(rt, count == 1, "StyleSheet.create expected to be called with one argument.");
     helpers::assertThat(rt, arguments[0].isObject(), "StyleSheet.create expected to be called with object or function.");
 
     auto thisStyleSheet = thisVal.asObject(rt);
     auto& registry = core::UnistylesRegistry::get();
-    int unid = arguments[1].asNumber();
 
     jsi::Object rawStyleSheet = arguments[0].asObject(rt);
-    auto registeredStyleSheet = registry.addStyleSheetFromValue(rt, std::move(rawStyleSheet), unid);
-
-    this->__unid = registeredStyleSheet->tag;
+    auto registeredStyleSheet = registry.addStyleSheetFromValue(rt, std::move(rawStyleSheet));
 
     auto parser = parser::Parser(this->_unistylesRuntime);
 
