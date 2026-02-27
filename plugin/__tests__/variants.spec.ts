@@ -75,31 +75,28 @@ pluginTester({
                     }
                 }
 
-                const styles = StyleSheet.create(
-                    (theme, rt) => ({
-                        container: {
-                            backgroundColor: theme.colors.background,
-                            variants: {
-                                size: {
-                                    small: {
-                                        width: 100,
-                                        height: 100
-                                    },
-                                    medium: {
-                                        width: 200,
-                                        height: 200
-                                    },
-                                    large: {
-                                        width: 300,
-                                        height: 300
-                                    }
+                const styles = StyleSheet.create((theme, rt) => ({
+                    container: {
+                        backgroundColor: theme.colors.background,
+                        variants: {
+                            size: {
+                                small: {
+                                    width: 100,
+                                    height: 100
+                                },
+                                medium: {
+                                    width: 200,
+                                    height: 200
+                                },
+                                large: {
+                                    width: 300,
+                                    height: 300
                                 }
-                            },
-                            uni__dependencies: [0, 4]
-                        }
-                    }),
-                    895829844
-                )
+                            }
+                        },
+                        uni__dependencies: [0, 4]
+                    }
+                }))
             `
         },
         {
@@ -143,7 +140,7 @@ pluginTester({
                     }
                 }
 
-                const s = StyleSheet.create({}, 895829844)
+                const s = StyleSheet.create({})
             `
         },
         {
@@ -215,7 +212,7 @@ pluginTester({
                     }
                 }
 
-                const styles = StyleSheet.create({}, 895829844)
+                const styles = StyleSheet.create({})
             `
         }
     ]
