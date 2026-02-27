@@ -250,11 +250,67 @@ void core::UnistylesRegistry::setScopedTheme(std::optional<std::string> themeNam
     this->_scopedTheme = std::move(themeName);
 }
 
+void core::UnistylesRegistry::setScopedContainerBreakpointId(std::optional<int> containerId) {
+    this->_scopedContainerBreakpointId = containerId;
+}
+
+const std::optional<int> core::UnistylesRegistry::getScopedContainerBreakpointId() {
+    return this->_scopedContainerBreakpointId;
+}
+
+void core::UnistylesRegistry::setContainerSize(int containerId, Dimensions dimensions) {
+    this->_containerSizes[containerId] = dimensions;
+}
+
+std::optional<Dimensions> core::UnistylesRegistry::getContainerSize(int containerId) {
+    auto it = this->_containerSizes.find(containerId);
+
+    if (it == this->_containerSizes.end()) {
+        return std::nullopt;
+    }
+
+    return it->second;
+}
+
+void core::UnistylesRegistry::removeContainerSize(int containerId) {
+    this->_containerSizes.erase(containerId);
+}
+
+core::DependencyMap core::UnistylesRegistry::buildContainerDependencyMap(jsi::Runtime& rt, int containerId) {
+    core::DependencyMap dependencyMap;
+
+    for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
+        bool hasContainerDep = false;
+
+        for (const auto& unistyleData : unistyles) {
+            if (unistyleData->containerBreakpointId.has_value() &&
+                unistyleData->containerBreakpointId.value() == containerId) {
+                hasContainerDep = true;
+                break;
+            }
+        }
+
+        if (!hasContainerDep) {
+            continue;
+        }
+
+        dependencyMap[family].insert(
+            dependencyMap[family].end(),
+            unistyles.begin(),
+            unistyles.end()
+        );
+    }
+
+    return dependencyMap;
+}
+
 void core::UnistylesRegistry::destroy() {
     this->_states.clear();
     this->_styleSheetRegistry.clear();
     this->_shadowRegistry.clear();
     this->_scopedTheme = std::nullopt;
+    this->_scopedContainerBreakpointId = std::nullopt;
+    this->_containerSizes.clear();
     _nextStyleSheetTag.store(0);
 }
 
