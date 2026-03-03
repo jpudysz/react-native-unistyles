@@ -137,6 +137,7 @@
         "react-native-reanimated": "*",
       },
       "optionalPeers": [
+        "react-native-edge-to-edge",
         "react-native-reanimated",
       ],
     },
