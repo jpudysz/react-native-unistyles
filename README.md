@@ -29,7 +29,7 @@ yarn add react-native-nitro-modules@0.34.1
 | >= 3.0.0               | 0.33.9                              |
 | >= 3.1.0               | 0.34.1                              |
 
-> **Note:** Since v3.1.0, `react-native-edge-to-edge` is an **optional** dependency. Unistyles enables edge-to-edge layout automatically on Android if the package is not installed. **Expo SDK 54+** users don't need it — Expo now uses React Native's built-in `enableEdgeToEdge` gradle property. **Bare React Native** users can use the `enableEdgeToEdge` gradle property or still install the package for ecosystem compatibility with libraries like `react-native-bootsplash` or `react-native-permissions`.
+> **Note:** Since v3.1.0, `react-native-edge-to-edge` is an **optional** dependency. Unistyles enables edge-to-edge layout automatically on Android if the package is not installed. **Expo SDK 54+** users don't need it — Expo now uses React Native's built-in `edgeToEdgeEnabled` gradle property. **Bare React Native** users can set `edgeToEdgeEnabled=true` in `gradle.properties` or still install the package for ecosystem compatibility with libraries like `react-native-bootsplash` or `react-native-permissions`.
 
 Then follow [installation guides](https://unistyl.es/v3/start/getting-started) for your platform.
 

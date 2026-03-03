@@ -289,7 +289,7 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
             return
         } catch (_: ClassNotFoundException) {}
 
-        // React Native's enableEdgeToEdge gradle property (or other mechanism)
+        // React Native's edgeToEdgeEnabled gradle property (or other mechanism)
         // may have already enabled edge-to-edge before Unistyles initializes
         if (isEdgeToEdgeAlreadyEnabled()) {
             return

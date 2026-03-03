@@ -46,9 +46,9 @@ Check compatibility table [here](https://github.com/jpudysz/react-native-unistyl
 <Aside title="react-native-edge-to-edge is optional since v3.1.0">
 Unistyles enables edge-to-edge layout automatically on Android if `react-native-edge-to-edge` is not installed.
 
-- **Expo SDK 54+**: You don't need it — Expo now uses React Native's built-in `enableEdgeToEdge` gradle property
+- **Expo SDK 54+**: You don't need it — Expo now uses React Native's built-in `edgeToEdgeEnabled` gradle property
 - **Expo SDK 53**: Still recommended for edge-to-edge support on Android
-- **Bare React Native**: Optional — you can use React Native's built-in `enableEdgeToEdge` gradle property instead, or install `react-native-edge-to-edge` if you use libraries that detect it for ecosystem compatibility (e.g. `react-native-bootsplash`, `react-native-permissions`)
+- **Bare React Native**: Optional — you can set `edgeToEdgeEnabled=true` in `gradle.properties` instead, or install `react-native-edge-to-edge` if you use libraries that detect it for ecosystem compatibility (e.g. `react-native-bootsplash`, `react-native-permissions`)
 
 Learn more about this dependency [here](/v3/other/dependencies).
 </Aside>

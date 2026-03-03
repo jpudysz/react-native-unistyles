@@ -37,16 +37,12 @@ Developed by: [Mathieu Acthernoene](https://github.com/zoontek)
 
 Since v3.1.0, this dependency is **optional**. Unistyles enables edge-to-edge layout automatically on Android if `react-native-edge-to-edge` is not installed.
 
-With Expo SDK 54, Expo transitioned away from `react-native-edge-to-edge` in favor of React Native’s built-in `enableEdgeToEdge` `build.gradle` property. Because of this, **Expo SDK 54+ users don’t need to install it**.
+With Expo SDK 54, Expo transitioned away from `react-native-edge-to-edge` in favor of React Native’s built-in `edgeToEdgeEnabled` `gradle.properties` flag. Because of this, **Expo SDK 54+ users don’t need to install it**.
 
-**Bare React Native** users can also use React Native's built-in `enableEdgeToEdge` `build.gradle` property instead:
+**Bare React Native** users can also enable edge-to-edge via `gradle.properties`:
 
-```groovy title="android/app/build.gradle" /enableEdgeToEdge/
-android {
-    defaultConfig {
-        enableEdgeToEdge = true
-    }
-}
+```properties title="android/gradle.properties" /edgeToEdgeEnabled/
+edgeToEdgeEnabled=true
 ```
 
 Alternatively, you can still install `react-native-edge-to-edge` if you use libraries that detect it for ecosystem-wide edge-to-edge detection (e.g. `react-native-bootsplash`, `react-native-permissions`).
