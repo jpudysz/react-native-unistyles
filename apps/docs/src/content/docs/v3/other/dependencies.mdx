@@ -41,10 +41,9 @@ With Expo SDK 54, Expo transitioned away from `react-native-edge-to-edge` in fav
 
 **Bare React Native** users can also use React Native's built-in `enableEdgeToEdge` `build.gradle` property instead:
 
-```groovy title="android/app/build.gradle"
+```groovy title="android/app/build.gradle" /enableEdgeToEdge/
 android {
     defaultConfig {
-        // highlight-next-line
         enableEdgeToEdge = true
     }
 }
