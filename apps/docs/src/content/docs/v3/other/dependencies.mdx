@@ -14,7 +14,7 @@ import Seo from '../../../../components/Seo.astro'
 >
 
 Unistyles 3.0 minimizes dependencies to keep your app as lightweight as possible.
-In the latest version, we’ve opted to include only two essential dependencies that are shaping the future of the React Native ecosystem.
+In the latest version, we’ve opted to include only the essential dependencies that are shaping the future of the React Native ecosystem.
 
 ### Nitro Modules
 
@@ -29,16 +29,18 @@ Developed by: [Marc Rousavy](https://github.com/mrousavy)
 
 We highly encourage you to give Nitro a star ⭐ or support Marc through sponsorship.
 
-### React Native Edge to Edge
+### React Native Edge to Edge (optional since v3.1.0)
 
 Developed by: [Mathieu Acthernoene](https://github.com/zoontek)
 
 [React Native Edge to Edge](https://github.com/zoontek/react-native-edge-to-edge) is a library aimed at unifying the handling of edge-to-edge layouts on Android.
-We fully support this initiative and have made it a dependency for Unistyles.
 
-You likely won’t notice any changes, as Unistyles has enforced edge-to-edge layouts since version 2.8.0. However, other libraries that detect `react-native-edge-to-edge` can now reliably assume that this mode is enabled.
-Additionally, Mathieu's initiative is supported by [Expo](https://docs.expo.dev/), which suggests it may become a standard in the future.
+Since v3.1.0, this dependency is **optional**. Unistyles enables edge-to-edge layout automatically on Android if `react-native-edge-to-edge` is not installed.
 
-If you use any of Mathieu's libraries, such as `react-native-permissions` or `react-native-bootsplash`, we encourage you to give them a star ⭐ and support him through sponsorship.
+With Expo SDK 54, Expo transitioned away from `react-native-edge-to-edge` in favor of React Native’s built-in `enableEdgeToEdge` `build.gradle` property. Because of this, **Expo SDK 54+ users don’t need to install it**.
+
+However, the package is still useful for **bare React Native** users who want ecosystem-wide edge-to-edge detection. Libraries like `react-native-bootsplash` and `react-native-permissions` detect `react-native-edge-to-edge` to reliably assume that edge-to-edge mode is enabled.
+
+If you use any of Mathieu’s libraries, we encourage you to give them a star ⭐ and support him through sponsorship.
 
 </Seo>

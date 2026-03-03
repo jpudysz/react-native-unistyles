@@ -167,6 +167,9 @@
   "peerDependenciesMeta": {
     "react-native-reanimated": {
       "optional": true
+    },
+    "react-native-edge-to-edge": {
+      "optional": true
     }
   },
   "engines": {

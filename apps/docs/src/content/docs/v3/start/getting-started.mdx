@@ -17,7 +17,7 @@ We’ve made Unistyles incredibly easy to use. You no longer need the `useStyle`
 
 ### Prerequisites
 
-Unistyles 3.0 is tightly integrated with `Fabric` and the latest versions of React Native. Therefore, you must use the **New Architecture** and at least **React Native 0.78.0**. Additionally, Unistyles relies on `react-native-nitro-modules` and `react-native-edge-to-edge`.
+Unistyles 3.0 is tightly integrated with `Fabric` and the latest versions of React Native. Therefore, you must use the **New Architecture** and at least **React Native 0.78.0**. Additionally, Unistyles relies on `react-native-nitro-modules`.
 
 <Aside>Learn more about how Unistyles leverages Nitro Modules and React Native Edge to Edge [here](/v3/other/dependencies).</Aside>
 
@@ -35,13 +35,23 @@ Since Unistyles relies on `Fabric`, it cannot run on the `Old Architecture` or o
 ### Installation
 
 ```shell title="Install Unistyles and its dependencies"
-yarn add react-native-unistyles react-native-nitro-modules react-native-edge-to-edge
+yarn add react-native-unistyles react-native-nitro-modules
 ```
 
 :::caution
 To avoid unexpected behaviors always use a fixed version of `react-native-nitro-modules`.
 Check compatibility table [here](https://github.com/jpudysz/react-native-unistyles?tab=readme-ov-file#installation).
 :::
+
+<Aside title="react-native-edge-to-edge is optional since v3.1.0">
+Unistyles enables edge-to-edge layout automatically on Android if `react-native-edge-to-edge` is not installed.
+
+- **Expo SDK 54+**: You don't need it — Expo now uses React Native's built-in `enableEdgeToEdge` gradle property
+- **Expo SDK 53**: Still recommended for edge-to-edge support on Android
+- **Bare React Native**: Optional — install it if you use libraries that detect it for ecosystem compatibility (e.g. `react-native-bootsplash`, `react-native-permissions`)
+
+Learn more about this dependency [here](/v3/other/dependencies).
+</Aside>
 
 Add babel plugin:
 
