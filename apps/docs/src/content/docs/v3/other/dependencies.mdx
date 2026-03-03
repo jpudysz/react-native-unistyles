@@ -39,7 +39,18 @@ Since v3.1.0, this dependency is **optional**. Unistyles enables edge-to-edge la
 
 With Expo SDK 54, Expo transitioned away from `react-native-edge-to-edge` in favor of React Native’s built-in `enableEdgeToEdge` `build.gradle` property. Because of this, **Expo SDK 54+ users don’t need to install it**.
 
-However, the package is still useful for **bare React Native** users who want ecosystem-wide edge-to-edge detection. Libraries like `react-native-bootsplash` and `react-native-permissions` detect `react-native-edge-to-edge` to reliably assume that edge-to-edge mode is enabled.
+**Bare React Native** users can also use React Native's built-in `enableEdgeToEdge` `build.gradle` property instead:
+
+```groovy title="android/app/build.gradle"
+android {
+    defaultConfig {
+        // highlight-next-line
+        enableEdgeToEdge = true
+    }
+}
+```
+
+Alternatively, you can still install `react-native-edge-to-edge` if you use libraries that detect it for ecosystem-wide edge-to-edge detection (e.g. `react-native-bootsplash`, `react-native-permissions`).
 
 If you use any of Mathieu’s libraries, we encourage you to give them a star ⭐ and support him through sponsorship.
 
