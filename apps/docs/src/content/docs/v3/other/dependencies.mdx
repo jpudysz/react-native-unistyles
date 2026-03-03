@@ -35,17 +35,17 @@ Developed by: [Mathieu Acthernoene](https://github.com/zoontek)
 
 [React Native Edge to Edge](https://github.com/zoontek/react-native-edge-to-edge) is a library aimed at unifying the handling of edge-to-edge layouts on Android.
 
-Since v3.1.0, this dependency is **optional**. Unistyles enables edge-to-edge layout automatically on Android if `react-native-edge-to-edge` is not installed.
+Since v3.1.0, `react-native-edge-to-edge` is **optional** as a direct dependency. Unistyles enables edge-to-edge layout automatically on Android if `react-native-edge-to-edge` is not installed.
 
-With Expo SDK 54, Expo transitioned away from `react-native-edge-to-edge` in favor of React Native’s built-in `edgeToEdgeEnabled` `gradle.properties` flag. Because of this, **Expo SDK 54+ users don’t need to install it**.
-
-**Bare React Native** users can also enable edge-to-edge via `gradle.properties`:
+However, we **strongly recommend** enabling `edgeToEdgeEnabled` in your `gradle.properties`:
 
 ```properties title="android/gradle.properties" /edgeToEdgeEnabled/
 edgeToEdgeEnabled=true
 ```
 
-Alternatively, you can still install `react-native-edge-to-edge` if you use libraries that detect it for ecosystem-wide edge-to-edge detection (e.g. `react-native-bootsplash`, `react-native-permissions`).
+This property does more than just enabling edge-to-edge layout — it enforces `statusBarTranslucent` / `navigationBarTranslucent` on modals, disables `backgroundColor` / `translucent` on `StatusBar`, and enables additional fixes in React Native core. **Expo SDK 54+** enables this automatically.
+
+You can still install `react-native-edge-to-edge` alongside this property if you use libraries that detect it for ecosystem-wide edge-to-edge detection (e.g. `react-native-bootsplash`, `react-native-permissions`).
 
 If you use any of Mathieu’s libraries, we encourage you to give them a star ⭐ and support him through sponsorship.
 

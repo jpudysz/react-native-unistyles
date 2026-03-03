@@ -44,13 +44,12 @@ Check compatibility table [here](https://github.com/jpudysz/react-native-unistyl
 :::
 
 <Aside title="react-native-edge-to-edge is optional since v3.1.0">
-Unistyles enables edge-to-edge layout automatically on Android if `react-native-edge-to-edge` is not installed.
+`react-native-edge-to-edge` is no longer a required dependency. We **strongly recommend** setting `edgeToEdgeEnabled=true` in your `android/gradle.properties` — it enforces translucent system bars on modals, disables legacy StatusBar hacks, and enables additional React Native core fixes.
 
-- **Expo SDK 54+**: You don't need it — Expo now uses React Native's built-in `edgeToEdgeEnabled` gradle property
-- **Expo SDK 53**: Still recommended for edge-to-edge support on Android
-- **Bare React Native**: Optional — you can set `edgeToEdgeEnabled=true` in `gradle.properties` instead, or install `react-native-edge-to-edge` if you use libraries that detect it for ecosystem compatibility (e.g. `react-native-bootsplash`, `react-native-permissions`)
+- **Expo SDK 54+**: Already enabled automatically
+- **Expo SDK 53 / Bare React Native**: Add `edgeToEdgeEnabled=true` to `android/gradle.properties`
 
-Learn more about this dependency [here](/v3/other/dependencies).
+You can still install `react-native-edge-to-edge` alongside this property for ecosystem compatibility (e.g. `react-native-bootsplash`, `react-native-permissions`). Learn more [here](/v3/other/dependencies).
 </Aside>
 
 Add babel plugin:
