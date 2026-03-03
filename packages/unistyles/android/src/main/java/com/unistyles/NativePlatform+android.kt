@@ -284,11 +284,29 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
     private fun checkEdgeToEdge() {
         // react-native-edge-to-edge will set setDecorFitsSystemWindows automatically
         // if it's present we assume that edge-to-edge is enabled
-
         try {
             Class.forName("com.zoontek.rnedgetoedge.EdgeToEdgePackage")
-        } catch (exception: ClassNotFoundException) {
-            enableEdgeToEdge()
+            return
+        } catch (_: ClassNotFoundException) {}
+
+        // React Native's enableEdgeToEdge gradle property (or other mechanism)
+        // may have already enabled edge-to-edge before Unistyles initializes
+        if (isEdgeToEdgeAlreadyEnabled()) {
+            return
+        }
+
+        enableEdgeToEdge()
+    }
+
+    @Suppress("DEPRECATION")
+    private fun isEdgeToEdgeAlreadyEnabled(): Boolean {
+        val activity = reactContext.currentActivity ?: return false
+
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            !activity.window.isDecorFitsSystemWindows
+        } else {
+            val flags = activity.window.decorView.systemUiVisibility
+            (flags and View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION) != 0
         }
     }
 
