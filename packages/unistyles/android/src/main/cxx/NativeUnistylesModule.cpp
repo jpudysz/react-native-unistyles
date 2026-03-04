@@ -10,14 +10,14 @@ using namespace facebook::react;
 UnistylesModule::UnistylesModule(
     jni::alias_ref<UnistylesModule::jhybridobject> jThis,
     jni::alias_ref<react::JRuntimeExecutor::javaobject> runtimeExecutorHolder,
-    jni::alias_ref<JHybridNativePlatformSpec::javaobject> nativePlatform
+    jni::alias_ref<JHybridNativePlatformSpec::JavaPart> nativePlatform
 ):  _runtimeExecutor(runtimeExecutorHolder->cthis()->get()),
-    _nativePlatform(nativePlatform->cthis()) {}
+    _nativePlatform(nativePlatform->getJHybridNativePlatformSpec()) {}
 
 jni::local_ref<UnistylesModule::jhybriddata> UnistylesModule::initHybrid(
     jni::alias_ref<UnistylesModule::jhybridobject> jThis,
     jni::alias_ref<JRuntimeExecutor::javaobject> runtimeExecutorHolder,
-    jni::alias_ref<JHybridNativePlatformSpec::javaobject> nativePlatform
+    jni::alias_ref<JHybridNativePlatformSpec::JavaPart> nativePlatform
 ) {
     return makeCxxInstance(jThis, runtimeExecutorHolder, nativePlatform);
 }

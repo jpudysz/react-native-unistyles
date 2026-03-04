@@ -19,14 +19,14 @@ struct UnistylesModule : public jni::HybridClass<UnistylesModule> {
     explicit UnistylesModule(
         jni::alias_ref<jhybridobject> jThis,
         jni::alias_ref<react::JRuntimeExecutor::javaobject> runtimeExecutorHolder,
-        jni::alias_ref<JHybridNativePlatformSpec::javaobject> nativePlatform
+        jni::alias_ref<JHybridNativePlatformSpec::JavaPart> nativePlatform
     );
 
     static void registerNatives();
     static jni::local_ref<jhybriddata> initHybrid(
         jni::alias_ref<jhybridobject> jThis,
         jni::alias_ref<JRuntimeExecutor::javaobject> runtimeExecutorHolder,
-        jni::alias_ref<JHybridNativePlatformSpec::javaobject> nativePlatform
+        jni::alias_ref<JHybridNativePlatformSpec::JavaPart> nativePlatform
     );
     static void invalidateNative(jni::alias_ref<jhybridobject> jThis) {
         auto* self = jThis->cthis();
