@@ -24,23 +24,6 @@ import com.margelo.nitro.core.HybridObject
   "LocalVariableName", "PropertyName", "PrivatePropertyName", "FunctionName"
 )
 abstract class HybridNativePlatformSpec: HybridObject() {
-  @DoNotStrip
-  private var mHybridData: HybridData = initHybrid()
-
-  init {
-    super.updateNative(mHybridData)
-  }
-
-  override fun updateNative(hybridData: HybridData) {
-    mHybridData = hybridData
-    super.updateNative(hybridData)
-  }
-
-  // Default implementation of `HybridObject.toString()`
-  override fun toString(): String {
-    return "[HybridObject NativePlatform]"
-  }
-
   // Properties
   
 
@@ -127,7 +110,21 @@ abstract class HybridNativePlatformSpec: HybridObject() {
   @Keep
   abstract fun unregisterPlatformListeners(): Unit
 
-  private external fun initHybrid(): HybridData
+  // Default implementation of `HybridObject.toString()`
+  override fun toString(): String {
+    return "[HybridObject NativePlatform]"
+  }
+
+  // C++ backing class
+  @DoNotStrip
+  @Keep
+  protected open class CxxPart(javaPart: HybridNativePlatformSpec): HybridObject.CxxPart(javaPart) {
+    // C++ JHybridNativePlatformSpec::CxxPart::initHybrid(...)
+    external override fun initHybrid(): HybridData
+  }
+  override fun createCxxPart(): CxxPart {
+    return CxxPart(this)
+  }
 
   companion object {
     protected const val TAG = "HybridNativePlatformSpec"

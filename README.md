@@ -21,13 +21,15 @@ yarn add react-native-unistyles
 Install dependencies:
 
 ```shell
-yarn add react-native-nitro-modules@0.34.1
+yarn add react-native-nitro-modules
 ```
 
 | react-native-unistyles | Minimum react-native-nitro-modules |
 |------------------------|-------------------------------------|
-| >= 3.0.0               | 0.33.9                              |
-| >= 3.1.0               | 0.34.1                              |
+| >= 3.0.0               | >= 0.33.9                              |
+| >= 3.1.0*               | >= 0.35.0                              |
+
+\* Unistyles 3.1.0 is not yet released
 
 > **Note:** Since v3.1.0, `react-native-edge-to-edge` is an **optional** dependency. We strongly recommend setting `edgeToEdgeEnabled=true` in your `android/gradle.properties` — it enforces translucent system bars on modals, disables legacy StatusBar hacks, and enables additional React Native core fixes. **Expo SDK 54+** enables this automatically. You can still install `react-native-edge-to-edge` for ecosystem compatibility with libraries like `react-native-bootsplash` or `react-native-permissions`.
 

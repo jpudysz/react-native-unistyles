@@ -41,37 +41,31 @@ namespace margelo::nitro::unistyles { enum class UnistyleDependency; }
 
 namespace margelo::nitro::unistyles {
 
-  jni::local_ref<JHybridNativePlatformSpec::jhybriddata> JHybridNativePlatformSpec::initHybrid(jni::alias_ref<jhybridobject> jThis) {
+  std::shared_ptr<JHybridNativePlatformSpec> JHybridNativePlatformSpec::JavaPart::getJHybridNativePlatformSpec() {
+    auto hybridObject = JHybridObject::JavaPart::getJHybridObject();
+    auto castHybridObject = std::dynamic_pointer_cast<JHybridNativePlatformSpec>(hybridObject);
+    if (castHybridObject == nullptr) [[unlikely]] {
+      throw std::runtime_error("Failed to downcast JHybridObject to JHybridNativePlatformSpec!");
+    }
+    return castHybridObject;
+  }
+
+  jni::local_ref<JHybridNativePlatformSpec::CxxPart::jhybriddata> JHybridNativePlatformSpec::CxxPart::initHybrid(jni::alias_ref<jhybridobject> jThis) {
     return makeCxxInstance(jThis);
   }
 
-  void JHybridNativePlatformSpec::registerNatives() {
-    registerHybrid({
-      makeNativeMethod("initHybrid", JHybridNativePlatformSpec::initHybrid),
-    });
-  }
-
-  size_t JHybridNativePlatformSpec::getExternalMemorySize() noexcept {
-    static const auto method = javaClassStatic()->getMethod<jlong()>("getMemorySize");
-    return method(_javaPart);
-  }
-
-  bool JHybridNativePlatformSpec::equals(const std::shared_ptr<HybridObject>& other) {
-    if (auto otherCast = std::dynamic_pointer_cast<JHybridNativePlatformSpec>(other)) {
-      return _javaPart == otherCast->_javaPart;
+  std::shared_ptr<JHybridObject> JHybridNativePlatformSpec::CxxPart::createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) {
+    auto castJavaPart = jni::dynamic_ref_cast<JHybridNativePlatformSpec::JavaPart>(javaPart);
+    if (castJavaPart == nullptr) [[unlikely]] {
+      throw std::runtime_error("Failed to cast JHybridObject::JavaPart to JHybridNativePlatformSpec::JavaPart!");
     }
-    return false;
+    return std::make_shared<JHybridNativePlatformSpec>(castJavaPart);
   }
 
-  void JHybridNativePlatformSpec::dispose() noexcept {
-    static const auto method = javaClassStatic()->getMethod<void()>("dispose");
-    method(_javaPart);
-  }
-
-  std::string JHybridNativePlatformSpec::toString() {
-    static const auto method = javaClassStatic()->getMethod<jni::JString()>("toString");
-    auto javaString = method(_javaPart);
-    return javaString->toStdString();
+  void JHybridNativePlatformSpec::CxxPart::registerNatives() {
+    registerHybrid({
+      makeNativeMethod("initHybrid", JHybridNativePlatformSpec::CxxPart::initHybrid),
+    });
   }
 
   // Properties
@@ -79,86 +73,86 @@ namespace margelo::nitro::unistyles {
 
   // Methods
   Insets JHybridNativePlatformSpec::getInsets() {
-    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JInsets>()>("getInsets");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JInsets>()>("getInsets");
     auto __result = method(_javaPart);
     return __result->toCpp();
   }
   ColorScheme JHybridNativePlatformSpec::getColorScheme() {
-    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JColorScheme>()>("getColorScheme");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JColorScheme>()>("getColorScheme");
     auto __result = method(_javaPart);
     return __result->toCpp();
   }
   double JHybridNativePlatformSpec::getFontScale() {
-    static const auto method = javaClassStatic()->getMethod<double()>("getFontScale");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<double()>("getFontScale");
     auto __result = method(_javaPart);
     return __result;
   }
   double JHybridNativePlatformSpec::getPixelRatio() {
-    static const auto method = javaClassStatic()->getMethod<double()>("getPixelRatio");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<double()>("getPixelRatio");
     auto __result = method(_javaPart);
     return __result;
   }
   Orientation JHybridNativePlatformSpec::getOrientation() {
-    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JOrientation>()>("getOrientation");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JOrientation>()>("getOrientation");
     auto __result = method(_javaPart);
     return __result->toCpp();
   }
   std::string JHybridNativePlatformSpec::getContentSizeCategory() {
-    static const auto method = javaClassStatic()->getMethod<jni::local_ref<jni::JString>()>("getContentSizeCategory");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<jni::JString>()>("getContentSizeCategory");
     auto __result = method(_javaPart);
     return __result->toStdString();
   }
   Dimensions JHybridNativePlatformSpec::getScreenDimensions() {
-    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JDimensions>()>("getScreenDimensions");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JDimensions>()>("getScreenDimensions");
     auto __result = method(_javaPart);
     return __result->toCpp();
   }
   Dimensions JHybridNativePlatformSpec::getStatusBarDimensions() {
-    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JDimensions>()>("getStatusBarDimensions");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JDimensions>()>("getStatusBarDimensions");
     auto __result = method(_javaPart);
     return __result->toCpp();
   }
   Dimensions JHybridNativePlatformSpec::getNavigationBarDimensions() {
-    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JDimensions>()>("getNavigationBarDimensions");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JDimensions>()>("getNavigationBarDimensions");
     auto __result = method(_javaPart);
     return __result->toCpp();
   }
   bool JHybridNativePlatformSpec::getPrefersRtlDirection() {
-    static const auto method = javaClassStatic()->getMethod<jboolean()>("getPrefersRtlDirection");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<jboolean()>("getPrefersRtlDirection");
     auto __result = method(_javaPart);
     return static_cast<bool>(__result);
   }
   void JHybridNativePlatformSpec::setRootViewBackgroundColor(double color) {
-    static const auto method = javaClassStatic()->getMethod<void(double /* color */)>("setRootViewBackgroundColor");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<void(double /* color */)>("setRootViewBackgroundColor");
     method(_javaPart, color);
   }
   void JHybridNativePlatformSpec::setNavigationBarHidden(bool isHidden) {
-    static const auto method = javaClassStatic()->getMethod<void(jboolean /* isHidden */)>("setNavigationBarHidden");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<void(jboolean /* isHidden */)>("setNavigationBarHidden");
     method(_javaPart, isHidden);
   }
   void JHybridNativePlatformSpec::setStatusBarHidden(bool isHidden) {
-    static const auto method = javaClassStatic()->getMethod<void(jboolean /* isHidden */)>("setStatusBarHidden");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<void(jboolean /* isHidden */)>("setStatusBarHidden");
     method(_javaPart, isHidden);
   }
   void JHybridNativePlatformSpec::setImmersiveMode(bool isEnabled) {
-    static const auto method = javaClassStatic()->getMethod<void(jboolean /* isEnabled */)>("setImmersiveMode");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<void(jboolean /* isEnabled */)>("setImmersiveMode");
     method(_javaPart, isEnabled);
   }
   UnistylesNativeMiniRuntime JHybridNativePlatformSpec::getMiniRuntime() {
-    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JUnistylesNativeMiniRuntime>()>("getMiniRuntime");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JUnistylesNativeMiniRuntime>()>("getMiniRuntime");
     auto __result = method(_javaPart);
     return __result->toCpp();
   }
   void JHybridNativePlatformSpec::registerPlatformListener(const std::function<void(const std::vector<UnistyleDependency>& /* dependencies */, const UnistylesNativeMiniRuntime& /* miniRuntime */)>& callback) {
-    static const auto method = javaClassStatic()->getMethod<void(jni::alias_ref<JFunc_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime::javaobject> /* callback */)>("registerPlatformListener_cxx");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<void(jni::alias_ref<JFunc_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime::javaobject> /* callback */)>("registerPlatformListener_cxx");
     method(_javaPart, JFunc_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_cxx::fromCpp(callback));
   }
   void JHybridNativePlatformSpec::registerImeListener(const std::function<void(const UnistylesNativeMiniRuntime& /* miniRuntime */)>& callback) {
-    static const auto method = javaClassStatic()->getMethod<void(jni::alias_ref<JFunc_void_UnistylesNativeMiniRuntime::javaobject> /* callback */)>("registerImeListener_cxx");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<void(jni::alias_ref<JFunc_void_UnistylesNativeMiniRuntime::javaobject> /* callback */)>("registerImeListener_cxx");
     method(_javaPart, JFunc_void_UnistylesNativeMiniRuntime_cxx::fromCpp(callback));
   }
   void JHybridNativePlatformSpec::unregisterPlatformListeners() {
-    static const auto method = javaClassStatic()->getMethod<void()>("unregisterPlatformListeners");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<void()>("unregisterPlatformListeners");
     method(_javaPart);
   }
 

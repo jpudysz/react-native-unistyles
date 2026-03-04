@@ -1,8 +1,8 @@
 package com.unistyles
 
+import android.os.Build
 import android.content.Context
 import android.content.res.Configuration
-import android.os.Build
 import android.util.DisplayMetrics
 import android.view.View
 import android.view.WindowManager
@@ -303,7 +303,7 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
         val activity = reactContext.currentActivity ?: return false
 
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            !activity.window.isDecorFitsSystemWindows
+            !activity.window.decorView.fitsSystemWindows
         } else {
             val flags = activity.window.decorView.systemUiVisibility
             (flags and View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION) != 0

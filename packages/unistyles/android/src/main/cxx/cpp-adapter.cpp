@@ -5,6 +5,6 @@
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *) {
     return facebook::jni::initialize(vm, [=] {
         margelo::nitro::unistyles::UnistylesModule::registerNatives();
-        margelo::nitro::unistyles::initialize(vm);
+        margelo::nitro::unistyles::registerAllNatives();
     });
 }
