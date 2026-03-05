@@ -30,7 +30,10 @@ struct Parser {
     folly::dynamic parseStylesToShadowTreeStyles(jsi::Runtime& rt, const std::vector<std::shared_ptr<UnistyleData>>& unistyles);
     void rebuildUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle, const Variants& variants, std::optional<std::vector<folly::dynamic>>);
     void rebuildUnistyleWithScopedTheme(jsi::Runtime& rt, jsi::Value& jsScopedTheme, std::shared_ptr<core::UnistyleData> unistyleData);
+    void rebuildUnistyleForContainerSize(jsi::Runtime& rt, std::shared_ptr<core::UnistyleData> unistyleData, Dimensions containerDimensions);
     jsi::Value getParsedStyleSheetForScopedTheme(jsi::Runtime& rt, core::Unistyle::Shared unistyle, std::string& scopedTheme);
+
+    std::optional<Dimensions> _containerDimensions = std::nullopt;
 
 private:
     jsi::Object unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, std::optional<UnistylesNativeMiniRuntime>);

@@ -13,6 +13,7 @@
 #include "Unistyle.h"
 #include "UnistyleData.h"
 #include "ShadowTrafficController.h"
+#include "Dimensions.hpp"
 
 namespace margelo::nitro::unistyles::core {
 
@@ -50,6 +51,14 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     void removeDuplicatedUnistyles(jsi::Runtime& rt, const ShadowNodeFamily* shadowNodeFamily, std::vector<core::Unistyle::Shared>& unistyles);
     void setScopedTheme(std::optional<std::string> themeName);
     core::Unistyle::Shared getUnistyleById(jsi::Runtime& rt, std::string unistyleID);
+
+    void setScopedContainerBreakpointId(std::optional<int> containerId);
+    const std::optional<int> getScopedContainerBreakpointId();
+    void setContainerSize(int containerId, Dimensions dimensions);
+    std::optional<Dimensions> getContainerSize(int containerId);
+    void removeContainerSize(int containerId);
+    DependencyMap buildContainerDependencyMap(jsi::Runtime& rt, int containerId);
+
     void destroy();
     void destroyState(jsi::Runtime* rt);
 
@@ -58,6 +67,8 @@ private:
 
     static std::atomic<int> _nextStyleSheetTag;
     std::optional<std::string> _scopedTheme{};
+    std::optional<int> _scopedContainerBreakpointId{};
+    std::unordered_map<int, Dimensions> _containerSizes{};
     std::unordered_map<jsi::Runtime*, UnistylesState> _states{};
     std::unordered_map<jsi::Runtime*, std::unordered_map<int, std::shared_ptr<core::StyleSheet>>> _styleSheetRegistry{};
     std::unordered_map<jsi::Runtime*, std::unordered_map<const ShadowNodeFamily*, std::vector<std::shared_ptr<UnistyleData>>>> _shadowRegistry{};

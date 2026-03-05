@@ -149,6 +149,7 @@ jest.mock('react-native-unistyles', () => {
         Hide: () => null,
         Display: () => null,
         ScopedTheme: () => null,
+        UnistylesBreakpointContainerProvider: ({ children }: { children: any }) => children,
         withUnistyles:
             <TComponent>(
                 Component: TComponent,

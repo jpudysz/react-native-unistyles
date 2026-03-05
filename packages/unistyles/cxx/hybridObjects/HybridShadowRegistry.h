@@ -34,6 +34,18 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
                             const jsi::Value& thisValue,
                             const jsi::Value* args,
                             size_t count);
+    jsi::Value setContainerBreakpointId(jsi::Runtime& rt,
+                            const jsi::Value& thisValue,
+                            const jsi::Value* args,
+                            size_t count);
+    jsi::Value getContainerBreakpointId(jsi::Runtime& rt,
+                            const jsi::Value& thisValue,
+                            const jsi::Value* args,
+                            size_t count);
+    jsi::Value updateContainerSize(jsi::Runtime& rt,
+                            const jsi::Value& thisValue,
+                            const jsi::Value* args,
+                            size_t count);
 
     void loadHybridMethods() override {
         HybridUnistylesShadowRegistrySpec::loadHybridMethods();
@@ -44,6 +56,9 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
             prototype.registerRawHybridMethod("flush", 0, &HybridShadowRegistry::flush);
             prototype.registerRawHybridMethod("setScopedTheme", 1, &HybridShadowRegistry::setScopedTheme);
             prototype.registerRawHybridMethod("getScopedTheme", 0, &HybridShadowRegistry::getScopedTheme);
+            prototype.registerRawHybridMethod("setContainerBreakpointId", 1, &HybridShadowRegistry::setContainerBreakpointId);
+            prototype.registerRawHybridMethod("getContainerBreakpointId", 0, &HybridShadowRegistry::getContainerBreakpointId);
+            prototype.registerRawHybridMethod("updateContainerSize", 3, &HybridShadowRegistry::updateContainerSize);
         });
     };
     

@@ -40,6 +40,7 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     }
 
     auto scopedTheme = registry.getScopedTheme();
+    auto containerBreakpointId = registry.getScopedContainerBreakpointId();
 
     // check if scope theme exists
     if (scopedTheme.has_value()) {
@@ -72,8 +73,17 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
             unistyle,
             variants,
             arguments[i],
-            scopedTheme
+            scopedTheme,
+            containerBreakpointId
         );
+
+        // set container dimensions context before any parsing
+        std::optional<Dimensions> containerDims = std::nullopt;
+
+        if (containerBreakpointId.has_value()) {
+            containerDims = registry.getContainerSize(containerBreakpointId.value());
+            parser._containerDimensions = containerDims;
+        }
 
         // before linking we need to check if given unistyle is affected by scoped theme
         if (scopedTheme.has_value() && unistyle->styleKey != helpers::EXOTIC_STYLE_KEY) {
@@ -81,7 +91,11 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
 
             // if so we need to force update
             parser.rebuildUnistyleWithScopedTheme(rt, parsedStyleSheet, unistyleData);
+        } else if (containerDims.has_value() && unistyle->styleKey != helpers::EXOTIC_STYLE_KEY) {
+            parser.rebuildUnistyleForContainerSize(rt, unistyleData, containerDims.value());
         }
+
+        parser._containerDimensions = std::nullopt;
 
         unistylesData.emplace_back(unistyleData);
     }
@@ -136,6 +150,65 @@ jsi::Value HybridShadowRegistry::getScopedTheme(jsi::Runtime &rt, const jsi::Val
     return maybeScopedTheme.has_value()
         ? jsi::String::createFromUtf8(rt, maybeScopedTheme.value())
         : jsi::Value::undefined();
+}
+
+jsi::Value HybridShadowRegistry::setContainerBreakpointId(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    helpers::assertThat(rt, count == 1, "Unistyles: setContainerBreakpointId expected 1 argument.");
+
+    auto& registry = core::UnistylesRegistry::get();
+
+    if (args[0].isUndefined() || args[0].isNull()) {
+        registry.setScopedContainerBreakpointId(std::nullopt);
+    }
+
+    if (args[0].isNumber()) {
+        registry.setScopedContainerBreakpointId(static_cast<int>(args[0].asNumber()));
+    }
+
+    return jsi::Value::undefined();
+}
+
+jsi::Value HybridShadowRegistry::getContainerBreakpointId(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    auto& registry = core::UnistylesRegistry::get();
+    auto maybeContainerId = registry.getScopedContainerBreakpointId();
+
+    return maybeContainerId.has_value()
+        ? jsi::Value(static_cast<double>(maybeContainerId.value()))
+        : jsi::Value::undefined();
+}
+
+jsi::Value HybridShadowRegistry::updateContainerSize(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    helpers::assertThat(rt, count == 3, "Unistyles: updateContainerSize expected 3 arguments.");
+
+    auto containerId = static_cast<int>(args[0].asNumber());
+    auto width = args[1].asNumber();
+    auto height = args[2].asNumber();
+
+    auto& registry = core::UnistylesRegistry::get();
+    auto oldSize = registry.getContainerSize(containerId);
+
+    if (oldSize.has_value() &&
+        oldSize->width == width &&
+        oldSize->height == height) {
+        return jsi::Value::undefined();
+    }
+
+    registry.setContainerSize(containerId, Dimensions(width, height));
+
+    auto dependencyMap = registry.buildContainerDependencyMap(rt, containerId);
+
+    if (dependencyMap.empty()) {
+        return jsi::Value::undefined();
+    }
+
+    auto parser = parser::Parser(this->_unistylesRuntime);
+    std::vector<std::shared_ptr<core::StyleSheet>> emptyStyleSheets;
+
+    parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, emptyStyleSheets, std::nullopt);
+    parser.rebuildShadowLeafUpdates(rt, dependencyMap);
+    shadow::ShadowTreeManager::updateShadowTree(rt);
+
+    return jsi::Value::undefined();
 }
 
 std::shared_ptr<const core::ShadowNode> HybridShadowRegistry::getShadowNodeFromRef(jsi::Runtime& rt, const jsi::Value& maybeRef) {
