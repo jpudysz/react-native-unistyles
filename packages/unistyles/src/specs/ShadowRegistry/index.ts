@@ -33,12 +33,6 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
         )
     }
 
-    if (!node) {
-        throw new Error(
-            `Unistyles: Could not find shadow node for one of your components of type ${handle?.constructor?.name ?? 'unknown'}`,
-        )
-    }
-
     return node
 }
 
@@ -57,7 +51,15 @@ HybridShadowRegistry.add = (handle, styles) => {
         .filter(Boolean)
 
     if (filteredStyles.length > 0) {
-        HybridShadowRegistry.link(findShadowNodeForHandle(handle), filteredStyles)
+        const node = findShadowNodeForHandle(handle)
+
+        if (!node) {
+            throw new Error(
+                `Unistyles: Could not find shadow node for one of your components of type ${handle?.constructor?.name ?? 'unknown'}`,
+            )
+        }
+
+        HybridShadowRegistry.link(node, filteredStyles)
     }
 }
 
@@ -66,7 +68,11 @@ HybridShadowRegistry.remove = (handle) => {
         return
     }
 
-    HybridShadowRegistry.unlink(findShadowNodeForHandle(handle))
+    const maybeNode = findShadowNodeForHandle(handle)
+
+    if (maybeNode) {
+        HybridShadowRegistry.unlink(maybeNode)
+    }
 }
 
 type PrivateMethods = 'add' | 'remove' | 'link' | 'unlink'
