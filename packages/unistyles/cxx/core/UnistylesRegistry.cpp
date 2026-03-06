@@ -199,20 +199,20 @@ std::vector<std::shared_ptr<core::StyleSheet>>core::UnistylesRegistry::getStyleS
 
     auto& styleSheets = this->_styleSheetRegistry[&rt];
 
-    for (const auto& [_, styleSheet] : styleSheets) {
-        if (styleSheet->type == StyleSheetType::ThemableWithMiniRuntime) {
-            auto hasMatchingDependency = [&depSet](const auto& unistyles) {
-                for (const auto& [_, unistyle] : unistyles) {
-                    for (const auto& dep : unistyle->dependencies) {
-                        if (depSet.count(dep)) {
-                            return true;
-                        }
-                    }
+    auto hasMatchingDependency = [&depSet](const auto& unistyles) {
+        for (const auto& [_, unistyle] : unistyles) {
+            for (const auto& dep : unistyle->dependencies) {
+                if (depSet.count(dep)) {
+                    return true;
                 }
+            }
+        }
 
-                return false;
-            };
+        return false;
+    };
 
+    for (const auto& [_, styleSheet] : styleSheets) {
+        if (styleSheet->type == StyleSheetType::ThemableWithMiniRuntime || styleSheet->type == StyleSheetType::Static) {
             if (hasMatchingDependency(styleSheet->unistyles)) {
                 stylesheetsToRefresh.emplace_back(styleSheet);
             }
