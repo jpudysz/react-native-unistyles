@@ -75,6 +75,10 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         const scopedTheme = useRef(UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme)
         const { proxifiedRuntime, proxifiedTheme, addDependencies } = useProxifiedUnistyles(scopedTheme.current)
 
+        // Always track Theme dependency — accessing any property on proxifiedTheme
+        // triggers the Proxy get trap which adds Theme to the dependency Set
+        void (proxifiedTheme as Record<string, unknown>).__uni
+
         useEffect(() => {
             const styleSecrets = getSecrets(narrowedProps.style)
             const contentContainerStyleSecrets = getSecrets(narrowedProps.contentContainerStyle)

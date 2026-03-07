@@ -83,6 +83,11 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
             parser.rebuildUnistyleWithScopedTheme(rt, parsedStyleSheet, unistyleData);
         }
 
+        // Initialize parsedStyle from the unistyle's current computed style from withUnistyles
+        if (!unistyleData->parsedStyle.has_value() && unistyle->parsedStyle.has_value()) {
+            unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
+        }
+
         unistylesData.emplace_back(unistyleData);
     }
 
