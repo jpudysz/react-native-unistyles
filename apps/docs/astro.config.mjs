@@ -71,7 +71,7 @@ export default defineConfig({
             ],
 			sidebar: [
                 {
-                    label: 'Tutorial', slug: 'v3/tutorial/intro', badge: 'New!'
+                    label: 'Tutorial', slug: 'v3/tutorial/intro'
                 },
                 {
                     label: 'LLMS', slug: 'v3/llms/info', badge: 'Hot!',
@@ -106,7 +106,7 @@ export default defineConfig({
                 {
                     label: 'API reference',
                     items: [
-                        { label: 'StyleSheet', slug: 'v3/references/stylesheet' },
+                        { label: 'StyleSheet', slug: 'v3/references/stylesheet', badge: 'Updated!' },
                         { label: 'Unistyles Runtime', slug: 'v3/references/unistyles-runtime' },
                         { label: 'Mini Runtime', slug: 'v3/references/mini-runtime' },
                         { label: 'Dynamic Functions', slug: 'v3/references/dynamic-functions' },
@@ -116,7 +116,7 @@ export default defineConfig({
                         { label: 'Compound Variants', slug: 'v3/references/compound-variants' },
                         { label: 'Web styles', slug: 'v3/references/web-styles' },
                         { label: 'Web Only Features', slug: 'v3/references/web-only' },
-                        { label: 'Scoped theme', slug: 'v3/references/scoped-theme', badge: 'Updated!' },
+                        { label: 'Scoped theme', slug: 'v3/references/scoped-theme' },
                         { label: 'Update 3rd party views', slug: 'v3/references/3rd-party-views' },
                         { label: 'withUnistyles', slug: 'v3/references/with-unistyles' },
                         { label: 'useUnistyles', slug: 'v3/references/use-unistyles' },
