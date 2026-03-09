@@ -7,6 +7,7 @@ if (majorReactVersions === undefined || majorReactVersions < 19) {
 }
 
 export { StyleSheet, UnistylesRuntime, StatusBar, NavigationBar } from './specs'
+export { UnistyleDependency } from './specs'
 export { mq } from './mq'
 export type { UnistylesThemes, UnistylesBreakpoints } from './global'
 export { withUnistyles, useUnistyles, createUnistylesElement } from './core'
