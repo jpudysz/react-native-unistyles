@@ -17,11 +17,23 @@ export class UnistylesListener {
     constructor(private services: UnistylesServices) {}
 
     emitChanges = (dependencies: Array<UnistyleDependency>) => {
-        dependencies.forEach((dependency) => {
-            this.stylesheetListeners[dependency]?.forEach((listener) => listener(dependency))
-            this.listeners[dependency]?.forEach((listener) => listener(dependency))
-        })
-        this.changeListeners.forEach((listener) => listener(dependencies))
+        for (const dependency of dependencies) {
+            const stylesheetListeners = this.stylesheetListeners[dependency] ?? []
+
+            for (const listener of stylesheetListeners) {
+                listener(dependency)
+            }
+
+            const listeners = this.listeners[dependency] ?? []
+
+            for (const listener of listeners) {
+                listener(dependency)
+            }
+        }
+
+        for (const listener of this.changeListeners) {
+            listener(dependencies.slice())
+        }
     }
 
     emitChange = (dependency: UnistyleDependency) => {

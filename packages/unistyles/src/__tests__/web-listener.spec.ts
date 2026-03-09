@@ -17,4 +17,21 @@ describe('UnistylesListener public change listeners', () => {
 
         expect(onChange).toHaveBeenCalledTimes(1)
     })
+
+    it('passes a fresh dependency array to each public listener', () => {
+        const listener = new UnistylesListener({} as never)
+        const firstListenerCalls = Array<Array<UnistyleDependency>>()
+        const firstListener = jest.fn((dependencies: Array<UnistyleDependency>) => {
+            firstListenerCalls.push([...dependencies])
+            dependencies.pop()
+        })
+        const secondListener = jest.fn()
+
+        listener.addChangeListener(firstListener)
+        listener.addChangeListener(secondListener)
+        listener.emitChanges([UnistyleDependency.Theme, UnistyleDependency.ThemeName])
+
+        expect(firstListenerCalls).toEqual([[UnistyleDependency.Theme, UnistyleDependency.ThemeName]])
+        expect(secondListener).toHaveBeenCalledWith([UnistyleDependency.Theme, UnistyleDependency.ThemeName])
+    })
 })
