@@ -3,7 +3,7 @@ title: StyleSheet
 description: Learn about StyleSheet in Unistyles 3.0
 ---
 
-import { Aside } from '@astrojs/starlight/components'
+import { Aside, Badge } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
 
 <Seo
@@ -145,7 +145,7 @@ The `configure` function **must** be called before you import any component that
 
 You can learn more about how to configure Unistyles [here](/v3/start/configuration).
 
-### addChangeListener
+### addChangeListener <Badge text="Since v3.1.0" variant="tip" />
 
 `StyleSheet.addChangeListener` is an advanced API for integrations, custom hooks, and animation helpers that need to react to runtime dependency updates.
 
