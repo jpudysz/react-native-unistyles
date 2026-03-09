@@ -5,6 +5,13 @@ require('../mocks')
 const unistyles = require('react-native-unistyles') as { StyleSheet: { create: CreateUnistylesStyleSheet } }
 
 describe('StyleSheet.create mock', () => {
+    it('should expose addChangeListener', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const dispose = (unistyles as any).StyleSheet.addChangeListener(() => {})
+
+        expect(typeof dispose).toBe('function')
+    })
+
     it('should strip variants from style entries', () => {
         const styles = unistyles.StyleSheet.create({
             container: {

@@ -3,6 +3,7 @@ import type { UnistylesServices } from './types'
 import { UnistyleDependency } from '../specs/NativePlatform'
 
 type Listener = (dependency: UnistyleDependency) => void
+type PublicListener = (dependencies: Array<UnistyleDependency>) => void
 
 export class UnistylesListener {
     private isInitialized = false
@@ -11,12 +12,40 @@ export class UnistylesListener {
         { length: Object.keys(UnistyleDependency).length / 2 },
         () => new Set<Listener>(),
     )
+    private changeListeners = new Set<PublicListener>()
 
     constructor(private services: UnistylesServices) {}
 
+    emitChanges = (dependencies: Array<UnistyleDependency>) => {
+        for (const dependency of dependencies) {
+            const stylesheetListeners = this.stylesheetListeners[dependency] ?? []
+
+            for (const listener of stylesheetListeners) {
+                listener(dependency)
+            }
+
+            const listeners = this.listeners[dependency] ?? []
+
+            for (const listener of listeners) {
+                listener(dependency)
+            }
+        }
+
+        for (const listener of this.changeListeners) {
+            listener(dependencies.slice())
+        }
+    }
+
     emitChange = (dependency: UnistyleDependency) => {
-        this.stylesheetListeners[dependency]?.forEach((listener) => listener(dependency))
-        this.listeners[dependency]?.forEach((listener) => listener(dependency))
+        this.emitChanges([dependency])
+    }
+
+    addChangeListener = (listener: PublicListener) => {
+        this.changeListeners.add(listener)
+
+        return () => {
+            this.changeListeners.delete(listener)
+        }
     }
 
     initListeners = () => {
@@ -31,24 +60,34 @@ export class UnistylesListener {
                 return
             }
 
-            this.emitChange(UnistyleDependency.ColorScheme)
-
             if (this.services.runtime.hasAdaptiveThemes) {
-                this.emitChange(UnistyleDependency.Theme)
-                this.emitChange(UnistyleDependency.ThemeName)
+                this.emitChanges([
+                    UnistyleDependency.ColorScheme,
+                    UnistyleDependency.Theme,
+                    UnistyleDependency.ThemeName,
+                ])
+
+                return
             }
+
+            this.emitChange(UnistyleDependency.ColorScheme)
         })
         this.services.runtime.lightMedia?.addEventListener('change', (event) => {
             if (!event.matches) {
                 return
             }
 
-            this.emitChange(UnistyleDependency.ColorScheme)
-
             if (this.services.runtime.hasAdaptiveThemes) {
-                this.emitChange(UnistyleDependency.Theme)
-                this.emitChange(UnistyleDependency.ThemeName)
+                this.emitChanges([
+                    UnistyleDependency.ColorScheme,
+                    UnistyleDependency.Theme,
+                    UnistyleDependency.ThemeName,
+                ])
+
+                return
             }
+
+            this.emitChange(UnistyleDependency.ColorScheme)
         })
 
         window.addEventListener('orientationchange', () => this.emitChange(UnistyleDependency.Orientation))

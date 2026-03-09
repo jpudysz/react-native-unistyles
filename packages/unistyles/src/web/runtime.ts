@@ -180,8 +180,7 @@ export class UnistylesRuntime {
         const oldTheme = this.services.state.themeName
 
         this.services.state.themeName = themeName
-        this.services.listener.emitChange(UnistyleDependency.Theme)
-        this.services.listener.emitChange(UnistyleDependency.ThemeName)
+        this.services.listener.emitChanges([UnistyleDependency.Theme, UnistyleDependency.ThemeName])
 
         if (!isServer() && !this.services.state.hasAdaptiveThemes && this.services.state.CSSVars) {
             this.rootElement?.classList.remove(oldTheme ?? '')

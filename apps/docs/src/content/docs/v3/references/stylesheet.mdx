@@ -145,6 +145,40 @@ The `configure` function **must** be called before you import any component that
 
 You can learn more about how to configure Unistyles [here](/v3/start/configuration).
 
+### addChangeListener
+
+`StyleSheet.addChangeListener` is an advanced API for integrations, custom hooks, and animation helpers that need to react to runtime dependency updates.
+
+For regular styles, you do not need to use it manually. Unistyles already recalculates `StyleSheet.create` output whenever the relevant dependencies change.
+
+Signature:
+
+```ts
+addChangeListener(
+    onChanged: (dependencies: Array<UnistyleDependency>) => void
+): () => void
+```
+
+The callback receives one or more `UnistyleDependency` values describing what changed. The function returns an unsubscribe callback.
+
+```tsx /addChangeListener/
+import { useEffect } from 'react'
+import { StyleSheet, UnistyleDependency } from 'react-native-unistyles'
+
+useEffect(() => {
+    const dispose = StyleSheet.addChangeListener((dependencies) => {
+        if (
+            dependencies.includes(UnistyleDependency.Theme) ||
+            dependencies.includes(UnistyleDependency.Breakpoints)
+        ) {
+            // react to theme or breakpoint updates
+        }
+    })
+
+    return dispose
+}, [])
+```
+
 ### hairlineWidth
 
 `StyleSheet.hairlineWidth` is a static value representing the smallest value that can be drawn on your device. It’s helpful for borders or dividers.

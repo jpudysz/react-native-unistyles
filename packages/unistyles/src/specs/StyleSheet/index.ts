@@ -63,6 +63,6 @@ HybridUnistylesStyleSheet.jsMethods = {
 
 HybridUnistylesStyleSheet.init()
 
-type PrivateMethods = 'jsMethods' | 'addChangeListener' | 'init'
+type PrivateMethods = 'jsMethods' | 'init'
 
 export const StyleSheet = HybridUnistylesStyleSheet as Omit<UnistylesStyleSheet, PrivateMethods>
