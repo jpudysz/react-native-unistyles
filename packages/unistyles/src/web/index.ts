@@ -10,6 +10,7 @@ import * as unistyles from './services'
 export const StyleSheet = {
     configure: unistyles.services.state.init,
     create: create,
+    addChangeListener: unistyles.services.listener.addChangeListener,
     absoluteFill: {
         position: 'absolute',
         left: 0,

@@ -48,7 +48,6 @@ export const useMedia = (config: { mq: symbol }) => {
     }, [config.mq])
 
     useLayoutEffect(() => {
-        // @ts-expect-error - this is hidden from TS
         const removeChangeListener = StyleSheet.addChangeListener((dependencies: Array<UnistyleDependency>) => {
             if (dependencies.includes(UnistyleDependency.Breakpoints)) {
                 setIsVisible(computeIsVisible())

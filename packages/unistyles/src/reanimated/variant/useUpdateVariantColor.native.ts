@@ -14,7 +14,6 @@ export const useUpdateVariantColor = <T extends Record<string, any>>({
     const toValue = useSharedValue<string>(style[colorKey])
 
     useEffect(() => {
-        // @ts-ignore this is hidden from TS
         const dispose = StyleSheet.addChangeListener((changedDependencies) => {
             if (
                 changedDependencies.includes(UnistyleDependency.Theme) ||
