@@ -58,6 +58,9 @@ jobs:
       - name: Check linting and formatting
         run: bun run --cwd packages/unistyles precommit
 
+      - name: Copy README to package
+        run: cp README.md packages/unistyles/README.md
+
       - name: Determine version
         id: determine_version
         run: |
