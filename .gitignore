@@ -84,6 +84,7 @@ packages/unistyles/cxx/tests/hermes-debug/
 packages/unistyles/cxx/tests/cmake-build-debug-coverage/
 
 packages/unistyles/src/**/*.js
+packages/unistyles/README.md
 tsconfig.tsbuildinfo
 
 # Yarn PnP cache
