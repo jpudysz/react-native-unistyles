@@ -92,6 +92,12 @@ export class UnistylesListener {
 
         window.addEventListener('orientationchange', () => this.emitChange(UnistyleDependency.Orientation))
         window.addEventListener('resize', () => this.emitChange(UnistyleDependency.Dimensions))
+        new MutationObserver(() => {
+            this.emitChange(UnistyleDependency.Rtl)
+        }).observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['dir'],
+        })
     }
 
     addListeners = (dependencies: Array<UnistyleDependency>, listener: Listener) => {

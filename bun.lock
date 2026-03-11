@@ -97,7 +97,7 @@
     },
     "packages/unistyles": {
       "name": "react-native-unistyles",
-      "version": "3.0.24",
+      "version": "3.1.1",
       "dependencies": {
         "@babel/types": "7.29.0",
       },
