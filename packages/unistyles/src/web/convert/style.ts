@@ -98,22 +98,22 @@ const convertMap = {
         borderInlineStartWidth: value,
     }),
     end: (value: number) => ({
-        right: value,
+        insetInlineEnd: value,
     }),
     start: (value: number) => ({
-        left: value,
+        insetInlineStart: value,
     }),
     marginEnd: (value: number) => ({
-        marginRight: value,
+        marginInlineEnd: value,
     }),
     marginStart: (value: number) => ({
-        marginLeft: value,
+        marginInlineStart: value,
     }),
     paddingEnd: (value: number) => ({
-        paddingRight: value,
+        paddingInlineEnd: value,
     }),
     paddingStart: (value: number) => ({
-        paddingLeft: value,
+        paddingInlineStart: value,
     }),
     transformMatrix: (value: Array<number>) => ({
         transform: `matrix(${value.join(', ')})`,
