@@ -41,7 +41,7 @@ export type ScreenSize = {
     height: number
 }
 
-export type RNStyle = ViewStyle & TextStyle & ImageStyle
+export type RNStyle = ViewStyle | TextStyle | ImageStyle
 export type RNValue = ViewStyle[keyof ViewStyle] | TextStyle[keyof TextStyle] | ImageStyle[keyof ImageStyle]
 export type NestedStyle = Record<keyof UnistylesBreakpoints | symbol, RNValue>
 export type NestedStylePairs = Array<[keyof UnistylesBreakpoints | symbol, RNValue]>
