@@ -13,7 +13,7 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     auto& registry = core::UnistylesRegistry::get();
 
     // this is special case for Animated, and prevents appending same unistyles to node
-    registry.removeDuplicatedUnistyles(rt, &shadowNodeWrapper->getFamily(), unistyleWrappers);
+    registry.removeDuplicatedUnistyles(&shadowNodeWrapper->getFamily(), unistyleWrappers);
 
     if (unistyleWrappers.empty()) {
         return jsi::Value::undefined();
@@ -45,7 +45,7 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     if (scopedTheme.has_value()) {
         auto themeName = scopedTheme.value();
 
-        helpers::assertThat(rt, registry.getState(rt).hasTheme(themeName), "Unistyles: You're trying to use scoped theme '" + themeName + "' but it wasn't registered.");
+        helpers::assertThat(rt, registry.getState().hasTheme(themeName), "Unistyles: You're trying to use scoped theme '" + themeName + "' but it wasn't registered.");
     }
 
     auto parser = parser::Parser(this->_unistylesRuntime);
@@ -107,7 +107,7 @@ jsi::Value HybridShadowRegistry::unlink(jsi::Runtime &rt, const jsi::Value &this
 
     auto& registry = core::UnistylesRegistry::get();
 
-    registry.unlinkShadowNodeWithUnistyles(rt, &shadowNodeWrapper->getFamily());
+    registry.unlinkShadowNodeWithUnistyles(&shadowNodeWrapper->getFamily());
 
     return jsi::Value::undefined();
 }

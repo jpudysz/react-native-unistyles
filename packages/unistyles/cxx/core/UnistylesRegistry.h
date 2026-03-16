@@ -32,35 +32,34 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     bool shouldUsePointsForBreakpoints = false;
 
     void registerTheme(jsi::Runtime& rt, std::string name, jsi::Value& theme);
-    void registerBreakpoints(jsi::Runtime& rt, std::vector<std::pair<std::string, double>>& sortedBreakpoints);
-    void setPrefersAdaptiveThemes(jsi::Runtime& rt, bool prefersAdaptiveThemes);
-    void setInitialThemeName(jsi::Runtime& rt, std::string themeName);
+    void registerBreakpoints(std::vector<std::pair<std::string, double>>& sortedBreakpoints);
+    void setPrefersAdaptiveThemes(bool prefersAdaptiveThemes);
+    void setInitialThemeName(std::string themeName);
     void updateTheme(jsi::Runtime& rt, std::string& themeName, jsi::Function&& callback);
 
-    UnistylesState& getState(jsi::Runtime& rt);
-    void createState(jsi::Runtime& rt);
-    std::vector<std::shared_ptr<core::StyleSheet>> getStyleSheetsToRefresh(jsi::Runtime& rt, std::vector<UnistyleDependency>& unistylesDependencies);
+    UnistylesState& getState();
+    void createState();
+    std::vector<std::shared_ptr<core::StyleSheet>> getStyleSheetsToRefresh(std::vector<UnistyleDependency>& unistylesDependencies);
     void linkShadowNodeWithUnistyle(jsi::Runtime& rt, const ShadowNodeFamily*, std::vector<std::shared_ptr<UnistyleData>>& unistylesData);
-    void unlinkShadowNodeWithUnistyles(jsi::Runtime& rt, const ShadowNodeFamily*);
+    void unlinkShadowNodeWithUnistyles(const ShadowNodeFamily*);
     std::shared_ptr<core::StyleSheet> addStyleSheet(jsi::Runtime& rt, core::StyleSheetType type, jsi::Object&& rawValue);
-    DependencyMap buildDependencyMap(jsi::Runtime& rt, std::vector<UnistyleDependency>& deps);
+    DependencyMap buildDependencyMap(std::vector<UnistyleDependency>& deps);
     void shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Value& maybePressableId);
     shadow::ShadowTrafficController trafficController{};
     const std::optional<std::string> getScopedTheme();
-    void removeDuplicatedUnistyles(jsi::Runtime& rt, const ShadowNodeFamily* shadowNodeFamily, std::vector<core::Unistyle::Shared>& unistyles);
+    void removeDuplicatedUnistyles(const ShadowNodeFamily* shadowNodeFamily, std::vector<core::Unistyle::Shared>& unistyles);
     void setScopedTheme(std::optional<std::string> themeName);
-    core::Unistyle::Shared getUnistyleById(jsi::Runtime& rt, std::string unistyleID);
+    core::Unistyle::Shared getUnistyleById(std::string unistyleID);
     void destroy();
-    void destroyState(jsi::Runtime* rt);
 
 private:
     UnistylesRegistry() = default;
 
     static std::atomic<int> _nextStyleSheetTag;
     std::optional<std::string> _scopedTheme{};
-    std::unordered_map<jsi::Runtime*, UnistylesState> _states{};
-    std::unordered_map<jsi::Runtime*, std::unordered_map<int, std::shared_ptr<core::StyleSheet>>> _styleSheetRegistry{};
-    std::unordered_map<jsi::Runtime*, std::unordered_map<const ShadowNodeFamily*, std::vector<std::shared_ptr<UnistyleData>>>> _shadowRegistry{};
+    std::unique_ptr<UnistylesState> _state{};
+    std::unordered_map<int, std::shared_ptr<core::StyleSheet>> _styleSheetRegistry{};
+    std::unordered_map<const ShadowNodeFamily*, std::vector<std::shared_ptr<UnistyleData>>> _shadowRegistry{};
 };
 
 inline UnistylesRegistry& UnistylesRegistry::get() {

@@ -13,8 +13,8 @@
 namespace margelo::nitro::unistyles {
 
 struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
-    HybridUnistylesRuntime(std::shared_ptr<HybridNativePlatformSpec> nativePlatform, jsi::Runtime& rt, std::function<void(std::function<void(jsi::Runtime&)>&&)> runOnJSThread)
-        : HybridObject(TAG), _nativePlatform{nativePlatform}, _rt{&rt}, runOnJSThread(std::move(runOnJSThread)) {}
+    HybridUnistylesRuntime(std::shared_ptr<HybridNativePlatformSpec> nativePlatform, std::function<void(std::function<void(jsi::Runtime&)>&&)> runOnJSThread)
+        : HybridObject(TAG), _nativePlatform{nativePlatform}, runOnJSThread(std::move(runOnJSThread)) {}
 
     jsi::Value getTheme(jsi::Runtime& rt,
                             const jsi::Value& thisValue,
@@ -69,7 +69,7 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     UnistylesCxxMiniRuntime getMiniRuntime() override;
     std::unordered_map<std::string, double> getBreakpoints() override;
 
-    jsi::Runtime& getRuntime();
+    core::UnistylesState& getState();
     UnistylesCxxMiniRuntime buildMiniRuntimeFromNativeRuntime(UnistylesNativeMiniRuntime& nativeMiniRuntime);
     jsi::Value getMiniRuntimeAsValue(jsi::Runtime& rt, std::optional<UnistylesNativeMiniRuntime> maybeMiniRuntime);
     void includeDependenciesForColorSchemeChange(std::vector<UnistyleDependency>& deps);
@@ -77,7 +77,6 @@ struct HybridUnistylesRuntime: public HybridUnistylesRuntimeSpec {
     std::function<void(std::function<void(jsi::Runtime&)>&&)> runOnJSThread;
 
 private:
-    jsi::Runtime* _rt;
     std::shared_ptr<HybridNavigationBar> _navigationBar;
     std::shared_ptr<HybridStatusBar> _statusBar;
     std::shared_ptr<HybridNativePlatformSpec> _nativePlatform;

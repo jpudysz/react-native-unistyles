@@ -9,50 +9,44 @@ using namespace facebook::react;
 std::atomic<int> core::UnistylesRegistry::_nextStyleSheetTag{0};
 
 void core::UnistylesRegistry::registerTheme(jsi::Runtime& rt, std::string name, jsi::Value& theme) {
-    auto& state = this->getState(rt);
+    auto& state = this->getState();
 
     state._jsThemes.emplace(name, std::move(theme));
     state._registeredThemeNames.push_back(name);
 }
 
-void core::UnistylesRegistry::registerBreakpoints(jsi::Runtime& rt, std::vector<std::pair<std::string, double>>& sortedBreakpoints) {
-    auto& state = this->getState(rt);
+void core::UnistylesRegistry::registerBreakpoints(std::vector<std::pair<std::string, double>>& sortedBreakpoints) {
+    auto& state = this->getState();
 
     state._sortedBreakpointPairs = std::move(sortedBreakpoints);
 }
 
-void core::UnistylesRegistry::setPrefersAdaptiveThemes(jsi::Runtime& rt, bool prefersAdaptiveThemes) {
-    auto& state = this->getState(rt);
+void core::UnistylesRegistry::setPrefersAdaptiveThemes(bool prefersAdaptiveThemes) {
+    auto& state = this->getState();
 
     state._prefersAdaptiveThemes = prefersAdaptiveThemes;
 }
 
-void core::UnistylesRegistry::setInitialThemeName(jsi::Runtime& rt, std::string themeName) {
-    auto& state = this->getState(rt);
+void core::UnistylesRegistry::setInitialThemeName(std::string themeName) {
+    auto& state = this->getState();
 
     state._initialThemeName = themeName;
 }
 
-core::UnistylesState& core::UnistylesRegistry::getState(jsi::Runtime& rt) {
-    auto it = this->_states.find(&rt);
+core::UnistylesState& core::UnistylesRegistry::getState() {
+    if (!this->_state) {
+        throw std::runtime_error("Unistyles was loaded, but it's not configured. Did you forget to call StyleSheet.configure? If you don't want to use any themes or breakpoints, simply call it with an empty object {}.");
+    }
 
-    helpers::assertThat(rt, it != this->_states.end(), "Unistyles was loaded, but it's not configured. Did you forget to call StyleSheet.configure? If you don't want to use any themes or breakpoints, simply call it with an empty object {}.");
-
-    return it->second;
+    return *this->_state;
 }
 
-void core::UnistylesRegistry::createState(jsi::Runtime& rt) {
-    auto it = this->_states.find(&rt);
-
-    this->_states.emplace(
-        std::piecewise_construct,
-        std::forward_as_tuple(&rt),
-        std::forward_as_tuple(rt)
-    );
+void core::UnistylesRegistry::createState() {
+    this->_state = std::make_unique<UnistylesState>();
 }
 
 void core::UnistylesRegistry::updateTheme(jsi::Runtime& rt, std::string& themeName, jsi::Function&& callback) {
-    auto& state = this->getState(rt);
+    auto& state = this->getState();
     auto it = state._jsThemes.find(themeName);
 
     helpers::assertThat(rt, it != state._jsThemes.end(), "Unistyles: You're trying to update theme '" + themeName + "' but it wasn't registered.");
@@ -73,8 +67,8 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
         shadow::ShadowLeafUpdates updates;
         auto parser = parser::Parser(nullptr);
 
-        std::for_each(unistylesData.begin(), unistylesData.end(), [this, &rt, shadowNodeFamily](std::shared_ptr<UnistyleData> unistyleData){
-            this->_shadowRegistry[&rt][shadowNodeFamily].emplace_back(unistyleData);
+        std::for_each(unistylesData.begin(), unistylesData.end(), [this, shadowNodeFamily](std::shared_ptr<UnistyleData> unistyleData){
+            this->_shadowRegistry[shadowNodeFamily].emplace_back(unistyleData);
         });
 
         updates[shadowNodeFamily] = parser.parseStylesToShadowTreeStyles(rt, unistylesData);
@@ -84,8 +78,8 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
     });
 }
 
-void core::UnistylesRegistry::removeDuplicatedUnistyles(jsi::Runtime& rt, const ShadowNodeFamily *shadowNodeFamily, std::vector<core::Unistyle::Shared>& unistyles) {
-    auto targetFamilyUnistyles = this->_shadowRegistry[&rt][shadowNodeFamily];
+void core::UnistylesRegistry::removeDuplicatedUnistyles(const ShadowNodeFamily *shadowNodeFamily, std::vector<core::Unistyle::Shared>& unistyles) {
+    auto targetFamilyUnistyles = this->_shadowRegistry[shadowNodeFamily];
 
     unistyles.erase(
         std::remove_if(
@@ -105,14 +99,10 @@ void core::UnistylesRegistry::removeDuplicatedUnistyles(jsi::Runtime& rt, const 
     );
 }
 
-void core::UnistylesRegistry::unlinkShadowNodeWithUnistyles(jsi::Runtime& rt, const ShadowNodeFamily* shadowNodeFamily) {
-    this->trafficController.withLock([this, &rt, shadowNodeFamily](){
-        this->_shadowRegistry[&rt].erase(shadowNodeFamily);
+void core::UnistylesRegistry::unlinkShadowNodeWithUnistyles(const ShadowNodeFamily* shadowNodeFamily) {
+    this->trafficController.withLock([this, shadowNodeFamily](){
+        this->_shadowRegistry.erase(shadowNodeFamily);
         this->trafficController.removeShadowNode(shadowNodeFamily);
-
-        if (this->_shadowRegistry[&rt].empty()) {
-            this->_shadowRegistry.erase(&rt);
-        }
     });
 }
 
@@ -120,17 +110,17 @@ std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(jsi::Ru
     int tag = _nextStyleSheetTag.fetch_add(1);
 
     auto sheet = std::make_shared<core::StyleSheet>(tag, type, std::move(rawValue));
-    this->_styleSheetRegistry[&rt][tag] = sheet;
+    this->_styleSheetRegistry[tag] = sheet;
 
     return sheet;
 }
 
-core::DependencyMap core::UnistylesRegistry::buildDependencyMap(jsi::Runtime& rt, std::vector<UnistyleDependency>& deps) {
+core::DependencyMap core::UnistylesRegistry::buildDependencyMap(std::vector<UnistyleDependency>& deps) {
     core::DependencyMap dependencyMap;
 
     std::unordered_set<UnistyleDependency> uniqueDependencies(deps.begin(), deps.end());
 
-    for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
+    for (const auto& [family, unistyles] : this->_shadowRegistry) {
         bool hasAnyOfDependencies = false;
 
         // Check if any dependency matches
@@ -171,7 +161,7 @@ void core::UnistylesRegistry::shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Uni
             ? std::make_optional(maybePressableId.asString(rt).utf8(rt))
             : std::nullopt;
 
-        for (const auto& [family, unistyles] : this->_shadowRegistry[&rt]) {
+        for (const auto& [family, unistyles] : this->_shadowRegistry) {
             for (const auto& unistyleData : unistyles) {
                 if (unistyleData->unistyle == unistyle) {
                     updates[family] = parser.parseStylesToShadowTreeStyles(rt, { unistyleData });
@@ -183,7 +173,7 @@ void core::UnistylesRegistry::shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Uni
     });
 }
 
-std::vector<std::shared_ptr<core::StyleSheet>>core::UnistylesRegistry::getStyleSheetsToRefresh(jsi::Runtime& rt, std::vector<UnistyleDependency>& unistylesDependencies) {
+std::vector<std::shared_ptr<core::StyleSheet>>core::UnistylesRegistry::getStyleSheetsToRefresh(std::vector<UnistyleDependency>& unistylesDependencies) {
     std::vector<std::shared_ptr<core::StyleSheet>> stylesheetsToRefresh;
     std::unordered_set<UnistyleDependency> depSet(
         unistylesDependencies.begin(),
@@ -197,8 +187,6 @@ std::vector<std::shared_ptr<core::StyleSheet>>core::UnistylesRegistry::getStyleS
         return stylesheetsToRefresh;
     }
 
-    auto& styleSheets = this->_styleSheetRegistry[&rt];
-
     auto hasMatchingDependency = [&depSet](const auto& unistyles) {
         for (const auto& [_, unistyle] : unistyles) {
             for (const auto& dep : unistyle->dependencies) {
@@ -211,7 +199,7 @@ std::vector<std::shared_ptr<core::StyleSheet>>core::UnistylesRegistry::getStyleS
         return false;
     };
 
-    for (const auto& [_, styleSheet] : styleSheets) {
+    for (const auto& [_, styleSheet] : this->_styleSheetRegistry) {
         if (styleSheet->type == StyleSheetType::ThemableWithMiniRuntime || styleSheet->type == StyleSheetType::Static) {
             if (hasMatchingDependency(styleSheet->unistyles)) {
                 stylesheetsToRefresh.emplace_back(styleSheet);
@@ -226,8 +214,8 @@ std::vector<std::shared_ptr<core::StyleSheet>>core::UnistylesRegistry::getStyleS
     return stylesheetsToRefresh;
 }
 
-core::Unistyle::Shared core::UnistylesRegistry::getUnistyleById(jsi::Runtime& rt, std::string unistyleID) {
-    for (auto& pair: this->_styleSheetRegistry[&rt]) {
+core::Unistyle::Shared core::UnistylesRegistry::getUnistyleById(std::string unistyleID) {
+    for (auto& pair: this->_styleSheetRegistry) {
         auto [_, stylesheet] = pair;
 
         for (auto unistylePair: stylesheet->unistyles) {
@@ -251,16 +239,9 @@ void core::UnistylesRegistry::setScopedTheme(std::optional<std::string> themeNam
 }
 
 void core::UnistylesRegistry::destroy() {
-    this->_states.clear();
+    this->_state.reset();
     this->_styleSheetRegistry.clear();
     this->_shadowRegistry.clear();
     this->_scopedTheme = std::nullopt;
     _nextStyleSheetTag.store(0);
-}
-
-void core::UnistylesRegistry::destroyState(jsi::Runtime* rt) {
-    this->_states.erase(rt);
-    this->_styleSheetRegistry.erase(rt);
-    this->_shadowRegistry.erase(rt);
-    this->_scopedTheme = std::nullopt;
 }
