@@ -21,11 +21,11 @@ namespace margelo::nitro::unistyles {
   class JHybridNativePlatformSpec: public virtual HybridNativePlatformSpec, public virtual JHybridObject {
   public:
     struct JavaPart: public jni::JavaClass<JavaPart, JHybridObject::JavaPart> {
-      static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/unistyles/HybridNativePlatformSpec;";
+      static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/unistyles/HybridNativePlatformSpec;";
       std::shared_ptr<JHybridNativePlatformSpec> getJHybridNativePlatformSpec();
     };
     struct CxxPart: public jni::HybridClass<CxxPart, JHybridObject::CxxPart> {
-      static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/unistyles/HybridNativePlatformSpec$CxxPart;";
+      static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/unistyles/HybridNativePlatformSpec$CxxPart;";
       static jni::local_ref<jhybriddata> initHybrid(jni::alias_ref<jhybridobject> jThis);
       static void registerNatives();
       using HybridBase::HybridBase;

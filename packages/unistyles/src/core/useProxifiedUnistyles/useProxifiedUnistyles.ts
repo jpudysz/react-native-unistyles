@@ -62,7 +62,10 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
     }
 
     useEffect(() => {
-        return () => disposeRef.current?.()
+        return () => {
+            disposeRef.current?.()
+            syncedDependenciesSizeRef.current = -1
+        }
     }, [disposeRef])
 
     const maybeNewScopedTheme = UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme

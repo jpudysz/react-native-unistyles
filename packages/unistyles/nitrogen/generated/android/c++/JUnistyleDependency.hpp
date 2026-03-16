@@ -19,7 +19,7 @@ namespace margelo::nitro::unistyles {
    */
   struct JUnistyleDependency final: public jni::JavaClass<JUnistyleDependency> {
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/unistyles/UnistyleDependency;";
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/unistyles/UnistyleDependency;";
 
   public:
     /**
