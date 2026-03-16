@@ -24,6 +24,8 @@
     "@react-native-community/cli-platform-android": "20.1.2",
     "@react-native-community/cli-platform-ios": "20.1.2",
     "@react-native/babel-preset": "0.83.2",
+    "@react-native/codegen": "0.83.2",
+    "@react-native/gradle-plugin": "0.83.2",
     "@react-native/metro-config": "0.83.2",
     "@react-native/typescript-config": "0.83.2",
     "@types/react": "19.2.14",
