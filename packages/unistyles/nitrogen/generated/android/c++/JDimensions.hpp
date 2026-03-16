@@ -21,7 +21,7 @@ namespace margelo::nitro::unistyles {
    */
   struct JDimensions final: public jni::JavaClass<JDimensions> {
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/unistyles/Dimensions;";
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/unistyles/Dimensions;";
 
   public:
     /**
