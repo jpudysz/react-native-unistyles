@@ -19,7 +19,7 @@ namespace margelo::nitro::unistyles {
    */
   struct JOrientation final: public jni::JavaClass<JOrientation> {
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/unistyles/Orientation;";
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/unistyles/Orientation;";
 
   public:
     /**

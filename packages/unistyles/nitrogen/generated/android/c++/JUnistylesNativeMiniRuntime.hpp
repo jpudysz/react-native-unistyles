@@ -27,7 +27,7 @@ namespace margelo::nitro::unistyles {
    */
   struct JUnistylesNativeMiniRuntime final: public jni::JavaClass<JUnistylesNativeMiniRuntime> {
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/unistyles/UnistylesNativeMiniRuntime;";
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/unistyles/UnistylesNativeMiniRuntime;";
 
   public:
     /**

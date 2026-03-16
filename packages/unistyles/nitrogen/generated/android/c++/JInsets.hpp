@@ -21,7 +21,7 @@ namespace margelo::nitro::unistyles {
    */
   struct JInsets final: public jni::JavaClass<JInsets> {
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/unistyles/Insets;";
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/unistyles/Insets;";
 
   public:
     /**

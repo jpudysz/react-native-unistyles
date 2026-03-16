@@ -35,7 +35,7 @@ namespace margelo::nitro::unistyles {
    */
   struct JFunc_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime: public jni::JavaClass<JFunc_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime> {
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/unistyles/Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime;";
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/unistyles/Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime;";
 
   public:
     /**
@@ -89,7 +89,7 @@ namespace margelo::nitro::unistyles {
     }
 
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/unistyles/Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_cxx;";
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/unistyles/Func_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_cxx;";
     static void registerNatives() {
       registerHybrid({makeNativeMethod("invoke_cxx", JFunc_void_std__vector_UnistyleDependency__UnistylesNativeMiniRuntime_cxx::invoke_cxx)});
     }

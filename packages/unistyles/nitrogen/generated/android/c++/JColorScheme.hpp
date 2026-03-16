@@ -19,7 +19,7 @@ namespace margelo::nitro::unistyles {
    */
   struct JColorScheme final: public jni::JavaClass<JColorScheme> {
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/unistyles/ColorScheme;";
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/unistyles/ColorScheme;";
 
   public:
     /**
