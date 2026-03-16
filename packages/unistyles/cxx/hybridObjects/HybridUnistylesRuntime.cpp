@@ -3,6 +3,10 @@
 
 using namespace margelo::nitro::unistyles;
 
+core::UnistylesState& HybridUnistylesRuntime::getState() {
+    return core::UnistylesRegistry::get().getState();
+}
+
 ColorScheme HybridUnistylesRuntime::getColorScheme() {
     auto colorScheme = this->_nativePlatform->getColorScheme();
 
@@ -10,9 +14,7 @@ ColorScheme HybridUnistylesRuntime::getColorScheme() {
 }
 
 bool HybridUnistylesRuntime::getHasAdaptiveThemes() {
-    auto& state = core::UnistylesRegistry::get().getState(*_rt);
-
-    return state.hasAdaptiveThemes();
+    return this->getState().hasAdaptiveThemes();
 };
 
 Dimensions HybridUnistylesRuntime::getScreen() {
@@ -22,14 +24,12 @@ Dimensions HybridUnistylesRuntime::getScreen() {
 std::optional<std::string> HybridUnistylesRuntime::getThemeName() {
     auto& registry = core::UnistylesRegistry::get();
     auto maybeScopedTheme = registry.getScopedTheme();
-    
+
     if (maybeScopedTheme.has_value()) {
         return maybeScopedTheme.value();
     }
-    
-    auto& state = registry.getState(*_rt);
-    
-    return state.getCurrentThemeName();
+
+    return this->getState().getCurrentThemeName();
 };
 
 std::string HybridUnistylesRuntime::getContentSizeCategory() {
@@ -37,9 +37,7 @@ std::string HybridUnistylesRuntime::getContentSizeCategory() {
 };
 
 std::optional<std::string> HybridUnistylesRuntime::getBreakpoint() {
-    auto& state = core::UnistylesRegistry::get().getState(*_rt);
-
-    return state.getCurrentBreakpointName();
+    return this->getState().getCurrentBreakpointName();
 };
 
 bool HybridUnistylesRuntime::getRtl() {
@@ -73,8 +71,7 @@ double HybridUnistylesRuntime::getFontScale() {
 };
 
 std::unordered_map<std::string, double> HybridUnistylesRuntime::getBreakpoints() {
-    auto& state = core::UnistylesRegistry::get().getState(*_rt);
-    auto sortedBreakpointPairs = state.getSortedBreakpointPairs();
+    auto sortedBreakpointPairs = this->getState().getSortedBreakpointPairs();
     std::unordered_map<std::string, double> breakpoints{};
 
     std::for_each(sortedBreakpointPairs.begin(), sortedBreakpointPairs.end(), [&breakpoints](std::pair<std::string, double>& pair){
@@ -85,12 +82,13 @@ std::unordered_map<std::string, double> HybridUnistylesRuntime::getBreakpoints()
 }
 
 void HybridUnistylesRuntime::setTheme(const std::string &themeName) {
-    helpers::assertThat(*_rt, !this->getHasAdaptiveThemes(), "Unistyles: You're trying to set theme to: '" + themeName + "', but adaptiveThemes are enabled.");
+    if (this->getHasAdaptiveThemes()) {
+        throw std::runtime_error("Unistyles: You're trying to set theme to: '" + themeName + "', but adaptiveThemes are enabled.");
+    }
 
-    auto& state = core::UnistylesRegistry::get().getState(*_rt);
-    auto currentThemeName = state.getCurrentThemeName();
+    auto currentThemeName = this->getState().getCurrentThemeName();
 
-    state.setTheme(themeName);
+    this->getState().setTheme(themeName);
 
     if (currentThemeName.value() != themeName) {
         this->_onDependenciesChange({UnistyleDependency::THEME, UnistyleDependency::THEMENAME});
@@ -106,7 +104,7 @@ void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
 
     bool hadAdaptiveThemes = this->getHasAdaptiveThemes();
 
-    registry.setPrefersAdaptiveThemes(*_rt, isEnabled);
+    registry.setPrefersAdaptiveThemes(isEnabled);
 
     bool haveAdaptiveThemes = this->getHasAdaptiveThemes();
 
@@ -128,7 +126,6 @@ void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
 };
 
 void HybridUnistylesRuntime::calculateNewThemeAndDependencies(std::vector<UnistyleDependency>& changedDependencies) {
-    auto& state = core::UnistylesRegistry::get().getState(*_rt);
     auto colorScheme = this->getColorScheme();
     auto currentThemeName = this->getThemeName();
     auto nextTheme = colorScheme == ColorScheme::LIGHT
@@ -139,18 +136,18 @@ void HybridUnistylesRuntime::calculateNewThemeAndDependencies(std::vector<Unisty
         changedDependencies.push_back(UnistyleDependency::THEME);
         changedDependencies.push_back(UnistyleDependency::THEMENAME);
 
-        state.setTheme(nextTheme);
+        this->getState().setTheme(nextTheme);
     }
 }
 
 jsi::Value HybridUnistylesRuntime::getTheme(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count <= 1, "UnistylesRuntime.getTheme expected to be called with 0 or 1 argument.");
 
-    auto& state = core::UnistylesRegistry::get().getState(*_rt);
+    auto& state = this->getState();
 
     if (count == 1) {
         if (args[0].isUndefined()) {
-            return state.getCurrentJSTheme();
+            return state.getCurrentJSTheme(rt);
         }
 
         helpers::assertThat(rt, args[0].isString(), "UnistylesRuntime.getTheme expected to be called with string.");
@@ -159,10 +156,10 @@ jsi::Value HybridUnistylesRuntime::getTheme(jsi::Runtime &rt, const jsi::Value &
 
         helpers::assertThat(rt, state.hasTheme(themeName), "Unistyles: You're trying to get theme '" + themeName + "' but it wasn't registered.");
 
-        return state.getJSThemeByName(themeName);
+        return state.getJSThemeByName(rt, themeName);
     }
 
-    return state.getCurrentJSTheme();
+    return state.getCurrentJSTheme(rt);
 }
 
 jsi::Value HybridUnistylesRuntime::updateTheme(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
@@ -292,17 +289,10 @@ void HybridUnistylesRuntime::unregisterNativePlatformListeners() {
 }
 
 void HybridUnistylesRuntime::includeDependenciesForColorSchemeChange(std::vector<UnistyleDependency>& deps) {
-    auto& registry = core::UnistylesRegistry::get();
-    auto& state = registry.getState(*this->_rt);
-
     // ignore color scheme changes if user has no adaptive themes
-    if (!state.hasAdaptiveThemes()) {
+    if (!this->getState().hasAdaptiveThemes()) {
         return;
     }
 
     this->calculateNewThemeAndDependencies(deps);
-}
-
-jsi::Runtime& HybridUnistylesRuntime::getRuntime() {
-    return *this->_rt;
 }

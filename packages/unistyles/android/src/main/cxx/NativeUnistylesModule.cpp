@@ -33,11 +33,8 @@ void UnistylesModule::registerNatives() {
 jni::local_ref<BindingsInstallerHolder::javaobject> UnistylesModule::getBindingsInstaller(jni::alias_ref<UnistylesModule::javaobject> jobj) {
     auto& runtimeExecutor = jobj->cthis()->_runtimeExecutor;
     auto& nativePlatform = jobj->cthis()->_nativePlatform;
-    auto* self = jobj->cthis();
 
-    return BindingsInstallerHolder::newObjectCxxArgs([&runtimeExecutor, &nativePlatform, self](jsi::Runtime& rt) {
-        self->_runtime = &rt;
-
+    return BindingsInstallerHolder::newObjectCxxArgs([&runtimeExecutor, &nativePlatform](jsi::Runtime& rt) {
         // function is called on: first init and every live reload
         // check if this is live reload, if so let's replace UnistylesRuntime with new runtime
         auto hasUnistylesRuntime = HybridObjectRegistry::hasHybridObject("UnistylesRuntime");
@@ -55,7 +52,7 @@ jni::local_ref<BindingsInstallerHolder::javaobject> UnistylesModule::getBindings
         };
 
         // init hybrids
-        auto unistylesRuntime = std::make_shared<HybridUnistylesRuntime>(nativePlatform, rt, runOnJSThread);
+        auto unistylesRuntime = std::make_shared<HybridUnistylesRuntime>(nativePlatform, runOnJSThread);
         auto styleSheet = std::make_shared<HybridStyleSheet>(unistylesRuntime);
 
         HybridObjectRegistry::registerHybridObjectConstructor("UnistylesRuntime", [unistylesRuntime]() -> std::shared_ptr<HybridObject>{

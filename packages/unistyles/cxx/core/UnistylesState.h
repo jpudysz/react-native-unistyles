@@ -13,7 +13,7 @@ struct UnistylesRegistry;
 using namespace facebook;
 
 struct UnistylesState {
-    UnistylesState(jsi::Runtime& rt): _rt{&rt} {}
+    UnistylesState() = default;
     UnistylesState(const UnistylesState&) = delete;
     UnistylesState(const UnistylesState&&) = delete;
 
@@ -29,16 +29,15 @@ struct UnistylesState {
     std::optional<std::string> getCurrentBreakpointName();
     std::vector<std::pair<std::string, double>> getSortedBreakpointPairs();
 
-    jsi::Object getCurrentJSTheme();
-    jsi::Object getJSThemeByName(std::string& themeName);
-    int parseColor(jsi::Value& color);
-    jsi::Array parseBoxShadowString(std::string&& boxShadowString);
+    jsi::Object getCurrentJSTheme(jsi::Runtime& rt);
+    jsi::Object getJSThemeByName(jsi::Runtime& rt, std::string& themeName);
+    int parseColor(jsi::Runtime& rt, jsi::Value& color);
+    jsi::Array parseBoxShadowString(jsi::Runtime& rt, std::string&& boxShadowString);
     void computeCurrentBreakpoint(int screenWidth);
     void registerProcessColorFunction(jsi::Function&& fn);
     void registerParseBoxShadowString(jsi::Function&& fn);
 
 private:
-    jsi::Runtime* _rt;
     std::unordered_map<std::string, jsi::Value> _jsThemes{};
     std::optional<bool> _prefersAdaptiveThemes = std::nullopt;
     std::optional<std::string> _initialThemeName = std::nullopt;

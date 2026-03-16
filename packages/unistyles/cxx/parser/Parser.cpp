@@ -101,8 +101,8 @@ jsi::Value parser::Parser::getParsedStyleSheetForScopedTheme(jsi::Runtime& rt, c
         return jsi::Value::undefined();
     }
 
-    auto& state = core::UnistylesRegistry::get().getState(rt);
-    auto jsTheme = state.getJSThemeByName(scopedTheme);
+    auto& state = core::UnistylesRegistry::get().getState();
+    auto jsTheme = state.getJSThemeByName(rt, scopedTheme);
 
     if (unistyle->parent->type == StyleSheetType::Themable) {
         return unistyle->parent->rawValue
@@ -184,8 +184,8 @@ jsi::Object parser::Parser::unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<S
     }
 
     // StyleSheet is a function
-    auto& state = core::UnistylesRegistry::get().getState(rt);
-    auto theme = state.getCurrentJSTheme();
+    auto& state = core::UnistylesRegistry::get().getState();
+    auto theme = state.getCurrentJSTheme(rt);
 
     if (styleSheet->type == StyleSheetType::Themable) {
         return styleSheet->rawValue
@@ -690,9 +690,9 @@ jsi::Value parser::Parser::parseBoxShadow(jsi::Runtime &rt, Unistyle::Shared uni
 
 jsi::Array parser::Parser::parseBoxShadowString(jsi::Runtime& rt, std::string&& boxShadowString) {
     auto& registry = core::UnistylesRegistry::get();
-    auto& state = registry.getState(rt);
+    auto& state = registry.getState();
 
-    return state.parseBoxShadowString(std::move(boxShadowString));
+    return state.parseBoxShadowString(rt, std::move(boxShadowString));
 }
 
 // eg. [{ brightness: 0.5 }, { opacity: 0.25 }]
@@ -767,7 +767,7 @@ jsi::Value parser::Parser::parseFilters(jsi::Runtime &rt, Unistyle::Shared unist
 // find value based on breakpoints and mq
 jsi::Value parser::Parser::getValueFromBreakpoints(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Object& obj) {
     auto& registry = core::UnistylesRegistry::get();
-    auto& state = registry.getState(rt);
+    auto& state = registry.getState();
 
     auto sortedBreakpoints = state.getSortedBreakpointPairs();
     auto hasBreakpoints = !sortedBreakpoints.empty();
@@ -1052,7 +1052,7 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, Unistyle::Shared u
 // convert unistyles to folly with int colors
 folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, const std::vector<std::shared_ptr<UnistyleData>>& unistyles) {
     jsi::Object convertedStyles(rt);
-    auto& state = core::UnistylesRegistry::get().getState(rt);
+    auto& state = core::UnistylesRegistry::get().getState();
 
     for (const auto& unistyleData : unistyles) {
         if (!unistyleData->parsedStyle.has_value()) {
@@ -1068,7 +1068,7 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
                         convertedStyles.setProperty(
                             rt,
                             propertyName.c_str(),
-                            jsi::Value(state.parseColor(propertyValue))
+                            jsi::Value(state.parseColor(rt, propertyValue))
                         );
                     } else {
                         convertedStyles.setProperty(
@@ -1124,7 +1124,7 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
                                             obj.setProperty(
                                                 rt,
                                                 nestedPropName.c_str(),
-                                                state.parseColor(nestedPropValue)
+                                                state.parseColor(rt, nestedPropValue)
                                             );
                                         } else {
                                             obj.setProperty(
@@ -1156,7 +1156,7 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
                                                     parsedNestedObj.setProperty(
                                                         rt,
                                                         secondLevelPropName.c_str(),
-                                                        state.parseColor(secondLevelPropValue)
+                                                        state.parseColor(rt, secondLevelPropValue)
                                                     );
 
                                                     return;
@@ -1195,7 +1195,7 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
                                 parsedArray.setValueAtIndex(
                                     rt,
                                     i,
-                                    jsi::Value(state.parseColor(nestedValue))
+                                    jsi::Value(state.parseColor(rt, nestedValue))
                                 );
                             } else {
                                 parsedArray.setValueAtIndex(rt, i, nestedValue);

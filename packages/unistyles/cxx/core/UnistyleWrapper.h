@@ -57,7 +57,7 @@ inline static std::vector<Unistyle::Shared> unistylesFromHashKeys(jsi::Runtime& 
     auto& registry = UnistylesRegistry::get();
 
     for (auto& key: keys) {
-        unistyles.emplace_back(registry.getUnistyleById(rt, key));
+        unistyles.emplace_back(registry.getUnistyleById(key));
     }
 
     return unistyles;
@@ -157,7 +157,7 @@ inline static jsi::Value objectFromUnistyle(jsi::Runtime& rt, std::shared_ptr<Hy
         [unistyleID = unistyle->unid, unistylesRuntime, variants, parsedArguments](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count
     ) {
         auto& registry = UnistylesRegistry::get();
-        auto unistyle = registry.getUnistyleById(rt, unistyleID);
+        auto unistyle = registry.getUnistyleById(unistyleID);
 
         parser::Parser(unistylesRuntime).rebuildUnistyle(rt, unistyle, variants, parsedArguments);
 

@@ -12,7 +12,9 @@ bool core::UnistylesState::hasAdaptiveThemes() {
 }
 
 void core::UnistylesState::setTheme(std::string themeName) {
-    helpers::assertThat(*_rt, helpers::vecContainsKeys(this->_registeredThemeNames, {themeName}), "Unistyles: You're trying to set theme to: '" + std::string(themeName) + "', but it wasn't registered.");
+    if (!helpers::vecContainsKeys(this->_registeredThemeNames, {themeName})) {
+        throw std::runtime_error("Unistyles: You're trying to set theme to: '" + std::string(themeName) + "', but it wasn't registered.");
+    }
 
     if (themeName != this->_currentThemeName) {
         this->_currentThemeName = themeName;
@@ -23,33 +25,33 @@ std::optional<std::string>& core::UnistylesState::getCurrentThemeName() {
     return this->_currentThemeName;
 }
 
-jsi::Object core::UnistylesState::getCurrentJSTheme() {
+jsi::Object core::UnistylesState::getCurrentJSTheme(jsi::Runtime& rt) {
     auto hasSomeThemes = _registeredThemeNames.size() > 0;
 
     if (!hasSomeThemes && !this->hasUserConfig) {
-        helpers::assertThat(*_rt, false, "Unistyles: One of your stylesheets is trying to get the theme, but no theme has been selected yet. Did you forget to call StyleSheet.configure? If you called it, make sure you did so before any StyleSheet.create.");
+        helpers::assertThat(rt, false, "Unistyles: One of your stylesheets is trying to get the theme, but no theme has been selected yet. Did you forget to call StyleSheet.configure? If you called it, make sure you did so before any StyleSheet.create.");
     }
 
     // return empty object, if user didn't register any themes
     if (!hasSomeThemes) {
-        return jsi::Object(*_rt);
+        return jsi::Object(rt);
     }
 
-    helpers::assertThat(*_rt, _currentThemeName.has_value(), "Unistyles: One of your stylesheets is trying to get the theme, but no theme has been selected yet. Did you forget to select an initial theme?");
+    helpers::assertThat(rt, _currentThemeName.has_value(), "Unistyles: One of your stylesheets is trying to get the theme, but no theme has been selected yet. Did you forget to select an initial theme?");
 
     auto it = this->_jsThemes.find(_currentThemeName.value());
 
-    helpers::assertThat(*_rt, it != this->_jsThemes.end(), "Unistyles: You're trying to get theme '" + _currentThemeName.value() + "', but it was not registered. Did you forget to register it with StyleSheet.configure?");
+    helpers::assertThat(rt, it != this->_jsThemes.end(), "Unistyles: You're trying to get theme '" + _currentThemeName.value() + "', but it was not registered. Did you forget to register it with StyleSheet.configure?");
 
-    return it->second.asObject(*_rt);
+    return it->second.asObject(rt);
 }
 
-jsi::Object core::UnistylesState::getJSThemeByName(std::string& themeName) {
+jsi::Object core::UnistylesState::getJSThemeByName(jsi::Runtime& rt, std::string& themeName) {
     auto it = this->_jsThemes.find(themeName);
 
-    helpers::assertThat(*_rt, it != this->_jsThemes.end(), "Unistyles: You're trying to get theme '" + themeName + "', but it was not registered. Did you forget to register it with StyleSheet.configure?");
+    helpers::assertThat(rt, it != this->_jsThemes.end(), "Unistyles: You're trying to get theme '" + themeName + "', but it was not registered. Did you forget to register it with StyleSheet.configure?");
 
-    return it->second.asObject(*_rt);
+    return it->second.asObject(rt);
 }
 
 void core::UnistylesState::computeCurrentBreakpoint(int screenWidth) {
@@ -99,28 +101,28 @@ void core::UnistylesState::registerParseBoxShadowString(jsi::Function&& fn) {
     this->_parseBoxShadowStringFn = std::make_shared<jsi::Function>(std::move(fn));
 }
 
-int core::UnistylesState::parseColor(jsi::Value& maybeColor) {
+int core::UnistylesState::parseColor(jsi::Runtime& rt, jsi::Value& maybeColor) {
     if (!maybeColor.isString()) {
         return 0;
     }
 
-    auto colorString = maybeColor.asString(*_rt);
+    auto colorString = maybeColor.asString(rt);
 
-    if (!this->_colorCache.contains(colorString.utf8(*_rt).c_str())) {
+    if (!this->_colorCache.contains(colorString.utf8(rt).c_str())) {
         #ifdef ANDROID
-            int color = this->_processColorFn.get()->call(*_rt, colorString).asNumber();
+            int color = this->_processColorFn.get()->call(rt, colorString).asNumber();
         #else
-            uint32_t color = this->_processColorFn.get()->call(*_rt, colorString).asNumber();
+            uint32_t color = this->_processColorFn.get()->call(rt, colorString).asNumber();
         #endif
 
-        this->_colorCache[colorString.utf8(*_rt).c_str()] = color ? color : 0;
+        this->_colorCache[colorString.utf8(rt).c_str()] = color ? color : 0;
     }
 
-    return this->_colorCache[colorString.utf8(*_rt).c_str()];
+    return this->_colorCache[colorString.utf8(rt).c_str()];
 }
 
-jsi::Array core::UnistylesState::parseBoxShadowString(std::string&& boxShadowString) {
-    jsi::Value result = this->_parseBoxShadowStringFn.get()->call(*_rt, boxShadowString);
+jsi::Array core::UnistylesState::parseBoxShadowString(jsi::Runtime& rt, std::string&& boxShadowString) {
+    jsi::Value result = this->_parseBoxShadowStringFn.get()->call(rt, boxShadowString);
 
-    return result.asObject(*_rt).asArray(*_rt);
+    return result.asObject(rt).asArray(rt);
 }
