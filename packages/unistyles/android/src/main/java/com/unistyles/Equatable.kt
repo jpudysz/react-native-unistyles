@@ -54,7 +54,11 @@ fun NativePlatformAndroid.diffMiniRuntimes(lhs: UnistylesNativeMiniRuntime, rhs:
         dependencies.add(UnistyleDependency.NAVIGATIONBAR)
     }
 
-    // rtl and pixel ratio are not dynamic
+    if (lhs.rtl != rhs.rtl) {
+        dependencies.add(UnistyleDependency.RTL)
+    }
+
+    // pixel ratio is not dynamic
 
     return dependencies.toTypedArray()
 }
