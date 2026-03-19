@@ -155,11 +155,15 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
             "com.facebook.react.modules.i18nmanager.I18nUtil",
             Context.MODE_PRIVATE
         )
+        val resourcesLocale =
+            reactContext.resources.configuration.locales[0]
         val hasForcedRtl = sharedPrefs.getBoolean("RCTI18nUtil_forceRTL", false)
         // user preferences
         val isRtl = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == ViewCompat.LAYOUT_DIRECTION_RTL
+        val isResourcesRtl = TextUtilsCompat.getLayoutDirectionFromLocale(resourcesLocale) == ViewCompat.LAYOUT_DIRECTION_RTL
 
-        return hasForcedRtl || isRtl
+
+        return hasForcedRtl || isRtl || isResourcesRtl
     }
 
     override fun setRootViewBackgroundColor(color: Double) {

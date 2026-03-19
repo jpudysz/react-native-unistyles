@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.Keep
@@ -23,21 +24,38 @@ class NativePlatformListener(
 ) {
     private val _dependencyListeners: MutableList<CxxDependencyListener> = mutableListOf()
 
+    private fun notifyConfigChangedWithDelay() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            this@NativePlatformListener.onConfigChange()
+        }, 25)
+    }
+
     private val configurationChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            Handler(Looper.getMainLooper()).postDelayed({
-                this@NativePlatformListener.onConfigChange()
-            }, 25)
+            notifyConfigChangedWithDelay()
         }
     }
 
+    private val rtlPreferenceListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
+        if (key == "RCTI18nUtil_forceRTL") {
+            notifyConfigChangedWithDelay()
+        }
+    }
+
+    private val i18nUtilSharedPrefs = reactContext.getSharedPreferences(
+        "com.facebook.react.modules.i18nmanager.I18nUtil",
+        Context.MODE_PRIVATE
+    )
+
     init {
         reactContext.registerReceiver(configurationChangeReceiver, IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED))
+        i18nUtilSharedPrefs.registerOnSharedPreferenceChangeListener(rtlPreferenceListener)
     }
 
     fun onDestroy() {
         this.removePlatformListeners()
         reactContext.unregisterReceiver(configurationChangeReceiver)
+        i18nUtilSharedPrefs.unregisterOnSharedPreferenceChangeListener(rtlPreferenceListener)
     }
 
     fun addPlatformListener(listener: CxxDependencyListener) {
