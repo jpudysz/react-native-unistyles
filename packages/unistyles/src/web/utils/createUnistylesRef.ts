@@ -20,7 +20,7 @@ export const createUnistylesRef = <T>(styles?: Styles, forwardedRef?: React.Forw
         ? undefined
         : (ref: Nullable<T>) => {
               if (!ref) {
-                  unistyles.services.shadowRegistry.remove(storedRef, classNames?.hash)
+                  unistyles.services.shadowRegistry.remove(storedRef.current, classNames?.hash)
               }
 
               storedRef.current = ref
