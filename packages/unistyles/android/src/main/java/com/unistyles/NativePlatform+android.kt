@@ -37,6 +37,8 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
     }
 
     fun onDestroy() {
+        _listener.onDestroy()
+        _insets.onDestroy()
         reactContext.removeLifecycleEventListener(this)
     }
 
@@ -155,8 +157,7 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
             "com.facebook.react.modules.i18nmanager.I18nUtil",
             Context.MODE_PRIVATE
         )
-        val resourcesLocale =
-            reactContext.resources.configuration.locales[0]
+        val resourcesLocale = reactContext.resources.configuration.locales[0]
         val hasForcedRtl = sharedPrefs.getBoolean("RCTI18nUtil_forceRTL", false)
         // user preferences
         val isRtl = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == ViewCompat.LAYOUT_DIRECTION_RTL
