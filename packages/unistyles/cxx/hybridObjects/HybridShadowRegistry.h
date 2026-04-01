@@ -22,6 +22,10 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
                             const jsi::Value& thisValue,
                             const jsi::Value* args,
                             size_t count);
+    jsi::Value suspend(jsi::Runtime& rt,
+                            const jsi::Value& thisValue,
+                            const jsi::Value* args,
+                            size_t count);
     jsi::Value flush(jsi::Runtime& rt,
                             const jsi::Value& thisValue,
                             const jsi::Value* args,
@@ -41,6 +45,7 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
         registerHybrids(this, [](Prototype& prototype) {
             prototype.registerRawHybridMethod("link", 2, &HybridShadowRegistry::link);
             prototype.registerRawHybridMethod("unlink", 1, &HybridShadowRegistry::unlink);
+            prototype.registerRawHybridMethod("suspend", 1, &HybridShadowRegistry::suspend);
             prototype.registerRawHybridMethod("flush", 0, &HybridShadowRegistry::flush);
             prototype.registerRawHybridMethod("setScopedTheme", 1, &HybridShadowRegistry::setScopedTheme);
             prototype.registerRawHybridMethod("getScopedTheme", 0, &HybridShadowRegistry::getScopedTheme);

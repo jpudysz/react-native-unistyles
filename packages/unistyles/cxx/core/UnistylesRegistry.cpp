@@ -64,6 +64,12 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
     std::vector<std::shared_ptr<UnistyleData>>& unistylesData
 ) {
     this->trafficController.withLock([this, &rt, &unistylesData, shadowNodeFamily](){
+        // Clear suspension state if this family was previously suspended
+        if (_suspendedFamilies.erase(shadowNodeFamily) > 0) {
+            auto* mutableFamily = const_cast<ShadowNodeFamily*>(shadowNodeFamily);
+            mutableFamily->nativeProps_DEPRECATED.reset();
+        }
+
         shadow::ShadowLeafUpdates updates;
         auto parser = parser::Parser(nullptr);
 
@@ -72,6 +78,14 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
         });
 
         updates[shadowNodeFamily] = parser.parseStylesToShadowTreeStyles(rt, unistylesData);
+
+        auto* mutableFamily = const_cast<ShadowNodeFamily*>(shadowNodeFamily);
+
+        if (mutableFamily->nativeProps_DEPRECATED) {
+            mutableFamily->nativeProps_DEPRECATED->update(updates[shadowNodeFamily]);
+        } else {
+            mutableFamily->nativeProps_DEPRECATED = std::make_unique<folly::dynamic>(updates[shadowNodeFamily]);
+        }
 
         this->trafficController.setUpdates(updates);
         this->trafficController.resumeUnistylesTraffic();
@@ -102,8 +116,21 @@ void core::UnistylesRegistry::removeDuplicatedUnistyles(const ShadowNodeFamily *
 void core::UnistylesRegistry::unlinkShadowNodeWithUnistyles(const ShadowNodeFamily* shadowNodeFamily) {
     this->trafficController.withLock([this, shadowNodeFamily](){
         this->_shadowRegistry.erase(shadowNodeFamily);
+        this->_suspendedFamilies.erase(shadowNodeFamily);
         this->trafficController.removeShadowNode(shadowNodeFamily);
     });
+}
+
+void core::UnistylesRegistry::suspendShadowNode(const ShadowNodeFamily* shadowNodeFamily) {
+    this->trafficController.withLock([this, shadowNodeFamily](){
+        if (this->_shadowRegistry.contains(shadowNodeFamily)) {
+            this->_suspendedFamilies.insert(shadowNodeFamily);
+        }
+    });
+}
+
+bool core::UnistylesRegistry::isSuspended(const ShadowNodeFamily* family) const noexcept {
+    return _suspendedFamilies.count(family) > 0;
 }
 
 std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(jsi::Runtime& rt, core::StyleSheetType type, jsi::Object&& rawValue) {
@@ -242,6 +269,7 @@ void core::UnistylesRegistry::destroy() {
     this->_state.reset();
     this->_styleSheetRegistry.clear();
     this->_shadowRegistry.clear();
+    this->_suspendedFamilies.clear();
     this->_scopedTheme = std::nullopt;
     _nextStyleSheetTag.store(0);
 }

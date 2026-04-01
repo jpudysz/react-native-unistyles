@@ -112,6 +112,17 @@ jsi::Value HybridShadowRegistry::unlink(jsi::Runtime &rt, const jsi::Value &this
     return jsi::Value::undefined();
 }
 
+jsi::Value HybridShadowRegistry::suspend(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    helpers::assertThat(rt, count == 1, "Unistyles: Invalid babel transform 'ShadowRegistry suspend' expected 1 argument.");
+
+    auto shadowNodeWrapper = getShadowNodeFromRef(rt, args[0]);
+    auto& registry = core::UnistylesRegistry::get();
+
+    registry.suspendShadowNode(&shadowNodeWrapper->getFamily());
+
+    return jsi::Value::undefined();
+}
+
 jsi::Value HybridShadowRegistry::flush(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     shadow::ShadowTreeManager::updateShadowTree(rt);
 
