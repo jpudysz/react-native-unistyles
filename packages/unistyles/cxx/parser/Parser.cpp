@@ -497,7 +497,7 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared u
         
         if (propertyValue.isBool() && propertyName == "includeFontPadding") {
             parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), propertyValue);
-            
+
             return;
         }
 
@@ -1039,7 +1039,7 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, Unistyle::Shared u
             return;
         }
 
-        if (propertyName == "shadowOffset" || propertyName == "textShadowOffset") {
+        if (propertyName == "shadowOffset" || propertyName == "textShadowOffset" || propertyName == "dropShadow") {
             parsedStyle.setProperty(rt, propertyName.c_str(), this->parseSecondLevel(rt, unistyle, propertyValue));
 
             return;
