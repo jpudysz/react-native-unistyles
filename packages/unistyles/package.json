@@ -1,6 +1,6 @@
 {
   "name": "react-native-unistyles",
-  "version": "3.1.1",
+  "version": "3.2.0",
   "description": "Level up your React Native StyleSheet",
   "scripts": {
     "test": "NODE_ENV=babel-test jest ./plugin ./src/__tests__",
