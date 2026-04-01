@@ -10,12 +10,40 @@ interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     // JSI
     link(node: ShadowNode, styles?: Array<Unistyle>): void
     unlink(node: ShadowNode): void
+    suspend(node: ShadowNode): void
     flush(): void
     setScopedTheme(themeName?: string): void
     getScopedTheme(): string | undefined
 }
 
 const HybridShadowRegistry = NitroModules.createHybridObject<ShadowRegistry>('UnistylesShadowRegistry')
+
+const SUSPENSE_TAG = 13
+
+const isInsideSuspendedBoundary = (fiber: any): boolean => {
+    let current = fiber?.return
+
+    while (current) {
+        if (current.tag === SUSPENSE_TAG && current.memoizedState !== null) {
+            return true
+        }
+
+        current = current.return
+    }
+
+    return false
+}
+
+const findFiberForHandle = (handle: ViewHandle) => {
+    return (
+        handle?.__internalInstanceHandle ??
+        handle?.getScrollResponder?.()?.getNativeScrollRef?.()?.__internalInstanceHandle ??
+        handle?.getNativeScrollRef?.()?.__internalInstanceHandle ??
+        handle?._viewRef?.__internalInstanceHandle ??
+        handle?.viewRef?.current?.__internalInstanceHandle ??
+        handle?._nativeRef?.__internalInstanceHandle
+    )
+}
 
 const findShadowNodeForHandle = (handle: ViewHandle) => {
     const node =
@@ -71,10 +99,16 @@ HybridShadowRegistry.remove = (handle) => {
     const maybeNode = findShadowNodeForHandle(handle)
 
     if (maybeNode) {
-        HybridShadowRegistry.unlink(maybeNode)
+        const fiber = findFiberForHandle(handle)
+
+        if (fiber && isInsideSuspendedBoundary(fiber)) {
+            HybridShadowRegistry.suspend(maybeNode)
+        } else {
+            HybridShadowRegistry.unlink(maybeNode)
+        }
     }
 }
 
-type PrivateMethods = 'add' | 'remove' | 'link' | 'unlink'
+type PrivateMethods = 'add' | 'remove' | 'link' | 'unlink' | 'suspend'
 
 export const UnistylesShadowRegistry = HybridShadowRegistry as Omit<ShadowRegistry, PrivateMethods>
