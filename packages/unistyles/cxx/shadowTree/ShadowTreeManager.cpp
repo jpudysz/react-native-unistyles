@@ -20,14 +20,16 @@ void shadow::ShadowTreeManager::updateShadowTree(jsi::Runtime& rt) {
         std::unordered_map<Tag, folly::dynamic> tagToProps;
 
         for (const auto& [family, props] : updates) {
-            tagToProps.insert({family->getTag(), props});
+            auto safeProps = props.isObject() ? props : folly::dynamic::object();
+
+            tagToProps.insert({family->getTag(), safeProps});
 
             auto* mutableFamily = const_cast<ShadowNodeFamily*>(family);
 
-            if (mutableFamily->nativeProps_DEPRECATED) {
-                mutableFamily->nativeProps_DEPRECATED->update(props);
+            if (mutableFamily->nativeProps_DEPRECATED && mutableFamily->nativeProps_DEPRECATED->isObject()) {
+                mutableFamily->nativeProps_DEPRECATED->update(safeProps);
             } else {
-                mutableFamily->nativeProps_DEPRECATED = std::make_unique<folly::dynamic>(props);
+                mutableFamily->nativeProps_DEPRECATED = std::make_unique<folly::dynamic>(safeProps);
             }
         }
 
@@ -45,11 +47,12 @@ void shadow::ShadowTreeManager::updateShadowTree(jsi::Runtime& rt) {
                 for (const auto& [family, props] : updates) {
                     // Merge props to fix glitches caused by REA updates
                     auto* mutableFamily = const_cast<ShadowNodeFamily*>(family);
+                    auto safeProps = props.isObject() ? props : folly::dynamic::object();
 
-                    if (mutableFamily->nativeProps_DEPRECATED) {
-                        mutableFamily->nativeProps_DEPRECATED->update(props);
+                    if (mutableFamily->nativeProps_DEPRECATED && mutableFamily->nativeProps_DEPRECATED->isObject()) {
+                        mutableFamily->nativeProps_DEPRECATED->update(safeProps);
                     } else {
-                        mutableFamily->nativeProps_DEPRECATED = std::make_unique<folly::dynamic>(props);
+                        mutableFamily->nativeProps_DEPRECATED = std::make_unique<folly::dynamic>(safeProps);
                     }
                 }
 
