@@ -79,14 +79,6 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
 
         updates[shadowNodeFamily] = parser.parseStylesToShadowTreeStyles(rt, unistylesData);
 
-        auto* mutableFamily = const_cast<ShadowNodeFamily*>(shadowNodeFamily);
-
-        if (mutableFamily->nativeProps_DEPRECATED) {
-            mutableFamily->nativeProps_DEPRECATED->update(updates[shadowNodeFamily]);
-        } else {
-            mutableFamily->nativeProps_DEPRECATED = std::make_unique<folly::dynamic>(updates[shadowNodeFamily]);
-        }
-
         this->trafficController.setUpdates(updates);
         this->trafficController.resumeUnistylesTraffic();
     });
