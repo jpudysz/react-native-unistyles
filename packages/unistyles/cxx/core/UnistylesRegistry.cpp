@@ -70,6 +70,8 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
             mutableFamily->nativeProps_DEPRECATED.reset();
             // Clear old registry entries to prevent stale UnistyleData accumulation
             this->_shadowRegistry.erase(shadowNodeFamily);
+            // Remove any stale traffic controller entry (e.g. from a theme change during suspension)
+            this->trafficController.removeShadowNode(shadowNodeFamily);
         }
 
         std::for_each(unistylesData.begin(), unistylesData.end(), [this, shadowNodeFamily](std::shared_ptr<UnistyleData> unistyleData){
