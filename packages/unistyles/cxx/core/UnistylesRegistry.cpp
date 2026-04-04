@@ -68,19 +68,13 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
         if (_suspendedFamilies.erase(shadowNodeFamily) > 0) {
             auto* mutableFamily = const_cast<ShadowNodeFamily*>(shadowNodeFamily);
             mutableFamily->nativeProps_DEPRECATED.reset();
+            // Clear old registry entries to prevent stale UnistyleData accumulation
+            this->_shadowRegistry.erase(shadowNodeFamily);
         }
-
-        shadow::ShadowLeafUpdates updates;
-        auto parser = parser::Parser(nullptr);
 
         std::for_each(unistylesData.begin(), unistylesData.end(), [this, shadowNodeFamily](std::shared_ptr<UnistyleData> unistyleData){
             this->_shadowRegistry[shadowNodeFamily].emplace_back(unistyleData);
         });
-
-        updates[shadowNodeFamily] = parser.parseStylesToShadowTreeStyles(rt, unistylesData);
-
-        this->trafficController.setUpdates(updates);
-        this->trafficController.resumeUnistylesTraffic();
     });
 }
 
