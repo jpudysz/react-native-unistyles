@@ -60,6 +60,17 @@ export default defineConfig({
 		starlight({
 			title: 'react-native-unistyles',
             description: 'React Native StyleSheet 3.0',
+            head: [
+                {
+                    tag: 'script',
+                    attrs: {
+                        src: 'https://cdn.usefathom.com/script.js',
+                        'data-site': 'DNUCGBOT',
+                        'data-spa': 'auto',
+                        defer: true,
+                    },
+                },
+            ],
             customCss: ['./src/styles/docs.css'],
             logo: {
                 src: './public/favicon.png'
