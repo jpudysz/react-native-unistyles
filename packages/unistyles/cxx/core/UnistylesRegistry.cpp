@@ -61,9 +61,10 @@ void core::UnistylesRegistry::updateTheme(jsi::Runtime& rt, std::string& themeNa
 void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
     jsi::Runtime& rt,
     const ShadowNodeFamily* shadowNodeFamily,
-    std::vector<std::shared_ptr<UnistyleData>>& unistylesData
+    std::vector<std::shared_ptr<UnistyleData>>& unistylesData,
+    std::optional<folly::dynamic> initialScopedUpdate
 ) {
-    this->trafficController.withLock([this, &rt, &unistylesData, shadowNodeFamily](){
+    this->trafficController.withLock([this, &rt, &unistylesData, shadowNodeFamily, &initialScopedUpdate](){
         // Clear suspension state if this family was previously suspended
         if (_suspendedFamilies.erase(shadowNodeFamily) > 0) {
             auto* mutableFamily = const_cast<ShadowNodeFamily*>(shadowNodeFamily);
@@ -77,6 +78,14 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
         std::for_each(unistylesData.begin(), unistylesData.end(), [this, shadowNodeFamily](std::shared_ptr<UnistyleData> unistyleData){
             this->_shadowRegistry[shadowNodeFamily].emplace_back(unistyleData);
         });
+
+        // Required for scoped themes to apply on initial mount
+        if (initialScopedUpdate.has_value()) {
+            shadow::ShadowLeafUpdates updates;
+
+            updates.emplace(shadowNodeFamily, std::move(*initialScopedUpdate));
+            this->trafficController.setUpdates(updates);
+        }
     });
 }
 

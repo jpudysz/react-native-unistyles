@@ -40,7 +40,7 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     UnistylesState& getState();
     void createState();
     std::vector<std::shared_ptr<core::StyleSheet>> getStyleSheetsToRefresh(std::vector<UnistyleDependency>& unistylesDependencies);
-    void linkShadowNodeWithUnistyle(jsi::Runtime& rt, const ShadowNodeFamily*, std::vector<std::shared_ptr<UnistyleData>>& unistylesData);
+    void linkShadowNodeWithUnistyle(jsi::Runtime& rt, const ShadowNodeFamily*, std::vector<std::shared_ptr<UnistyleData>>& unistylesData, std::optional<folly::dynamic> initialScopedUpdate = std::nullopt);
     void unlinkShadowNodeWithUnistyles(const ShadowNodeFamily*);
     void suspendShadowNode(const ShadowNodeFamily*);
     bool isSuspended(const ShadowNodeFamily*) const noexcept;
