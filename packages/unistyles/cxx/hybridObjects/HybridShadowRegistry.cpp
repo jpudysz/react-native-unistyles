@@ -94,23 +94,18 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
         unistylesData.emplace_back(unistyleData);
     }
 
+    std::optional<folly::dynamic> initialScopedUpdate;
+
+    if (scopedTheme.has_value()) {
+        initialScopedUpdate = parser.parseStylesToShadowTreeStyles(rt, unistylesData);
+    }
+
     registry.linkShadowNodeWithUnistyle(
         rt,
         &shadowNodeWrapper->getFamily(),
-        unistylesData
+        unistylesData,
+        std::move(initialScopedUpdate)
     );
-
-    // Required for scoped themes to apply on initial mount
-    if (scopedTheme.has_value()) {
-        registry.trafficController.withLock([&]() {
-            shadow::ShadowLeafUpdates scopedUpdates;
-            auto rawProps = parser.parseStylesToShadowTreeStyles(rt, unistylesData);
-
-            scopedUpdates.emplace(&shadowNodeWrapper->getFamily(), std::move(rawProps));
-
-            registry.trafficController.setUpdates(scopedUpdates);
-        });
-    }
 
     return jsi::Value::undefined();
 }
