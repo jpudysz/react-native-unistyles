@@ -50,4 +50,48 @@ describe('removeInlineStyles', () => {
         expect(flattened).toEqual({ width: '100%', height: 300 })
         expect(flattened).not.toHaveProperty('variants')
     })
+
+    it('merges _web CSS properties as enumerable', () => {
+        const input = {
+            width: 100,
+            _web: {
+                cursor: 'pointer',
+                userSelect: 'none',
+            },
+        }
+        const result = removeInlineStyles(input as any)
+
+        const enumKeys = Object.keys(result)
+
+        // _web container stays non-enumerable
+        expect(enumKeys).not.toContain('_web')
+
+        // But _web CSS properties are merged as enumerable
+        expect(enumKeys).toContain('cursor')
+        expect(enumKeys).toContain('userSelect')
+        expect({ ...result }).toEqual({ width: 100, cursor: 'pointer', userSelect: 'none' })
+    })
+
+    it('does not merge _web pseudo selectors or _classNames', () => {
+        const input = {
+            width: 100,
+            _web: {
+                cursor: 'pointer',
+                _classNames: 'custom-class',
+                _hover: { opacity: 0.8 },
+                _focus: { outline: 'none' },
+            },
+        }
+        const result = removeInlineStyles(input as any)
+
+        const enumKeys = Object.keys(result)
+
+        // CSS property from _web is merged
+        expect(enumKeys).toContain('cursor')
+
+        // Pseudo selectors and _classNames are NOT merged
+        expect(enumKeys).not.toContain('_classNames')
+        expect(enumKeys).not.toContain('_hover')
+        expect(enumKeys).not.toContain('_focus')
+    })
 })
