@@ -58,7 +58,12 @@ export const extractSecrets = (object: any) => {
     return reduceObject(Object.getOwnPropertyDescriptors(secrets), (secret) => secret.value)
 }
 
-const UNISTYLES_METADATA_KEYS = new Set(['variants', 'compoundVariants', '_web', 'uni__dependencies', '_classNames'])
+/**
+ * Internal metadata keys that should not be treated as CSS style properties.
+ * Used to filter out unistyles-specific keys when exposing styles to
+ * third-party components and when converting styles to CSS.
+ */
+export const UNISTYLES_METADATA_KEYS = new Set(['variants', 'compoundVariants', '_web', 'uni__dependencies', '_classNames'])
 
 export const removeInlineStyles = (values: UnistylesValues) => {
     const returnValue = {}
