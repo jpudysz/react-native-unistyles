@@ -77,6 +77,25 @@ export const removeInlineStyles = (values: UnistylesValues) => {
         })),
     )
 
+    // Merge web-only CSS properties (cursor, userSelect, etc.) as enumerable
+    // so third-party components that use Object.assign/spread can access them.
+    // This mirrors what shadowRegistry.addStyles does for wrapped components:
+    //   { ...resultWithVariants, ...resultWithVariants._web }
+    const webStyles = (values as any)?._web
+    if (webStyles && typeof webStyles === 'object') {
+        for (const webKey of Object.keys(webStyles)) {
+            // Skip internal keys (_classNames) and pseudo selectors (_hover, _focus, etc.)
+            if (webKey === '_classNames' || webKey.startsWith('_')) {
+                continue
+            }
+            Object.defineProperty(returnValue, webKey, {
+                value: webStyles[webKey],
+                enumerable: true,
+                configurable: true,
+            })
+        }
+    }
+
     return returnValue
 }
 
