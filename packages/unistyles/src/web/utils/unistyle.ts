@@ -65,7 +65,7 @@ export const removeInlineStyles = (values: UnistylesValues) => {
         returnValue,
         reduceObject(values, (value) => ({
             value,
-            enumerable: false,
+            enumerable: true,
             configurable: true,
         })),
     )
