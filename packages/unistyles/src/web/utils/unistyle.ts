@@ -58,14 +58,16 @@ export const extractSecrets = (object: any) => {
     return reduceObject(Object.getOwnPropertyDescriptors(secrets), (secret) => secret.value)
 }
 
+const UNISTYLES_METADATA_KEYS = new Set(['variants', 'compoundVariants', '_web', 'uni__dependencies', '_classNames'])
+
 export const removeInlineStyles = (values: UnistylesValues) => {
     const returnValue = {}
 
     Object.defineProperties(
         returnValue,
-        reduceObject(values, (value) => ({
+        reduceObject(values, (value, key) => ({
             value,
-            enumerable: false,
+            enumerable: !UNISTYLES_METADATA_KEYS.has(key as string),
             configurable: true,
         })),
     )
