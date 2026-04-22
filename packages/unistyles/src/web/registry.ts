@@ -9,7 +9,12 @@ import { error, extractUnistyleDependencies, generateHash } from './utils'
 export class UnistylesRegistry {
     private readonly stylesheets = new Map<StyleSheetWithSuperPowers<StyleSheet>, StyleSheet>()
     private readonly stylesCache = new Set<string>()
-    private readonly stylesCounter = new Map<string, Set<HTMLElement>>()
+    // Use counter instead of Set<HTMLElement> to avoid retaining detached DOM nodes
+    // FR is a fallback when remove() is missed
+    private readonly stylesCounter = new Map<string, number>()
+    private readonly finalizationRegistry = new FinalizationRegistry<string>((hash) => {
+        this.decrementAndMaybeCleanup(hash)
+    })
     private readonly disposeListenersMap = new Map<object, VoidFunction>()
     private readonly dependenciesMap = new Map<StyleSheetWithSuperPowers<StyleSheet>, Set<UnistyleDependency>>()
     readonly css: CSSState
@@ -78,33 +83,45 @@ export class UnistylesRegistry {
     }
 
     connect = (ref: HTMLElement, hash: string) => {
-        const stylesCounter = this.stylesCounter.get(hash) ?? new Set()
-
-        stylesCounter.add(ref)
-        this.stylesCounter.set(hash, stylesCounter)
+        this.stylesCounter.set(hash, (this.stylesCounter.get(hash) ?? 0) + 1)
+        this.finalizationRegistry.register(ref, hash, ref)
     }
 
     remove = (ref: HTMLElement, hash: string) => {
-        const stylesCounter = this.stylesCounter.get(hash) ?? new Set()
+        this.finalizationRegistry.unregister(ref)
 
-        stylesCounter.delete(ref)
+        return this.decrementAndMaybeCleanup(hash)
+    }
 
-        if (stylesCounter.size === 0) {
-            // Move this to the end of the event loop so the element is removed from the DOM
-            return Promise.resolve().then(() => {
-                // Check if element is still in the DOM
-                if (document.querySelector(`.${hash}`)) {
-                    return false
-                }
+    private decrementAndMaybeCleanup = (hash: string): Promise<boolean> => {
+        const next = (this.stylesCounter.get(hash) ?? 0) - 1
 
-                this.css.remove(hash)
-                this.stylesCache.delete(hash)
+        if (next > 0) {
+            this.stylesCounter.set(hash, next)
 
-                return true
-            })
+            return Promise.resolve(false)
         }
 
-        return Promise.resolve(false)
+        // Drop the empty bucket from the Map
+        this.stylesCounter.delete(hash)
+
+        // Move this to the end of the event loop so the element is removed from the DOM
+        return Promise.resolve().then(() => {
+            // New connect raced in during the microtask
+            if ((this.stylesCounter.get(hash) ?? 0) > 0) {
+                return false
+            }
+
+            // Check if element is still in the DOM
+            if (document.querySelector(`.${hash}`)) {
+                return false
+            }
+
+            this.css.remove(hash)
+            this.stylesCache.delete(hash)
+
+            return true
+        })
     }
 
     add = (value: UnistylesValues, forChild?: boolean) => {
