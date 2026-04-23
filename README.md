@@ -76,9 +76,6 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 <a href="https://github.com/AdiRishi">
      <img src="https://avatars.githubusercontent.com/u/8351234?v=4" height="70px" width="70px" alt="AdiRishi" />
 </a>
-<a href="https://github.com/cybercarrot">
-     <img src="https://avatars.githubusercontent.com/u/6837094?v=4" height="70px" width="70px" alt="cybercarrot" />
-</a>
 
 
 ## Past sponsors
@@ -154,6 +151,9 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 </a>
 <a href="https://github.com/biw">
      <img src="https://avatars.githubusercontent.com/u/6139501?v=4" height="60px" width="60px" alt="biw" />
+</a>
+<a href="https://github.com/cybercarrot">
+     <img src="https://avatars.githubusercontent.com/u/6837094?v=4" height="60px" width="60px" alt="cybercarrot" />
 </a>
 
 ## Sponsor my work
