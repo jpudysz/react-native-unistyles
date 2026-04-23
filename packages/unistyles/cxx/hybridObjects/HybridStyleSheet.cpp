@@ -271,32 +271,9 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
             return;
         }
 
-        auto& registry = core::UnistylesRegistry::get();
-        auto parser = parser::Parser(self->_unistylesRuntime);
         auto unistyleDependencies = dependencies;
-        auto dependencyMap = registry.buildDependencyMap(unistyleDependencies);
 
-        if (dependencyMap.empty()) {
-            self->notifyJSListeners(unistyleDependencies);
-        }
-
-        // in a later step, we will rebuild only Unistyles with mounted StyleSheets
-        // however, user may have StyleSheets with components that haven't mounted yet
-        // we need to rebuild all dependent StyleSheets as well
-        auto dependentStyleSheets = registry.getStyleSheetsToRefresh(unistyleDependencies);
-
-        parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets, std::nullopt);
-
-        // we need to stop here if there is nothing to update at the moment,
-        // but we need to compute dependentStyleSheets
-        if (dependencyMap.empty()) {
-            return;
-        }
-
-        parser.rebuildShadowLeafUpdates(rt, dependencyMap);
-
-        self->notifyJSListeners(unistyleDependencies);
-        shadow::ShadowTreeManager::updateShadowTree(rt);
+        self->applyDependencyChanges(rt, unistyleDependencies, std::nullopt);
     });
 }
 
@@ -316,7 +293,6 @@ void HybridStyleSheet::onPlatformNativeDependenciesChange(std::vector<UnistyleDe
         }
 
         auto& registry = core::UnistylesRegistry::get();
-        auto parser = parser::Parser(self->_unistylesRuntime);
         auto unistyleDependencies = std::move(dependencies);
 
         // re-compute new breakpoint
@@ -339,29 +315,7 @@ void HybridStyleSheet::onPlatformNativeDependenciesChange(std::vector<UnistyleDe
             self->_unistylesRuntime->includeDependenciesForColorSchemeChange(unistyleDependencies);
         }
 
-        auto dependencyMap = registry.buildDependencyMap(unistyleDependencies);
-
-        if (dependencyMap.empty()) {
-            self->notifyJSListeners(unistyleDependencies);
-        }
-
-        // in a later step, we will rebuild only Unistyles with mounted StyleSheets
-        // however, user may have StyleSheets with components that haven't mounted yet
-        // we need to rebuild all dependent StyleSheets as well
-        auto dependentStyleSheets = registry.getStyleSheetsToRefresh(unistyleDependencies);
-
-        parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets, miniRuntime);
-
-        // we need to stop here if there is nothing to update at the moment,
-        // but we need to compute dependentStyleSheets
-        if (dependencyMap.empty()) {
-            return;
-        }
-
-        parser.rebuildShadowLeafUpdates(rt, dependencyMap);
-
-        self->notifyJSListeners(unistyleDependencies);
-        shadow::ShadowTreeManager::updateShadowTree(rt);
+        self->applyDependencyChanges(rt, unistyleDependencies, miniRuntime);
     });
 }
 
@@ -380,26 +334,36 @@ void HybridStyleSheet::onImeChange(UnistylesNativeMiniRuntime miniRuntime) {
         }
 
         std::vector<UnistyleDependency> dependencies{UnistyleDependency::IME};
-        auto& registry = core::UnistylesRegistry::get();
-        auto parser = parser::Parser(self->_unistylesRuntime);
-        auto dependencyMap = registry.buildDependencyMap(dependencies);
 
-        if (dependencyMap.empty()) {
-            self->notifyJSListeners(dependencies);
-
-            return;
-        }
-
-        // we don't care about other unmounted stylesheets as their not visible
-        // so user won't see any changes
-        std::vector<std::shared_ptr<core::StyleSheet>> dependentStyleSheets;
-
-        parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets, miniRuntime);
-        parser.rebuildShadowLeafUpdates(rt, dependencyMap);
-
-        self->notifyJSListeners(dependencies);
-        shadow::ShadowTreeManager::updateShadowTree(rt);
+        self->applyDependencyChanges(rt, dependencies, miniRuntime);
     });
+}
+
+void HybridStyleSheet::applyDependencyChanges(jsi::Runtime& rt, std::vector<UnistyleDependency>& dependencies, std::optional<UnistylesNativeMiniRuntime> maybeMiniRuntime) {
+    auto& registry = core::UnistylesRegistry::get();
+    auto parser = parser::Parser(this->_unistylesRuntime);
+    auto dependencyMap = registry.buildDependencyMap(dependencies);
+
+    // include StyleSheets consumed only by JS (withUnistyles) — they aren't in dependencyMap
+    // but their rawValue must still be refreshed so rerenders read fresh closures
+    auto dependentStyleSheets = registry.getStyleSheetsToRefresh(dependencies);
+
+    if (dependencyMap.empty() && dependentStyleSheets.empty()) {
+        return;
+    }
+
+    // rebuild rawValue BEFORE notifying listeners so JS rerenders read fresh closures
+    parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets, maybeMiniRuntime);
+
+    if (!dependencyMap.empty()) {
+        parser.rebuildShadowLeafUpdates(rt, dependencyMap);
+    }
+
+    this->notifyJSListeners(dependencies);
+
+    if (!dependencyMap.empty()) {
+        shadow::ShadowTreeManager::updateShadowTree(rt);
+    }
 }
 
 void HybridStyleSheet::notifyJSListeners(std::vector<UnistyleDependency>& dependencies) {
