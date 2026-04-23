@@ -3,6 +3,7 @@
 #include <cmath>
 #include <jsi/jsi.h>
 #include <mutex>
+#include <optional>
 #include <unordered_map>
 #include "HybridUnistylesRuntime.h"
 #include "HybridUnistylesStyleSheetSpec.hpp"
@@ -69,6 +70,7 @@ private:
     void onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies);
     void onPlatformNativeDependenciesChange(std::vector<UnistyleDependency> dependencies, UnistylesNativeMiniRuntime miniRuntime);
     void onImeChange(UnistylesNativeMiniRuntime miniRuntime);
+    void applyDependencyChanges(jsi::Runtime& rt, std::vector<UnistyleDependency>& dependencies, std::optional<UnistylesNativeMiniRuntime> maybeMiniRuntime);
     void notifyJSListeners(std::vector<UnistyleDependency>& dependencies);
 
     bool isInitialized = false;
