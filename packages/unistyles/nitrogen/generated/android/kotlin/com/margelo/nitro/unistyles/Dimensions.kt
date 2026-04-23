@@ -9,6 +9,7 @@ package com.margelo.nitro.unistyles
 
 import androidx.annotation.Keep
 import com.facebook.proguard.annotations.DoNotStrip
+import java.util.Objects
 
 
 /**
@@ -25,6 +26,20 @@ data class Dimensions(
   val height: Double
 ) {
   /* primary constructor */
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is Dimensions) return false
+    return Objects.deepEquals(this.width, other.width)
+      && Objects.deepEquals(this.height, other.height)
+  }
+
+  override fun hashCode(): Int {
+    return arrayOf(
+      width,
+      height
+    ).contentDeepHashCode()
+  }
 
   companion object {
     /**

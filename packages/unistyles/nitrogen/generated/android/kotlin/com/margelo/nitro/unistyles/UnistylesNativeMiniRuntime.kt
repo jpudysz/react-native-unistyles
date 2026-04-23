@@ -9,6 +9,7 @@ package com.margelo.nitro.unistyles
 
 import androidx.annotation.Keep
 import com.facebook.proguard.annotations.DoNotStrip
+import java.util.Objects
 
 
 /**
@@ -52,6 +53,38 @@ data class UnistylesNativeMiniRuntime(
   val isLandscape: Boolean
 ) {
   /* primary constructor */
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is UnistylesNativeMiniRuntime) return false
+    return Objects.deepEquals(this.colorScheme, other.colorScheme)
+      && Objects.deepEquals(this.screen, other.screen)
+      && Objects.deepEquals(this.contentSizeCategory, other.contentSizeCategory)
+      && Objects.deepEquals(this.insets, other.insets)
+      && Objects.deepEquals(this.pixelRatio, other.pixelRatio)
+      && Objects.deepEquals(this.fontScale, other.fontScale)
+      && Objects.deepEquals(this.rtl, other.rtl)
+      && Objects.deepEquals(this.statusBar, other.statusBar)
+      && Objects.deepEquals(this.navigationBar, other.navigationBar)
+      && Objects.deepEquals(this.isPortrait, other.isPortrait)
+      && Objects.deepEquals(this.isLandscape, other.isLandscape)
+  }
+
+  override fun hashCode(): Int {
+    return arrayOf(
+      colorScheme,
+      screen,
+      contentSizeCategory,
+      insets,
+      pixelRatio,
+      fontScale,
+      rtl,
+      statusBar,
+      navigationBar,
+      isPortrait,
+      isLandscape
+    ).contentDeepHashCode()
+  }
 
   companion object {
     /**
