@@ -9,6 +9,7 @@ package com.margelo.nitro.unistyles
 
 import androidx.annotation.Keep
 import com.facebook.proguard.annotations.DoNotStrip
+import java.util.Objects
 
 
 /**
@@ -34,6 +35,26 @@ data class Insets(
   val ime: Double
 ) {
   /* primary constructor */
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is Insets) return false
+    return Objects.deepEquals(this.top, other.top)
+      && Objects.deepEquals(this.bottom, other.bottom)
+      && Objects.deepEquals(this.left, other.left)
+      && Objects.deepEquals(this.right, other.right)
+      && Objects.deepEquals(this.ime, other.ime)
+  }
+
+  override fun hashCode(): Int {
+    return arrayOf(
+      top,
+      bottom,
+      left,
+      right,
+      ime
+    ).contentDeepHashCode()
+  }
 
   companion object {
     /**
