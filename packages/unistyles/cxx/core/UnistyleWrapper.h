@@ -171,10 +171,12 @@ inline static jsi::Value objectFromUnistyle(jsi::Runtime& rt, std::shared_ptr<Hy
             auto parser = parser::Parser(unistylesRuntime);
             auto parsedStyleSheet = parser.getParsedStyleSheetForScopedTheme(rt, unistyle, scopedTheme.value());
 
-            parser.rebuildUnistyleWithScopedTheme(rt, parsedStyleSheet, unistyleData);
+            if (!parsedStyleSheet.isUndefined()) {
+                parser.rebuildUnistyleWithScopedTheme(rt, parsedStyleSheet, unistyleData);
 
-            if (unistyleData->parsedStyle.has_value()) {
-                return jsi::Value(rt, unistyleData->parsedStyle.value()).asObject(rt);
+                if (unistyleData->parsedStyle.has_value()) {
+                    return jsi::Value(rt, unistyleData->parsedStyle.value()).asObject(rt);
+                }
             }
         }
 
