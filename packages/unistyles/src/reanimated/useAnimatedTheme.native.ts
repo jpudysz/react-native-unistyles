@@ -18,7 +18,7 @@ export const useAnimatedTheme = () => {
     }
 
     useEffect(() => {
-        const dispose = StyleSheet.addChangeListener(changedDependencies => {
+        const dispose = StyleSheet.addChangeListener((changedDependencies) => {
             if (!changedDependencies.includes(UnistyleDependency.Theme)) {
                 return
             }
