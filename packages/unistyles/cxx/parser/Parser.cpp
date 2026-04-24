@@ -494,7 +494,7 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared u
 
             return;
         }
-        
+
         if (propertyValue.isBool() && propertyName == "includeFontPadding") {
             parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), propertyValue);
 
@@ -1004,6 +1004,15 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, Unistyle::Shared u
 
         if (nestedObjectStyle.isFunction(rt)) {
             parsedStyle.setProperty(rt, propertyName.c_str(), jsi::Value::undefined());
+
+            return;
+        }
+
+        // PlatformColor / DynamicColorIOS / Android ColorResource objects must
+        // pass through unchanged — otherwise getValueFromBreakpoints treats them
+        // as a breakpoint map and strips the color
+        if (helpers::isPlatformColor(rt, nestedObjectStyle)) {
+            parsedStyle.setProperty(rt, propertyName.c_str(), propertyValue);
 
             return;
         }
