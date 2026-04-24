@@ -158,8 +158,29 @@ inline static jsi::Value objectFromUnistyle(jsi::Runtime& rt, std::shared_ptr<Hy
     ) {
         auto& registry = UnistylesRegistry::get();
         auto unistyle = registry.getUnistyleById(unistyleID);
+        auto scopedTheme = registry.getScopedTheme();
+        parser::Parser parser(unistylesRuntime);
 
-        parser::Parser(unistylesRuntime).rebuildUnistyle(rt, unistyle, variants, parsedArguments);
+        // scoped theme path — parse with scope so `withUnistyles`-wrapped
+        // components inside <ScopedTheme> reflect the scope instead of the global theme
+        if (scopedTheme.has_value() && unistyle->styleKey != helpers::EXOTIC_STYLE_KEY) {
+            std::vector<folly::dynamic> scopedArguments = parsedArguments.has_value()
+                ? parsedArguments.value()
+                : std::vector<folly::dynamic>{};
+
+            auto unistyleData = std::make_shared<UnistyleData>(unistyle, variants, scopedArguments, scopedTheme);
+            auto parsedStyleSheet = parser.getParsedStyleSheetForScopedTheme(rt, unistyle, scopedTheme.value());
+
+            if (!parsedStyleSheet.isUndefined()) {
+                parser.rebuildUnistyleWithScopedTheme(rt, parsedStyleSheet, unistyleData);
+
+                if (unistyleData->parsedStyle.has_value()) {
+                    return jsi::Value(rt, unistyleData->parsedStyle.value()).asObject(rt);
+                }
+            }
+        }
+
+        parser.rebuildUnistyle(rt, unistyle, variants, parsedArguments);
 
         return jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
     });
