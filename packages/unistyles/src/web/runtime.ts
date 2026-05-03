@@ -80,7 +80,13 @@ export class UnistylesRuntime {
             return Orientation.Portrait
         }
 
-        return screen.orientation.type.includes('portrait') ? Orientation.Portrait : Orientation.Landscape
+        const orientationType = window.screen.orientation?.type
+
+        if (orientationType) {
+            return orientationType.includes('portrait') ? Orientation.Portrait : Orientation.Landscape
+        }
+
+        return window.innerHeight >= window.innerWidth ? Orientation.Portrait : Orientation.Landscape
     }
 
     get isLandscape() {
