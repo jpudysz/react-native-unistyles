@@ -495,7 +495,7 @@ pluginTester({
                 })
             `,
             output: `
-                import { StyleSheet } from 'react-native-unistyles'
+                import { StyleSheet } from 'react-native'
                 const styles = StyleSheet.create({
                     map: {},
                     length: {},
@@ -516,7 +516,7 @@ pluginTester({
                 }))
             `,
             output: `
-                import { StyleSheet } from 'react-native-unistyles'
+                import { StyleSheet } from 'react-native'
                 const styles = StyleSheet.create(theme => ({
                     map: {},
                     length: {},

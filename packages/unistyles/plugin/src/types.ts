@@ -6,8 +6,10 @@ interface UnistylesState {
     hasAnyUnistyle: boolean
     hasVariants: boolean
     hasUnistylesImport: boolean
+    hasDynamicStyleSheet: boolean
     addUnistylesRequire: boolean
     forceProcessing: boolean
+    isExcluded: boolean
     styleSheetLocalName: string
     replaceWithUnistyles: boolean
     reactNativeCommonJSName: string

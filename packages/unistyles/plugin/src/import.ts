@@ -71,6 +71,10 @@ export function isInsideNodeModules(state: UnistylesPluginPass) {
     return state.file.opts.filename?.includes('node_modules') && !state.file.replaceWithUnistyles
 }
 
+export function isExcludedPath(state: UnistylesPluginPass, excludePaths: Array<string>) {
+    return excludePaths.some((p) => state.file.opts.filename?.includes(p))
+}
+
 export function addUnistylesRequire(path: NodePath<t.Program>, state: UnistylesPluginPass) {
     Object.entries(state.reactNativeImports).forEach(([componentName, uniqueName]) => {
         const newRequire = t.variableDeclaration('const', [

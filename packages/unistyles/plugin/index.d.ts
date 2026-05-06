@@ -110,6 +110,15 @@ export interface UnistylesPluginOptions {
     autoProcessPaths?: Array<string>
 
     /**
+     * Example: ['src/constants/styles', 'src/tokens']
+     * Skip processing entirely for files whose path includes any of these strings.
+     * Useful for pure-static style files (design tokens, layout constants) that never use
+     * `theme`, `rt`, variants, or RN component imports — so the plugin has nothing to do.
+     * Takes precedence over `root`, `autoProcessImports`, and `autoProcessPaths`.
+     */
+    excludePaths?: Array<string>
+
+    /**
      * In order to list detected dependencies by the Babel plugin you can enable the `debug` flag.
      * It will `console.log` name of the file and component with Unistyles dependencies.
      */

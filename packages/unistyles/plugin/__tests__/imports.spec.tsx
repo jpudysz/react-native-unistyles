@@ -37,7 +37,7 @@ pluginTester({
             output: `
                 import { View } from 'react-native-custom'
                 import { FlatList } from 'react-native-gesture-handler'
-                import { StyleSheet } from 'react-native-unistyles'
+                import { StyleSheet } from 'react-native'
 
                 export const Example = () => {
                     return <View style={styles.container} />
