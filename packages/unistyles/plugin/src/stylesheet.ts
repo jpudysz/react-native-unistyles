@@ -667,6 +667,8 @@ export function addDependencies(
 
     // add metadata about dependencies
     if (styleDependencies.length > 0) {
+        state.file.hasDynamicStyleSheet = true
+
         const uniqueDependencies = Array.from(new Set(styleDependencies))
 
         debugMessage(uniqueDependencies)

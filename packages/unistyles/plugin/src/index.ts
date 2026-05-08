@@ -59,14 +59,27 @@ export default function (): PluginObj<UnistylesPluginPass> {
                         .map(toPlatformPath)
                         .some((path) => state.filename?.includes(path))
 
+                    state.file.isExcluded = Array.isArray(state.opts.excludePaths)
+                        ? state.opts.excludePaths.map(toPlatformPath).some((p) => state.filename?.includes(p))
+                        : false
+
+                    if (state.file.isExcluded) {
+                        return
+                    }
+
                     state.file.hasAnyUnistyle = false
                     state.file.hasUnistylesImport = false
+                    state.file.hasDynamicStyleSheet = false
                     state.file.addUnistylesRequire = false
                     state.file.hasVariants = false
                     state.file.styleSheetLocalName = ''
                     state.file.reactNativeCommonJSName = ''
                     state.reactNativeImports = {}
-                    state.file.forceProcessing = state.filename?.includes(appRoot) ?? false
+                    // forceProcessing is no longer set eagerly from the path match.
+                    // It is activated in ImportDeclaration when a qualifying RN component
+                    // import is detected — so files that only contain a static StyleSheet.create
+                    // and no RN component imports produce zero output changes.
+                    state.file.forceProcessing = false
 
                     path.traverse({
                         BlockStatement(blockPath) {
@@ -79,12 +92,68 @@ export default function (): PluginObj<UnistylesPluginPass> {
                     })
                 },
                 exit(path, state) {
-                    if (isInsideNodeModules(state)) {
+                    if (state.file.isExcluded || isInsideNodeModules(state)) {
                         return
                     }
 
                     if (state.file.addUnistylesRequire) {
                         return addUnistylesRequire(path, state)
+                    }
+
+                    // If the file imported StyleSheet from react-native-unistyles but every
+                    // StyleSheet.create call was purely static (no uni__dependencies injected),
+                    // rewrite the import source to 'react-native' so the Unistyles registry is
+                    // never involved for this file.
+                    if (
+                        state.file.hasUnistylesImport &&
+                        state.file.styleSheetLocalName &&
+                        !state.file.hasDynamicStyleSheet &&
+                        !state.file.forceProcessing &&
+                        !state.file.replaceWithUnistyles
+                    ) {
+                        path.node.body.forEach((node) => {
+                            if (
+                                t.isImportDeclaration(node) &&
+                                node.source.value === 'react-native-unistyles' &&
+                                node.specifiers.some(
+                                    (s) =>
+                                        t.isImportSpecifier(s) &&
+                                        t.isIdentifier(s.imported) &&
+                                        s.imported.name === 'StyleSheet',
+                                )
+                            ) {
+                                // Collect any non-StyleSheet specifiers that should stay on unistyles
+                                const otherSpecifiers = node.specifiers.filter(
+                                    (s) =>
+                                        !(
+                                            t.isImportSpecifier(s) &&
+                                            t.isIdentifier(s.imported) &&
+                                            s.imported.name === 'StyleSheet'
+                                        ),
+                                )
+                                const styleSheetSpecifiers = node.specifiers.filter(
+                                    (s) =>
+                                        t.isImportSpecifier(s) &&
+                                        t.isIdentifier(s.imported) &&
+                                        s.imported.name === 'StyleSheet',
+                                )
+
+                                if (otherSpecifiers.length > 0) {
+                                    // Keep unistyles import for other named exports; add separate RN import
+                                    node.specifiers = otherSpecifiers
+                                    const rnImport = t.importDeclaration(
+                                        styleSheetSpecifiers,
+                                        t.stringLiteral('react-native'),
+                                    )
+                                    path.node.body.splice(path.node.body.indexOf(node) + 1, 0, rnImport)
+                                } else {
+                                    // Only StyleSheet was imported — rewrite the source in place
+                                    node.source = t.stringLiteral('react-native')
+                                }
+                            }
+                        })
+
+                        return
                     }
 
                     if (
@@ -98,7 +167,7 @@ export default function (): PluginObj<UnistylesPluginPass> {
                 },
             },
             FunctionDeclaration(path, state) {
-                if (isInsideNodeModules(state)) {
+                if (state.file.isExcluded || isInsideNodeModules(state)) {
                     return
                 }
 
@@ -109,7 +178,7 @@ export default function (): PluginObj<UnistylesPluginPass> {
                 }
             },
             ClassDeclaration(path, state) {
-                if (isInsideNodeModules(state)) {
+                if (state.file.isExcluded || isInsideNodeModules(state)) {
                     return
                 }
 
@@ -120,7 +189,7 @@ export default function (): PluginObj<UnistylesPluginPass> {
                 }
             },
             VariableDeclaration(path, state) {
-                if (isInsideNodeModules(state)) {
+                if (state.file.isExcluded || isInsideNodeModules(state)) {
                     return
                 }
 
@@ -136,6 +205,10 @@ export default function (): PluginObj<UnistylesPluginPass> {
                 })
             },
             ImportDeclaration(path, state) {
+                if (state.file.isExcluded) {
+                    return
+                }
+
                 const exoticImport = REPLACE_WITH_UNISTYLES_EXOTIC_PATHS.concat(state.opts.autoRemapImports ?? []).find(
                     (exotic) => state.filename?.includes(exotic.path),
                 )
@@ -172,6 +245,9 @@ export default function (): PluginObj<UnistylesPluginPass> {
                             REACT_NATIVE_COMPONENT_NAMES.includes(specifier.imported.name)
                         ) {
                             state.reactNativeImports[specifier.local.name] = specifier.imported.name
+                            // activate forceProcessing only when there are actual RN components
+                            // to rewrite — not just because the file is inside root
+                            state.file.forceProcessing = true
                         }
                     })
                 }
@@ -185,7 +261,7 @@ export default function (): PluginObj<UnistylesPluginPass> {
                 }
             },
             JSXElement(path, state) {
-                if (isInsideNodeModules(state)) {
+                if (state.file.isExcluded || isInsideNodeModules(state)) {
                     return
                 }
 
@@ -194,7 +270,7 @@ export default function (): PluginObj<UnistylesPluginPass> {
                 }
             },
             MemberExpression(path, state) {
-                if (isInsideNodeModules(state)) {
+                if (state.file.isExcluded || isInsideNodeModules(state)) {
                     return
                 }
 
@@ -225,7 +301,7 @@ export default function (): PluginObj<UnistylesPluginPass> {
                 path.node.object.name = state.reactNativeImports[path.node.property.name] as string
             },
             CallExpression(path, state) {
-                if (isInsideNodeModules(state)) {
+                if (state.file.isExcluded || isInsideNodeModules(state)) {
                     return
                 }
 
