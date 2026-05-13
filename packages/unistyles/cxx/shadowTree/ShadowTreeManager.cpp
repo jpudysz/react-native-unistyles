@@ -10,7 +10,19 @@ void shadow::ShadowTreeManager::updateShadowTree(jsi::Runtime& rt) {
     auto& registry = core::UnistylesRegistry::get();
 
     registry.trafficController.withLock([&](){
-        auto updates = registry.trafficController.getUpdates();
+        auto updates = registry.trafficController.takeUpdates();
+
+        if (updates.empty()) {
+            return;
+        }
+
+        for (auto it = updates.begin(); it != updates.end();) {
+            if (!registry.isActiveUnistylesFamily(it->first)) {
+                it = updates.erase(it);
+            } else {
+                ++it;
+            }
+        }
 
         if (updates.empty()) {
             return;

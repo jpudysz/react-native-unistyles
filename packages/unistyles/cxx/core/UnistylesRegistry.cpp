@@ -122,12 +122,17 @@ void core::UnistylesRegistry::suspendShadowNode(const ShadowNodeFamily* shadowNo
     this->trafficController.withLock([this, shadowNodeFamily](){
         if (this->_shadowRegistry.contains(shadowNodeFamily)) {
             this->_suspendedFamilies.insert(shadowNodeFamily);
+            this->trafficController.removeShadowNode(shadowNodeFamily);
         }
     });
 }
 
 bool core::UnistylesRegistry::isSuspended(const ShadowNodeFamily* family) const noexcept {
     return _suspendedFamilies.count(family) > 0;
+}
+
+bool core::UnistylesRegistry::isActiveUnistylesFamily(const ShadowNodeFamily* family) const noexcept {
+    return _shadowRegistry.count(family) > 0 && _suspendedFamilies.count(family) == 0;
 }
 
 std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(jsi::Runtime& rt, core::StyleSheetType type, jsi::Object&& rawValue) {
@@ -145,6 +150,10 @@ core::DependencyMap core::UnistylesRegistry::buildDependencyMap(std::vector<Unis
     std::unordered_set<UnistyleDependency> uniqueDependencies(deps.begin(), deps.end());
 
     for (const auto& [family, unistyles] : this->_shadowRegistry) {
+        if (this->_suspendedFamilies.count(family) > 0) {
+            continue;
+        }
+
         bool hasAnyOfDependencies = false;
 
         // Check if any dependency matches
