@@ -20,9 +20,13 @@ struct ShadowTrafficController {
         this->_canCommit = true;
     }
 
-    inline shadow::ShadowLeafUpdates& getUpdates() {
+    inline shadow::ShadowLeafUpdates takeUpdates() {
         // call it only within withLock!
-        return _unistylesUpdates;
+        auto updates = std::move(_unistylesUpdates);
+        _unistylesUpdates = {};
+        _canCommit = false;
+
+        return updates;
     }
 
     inline void setUpdates(shadow::ShadowLeafUpdates& newUpdates) {

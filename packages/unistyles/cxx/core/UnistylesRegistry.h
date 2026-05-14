@@ -44,6 +44,8 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     void unlinkShadowNodeWithUnistyles(const ShadowNodeFamily*);
     void suspendShadowNode(const ShadowNodeFamily*);
     bool isSuspended(const ShadowNodeFamily*) const noexcept;
+    // Caller must hold trafficController's lock when link/unlink/suspend may race.
+    bool isActiveUnistylesFamily(const ShadowNodeFamily*) const noexcept;
     std::shared_ptr<core::StyleSheet> addStyleSheet(jsi::Runtime& rt, core::StyleSheetType type, jsi::Object&& rawValue);
     DependencyMap buildDependencyMap(std::vector<UnistyleDependency>& deps);
     void shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Value& maybePressableId);
