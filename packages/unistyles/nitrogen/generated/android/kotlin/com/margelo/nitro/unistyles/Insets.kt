@@ -47,7 +47,7 @@ data class Insets(
   }
 
   override fun hashCode(): Int {
-    return arrayOf(
+    return arrayOf<Any?>(
       top,
       bottom,
       left,
