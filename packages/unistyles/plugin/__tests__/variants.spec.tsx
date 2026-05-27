@@ -216,5 +216,141 @@ pluginTester({
                 const styles = StyleSheet.create({})
             `,
         },
+        {
+            title: 'Should detect variants on string-literal keyed styles (#1188)',
+            code: `
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    styles.useVariants({
+                        size: 'small'
+                    })
+
+                    return (
+                        <View style={styles['headline-large']}>
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create((theme, rt) => ({
+                    'headline-large': {
+                        backgroundColor: theme.colors.background,
+                        variants: {
+                            size: {
+                                small: {
+                                    width: 100
+                                },
+                                large: {
+                                    width: 300
+                                }
+                            }
+                        }
+                    }
+                }))
+            `,
+            output: `
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import { View } from 'react-native-unistyles/components/native/View'
+
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    const _styles = styles
+                    {
+                        const styles = _styles.useVariants({
+                            size: 'small'
+                        })
+
+                        return (
+                            <View style={styles['headline-large']}>
+                                <Text>Hello world</Text>
+                            </View>
+                        )
+                    }
+                }
+
+                const styles = StyleSheet.create((theme, rt) => ({
+                    'headline-large': {
+                        backgroundColor: theme.colors.background,
+                        variants: {
+                            size: {
+                                small: {
+                                    width: 100
+                                },
+                                large: {
+                                    width: 300
+                                }
+                            }
+                        },
+                        uni__dependencies: [0, 4]
+                    }
+                }))
+            `,
+        },
+        {
+            title: 'Should detect variants on string-literal keyed styles in object form (#1188)',
+            code: `
+                import { View, Text } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    styles.useVariants({
+                        size: 'small'
+                    })
+
+                    return (
+                        <View style={styles['headline-large']}>
+                            <Text>Hello world</Text>
+                        </View>
+                    )
+                }
+
+                const styles = StyleSheet.create({
+                    'headline-large': {
+                        variants: {
+                            size: {
+                                small: { width: 100 },
+                                large: { width: 300 }
+                            }
+                        }
+                    }
+                })
+            `,
+            output: `
+                import { Text } from 'react-native-unistyles/components/native/Text'
+                import { View } from 'react-native-unistyles/components/native/View'
+
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    const _styles = styles
+                    {
+                        const styles = _styles.useVariants({
+                            size: 'small'
+                        })
+
+                        return (
+                            <View style={styles['headline-large']}>
+                                <Text>Hello world</Text>
+                            </View>
+                        )
+                    }
+                }
+
+                const styles = StyleSheet.create({
+                    'headline-large': {
+                        variants: {
+                            size: {
+                                small: { width: 100 },
+                                large: { width: 300 }
+                            }
+                        },
+                        uni__dependencies: [4]
+                    }
+                })
+            `,
+        },
     ],
 })
