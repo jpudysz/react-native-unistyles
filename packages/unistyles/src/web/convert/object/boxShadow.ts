@@ -7,7 +7,7 @@ import { normalizeNumericValue } from '../utils'
 const createBoxShadowValue = (style: BoxShadowValue) => {
     const { offsetX, offsetY, blurRadius = 0, spreadDistance = 0, color = '#000', inset } = style
 
-    return `${inset ? 'inset ' : ''}${normalizeNumericValue(offsetX)} ${normalizeNumericValue(offsetY)} ${normalizeNumericValue(blurRadius as number)} ${normalizeNumericValue(spreadDistance as number)} ${color}`
+    return `${inset ? 'inset ' : ''}${normalizeNumericValue(offsetX)} ${normalizeNumericValue(offsetY)} ${normalizeNumericValue(blurRadius as number)} ${normalizeNumericValue(spreadDistance as number)} ${String(color)}`
 }
 
 export const getBoxShadow = (boxShadow: Array<BoxShadowValue>) => {

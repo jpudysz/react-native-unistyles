@@ -32,7 +32,7 @@
           },
           "ios": {
             "newArchEnabled": true,
-            "deploymentTarget": "15.3"
+            "deploymentTarget": "16.4"
           }
         }
       ],
