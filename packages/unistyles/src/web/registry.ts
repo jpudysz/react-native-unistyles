@@ -126,7 +126,9 @@ export class UnistylesRegistry {
     }
 
     reset = () => {
+        this.disposeListenersMap.forEach((dispose) => dispose())
         this.css.reset()
+        this.stylesheets.clear()
         this.stylesCache.clear()
         this.dependenciesMap.clear()
         this.disposeListenersMap.clear()
