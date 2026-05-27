@@ -32,6 +32,22 @@ const UnistyleDependency = {
     Rtl: 15,
 }
 
+export function getStyleKeyName(key: t.Node | null | undefined): string | null {
+    if (!key) {
+        return null
+    }
+
+    if (t.isIdentifier(key)) {
+        return key.name
+    }
+
+    if (t.isStringLiteral(key) || t.isNumericLiteral(key) || t.isBooleanLiteral(key)) {
+        return String(key.value)
+    }
+
+    return null
+}
+
 function getProperty(property: t.ObjectProperty | t.RestElement): Props | undefined {
     if (!property) {
         return undefined
@@ -269,26 +285,29 @@ export function getStylesDependenciesFromObject(path: NodePath<t.CallExpression>
 
     if (t.isObjectExpression(stylesheet)) {
         stylesheet?.properties.forEach((property) => {
-            if (!t.isObjectProperty(property) || !t.isIdentifier(property.key)) {
+            if (!t.isObjectProperty(property)) {
                 return
             }
 
-            if (t.isObjectProperty(property)) {
-                if (t.isObjectExpression(property.value)) {
-                    property.value.properties.forEach((innerProp) => {
-                        if (
-                            t.isObjectProperty(innerProp) &&
-                            t.isIdentifier(innerProp.key) &&
-                            t.isIdentifier(property.key) &&
-                            innerProp.key.name === 'variants'
-                        ) {
-                            detectedStylesWithVariants.add({
-                                label: 'variants',
-                                key: property.key.name,
-                            })
-                        }
-                    })
-                }
+            const styleKey = getStyleKeyName(property.key)
+
+            if (!styleKey) {
+                return
+            }
+
+            if (t.isObjectExpression(property.value)) {
+                property.value.properties.forEach((innerProp) => {
+                    if (
+                        t.isObjectProperty(innerProp) &&
+                        t.isIdentifier(innerProp.key) &&
+                        innerProp.key.name === 'variants'
+                    ) {
+                        detectedStylesWithVariants.add({
+                            label: 'variants',
+                            key: styleKey,
+                        })
+                    }
+                })
             }
 
             if (t.isArrowFunctionExpression(property.value)) {
@@ -297,12 +316,11 @@ export function getStylesDependenciesFromObject(path: NodePath<t.CallExpression>
                         if (
                             t.isObjectProperty(innerProp) &&
                             t.isIdentifier(innerProp.key) &&
-                            t.isIdentifier(property.key) &&
                             innerProp.key.name === 'variants'
                         ) {
                             detectedStylesWithVariants.add({
                                 label: 'variants',
-                                key: property.key.name,
+                                key: styleKey,
                             })
                         }
                     })
@@ -422,11 +440,12 @@ export function getStylesDependenciesFromFunction(funcPath: NodePath<t.Node> | A
             return
         }
 
-        if (!stylePath.isIdentifier()) {
+        const styleKey = getStyleKeyName(stylePath.node)
+
+        if (!styleKey) {
             return
         }
 
-        const styleKey = stylePath.node.name
         const valuePath = propPath.get('value')
 
         if (Array.isArray(valuePath)) {

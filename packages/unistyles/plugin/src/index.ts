@@ -17,6 +17,7 @@ import { toPlatformPath } from './paths'
 import { hasStringRef } from './ref'
 import {
     addDependencies,
+    getStyleKeyName,
     getStylesDependenciesFromFunction,
     getStylesDependenciesFromObject,
     isKindOfStyleSheet,
@@ -254,17 +255,14 @@ export default function (): PluginObj<UnistylesPluginPass> {
                     if (detectedDependencies) {
                         if (t.isObjectExpression(arg)) {
                             arg.properties.forEach((property) => {
-                                if (
-                                    t.isObjectProperty(property) &&
-                                    t.isIdentifier(property.key) &&
-                                    Object.prototype.hasOwnProperty.call(detectedDependencies, property.key.name)
-                                ) {
-                                    addDependencies(
-                                        state,
-                                        property.key.name,
-                                        property,
-                                        detectedDependencies[property.key.name] ?? [],
-                                    )
+                                if (!t.isObjectProperty(property)) {
+                                    return
+                                }
+
+                                const styleKey = getStyleKeyName(property.key)
+
+                                if (styleKey && Object.prototype.hasOwnProperty.call(detectedDependencies, styleKey)) {
+                                    addDependencies(state, styleKey, property, detectedDependencies[styleKey] ?? [])
                                 }
                             })
                         }
@@ -286,17 +284,14 @@ export default function (): PluginObj<UnistylesPluginPass> {
                         // Ensure the function body returns an object
                         if (t.isObjectExpression(body)) {
                             body.properties.forEach((property) => {
-                                if (
-                                    t.isObjectProperty(property) &&
-                                    t.isIdentifier(property.key) &&
-                                    Object.prototype.hasOwnProperty.call(detectedDependencies, property.key.name)
-                                ) {
-                                    addDependencies(
-                                        state,
-                                        property.key.name,
-                                        property,
-                                        detectedDependencies[property.key.name] ?? [],
-                                    )
+                                if (!t.isObjectProperty(property)) {
+                                    return
+                                }
+
+                                const styleKey = getStyleKeyName(property.key)
+
+                                if (styleKey && Object.prototype.hasOwnProperty.call(detectedDependencies, styleKey)) {
+                                    addDependencies(state, styleKey, property, detectedDependencies[styleKey] ?? [])
                                 }
                             })
                         }
