@@ -48,6 +48,12 @@ export class UnistylesListener {
         }
     }
 
+    reset = () => {
+        this.listeners.forEach((listeners) => listeners.clear())
+        this.stylesheetListeners.forEach((listeners) => listeners.clear())
+        this.changeListeners.clear()
+    }
+
     initListeners = () => {
         if (this.isInitialized) {
             return

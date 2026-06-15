@@ -219,6 +219,18 @@ var UnistyleDependency = {
   Ime: 14,
   Rtl: 15
 };
+function getStyleKeyName(key) {
+  if (!key) {
+    return null;
+  }
+  if (t4.isIdentifier(key)) {
+    return key.name;
+  }
+  if (t4.isStringLiteral(key) || t4.isNumericLiteral(key) || t4.isBooleanLiteral(key)) {
+    return String(key.value);
+  }
+  return null;
+}
 function getProperty(property) {
   if (!property) {
     return void 0;
@@ -389,28 +401,30 @@ function getStylesDependenciesFromObject(path2) {
   const stylesheet = path2.node.arguments[0];
   if (t4.isObjectExpression(stylesheet)) {
     stylesheet?.properties.forEach((property) => {
-      if (!t4.isObjectProperty(property) || !t4.isIdentifier(property.key)) {
+      if (!t4.isObjectProperty(property)) {
         return;
       }
-      if (t4.isObjectProperty(property)) {
-        if (t4.isObjectExpression(property.value)) {
-          property.value.properties.forEach((innerProp) => {
-            if (t4.isObjectProperty(innerProp) && t4.isIdentifier(innerProp.key) && t4.isIdentifier(property.key) && innerProp.key.name === "variants") {
-              detectedStylesWithVariants.add({
-                label: "variants",
-                key: property.key.name
-              });
-            }
-          });
-        }
+      const styleKey = getStyleKeyName(property.key);
+      if (!styleKey) {
+        return;
+      }
+      if (t4.isObjectExpression(property.value)) {
+        property.value.properties.forEach((innerProp) => {
+          if (t4.isObjectProperty(innerProp) && t4.isIdentifier(innerProp.key) && innerProp.key.name === "variants") {
+            detectedStylesWithVariants.add({
+              label: "variants",
+              key: styleKey
+            });
+          }
+        });
       }
       if (t4.isArrowFunctionExpression(property.value)) {
         if (t4.isObjectExpression(property.value.body)) {
           property.value.body.properties.forEach((innerProp) => {
-            if (t4.isObjectProperty(innerProp) && t4.isIdentifier(innerProp.key) && t4.isIdentifier(property.key) && innerProp.key.name === "variants") {
+            if (t4.isObjectProperty(innerProp) && t4.isIdentifier(innerProp.key) && innerProp.key.name === "variants") {
               detectedStylesWithVariants.add({
                 label: "variants",
-                key: property.key.name
+                key: styleKey
               });
             }
           });
@@ -493,10 +507,10 @@ function getStylesDependenciesFromFunction(funcPath) {
     if (Array.isArray(stylePath)) {
       return;
     }
-    if (!stylePath.isIdentifier()) {
+    const styleKey = getStyleKeyName(stylePath.node);
+    if (!styleKey) {
       return;
     }
-    const styleKey = stylePath.node.name;
     const valuePath = propPath.get("value");
     if (Array.isArray(valuePath)) {
       return;
@@ -901,13 +915,12 @@ function index_default() {
           if (detectedDependencies) {
             if (t6.isObjectExpression(arg)) {
               arg.properties.forEach((property) => {
-                if (t6.isObjectProperty(property) && t6.isIdentifier(property.key) && Object.prototype.hasOwnProperty.call(detectedDependencies, property.key.name)) {
-                  addDependencies(
-                    state,
-                    property.key.name,
-                    property,
-                    detectedDependencies[property.key.name] ?? []
-                  );
+                if (!t6.isObjectProperty(property)) {
+                  return;
+                }
+                const styleKey = getStyleKeyName(property.key);
+                if (styleKey && Object.prototype.hasOwnProperty.call(detectedDependencies, styleKey)) {
+                  addDependencies(state, styleKey, property, detectedDependencies[styleKey] ?? []);
                 }
               });
             }
@@ -920,13 +933,12 @@ function index_default() {
             const body = t6.isBlockStatement(arg.body) ? arg.body.body.find((statement) => t6.isReturnStatement(statement))?.argument : arg.body;
             if (t6.isObjectExpression(body)) {
               body.properties.forEach((property) => {
-                if (t6.isObjectProperty(property) && t6.isIdentifier(property.key) && Object.prototype.hasOwnProperty.call(detectedDependencies, property.key.name)) {
-                  addDependencies(
-                    state,
-                    property.key.name,
-                    property,
-                    detectedDependencies[property.key.name] ?? []
-                  );
+                if (!t6.isObjectProperty(property)) {
+                  return;
+                }
+                const styleKey = getStyleKeyName(property.key);
+                if (styleKey && Object.prototype.hasOwnProperty.call(detectedDependencies, styleKey)) {
+                  addDependencies(state, styleKey, property, detectedDependencies[styleKey] ?? []);
                 }
               });
             }

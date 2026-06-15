@@ -7,4 +7,6 @@ export const resetServerUnistyles = () => {
     }
 
     unistyles.services.registry.reset()
+    unistyles.services.shadowRegistry.reset()
+    unistyles.services.listener.reset()
 }

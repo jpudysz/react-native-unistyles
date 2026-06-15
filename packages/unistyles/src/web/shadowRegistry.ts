@@ -121,5 +121,10 @@ export class UnistylesShadowRegistry {
         })
     }
 
+    reset = () => {
+        this.disposeMap.forEach((dispose) => dispose())
+        this.disposeMap.clear()
+    }
+
     flush = () => {}
 }
