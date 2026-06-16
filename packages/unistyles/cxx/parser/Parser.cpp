@@ -695,6 +695,13 @@ jsi::Array parser::Parser::parseBoxShadowString(jsi::Runtime& rt, std::string&& 
     return state.parseBoxShadowString(rt, std::move(boxShadowString));
 }
 
+jsi::Array parser::Parser::parseBackgroundImageString(jsi::Runtime& rt, std::string&& backgroundImageString) {
+    auto& registry = core::UnistylesRegistry::get();
+    auto& state = registry.getState();
+
+    return state.parseBackgroundImageString(rt, std::move(backgroundImageString));
+}
+
 // eg. [{ brightness: 0.5 }, { opacity: 0.25 }]
 jsi::Value parser::Parser::parseFilters(jsi::Runtime &rt, Unistyle::Shared unistyle, jsi::Object &obj) {
     std::vector<jsi::Value> parsedFilters{};
@@ -1072,6 +1079,16 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
             rt,
             unistyleData->parsedStyle.value(),
             [this, &rt, &state, &convertedStyles](const std::string& propertyName, jsi::Value& propertyValue) {
+                if (propertyName == "experimental_backgroundImage" && propertyValue.isString()) {
+                    convertedStyles.setProperty(
+                        rt,
+                        propertyName.c_str(),
+                        this->parseBackgroundImageString(rt, propertyValue.asString(rt).utf8(rt))
+                    );
+
+                    return;
+                }
+
                 if (this->isColor(propertyName)) {
                     if (propertyValue.isString()) {
                         convertedStyles.setProperty(

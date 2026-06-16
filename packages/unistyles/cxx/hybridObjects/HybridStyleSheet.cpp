@@ -247,13 +247,19 @@ void HybridStyleSheet::loadExternalMethods(const jsi::Value& thisValue, jsi::Run
 
     helpers::assertThat(rt, maybeParseBoxShadowStringFn.isObject(), "Unistyles: Can't load parseBoxShadowString function from JS.");
 
+    auto maybeProcessBackgroundImageFn = jsMethods.asObject(rt).getProperty(rt, "processBackgroundImage");
+
+    helpers::assertThat(rt, maybeProcessBackgroundImageFn.isObject(), "Unistyles: Can't load processBackgroundImage function from JS.");
+
     auto processColorFn = maybeProcessColorFn.asObject(rt).asFunction(rt);
     auto parseBoxShadowStringFn = maybeParseBoxShadowStringFn.asObject(rt).asFunction(rt);
+    auto processBackgroundImageFn = maybeProcessBackgroundImageFn.asObject(rt).asFunction(rt);
     auto& registry = core::UnistylesRegistry::get();
     auto& state = registry.getState();
 
     state.registerProcessColorFunction(std::move(processColorFn));
     state.registerParseBoxShadowString(std::move(parseBoxShadowStringFn));
+    state.registerParseBackgroundImageString(std::move(processBackgroundImageFn));
 }
 
 void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependency> dependencies) {

@@ -231,6 +231,7 @@ jest.mock('react-native-unistyles', () => {
             jsMethods: {
                 processColor: () => null,
                 parseBoxShadowString: () => [],
+                processBackgroundImage: () => [],
             },
             hairlineWidth: 1,
             addChangeListener: () => () => {},
