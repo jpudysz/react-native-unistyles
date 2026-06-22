@@ -2,6 +2,11 @@
 #include "UnistyleWrapper.h"
 #include <iomanip>
 #include <sstream>
+#if defined(RN_SERIALIZABLE_STATE) && __has_include(<react/renderer/components/view/BackgroundImagePropsConversions.h>)
+#include <react/renderer/components/view/BackgroundImagePropsConversions.h>
+#include <react/renderer/core/propsConversions.h>
+#define UNISTYLES_HAS_RN_BACKGROUND_IMAGE_PARSER 1
+#endif
 #include <react/renderer/css/CSSFilter.h>
 #include <react/renderer/css/CSSValueParser.h>
 
@@ -12,6 +17,11 @@ using namespace facebook::react;
 using Variants = std::vector<std::pair<std::string, std::string>>;
 
 namespace {
+
+bool isBackgroundImagePropName(const std::string& propertyName) {
+    return propertyName == "backgroundImage" ||
+        propertyName == "experimental_backgroundImage";
+}
 
 bool isSupportedLength(const CSSLength& length) {
     return length.unit == CSSLengthUnit::Px;
@@ -61,6 +71,20 @@ std::optional<jsi::Object> parseDropShadowString(jsi::Runtime& rt, const std::st
 
     return shadowObject;
 }
+
+#ifdef UNISTYLES_HAS_RN_BACKGROUND_IMAGE_PARSER
+std::optional<folly::dynamic> parseBackgroundImageString(const std::string& backgroundImageString) {
+    std::vector<BackgroundImage> backgroundImages;
+
+    parseUnprocessedBackgroundImageString(backgroundImageString, backgroundImages);
+
+    if (backgroundImages.empty()) {
+        return std::nullopt;
+    }
+
+    return toDynamic(backgroundImages);
+}
+#endif
 
 }
 
@@ -1072,6 +1096,30 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
             rt,
             unistyleData->parsedStyle.value(),
             [this, &rt, &state, &convertedStyles](const std::string& propertyName, jsi::Value& propertyValue) {
+                if (isBackgroundImagePropName(propertyName) && propertyValue.isString()) {
+#ifdef UNISTYLES_HAS_RN_BACKGROUND_IMAGE_PARSER
+                    auto maybeBackgroundImage = parseBackgroundImageString(propertyValue.asString(rt).utf8(rt));
+
+                    if (maybeBackgroundImage.has_value()) {
+                        convertedStyles.setProperty(
+                            rt,
+                            propertyName.c_str(),
+                            jsi::valueFromDynamic(rt, maybeBackgroundImage.value())
+                        );
+
+                        return;
+                    }
+#endif
+
+                    convertedStyles.setProperty(
+                        rt,
+                        propertyName.c_str(),
+                        propertyValue
+                    );
+
+                    return;
+                }
+
                 if (this->isColor(propertyName)) {
                     if (propertyValue.isString()) {
                         convertedStyles.setProperty(
