@@ -2,6 +2,10 @@
 #include "UnistyleWrapper.h"
 #include <iomanip>
 #include <sstream>
+#if defined(RN_SERIALIZABLE_STATE) && __has_include(<react/renderer/components/view/conversions.h>)
+#include <react/renderer/components/view/conversions.h>
+#define UNISTYLES_HAS_RN_TRANSFORM_ORIGIN_PARSER 1
+#endif
 #include <react/renderer/css/CSSFilter.h>
 #include <react/renderer/css/CSSValueParser.h>
 
@@ -61,6 +65,20 @@ std::optional<jsi::Object> parseDropShadowString(jsi::Runtime& rt, const std::st
 
     return shadowObject;
 }
+
+#ifdef UNISTYLES_HAS_RN_TRANSFORM_ORIGIN_PARSER
+std::optional<folly::dynamic> parseTransformOriginString(const std::string& transformOriginString) {
+    TransformOrigin transformOrigin;
+
+    parseUnprocessedTransformOriginString(transformOriginString, transformOrigin);
+
+    if (!transformOrigin.isSet()) {
+        return std::nullopt;
+    }
+
+    return static_cast<folly::dynamic>(transformOrigin);
+}
+#endif
 
 }
 
@@ -1072,6 +1090,30 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
             rt,
             unistyleData->parsedStyle.value(),
             [this, &rt, &state, &convertedStyles](const std::string& propertyName, jsi::Value& propertyValue) {
+                if (propertyName == "transformOrigin" && propertyValue.isString()) {
+#ifdef UNISTYLES_HAS_RN_TRANSFORM_ORIGIN_PARSER
+                    auto maybeTransformOrigin = parseTransformOriginString(propertyValue.asString(rt).utf8(rt));
+
+                    if (maybeTransformOrigin.has_value()) {
+                        convertedStyles.setProperty(
+                            rt,
+                            propertyName.c_str(),
+                            jsi::valueFromDynamic(rt, maybeTransformOrigin.value())
+                        );
+
+                        return;
+                    }
+#endif
+
+                    convertedStyles.setProperty(
+                        rt,
+                        propertyName.c_str(),
+                        propertyValue
+                    );
+
+                    return;
+                }
+
                 if (this->isColor(propertyName)) {
                     if (propertyValue.isString()) {
                         convertedStyles.setProperty(
