@@ -19,12 +19,13 @@ interface ShadowRegistry extends UnistylesShadowRegistrySpec {
 const HybridShadowRegistry = NitroModules.createHybridObject<ShadowRegistry>('UnistylesShadowRegistry')
 
 const SUSPENSE_TAG = 13
+const OFFSCREEN_TAG = 22
 
 const isInsideSuspendedBoundary = (fiber: any): boolean => {
     let current = fiber?.return
 
     while (current) {
-        if (current.tag === SUSPENSE_TAG && current.memoizedState !== null) {
+        if ((current.tag === SUSPENSE_TAG || current.tag === OFFSCREEN_TAG) && current.memoizedState !== null) {
             return true
         }
 
