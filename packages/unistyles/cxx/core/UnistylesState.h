@@ -33,9 +33,11 @@ struct UnistylesState {
     jsi::Object getJSThemeByName(jsi::Runtime& rt, std::string& themeName);
     int parseColor(jsi::Runtime& rt, jsi::Value& color);
     jsi::Array parseBoxShadowString(jsi::Runtime& rt, std::string&& boxShadowString);
+    jsi::Array parseBackgroundImageString(jsi::Runtime& rt, std::string&& backgroundImageString);
     void computeCurrentBreakpoint(int screenWidth);
     void registerProcessColorFunction(jsi::Function&& fn);
     void registerParseBoxShadowString(jsi::Function&& fn);
+    void registerParseBackgroundImageString(jsi::Function&& fn);
 
 private:
     std::unordered_map<std::string, jsi::Value> _jsThemes{};
@@ -47,6 +49,7 @@ private:
     std::optional<std::string> _currentThemeName = std::nullopt;
     std::shared_ptr<jsi::Function> _processColorFn;
     std::shared_ptr<jsi::Function> _parseBoxShadowStringFn;
+    std::shared_ptr<jsi::Function> _parseBackgroundImageStringFn;
     std::unordered_map<std::string, uint32_t> _colorCache{};
 
     friend class UnistylesRegistry;

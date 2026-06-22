@@ -8,6 +8,11 @@ import type { CreateUnistylesStyleSheet } from '../../types'
 import type { UnistylesStyleSheet as UnistylesStyleSheetSpec } from './UnistylesStyleSheet.nitro'
 
 import { parseBoxShadowString } from '../../core/parseBoxShadow'
+// React Native has no public export for its background-image parser, but it is the
+// same processor the core renderer applies, so reusing it produces the exact array
+// shape native expects (the raw CSS string crashes the Android RCTView prop setter).
+// @ts-ignore - deep import has no type declarations
+import processBackgroundImage from 'react-native/Libraries/StyleSheet/processBackgroundImage'
 
 type UnistylesThemeSettings =
     | {
@@ -47,6 +52,7 @@ export interface UnistylesStyleSheet extends UnistylesStyleSheetSpec {
     jsMethods: {
         processColor: typeof processColor
         parseBoxShadowString: typeof parseBoxShadowString
+        processBackgroundImage: typeof processBackgroundImage
     }
 }
 
@@ -59,6 +65,7 @@ HybridUnistylesStyleSheet.compose = NativeStyleSheet.compose
 HybridUnistylesStyleSheet.jsMethods = {
     processColor,
     parseBoxShadowString,
+    processBackgroundImage,
 }
 
 HybridUnistylesStyleSheet.init()

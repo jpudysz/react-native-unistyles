@@ -101,6 +101,10 @@ void core::UnistylesState::registerParseBoxShadowString(jsi::Function&& fn) {
     this->_parseBoxShadowStringFn = std::make_shared<jsi::Function>(std::move(fn));
 }
 
+void core::UnistylesState::registerParseBackgroundImageString(jsi::Function&& fn) {
+    this->_parseBackgroundImageStringFn = std::make_shared<jsi::Function>(std::move(fn));
+}
+
 int core::UnistylesState::parseColor(jsi::Runtime& rt, jsi::Value& maybeColor) {
     if (!maybeColor.isString()) {
         return 0;
@@ -123,6 +127,12 @@ int core::UnistylesState::parseColor(jsi::Runtime& rt, jsi::Value& maybeColor) {
 
 jsi::Array core::UnistylesState::parseBoxShadowString(jsi::Runtime& rt, std::string&& boxShadowString) {
     jsi::Value result = this->_parseBoxShadowStringFn.get()->call(rt, boxShadowString);
+
+    return result.asObject(rt).asArray(rt);
+}
+
+jsi::Array core::UnistylesState::parseBackgroundImageString(jsi::Runtime& rt, std::string&& backgroundImageString) {
+    jsi::Value result = this->_parseBackgroundImageStringFn.get()->call(rt, backgroundImageString);
 
     return result.asObject(rt).asArray(rt);
 }
