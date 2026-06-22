@@ -11,10 +11,11 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     std::vector<core::Unistyle::Shared> unistyleWrappers = core::unistyleFromValue(rt, args[1]);
     std::vector<std::vector<folly::dynamic>> arguments;
     auto& registry = core::UnistylesRegistry::get();
+    const bool wasSuspended = registry.isSuspended(&shadowNodeWrapper->getFamily());
 
     // this is special case for Animated, and prevents appending same unistyles to node
     // skip for suspended families - they need a full re-link with fresh UnistyleData
-    if (!registry.isSuspended(&shadowNodeWrapper->getFamily())) {
+    if (!wasSuspended) {
         registry.removeDuplicatedUnistyles(&shadowNodeWrapper->getFamily(), unistyleWrappers);
 
         if (unistyleWrappers.empty()) {
@@ -96,7 +97,7 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
 
     std::optional<folly::dynamic> initialScopedUpdate;
 
-    if (scopedTheme.has_value()) {
+    if (scopedTheme.has_value() || wasSuspended) {
         initialScopedUpdate = parser.parseStylesToShadowTreeStyles(rt, unistylesData);
     }
 
@@ -106,6 +107,10 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
         unistylesData,
         std::move(initialScopedUpdate)
     );
+
+    if (wasSuspended) {
+        shadow::ShadowTreeManager::updateShadowTree(rt);
+    }
 
     return jsi::Value::undefined();
 }
