@@ -77,4 +77,74 @@ describe('UnistylesRegistry counter', () => {
         expect(removed).toBe(false)
         expect(cssRemoveSpy).not.toHaveBeenCalled()
     })
+
+    it('tracks counters independently when one element carries multiple hashes', async () => {
+        const { registry, cssRemoveSpy } = createRegistry()
+        const a = document.createElement('div')
+
+        registry.connect(a, 'hash-4')
+        registry.connect(a, 'hash-5')
+
+        await registry.remove(a, 'hash-4')
+
+        expect(cssRemoveSpy).toHaveBeenCalledTimes(1)
+        expect(cssRemoveSpy).toHaveBeenCalledWith('hash-4')
+
+        await registry.remove(a, 'hash-5')
+
+        expect(cssRemoveSpy).toHaveBeenCalledTimes(2)
+        expect(cssRemoveSpy).toHaveBeenCalledWith('hash-5')
+    })
+
+    it('ignores stale FinalizationRegistry callbacks fired after reset()', async () => {
+        const original = (globalThis as { FinalizationRegistry?: unknown }).FinalizationRegistry
+        let finalize: ((heldValue: { hash: string; generation: number }) => void) | undefined
+
+        ;(globalThis as { FinalizationRegistry?: unknown }).FinalizationRegistry = class {
+            constructor(callback: (heldValue: { hash: string; generation: number }) => void) {
+                finalize = callback
+            }
+            register() {}
+            unregister() {}
+        }
+
+        try {
+            const { registry, cssRemoveSpy } = createRegistry()
+            const a = document.createElement('div')
+
+            registry.connect(a, 'hash-7')
+            registry.reset()
+            registry.connect(a, 'hash-7')
+
+            // Simulate GC firing the stale (pre-reset) callback
+            finalize?.({ hash: 'hash-7', generation: 0 })
+
+            await Promise.resolve()
+            await Promise.resolve()
+
+            expect(cssRemoveSpy).not.toHaveBeenCalled()
+        } finally {
+            ;(globalThis as { FinalizationRegistry?: unknown }).FinalizationRegistry = original
+        }
+    })
+
+    it('falls back to counter-only cleanup when FinalizationRegistry is unavailable', async () => {
+        const original = (globalThis as { FinalizationRegistry?: unknown }).FinalizationRegistry
+
+        delete (globalThis as { FinalizationRegistry?: unknown }).FinalizationRegistry
+
+        try {
+            const { registry, cssRemoveSpy } = createRegistry()
+            const a = document.createElement('div')
+
+            registry.connect(a, 'hash-6')
+
+            await registry.remove(a, 'hash-6')
+
+            expect(cssRemoveSpy).toHaveBeenCalledTimes(1)
+            expect(cssRemoveSpy).toHaveBeenCalledWith('hash-6')
+        } finally {
+            ;(globalThis as { FinalizationRegistry?: unknown }).FinalizationRegistry = original
+        }
+    })
 })
