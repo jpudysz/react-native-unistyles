@@ -22,7 +22,7 @@
     "react-native": "0.85.3",
     "react-native-edge-to-edge": "1.8.1",
     "react-native-gesture-handler": "2.31.1",
-    "react-native-nitro-modules": "0.35.9",
+    "react-native-nitro-modules": "0.36.1",
     "react-native-reanimated": "4.3.1",
     "react-native-safe-area-context": "5.7.0",
     "react-native-screens": "4.25.2",

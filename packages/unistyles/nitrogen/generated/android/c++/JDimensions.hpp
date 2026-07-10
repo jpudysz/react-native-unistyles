@@ -17,7 +17,7 @@ namespace margelo::nitro::unistyles {
   using namespace facebook;
 
   /**
-   * The C++ JNI bridge between the C++ struct "Dimensions" and the the Kotlin data class "Dimensions".
+   * The C++ JNI bridge between the C++ struct "Dimensions" and the Kotlin data class "Dimensions".
    */
   struct JDimensions final: public jni::JavaClass<JDimensions> {
   public:

@@ -23,7 +23,7 @@ namespace margelo::nitro::unistyles {
   using namespace facebook;
 
   /**
-   * The C++ JNI bridge between the C++ struct "UnistylesNativeMiniRuntime" and the the Kotlin data class "UnistylesNativeMiniRuntime".
+   * The C++ JNI bridge between the C++ struct "UnistylesNativeMiniRuntime" and the Kotlin data class "UnistylesNativeMiniRuntime".
    */
   struct JUnistylesNativeMiniRuntime final: public jni::JavaClass<JUnistylesNativeMiniRuntime> {
   public:

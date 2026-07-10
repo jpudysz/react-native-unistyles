@@ -17,7 +17,7 @@ namespace margelo::nitro::unistyles {
   using namespace facebook;
 
   /**
-   * The C++ JNI bridge between the C++ struct "Insets" and the the Kotlin data class "Insets".
+   * The C++ JNI bridge between the C++ struct "Insets" and the Kotlin data class "Insets".
    */
   struct JInsets final: public jni::JavaClass<JInsets> {
   public:
