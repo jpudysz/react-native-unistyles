@@ -31,6 +31,7 @@
       "default": "./lib/commonjs/index.js"
     },
     "./mocks": {
+      "types": "./lib/typescript/src/mocks.d.ts",
       "import": "./lib/module/mocks.js",
       "browser": "./lib/module/mocks.js",
       "react-native": "./src/mocks.ts",
