@@ -33,5 +33,3 @@ export const StyleSheet = {
 export const UnistylesRuntime = unistyles.services.runtime as unknown as typeof NativeUnistylesRuntime
 export const UnistylesShadowRegistry = unistyles.services
     .shadowRegistry as unknown as typeof NativeUnistylesShadowRegistry
-
-export * from './mock'

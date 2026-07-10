@@ -157,8 +157,10 @@ UnistylesRuntime.setImmersiveMode(true)
 
 ## StatusBar
 
+Accessed via `UnistylesRuntime.statusBar`.
+
 ```tsx
-import { StatusBar } from 'react-native-unistyles'
+UnistylesRuntime.statusBar
 ```
 
 | Property/Method | Type | Description |
@@ -168,14 +170,14 @@ import { StatusBar } from 'react-native-unistyles'
 | `setHidden(hidden, animation?)` | `(boolean, 'none' \| 'fade' \| 'slide') => void` | Show/hide status bar |
 | `setStyle(style, animated?)` | `('default' \| 'light' \| 'dark', boolean?) => void` | Set status bar style |
 
-Also accessible via `UnistylesRuntime.statusBar`.
-
 ---
 
 ## NavigationBar
 
+Accessed via `UnistylesRuntime.navigationBar`.
+
 ```tsx
-import { NavigationBar } from 'react-native-unistyles'
+UnistylesRuntime.navigationBar
 ```
 
 | Property/Method | Type | Description |
@@ -183,8 +185,6 @@ import { NavigationBar } from 'react-native-unistyles'
 | `width` | `number` | Navigation bar width |
 | `height` | `number` | Navigation bar height |
 | `setHidden(hidden)` | `(boolean) => void` | Show/hide navigation bar (Android) |
-
-Also accessible via `UnistylesRuntime.navigationBar`.
 
 ---
 
