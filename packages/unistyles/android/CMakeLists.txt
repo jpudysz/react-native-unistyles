@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.9.0)
 
 project(unistyles)
 
-file(GLOB_RECURSE CORE_SRC RELATIVE ${CMAKE_SOURCE_DIR} "../cxx/**/*.cpp")
+file(GLOB_RECURSE CORE_SRC CONFIGURE_DEPENDS RELATIVE ${CMAKE_SOURCE_DIR} "../cxx/*.cpp")
 file(GLOB_RECURSE PLATFORM_SRC RELATIVE ${CMAKE_SOURCE_DIR} "./src/main/cxx/*.cpp")
 
 if(ReactAndroid_VERSION_MINOR GREATER_EQUAL 80)
