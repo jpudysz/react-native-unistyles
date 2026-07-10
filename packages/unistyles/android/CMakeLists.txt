@@ -21,6 +21,7 @@ include_directories(
     ./src/main/cxx
     ../cxx
     ../cxx/common
+    ../cxx/converters
     ../cxx/core
     ../cxx/hybridObjects
     ../cxx/parser

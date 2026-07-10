@@ -1,6 +1,7 @@
 #include "Parser.h"
 #include "UnistyleWrapper.h"
-#include "converters/BackgroundImageConverter.h"
+#include "BackgroundImageConverter.h"
+#include "TransformOriginConverter.h"
 #include <iomanip>
 #include <sstream>
 #include <react/renderer/css/CSSFilter.h>
@@ -1081,6 +1082,28 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
                             rt,
                             propertyName.c_str(),
                             jsi::valueFromDynamic(rt, maybeBackgroundImage.value())
+                        );
+
+                        return;
+                    }
+
+                    convertedStyles.setProperty(
+                        rt,
+                        propertyName.c_str(),
+                        propertyValue
+                    );
+
+                    return;
+                }
+
+                if (converters::isTransformOriginPropName(propertyName) && propertyValue.isString()) {
+                    auto maybeTransformOrigin = converters::parseTransformOriginString(propertyValue.asString(rt).utf8(rt));
+
+                    if (maybeTransformOrigin.has_value()) {
+                        convertedStyles.setProperty(
+                            rt,
+                            propertyName.c_str(),
+                            jsi::valueFromDynamic(rt, maybeTransformOrigin.value())
                         );
 
                         return;
