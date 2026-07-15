@@ -76,7 +76,10 @@ export class UnistylesRuntime {
     }
 
     get orientation() {
-        if (isServer()) {
+        // `screen.orientation` is undefined in browsers without the Screen
+        // Orientation API (e.g. iOS Safari <= 16.3). Guard it so the runtime
+        // does not throw during initialization on those browsers.
+        if (isServer() || !screen.orientation) {
             return Orientation.Portrait
         }
 
