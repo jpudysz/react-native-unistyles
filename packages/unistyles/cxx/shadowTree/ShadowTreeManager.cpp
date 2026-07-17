@@ -16,7 +16,9 @@ void shadow::ShadowTreeManager::updateShadowTree(jsi::Runtime& rt) {
             return;
         }
 
-#if REACT_NATIVE_VERSION_MINOR >= 81
+// MAJOR > 0 covers future 1.x releases and React Native's in-tree dev
+// placeholder 1000.0.0, which prebuilt-core artifacts can report.
+#if REACT_NATIVE_VERSION_MAJOR > 0 || REACT_NATIVE_VERSION_MINOR >= 81
         std::unordered_map<Tag, folly::dynamic> tagToProps;
 
         for (const auto& [family, props] : updates) {

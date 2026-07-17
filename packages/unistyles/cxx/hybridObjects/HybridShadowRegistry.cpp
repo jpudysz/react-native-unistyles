@@ -170,7 +170,9 @@ jsi::Value HybridShadowRegistry::getScopedTheme(jsi::Runtime &rt, const jsi::Val
 }
 
 std::shared_ptr<const core::ShadowNode> HybridShadowRegistry::getShadowNodeFromRef(jsi::Runtime& rt, const jsi::Value& maybeRef) {
-#if REACT_NATIVE_VERSION_MINOR >= 81
+// MAJOR > 0 covers future 1.x releases and React Native's in-tree dev
+// placeholder 1000.0.0, which prebuilt-core artifacts can report.
+#if REACT_NATIVE_VERSION_MAJOR > 0 || REACT_NATIVE_VERSION_MINOR >= 81
     return Bridging<std::shared_ptr<const ShadowNode>>::fromJs(rt, maybeRef);
 #else
     return shadowNodeFromValue(rt, maybeRef);
