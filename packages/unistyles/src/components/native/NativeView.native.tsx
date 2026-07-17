@@ -1,7 +1,9 @@
 import type { ViewProps } from 'react-native'
 
 import { type ComponentType, createElement, forwardRef } from 'react'
-
+// registers the RCTView view config as a module side effect,
+// otherwise createElement('RCTView') throws when no <View> has mounted yet
+import 'react-native/Libraries/Components/View/ViewNativeComponent'
 import { createUnistylesElement } from '../../core'
 
 // credits to @hirbod
