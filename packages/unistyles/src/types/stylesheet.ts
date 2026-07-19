@@ -19,7 +19,7 @@ type UnistyleNestedStyles = {
     shadowOffset?: ToDeepUnistyles<ShadowOffset>
     textShadowOffset?: ToDeepUnistyles<ShadowOffset>
     transform?: Array<ToDeepUnistyles<TransformStyles>>
-    boxShadow?: Array<ToDeepUnistyles<BoxShadowValue>> | string
+    boxShadow?: ReadonlyArray<ToDeepUnistyles<BoxShadowValue>> | string
     filter?: Array<ToDeepUnistyles<FilterFunction>> | string
 }
 
