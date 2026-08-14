@@ -1,6 +1,34 @@
-import { pluginTester } from 'babel-plugin-tester'
+import type { PluginObj } from '@babel/core'
+
+import * as t from '@babel/types'
+import { pluginTester, runPluginUnderTestHere } from 'babel-plugin-tester'
 
 import plugin from '../src/index'
+
+// React Compiler resolves a Babel binding for every variable declaration it lowers, and
+// requires that the binding it finds is the one introduced by that very declaration
+// (BuildHIR::lowerAssignment -> HIRBuilder#resolveIdentifier). Declarations injected into
+// the AST without being registered in Babel's scope make it bail out with
+// "(BuildHIR::lowerAssignment) Could not find binding for declaration.".
+// This plugin mirrors that lookup so we can guard it without depending on React Compiler.
+const assertBindingsAreRegistered = (): PluginObj => ({
+    name: 'assert-bindings-are-registered',
+    visitor: {
+        VariableDeclarator(path) {
+            if (!t.isIdentifier(path.node.id)) {
+                return
+            }
+
+            const binding = path.scope.getBinding(path.node.id.name)
+
+            // Comparing identifiers matters: looking a name up alone can resolve to an outer
+            // declaration that shadows the missing one and let the check pass silently.
+            if (!binding || binding.identifier !== path.node.id) {
+                throw new Error(`Unistyles: no scope binding registered for declaration '${path.node.id.name}'`)
+            }
+        },
+    },
+})
 
 pluginTester({
     plugin,
@@ -345,6 +373,61 @@ pluginTester({
                             size: {
                                 small: { width: 100 },
                                 large: { width: 300 }
+                            }
+                        },
+                        uni__dependencies: [4]
+                    }
+                })
+            `,
+        },
+        {
+            title: 'Should register scope bindings for the shadowed stylesheet',
+            babelOptions: {
+                plugins: [runPluginUnderTestHere, assertBindingsAreRegistered],
+            },
+            code: `
+                import { View } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    styles.useVariants({
+                        size: 'small'
+                    })
+
+                    return <View style={styles.container} />
+                }
+
+                const styles = StyleSheet.create({
+                    container: {
+                        variants: {
+                            size: {
+                                small: { width: 100 }
+                            }
+                        }
+                    }
+                })
+            `,
+            output: `
+                import { View } from 'react-native-unistyles/components/native/View'
+
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = () => {
+                    const _styles = styles
+                    {
+                        const styles = _styles.useVariants({
+                            size: 'small'
+                        })
+
+                        return <View style={styles.container} />
+                    }
+                }
+
+                const styles = StyleSheet.create({
+                    container: {
+                        variants: {
+                            size: {
+                                small: { width: 100 }
                             }
                         },
                         uni__dependencies: [4]
