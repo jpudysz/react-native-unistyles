@@ -3,5 +3,5 @@
   "compilerOptions": {
     "noEmit": false
   },
-  "exclude": ["plugin", "repack-plugin", "lib"]
+  "exclude": ["plugin", "repack-plugin", "vite-plugin", "lib"]
 }

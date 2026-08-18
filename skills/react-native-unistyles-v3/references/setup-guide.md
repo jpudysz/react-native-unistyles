@@ -69,6 +69,22 @@ module.exports = {
 }
 ```
 
+## Vite Plugin Configuration
+
+Vite scans dependencies before the Unistyles Babel plugin rewrites React Native component imports. For Vite 6–8, add the Unistyles Vite plugin so those generated deep imports are prebundled in every environment:
+
+```ts
+// vite.config.ts
+import { unistyles } from 'react-native-unistyles/vite'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  plugins: [unistyles()],
+})
+```
+
+The Vite plugin does not replace the mandatory Babel plugin and has no effect on which modules are included in production bundles.
+
 ## StyleSheet.configure
 
 Call **once** before any component renders. Typically in your app entry point file.
