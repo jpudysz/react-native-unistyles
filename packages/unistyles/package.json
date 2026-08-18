@@ -3,17 +3,18 @@
   "version": "3.3.0",
   "description": "Level up your React Native StyleSheet",
   "scripts": {
-    "test": "NODE_ENV=babel-test jest ./plugin ./src/__tests__",
+    "test": "NODE_ENV=babel-test jest ./plugin ./vite-plugin ./src/__tests__",
     "test:coverage": "NODE_ENV=babel-test jest --passWithNoTests --coverage",
     "tsc": "node_modules/typescript/bin/tsc --noEmit",
-    "format": "oxfmt src plugin repack-plugin",
-    "lint": "oxlint src plugin repack-plugin",
-    "check": "oxfmt src plugin repack-plugin && oxlint --fix src plugin repack-plugin",
-    "check:ci": "oxfmt --check src plugin repack-plugin && oxlint src plugin repack-plugin",
-    "prepare": "bob build && bun run plugin:build && bun run repack:plugin:build",
+    "format": "oxfmt src plugin repack-plugin vite-plugin",
+    "lint": "oxlint src plugin repack-plugin vite-plugin",
+    "check": "oxfmt src plugin repack-plugin vite-plugin && oxlint --fix src plugin repack-plugin vite-plugin",
+    "check:ci": "oxfmt --check src plugin repack-plugin vite-plugin && oxlint src plugin repack-plugin vite-plugin",
+    "prepare": "bob build && bun run plugin:build && bun run repack:plugin:build && bun run vite:plugin:build",
     "precommit": "concurrently 'bun run tsc' 'bun run lint' 'bun run check' 'bun run test' 'bun run circular:check'",
     "plugin:build": "node plugin/esbuild.js",
     "repack:plugin:build": "node repack-plugin/esbuild.js",
+    "vite:plugin:build": "node vite-plugin/esbuild.js",
     "circular:check": "dpdm --no-warning --no-tree -T --exit-code circular:1 src/**/*.ts",
     "components:build": "node build-components.js"
   },
@@ -52,6 +53,11 @@
       "import": "./repack-plugin/index.js",
       "types": "./repack-plugin/index.d.ts",
       "default": "./repack-plugin/index.js"
+    },
+    "./vite": {
+      "import": "./vite-plugin/index.js",
+      "types": "./vite-plugin/index.d.ts",
+      "default": "./vite-plugin/index.js"
     },
     "./package.json": "./package.json",
     "./server": {
@@ -92,10 +98,14 @@
     "react-native.config.js",
     "Unistyles.podspec",
     "repack-plugin",
+    "vite-plugin",
     "unistyles_get_rn_version.rb",
     "!repack-plugin/__tests__",
     "!repack-plugin/src",
     "!repack-plugin/esbuild.js",
+    "!vite-plugin/__tests__",
+    "!vite-plugin/src",
+    "!vite-plugin/esbuild.js",
     "!plugin/__tests__",
     "!plugin/src",
     "!plugin/esbuild.js",
@@ -155,7 +165,8 @@
     "react-native-nitro-modules": "0.36.5",
     "react-native-reanimated": "4.3.1",
     "react-native-web": "0.21.2",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vite": "6.4.1"
   },
   "peerDependencies": {
     "@react-native/normalize-colors": "*",
@@ -163,13 +174,17 @@
     "react-native": ">=0.76.0",
     "react-native-edge-to-edge": "*",
     "react-native-nitro-modules": "*",
-    "react-native-reanimated": "*"
+    "react-native-reanimated": "*",
+    "vite": "^6.0.0 || ^7.0.0 || ^8.0.0"
   },
   "peerDependenciesMeta": {
     "react-native-reanimated": {
       "optional": true
     },
     "react-native-edge-to-edge": {
+      "optional": true
+    },
+    "vite": {
       "optional": true
     }
   },
