@@ -10,6 +10,7 @@
   "exclude": [
     "plugin",
     "repack-plugin",
+    "vite-plugin",
     "metro",
     "lib",
     "src/unifiber/test",
