@@ -98,31 +98,45 @@ describe('StyleSheet.create mock', () => {
 })
 
 describe('mock registry persistence', () => {
-    it('should keep configured themes visible to StyleSheet.create after jest.resetModules()', () => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const first = require('react-native-unistyles') as { StyleSheet: { configure: (config: any) => void } }
+    const REGISTRY_KEY = '__UNISTYLES_MOCK_REGISTRY__'
 
-        first.StyleSheet.configure({
-            themes: {
-                light: {
-                    colors: {
-                        bg: 'red',
+    it('should keep configured themes visible to StyleSheet.create after jest.resetModules()', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const globalWithRegistry = globalThis as any
+        const previousRegistry = globalWithRegistry[REGISTRY_KEY]
+
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const first = require('react-native-unistyles') as { StyleSheet: { configure: (config: any) => void } }
+
+            first.StyleSheet.configure({
+                themes: {
+                    light: {
+                        colors: {
+                            bg: 'red',
+                        },
                     },
                 },
-            },
-        })
+            })
 
-        jest.resetModules()
+            jest.resetModules()
 
-        const second = require('react-native-unistyles') as { StyleSheet: { create: CreateUnistylesStyleSheet } }
+            const second = require('react-native-unistyles') as { StyleSheet: { create: CreateUnistylesStyleSheet } }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any
-        const styles = second.StyleSheet.create((theme: any) => ({
-            box: {
-                backgroundColor: theme.colors.bg,
-            },
-        }))
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any
+            const styles = second.StyleSheet.create((theme: any) => ({
+                box: {
+                    backgroundColor: theme.colors.bg,
+                },
+            }))
 
-        expect(styles.box).toEqual({ backgroundColor: 'red' })
+            expect(styles.box).toEqual({ backgroundColor: 'red' })
+        } finally {
+            if (previousRegistry === undefined) {
+                delete globalWithRegistry[REGISTRY_KEY]
+            } else {
+                globalWithRegistry[REGISTRY_KEY] = previousRegistry
+            }
+        }
     })
 })
