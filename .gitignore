@@ -97,3 +97,5 @@ tsconfig.tsbuildinfo
 
 # Next.js
 .next/
+playwright-report/
+test-results/

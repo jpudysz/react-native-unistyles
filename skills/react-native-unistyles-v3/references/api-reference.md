@@ -467,7 +467,7 @@ import {
   getServerUnistyles,
   hydrateServerUnistyles,
   resetServerUnistyles
-} from 'react-native-unistyles'
+} from 'react-native-unistyles/server'
 ```
 
 | Function | Description |
@@ -477,7 +477,9 @@ import {
 | `hydrateServerUnistyles()` | Call on client to hydrate server-rendered styles |
 | `resetServerUnistyles()` | Reset server styles between requests |
 
-Settings: `{ includeRNWStyles?: boolean }`
+Settings: `{ includeRNWStyles?: boolean; layerRNWStyles?: boolean }`
+
+For a streaming Next.js App Router integration, pass `{ layerRNWStyles: true }`. This keeps the late React Native Web server snapshot below host-local RSC styles. The option defaults to `false` so Pages Router and other legacy SSR integrations retain their existing cascade. Because cascade layers reverse priority for `!important`, audit custom important overrides before enabling it.
 
 ---
 

@@ -2,10 +2,14 @@ import type { PressableProps as Props, View } from 'react-native'
 
 import React, { forwardRef } from 'react'
 import { Pressable as NativePressableReactNative } from 'react-native'
+import {
+    getServerUnistylesStyle,
+    isReactServerComponentRender,
+} from 'react-native-unistyles/internal/server-unistyles-style'
 
 import type { UnistylesValues } from '../../types'
 
-import { getClassName } from '../../core'
+import { getClassName } from '../../core/getClassname'
 import { UnistylesShadowRegistry } from '../../specs'
 import { isServer } from '../../web/utils'
 
@@ -27,6 +31,29 @@ export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, 
     const scopedTheme = UnistylesShadowRegistry.getScopedTheme()
     let storedRef: HTMLElement | null = null
     let classNames: ReturnType<typeof getClassName> | undefined = undefined
+
+    if (isReactServerComponentRender()) {
+        const styleResult =
+            typeof style === 'function'
+                ? style({
+                      focused: false,
+                      hovered: false,
+                      pressed: false,
+                  })
+                : style
+        const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
+
+        UnistylesShadowRegistry.setScopedTheme(scopedTheme)
+        classNames = getClassName(styleResult as UnistylesValues)
+        UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
+
+        return (
+            <>
+                {getServerUnistylesStyle([classNames])}
+                <NativePressableReactNative {...props} style={classNames as any} />
+            </>
+        )
+    }
 
     return (
         <NativePressableReactNative

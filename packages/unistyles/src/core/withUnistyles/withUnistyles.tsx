@@ -1,9 +1,16 @@
 import React, { type ComponentType, forwardRef, type ComponentProps, type ComponentRef } from 'react'
+import {
+    getServerUnistylesStyle,
+    isReactServerComponentRender,
+} from 'react-native-unistyles/internal/server-unistyles-style'
 
-import type { UnistylesValues } from '../../types'
+import type { UnistylesMiniRuntime } from '../../specs'
+import type { UnistylesTheme, UnistylesValues } from '../../types'
 import type { Mappings } from './types'
 
 import { deepMergeObjects } from '../../utils'
+import * as unistyles from '../../web/services'
+import { createUnistylesRef } from '../../web/utils/createUnistylesRef'
 import { getClassName } from '../getClassname'
 import { useProxifiedUnistyles } from '../useProxifiedUnistyles'
 import { maybeWarnAboutMultipleUnistyles } from '../warn'
@@ -26,15 +33,19 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         contentContainerStyle?: UnistylesValues
     }
 
-    return forwardRef<GenericComponentRef<TComponent>, PropsWithUnistyles>((props, ref) => {
+    const renderComponent = (
+        props: PropsWithUnistyles,
+        ref: React.ForwardedRef<GenericComponentRef<TComponent>>,
+        theme: UnistylesTheme,
+        runtime: UnistylesMiniRuntime,
+    ) => {
         const narrowedProps = props as PropsWithUnistyles & UnistyleStyles
         const styleClassNames = getClassName(narrowedProps.style, true)
         const contentContainerStyleClassNames = getClassName(narrowedProps.contentContainerStyle)
-        const { proxifiedRuntime, proxifiedTheme } = useProxifiedUnistyles()
 
-        const { key: mappingsKey, ...mappingsProps } = mappings ? mappings(proxifiedTheme, proxifiedRuntime) : {}
+        const { key: mappingsKey, ...mappingsProps } = mappings ? mappings(theme, runtime) : {}
         const { key: uniPropsKey, ...unistyleProps } = narrowedProps.uniProps
-            ? narrowedProps.uniProps(proxifiedTheme, proxifiedRuntime)
+            ? narrowedProps.uniProps(theme, runtime)
             : {}
 
         const emptyStyles = narrowedProps.style
@@ -69,11 +80,40 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
 
         const NativeComponent = Component as ComponentType
         const [classNames] = styleClassNames ?? []
-
-        return (
-            <div className={classNames?.hash} style={{ display: 'contents' }}>
+        const styleRef = createUnistylesRef(styleClassNames)
+        const serverStyle = getServerUnistylesStyle([styleClassNames, contentContainerStyleClassNames])
+        const element = (
+            <div className={classNames?.hash} ref={styleRef} style={{ display: 'contents' }}>
                 <NativeComponent key={uniPropsKey || mappingsKey} {...combinedProps} ref={ref} />
             </div>
         )
+
+        return serverStyle ? (
+            <>
+                {serverStyle}
+                {element}
+            </>
+        ) : (
+            element
+        )
+    }
+
+    const ClientComponent = forwardRef<GenericComponentRef<TComponent>, PropsWithUnistyles>((props, ref) => {
+        const { proxifiedRuntime, proxifiedTheme } = useProxifiedUnistyles()
+
+        return renderComponent(props as PropsWithUnistyles, ref, proxifiedTheme, proxifiedRuntime)
+    })
+
+    return forwardRef<GenericComponentRef<TComponent>, PropsWithUnistyles>((props, ref) => {
+        if (isReactServerComponentRender()) {
+            return renderComponent(
+                props as PropsWithUnistyles,
+                ref,
+                unistyles.services.runtime.theme,
+                unistyles.services.runtime.miniRuntime,
+            )
+        }
+
+        return React.createElement(ClientComponent as any, { ...props, ref } as any)
     })
 }

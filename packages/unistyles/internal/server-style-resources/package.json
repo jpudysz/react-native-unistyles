@@ -1,0 +1,7 @@
+{
+  "main": "../../lib/commonjs/web/css/serverStyleResources.noop.js",
+  "module": "../../lib/module/web/css/serverStyleResources.noop.js",
+  "browser": "../../lib/module/web/css/serverStyleResources.noop.js",
+  "react-native": "../../src/web/css/serverStyleResources.noop.ts",
+  "types": "../../lib/typescript/src/web/css/serverStyleResources.d.ts"
+}

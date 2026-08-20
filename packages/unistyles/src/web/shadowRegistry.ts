@@ -3,6 +3,7 @@ import type { UniGeneratedStyle, UnistylesServices } from './types'
 
 import { UnistyleDependency } from '../specs/NativePlatform/NativePlatform.nitro'
 import { deepMergeObjects } from '../utils'
+import { setStyleResourceId } from './styleResource'
 import { extractSecrets, extractUnistyleDependencies, isGeneratedUnistyle, isServer } from './utils'
 import { getVariants } from './variants'
 
@@ -59,10 +60,11 @@ export class UnistylesShadowRegistry {
                 const result = typeof style === 'function' ? style(...__uni__args) : style
                 const variantsResult = getVariants(result, variants)
                 const resultWithVariants = deepMergeObjects(result, variantsResult)
-                const dependencies = extractUnistyleDependencies(resultWithVariants)
 
-                if (typeof __uni__stylesheet === 'function') {
+                if (!isServer() && typeof __uni__stylesheet === 'function') {
                     // Add dependencies from dynamic styles to stylesheet
+                    const dependencies = extractUnistyleDependencies(resultWithVariants)
+
                     this.services.registry.addDependenciesToStylesheet(__uni__stylesheet, dependencies)
                 }
 
@@ -81,12 +83,12 @@ export class UnistylesShadowRegistry {
         const { hash, existingHash } = this.services.registry.add(parsedStyles, forChild)
         const injectedClassNames = parsedStyles?._web?._classNames ?? []
         const injectedClassName = Array.isArray(injectedClassNames) ? injectedClassNames.join(' ') : injectedClassNames
-        const dependencies = extractUnistyleDependencies(parsedStyles)
-        const filteredDependencies = this.services.state.CSSVars
-            ? dependencies.filter((dependency) => dependency !== UnistyleDependency.Theme)
-            : dependencies
+        if (!existingHash && !isServer()) {
+            const dependencies = extractUnistyleDependencies(parsedStyles)
+            const filteredDependencies = this.services.state.CSSVars
+                ? dependencies.filter((dependency) => dependency !== UnistyleDependency.Theme)
+                : dependencies
 
-        if (!existingHash) {
             this.disposeMap.set(
                 hash,
                 this.services.listener.addListeners(filteredDependencies, () => {
@@ -97,7 +99,7 @@ export class UnistylesShadowRegistry {
 
         const hashClassname = forChild ? hash.replace(' > *', '') : hash
 
-        return { injectedClassName, hash: hashClassname, parsedStyles }
+        return setStyleResourceId({ injectedClassName, hash: hashClassname, parsedStyles }, hash)
     }
 
     setScopedTheme = (theme?: UnistylesTheme) => {

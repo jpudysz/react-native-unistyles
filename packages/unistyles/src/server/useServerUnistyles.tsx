@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useRef } from 'react'
 
 import { isServer } from '../web/utils'

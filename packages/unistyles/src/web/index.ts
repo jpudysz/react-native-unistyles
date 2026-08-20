@@ -8,7 +8,7 @@ import { create } from './create'
 import * as unistyles from './services'
 
 export const StyleSheet = {
-    configure: unistyles.services.state.init,
+    configure: unistyles.configureServices,
     create: create,
     addChangeListener: unistyles.services.listener.addChangeListener,
     absoluteFill: {

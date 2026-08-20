@@ -4,7 +4,7 @@ import type { StyleSheet, StyleSheetWithSuperPowers } from '../types/stylesheet'
 import type { UnistylesServices } from './types'
 
 import { CSSState } from './css'
-import { error, extractUnistyleDependencies, generateHash } from './utils'
+import { error, extractUnistyleDependencies, generateHash, isServer } from './utils'
 
 export class UnistylesRegistry {
     private readonly stylesheets = new Map<StyleSheetWithSuperPowers<StyleSheet>, StyleSheet>()
@@ -46,9 +46,11 @@ export class UnistylesRegistry {
             this.services.state.CSSVars,
         )
         const createdStylesheet = stylesheet(currentTheme, this.services.runtime.miniRuntime)
-        const dependencies = Object.values(createdStylesheet).flatMap((value) => extractUnistyleDependencies(value))
+        if (!isServer()) {
+            const dependencies = Object.values(createdStylesheet).flatMap((value) => extractUnistyleDependencies(value))
 
-        this.addDependenciesToStylesheet(stylesheet, dependencies)
+            this.addDependenciesToStylesheet(stylesheet, dependencies)
+        }
         this.stylesheets.set(stylesheet, createdStylesheet)
 
         return createdStylesheet
@@ -58,6 +60,10 @@ export class UnistylesRegistry {
         stylesheet: (theme: UnistylesTheme, miniRuntime: UnistylesMiniRuntime) => StyleSheet,
         dependencies: Array<UnistyleDependency>,
     ) => {
+        if (isServer()) {
+            return
+        }
+
         this.disposeListenersMap.get(stylesheet)?.()
 
         const dependenciesMap = this.dependenciesMap.get(stylesheet) ?? new Set(dependencies)
@@ -92,6 +98,12 @@ export class UnistylesRegistry {
         if (stylesCounter.size === 0) {
             // Move this to the end of the event loop so the element is removed from the DOM
             return Promise.resolve().then(() => {
+                // A callback ref can disconnect and reconnect the same hash before this microtask runs.
+                // Keep the registration when a new element has already claimed it.
+                if (this.stylesCounter.get(hash)?.size) {
+                    return false
+                }
+
                 // Check if element is still in the DOM
                 if (document.querySelector(`.${hash}`)) {
                     return false
@@ -99,6 +111,7 @@ export class UnistylesRegistry {
 
                 this.css.remove(hash)
                 this.stylesCache.delete(hash)
+                this.stylesCounter.delete(hash)
 
                 return true
             })

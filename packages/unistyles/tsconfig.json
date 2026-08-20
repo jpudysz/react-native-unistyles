@@ -3,7 +3,9 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "react-native-unistyles": ["./src/index"]
+      "react-native-unistyles": ["./src/index"],
+      "react-native-unistyles/internal/server-style-resources": ["./src/web/css/serverStyleResources"],
+      "react-native-unistyles/internal/server-unistyles-style": ["./src/core/ServerUnistylesStyle"]
     }
   },
   "exclude": [

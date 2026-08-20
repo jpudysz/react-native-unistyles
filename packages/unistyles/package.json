@@ -10,7 +10,7 @@
     "lint": "oxlint src plugin repack-plugin",
     "check": "oxfmt src plugin repack-plugin && oxlint --fix src plugin repack-plugin",
     "check:ci": "oxfmt --check src plugin repack-plugin && oxlint src plugin repack-plugin",
-    "prepare": "bob build && bun run plugin:build && bun run repack:plugin:build",
+    "prepare": "bob build && node write-build-package-scope.js && bun run plugin:build && bun run repack:plugin:build",
     "precommit": "concurrently 'bun run tsc' 'bun run lint' 'bun run check' 'bun run test' 'bun run circular:check'",
     "plugin:build": "node plugin/esbuild.js",
     "repack:plugin:build": "node repack-plugin/esbuild.js",
@@ -42,6 +42,34 @@
       "browser": "./lib/module/components/native/*",
       "react-native": "./src/components/native/*",
       "default": "./lib/commonjs/components/native/*"
+    },
+    "./internal/server-unistyles-style": {
+      "types": "./lib/typescript/src/core/ServerUnistylesStyle.d.ts",
+      "react-native": "./src/core/ServerUnistylesStyle.noop.ts",
+      "react-server": {
+        "import": "./lib/module/core/ServerUnistylesStyle.js",
+        "default": "./lib/commonjs/core/ServerUnistylesStyle.js"
+      },
+      "browser": {
+        "import": "./lib/module/core/ServerUnistylesStyle.noop.js",
+        "default": "./lib/commonjs/core/ServerUnistylesStyle.noop.js"
+      },
+      "import": "./lib/module/core/ServerUnistylesStyle.noop.js",
+      "default": "./lib/commonjs/core/ServerUnistylesStyle.noop.js"
+    },
+    "./internal/server-style-resources": {
+      "types": "./lib/typescript/src/web/css/serverStyleResources.d.ts",
+      "react-native": "./src/web/css/serverStyleResources.noop.ts",
+      "react-server": {
+        "import": "./lib/module/web/css/serverStyleResources.js",
+        "default": "./lib/commonjs/web/css/serverStyleResources.js"
+      },
+      "browser": {
+        "import": "./lib/module/web/css/serverStyleResources.noop.js",
+        "default": "./lib/commonjs/web/css/serverStyleResources.noop.js"
+      },
+      "import": "./lib/module/web/css/serverStyleResources.noop.js",
+      "default": "./lib/commonjs/web/css/serverStyleResources.noop.js"
     },
     "./plugin": {
       "import": "./plugin/index.js",
@@ -86,6 +114,7 @@
     "plugin",
     "web",
     "components",
+    "internal",
     "server",
     "web-only",
     "reanimated",
@@ -137,6 +166,7 @@
     "@rspack/core": "1.7.6",
     "@types/jest": "30.0.0",
     "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
     "babel-plugin-tester": "12.0.0",
     "commitlint": "20.4.2",
     "concurrently": "9.2.1",
@@ -150,10 +180,12 @@
     "oxfmt": "0.35.0",
     "oxlint": "1.50.0",
     "react": "19.2.3",
+    "react-dom": "19.2.3",
     "react-native": "0.85.3",
     "react-native-builder-bob": "0.40.18",
     "react-native-nitro-modules": "0.36.5",
     "react-native-reanimated": "4.3.1",
+    "react-server-dom-webpack": "19.2.3",
     "react-native-web": "0.21.2",
     "typescript": "5.9.3"
   },
@@ -178,6 +210,10 @@
   },
   "jest": {
     "preset": "react-native",
+    "moduleNameMapper": {
+      "^react-native-unistyles/internal/server-style-resources$": "<rootDir>/src/web/css/serverStyleResources.ts",
+      "^react-native-unistyles/internal/server-unistyles-style$": "<rootDir>/src/core/ServerUnistylesStyle.tsx"
+    },
     "modulePathIgnorePatterns": [
       "<rootDir>/lib/",
       "<rootDir>/cxx/tests"

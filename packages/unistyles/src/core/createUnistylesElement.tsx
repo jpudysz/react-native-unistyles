@@ -1,6 +1,7 @@
 import type { ViewStyle } from 'react-native'
 
 import React from 'react'
+import { getServerUnistylesStyle } from 'react-native-unistyles/internal/server-unistyles-style'
 
 import type { UnistylesValues } from '../types'
 
@@ -39,7 +40,19 @@ const buildUnistylesProps = (Component: any, props: ComponentProps, forwardedRef
 
 export const createUnistylesElement = (Component: any) => {
     const UnistylesComponent = (props: any) => {
-        return <Component {...props} {...buildUnistylesProps(Component, props, props.ref)} />
+        const unistylesProps = buildUnistylesProps(Component, props, props.ref)
+        const serverStyle = getServerUnistylesStyle(Object.values(unistylesProps))
+
+        if (serverStyle) {
+            return (
+                <>
+                    {serverStyle}
+                    <Component {...props} {...unistylesProps} />
+                </>
+            )
+        }
+
+        return <Component {...props} {...unistylesProps} />
     }
 
     return copyComponentProperties(Component, UnistylesComponent)

@@ -614,25 +614,40 @@ Never spread:
 ### App Router
 
 ```tsx
+// app/Style.tsx
+'use client'
+
+import { PropsWithChildren, useRef } from 'react'
+import { useServerInsertedHTML } from 'next/navigation'
+import { useServerUnistyles } from 'react-native-unistyles/server'
+
+export function Style({ children }: PropsWithChildren) {
+  const inserted = useRef(false)
+  const styles = useServerUnistyles({ layerRNWStyles: true })
+
+  useServerInsertedHTML(() => {
+    if (inserted.current) {
+      return null
+    }
+
+    inserted.current = true
+    return styles
+  })
+
+  return children
+}
+
 // app/layout.tsx
-import { useServerUnistyles } from 'react-native-unistyles'
+import { Style } from './Style'
 
 export default function RootLayout({ children }) {
-  const styles = useServerUnistyles()
 
   return (
     <html>
-      <head>{styles}</head>
-      <body>{children}</body>
+      <body><Style>{children}</Style></body>
     </html>
   )
 }
-
-// app/page.tsx (client component)
-'use client'
-import { hydrateServerUnistyles } from 'react-native-unistyles'
-
-hydrateServerUnistyles()
 ```
 
 ### Pages Router

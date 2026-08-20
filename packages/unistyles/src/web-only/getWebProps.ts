@@ -2,7 +2,7 @@ import type { StyleProp } from 'react-native'
 
 import type { RNStyle, UnistylesValues } from '../types'
 
-import { getClassName } from '../core'
+import { getClassName } from '../core/getClassname'
 import { createUnistylesRef } from '../web/utils/createUnistylesRef'
 
 export const getWebProps = <T>(style: StyleProp<RNStyle>, forwardedRef?: React.ForwardedRef<T>) => {

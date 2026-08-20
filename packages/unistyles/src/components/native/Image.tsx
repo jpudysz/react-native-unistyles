@@ -1,9 +1,10 @@
 import React, { type ComponentProps, forwardRef } from 'react'
 import { type ImageStyle, Image as NativeImage, type StyleProp, type ViewStyle } from 'react-native'
+import { getServerUnistylesStyle } from 'react-native-unistyles/internal/server-unistyles-style'
 
 import type { UnistylesValues } from '../../types'
 
-import { getClassName } from '../../core'
+import { getClassName } from '../../core/getClassname'
 import { maybeWarnAboutMultipleUnistyles } from '../../core/warn'
 import { copyComponentProperties } from '../../utils'
 import { checkForProp } from '../../web/utils'
@@ -22,7 +23,7 @@ const UnistylesImage = forwardRef<unknown, Props>((props, forwardedRef) => {
 
     maybeWarnAboutMultipleUnistyles(props.style as ViewStyle, 'Image')
 
-    return (
+    const image = (
         <NativeImage
             {...props}
             style={
@@ -36,6 +37,18 @@ const UnistylesImage = forwardRef<unknown, Props>((props, forwardedRef) => {
             ref={ref}
         />
     )
+    const serverStyle = getServerUnistylesStyle([classNames])
+
+    if (serverStyle) {
+        return (
+            <>
+                {serverStyle}
+                {image}
+            </>
+        )
+    }
+
+    return image
 })
 
 export const Image = copyComponentProperties(NativeImage, UnistylesImage)

@@ -1,6 +1,7 @@
 import type { UnistylesValues } from '../types'
 
 import * as unistyles from '../web/services'
+import { getStyleResourceId, setStyleResourceId } from '../web/styleResource'
 import { checkForAnimated } from '../web/utils'
 
 export const getClassName = (unistyle: UnistylesValues | undefined | Array<UnistylesValues>, forChild?: boolean) => {
@@ -12,7 +13,17 @@ export const getClassName = (unistyle: UnistylesValues | undefined | Array<Unist
     const animatedStyles = flattenedStyles.filter(checkForAnimated)
     const regularStyles = flattenedStyles.filter((style) => !checkForAnimated(style))
 
-    const { hash, injectedClassName } = unistyles.services.shadowRegistry.addStyles(regularStyles, forChild)
+    const generatedStyle = unistyles.services.shadowRegistry.addStyles(regularStyles, forChild)
+    const { hash, injectedClassName } = generatedStyle
 
-    return hash ? ([{ $$css: true, hash, injectedClassName }, animatedStyles] as const) : undefined
+    if (!hash) {
+        return undefined
+    }
+
+    const metadata = setStyleResourceId(
+        { $$css: true, hash, injectedClassName },
+        getStyleResourceId(generatedStyle) ?? hash,
+    )
+
+    return [metadata, animatedStyles] as const
 }

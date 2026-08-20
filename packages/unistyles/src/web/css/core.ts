@@ -3,7 +3,7 @@ import type { CSSState } from './state'
 import { isPseudoClass } from '../convert/pseudo'
 import { getMediaQuery } from '../utils'
 
-export const convertToCSS = (hash: string, value: Record<string, any>, state: CSSState) => {
+export const convertToCSS = (hash: string, value: Record<string, any>, state: CSSState, sourceHash = hash) => {
     Object.entries(value).forEach(([styleKey, styleValue]) => {
         if (styleKey[0] === '_') {
             const isStylePseudoClass = isPseudoClass(styleKey)
@@ -18,6 +18,7 @@ export const convertToCSS = (hash: string, value: Record<string, any>, state: CS
                         state.set({
                             mediaQuery,
                             className: pseudoClassName,
+                            sourceHash,
                             propertyKey: breakpointStyleKey,
                             value: breakpointStyleValue,
                         })
@@ -28,6 +29,7 @@ export const convertToCSS = (hash: string, value: Record<string, any>, state: CS
 
                 state.set({
                     className: pseudoClassName,
+                    sourceHash,
                     propertyKey: pseudoStyleKey,
                     value: pseudoStyleValue,
                 })
@@ -52,6 +54,7 @@ export const convertToCSS = (hash: string, value: Record<string, any>, state: CS
                 state.set({
                     mediaQuery,
                     className: hash,
+                    sourceHash,
                     propertyKey: breakpointStyleKey,
                     value: breakpointStyleValue,
                 })
@@ -62,6 +65,7 @@ export const convertToCSS = (hash: string, value: Record<string, any>, state: CS
 
         state.set({
             className: hash,
+            sourceHash,
             propertyKey: styleKey,
             value: styleValue,
         })

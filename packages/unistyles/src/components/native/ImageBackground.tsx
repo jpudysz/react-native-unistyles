@@ -1,10 +1,11 @@
 import React from 'react'
 import { forwardRef } from 'react'
 import { type ImageStyle, ImageBackground as NativeImageBackground, type StyleProp, type ViewStyle } from 'react-native'
+import { getServerUnistylesStyle } from 'react-native-unistyles/internal/server-unistyles-style'
 
 import type { UnistylesValues } from '../../types'
 
-import { getClassName } from '../../core'
+import { getClassName } from '../../core/getClassname'
 import { maybeWarnAboutMultipleUnistyles } from '../../core/warn'
 import { copyComponentProperties } from '../../utils'
 import { keyInObject } from '../../web/utils'
@@ -26,7 +27,7 @@ const UnistylesImageBackground = forwardRef<unknown, Props>((props, forwardedRef
     maybeWarnAboutMultipleUnistyles(props.style as ViewStyle, 'ImageBackground')
     maybeWarnAboutMultipleUnistyles(props.imageStyle as ViewStyle, 'ImageBackground')
 
-    return (
+    const imageBackground = (
         <NativeImageBackground
             {...props}
             style={styleClassNames as StyleProp<ViewStyle>}
@@ -42,6 +43,18 @@ const UnistylesImageBackground = forwardRef<unknown, Props>((props, forwardedRef
             imageRef={imageRef}
         />
     )
+    const serverStyle = getServerUnistylesStyle([styleClassNames, imageClassNames])
+
+    if (serverStyle) {
+        return (
+            <>
+                {serverStyle}
+                {imageBackground}
+            </>
+        )
+    }
+
+    return imageBackground
 })
 
 export const ImageBackground = copyComponentProperties(NativeImageBackground, UnistylesImageBackground)

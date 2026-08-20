@@ -237,8 +237,11 @@ npx react-native run-android
 **Cause:** Server-rendered styles don't match client-side computed styles.
 **Solution:** Use the SSR utilities:
 ```tsx
-// Server: inject styles
-const styles = useServerUnistyles()  // or getServerUnistyles()
+// App Router: layer the late RNW snapshot below streamed RSC styles
+const styles = useServerUnistyles({ layerRNWStyles: true })
+
+// Pages Router: preserve the legacy cascade
+const styles = getServerUnistyles()
 
 // Client: hydrate
 hydrateServerUnistyles()

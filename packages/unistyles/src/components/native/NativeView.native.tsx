@@ -2,7 +2,7 @@ import type { ViewProps } from 'react-native'
 
 import { type ComponentType, createElement, forwardRef } from 'react'
 
-import { createUnistylesElement } from '../../core'
+import { createUnistylesElement } from '../../core/createUnistylesElement'
 
 // credits to @hirbod
 const LeanView = forwardRef((props, ref) => {

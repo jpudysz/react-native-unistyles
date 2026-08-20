@@ -1,0 +1,7 @@
+{
+  "main": "../../lib/commonjs/core/ServerUnistylesStyle.noop.js",
+  "module": "../../lib/module/core/ServerUnistylesStyle.noop.js",
+  "browser": "../../lib/module/core/ServerUnistylesStyle.noop.js",
+  "react-native": "../../src/core/ServerUnistylesStyle.noop.ts",
+  "types": "../../lib/typescript/src/core/ServerUnistylesStyle.d.ts"
+}

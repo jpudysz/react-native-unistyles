@@ -1,0 +1,25 @@
+{
+  "name": "next-ssr-e2e",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
+    "start": "next start",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "next": "16.2.12",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.85.3",
+    "react-native-unistyles": "workspace:*",
+    "react-native-web": "0.21.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.0",
+    "@types/node": "25.3.2",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "typescript": "5.9.3"
+  }
+}

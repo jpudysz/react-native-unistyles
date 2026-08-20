@@ -10,6 +10,10 @@
     "precommit": "bun run --cwd packages/unistyles precommit",
     "lint": "bun run --cwd packages/unistyles lint",
     "test": "bun run --cwd packages/unistyles test",
+    "test:ssr": "bun run --cwd packages/unistyles prepare && bun run test:ssr:exports && bun run test:ssr:concurrency && bun run test:ssr:resources && bun run --cwd apps/next-ssr-e2e test:e2e",
+    "test:ssr:concurrency": "node --conditions react-server apps/next-ssr-e2e/tests/server-services-concurrency.cjs",
+    "test:ssr:exports": "node apps/next-ssr-e2e/tests/conditional-exports.cjs",
+    "test:ssr:resources": "node --conditions react-server apps/next-ssr-e2e/tests/server-host-resources.cjs",
     "tsc": "bun run --cwd packages/unistyles tsc",
     "check": "bun run --cwd packages/unistyles check",
     "check:ci": "bun run --cwd packages/unistyles check:ci"

@@ -1,7 +1,7 @@
 import type { ViewStyle } from 'react-native'
 
 export const maybeWarnAboutMultipleUnistyles = (style: ViewStyle, displayName = 'Unknown') => {
-    if (__DEV__ && style && !Array.isArray(style)) {
+    if (typeof __DEV__ !== 'undefined' && __DEV__ && style && !Array.isArray(style)) {
         const unistylesKeys = Object.keys(style).filter((key) => key.startsWith('unistyles_'))
 
         if (unistylesKeys.length > 1) {

@@ -13,4 +13,10 @@ export type { UnistylesThemes, UnistylesBreakpoints } from './global'
 export { withUnistyles, useUnistyles, createUnistylesElement } from './core'
 export type { UnistylesVariants, UnistylesValues, IOSContentSizeCategory, AndroidContentSizeCategory } from './types'
 export { Display, Hide, ScopedTheme } from './components'
-export { useServerUnistyles, hydrateServerUnistyles, getServerUnistyles, resetServerUnistyles } from './server'
+export {
+    ServerUnistylesStyles,
+    useServerUnistyles,
+    hydrateServerUnistyles,
+    getServerUnistyles,
+    resetServerUnistyles,
+} from './server'

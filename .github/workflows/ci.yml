@@ -41,3 +41,28 @@ jobs:
 
       - name: Run tests
         run: bun run test
+
+  ssr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Chromium
+        run: bun run --cwd apps/next-ssr-e2e playwright install --with-deps chromium
+
+      - name: Test incremental SSR styles
+        run: bun run test:ssr

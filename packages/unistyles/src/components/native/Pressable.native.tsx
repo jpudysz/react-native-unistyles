@@ -3,7 +3,7 @@ import type { PressableProps as Props, View } from 'react-native'
 import React, { forwardRef, useLayoutEffect, useRef } from 'react'
 import { Pressable as NativePressableReactNative } from 'react-native'
 
-import { passForwardedRef } from '../../core'
+import { passForwardedRef } from '../../core/passForwardRef'
 import { UnistylesShadowRegistry } from '../../specs'
 
 type PressableProps = Props & {
