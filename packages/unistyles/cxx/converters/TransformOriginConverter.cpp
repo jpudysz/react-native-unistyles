@@ -1,6 +1,13 @@
 #include "TransformOriginConverter.h"
 
-#if defined(RN_SERIALIZABLE_STATE) &&                                          \
+#if __has_include(<cxxreact/ReactNativeVersion.h>)
+#include <cxxreact/ReactNativeVersion.h>
+#endif
+
+// facebook::react::parseUnprocessedTransformOriginString was introduced in
+// React Native 0.85, while conversions.h is available in every supported
+// version, so the include alone is not enough to detect the parser.
+#if defined(RN_SERIALIZABLE_STATE) && REACT_NATIVE_VERSION_MINOR >= 85 &&      \
     __has_include(<react/renderer/components/view/conversions.h>)
 #include <react/renderer/components/view/conversions.h>
 #define UNISTYLES_HAS_RN_TRANSFORM_ORIGIN_PARSER 1
