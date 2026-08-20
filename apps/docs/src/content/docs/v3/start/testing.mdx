@@ -51,6 +51,24 @@ Extend the configuration from the previous step by including the file where you 
 You must include configuration file **after** the mocks as they provide all necessary stubs for `StyleSheet.configure`.
 </Aside>
 
+If `StyleSheet.configure` is called from a design system package rather than your app, point `setupFiles` at that package's entry instead of a local file:
+
+```tsx title="package.json"
+{
+    "jest": {
+        "preset": "jest-expo",
+        "setupFiles": [
+            "react-native-unistyles/mocks",
+            "@your-ds/unistyles" // wherever StyleSheet.configure is actually called
+        ]
+    }
+}
+```
+
+<Aside type="caution">
+Never `moduleNameMapper` `react-native-unistyles` to a custom mock. The official mocks are registered with `jest.mock()` inside `react-native-unistyles/mocks`, and a mapper replaces the whole package, silently dropping the `react-native-nitro-modules` and `react-native-unistyles/reanimated` stubs along with it.
+</Aside>
+
 ### Babel Plugin
 
 The Babel plugin is automatically disabled in the `jest` test environment or when `NODE_ENV === 'test'`.
