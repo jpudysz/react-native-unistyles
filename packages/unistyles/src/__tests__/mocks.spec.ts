@@ -103,7 +103,15 @@ describe('mock registry persistence', () => {
     it('should keep configured themes visible to StyleSheet.create after jest.resetModules()', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const globalWithRegistry = globalThis as any
-        const previousRegistry = globalWithRegistry[REGISTRY_KEY]
+        const registryExisted = REGISTRY_KEY in globalWithRegistry
+        // StyleSheet.configure reassigns .themes/.breakpoints on the shared registry object,
+        // so a plain reference wouldn't survive the mutation below — snapshot the values instead.
+        const previousRegistry = registryExisted
+            ? {
+                  themes: { ...globalWithRegistry[REGISTRY_KEY].themes },
+                  breakpoints: { ...globalWithRegistry[REGISTRY_KEY].breakpoints },
+              }
+            : undefined
 
         try {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -132,7 +140,7 @@ describe('mock registry persistence', () => {
 
             expect(styles.box).toEqual({ backgroundColor: 'red' })
         } finally {
-            if (previousRegistry === undefined) {
+            if (!registryExisted) {
                 delete globalWithRegistry[REGISTRY_KEY]
             } else {
                 globalWithRegistry[REGISTRY_KEY] = previousRegistry
