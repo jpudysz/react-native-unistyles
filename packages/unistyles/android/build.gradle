@@ -38,6 +38,9 @@ if (isNewArchitectureEnabled()) {
 
 android {
     compileSdkVersion safeExtGet('compileSdkVersion', 35)
+    if (rootProject.ext.has('ndkVersion')) {
+        ndkVersion rootProject.ext.get('ndkVersion')
+    }
     namespace "com.unistyles"
 
     defaultConfig {
