@@ -10,7 +10,12 @@ import { createUnistylesRef } from '../web/utils/createUnistylesRef'
 import { getClassName } from './getClassname'
 import { maybeWarnAboutMultipleUnistyles } from './warn'
 
-const STYLE_PROPS = ['contentContainerStyle', 'columnWrapperStyle'] as const
+const STYLE_PROPS = [
+    'contentContainerStyle',
+    'columnWrapperStyle',
+    'ListHeaderComponentStyle',
+    'ListFooterComponentStyle',
+] as const
 
 type StyleProp = (typeof STYLE_PROPS)[number] | 'style'
 
