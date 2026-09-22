@@ -31,11 +31,16 @@ void UnistylesModule::registerNatives() {
 }
 
 jni::local_ref<BindingsInstallerHolder::javaobject> UnistylesModule::getBindingsInstaller(jni::alias_ref<UnistylesModule::javaobject> jobj) {
-    auto& runtimeExecutor = jobj->cthis()->_runtimeExecutor;
-    auto& nativePlatform = jobj->cthis()->_nativePlatform;
+    auto* self = jobj->cthis();
+    auto& runtimeExecutor = self->_runtimeExecutor;
+    auto& nativePlatform = self->_nativePlatform;
 
-    return BindingsInstallerHolder::newObjectCxxArgs([&runtimeExecutor, &nativePlatform](jsi::Runtime& rt) {
+    return BindingsInstallerHolder::newObjectCxxArgs([self, &runtimeExecutor, &nativePlatform](jsi::Runtime& rt) {
         // function is called on: first init and every live reload
+        // claim the state for this runtime; wipes a previous runtime's state if it hasn't been invalidated yet
+        self->_runtime = &rt;
+        core::UnistylesRegistry::get().takeOwnership(&rt);
+
         // check if this is live reload, if so let's replace UnistylesRuntime with new runtime
         auto hasUnistylesRuntime = HybridObjectRegistry::hasHybridObject("UnistylesRuntime");
 

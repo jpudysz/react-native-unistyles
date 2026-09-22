@@ -2,6 +2,7 @@
 
 #include "set"
 #include <atomic>
+#include <mutex>
 #include <jsi/jsi.h>
 #include <folly/dynamic.h>
 #include <react/renderer/uimanager/UIManager.h>
@@ -52,12 +53,22 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     void removeDuplicatedUnistyles(const ShadowNodeFamily* shadowNodeFamily, std::vector<core::Unistyle::Shared>& unistyles);
     void setScopedTheme(std::optional<std::string> themeName);
     core::Unistyle::Shared getUnistyleById(std::string unistyleID);
-    void destroy();
+    // Runtime ownership of the (process-global) state. On a reload the old runtime's
+    // invalidate is queued behind its busy JS thread and can land after the new runtime
+    // has already configured. Only the current owner may wipe; the newest install wins.
+    // Runtime pointers are compared for identity only, never dereferenced.
+    void takeOwnership(jsi::Runtime* rt);
+    void releaseOwnership(jsi::Runtime* rt);
 
 private:
     UnistylesRegistry() = default;
 
+    // only reachable through takeOwnership / releaseOwnership, so every wipe is ownership-checked
+    void destroy();
+
     static std::atomic<int> _nextStyleSheetTag;
+    std::mutex _ownershipMutex;
+    jsi::Runtime* _activeRuntime = nullptr;
     std::optional<std::string> _scopedTheme{};
     std::unique_ptr<UnistylesState> _state{};
     std::unordered_map<int, std::shared_ptr<core::StyleSheet>> _styleSheetRegistry{};

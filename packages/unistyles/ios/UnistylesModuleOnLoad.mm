@@ -6,7 +6,9 @@
 
 using namespace margelo::nitro;
 
-@implementation UnistylesModule
+@implementation UnistylesModule {
+    jsi::Runtime* _runtime;
+}
 
 RCT_EXPORT_MODULE(Unistyles)
 
@@ -16,6 +18,10 @@ RCT_EXPORT_MODULE(Unistyles)
 
 - (void)installJSIBindingsWithRuntime:(jsi::Runtime&)rt callInvoker:(const std::shared_ptr<facebook::react::CallInvoker> &)callInvoker {
     // function is called on: first init and every live reload
+    // claim the state for this runtime; wipes a previous runtime's state if it hasn't been invalidated yet
+    _runtime = &rt;
+    core::UnistylesRegistry::get().takeOwnership(&rt);
+
     // check if this is live reload, if so let's replace UnistylesRuntime with new runtime
     auto hasUnistylesRuntime = HybridObjectRegistry::hasHybridObject("UnistylesRuntime");
 
@@ -53,7 +59,8 @@ RCT_EXPORT_MODULE(Unistyles)
 }
 
 - (void)invalidate {
-    core::UnistylesRegistry::get().destroy();
+    // no-op if a newer runtime already took ownership (see UnistylesRegistry::releaseOwnership)
+    core::UnistylesRegistry::get().releaseOwnership(_runtime);
 
     [super invalidate];
 }

@@ -270,3 +270,26 @@ void core::UnistylesRegistry::destroy() {
     this->_scopedTheme = std::nullopt;
     _nextStyleSheetTag.store(0);
 }
+
+void core::UnistylesRegistry::takeOwnership(jsi::Runtime* rt) {
+    std::lock_guard<std::mutex> lock(this->_ownershipMutex);
+
+    // successor wipes the previous runtime's state, instead of relying on its late invalidate
+    if (this->_activeRuntime != nullptr && this->_activeRuntime != rt) {
+        this->destroy();
+    }
+
+    this->_activeRuntime = rt;
+}
+
+void core::UnistylesRegistry::releaseOwnership(jsi::Runtime* rt) {
+    std::lock_guard<std::mutex> lock(this->_ownershipMutex);
+
+    // a superseded runtime's late teardown must not touch the new owner's state
+    if (rt == nullptr || this->_activeRuntime != rt) {
+        return;
+    }
+
+    this->destroy();
+    this->_activeRuntime = nullptr;
+}
