@@ -7,6 +7,7 @@
 #include <fbjni/fbjni.h>
 #include <react/fabric/Binding.h>
 #include "NativePlatform.h"
+#include <atomic>
 
 namespace margelo::nitro::unistyles {
 
@@ -38,7 +39,8 @@ struct UnistylesModule : public jni::HybridClass<UnistylesModule> {
 private:
     RuntimeExecutor _runtimeExecutor;
     std::shared_ptr<HybridNativePlatformSpec> _nativePlatform;
-    jsi::Runtime* _runtime = nullptr;
+    // written on the JS thread at install, read from the teardown thread in invalidate
+    std::atomic<jsi::Runtime*> _runtime{nullptr};
 };
 
 }

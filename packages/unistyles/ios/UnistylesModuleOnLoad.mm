@@ -3,11 +3,13 @@
 #import "HybridUnistylesRuntime.h"
 #import "HybridStyleSheet.h"
 #import "HybridShadowRegistry.h"
+#include <atomic>
 
 using namespace margelo::nitro;
 
 @implementation UnistylesModule {
-    jsi::Runtime* _runtime;
+    // written on the JS thread at install, read from the teardown thread in invalidate
+    std::atomic<jsi::Runtime*> _runtime;
 }
 
 RCT_EXPORT_MODULE(Unistyles)
