@@ -1,6 +1,6 @@
 import type { PressableProps as Props, View } from 'react-native'
 
-import React, { forwardRef } from 'react'
+import React, { forwardRef, useRef } from 'react'
 import { Pressable as NativePressableReactNative } from 'react-native'
 
 import type { UnistylesValues } from '../../types'
@@ -31,8 +31,8 @@ export const Pressable: React.ForwardRefExoticComponent<PressableProps & React.R
     PressableProps
 >(({ style, ...props }, forwardedRef) => {
     const scopedTheme = UnistylesShadowRegistry.getScopedTheme()
-    let storedRef: HTMLElement | null = null
-    let classNames: ReturnType<typeof getClassName> | undefined = undefined
+    const storedRef = useRef<HTMLElement | null>(null)
+    const classNames = useRef<ReturnType<typeof getClassName>>(undefined)
 
     return (
         <NativePressableReactNative
@@ -41,9 +41,14 @@ export const Pressable: React.ForwardRefExoticComponent<PressableProps & React.R
                 isServer()
                     ? undefined
                     : (ref) => {
-                          storedRef = ref as unknown as HTMLElement
+                          if (!ref) {
+                              // @ts-expect-error hidden from TS
+                              UnistylesShadowRegistry.remove(storedRef.current, classNames.current?.[0].hash)
+                          }
+
+                          storedRef.current = ref as unknown as HTMLElement
                           // @ts-expect-error hidden from TS
-                          UnistylesShadowRegistry.add(storedRef, classNames?.hash)
+                          UnistylesShadowRegistry.add(storedRef.current, classNames.current?.[0].hash)
 
                           if (typeof forwardedRef === 'function') {
                               return forwardedRef(ref)
@@ -61,14 +66,14 @@ export const Pressable: React.ForwardRefExoticComponent<PressableProps & React.R
                 UnistylesShadowRegistry.setScopedTheme(scopedTheme)
 
                 // @ts-expect-error hidden from TS
-                UnistylesShadowRegistry.remove(storedRef, classNames?.hash)
-                classNames = getClassName(styleResult as UnistylesValues)
+                UnistylesShadowRegistry.remove(storedRef.current, classNames.current?.[0].hash)
+                classNames.current = getClassName(styleResult as UnistylesValues)
                 // @ts-expect-error hidden from TS
-                UnistylesShadowRegistry.add(storedRef, classNames?.hash)
+                UnistylesShadowRegistry.add(storedRef.current, classNames.current?.[0].hash)
 
                 UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
 
-                return classNames as any
+                return classNames.current as any
             }}
         />
     )

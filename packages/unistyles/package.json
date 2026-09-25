@@ -137,12 +137,14 @@
     "@rspack/core": "2.2.7",
     "@types/jest": "30.0.0",
     "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.3",
     "babel-plugin-tester": "12.0.0",
     "commitlint": "21.2.3",
     "concurrently": "10.0.5",
     "dpdm": "4.3.0",
     "esbuild": "0.28.2",
     "jest": "30.5.2",
+    "jest-environment-jsdom": "30.5.2",
     "@babel/plugin-syntax-jsx": "7.29.7",
     "@babel/runtime": "7.29.7",
     "@react-native/babel-preset": "0.87.1",
@@ -151,6 +153,7 @@
     "oxfmt": "0.70.0",
     "oxlint": "1.85.0",
     "react": "19.2.3",
+    "react-dom": "19.2.3",
     "react-native": "0.87.1",
     "react-native-builder-bob": "0.43.1",
     "react-native-nitro-modules": "0.37.1",
@@ -178,16 +181,46 @@
     "node": ">= 20.18.0"
   },
   "jest": {
-    "preset": "@react-native/jest-preset",
-    "modulePathIgnorePatterns": [
-      "<rootDir>/lib/",
-      "<rootDir>/cxx/tests"
-    ],
-    "testMatch": [
-      "**/*.spec.(ts|tsx|js)"
-    ],
-    "transformIgnorePatterns": [
-      "node_modules/(?!(.bun/.*?/node_modules/)?(react-native|@react-native|react-native-nitro-modules|react-native-reanimated)/)"
+    "projects": [
+      {
+        "displayName": "native",
+        "preset": "@react-native/jest-preset",
+        "modulePathIgnorePatterns": [
+          "<rootDir>/lib/",
+          "<rootDir>/cxx/tests"
+        ],
+        "testMatch": [
+          "**/*.spec.(ts|tsx|js)"
+        ],
+        "testPathIgnorePatterns": [
+          "/node_modules/",
+          "<rootDir>/src/__tests__/web-"
+        ],
+        "transformIgnorePatterns": [
+          "node_modules/(?!(.bun/.*?/node_modules/)?(react-native|@react-native|react-native-nitro-modules|react-native-reanimated)/)"
+        ]
+      },
+      {
+        "displayName": "web",
+        "testEnvironment": "jsdom",
+        "modulePathIgnorePatterns": [
+          "<rootDir>/lib/",
+          "<rootDir>/cxx/tests"
+        ],
+        "testMatch": [
+          "<rootDir>/src/__tests__/web-*.spec.(ts|tsx)"
+        ],
+        "moduleNameMapper": {
+          "^react-native$": "react-native-web"
+        },
+        "setupFiles": [
+          "<rootDir>/jest.web.setup.js"
+        ],
+        "globals": {
+          "__DEV__": true,
+          "IS_REACT_ACT_ENVIRONMENT": true
+        }
+      }
     ],
     "coverageReporters": [
       "html"
