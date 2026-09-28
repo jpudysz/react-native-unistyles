@@ -36,7 +36,8 @@
           }
         }
       ],
-      "expo-router"
+      "expo-router",
+      "./plugins/withUIScene"
     ],
     "web": {
       "favicon": "./assets/images/favicon.png",

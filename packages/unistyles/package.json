@@ -128,34 +128,35 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "@babel/types": "7.29.0"
+    "@babel/types": "7.29.8"
   },
   "devDependencies": {
-    "@callstack/repack": "5.2.4",
-    "@commitlint/config-conventional": "20.4.2",
-    "@react-native/normalize-colors": "0.85.3",
-    "@rspack/core": "1.7.6",
+    "@callstack/repack": "5.4.0",
+    "@commitlint/config-conventional": "21.2.3",
+    "@react-native/normalize-colors": "0.87.1",
+    "@rspack/core": "2.2.7",
     "@types/jest": "30.0.0",
-    "@types/react": "19.2.14",
+    "@types/react": "19.2.18",
     "babel-plugin-tester": "12.0.0",
-    "commitlint": "20.4.2",
-    "concurrently": "9.2.1",
-    "dpdm": "4.0.1",
-    "esbuild": "0.27.3",
-    "jest": "30.2.0",
-    "@babel/plugin-syntax-jsx": "7.28.6",
-    "@babel/runtime": "7.28.6",
-    "@react-native/babel-preset": "0.85.3",
+    "commitlint": "21.2.3",
+    "concurrently": "10.0.5",
+    "dpdm": "4.3.0",
+    "esbuild": "0.28.2",
+    "jest": "30.5.2",
+    "@babel/plugin-syntax-jsx": "7.29.7",
+    "@babel/runtime": "7.29.7",
+    "@react-native/babel-preset": "0.87.1",
+    "@react-native/jest-preset": "0.87.1",
     "nitrogen": "0.37.1",
-    "oxfmt": "0.35.0",
-    "oxlint": "1.50.0",
+    "oxfmt": "0.70.0",
+    "oxlint": "1.85.0",
     "react": "19.2.3",
-    "react-native": "0.85.3",
-    "react-native-builder-bob": "0.40.18",
+    "react-native": "0.87.1",
+    "react-native-builder-bob": "0.43.1",
     "react-native-nitro-modules": "0.37.1",
-    "react-native-reanimated": "4.3.1",
-    "react-native-web": "0.21.2",
-    "typescript": "5.9.3"
+    "react-native-reanimated": "4.7.0",
+    "react-native-web": "0.21.3",
+    "typescript": "6.0.3"
   },
   "peerDependencies": {
     "@react-native/normalize-colors": "*",
@@ -177,7 +178,7 @@
     "node": ">= 20.18.0"
   },
   "jest": {
-    "preset": "react-native",
+    "preset": "@react-native/jest-preset",
     "modulePathIgnorePatterns": [
       "<rootDir>/lib/",
       "<rootDir>/cxx/tests"

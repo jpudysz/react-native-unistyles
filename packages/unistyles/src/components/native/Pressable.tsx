@@ -18,12 +18,18 @@ type WebPressableState = {
 
 type WebPressableStyle = ((state: WebPressableState) => UnistylesValues) | UnistylesValues
 
+// instance type of View for both legacy and Strict TypeScript API (RN 0.87+)
+type ViewRef = React.ComponentRef<typeof View>
+
 type PressableProps = Props & {
     variants?: Variants
     style?: WebPressableStyle
 }
 
-export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, forwardedRef) => {
+export const Pressable: React.ForwardRefExoticComponent<PressableProps & React.RefAttributes<ViewRef>> = forwardRef<
+    ViewRef,
+    PressableProps
+>(({ style, ...props }, forwardedRef) => {
     const scopedTheme = UnistylesShadowRegistry.getScopedTheme()
     let storedRef: HTMLElement | null = null
     let classNames: ReturnType<typeof getClassName> | undefined = undefined
