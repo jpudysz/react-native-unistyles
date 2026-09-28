@@ -23,14 +23,7 @@ void shadow::ShadowTreeManager::updateShadowTree(jsi::Runtime& rt) {
             auto safeProps = props.isObject() ? props : folly::dynamic::object();
 
             tagToProps.insert({family->getTag(), safeProps});
-
-            auto* mutableFamily = const_cast<ShadowNodeFamily*>(family);
-
-            if (mutableFamily->nativeProps_DEPRECATED && mutableFamily->nativeProps_DEPRECATED->isObject()) {
-                mutableFamily->nativeProps_DEPRECATED->update(safeProps);
-            } else {
-                mutableFamily->nativeProps_DEPRECATED = std::make_unique<folly::dynamic>(safeProps);
-            }
+            shadow::mergeNativeProps(family, safeProps);
         }
 
         UIManagerBinding::getBinding(rt)->getUIManager().updateShadowTree(std::move(tagToProps));
@@ -45,15 +38,7 @@ void shadow::ShadowTreeManager::updateShadowTree(jsi::Runtime& rt) {
                 auto affectedNodes = shadow::ShadowTreeManager::findAffectedNodes(oldRootShadowNode, updates);
 
                 for (const auto& [family, props] : updates) {
-                    // Merge props to fix glitches caused by REA updates
-                    auto* mutableFamily = const_cast<ShadowNodeFamily*>(family);
-                    auto safeProps = props.isObject() ? props : folly::dynamic::object();
-
-                    if (mutableFamily->nativeProps_DEPRECATED && mutableFamily->nativeProps_DEPRECATED->isObject()) {
-                        mutableFamily->nativeProps_DEPRECATED->update(safeProps);
-                    } else {
-                        mutableFamily->nativeProps_DEPRECATED = std::make_unique<folly::dynamic>(safeProps);
-                    }
+                    shadow::mergeNativeProps(family, props.isObject() ? props : folly::dynamic::object());
                 }
 
                 return  std::static_pointer_cast<RootShadowNode>(shadow::ShadowTreeManager::cloneShadowTree(

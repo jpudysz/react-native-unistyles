@@ -1,6 +1,7 @@
 #include "UnistylesRegistry.h"
 #include "UnistylesState.h"
 #include "Parser.h"
+#include "NativeProps.h"
 
 using namespace margelo::nitro::unistyles;
 using namespace facebook;
@@ -67,8 +68,7 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
     this->trafficController.withLock([this, &rt, &unistylesData, shadowNodeFamily, &initialScopedUpdate](){
         // Clear suspension state if this family was previously suspended
         if (_suspendedFamilies.erase(shadowNodeFamily) > 0) {
-            auto* mutableFamily = const_cast<ShadowNodeFamily*>(shadowNodeFamily);
-            mutableFamily->nativeProps_DEPRECATED.reset();
+            shadow::resetNativeProps(shadowNodeFamily);
             // Clear old registry entries to prevent stale UnistyleData accumulation
             this->_shadowRegistry.erase(shadowNodeFamily);
             // Remove any stale traffic controller entry (e.g. from a theme change during suspension)
