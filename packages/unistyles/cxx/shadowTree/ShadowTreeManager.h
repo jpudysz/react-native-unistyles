@@ -5,6 +5,7 @@
 #include <react/renderer/uimanager/UIManager.h>
 #include <ranges>
 #include "ShadowLeafUpdate.h"
+#include "NativeProps.h"
 #include "UnistylesRegistry.h"
 #include <cxxreact/ReactNativeVersion.h>
 
