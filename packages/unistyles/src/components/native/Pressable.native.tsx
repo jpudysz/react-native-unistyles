@@ -3,9 +3,10 @@ import type { PressableProps as Props, View } from 'react-native'
 import React, { forwardRef, useLayoutEffect, useRef } from 'react'
 import { Pressable as NativePressableReactNative } from 'react-native'
 
+import type { Nullable } from '../../types'
+
 import { passForwardedRef } from '../../core'
 import { UnistylesShadowRegistry } from '../../specs'
-import type { Nullable } from '../../types'
 
 // instance type of View for both legacy and Strict TypeScript API (RN 0.87+)
 type ViewRef = React.ComponentRef<typeof View>
