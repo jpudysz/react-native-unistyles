@@ -32,12 +32,12 @@
           },
           "ios": {
             "newArchEnabled": true,
-            "deploymentTarget": "16.4"
+            "deploymentTarget": "16.4",
+            "enableSceneSupport": true
           }
         }
       ],
-      "expo-router",
-      "./plugins/withUIScene"
+      "expo-router"
     ],
     "web": {
       "favicon": "./assets/images/favicon.png",
