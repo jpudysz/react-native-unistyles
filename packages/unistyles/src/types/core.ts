@@ -1,19 +1,4 @@
 import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
-import type {
-    MatrixTransform,
-    PerspectiveTransform,
-    RotateTransform,
-    RotateXTransform,
-    RotateYTransform,
-    RotateZTransform,
-    ScaleTransform,
-    ScaleXTransform,
-    ScaleYTransform,
-    SkewXTransform,
-    SkewYTransform,
-    TranslateXTransform,
-    TranslateYTransform,
-} from 'react-native/Libraries/StyleSheet/StyleSheetTypes'
 
 import type { UnistylesBreakpoints, UnistylesThemes } from '../global'
 
@@ -22,19 +7,13 @@ export type ShadowOffset = {
     height: number
 }
 
-export type TransformStyles = PerspectiveTransform &
-    RotateTransform &
-    RotateXTransform &
-    RotateYTransform &
-    RotateZTransform &
-    ScaleTransform &
-    ScaleXTransform &
-    ScaleYTransform &
-    TranslateXTransform &
-    TranslateYTransform &
-    SkewXTransform &
-    SkewYTransform &
-    MatrixTransform
+type TransformEntry = Exclude<NonNullable<ViewStyle['transform']>, string>[number]
+type TransformKeys<T> = T extends unknown ? keyof T : never
+type TransformValue<T, K extends PropertyKey> = T extends unknown ? (K extends keyof T ? T[K] : never) : never
+
+export type TransformStyles = {
+    [K in TransformKeys<TransformEntry>]: Exclude<TransformValue<TransformEntry, K>, void | undefined>
+}
 
 export type ScreenSize = {
     width: number
