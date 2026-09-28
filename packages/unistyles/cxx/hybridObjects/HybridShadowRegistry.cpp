@@ -87,8 +87,10 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
             parser.rebuildUnistyleWithScopedTheme(rt, parsedStyleSheet, unistyleData);
         }
 
-        // Initialize parsedStyle from the unistyle's current computed style from withUnistyles
+        // The shared cache can belong to another view by the time React attaches refs.
+        // Restore this view's arguments and variants before saving its native styles.
         if (!unistyleData->parsedStyle.has_value() && unistyle->parsedStyle.has_value()) {
+            parser.rebuildUnistyle(rt, unistyle, variants, unistyleData->dynamicFunctionMetadata);
             unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
         }
 
