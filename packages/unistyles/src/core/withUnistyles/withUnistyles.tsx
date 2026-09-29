@@ -1,8 +1,9 @@
-import React, { type ComponentType, forwardRef, type ComponentProps, type ComponentRef } from 'react'
+import React, { type ComponentType, forwardRef, type ComponentProps, type ComponentRef, useContext } from 'react'
 
 import type { UnistylesValues } from '../../types'
 import type { Mappings } from './types'
 
+import { ScopedThemeContext, withScopedTheme } from '../../components/ScopedThemeContext'
 import { deepMergeObjects } from '../../utils'
 import { getClassName } from '../getClassname'
 import { useProxifiedUnistyles } from '../useProxifiedUnistyles'
@@ -28,8 +29,11 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
 
     return forwardRef<GenericComponentRef<TComponent>, PropsWithUnistyles>((props, ref) => {
         const narrowedProps = props as PropsWithUnistyles & UnistyleStyles
-        const styleClassNames = getClassName(narrowedProps.style, true)
-        const contentContainerStyleClassNames = getClassName(narrowedProps.contentContainerStyle)
+        const scope = useContext(ScopedThemeContext)
+        const styleClassNames = withScopedTheme(scope, () => getClassName(narrowedProps.style, true))
+        const contentContainerStyleClassNames = withScopedTheme(scope, () =>
+            getClassName(narrowedProps.contentContainerStyle),
+        )
         const { proxifiedRuntime, proxifiedTheme } = useProxifiedUnistyles()
 
         const { key: mappingsKey, ...mappingsProps } = mappings ? mappings(proxifiedTheme, proxifiedRuntime) : {}

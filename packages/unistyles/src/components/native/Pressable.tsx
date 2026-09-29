@@ -1,6 +1,6 @@
 import type { PressableProps as Props, View } from 'react-native'
 
-import React, { forwardRef } from 'react'
+import React, { forwardRef, useContext } from 'react'
 import { Pressable as NativePressableReactNative } from 'react-native'
 
 import type { UnistylesValues } from '../../types'
@@ -8,6 +8,7 @@ import type { UnistylesValues } from '../../types'
 import { getClassName } from '../../core'
 import { UnistylesShadowRegistry } from '../../specs'
 import { isServer } from '../../web/utils'
+import { ScopedThemeContext, getScopedThemeName } from '../ScopedThemeContext'
 
 type Variants = Record<string, string | boolean | undefined>
 type WebPressableState = {
@@ -30,7 +31,7 @@ export const Pressable: React.ForwardRefExoticComponent<PressableProps & React.R
     ViewRef,
     PressableProps
 >(({ style, ...props }, forwardedRef) => {
-    const scopedTheme = UnistylesShadowRegistry.getScopedTheme()
+    const scopedTheme = getScopedThemeName(useContext(ScopedThemeContext))
     let storedRef: HTMLElement | null = null
     let classNames: ReturnType<typeof getClassName> | undefined = undefined
 
