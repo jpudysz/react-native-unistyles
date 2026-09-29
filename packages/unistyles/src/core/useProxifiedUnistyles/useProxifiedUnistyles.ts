@@ -68,10 +68,10 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
         }
     }, [disposeRef])
 
-    const maybeNewScopedTheme = contextScopedTheme
-
-    if (scopedTheme && maybeNewScopedTheme && scopedTheme !== maybeNewScopedTheme) {
-        setScopedTheme(maybeNewScopedTheme)
+    // Follow the nearest ScopedTheme when it changes, `reset` included; `forcedTheme` only seeds the first render.
+    if (scopedTheme !== contextScopedTheme) {
+        setScopedTheme(contextScopedTheme)
+        setTheme(UnistylesRuntime.getTheme(contextScopedTheme))
     }
 
     const proxifiedTheme = new Proxy(theme, {
