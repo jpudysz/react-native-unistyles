@@ -6,7 +6,12 @@
 
 using namespace margelo::nitro;
 
-@implementation UnistylesModule
+@implementation UnistylesModule {
+    // The JS runtime this module instance installed its bindings for. Compared
+    // against the registry's active runtime on teardown so a late invalidation of a
+    // previous runtime can't wipe a newer runtime's state during an OTA hard reload.
+    jsi::Runtime* _runtime;
+}
 
 RCT_EXPORT_MODULE(Unistyles)
 
@@ -16,6 +21,11 @@ RCT_EXPORT_MODULE(Unistyles)
 
 - (void)installJSIBindingsWithRuntime:(jsi::Runtime&)rt callInvoker:(const std::shared_ptr<facebook::react::CallInvoker> &)callInvoker {
     // function is called on: first init and every live reload
+    // claim ownership of Unistyles state for this runtime (newest install wins); this
+    // also wipes a previous runtime's now-defunct state on a live/OTA reload
+    _runtime = &rt;
+    core::UnistylesRegistry::get().takeOwnership(&rt);
+
     // check if this is live reload, if so let's replace UnistylesRuntime with new runtime
     auto hasUnistylesRuntime = HybridObjectRegistry::hasHybridObject("UnistylesRuntime");
 
@@ -53,7 +63,10 @@ RCT_EXPORT_MODULE(Unistyles)
 }
 
 - (void)invalidate {
-    core::UnistylesRegistry::get().destroy();
+    // Releases ownership and wipes state only if this runtime is still the owner.
+    // During an OTA hard reload a newer runtime has already taken ownership, so this
+    // (superseded) runtime's late teardown is a no-op and won't clear the new state.
+    core::UnistylesRegistry::get().releaseOwnership(_runtime);
 
     [super invalidate];
 }
