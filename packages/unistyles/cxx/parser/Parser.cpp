@@ -444,8 +444,7 @@ void parser::Parser::rebuildShadowLeafUpdates(jsi::Runtime& rt, core::Dependency
             updates.emplace(shadowNode, std::move(rawProps));
         }
 
-        registry.trafficController.setUpdates(updates);
-        registry.trafficController.resumeUnistylesTraffic();
+        registry.queueShadowLeafUpdatesUnsafe(updates);
     });
 }
 

@@ -104,7 +104,7 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
 
     registry.linkShadowNodeWithUnistyle(
         rt,
-        &shadowNodeWrapper->getFamily(),
+        shadowNodeWrapper->getFamilyShared(),
         unistylesData,
         std::move(initialScopedUpdate)
     );
@@ -171,9 +171,5 @@ jsi::Value HybridShadowRegistry::getScopedTheme(jsi::Runtime &rt, const jsi::Val
 }
 
 std::shared_ptr<const core::ShadowNode> HybridShadowRegistry::getShadowNodeFromRef(jsi::Runtime& rt, const jsi::Value& maybeRef) {
-#if REACT_NATIVE_VERSION_MINOR >= 81
     return Bridging<std::shared_ptr<const ShadowNode>>::fromJs(rt, maybeRef);
-#else
-    return shadowNodeFromValue(rt, maybeRef);
-#endif
 }
