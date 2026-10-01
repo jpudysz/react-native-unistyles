@@ -61,36 +61,85 @@ void core::UnistylesRegistry::updateTheme(jsi::Runtime& rt, std::string& themeNa
 
 void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
     jsi::Runtime& rt,
-    const ShadowNodeFamily* shadowNodeFamily,
+    const std::shared_ptr<const ShadowNodeFamily>& shadowNodeFamily,
     std::vector<std::shared_ptr<UnistyleData>>& unistylesData,
     std::optional<folly::dynamic> initialScopedUpdate
 ) {
-    this->trafficController.withLock([this, &rt, &unistylesData, shadowNodeFamily, &initialScopedUpdate](){
+    // released after unlocking, so a family destructor never runs within the lock
+    ReleasedFamilies releasedFamilies;
+
+    this->trafficController.withLock([this, &unistylesData, &shadowNodeFamily, &initialScopedUpdate, &releasedFamilies](){
+        auto family = shadowNodeFamily.get();
+        auto it = this->_shadowRegistry.find(family);
+
         // Clear suspension state if this family was previously suspended
-        if (_suspendedFamilies.erase(shadowNodeFamily) > 0) {
-            shadow::resetNativeProps(shadowNodeFamily);
+        if (it != this->_shadowRegistry.end() && it->second.isSuspended) {
+            shadow::resetNativeProps(family);
             // Clear old registry entries to prevent stale UnistyleData accumulation
-            this->_shadowRegistry.erase(shadowNodeFamily);
-            // Remove any stale traffic controller entry (e.g. from a theme change during suspension)
-            this->trafficController.removeShadowNode(shadowNodeFamily);
+            // and any stale traffic controller entry (e.g. from a theme change during suspension)
+            this->forgetFamilyUnsafe(family, releasedFamilies);
         }
 
-        std::for_each(unistylesData.begin(), unistylesData.end(), [this, shadowNodeFamily](std::shared_ptr<UnistyleData> unistyleData){
-            this->_shadowRegistry[shadowNodeFamily].emplace_back(unistyleData);
-        });
+        auto& linkedFamily = this->_shadowRegistry[family];
+
+        linkedFamily.family = shadowNodeFamily;
+        linkedFamily.unistyles.insert(linkedFamily.unistyles.end(), unistylesData.begin(), unistylesData.end());
 
         // Required for scoped themes to apply on initial mount
         if (initialScopedUpdate.has_value()) {
-            shadow::ShadowLeafUpdates updates;
+            this->trafficController.setUpdate(shadowNodeFamily, std::move(*initialScopedUpdate));
+        }
 
-            updates.emplace(shadowNodeFamily, std::move(*initialScopedUpdate));
-            this->trafficController.setUpdates(updates);
+        // families unmounted without unlink (eg. while frozen) are pinned by us only
+        // sweep them once the registry doubles, so it's amortized O(1) per link
+        if (this->_shadowRegistry.size() >= this->_sweepThreshold) {
+            this->sweepUnownedFamiliesUnsafe(releasedFamilies);
+            this->_sweepThreshold = std::max(MIN_SWEEP_THRESHOLD, this->_shadowRegistry.size() * 2);
         }
     });
 }
 
+bool core::UnistylesRegistry::isOwnedOnlyByUnistyles(const LinkedFamily& linkedFamily) noexcept {
+    // shadow nodes own their family, so if nothing but our pin owns it, the family is not part of any
+    // shadow tree anymore. React Native can't get it back, as it only keeps weak references beside shadow nodes
+    return linkedFamily.family.use_count() == 1;
+}
+
+void core::UnistylesRegistry::forgetFamilyUnsafe(const ShadowNodeFamily* shadowNodeFamily, ReleasedFamilies& releasedFamilies) {
+    auto it = this->_shadowRegistry.find(shadowNodeFamily);
+
+    if (it != this->_shadowRegistry.end()) {
+        releasedFamilies.emplace_back(std::move(it->second.family));
+        this->_shadowRegistry.erase(it);
+    }
+
+    if (auto pendingFamily = this->trafficController.removeShadowNode(shadowNodeFamily)) {
+        releasedFamilies.emplace_back(std::move(pendingFamily));
+    }
+}
+
+void core::UnistylesRegistry::sweepUnownedFamiliesUnsafe(ReleasedFamilies& releasedFamilies) {
+    std::vector<const ShadowNodeFamily*> unownedFamilies;
+
+    for (const auto& [family, linkedFamily] : this->_shadowRegistry) {
+        if (isOwnedOnlyByUnistyles(linkedFamily)) {
+            unownedFamilies.emplace_back(family);
+        }
+    }
+
+    for (const auto* family : unownedFamilies) {
+        this->forgetFamilyUnsafe(family, releasedFamilies);
+    }
+}
+
 void core::UnistylesRegistry::removeDuplicatedUnistyles(const ShadowNodeFamily *shadowNodeFamily, std::vector<core::Unistyle::Shared>& unistyles) {
-    auto targetFamilyUnistyles = this->_shadowRegistry[shadowNodeFamily];
+    auto it = this->_shadowRegistry.find(shadowNodeFamily);
+
+    if (it == this->_shadowRegistry.end()) {
+        return;
+    }
+
+    auto& targetFamilyUnistyles = it->second.unistyles;
 
     unistyles.erase(
         std::remove_if(
@@ -111,23 +160,27 @@ void core::UnistylesRegistry::removeDuplicatedUnistyles(const ShadowNodeFamily *
 }
 
 void core::UnistylesRegistry::unlinkShadowNodeWithUnistyles(const ShadowNodeFamily* shadowNodeFamily) {
-    this->trafficController.withLock([this, shadowNodeFamily](){
-        this->_shadowRegistry.erase(shadowNodeFamily);
-        this->_suspendedFamilies.erase(shadowNodeFamily);
-        this->trafficController.removeShadowNode(shadowNodeFamily);
+    ReleasedFamilies releasedFamilies;
+
+    this->trafficController.withLock([this, shadowNodeFamily, &releasedFamilies](){
+        this->forgetFamilyUnsafe(shadowNodeFamily, releasedFamilies);
     });
 }
 
 void core::UnistylesRegistry::suspendShadowNode(const ShadowNodeFamily* shadowNodeFamily) {
     this->trafficController.withLock([this, shadowNodeFamily](){
-        if (this->_shadowRegistry.contains(shadowNodeFamily)) {
-            this->_suspendedFamilies.insert(shadowNodeFamily);
+        auto it = this->_shadowRegistry.find(shadowNodeFamily);
+
+        if (it != this->_shadowRegistry.end()) {
+            it->second.isSuspended = true;
         }
     });
 }
 
 bool core::UnistylesRegistry::isSuspended(const ShadowNodeFamily* family) const noexcept {
-    return _suspendedFamilies.count(family) > 0;
+    auto it = this->_shadowRegistry.find(family);
+
+    return it != this->_shadowRegistry.end() && it->second.isSuspended;
 }
 
 std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(jsi::Runtime& rt, core::StyleSheetType type, jsi::Object&& rawValue) {
@@ -143,36 +196,56 @@ core::DependencyMap core::UnistylesRegistry::buildDependencyMap(std::vector<Unis
     core::DependencyMap dependencyMap;
 
     std::unordered_set<UnistyleDependency> uniqueDependencies(deps.begin(), deps.end());
+    ReleasedFamilies releasedFamilies;
 
-    for (const auto& [family, unistyles] : this->_shadowRegistry) {
-        bool hasAnyOfDependencies = false;
+    // families stay pinned by the registry until the shadow tree update is committed
+    this->trafficController.withLock([this, &dependencyMap, &uniqueDependencies, &releasedFamilies](){
+        // we iterate whole registry anyway, so it's a free moment to drop families unmounted without unlink
+        this->sweepUnownedFamiliesUnsafe(releasedFamilies);
 
-        // Check if any dependency matches
-        for (const auto& unistyleData : unistyles) {
-            for (const auto& dep : unistyleData->unistyle->dependencies) {
-                if (uniqueDependencies.count(dep)) {
-                    hasAnyOfDependencies = true;
-                    break;
+        for (const auto& [family, linkedFamily] : this->_shadowRegistry) {
+            bool hasAnyOfDependencies = false;
+
+            // Check if any dependency matches
+            for (const auto& unistyleData : linkedFamily.unistyles) {
+                for (const auto& dep : unistyleData->unistyle->dependencies) {
+                    if (uniqueDependencies.count(dep)) {
+                        hasAnyOfDependencies = true;
+                        break;
+                    }
                 }
+
+                if (hasAnyOfDependencies) {
+                    break;
+                };
             }
 
-            if (hasAnyOfDependencies) {
-                break;
-            };
-        }
+            if (!hasAnyOfDependencies) {
+                continue;
+            }
 
-        if (!hasAnyOfDependencies) {
+            dependencyMap[family].insert(
+                dependencyMap[family].end(),
+                linkedFamily.unistyles.begin(),
+                linkedFamily.unistyles.end()
+            );
+        }
+    });
+
+    return dependencyMap;
+}
+
+void core::UnistylesRegistry::queueShadowLeafUpdatesUnsafe(shadow::ShadowLeafUpdates& updates) {
+    for (auto& [family, props] : updates) {
+        auto it = this->_shadowRegistry.find(family);
+
+        // family was unlinked in the meantime, there is nothing to update
+        if (it == this->_shadowRegistry.end()) {
             continue;
         }
 
-        dependencyMap[family].insert(
-            dependencyMap[family].end(),
-            unistyles.begin(),
-            unistyles.end()
-        );
+        this->trafficController.setUpdate(it->second.family, std::move(props));
     }
-
-    return dependencyMap;
 }
 
 // called from proxied function only, we don't know host
@@ -185,15 +258,15 @@ void core::UnistylesRegistry::shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Uni
             ? std::make_optional(maybePressableId.asString(rt).utf8(rt))
             : std::nullopt;
 
-        for (const auto& [family, unistyles] : this->_shadowRegistry) {
-            for (const auto& unistyleData : unistyles) {
+        for (const auto& [family, linkedFamily] : this->_shadowRegistry) {
+            for (const auto& unistyleData : linkedFamily.unistyles) {
                 if (unistyleData->unistyle == unistyle) {
                     updates[family] = parser.parseStylesToShadowTreeStyles(rt, { unistyleData });
                 }
             }
         }
 
-        this->trafficController.setUpdates(updates);
+        this->queueShadowLeafUpdatesUnsafe(updates);
     });
 }
 
@@ -263,10 +336,25 @@ void core::UnistylesRegistry::setScopedTheme(std::optional<std::string> themeNam
 }
 
 void core::UnistylesRegistry::destroy() {
+    // called when module is invalidated, before React Native destroys the runtime
+    // pins must be released now, as families hold JS handles that can't outlive the runtime
+    ReleasedFamilies releasedFamilies;
+
+    this->trafficController.withLock([this, &releasedFamilies](){
+        for (auto& [_, linkedFamily] : this->_shadowRegistry) {
+            releasedFamilies.emplace_back(std::move(linkedFamily.family));
+        }
+
+        for (auto& [_, pendingUpdate] : this->trafficController.takeUpdates()) {
+            releasedFamilies.emplace_back(std::move(pendingUpdate.family));
+        }
+
+        this->_shadowRegistry.clear();
+        this->_sweepThreshold = MIN_SWEEP_THRESHOLD;
+    });
+
     this->_state.reset();
     this->_styleSheetRegistry.clear();
-    this->_shadowRegistry.clear();
-    this->_suspendedFamilies.clear();
     this->_scopedTheme = std::nullopt;
     _nextStyleSheetTag.store(0);
 }

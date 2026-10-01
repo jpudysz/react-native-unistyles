@@ -8,52 +8,32 @@ namespace margelo::nitro::unistyles::shadow {
 // Like a traffic officer managing a jam, this struct ensures everything
 // is synchronized within a set timeframe, controlling flow and preventing chaos.
 struct ShadowTrafficController {
-    inline bool shouldStop() {
-        return !_canCommit;
-    }
-
-    inline void stopUnistylesTraffic() {
-        this->_canCommit = false;
-    }
-
-    inline void resumeUnistylesTraffic() {
-        this->_canCommit = true;
-    }
-
-    inline shadow::ShadowLeafUpdates& getUpdates() {
+    inline void setUpdate(std::shared_ptr<const ShadowNodeFamily> family, folly::dynamic props) {
         // call it only within withLock!
-        return _unistylesUpdates;
+        auto key = family.get();
+
+        _unistylesUpdates.insert_or_assign(key, PinnedShadowLeafUpdate{std::move(family), std::move(props)});
     }
 
-    inline void setUpdates(shadow::ShadowLeafUpdates& newUpdates) {
+    inline PinnedShadowLeafUpdates takeUpdates() {
         // call it only within withLock!
-        auto& targetUpdates = _unistylesUpdates;
-
-        // this is important as overriding updates may skip some interim changes
-        // Unistyles emits different events so this will make sure that everything is synced
-        std::for_each(newUpdates.begin(), newUpdates.end(), [&targetUpdates](auto& pair){
-            if (targetUpdates.contains(pair.first)) {
-                targetUpdates[pair.first] = std::move(pair.second);
-
-                return;
-            }
-
-            targetUpdates.emplace(pair.first, std::move(pair.second));
-        });
+        return std::exchange(_unistylesUpdates, {});
     }
 
-    inline void removeShadowNode(const ShadowNodeFamily* shadowNodeFamily) {
+    inline std::shared_ptr<const ShadowNodeFamily> removeShadowNode(const ShadowNodeFamily* shadowNodeFamily) {
         // call it only within withLock!
-        if (_unistylesUpdates.contains(shadowNodeFamily)) {
-            _unistylesUpdates.erase(shadowNodeFamily);
+        // returns the pin, so the caller can release it after unlocking
+        auto it = _unistylesUpdates.find(shadowNodeFamily);
+
+        if (it == _unistylesUpdates.end()) {
+            return nullptr;
         }
-    }
 
-    inline void restore() {
-        // call it only within withLock!
+        auto family = std::move(it->second.family);
 
-        _unistylesUpdates = {};
-        _canCommit = false;
+        _unistylesUpdates.erase(it);
+
+        return family;
     }
 
     template <typename F>
@@ -64,8 +44,7 @@ struct ShadowTrafficController {
     }
 
 private:
-    std::atomic<bool> _canCommit = false;
-    shadow::ShadowLeafUpdates _unistylesUpdates{};
+    PinnedShadowLeafUpdates _unistylesUpdates{};
 
     // this struct should be accessed in thread-safe manner. Otherwise shadow tree updates
     // from different threads will break it
