@@ -75,5 +75,11 @@ export function extractVariants(path: NodePath<t.BlockStatement>, state: Unistyl
 
     path.node.body = [...path.node.body.slice(0, pathIndex), shadowDeclaration, statement]
 
+    // We mutated `path.node.body` directly, so this scope was already crawled and the shadow
+    // declaration we just added to it has no binding. The shadowed `const styles` is fine
+    // because its enclosing block is new, so Babel crawls it lazily on the way down.
+    // Re-crawl so plugins running after us (React Compiler) can resolve the shadow declaration.
+    path.scope.crawl()
+
     state.file.hasVariants = true
 }
