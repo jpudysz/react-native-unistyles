@@ -57,7 +57,21 @@ const styles = StyleSheet.create(theme => ({
 
 <Aside type="caution" title="Serializable arguments">
 Keep in mind that a dynamic function can accept only serializable arguments.
-These arguments will be passed to C++, so anything that can be represented as `folly::dynamic` is supported (such as strings, numbers, booleans, arrays, objects, etc.).
+These arguments are stored in C++, so only values that can be represented as `folly::dynamic` are supported: strings, numbers, booleans, `null`, `undefined` and plain arrays/objects built from them.
 </Aside>
+
+Unistyles stores the arguments and may re-run your dynamic function natively with the stored copy, e.g. when your theme or runtime values change, or when a view hidden by a frozen or suspended screen is linked again.
+That's why you shouldn't pass non-serializable values:
+
+- functions are dropped (top-level function arguments are removed, which shifts the remaining arguments; nested ones become `null`)
+- `Date`, `Map`, `Set` and class instances lose their prototype and become plain objects (e.g. a `Date` becomes `{}`)
+
+```tsx
+// ❌ Don't pass functions, Dates or class instances
+<View style={styles.container({ getColor: () => 'red', createdAt: new Date() })} />
+
+// ✅ Pass already computed, serializable values
+<View style={styles.container({ color: 'red', createdAt: date.getTime() })} />
+```
 
 </Seo>

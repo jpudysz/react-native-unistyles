@@ -7,7 +7,7 @@ pluginTester({
     pluginOptions: {
         debug: false,
         root: 'src',
-        autoProcessImports: ['@codemask/styles'],
+        autoProcessImports: ['@my-org/styles'],
     },
     babelOptions: {
         plugins: ['@babel/plugin-syntax-jsx'],
@@ -20,7 +20,7 @@ pluginTester({
             title: 'Should respect user imports',
             code: `
                 import { View, Text } from 'react-native'
-                import { StyleSheet } from '@codemask/styles'
+                import { StyleSheet } from '@my-org/styles'
 
                 export const Example = () => {
                     return (
@@ -40,7 +40,7 @@ pluginTester({
                 import { Text } from 'react-native-unistyles/components/native/Text'
                 import { View } from 'react-native-unistyles/components/native/View'
 
-                import { StyleSheet } from '@codemask/styles'
+                import { StyleSheet } from '@my-org/styles'
 
                 export const Example = () => {
                     return (
@@ -61,7 +61,7 @@ pluginTester({
             title: 'Should respect user imports event if then changed the name',
             code: `
                 import { View, Text } from 'react-native'
-                import { s } from '@codemask/styles'
+                import { s } from '@my-org/styles'
 
                 export const Example = () => {
                     return (
@@ -81,7 +81,7 @@ pluginTester({
                 import { Text } from 'react-native-unistyles/components/native/Text'
                 import { View } from 'react-native-unistyles/components/native/View'
 
-                import { s } from '@codemask/styles'
+                import { s } from '@my-org/styles'
 
                 export const Example = () => {
                     return (

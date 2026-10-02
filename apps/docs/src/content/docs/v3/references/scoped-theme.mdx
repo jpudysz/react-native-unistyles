@@ -76,6 +76,8 @@ the dark theme when the color scheme is light
 the light theme when the color scheme is dark
 ```
 
+If adaptive themes are disabled, `ScopedTheme` with `invertedAdaptive` has no effect and its children are rendered with the current theme.
+
 **Use Cases**:
 
 The `invertedAdaptive` prop is useful in scenarios where you want to highlight a specific section of your app by contrasting it with the current theme. For example:
@@ -207,6 +209,8 @@ const ScopedComponent = () => {
     <ScopedComponent />
 </ScopedTheme>
 ```
+
+The `useAnimatedTheme` hook from `react-native-unistyles/reanimated` also respects the parent `ScopedTheme`. Learn more in the [Reanimated guide](/v3/guides/reanimated#access-theme-in-worklets).
 
 ### Scoped Theme with Suspense
 
