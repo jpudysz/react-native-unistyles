@@ -13,21 +13,22 @@ import Seo from '../../../../components/Seo.astro'
     }}
 >
 
-We’ve made Unistyles incredibly easy to use. You no longer need the `useStyle` hook or wrap your app in React Provider. Unistyles integrates seamlessly with your existing code, so you can start using it immediately.
+We’ve made Unistyles incredibly easy to use. You no longer need the `useStyles` hook or wrap your app in React Provider. Unistyles integrates seamlessly with your existing code, so you can start using it immediately.
 
 ### Prerequisites
 
-Unistyles 3.0 is tightly integrated with `Fabric` and the latest versions of React Native. Therefore, you must use the **New Architecture** and at least **React Native 0.78.0**. Additionally, Unistyles relies on `react-native-nitro-modules`.
+Unistyles 3.0 is tightly integrated with `Fabric` and the latest versions of React Native. Therefore, you must use the **New Architecture** and at least **React Native 0.81.0**. Additionally, Unistyles relies on `react-native-nitro-modules`.
 
 <Aside>Learn more about how Unistyles leverages Nitro Modules and React Native Edge to Edge [here](/v3/other/dependencies).</Aside>
 
 **Table of requirements:**
 |                    | Required                  | Note                        |
 |--------------------|---------------------------|-----------------------------|
-| React Native       | 0.78.0+                   |                             |
+| React Native       | 0.81.0+                   |                             |
+| React              | 19.0.0+                   |                             |
 | New Architecture   | enabled                   | no option to opt-out        |
-| Expo SDK           | 53+                       | (if you use Expo)           |
-| Xcode              | 16+ (recommended 16.3+)   | Required by Nitro Modules   |
+| Expo SDK           | 54+                       | (if you use Expo)           |
+| Xcode              | 16.4+                     | Required by Nitro Modules   |
 | Platform           | iOS / Android / Web / SSR | Follow instructions below |
 
 Since Unistyles relies on `Fabric`, it cannot run on the `Old Architecture` or older versions of React Native. If you can’t meet these requirements, you can use Unistyles 2.0+, which is compatible with those versions.
@@ -35,7 +36,7 @@ Since Unistyles relies on `Fabric`, it cannot run on the `Old Architecture` or o
 ### Installation
 
 ```shell title="Install Unistyles and its dependencies"
-yarn add react-native-unistyles react-native-nitro-modules
+yarn add react-native-unistyles react-native-nitro-modules@0.37.1
 ```
 
 :::caution
@@ -47,7 +48,7 @@ Check compatibility table [here](https://github.com/jpudysz/react-native-unistyl
 `react-native-edge-to-edge` is no longer a required dependency. We **strongly recommend** setting `edgeToEdgeEnabled=true` in your `android/gradle.properties` — it enforces translucent system bars on modals, disables legacy StatusBar hacks, and enables additional React Native core fixes.
 
 - **Expo SDK 54+**: Already enabled automatically
-- **Expo SDK 53 / Bare React Native**: Add `edgeToEdgeEnabled=true` to `android/gradle.properties`
+- **Bare React Native**: Add `edgeToEdgeEnabled=true` to `android/gradle.properties`
 
 You can still install `react-native-edge-to-edge` alongside this property for ecosystem compatibility (e.g. `react-native-bootsplash`, `react-native-permissions`). Learn more [here](/v3/other/dependencies).
 </Aside>

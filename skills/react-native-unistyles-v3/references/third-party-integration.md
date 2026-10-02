@@ -4,7 +4,9 @@ How to integrate Unistyles v3 with third-party libraries, custom components, and
 
 ## withUnistyles HOC
 
-For third-party components that need theme-derived **non-style props** (e.g., `color`, `size`, `tintColor`).
+For components that need theme-derived **non-style props** (e.g., `color`, `size`, `trackColor` — including RN components like `Button`/`Switch`), for `contentContainerStyle`, and for third-party views that don't expose a native ref (so Unistyles can't update them from C++).
+
+On iOS/Android a wrapped component is always subscribed to theme changes; other dependencies (insets, breakpoints, ...) re-render it only if the mappings or the passed styles use them.
 
 ### Basic wrapping
 
@@ -22,7 +24,7 @@ const UniButton = withUnistyles(Button, (theme, rt) => ({
 <UniButton title="Override" color="red" />  // overrides mapped color
 ```
 
-### Static mappings vs uniProps
+### Mappings vs uniProps
 
 The second argument to `withUnistyles` maps theme/runtime values to props. These are applied as **defaults** — the consumer can override them:
 
@@ -37,6 +39,31 @@ const UniIcon = withUnistyles(Icon, (theme) => ({
 
 // Consumer overrides color
 <UniIcon name="home" color="red" />
+```
+
+Mappings can't see component props/state. For that, pass `uniProps` per instance:
+
+```tsx
+const UniSwitch = withUnistyles(Switch)
+
+<UniSwitch
+  uniProps={(theme) => ({
+    trackColor: { true: isDisabled ? theme.colors.disabled : theme.colors.primary },
+  })}
+/>
+```
+
+Priority: mappings < `uniProps` < inline props.
+
+### Remounting with `key`
+
+Mappings and `uniProps` can return `key` — it's used as the React `key` (not passed down), so changing it remounts the component (`uniProps` wins if both set):
+
+```tsx
+const UniFlashList = withUnistyles(FlashList, (theme, rt) => ({
+  key: rt.isLandscape ? 'landscape' : 'portrait',
+  numColumns: rt.isLandscape ? 4 : 2,
+}))
 ```
 
 ### Ref forwarding
@@ -55,7 +82,7 @@ const inputRef = useRef<TextInput>(null)
 
 ### style and contentContainerStyle auto-processing
 
-`withUnistyles` automatically processes `style` and `contentContainerStyle` props. You can pass Unistyles styles directly:
+`withUnistyles` automatically processes `style` and `contentContainerStyle` props (they can't be returned from mappings/`uniProps`). You can pass Unistyles styles directly:
 
 ```tsx
 const UniScrollView = withUnistyles(ScrollView)
@@ -70,7 +97,7 @@ const UniScrollView = withUnistyles(ScrollView)
 
 ## Babel Plugin: autoProcessPaths
 
-By default, the Babel plugin only processes files inside the `root` directory. For files outside `root` (e.g., shared packages in a monorepo), add their paths:
+The plugin processes every file under `root` and always ignores `node_modules`. `autoProcessPaths` opts 3rd party code in: inside these paths, `react-native` imports are replaced with Unistyles ref-borrowing factories, so the library's views update from C++:
 
 ```js
 // babel.config.js
@@ -79,21 +106,21 @@ module.exports = {
     ['react-native-unistyles/plugin', {
       root: 'src',
       autoProcessPaths: [
-        '../packages/shared-ui/src',
-        '../packages/design-system/src',
+        'external-library/components',
+        'my-ui-kit/src',
       ],
     }]
   ]
 }
 ```
 
-**Important:** Paths are relative to the project root (where babel.config.js lives).
+**Important:** each entry is matched as a **substring of the absolute file path** — use path fragments like `'some-lib/src'`, not relative paths like `'../packages/ui'` (those never match). `react-native-reanimated/src/component` and `react-native-reanimated/lib/module/component` are always included; your paths are added to them.
 
 ---
 
 ## Babel Plugin: autoProcessImports
 
-Process files that import from custom package names (useful for internal packages that re-export components):
+Force-process any file (outside `node_modules`) that imports one of these sources — the way to cover monorepo packages that live outside `root`:
 
 ```js
 // babel.config.js
@@ -101,19 +128,19 @@ module.exports = {
   plugins: [
     ['react-native-unistyles/plugin', {
       root: 'src',
-      autoProcessImports: ['@myorg/ui', '@myorg/shared-components'],
+      autoProcessImports: ['@my-org/styles', '@my-org/ui'],
     }]
   ]
 }
 ```
 
-This tells the plugin: "If a file imports from `@myorg/ui`, process the components in that file the same way as standard React Native components."
+This tells the plugin: "If a file imports exactly `@my-org/styles`, process it like a file under `root`" (stylesheets + react-native component factories).
 
 ---
 
 ## Babel Plugin: autoRemapImports
 
-Map exotic component imports to Unistyles component factories. Useful when a library exports components with non-standard names that the plugin can't detect:
+Advanced (rarely needed): for a `node_modules` library that doesn't import `react-native` components directly (e.g. imports raw native components from `react-native/Libraries/...`), remap those imports to Unistyles factories (names from `react-native-unistyles/components/native`, e.g. `NativeView`, `NativeText`):
 
 ```js
 // babel.config.js
@@ -121,20 +148,36 @@ module.exports = {
   plugins: [
     ['react-native-unistyles/plugin', {
       root: 'src',
-      autoRemapImports: {
-        '@expo/vector-icons': {
-          'MaterialIcons': 'Text',     // treat as Text factory
-          'FontAwesome': 'Text',
+      autoRemapImports: [
+        {
+          path: 'node_modules/custom-library/components',  // must be a path within node_modules
+          imports: [
+            {
+              isDefault: false,
+              name: 'NativeText',
+              path: 'react-native/Libraries/Text/TextNativeComponent',
+              mapTo: 'NativeText',
+            },
+            {
+              isDefault: true,
+              path: 'react-native/Libraries/Components/View/ViewNativeComponent',
+              mapTo: 'NativeView',
+            },
+          ],
         },
-        'react-native-svg': {
-          'Svg': 'View',              // treat as View factory
-          'Circle': 'View',
-        },
-      },
+      ],
     }]
   ]
 }
 ```
+
+It doesn't make non-RN views (e.g. SVG, icon fonts) reactive — use `withUnistyles` for those.
+
+---
+
+## Re.Pack
+
+Use `RepackUnistylePlugin` from `react-native-unistyles/repack-plugin` in your Rspack config instead of the Babel config entry; pass the same options as `unistylesPluginOptions` (`root` required). See [setup-guide.md](setup-guide.md#repack).
 
 ---
 
@@ -167,6 +210,10 @@ module.exports = {
 ### Version requirements
 
 - `react-native-reanimated` 3.17.3+ **or** 4.0.0-beta.3+
+
+### Theme in worklets
+
+Use `useAnimatedTheme()` from `react-native-unistyles/reanimated` (a `SharedValue`, no re-renders, follows `ScopedTheme`) instead of `UnistylesRuntime.getTheme()` (doesn't update worklets) or `useUnistyles()` (re-renders). Animate variant colors with `useAnimatedVariantColor(styles.x, 'backgroundColor')`, which returns a `SharedValue<string>` to use inside `useAnimatedStyle`.
 
 ### CSS transitions workaround
 
@@ -202,13 +249,9 @@ const animatedStyle = useAnimatedStyle(() => ({
 
 ---
 
-## react-native-edge-to-edge
+## Edge-to-edge (Android)
 
-Required for Android to get proper inset values. Install and use `rt.insets` in styles:
-
-```bash
-npm install react-native-edge-to-edge
-```
+Unistyles reads insets with `WindowInsetsCompat`, which needs an edge-to-edge layout — Unistyles enables it automatically. `react-native-edge-to-edge` is **optional** since v3.1.0; instead set `edgeToEdgeEnabled=true` in `android/gradle.properties` (Expo SDK 54+ does this for you). Keep `react-native-edge-to-edge` only if other libraries detect it (e.g. `react-native-bootsplash`, `react-native-permissions`). Then use `rt.insets` in styles:
 
 ```tsx
 const styles = StyleSheet.create((theme, rt) => ({
@@ -222,6 +265,12 @@ const styles = StyleSheet.create((theme, rt) => ({
 ```
 
 This replaces `react-native-safe-area-context` for most use cases. No `<SafeAreaProvider>` or `useSafeAreaInsets()` needed.
+
+---
+
+## Frozen / hidden screens
+
+Screens hidden without unmounting keep their Unistyles bindings: `freezeOnBlur` (react-navigation / react-native-screens, via `react-freeze`), react-navigation `inactiveBehavior` (React `<Activity />`), and `Suspense` fallbacks. Theme/runtime changes made while hidden are applied when the screen becomes visible (Suspense/react-freeze since 3.2.0, `<Activity />` since 3.3.0, stale-style fixes in **3.4.0** — upgrade if frozen screens come back with outdated styles). Components using `useUnistyles`/`withUnistyles` re-render only after unfreezing.
 
 ---
 
@@ -273,7 +322,7 @@ For design system libraries (Paper, Tamagui, NativeBase, etc.) that have their o
 Keep the library's theme in sync with Unistyles:
 
 ```tsx
-import { UnistylesRuntime, StyleSheet } from 'react-native-unistyles'
+import { StyleSheet, UnistyleDependency, UnistylesRuntime } from 'react-native-unistyles'
 
 // Listen for Unistyles theme changes and sync
 StyleSheet.addChangeListener((deps) => {

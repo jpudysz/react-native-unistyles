@@ -100,7 +100,8 @@ the cause (2026-10-02, iOS 27 simulator, iPhone Air):
 | M3 revert a8d51464 only, `rebuildUnistyle` in `link` clears the StyleSheet's dirty flag      | `frozen-stack` (fresh step pushed after frozen steps re-linked)   | `Paragraph 'description' color expected <dark muted> actual <light muted>`                      |
 | M4a #1266: no sweep of families unmounted while frozen                                      | `frozen-unmount`                                                  | `orphans expected 0 actual 6` (12 after the second rep)                                         |
 | M4b #1266: queued updates are never drained (the #1217 leak)                                | every step                                                        | `pendingUpdates expected 0 actual 57`                                                           |
-| M5 no `refreshReactNodes`, React re-attaches a subtree from before a Unistyles commit       | `update-theme` after `set-theme-on-mount` (iOS and Android)       | runtime `View 'accent' backgroundColor expected <shuffled accent> actual <previous accent>`     |
+| M5 ActivityIndicator linked like a View, its style goes to the inner spinner                | `tour`, `mount-after-flip` (iOS and Android)                      | `ActivityIndicatorView 'spinner' backgroundColor expected <light subtle> actual undefined`      |
+| M6 no `refreshReactNodes`, React re-attaches a subtree from before a Unistyles commit       | `update-theme` after `set-theme-on-mount` (iOS and Android)       | runtime `View 'accent' backgroundColor expected <shuffled accent> actual <previous accent>`     |
 
 #1266 can't be reverted as a whole, `verify()` reads the registry it introduced, so M4a and M4b disable its two
 mechanisms. The use after free itself (#1217, #1179) only crashes with freed families, which needs a Release build with
@@ -108,15 +109,10 @@ a sanitizer, the host still reports a crash whenever one happens.
 
 ## Known issues found by the suite
 
-- ActivityIndicator: React Native puts its `style` on a wrapping View while Unistyles links the style with the inner
-  `ActivityIndicatorView`, so theme changes paint the inner spinner and miss the wrapper (`verify()` reported
-  `ActivityIndicatorView 'spinner' backgroundColor expected <theme> actual undefined`). The showcase keeps themed props
-  off it until this is fixed.
+None open. Both issues it found are fixed and covered by M5 (ActivityIndicator) and M6 (`updateTheme`).
 
 ## Known limitations
 
 - Android reads the tree with `uiautomator`, which needs an idle UI, so sync points never happen while an infinite
   animation is on screen (spinners render with `animating={false}`).
-- `verify()` checks props Unistyles owns. ActivityIndicator styles are linked with the inner native spinner while React
-  Native puts them on a wrapping view, so the showcase keeps themed props off it (see known issues).
 - A theme change is asynchronous (`runOnJSThread`), `settle()` relies on the idle callbacks running after it.

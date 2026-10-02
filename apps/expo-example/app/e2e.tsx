@@ -3,7 +3,7 @@ import { Text, View } from 'react-native'
 import { useLocalSearchParams } from 'expo-router'
 import { StyleSheet } from 'react-native-unistyles'
 import { startRun } from '../e2e'
-import { type ScenarioId, SCENARIOS } from '../e2e/protocol'
+import { parseRunInteger, type ScenarioId, SCENARIOS } from '../e2e/protocol'
 
 type Params = {
     scenarios?: string,
@@ -34,8 +34,8 @@ export default function E2EScreen() {
     useEffect(() => {
         startRun({
             scenarios: parseScenarios(params.scenarios),
-            reps: Number(params.reps ?? 1),
-            seed: Number(params.seed ?? 1),
+            reps: parseRunInteger('reps', params.reps, 1),
+            seed: parseRunInteger('seed', params.seed, 1),
             taps: params.taps === '1',
             host: params.host === '1' || params.taps === '1'
         })

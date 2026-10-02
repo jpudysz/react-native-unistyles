@@ -2,10 +2,12 @@
     --white: #fff;
     --background: #171928;
     --border: rgba(255, 255, 255, 0.5);
+    --hairline: rgba(255, 255, 255, 0.12);
+    --accent-violet: #8B5CF6;
 	--sl-color-accent: #FF5ED7;
 	--sl-color-accent-high: #FF5ED7;
 	--sl-color-white: var(--white);
-    --sl-color-hairline-light: var(--border);
+    --sl-color-hairline-light: var(--hairline);
     --sl-color-bg-sidebar: #141523;
     --sl-color-bg-nav: #141523;
     --sl-color-text: var(--white);
@@ -16,8 +18,8 @@
     --sl-color-bg-inline-code: var(--sl-color-gray-6);
     --sl-color-black: #141523;
     --ec-brdWd: 1px;
-    --ec-brdCol: var(--border)!important;
-    --ec-frm-edTabBarBrdCol: var(--border)!important;
+    --ec-brdCol: var(--hairline)!important;
+    --ec-frm-edTabBarBrdCol: var(--hairline)!important;
     --ec-frm-edActTabBg: rgba(255, 255, 255, 0.1)!important;
     --sl-color-orange: hsl(var(--sl-hue-orange), 82%, 63%)!important;
     --sl-color-orange-high: hsl(var(--sl-hue-orange), 82%, 87%)!important;
@@ -33,22 +35,18 @@
 }
 
 a[aria-current="page"], a[aria-current="page"]:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: linear-gradient(90deg, rgba(255, 94, 215, 0.14), rgba(255, 94, 215, 0.02));
+    border: 1px solid rgba(255, 94, 215, 0.25);
     border-radius: 8px;
     color: var(--sl-color-accent)!important;
 }
 
-a[aria-current="page"]:hover {
-    color: var(--background);
-}
-
 .sidebar-pane, .header {
-    border-color: var(--border)!important;
+    border-color: var(--hairline)!important;
 }
 
 .right-sidebar-panel {
-    border-left: 1px solid var(--border);
+    border-left: 1px solid var(--hairline);
 }
 
 body {
@@ -60,7 +58,15 @@ body {
 }
 
 button[data-open-modal] {
-    border-color: var(--border)!important;
+    border-color: var(--hairline)!important;
+    border-radius: 10px!important;
+    background-color: rgba(255, 255, 255, 0.03)!important;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+button[data-open-modal]:hover {
+    border-color: rgba(255, 94, 215, 0.45)!important;
+    background-color: rgba(255, 94, 215, 0.06)!important;
 }
 
 starlight-theme-select {
@@ -72,7 +78,7 @@ figcaption.header {
 }
 
 .header::before {
-    border-bottom: 1px solid var(--border)!important;
+    border-bottom: 1px solid var(--hairline)!important;
 }
 
 .top-level > li > details > ul > li:nth-child(1) {
@@ -80,7 +86,7 @@ figcaption.header {
 }
 
 .sl-steps > li::before {
-    box-shadow: inset 0 0 0 1px var(--border);
+    box-shadow: inset 0 0 0 1px var(--hairline);
 }
 
 html {
@@ -94,9 +100,86 @@ html {
 .starlight-aside--caution {
     --sl-color-asides-text-accent: var(--sl-color-orange-high);
     --sl-color-asides-border: var(--sl-color-orange);
-    background-color: (--sl-color-orange-low);
+    background-color: var(--sl-color-orange-low);
 }
 
 .sl-badge {
-    background-color: hsl(224, 54%, 20%)!important;
+    background-color: rgba(255, 94, 215, 0.12)!important;
+    border-color: rgba(255, 94, 215, 0.45)!important;
+    border-radius: 999px!important;
+    padding-inline: 0.5em!important;
+}
+
+/* Refresh: header with soft blur and brand gradient line */
+header.header {
+    background-color: rgba(20, 21, 35, 0.82);
+    backdrop-filter: saturate(140%) blur(12px);
+    -webkit-backdrop-filter: saturate(140%) blur(12px);
+    border-bottom-color: transparent!important;
+}
+
+header.header::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 94, 215, 0.6) 30%, rgba(139, 92, 246, 0.6) 70%, transparent);
+    pointer-events: none;
+}
+
+/* Refresh: faint glow behind the page title */
+.main-frame {
+    background:
+        radial-gradient(600px 260px at 30% 0%, rgba(255, 94, 215, 0.07), transparent 70%),
+        radial-gradient(500px 240px at 75% 0%, rgba(139, 92, 246, 0.06), transparent 70%);
+    background-repeat: no-repeat;
+}
+
+/* Refresh: sidebar links */
+.sidebar-content a {
+    transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.sidebar-content a:not([aria-current="page"]):hover {
+    color: var(--white);
+    background-color: rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
+}
+
+/* Refresh: content links */
+.sl-markdown-content a:not(:where(.not-content *)) {
+    color: var(--sl-color-accent);
+    text-decoration-color: rgba(255, 94, 215, 0.4);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.15s ease;
+}
+
+.sl-markdown-content a:not(:where(.not-content *)):hover {
+    text-decoration-color: var(--sl-color-accent);
+}
+
+/* Refresh: rounder code blocks */
+.expressive-code {
+    --ec-brdRad: 12px;
+}
+
+.expressive-code .frame {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18)!important;
+}
+
+/* Refresh: asides */
+.starlight-aside {
+    border-radius: 10px;
+}
+
+/* Refresh: previous / next cards */
+.pagination-links a {
+    border-color: var(--hairline);
+    border-radius: 12px;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.pagination-links a:hover {
+    border-color: rgba(255, 94, 215, 0.5);
+    background-color: rgba(255, 94, 215, 0.04);
 }

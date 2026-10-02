@@ -28,7 +28,7 @@ This combination may cause some issues. To prevent that you need to modify your 
 }
 ```
 
-Then, create `index.ts` file with following content:
+Then, create `index.ts` (or `index.js`) file with following content:
 
 ```js title="index.ts"
 import 'expo-router/entry'
@@ -40,6 +40,10 @@ The `unistyles.ts` file is where Unistyles is configured. For more details, refe
 </Aside>
 
 With this setup, we will ensure that Unistyles is initialized before any other component.
+
+<Aside>
+Expo Router is built on top of React Navigation, so screens can be frozen when they are not focused (`freezeOnBlur`). Unistyles supports frozen screens, learn more [here](/v3/guides/why-my-view-doesnt-update#problem-5-frozen-or-hidden-screens).
+</Aside>
 
 ### Expo Router Web - Static rendering
 

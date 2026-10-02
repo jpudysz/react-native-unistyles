@@ -3,7 +3,7 @@ title: Unistyles Runtime
 description: Learn about Unistyles Runtime in Unistyles 3.0
 ---
 
-import { Card } from '@astrojs/starlight/components'
+import { Aside } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
 
 <Seo
@@ -32,32 +32,56 @@ and use it anywhere in your code, even outside a React component.
 | ----| ---- | ----------- |
 | colorScheme | string | Get your device's color scheme. Available options `dark`, `light` or `unspecified` |
 | hasAdaptiveThemes | boolean | Indicates if you have enabled [adaptive themes](/v3/guides/theming#adaptive-themes) |
-| themeName | string? | Name of the selected theme or `undefined` if you haven't register any theme |
+| themeName | string? | Name of the selected theme or `undefined` if you haven't registered any theme. When read while rendering inside a [ScopedTheme](/v3/references/scoped-theme/), it returns the scoped theme name |
 | breakpoint | string? | Current breakpoint or undefined if you haven't registered any |
 | breakpoints | Object | Your registered breakpoints |
 | screen | \{width: number, height: number\} | Screen dimensions |
+| orientation | `portrait` or `landscape` | Current device orientation |
 | isPortrait | boolean | Indicates if your device is in portrait mode |
 | isLandscape | boolean | Indicates if your device is in landscape mode |
-| contentSizeCategory | IOSContentSizeCategory or AndroidContentSizeCategory | Your device's [content size category](/v3/references/content-size-category/) |
+| contentSizeCategory | IOSContentSizeCategory, AndroidContentSizeCategory or WebContentSizeCategory | Your device's [content size category](/v3/references/content-size-category/) |
 | insets | \{ top: number, bottom: number, left: number, right: number, ime: number \} | Device insets which are safe to put content into |
 | statusBar | \{width: number, height: number\} | Status bar dimensions |
 | navigationBar | \{width: number, height: number\} | Navigation bar dimensions (Android only) |
 | pixelRatio | number | Pixel density of the device |
 | fontScale | number | Font scale of the device |
 | rtl | boolean | Indicates if the device is in RTL mode |
-| getTheme | (themeName?: string) => Theme | Get theme by name or current theme if name was not specified |
 
-## Setters
+## Methods
 
 | Name | Type | Description |
 | ----| ---- | ----------- |
+| getTheme | (themeName?: string) => Theme | Get theme by name or current theme if name was not specified |
 | setTheme | (themeName: string) => void | Change the current theme |
 | setAdaptiveThemes | (enabled: boolean) => void | Toggle [adaptive themes](/v3/guides/theming#adaptive-themes) |
 | updateTheme | (themeName: string, updater: (currentTheme: Theme) => Theme) => void | Update the [theme](/v3/guides/theming/#update-theme-during-runtime) at runtime |
-| statusBar.setHidden | (hidden: boolean) => void | Show/hide status bar at runtime |
-| navigationBar.setHidden | (hidden: boolean) => void | Show/hide navigation bar at runtime |
-| setImmersiveMode | (enabled: boolean) => void | Enable/disable immersive mode (hiding both status and navigation bars) |
-| setRootViewBackgroundColor | (color: string) => void | set root view background color |
+| statusBar.setHidden | (hidden: boolean, animation?: 'none' \| 'fade' \| 'slide') => void | Show/hide status bar at runtime. `animation` is used on iOS |
+| statusBar.setStyle | (style: StatusBarStyle, animated?: boolean) => void | Change status bar content style (`StatusBarStyle.Default`, `StatusBarStyle.Light` or `StatusBarStyle.Dark`) |
+| navigationBar.setHidden | (hidden: boolean) => void | Show/hide navigation bar at runtime (Android only) |
+| setImmersiveMode | (enabled: boolean) => void | Enable/disable immersive mode. Hides both status and navigation bars on Android, only the status bar on iOS (with `fade` animation) |
+| setRootViewBackgroundColor | (color?: string) => void | Set root view background color. Accepts any React Native color, omit it to reset the color to transparent |
+
+```tsx /StatusBarStyle/
+import { UnistylesRuntime, StatusBarStyle } from 'react-native-unistyles'
+
+UnistylesRuntime.statusBar.setStyle(StatusBarStyle.Light, true)
+UnistylesRuntime.statusBar.setHidden(true, 'slide')
+```
+
+<Aside>
+On the web, `statusBar` and `navigationBar` always report `0` dimensions, and `statusBar.setHidden`, `statusBar.setStyle`, `navigationBar.setHidden` and `setImmersiveMode` do nothing.
+`setRootViewBackgroundColor` sets the background color of the `html` element.
+</Aside>
+
+### RTL updates
+
+`rtl` is updated at runtime:
+
+- **Android** – when you call `I18nManager.forceRTL` or the app locale changes
+- **Web** – when the `dir` attribute of the `html` element changes
+- **iOS** – the value is read at app start, so changing it requires an app restart
+
+Every change emits the `Rtl` [dependency](/v3/references/stylesheet/), so styles that use `rt.rtl` are recalculated automatically.
 
 ### Why `UnistylesRuntime` doesn't re-render my component?
 

@@ -60,7 +60,12 @@ export default defineConfig({
 		starlight({
 			title: 'react-native-unistyles',
             description: 'React Native StyleSheet 3.0',
+            favicon: '/favicon.png',
             head: [
+                { tag: 'meta', attrs: { property: 'og:image', content: 'https://unistyl.es/opengraph-image3.png' } },
+                { tag: 'meta', attrs: { property: 'og:image:alt', content: 'Unistyles' } },
+                { tag: 'meta', attrs: { name: 'twitter:image', content: 'https://unistyl.es/opengraph-image3.png' } },
+                { tag: 'meta', attrs: { name: 'twitter:creator', content: '@jpudysz' } },
                 {
                     tag: 'script',
                     attrs: {
@@ -104,7 +109,7 @@ export default defineConfig({
                     label: 'Guides',
                     items: [
                         { label: 'Merging styles', slug: 'v3/guides/merging-styles' },
-                        { label: 'Why my view doesn\'t update?', slug: 'v3/guides/why-my-view-doesnt-update' },
+                        { label: 'Why my view doesn\'t update?', slug: 'v3/guides/why-my-view-doesnt-update', badge: 'Updated!' },
                         { label: 'Theming', slug: 'v3/guides/theming' },
                         { label: 'Avoiding Keyboard', slug: 'v3/guides/avoiding-keyboard' },
                         { label: 'Expo Router', slug: 'v3/guides/expo-router' },
@@ -118,7 +123,7 @@ export default defineConfig({
                     label: 'API reference',
                     items: [
                         { label: 'StyleSheet', slug: 'v3/references/stylesheet', badge: 'Updated!' },
-                        { label: 'Unistyles Runtime', slug: 'v3/references/unistyles-runtime' },
+                        { label: 'Unistyles Runtime', slug: 'v3/references/unistyles-runtime', badge: 'Updated!' },
                         { label: 'Mini Runtime', slug: 'v3/references/mini-runtime' },
                         { label: 'Dynamic Functions', slug: 'v3/references/dynamic-functions' },
                         { label: 'Breakpoints', slug: 'v3/references/breakpoints' },
@@ -140,7 +145,7 @@ export default defineConfig({
                 {
                     label: 'Other',
                     items: [
-                        { label: 'Babel plugin', slug: 'v3/other/babel-plugin' },
+                        { label: 'Babel plugin', slug: 'v3/other/babel-plugin', badge: 'Updated!' },
                         { label: 'Dependencies', slug: 'v3/other/dependencies' },
                         { label: 'For library authors', slug: 'v3/other/for-library-authors' },
                         { label: 'For sponsors', slug: 'v3/other/for-sponsors' },
@@ -153,14 +158,6 @@ export default defineConfig({
                 {
                     label: 'React Native Crossroads', link: 'https://reactnativecrossroads.com'
                 },
-                {
-                    label: 'Codemask', link: 'https://codemask.com'
-                },
-                {
-                    label: 'Hire us!',
-                    badge: 'Hot!',
-                    link: 'https://x.com/messages/compose?recipient_id=769868612198887425'
-                }
 			],
             plugins: [
                 starlightLlmsTxt({

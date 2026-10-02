@@ -80,12 +80,7 @@ We put a lot of effort into making dependency detection as accurate as possible,
 </Aside>
 
 
-### 2. Attaching unique id to each StyleSheet
-
-This helps us identify your `StyleSheet` while you're developing your app and trigger multiple `hot-reloads`. Such identification is required to swap your `StyleSheet` with another one, ensuring that you get up-to-date values during reloads.
-This feature does not affect your app in production, as the bundle never reloads in that environment.
-
-### 3. Component factory (borrowing ref)
+### 2. Component factory (borrowing ref)
 
 This is the most crucial part—without it, Unistyles won’t be able to update your views from C++.
 In the early versions of Unistyles 3.0, we tried solving this problem by using the `ref` prop, but it wasn’t reliable enough.
@@ -120,7 +115,7 @@ const ref = useRef()
 ```
 
 ```ts title="Babel transform"
-import { View } from 'react-native-unistyles/src/components/native/View'
+import { View } from 'react-native-unistyles/components/native/View'
 
 const ref = useRef()
 
@@ -156,7 +151,14 @@ import { Image } from 'react-native-unistyles/components/native/Image'
 <Image source={require('./image.png')} style={styles.image} ref={ref2} />
 ```
 
-### 4. Creating scopes for stateless variants
+The following `react-native` components are processed by the component factory: `ActivityIndicator`, `View`, `Text`, `Image`, `ImageBackground`, `KeyboardAvoidingView`, `Pressable`, `ScrollView`, `FlatList`, `SectionList`, `Switch`, `TextInput`, `RefreshControl`, `TouchableHighlight`, `TouchableOpacity`, `VirtualizedList`, `Animated` and `SafeAreaView`.
+`Modal` (no exposed native handle) and `TouchableWithoutFeedback` (can't accept a `ref`) are not supported.
+
+<Aside type="caution">
+String based refs (eg. `ref="myView"`) are not supported. The Babel plugin will throw an error if it detects one.
+</Aside>
+
+### 3. Creating scopes for stateless variants
 
 When you use variants, each time you call `useVariants`, a new scope is created. This scope contains a local copy of stylesheet that won't affect other components.
 This feature is similar to time travel, allowing you to explore different states of your styles with different calls to `useVariants`.
@@ -217,7 +219,8 @@ You can change this behaviour with options below:
 ### `root` (required)
 
 All files within the specified root folder will be processed by the Babel plugin.
-If you need to process extra folders, use with `autoProcessPaths` option.
+Files outside of `root` are processed only if they create a `StyleSheet` from Unistyles or import one of the `autoProcessImports` paths.
+If you need to process extra folders, use `autoProcessImports` or `autoProcessPaths` options.
 
 ```js
 {
@@ -225,7 +228,8 @@ If you need to process extra folders, use with `autoProcessPaths` option.
 }
 ```
 
-Folder name will be resolved with `process.cwd()`.
+The folder is resolved relative to Babel's `root` (your project directory by default).
+It can't point to the project root itself (e.g. `'.'`), as that would include the `node_modules` folder.
 
 <Aside type="note">
 If you use monorepo or a project with Expo Router, you most likely have multiple root folders.
@@ -238,11 +242,11 @@ In that case:
 ### `autoProcessImports`
 
 This configuration should be used when you want to process files containing specific imports.
-It can be useful for monorepos that use Unistyles with absolute paths, such as `@codemask/styles`.
+It can be useful for monorepos that use Unistyles with absolute paths, such as `@my-org/styles`.
 
 ```js
 {
-    autoProcessImports: ['@codemask/styles'] // whenever Babel encounters this import, it will process your file
+    autoProcessImports: ['@my-org/styles'] // whenever Babel encounters this import, it will process your file
 }
 ```
 
@@ -271,20 +275,22 @@ To convert it to Unistyles, you can use the following configuration:
 ```ts
 {
     autoRemapImports: [
-        path: 'node_modules/custom-library/components', // <- must be path from node_modules
-        imports: [
-            {
-                isDefault: false, // <- is default import?
-                name: 'NativeText', // <- if not, what's the import name?
-                path: 'react-native/Libraries/Text/TextNativeComponent' // <- what's the import source?
-                mapTo: 'NativeText' // <- which Unistyles component should be used? Check react-native-unistyles/src/components/native
-            },
-            {
-                isDefault: true,
-                path: 'react-native/Libraries/Components/View/ViewNativeComponent',
-                mapTo: 'NativeView'
-            }
-        ]
+        {
+            path: 'node_modules/custom-library/components', // <- must be path from node_modules
+            imports: [
+                {
+                    isDefault: false, // <- is default import?
+                    name: 'NativeText', // <- if not, what's the import name?
+                    path: 'react-native/Libraries/Text/TextNativeComponent', // <- what's the import source?
+                    mapTo: 'NativeText' // <- which Unistyles component should be used? Check react-native-unistyles/src/components/native
+                },
+                {
+                    isDefault: true,
+                    path: 'react-native/Libraries/Components/View/ViewNativeComponent',
+                    mapTo: 'NativeView'
+                }
+            ]
+        }
     ]
 }
 ```
@@ -298,12 +304,15 @@ This option should only be used for 3rd party libraries from `node_modules`.
 
 This configuration is unrelated to the `root`, `autoProcessImports`, and `autoRemapImports` options and can be used alongside them.
 By default, the Babel plugin ignores `node_modules`. However, you can extend these paths to attempt converting 3rd components into Unistyles compatible ones.
-Within these paths, we will replace `react-native` imports with `react-native-unistyles` factories that borrow component refs. [Read more](/v3/other/babel-plugin#3-component-factory-borrowing-ref).
+Within these paths, we will replace `react-native` imports with `react-native-unistyles` factories that borrow component refs. [Read more](/v3/other/babel-plugin#2-component-factory-borrowing-ref).
 
-Defaults to:
+The following paths are always processed, and any paths you pass are added to this list:
 
 ```ts
-['react-native-reanimated/src/component']
+[
+    'react-native-reanimated/src/component',
+    'react-native-reanimated/lib/module/component'
+]
 ```
 
 ### `debug`
@@ -325,7 +334,7 @@ const unistylesPluginOptions = {
     // any component in this folder will be processed
     root: 'src',
     // also files with these imports will be processed (in any non-root folder)
-    autoProcessImports: ['@react-native-ui-kit', '@codemask/styles'],
+    autoProcessImports: ['@react-native-ui-kit', '@my-org/styles'],
     // additionally process components from this `node_modules` package
     autoProcessPaths: ['external-library/components'],
     // log what you've found
@@ -344,5 +353,37 @@ module.exports = function (api) {
     }
 }
 ```
+
+### Usage with Re.Pack
+
+If your app is bundled with [Re.Pack](https://re-pack.dev/), use the `RepackUnistylePlugin` instead of adding Unistyles to your `babel.config.js`.
+It registers an Rspack loader that runs the Unistyles Babel plugin on your files.
+
+```js title="rspack.config.mjs"
+import * as Repack from '@callstack/repack'
+import { RepackUnistylePlugin } from 'react-native-unistyles/repack-plugin'
+
+export default {
+    // other config
+    plugins: [
+        new Repack.RepackPlugin(),
+        new RepackUnistylePlugin({
+            // the same options as for the Babel plugin, `root` is required
+            unistylesPluginOptions: {
+                root: 'src'
+            }
+        })
+    ]
+}
+```
+
+`RepackUnistylePlugin` accepts the following options:
+
+- **`unistylesPluginOptions`** – options passed to the Unistyles Babel plugin (see [Extra configuration](#extra-configuration)). The Babel plugin requires the `root` option, so you need to provide it here
+- **`ruleExcludePaths`** – an array of `RegExp` with paths that should be skipped by the loader. Defaults to `BASE_REPACK_EXCLUDE_PATHS` (exported from `react-native-unistyles/repack-plugin`), which covers `react`, `react-native`, `react-native-unistyles`, `react-native-nitro-modules`, `@callstack/repack` and other core packages
+
+<Aside type="caution">
+The loader parses your files with `@babel/plugin-syntax-typescript` (`.ts` / `.tsx` files) and `babel-plugin-syntax-hermes-parser` (`.js` / `.jsx` files). Make sure both packages are installed in your project.
+</Aside>
 
 </Seo>

@@ -307,11 +307,11 @@ You can also change dynamically the root view background color with `UnistylesRu
 ```tsx /UnistylesRuntime.setRootViewBackgroundColor/
 import { UnistylesRuntime } from 'react-native-unistyles'
 
-// update the theme at any time
-export const UpdateTheme = ({ selectedColors }) => (
+// update the root view background color at any time
+export const UpdateRootViewBackgroundColor = () => (
     <Button
-        title="Update theme"
-        onPress={() => UnistylesRuntime.setRootViewBackgroundColor(theme.colors.primary)}
+        title="Update background color"
+        onPress={() => UnistylesRuntime.setRootViewBackgroundColor(UnistylesRuntime.getTheme().colors.primary)}
     />
 )
 ```

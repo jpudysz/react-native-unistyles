@@ -14,6 +14,7 @@ import {
     formatSync,
     LABELS,
     parseReport,
+    parseRunInteger,
     parseSync,
     PROBE_COLORS,
     PROBES,
@@ -66,6 +67,14 @@ const unknownScenario = values.scenarios.split(',').find(id => id !== 'all' && !
 
 if (unknownScenario !== undefined) {
     console.error(`Unknown scenario "${unknownScenario}", expected one of: all, ${SCENARIOS.join(', ')}`)
+    process.exit(2)
+}
+
+try {
+    parseRunInteger('reps', values.reps, 20)
+    parseRunInteger('seed', values.seed, 1)
+} catch (error) {
+    console.error(error instanceof Error ? error.message : error)
     process.exit(2)
 }
 

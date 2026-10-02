@@ -23,10 +23,14 @@ Before diving into this guide, make sure you've read the other guides covering t
 ### Problem 1: Babel
 
 To leverage ShadowTree updates and avoid unnecessary re-renders, Unistyles must process both `StyleSheets` and your components.
-By default, the Babel plugin looks for `react-native-unistyles` imports and always ignores the `node_modules` folder.
+The Babel plugin processes:
+- every file under the required `root` folder (no matter what it imports)
+- files outside of `root` that create a `StyleSheet` from Unistyles or import one of the `autoProcessImports` paths
 
-If you separate `StyleSheets` from your components, it's your responsibility to configure Babel to detect components that lack a Unistyles import.
-We've added plenty of options, so be sure to [check them out](/v3/other/babel-plugin##extra-configuration).
+Files inside `node_modules` are ignored, unless they match `autoProcessPaths`.
+
+Views usually stop updating when a component lives outside of `root` (e.g. in a shared monorepo package) in a file that doesn't create its own `StyleSheet` (for example, it imports styles from another file), or inside a 3rd party library.
+For such cases, use the `autoProcessPaths`, `autoProcessImports` or `autoRemapImports` options. Be sure to [check them out](/v3/other/babel-plugin#extra-configuration).
 
 ### Problem 2: Dependency detection
 
@@ -68,7 +72,7 @@ On mobile, styles are returned the same way as in React Native. You can always `
 
 ```tsx title="mobile"
 export const MyView: React.FunctionComponent = () => {
-    console.log(styles.container) // { backgroundColor: 'red' }
+    console.log(styles.container) // { backgroundColor: 'red', unistyles_xyz: {} }
 
     return (
         ...
@@ -82,11 +86,11 @@ const styles = StyleSheet.create({
 })
 ```
 
-For the web, styles are not returned directly, as they are converted into CSS classes. If you try to log them, there will be no output:
+For the web, styles are not returned directly, as they are converted into CSS classes. If you try to log them, you won't see any style values:
 
 ```tsx title="web"
 export const MyView: React.FunctionComponent = () => {
-    console.log(styles.container) // {}
+    console.log(styles.container) // { unistyles_xyz: {} }
 
     return (
         ...
@@ -100,6 +104,23 @@ const styles = StyleSheet.create({
 })
 ```
 
-That's why you might mistakenly think the problem is only on the web. Please follow the [Babel config](/v3/other/babel-plugin##extra-configuration) to ensure all your components and StyleSheets are detected correctly.
+That's why you might mistakenly think the problem is only on the web. Please follow the [Babel config](/v3/other/babel-plugin#extra-configuration) to ensure all your components and StyleSheets are detected correctly.
+
+### Problem 5: Frozen or hidden screens
+
+Screens can be hidden without being unmounted, for example:
+
+- with `freezeOnBlur` in `react-navigation` / `react-native-screens` (powered by `react-freeze`, which uses `Suspense`)
+- with the `inactiveBehavior` option in `react-navigation` (powered by React's `<Activity />`)
+- by a `Suspense` boundary showing its fallback
+
+Unistyles keeps the bindings of such views. Theme and runtime changes made while a screen is hidden are applied when the screen becomes visible again.
+
+<Aside>
+`Suspense` and `react-freeze` support was added in Unistyles `3.2.0`, `<Activity />` (`inactiveBehavior`) support in `3.3.0`.
+Fixes for frozen screens coming back with stale styles landed in `3.4.0`. If your frozen screens show outdated styles, upgrade to `3.4.0` or newer.
+</Aside>
+
+Components that use `useUnistyles` or `withUnistyles` re-render only after the screen is unfrozen, as React blocks rendering of frozen trees.
 
 </Seo>

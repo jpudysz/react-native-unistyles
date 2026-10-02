@@ -3,7 +3,7 @@ title: Avoiding keyboard
 description: Learn how to avoid keyboard with Unistyles
 ---
 
-import { Card } from '@astrojs/starlight/components'
+import { Card, Aside } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
 
 <Seo
@@ -53,6 +53,28 @@ const styles = StyleSheet.create((theme, rt) => ({
 ```
 
 In this example, the `container` will automatically adjust to avoid the keyboard, ensuring the `input` remains visible at all times.
+
+### Platform differences
+
+The `ime` value is calculated differently on every platform:
+
+- **iOS** - `ime` is equal to the full height of the keyboard and it's animated frame by frame together with the keyboard
+- **Android** - `ime` is equal to the keyboard height minus the bottom inset (navigation bar). It's animated on Android 11 (API 30) and above, while on older versions it changes without animation
+- **Web** - `ime` is always `0`
+
+<Aside>
+On Android, Unistyles guards `rt.insets.bottom` from being polluted with the keyboard height by keyboard management libraries like `react-native-keyboard-controller`.
+</Aside>
+
+### Usage with `useUnistyles` and `withUnistyles`
+
+You can also read `rt.insets.ime` in [useUnistyles](/v3/references/use-unistyles) or in [withUnistyles](/v3/references/with-unistyles) mappings.
+Reading `rt.insets.ime` subscribes only to keyboard changes, not to other insets.
+
+<Aside type="caution">
+`ime` is animated, so components that read it in `useUnistyles` or `withUnistyles` will re-render on every frame of the keyboard animation.
+Prefer reading it in `StyleSheet`, which updates your views without any re-renders.
+</Aside>
 
 
 </Seo>

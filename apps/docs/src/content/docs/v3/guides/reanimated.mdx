@@ -49,6 +49,8 @@ export const MyAnimatedComponent = () => {
 It also triggers worklet updates if any change occurs and doesn't cause re-renders.
 </Aside>
 
+`useAnimatedTheme` also respects the parent [ScopedTheme](/v3/references/scoped-theme). Inside a `ScopedTheme`, it returns the scoped theme instead of the global one.
+
 ### Animating variant colors
 
 It's possible to reuse Unistyles variant colors and animate them using the `useAnimatedStyle` hook.
