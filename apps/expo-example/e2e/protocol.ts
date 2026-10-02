@@ -20,6 +20,17 @@ export const SCENARIOS = [
 
 export type ScenarioId = typeof SCENARIOS[number]
 
+// `reps` must be at least 1, otherwise no scenario runs and the result is an empty PASS
+export const parseRunInteger = (name: 'reps' | 'seed', value: string | undefined, fallback: number) => {
+    const parsed = value === undefined ? fallback : Number(value)
+
+    if (!Number.isInteger(parsed) || (name === 'reps' && parsed < 1)) {
+        throw new Error(`Invalid e2e ${name} "${value}", expected ${name === 'reps' ? 'a positive integer' : 'an integer'}`)
+    }
+
+    return parsed
+}
+
 // The runner blocks at a sync point until the host acts, every other step runs without the host
 export type SyncKind = 'READY' | 'CHECKPOINT' | 'TAP' | 'APPEARANCE' | 'FAILURE' | 'RESULT'
 
