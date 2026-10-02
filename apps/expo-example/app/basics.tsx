@@ -158,11 +158,10 @@ const styles = StyleSheet.create(theme => ({
     switch: {
         backgroundColor: theme.colors.background
     },
-    // no themed props: React Native puts ActivityIndicator's style on a wrapping View,
-    // but Unistyles links it with the inner native spinner, so theme changes would miss the wrapper
     spinner: {
         borderRadius: 8,
-        padding: theme.gap(1)
+        padding: theme.gap(1),
+        backgroundColor: theme.colors.chip.subtle
     },
     pressable: (isPressed: boolean) => ({
         padding: theme.gap(1.5),
