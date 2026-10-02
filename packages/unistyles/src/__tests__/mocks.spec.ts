@@ -96,3 +96,55 @@ describe('StyleSheet.create mock', () => {
         expect(styles.container).toEqual({ flex: 1, padding: 16 })
     })
 })
+
+describe('mock registry persistence', () => {
+    const REGISTRY_KEY = '__UNISTYLES_MOCK_REGISTRY__'
+
+    it('should keep configured themes visible to StyleSheet.create after jest.resetModules()', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const globalWithRegistry = globalThis as any
+        const registryExisted = REGISTRY_KEY in globalWithRegistry
+        // StyleSheet.configure reassigns .themes/.breakpoints on the shared registry object,
+        // so a plain reference wouldn't survive the mutation below — snapshot the values instead.
+        const previousRegistry = registryExisted
+            ? {
+                  themes: { ...globalWithRegistry[REGISTRY_KEY].themes },
+                  breakpoints: { ...globalWithRegistry[REGISTRY_KEY].breakpoints },
+              }
+            : undefined
+
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const first = require('react-native-unistyles') as { StyleSheet: { configure: (config: any) => void } }
+
+            first.StyleSheet.configure({
+                themes: {
+                    light: {
+                        colors: {
+                            bg: 'red',
+                        },
+                    },
+                },
+            })
+
+            jest.resetModules()
+
+            const second = require('react-native-unistyles') as { StyleSheet: { create: CreateUnistylesStyleSheet } }
+
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any
+            const styles = second.StyleSheet.create((theme: any) => ({
+                box: {
+                    backgroundColor: theme.colors.bg,
+                },
+            }))
+
+            expect(styles.box).toEqual({ backgroundColor: 'red' })
+        } finally {
+            if (!registryExisted) {
+                delete globalWithRegistry[REGISTRY_KEY]
+            } else {
+                globalWithRegistry[REGISTRY_KEY] = previousRegistry
+            }
+        }
+    })
+})
