@@ -358,3 +358,25 @@ void core::UnistylesRegistry::destroy() {
     this->_scopedTheme = std::nullopt;
     _nextStyleSheetTag.store(0);
 }
+
+std::vector<core::LinkedFamilySnapshot> core::UnistylesRegistry::getLinkedFamiliesSnapshot() {
+    std::vector<LinkedFamilySnapshot> snapshot;
+
+    this->trafficController.withLock([this, &snapshot](){
+        snapshot.reserve(this->_shadowRegistry.size());
+
+        for (const auto& [_, linkedFamily] : this->_shadowRegistry) {
+            const bool isOwnedOnlyByUnistyles = this->isOwnedOnlyByUnistyles(linkedFamily);
+
+            snapshot.push_back({linkedFamily.family, linkedFamily.unistyles, linkedFamily.isSuspended, isOwnedOnlyByUnistyles});
+        }
+    });
+
+    return snapshot;
+}
+
+size_t core::UnistylesRegistry::getPendingUpdatesCount() {
+    return this->trafficController.withLock([this](){
+        return this->trafficController.getUpdatesCount();
+    });
+}

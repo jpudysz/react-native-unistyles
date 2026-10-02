@@ -74,6 +74,13 @@
       "browser": "./lib/module/reanimated/index.js",
       "react-native": "./src/reanimated/index.ts",
       "default": "./lib/commonjs/reanimated/index.js"
+    },
+    "./diagnostics": {
+      "types": "./lib/typescript/src/diagnostics/index.d.ts",
+      "import": "./lib/module/diagnostics/index.js",
+      "browser": "./lib/module/diagnostics/index.js",
+      "react-native": "./src/diagnostics/index.ts",
+      "default": "./lib/commonjs/diagnostics/index.js"
     }
   },
   "files": [
@@ -89,6 +96,7 @@
     "server",
     "web-only",
     "reanimated",
+    "diagnostics",
     "react-native.config.js",
     "Unistyles.podspec",
     "repack-plugin",

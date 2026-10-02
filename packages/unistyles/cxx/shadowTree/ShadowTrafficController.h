@@ -36,6 +36,10 @@ struct ShadowTrafficController {
         return family;
     }
 
+    inline size_t getUpdatesCount() const {
+        return _unistylesUpdates.size();
+    }
+
     template <typename F>
     inline auto withLock(F&& func) {
         std::lock_guard<std::mutex> lock(_mutex);

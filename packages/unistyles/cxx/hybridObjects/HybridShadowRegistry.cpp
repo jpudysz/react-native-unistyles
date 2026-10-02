@@ -178,6 +178,10 @@ jsi::Value HybridShadowRegistry::getScopedTheme(jsi::Runtime &rt, const jsi::Val
         : jsi::Value::undefined();
 }
 
+jsi::Value HybridShadowRegistry::verify(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    return shadow::ShadowTreeDiagnostics::verify(rt, this->_unistylesRuntime);
+}
+
 std::shared_ptr<const core::ShadowNode> HybridShadowRegistry::getShadowNodeFromRef(jsi::Runtime& rt, const jsi::Value& maybeRef) {
     return Bridging<std::shared_ptr<const ShadowNode>>::fromJs(rt, maybeRef);
 }
