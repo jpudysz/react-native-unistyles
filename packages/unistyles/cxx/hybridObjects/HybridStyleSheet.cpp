@@ -348,17 +348,18 @@ void HybridStyleSheet::applyDependencyChanges(jsi::Runtime& rt, std::vector<Unis
     // but their rawValue must still be refreshed so rerenders read fresh closures
     auto dependentStyleSheets = registry.getStyleSheetsToRefresh(dependencies);
 
-    if (dependencyMap.empty() && dependentStyleSheets.empty()) {
-        return;
-    }
-
     // rebuild rawValue BEFORE notifying listeners so JS rerenders read fresh closures
-    parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets, maybeMiniRuntime);
+    if (!dependencyMap.empty() || !dependentStyleSheets.empty()) {
+        parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets, maybeMiniRuntime);
+    }
 
     if (!dependencyMap.empty()) {
         parser.rebuildShadowLeafUpdates(rt, dependencyMap);
     }
 
+    // JS listeners (useUnistyles, withUnistyles, Display/Hide, useAnimatedTheme, StyleSheet.addChangeListener)
+    // subscribe to runtime changes directly and must be notified even when no registered StyleSheet
+    // depends on the changed dependencies, otherwise they never learn about e.g. orientation changes
     this->notifyJSListeners(dependencies);
 
     if (!dependencyMap.empty()) {
