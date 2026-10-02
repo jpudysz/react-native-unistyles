@@ -1,0 +1,6 @@
+{
+  "main": "../lib/commonjs/diagnostics/index",
+  "module": "../lib/module/diagnostics/index",
+  "react-native": "../src/diagnostics/index",
+  "types": "../lib/typescript/src/diagnostics/index"
+}

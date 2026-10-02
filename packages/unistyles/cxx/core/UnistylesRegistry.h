@@ -29,6 +29,13 @@ struct LinkedFamily {
     bool isSuspended = false;
 };
 
+struct LinkedFamilySnapshot {
+    std::shared_ptr<const ShadowNodeFamily> family;
+    std::vector<std::shared_ptr<UnistyleData>> unistyles;
+    bool isSuspended = false;
+    bool isOwnedOnlyByUnistyles = false;
+};
+
 struct UnistylesRegistry: public StyleSheetRegistry {
     static UnistylesRegistry& get();
 
@@ -61,6 +68,8 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     void setScopedTheme(std::optional<std::string> themeName);
     core::Unistyle::Shared getUnistyleById(std::string unistyleID);
     void destroy();
+    std::vector<LinkedFamilySnapshot> getLinkedFamiliesSnapshot();
+    size_t getPendingUpdatesCount();
 
 private:
     using ReleasedFamilies = std::vector<std::shared_ptr<const ShadowNodeFamily>>;

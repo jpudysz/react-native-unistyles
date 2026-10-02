@@ -6,6 +6,7 @@
 #include "UnistylesState.h"
 #include "UnistylesRegistry.h"
 #include "ShadowTreeManager.h"
+#include "ShadowTreeDiagnostics.h"
 #include <cxxreact/ReactNativeVersion.h>
 
 namespace margelo::nitro::unistyles {
@@ -38,6 +39,10 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
                             const jsi::Value& thisValue,
                             const jsi::Value* args,
                             size_t count);
+    jsi::Value verify(jsi::Runtime& rt,
+                            const jsi::Value& thisValue,
+                            const jsi::Value* args,
+                            size_t count);
 
     void loadHybridMethods() override {
         HybridUnistylesShadowRegistrySpec::loadHybridMethods();
@@ -49,6 +54,7 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
             prototype.registerRawHybridMethod("flush", 0, &HybridShadowRegistry::flush);
             prototype.registerRawHybridMethod("setScopedTheme", 1, &HybridShadowRegistry::setScopedTheme);
             prototype.registerRawHybridMethod("getScopedTheme", 0, &HybridShadowRegistry::getScopedTheme);
+            prototype.registerRawHybridMethod("verify", 0, &HybridShadowRegistry::verify);
         });
     };
     

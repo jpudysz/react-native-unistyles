@@ -1,5 +1,6 @@
 import { NitroModules } from 'react-native-nitro-modules'
 
+import type { VerifyReport } from '../../diagnostics/types'
 import type { UnistylesShadowRegistry as UnistylesShadowRegistrySpec } from './ShadowRegistry.nitro'
 import type { ShadowNode, Unistyle, ViewHandle } from './types'
 
@@ -14,6 +15,7 @@ interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     flush(): void
     setScopedTheme(themeName?: string): void
     getScopedTheme(): string | undefined
+    verify(): VerifyReport
 }
 
 const HybridShadowRegistry = NitroModules.createHybridObject<ShadowRegistry>('UnistylesShadowRegistry')
