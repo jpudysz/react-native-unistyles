@@ -100,6 +100,7 @@ the cause (2026-10-02, iOS 27 simulator, iPhone Air):
 | M3 revert a8d51464 only, `rebuildUnistyle` in `link` clears the StyleSheet's dirty flag      | `frozen-stack` (fresh step pushed after frozen steps re-linked)   | `Paragraph 'description' color expected <dark muted> actual <light muted>`                      |
 | M4a #1266: no sweep of families unmounted while frozen                                      | `frozen-unmount`                                                  | `orphans expected 0 actual 6` (12 after the second rep)                                         |
 | M4b #1266: queued updates are never drained (the #1217 leak)                                | every step                                                        | `pendingUpdates expected 0 actual 57`                                                           |
+| M5 no `refreshReactNodes`, React re-attaches a subtree from before a Unistyles commit       | `update-theme` after `set-theme-on-mount` (iOS and Android)       | runtime `View 'accent' backgroundColor expected <shuffled accent> actual <previous accent>`     |
 
 #1266 can't be reverted as a whole, `verify()` reads the registry it introduced, so M4a and M4b disable its two
 mechanisms. The use after free itself (#1217, #1179) only crashes with freed families, which needs a Release build with
@@ -107,11 +108,6 @@ a sanitizer, the host still reports a crash whenever one happens.
 
 ## Known issues found by the suite
 
-- `updateTheme` doesn't reach some nodes (iOS and Android): run `set-theme-on-mount,update-theme`. After a screen called
-  `setTheme` from its mount effect, `updateTheme` of the current theme on the runtime screen queues the right props
-  (traced in `rebuildShadowLeafUpdates`) but the committed shadow tree keeps the old value, `update-theme` reports
-  `View 'accent' backgroundColor expected <updated accent> actual <previous accent>`. `update-theme` alone passes.
-  Not fixed yet, so the full suite fails on main with these 2 mismatches.
 - ActivityIndicator: React Native puts its `style` on a wrapping View while Unistyles links the style with the inner
   `ActivityIndicatorView`, so theme changes paint the inner spinner and miss the wrapper (`verify()` reported
   `ActivityIndicatorView 'spinner' backgroundColor expected <theme> actual undefined`). The showcase keeps themed props

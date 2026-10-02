@@ -4,6 +4,8 @@ import type { VerifyReport } from '../../diagnostics/types'
 import type { UnistylesShadowRegistry as UnistylesShadowRegistrySpec } from './ShadowRegistry.nitro'
 import type { ShadowNode, Unistyle, ViewHandle } from './types'
 
+import { StyleSheet } from '../StyleSheet'
+
 interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     // Babel API
     add(handle?: ViewHandle, styles?: Array<Unistyle>): void
@@ -16,10 +18,12 @@ interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     setScopedTheme(themeName?: string): void
     getScopedTheme(): string | undefined
     verify(): VerifyReport
+    refreshReactNodes(nodes: Array<ShadowNode>): void
 }
 
 const HybridShadowRegistry = NitroModules.createHybridObject<ShadowRegistry>('UnistylesShadowRegistry')
 
+const HOST_COMPONENT_TAG = 5
 const SUSPENSE_TAG = 13
 const OFFSCREEN_TAG = 22
 
@@ -67,6 +71,81 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
     return node
 }
 
+// weak, nodes unmounted while frozen are never removed
+const linkedHandles = new Set<WeakRef<ViewHandle>>()
+const linkedHandleRefs = new WeakMap<ViewHandle, WeakRef<ViewHandle>>()
+
+const trackHandle = (handle: ViewHandle) => {
+    if (linkedHandleRefs.has(handle)) {
+        return
+    }
+
+    const ref = new WeakRef(handle)
+
+    linkedHandleRefs.set(handle, ref)
+    linkedHandles.add(ref)
+}
+
+const untrackHandle = (handle: ViewHandle) => {
+    const ref = linkedHandleRefs.get(handle)
+
+    if (ref) {
+        linkedHandles.delete(ref)
+        linkedHandleRefs.delete(handle)
+    }
+}
+
+// React re-attaches an untouched subtree through its root's node and only follows clones made on the JS thread.
+// Once a node was cloned elsewhere (state updates, Reanimated), React would commit a subtree from before a Unistyles
+// update, so after every Unistyles commit the linked nodes and their host ancestors must point at the committed tree
+const refreshReactNodes = () => {
+    const nodes = new Set<ShadowNode>()
+    const visited = new Set<any>()
+
+    for (const ref of linkedHandles) {
+        const handle = ref.deref()
+
+        if (!handle) {
+            linkedHandles.delete(ref)
+
+            continue
+        }
+
+        const fiber = findFiberForHandle(handle)
+
+        // hidden by Suspense or a frozen screen, it gets fresh styles when restored
+        if (!fiber || isInsideSuspendedBoundary(fiber)) {
+            continue
+        }
+
+        for (let current: any = fiber; current && !visited.has(current); current = current.return) {
+            visited.add(current)
+
+            if (current.alternate) {
+                visited.add(current.alternate)
+            }
+
+            if (current.tag !== HOST_COMPONENT_TAG) {
+                continue
+            }
+
+            for (const target of [current, current.alternate]) {
+                const node = target?.stateNode?.node
+
+                if (node) {
+                    nodes.add(node)
+                }
+            }
+        }
+    }
+
+    if (nodes.size > 0) {
+        HybridShadowRegistry.refreshReactNodes(Array.from(nodes))
+    }
+}
+
+StyleSheet.addChangeListener(refreshReactNodes)
+
 HybridShadowRegistry.add = (handle, styles) => {
     // virtualized nodes can be null
     if (!handle || !styles) {
@@ -91,6 +170,7 @@ HybridShadowRegistry.add = (handle, styles) => {
         }
 
         HybridShadowRegistry.link(node, filteredStyles)
+        trackHandle(handle)
     }
 }
 
@@ -108,10 +188,11 @@ HybridShadowRegistry.remove = (handle) => {
             HybridShadowRegistry.suspend(maybeNode)
         } else {
             HybridShadowRegistry.unlink(maybeNode)
+            untrackHandle(handle)
         }
     }
 }
 
-type PrivateMethods = 'add' | 'remove' | 'link' | 'unlink' | 'suspend'
+type PrivateMethods = 'add' | 'remove' | 'link' | 'unlink' | 'suspend' | 'refreshReactNodes'
 
 export const UnistylesShadowRegistry = HybridShadowRegistry as Omit<ShadowRegistry, PrivateMethods>

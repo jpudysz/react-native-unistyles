@@ -182,6 +182,46 @@ jsi::Value HybridShadowRegistry::verify(jsi::Runtime &rt, const jsi::Value &this
     return shadow::ShadowTreeDiagnostics::verify(rt, this->_unistylesRuntime);
 }
 
+jsi::Value HybridShadowRegistry::refreshReactNodes(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    helpers::assertThat(rt, count == 1 && args[0].isObject(), "Unistyles: refreshReactNodes expected to be called with an array of shadow nodes.");
+
+    auto nodes = args[0].asObject(rt).asArray(rt);
+    std::unordered_map<SurfaceId, std::shared_ptr<const RootShadowNode>> roots;
+
+    UIManagerBinding::getBinding(rt)->getUIManager().getShadowTreeRegistry().enumerate([&roots](const ShadowTree& shadowTree, bool&) {
+        roots.emplace(shadowTree.getSurfaceId(), shadowTree.getCurrentRevision().rootShadowNode);
+    });
+
+    for (size_t i = 0; i < nodes.size(rt); i++) {
+        auto node = nodes.getValueAtIndex(rt, i);
+
+        if (!node.isObject() || !node.asObject(rt).hasNativeState<ShadowNodeWrapper>(rt)) {
+            continue;
+        }
+
+        auto wrapper = node.asObject(rt).getNativeState<ShadowNodeWrapper>(rt);
+        const auto& family = wrapper->shadowNode->getFamily();
+        auto rootIt = roots.find(family.getSurfaceId());
+
+        if (rootIt == roots.end()) {
+            continue;
+        }
+
+        auto ancestors = family.getAncestors(*rootIt->second);
+
+        // frozen nodes are not in the committed tree, nativeProps_DEPRECATED covers them
+        if (ancestors.empty()) {
+            continue;
+        }
+
+        const auto& [parent, index] = ancestors.back();
+
+        wrapper->shadowNode = parent.get().getChildren().at(index);
+    }
+
+    return jsi::Value::undefined();
+}
+
 std::shared_ptr<const core::ShadowNode> HybridShadowRegistry::getShadowNodeFromRef(jsi::Runtime& rt, const jsi::Value& maybeRef) {
     return Bridging<std::shared_ptr<const ShadowNode>>::fromJs(rt, maybeRef);
 }
