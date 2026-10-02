@@ -17,12 +17,12 @@ You are migrating a React Native codebase from react-native-unistyles v2 to v3. 
 
 ## Prerequisites
 
-- React Native 0.78.0+ with New Architecture **mandatory** (enabled by default from RN 0.83+)
+- React Native 0.81.0+ with New Architecture **mandatory** (enabled by default since RN 0.76, the only architecture since RN 0.82)
 - React 19+ (enforced at runtime by Unistyles)
-- `react-native-nitro-modules` (native bridge dependency)
-- `react-native-edge-to-edge` (required for Android edge-to-edge insets)
-- Expo SDK 53+ (if using Expo; not compatible with Expo Go — requires dev client or prebuild)
-- Xcode 16+ (iOS)
+- `react-native-nitro-modules` (native bridge dependency; Unistyles 3.4.0+ requires 0.37.1+)
+- `react-native-edge-to-edge` is optional since v3.1.0 (we strongly recommend setting `edgeToEdgeEnabled=true` in `android/gradle.properties`; Expo SDK 54+ enables it automatically)
+- Expo SDK 54+ (if using Expo; not compatible with Expo Go — requires dev client or prebuild)
+- Xcode 16.4+ (iOS, required by Nitro Modules), iOS 15.1+
 
 ## Migration Workflow
 
@@ -30,7 +30,13 @@ Follow these steps IN ORDER. Each step must be completed before moving to the ne
 
 ### Step 1: Install v3 and configure Babel plugin
 
-Install `react-native-unistyles@3` and add the Babel plugin:
+Install v3 together with Nitro Modules, then rebuild the native app (pods / Gradle):
+
+```bash
+yarn add react-native-unistyles@3 react-native-nitro-modules@0.37.1  # or npm / bun / pnpm
+```
+
+Add the Babel plugin:
 
 ```js
 // babel.config.js
@@ -41,9 +47,11 @@ module.exports = {
 }
 ```
 
-The `root` option is REQUIRED. It tells the plugin which directory contains your app code. Files outside this directory (except node_modules paths you explicitly configure) won't be processed.
+The `root` option is REQUIRED (the plugin throws without it, and it can't resolve to the project root itself). Every file under `root` is processed, no matter what it imports. Outside `root`, a file is processed only if it imports `react-native-unistyles`, contains an import listed in `autoProcessImports`, or matches `autoProcessPaths` (which always includes the two `react-native-reanimated` component paths; yours are added to them). `node_modules` is ignored unless whitelisted via `autoProcessPaths` / `autoRemapImports`.
 
 If using React Compiler, the Unistyles plugin MUST come BEFORE React Compiler in the plugins array.
+
+If the app is bundled with Re.Pack, don't add the plugin to `babel.config.js` — use `RepackUnistylePlugin` from `react-native-unistyles/repack-plugin` with `unistylesPluginOptions: { root: 'src' }` instead.
 
 ### Step 2: Replace UnistylesRegistry with StyleSheet.configure
 
@@ -66,13 +74,14 @@ If using React Compiler, the Unistyles plugin MUST come BEFORE React Compiler in
 +   themes: { light: lightTheme, dark: darkTheme },
 +   breakpoints: { sm: 0, md: 768, lg: 1200 },
 +   settings: {
-+     adaptiveThemes: true,
-+     initialTheme: 'dark'
++     adaptiveThemes: true // OR initialTheme: 'dark' - never both
 +   }
 + })
 ```
 
 **Removed settings:** `plugins`, `experimentalCSSMediaQueries` (now always on), `windowResizeDebounceTimeMs` (no debounce), `disableAnimatedInsets` (insets no longer re-render).
+
+**v3 `settings` accepts exactly:** `adaptiveThemes`, `initialTheme`, `CSSVars` (web), `nativeBreakpointsMode` (`'pixels'` default | `'points'`). Any other key throws. `initialTheme` together with `adaptiveThemes: true` throws (mutually exclusive), `adaptiveThemes` requires both `light` and `dark` themes, and the first breakpoint must be `0`. Call `StyleSheet.configure` before any `StyleSheet.create` is evaluated (import the config file first in your entry point).
 
 ### Step 3: Replace all StyleSheet imports and createStyleSheet
 
@@ -103,6 +112,8 @@ Unistyles `StyleSheet` is a full polyfill of React Native's `StyleSheet` — it 
 ```
 
 Styles created with `StyleSheet.create` are used directly - no hook needed. The Babel plugin handles reactivity at build time.
+
+Dynamic functions (`styles.box(width, color)`) keep working, but their arguments must be serializable (strings, numbers, booleans, `null`, `undefined`, plain arrays/objects) because Unistyles stores them in C++ and re-runs the function on theme/runtime changes. Functions are dropped and `Date` / `Map` / `Set` / class instances become plain objects — pass precomputed values instead.
 
 ### Step 5: Replace useInitialTheme with settings.initialTheme
 
@@ -150,7 +161,7 @@ const MyComponent = () => {
 }
 ```
 
-**WARNING:** `useUnistyles` causes re-renders when theme/runtime changes. Prefer `withUnistyles` or `StyleSheet.create(theme => ...)` for performance.
+**WARNING:** `useUnistyles` re-renders the whole component whenever a `theme` / `rt` value you read changes (subscriptions are created on property access, not on destructuring). Prefer `withUnistyles` or `StyleSheet.create(theme => ...)` for performance. Note that on iOS/Android `withUnistyles` components always re-render on theme change. `withUnistyles` mappings receive the mini runtime, can't return `style` / `contentContainerStyle` (those are mapped automatically), and may return a `key` to force a remount.
 
 ### Step 7: Update variant selection
 
@@ -159,7 +170,7 @@ const MyComponent = () => {
 + styles.useVariants({ size: 'large', color: 'primary' })
 ```
 
-Call `styles.useVariants()` at the top of your component (like a hook). It must be called before accessing styles that use variants.
+Call `styles.useVariants()` at the top of your component (like a hook). It must be called before accessing styles that use variants. It always expects an object — pass `{}` to select `default` variants; `styles.useVariants(undefined)` throws on iOS/Android. Without a `useVariants` call, variants (including `default`) are ignored.
 
 ### Step 8: Fix style spreading (CRITICAL)
 
@@ -205,31 +216,37 @@ The plugin system is removed. Replace plugins with static functions in your them
 
 ### Step 11: Update UnistylesRuntime usage
 
-**Renamed/changed methods:**
-- `UnistylesRuntime.setImmersiveMode(bool)` replaces separate status bar/nav bar hide
-- `UnistylesRuntime.setRootViewBackgroundColor(color)` - no more alpha parameter
+**Renamed/changed methods** (follow the TypeScript types for the rest):
+- `UnistylesRuntime.setRootViewBackgroundColor(color?)` - no more alpha parameter; accepts any React Native color, omit it to reset to transparent
 - `StyleSheet.hairlineWidth` instead of `UnistylesRuntime.hairlineWidth`
 
 **Removed methods:**
 - `addPlugin(plugin)`, `removePlugin(plugin)`, `enabledPlugins`
-- `statusBar.setColor(color)`, `navigationBar.setColor(color)`
+- `statusBar.setColor(color)`, `navigationBar.setColor(color)` (Android 15 deprecation)
 
-**New properties on UnistylesRuntime:**
-- `statusBar` object with `setHidden(hidden, animation)` and `setStyle(style)`
-- `navigationBar` object with `setHidden(hidden)`
+**v3 system bar / inset API on UnistylesRuntime:**
+- `statusBar.setHidden(hidden, animation?)` - `animation` is `'none' | 'fade' | 'slide'` (used on iOS)
+- `statusBar.setStyle(style, animated?)` - `style` is the `StatusBarStyle` enum (`StatusBarStyle.Default | Light | Dark`, exported from `react-native-unistyles`)
+- `navigationBar.setHidden(hidden)` - Android only (navigation bar dimensions are always `0` on iOS)
+- `setImmersiveMode(enabled)` - hides status + navigation bars on Android, only the status bar on iOS
 - `insets.ime` for keyboard inset
+
+Access system bars only through `UnistylesRuntime.statusBar` / `UnistylesRuntime.navigationBar` — there are no standalone status/navigation bar exports.
 
 ### Step 12: Update TypeScript declarations
 
 ```diff
 - type AppThemes = { light: typeof lightTheme, dark: typeof darkTheme }
 + type AppThemes = typeof themes  // where themes = { light: lightTheme, dark: darkTheme }
++ type AppBreakpoints = typeof breakpoints
 
   declare module 'react-native-unistyles' {
     export interface UnistylesThemes extends AppThemes {}
-+   export interface UnistylesBreakpoints extends typeof breakpoints {}
++   export interface UnistylesBreakpoints extends AppBreakpoints {}
   }
 ```
+
+`interface X extends typeof y` is not valid TypeScript — always go through a type alias. Useful v3 exports: enums `ColorScheme`, `Orientation`, `StatusBarStyle`, `IOSContentSizeCategory`, `AndroidContentSizeCategory`, `WebContentSizeCategory`, and types `UnistylesVariants`, `UnistylesMiniRuntime`.
 
 ### Step 13: Update keyboard/IME handling
 
@@ -247,13 +264,19 @@ The plugin system is removed. Replace plugins with static functions in your them
 
 ### Step 14: Set up testing mocks
 
-```js
-// jest.setup.js
-require('react-native-unistyles/mocks')
-require('./unistyles.config') // your StyleSheet.configure call
+```json
+// package.json (or jest.config.js)
+{
+  "jest": {
+    "setupFiles": [
+      "react-native-unistyles/mocks",
+      "./unistyles.ts"
+    ]
+  }
+}
 ```
 
-The Babel plugin auto-disables in test environments (`NODE_ENV=test`).
+The config file (your `StyleSheet.configure` call) must come AFTER the mocks. The Babel plugin is a no-op when `NODE_ENV=test` (Jest's default). Mocks always use the first registered theme, report `0` for runtime dimensions/insets, strip variants, and render nothing for `Display` / `Hide` / `ScopedTheme` — don't assert on resolved styles.
 
 ## Expo Router Integration
 
@@ -332,20 +355,22 @@ See https://www.unistyl.es/v3/guides/expo-router for full details.
 
 When a third-party component needs theme values or Unistyles styles:
 
-1. **Does it accept a `style` prop?** -> Pass Unistyles styles directly (Babel plugin handles it for standard RN components)
-2. **Does it need theme-derived non-style props (e.g. `color`)?** -> Wrap with `withUnistyles`
-3. **Is it from a library with custom native views?** -> Configure `autoProcessPaths` in Babel plugin
-4. **None of the above work?** -> Use `useUnistyles()` hook as fallback
+1. **Is it a `react-native` / `react-native-reanimated` component with a `style` prop?** -> Pass Unistyles styles directly, nothing else needed
+2. **Is it a `react-native` component with `contentContainerStyle`?** -> Wrap with `withUnistyles` (auto-maps `style` and `contentContainerStyle`)
+3. **Is it a third-party component that uses `react-native` components internally?** -> Whitelist it with `autoProcessPaths` (or `autoRemapImports` for non-standard imports) in the Babel plugin
+4. **Does it need theme-derived non-style props (e.g. `color`), or did step 3 fail?** -> Wrap with `withUnistyles`
+5. **None of the above work?** -> Use `useUnistyles()` hook as fallback
 
 ## Critical Rules
 
-1. **New Architecture is mandatory** - enable it explicitly (default from RN 0.83+)
+1. **New Architecture is mandatory** - it's enabled by default since RN 0.76 and is the only architecture since RN 0.82; on RN 0.81 make sure you haven't opted out
 2. **NEVER spread styles** - always use array syntax `[styles.a, styles.b]`
 3. **Babel plugin is REQUIRED** - without it, styles won't be reactive
 4. **Import `StyleSheet` from `react-native-unistyles` only** - it polyfills all RN StyleSheet APIs (`hairlineWidth`, `compose`, `flatten`, `absoluteFill`, etc.), so remove any `import { StyleSheet } from 'react-native'`
-5. **Never re-export `StyleSheet`** from barrel files - the Babel plugin won't detect it
-6. **`styles.useVariants()` must be called before accessing styles** in the component render
-7. **React 19+ is required** - v3 uses the new React architecture
+5. **Prefer importing `StyleSheet` directly from `react-native-unistyles`** - if you re-export it from your own package/alias (e.g. `@myorg/design-system`), files outside `root` that use it must be listed via `autoProcessImports`
+6. **`styles.useVariants({...})` must be called before accessing styles** in the component render (always with an object)
+7. **React 19+ is required** - Unistyles throws at import time on older React versions
+8. **Never `initialTheme` + `adaptiveThemes: true`** together - `StyleSheet.configure` throws
 
 ## Reference Files
 

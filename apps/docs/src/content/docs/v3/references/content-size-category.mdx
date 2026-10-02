@@ -33,7 +33,7 @@ In addition to the above categories, you can also use the [Accessibility sizes](
 
 There is no direct equivalent to the iOS content size category on Android. The implementation is based on [Font Scale](https://developer.android.com/reference/android/content/res/Configuration#fontScale), and the available values are:
 
-`Small`, `Default`, `Large`, `ExtraLarge`, `Huge`
+`Small`, `Default`, `Large`, `ExtraLarge`, `Huge`, `ExtraHuge`, `ExtraExtraHuge`
 
 Mapping is based on the following table:
 
@@ -51,13 +51,14 @@ Mapping is based on the following table:
 ### Web
 
 There is no support for the content size category on the web.
-Reading the value will always resolve to `unspecified`.
+Reading the value will always resolve to `web-unspecified` (`WebContentSizeCategory.Unspecified`).
 
 ### Usage
 
 To get the current `contentSizeCategory`, you need to use `UnistylesRuntime`:
 
 ```tsx /contentSizeCategory/
+import { Text } from 'react-native'
 import { UnistylesRuntime } from 'react-native-unistyles'
 
 // check the current content size category
@@ -68,12 +69,22 @@ export const ContentSizeCategory = () => (
 )
 ```
 
-For convenience, the library exposes two enums to map the values mentioned above:
+For convenience, the library exports `IOSContentSizeCategory`, `AndroidContentSizeCategory` and `WebContentSizeCategory` enums that map the values mentioned above:
 
 ```tsx /AndroidContentSizeCategory/ /IOSContentSizeCategory/
-import { AndroidContentSizeCategory, IOSContentSizeCategory } from 'react-native-unistyles'
+import { Platform } from 'react-native'
+import {
+    AndroidContentSizeCategory,
+    IOSContentSizeCategory,
+    UnistylesRuntime
+} from 'react-native-unistyles'
 
 // compare the current content size category based on platform
+const isLargeText = Platform.select({
+    ios: UnistylesRuntime.contentSizeCategory === IOSContentSizeCategory.ExtraExtraExtraLarge,
+    android: UnistylesRuntime.contentSizeCategory === AndroidContentSizeCategory.Huge,
+    default: false
+})
 ```
 
 </Seo>

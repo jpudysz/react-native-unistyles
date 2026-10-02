@@ -103,10 +103,6 @@ The migration process is quite simple, but it can be tedious since you'll need t
     +}))
 
     const MyButton = () => {
-        return <UniButton />
-    }
-
-    const MyButton = () => {
     -    const { theme } = useStyles(stylesheet)
 
     -     return <Button color={theme.colors.primary} />
@@ -136,12 +132,14 @@ The migration process is quite simple, but it can be tedious since you'll need t
 
     const MyText = () => {
         return (
-            <Display mq={mq.only.width(0, 400)}>
-                <Text>This text is visible on small devices</Text>
-            </Display>
-            <Hide mq={mq.only.width(400)}>
-                <Text>This text is hidden on big devices</Text>
-            </Hide>
+            <>
+                <Display mq={mq.only.width(0, 400)}>
+                    <Text>This text is visible on small devices</Text>
+                </Display>
+                <Hide mq={mq.only.width(400)}>
+                    <Text>This text is hidden on big devices</Text>
+                </Hide>
+            </>
         )
     }
     ```
@@ -159,12 +157,12 @@ The migration process is quite simple, but it can be tedious since you'll need t
 12. If you want to move your component based on keyboard position, use `ime` inset:
 
     ```diff lang="tsx"
-    const style = StyleSheet.create({
+    const style = StyleSheet.create((theme, rt) => ({
         container: {
     -      paddingBottom: rt.insets.bottom // bottom is no longer dynamic
     +      paddingBottom: rt.insets.ime
         }
-    })
+    }))
     ```
 13. Some `UnistylesRuntime` methods have been renamed. Follow TypeScript types to use new names.
 14. Some `UnistylesRuntime` methods have been removed:
