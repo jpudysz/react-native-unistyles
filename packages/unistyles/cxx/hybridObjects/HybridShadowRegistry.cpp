@@ -97,9 +97,17 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     }
 
     std::optional<folly::dynamic> initialScopedUpdate;
+    bool shouldCommit = wasSuspended;
 
     if (scopedTheme.has_value() || wasSuspended) {
         initialScopedUpdate = parser.parseStylesToShadowTreeStyles(rt, unistylesData);
+    } else if (shadow::hasNativeProps(&shadowNodeWrapper->getFamily())) {
+        auto update = parser.parseStylesToShadowTreeStyles(rt, unistylesData);
+
+        if (shadow::hasOutdatedNativeProps(&shadowNodeWrapper->getFamily(), update)) {
+            initialScopedUpdate = std::move(update);
+            shouldCommit = true;
+        }
     }
 
     registry.linkShadowNodeWithUnistyle(
@@ -109,7 +117,7 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
         std::move(initialScopedUpdate)
     );
 
-    if (wasSuspended) {
+    if (shouldCommit) {
         shadow::ShadowTreeManager::updateShadowTree(rt);
     }
 
