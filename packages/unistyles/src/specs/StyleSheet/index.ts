@@ -35,7 +35,7 @@ export type UnistylesConfig = {
 }
 
 export interface UnistylesStyleSheet extends UnistylesStyleSheetSpec {
-    absoluteFillObject: typeof NativeStyleSheetType.absoluteFill
+    absoluteFillObject: typeof NativeStyleSheetType.absoluteFillObject
     absoluteFill: typeof NativeStyleSheetType.absoluteFill
     compose: typeof NativeStyleSheetType.compose
     flatten: typeof NativeStyleSheetType.flatten
@@ -52,7 +52,7 @@ export interface UnistylesStyleSheet extends UnistylesStyleSheetSpec {
 
 const HybridUnistylesStyleSheet = NitroModules.createHybridObject<UnistylesStyleSheet>('UnistylesStyleSheet')
 
-HybridUnistylesStyleSheet.absoluteFillObject = NativeStyleSheet.absoluteFill
+HybridUnistylesStyleSheet.absoluteFillObject = NativeStyleSheet.absoluteFillObject
 HybridUnistylesStyleSheet.absoluteFill = NativeStyleSheet.absoluteFill
 HybridUnistylesStyleSheet.flatten = NativeStyleSheet.flatten
 HybridUnistylesStyleSheet.compose = NativeStyleSheet.compose
