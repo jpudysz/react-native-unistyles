@@ -135,7 +135,7 @@ const refreshReactNodes = () => {
 
         const fiber = findFiberForHandle(handle)
 
-        // hidden by Suspense or a frozen screen, it gets fresh styles when restored
+        // hidden by Suspense or a frozen screen
         if (!fiber || isInsideSuspendedBoundary(fiber)) {
             continue
         }

@@ -73,8 +73,8 @@ void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
         auto it = this->_shadowRegistry.find(family);
 
         // Clear suspension state if this family was previously suspended
+        // native props stay, they hold values from theme changes that React doesn't know about
         if (it != this->_shadowRegistry.end() && it->second.isSuspended) {
-            shadow::resetNativeProps(family);
             // Clear old registry entries to prevent stale UnistyleData accumulation
             // and any stale traffic controller entry (e.g. from a theme change during suspension)
             this->forgetFamilyUnsafe(family, releasedFamilies);

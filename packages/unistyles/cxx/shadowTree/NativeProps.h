@@ -85,12 +85,4 @@ inline bool hasOutdatedNativeProps(const ShadowNodeFamily* family, const folly::
     return false;
 }
 
-inline void resetNativeProps(const ShadowNodeFamily* family) {
-#if UNISTYLES_HAS_NATIVE_PROPS_MUTEX
-    std::lock_guard<std::mutex> lock(family->nativePropsMutex);
-#endif
-
-    family->nativeProps_DEPRECATED.reset();
-}
-
 }

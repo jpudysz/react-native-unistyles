@@ -44,6 +44,8 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `frozen-stack`        | session steps 1 to 3 and back, theme change on step 3                      | #1262, frozen screens re-linked with another caller's args |
 | `frozen-flip`         | theme changes while home and other screens are frozen                      | suspended nodes restored with the new theme              |
 | `suspense`            | suspend and resume a Suspense boundary around theme changes                | #1260, per-view styles restored by Suspense (d5f8a851)   |
+| `activity`            | theme changes and new arguments while `<Activity>` hides content           | hidden content that keeps rendering, shown again         |
+| `frozen-list`         | a 300 row screen frozen and restored, with a theme change while frozen      | #1252, restoring a frozen screen blocked JS for seconds  |
 | `frozen-unmount`      | log out with frozen steps, churn memory, log in, unfreeze, theme change    | #1217 / #1179, families unmounted while frozen (9afc15b6) |
 | `scoped`              | theme changes, adaptive themes and a late mounted scope on `scoped-theme`  | scoped theme resolution                                  |
 | `variants-after-flip` | variant changes after theme changes                                       | variants with fresh theme values                         |
@@ -62,7 +64,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `verify()` mismatch   | after every step       | a committed prop differs from the node's own style under the current (or scoped) theme   |
 | `pendingUpdates`      | after every step       | shadow tree updates that were queued but never committed                                 |
 | `orphans`             | `frozen-unmount`       | families unmounted while frozen that survive the sweep of a theme change                 |
-| `expect`              | after a screen check   | a prop React owns differs in the committed tree, eg. `transition.check` measures the bar |
+| `expect`              | after a screen check   | a prop React owns differs in the committed tree, eg. `transition.check` measures the bar, or the JS thread stalled too long (`frozen-list.stall`) |
 | probe                 | at checkpoints         | the screen paints other colors than the theme (overlay squares, one through Reanimated)  |
 | crash                 | while the host waits   | the app process died, e.g. a use after free on a frozen unmount                          |
 | host `timeout`, stall | at sync points         | the screen stopped updating or the runner hung                                           |
@@ -94,7 +96,7 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
 ## Mutation check
 
 Each fix was reverted (or its mechanism disabled) in a Release build and the suite failed with a report pointing at
-the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked 2026-10-03 on iOS and Android):
+the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 added 2026-10-03 on iOS and Android):
 
 | mutation                                                                                   | caught by                                                         | first failure                                                                                   |
 | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
@@ -107,6 +109,7 @@ the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked 2026-10-
 | M6 no `refreshReactNodes`, React re-attaches a subtree from before a Unistyles commit       | `update-theme` after `set-theme-on-mount` (iOS and Android)       | runtime `View 'accent' backgroundColor expected <shuffled accent> actual <previous accent>`     |
 | M7 shadow tree updates keep the props an inline style sets last (cached in `nativeProps`)    | `transition` (iOS and Android, 12 failures in 3 reps)             | transition `bar width expected 120 actual 200` after a commit while React yields               |
 | M8 `refreshReactNodes` also re-points React's uncommitted clones (no `getHasBeenPromoted`)   | `transition` (iOS and Android, 6 failures in 3 reps)              | transition `bar width expected 120 actual 200`, the clone React made before the commit is lost |
+| M9 `link` commits once per restored node of a frozen screen (#1252)                          | `frozen-list` (iOS and Android)                                   | `js stall ms expected <= 300 actual 870` (iOS) and `actual 1519` (Android) on the first restore |
 
 #1266 can't be reverted as a whole, `verify()` reads the registry it introduced, so M4a and M4b disable its two
 mechanisms. The use after free itself (#1217, #1179) only crashes with freed families, which needs a Release build with

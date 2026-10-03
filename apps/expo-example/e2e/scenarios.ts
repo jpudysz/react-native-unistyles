@@ -110,6 +110,42 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.back()
         await a.checkpoint()
     },
+    // <Activity> keeps rendering hidden content, theme changes and new arguments land while it's hidden
+    'activity': async a => {
+        await a.push('/activity')
+        await a.act('activity.toggle')
+        await a.flip('dark')
+        await a.act('activity.toggle')
+        await a.act('activity.toggle')
+        await a.act('activity.bump')
+        await a.flip('premium')
+        await a.act('activity.bump')
+        await a.act('activity.toggle')
+        await a.act('activity.toggle')
+        await a.flip('light')
+        await a.act('activity.bump')
+        await a.act('activity.toggle')
+        await a.back()
+        await a.checkpoint()
+    },
+    // #1252: restoring a big frozen screen, with and without a theme change while it's frozen
+    'frozen-list': async a => {
+        await a.push('/frozen-list')
+        await a.push('/basics')
+        await a.push('/variants')
+        await a.act('frozen-list.watch')
+        await a.back()
+        await a.expect('frozen-list.stall')
+        await a.push('/variants')
+        await a.flip('dark')
+        await a.act('frozen-list.watch')
+        await a.back()
+        await a.expect('frozen-list.stall')
+        await a.back()
+        await a.flip('light')
+        await a.back()
+        await a.checkpoint()
+    },
     // #1217 / #1179: log out while steps are frozen, free their families, log in and change the theme
     'frozen-unmount': async a => {
         await a.push('/session')
