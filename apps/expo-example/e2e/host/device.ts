@@ -2,7 +2,7 @@
 import { closeSync, openSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-export const APP_ID = 'com.codemask.expoexample'
+export const APP_ID = 'com.unistyles.expoexample'
 export const APP_DIR = resolve(import.meta.dir, '../..')
 export const APP_SCHEME = 'expo-example'
 

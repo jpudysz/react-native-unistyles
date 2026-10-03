@@ -359,11 +359,15 @@ void HybridStyleSheet::applyDependencyChanges(jsi::Runtime& rt, std::vector<Unis
         parser.rebuildShadowLeafUpdates(rt, dependencyMap);
     }
 
-    this->notifyJSListeners(dependencies);
+    std::vector<Tag> committedTags;
 
     if (!dependencyMap.empty()) {
-        shadow::ShadowTreeManager::updateShadowTree(rt);
+        committedTags = shadow::ShadowTreeManager::updateShadowTree(rt);
     }
+
+    // after the commit, so listeners can point React at the committed nodes
+    registry.setCommittedTags(std::move(committedTags));
+    this->notifyJSListeners(dependencies);
 }
 
 void HybridStyleSheet::notifyJSListeners(std::vector<UnistyleDependency>& dependencies) {

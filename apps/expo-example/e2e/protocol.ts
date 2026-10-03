@@ -13,6 +13,7 @@ export const SCENARIOS = [
     'mount-after-flip',
     'set-theme-on-mount',
     'update-theme',
+    'transition',
     'lists-scroll',
     'os-appearance',
     'random-walk'

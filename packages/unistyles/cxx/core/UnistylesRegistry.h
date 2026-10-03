@@ -70,6 +70,8 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     void destroy();
     std::vector<LinkedFamilySnapshot> getLinkedFamiliesSnapshot();
     size_t getPendingUpdatesCount();
+    void setCommittedTags(std::vector<Tag>&& tags);
+    std::vector<Tag> takeCommittedTags();
 
 private:
     using ReleasedFamilies = std::vector<std::shared_ptr<const ShadowNodeFamily>>;
@@ -92,6 +94,7 @@ private:
     std::unordered_map<int, std::shared_ptr<core::StyleSheet>> _styleSheetRegistry{};
     std::unordered_map<const ShadowNodeFamily*, LinkedFamily> _shadowRegistry{};
     size_t _sweepThreshold = MIN_SWEEP_THRESHOLD;
+    std::vector<Tag> _committedTags{};
 };
 
 inline UnistylesRegistry& UnistylesRegistry::get() {

@@ -50,6 +50,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `mount-after-flip`    | screens pushed after theme changes, list scroll, screen actions            | nodes mounted into a changed theme                       |
 | `set-theme-on-mount`  | a screen that calls `setTheme` from its mount effect                       | nodes rendered before a theme change that link after it  |
 | `update-theme`        | `updateTheme` of the current theme, theme changes, restore                 | `UnistylesRuntime.updateTheme`                           |
+| `transition`          | Unistyles commits while React yields in a `startTransition` render         | props React rendered before the commit (inline styles)   |
 | `lists-scroll`        | theme changes at scrolled FlatList positions                               | virtualized rows mounted after a theme change            |
 | `os-appearance`       | OS appearance flips with adaptive themes (host only)                       | adaptive themes, inverted adaptive scopes                |
 | `random-walk`         | 14 seeded random theme changes, pushes, backs and screen actions           | combinations of the above                                |
@@ -61,6 +62,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `verify()` mismatch   | after every step       | a committed prop differs from the node's own style under the current (or scoped) theme   |
 | `pendingUpdates`      | after every step       | shadow tree updates that were queued but never committed                                 |
 | `orphans`             | `frozen-unmount`       | families unmounted while frozen that survive the sweep of a theme change                 |
+| `expect`              | after a screen check   | a prop React owns differs in the committed tree, eg. `transition.check` measures the bar |
 | probe                 | at checkpoints         | the screen paints other colors than the theme (overlay squares, one through Reanimated)  |
 | crash                 | while the host waits   | the app process died, e.g. a use after free on a frozen unmount                          |
 | host `timeout`, stall | at sync points         | the screen stopped updating or the runner hung                                           |
@@ -72,7 +74,8 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
 
 ## How it works
 
-- `runner.ts` runs each step as act, `settle()`, `verify()`, record. Theme changes go through the header's
+- `runner.ts` runs each step as act, `settle()`, `verify()`, record. `expect` steps run a check registered with
+  `useE2EAction` that returns a failure or nothing, for props `verify()` skips because React owns them. Theme changes go through the header's
   `selectTheme`, screen actions through `useE2EAction` handlers (the same code the screen's buttons run) and scrolling
   through `e2eScrollRef`. `settle.ts` waits two idle callbacks and two frames: Unistyles applies theme changes from a
   native callback on the JS thread, the idle callbacks run after it.
@@ -91,7 +94,7 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
 ## Mutation check
 
 Each fix was reverted (or its mechanism disabled) in a Release build and the suite failed with a report pointing at
-the cause (2026-10-02, iOS 27 simulator, iPhone Air):
+the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked 2026-10-03 on iOS and Android):
 
 | mutation                                                                                   | caught by                                                         | first failure                                                                                   |
 | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
@@ -101,6 +104,9 @@ the cause (2026-10-02, iOS 27 simulator, iPhone Air):
 | M4a #1266: no sweep of families unmounted while frozen                                      | `frozen-unmount`                                                  | `orphans expected 0 actual 6` (12 after the second rep)                                         |
 | M4b #1266: queued updates are never drained (the #1217 leak)                                | every step                                                        | `pendingUpdates expected 0 actual 57`                                                           |
 | M5 ActivityIndicator linked like a View, its style goes to the inner spinner                | `tour`, `mount-after-flip` (iOS and Android)                      | `ActivityIndicatorView 'spinner' backgroundColor expected <light subtle> actual undefined`      |
+| M6 no `refreshReactNodes`, React re-attaches a subtree from before a Unistyles commit       | `update-theme` after `set-theme-on-mount` (iOS and Android)       | runtime `View 'accent' backgroundColor expected <shuffled accent> actual <previous accent>`     |
+| M7 shadow tree updates keep the props an inline style sets last (cached in `nativeProps`)    | `transition` (iOS and Android, 12 failures in 3 reps)             | transition `bar width expected 120 actual 200` after a commit while React yields               |
+| M8 `refreshReactNodes` also re-points React's uncommitted clones (no `getHasBeenPromoted`)   | `transition` (iOS and Android, 6 failures in 3 reps)              | transition `bar width expected 120 actual 200`, the clone React made before the commit is lost |
 
 #1266 can't be reverted as a whole, `verify()` reads the registry it introduced, so M4a and M4b disable its two
 mechanisms. The use after free itself (#1217, #1179) only crashes with freed families, which needs a Release build with
@@ -108,11 +114,7 @@ a sanitizer, the host still reports a crash whenever one happens.
 
 ## Known issues found by the suite
 
-- `updateTheme` doesn't reach some nodes (iOS and Android): run `set-theme-on-mount,update-theme`. After a screen called
-  `setTheme` from its mount effect, `updateTheme` of the current theme on the runtime screen queues the right props
-  (traced in `rebuildShadowLeafUpdates`) but the committed shadow tree keeps the old value, `update-theme` reports
-  `View 'accent' backgroundColor expected <updated accent> actual <previous accent>`. `update-theme` alone passes.
-  Not fixed yet, so the full suite fails on main with these 2 mismatches.
+None open. Both issues it found are fixed and covered by M5 (ActivityIndicator) and M6 (`updateTheme`).
 
 ## Known limitations
 

@@ -26,6 +26,9 @@ export type RunnerState = {
     report?: Report
 }
 
+// Returned by a check registered with useE2EAction, for state verify() doesn't cover (props React owns)
+type ExpectationFailure = Pick<Failure, 'prop' | 'expected' | 'actual'> & Partial<Failure>
+
 type Bindings = {
     pathname: string
 }
@@ -230,6 +233,15 @@ class E2ERun implements Actions {
         this.step(`${name}${argument === undefined ? '' : ` ${argument}`}`, () => runAction(name, argument))
 
     scroll = (target: string, y: number) => this.step(`scroll ${target} ${y}`, () => scrollTarget(target, y))
+
+    expect = (name: string) =>
+        this.step(`expect ${name}`, async () => {
+            const failure = await runAction(name) as ExpectationFailure | undefined
+
+            if (failure) {
+                this.fail(failure)
+            }
+        })
 
     // Frozen screens unmounted without unlink are dropped by the sweep of every theme change
     expectNoOrphans = () => {

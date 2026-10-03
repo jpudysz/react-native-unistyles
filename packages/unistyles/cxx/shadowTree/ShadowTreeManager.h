@@ -15,7 +15,7 @@ using namespace facebook::react;
 using namespace facebook;
 
 struct ShadowTreeManager {
-    static void updateShadowTree(jsi::Runtime& rt);
+    static std::vector<Tag> updateShadowTree(jsi::Runtime& rt);
 };
 
 }

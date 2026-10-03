@@ -9,6 +9,7 @@ export const screens = [
     { route: 'with-unistyles', title: 'withUnistyles', description: 'Third party components and useUnistyles' },
     { route: 'animations', title: 'Animations', description: 'Animated, Reanimated and useAnimatedTheme' },
     { route: 'lists', title: 'Lists', description: 'ScrollView, FlatList and SectionList' },
+    { route: 'transition', title: 'Transition', description: 'Unistyles commits during a transition render' },
     { route: 'suspense', title: 'Suspense', description: 'Theme changes while content is suspended (#1260)' },
     { route: 'session', title: 'Frozen session', description: 'Frozen stack, shared styles, log out while frozen (#1262, #1217)' }
 ] as const
