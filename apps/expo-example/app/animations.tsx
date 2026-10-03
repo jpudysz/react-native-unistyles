@@ -1,11 +1,12 @@
 // Animations change transforms only: verify() compares the props React rendered and the animated ones differ by design
 import React, { useRef, useState } from 'react'
-import { Animated as RNAnimated, Text } from 'react-native'
+import { Animated as RNAnimated, processColor, Text } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
-import { StyleSheet } from 'react-native-unistyles'
+import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
 import { useAnimatedTheme, useAnimatedVariantColor } from 'react-native-unistyles/reanimated'
 import { Button, Screen, Section } from '../components'
 import { useE2EAction } from '../e2e/actions'
+import { themes, type ThemeName } from '../themes'
 
 export default function AnimationsScreen() {
     const [tone, setTone] = useState<'primary' | 'accent'>('primary')
@@ -36,6 +37,15 @@ export default function AnimationsScreen() {
     }
 
     useE2EAction('animations.move', move)
+    // Reanimated owns the animated color, it must follow the theme even if the theme changed while the screen was frozen
+    useE2EAction('animations.variant-color', () => {
+        const expected = themes[UnistylesRuntime.themeName as ThemeName].colors[tone]
+        const actual = variantColor.value
+
+        return processColor(actual) === processColor(expected)
+            ? undefined
+            : { styleKey: 'variantBox', prop: 'animated backgroundColor', expected, actual: String(actual) }
+    })
 
     return (
         <Screen>

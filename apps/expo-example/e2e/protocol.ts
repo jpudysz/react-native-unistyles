@@ -9,6 +9,7 @@ export const SCENARIOS = [
     'suspense',
     'activity',
     'frozen-list',
+    'animated-variant',
     'frozen-unmount',
     'scoped',
     'variants-after-flip',

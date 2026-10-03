@@ -146,6 +146,26 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.back()
         await a.checkpoint()
     },
+    // useAnimatedVariantColor restored from a frozen stack after a theme change, then with the screen just below the top
+    'animated-variant': async a => {
+        await a.push('/animations')
+        await a.act('animations.move')
+        await a.expect('animations.variant-color')
+        await a.push('/basics')
+        await a.push('/variants')
+        await a.flip('dark')
+        await a.back()
+        await a.back()
+        await a.expect('animations.variant-color')
+        await a.push('/basics')
+        await a.flip('premium')
+        await a.back()
+        await a.expect('animations.variant-color')
+        await a.flip('light')
+        await a.expect('animations.variant-color')
+        await a.back()
+        await a.checkpoint()
+    },
     // #1217 / #1179: log out while steps are frozen, free their families, log in and change the theme
     'frozen-unmount': async a => {
         await a.push('/session')
