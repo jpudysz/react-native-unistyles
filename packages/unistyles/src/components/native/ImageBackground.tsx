@@ -1,5 +1,5 @@
 import React from 'react'
-import { forwardRef } from 'react'
+import { forwardRef, useContext } from 'react'
 import { type ImageStyle, ImageBackground as NativeImageBackground, type StyleProp, type ViewStyle } from 'react-native'
 
 import type { UnistylesValues } from '../../types'
@@ -9,6 +9,7 @@ import { maybeWarnAboutMultipleUnistyles } from '../../core/warn'
 import { copyComponentProperties } from '../../utils'
 import { keyInObject } from '../../web/utils'
 import { createUnistylesRef } from '../../web/utils/createUnistylesRef'
+import { ScopedThemeContext, withScopedTheme } from '../ScopedThemeContext'
 
 type Props = {
     style?: UnistylesValues
@@ -16,8 +17,9 @@ type Props = {
 }
 
 const UnistylesImageBackground = forwardRef<unknown, Props>((props, forwardedRef) => {
-    const styleClassNames = getClassName(props.style)
-    const imageClassNames = getClassName(props.imageStyle)
+    const scope = useContext(ScopedThemeContext)
+    const styleClassNames = withScopedTheme(scope, () => getClassName(props.style))
+    const imageClassNames = withScopedTheme(scope, () => getClassName(props.imageStyle))
     const ref = createUnistylesRef(styleClassNames, forwardedRef)
     const imageRef = createUnistylesRef(imageClassNames)
     const hasWidthStyle = typeof props.imageStyle === 'object' && keyInObject(props.imageStyle, 'width')

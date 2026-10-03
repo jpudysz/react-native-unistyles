@@ -1,12 +1,13 @@
 import type { PropsWithChildren } from 'react'
 
-import React, { useLayoutEffect } from 'react'
+import React, { useLayoutEffect, useMemo } from 'react'
 
 import type { UnistylesThemes } from '../global'
 
 import { useUnistyles } from '../core'
 import { UnistylesShadowRegistry } from '../specs'
 import { ApplyScopedTheme } from './ApplyScopedTheme'
+import { ScopedThemeContext } from './ScopedThemeContext'
 
 interface AdaptiveThemeProps extends PropsWithChildren {
     previousScopedTheme?: string
@@ -15,9 +16,12 @@ interface AdaptiveThemeProps extends PropsWithChildren {
 export const AdaptiveTheme: React.FunctionComponent<AdaptiveThemeProps> = ({ children, previousScopedTheme }) => {
     const { rt } = useUnistyles()
     const name = (rt.colorScheme === 'dark' ? 'light' : 'dark') as keyof UnistylesThemes
+    const scope = useMemo(() => ({ name }), [name])
     const mappedChildren = [
         <ApplyScopedTheme key={name} name={name} />,
-        children,
+        <ScopedThemeContext.Provider key="scope" value={scope}>
+            {children}
+        </ScopedThemeContext.Provider>,
         <ApplyScopedTheme key="dispose" name={previousScopedTheme as keyof UnistylesThemes | undefined} />,
     ]
 

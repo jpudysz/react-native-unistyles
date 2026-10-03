@@ -1,9 +1,10 @@
 import type { ViewStyle } from 'react-native'
 
-import React from 'react'
+import React, { useContext } from 'react'
 
 import type { UnistylesValues } from '../types'
 
+import { ScopedThemeContext, withScopedTheme } from '../components/ScopedThemeContext'
 import { copyComponentProperties } from '../utils'
 import { isServer } from '../web/utils'
 import { createUnistylesRef } from '../web/utils/createUnistylesRef'
@@ -39,7 +40,11 @@ const buildUnistylesProps = (Component: any, props: ComponentProps, forwardedRef
 
 export const createUnistylesElement = (Component: any) => {
     const UnistylesComponent = (props: any) => {
-        return <Component {...props} {...buildUnistylesProps(Component, props, props.ref)} />
+        const scope = useContext(ScopedThemeContext)
+
+        return (
+            <Component {...props} {...withScopedTheme(scope, () => buildUnistylesProps(Component, props, props.ref))} />
+        )
     }
 
     return copyComponentProperties(Component, UnistylesComponent)

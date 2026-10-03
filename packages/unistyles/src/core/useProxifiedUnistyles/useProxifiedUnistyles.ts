@@ -1,8 +1,9 @@
-import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
+import { useContext, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
 
 import type { UnistylesTheme } from '../../types'
 
-import { type UnistylesMiniRuntime, UnistylesRuntime, UnistylesShadowRegistry } from '../../specs'
+import { ScopedThemeContext, getScopedThemeName } from '../../components/ScopedThemeContext'
+import { type UnistylesMiniRuntime, UnistylesRuntime } from '../../specs'
 // It's imported that way because of circular dependency
 import { UnistyleDependency } from '../../specs/NativePlatform'
 import { listener } from './listener'
@@ -30,9 +31,8 @@ const RTDependencyMap = {
 } satisfies Partial<Record<keyof UnistylesMiniRuntime, UnistyleDependency>>
 
 export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
-    const [scopedTheme, setScopedTheme] = useState(
-        forcedTheme ?? (UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme),
-    )
+    const contextScopedTheme = getScopedThemeName(useContext(ScopedThemeContext)) as UnistylesTheme
+    const [scopedTheme, setScopedTheme] = useState(forcedTheme ?? contextScopedTheme)
     const [dependencies] = useState(() => new Set<number>())
     const [theme, setTheme] = useState(UnistylesRuntime.getTheme(scopedTheme))
     const [_, runtimeChanged] = useReducer(() => ({}), {})
@@ -68,10 +68,10 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
         }
     }, [disposeRef])
 
-    const maybeNewScopedTheme = UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme
-
-    if (scopedTheme && maybeNewScopedTheme && scopedTheme !== maybeNewScopedTheme) {
-        setScopedTheme(maybeNewScopedTheme)
+    // Follow the nearest ScopedTheme when it changes, `reset` included; `forcedTheme` only seeds the first render.
+    if (scopedTheme !== contextScopedTheme) {
+        setScopedTheme(contextScopedTheme)
+        setTheme(UnistylesRuntime.getTheme(contextScopedTheme))
     }
 
     const proxifiedTheme = new Proxy(theme, {
