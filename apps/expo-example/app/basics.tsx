@@ -12,6 +12,8 @@ import {
     TouchableOpacity,
     View
 } from 'react-native'
+// @ts-expect-error RN 0.86 declares the host components only in the strict API types, RN 0.87+ in the default ones
+import { unstable_NativeText as NativeText, unstable_NativeView as NativeView } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 import { Screen, Section } from '../components'
 import { useE2EAction } from '../e2e/actions'
@@ -43,6 +45,11 @@ export default function BasicsScreen() {
                 <View style={styles.shadow}>
                     <Text style={styles.text}>boxShadow and transforms</Text>
                 </View>
+            </Section>
+            <Section title="Host components" description="unstable_NativeText and unstable_NativeView from react-native">
+                <NativeView style={styles.hostView}>
+                    <NativeText style={styles.hostText}>NativeText in a NativeView</NativeText>
+                </NativeView>
             </Section>
             <Section title="Images">
                 <View style={styles.row}>
@@ -126,6 +133,15 @@ const styles = StyleSheet.create(theme => ({
         backgroundColor: theme.colors.surface,
         boxShadow: `0 2px 8px ${theme.colors.border}`,
         transform: [{ rotate: '-1deg' }]
+    },
+    hostView: {
+        padding: theme.gap(1.5),
+        borderRadius: 8,
+        backgroundColor: theme.colors.primary
+    },
+    hostText: {
+        color: theme.colors.chip.onFill,
+        fontWeight: '600'
     },
     image: {
         width: 48,
