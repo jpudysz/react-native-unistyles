@@ -34,8 +34,18 @@ export type UnistylesConfig = {
     breakpoints?: UnistylesBreakpoints
 }
 
+// `absoluteFill` may resolve to a registered numeric style id (web / older RN), so keep
+// `absoluteFillObject` a real descriptor object to stay spreadable and match RN's contract
+const absoluteFillObject = {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+} as const
+
 export interface UnistylesStyleSheet extends UnistylesStyleSheetSpec {
-    absoluteFillObject: typeof NativeStyleSheetType.absoluteFill
+    absoluteFillObject: typeof absoluteFillObject
     absoluteFill: typeof NativeStyleSheetType.absoluteFill
     compose: typeof NativeStyleSheetType.compose
     flatten: typeof NativeStyleSheetType.flatten
@@ -52,7 +62,7 @@ export interface UnistylesStyleSheet extends UnistylesStyleSheetSpec {
 
 const HybridUnistylesStyleSheet = NitroModules.createHybridObject<UnistylesStyleSheet>('UnistylesStyleSheet')
 
-HybridUnistylesStyleSheet.absoluteFillObject = NativeStyleSheet.absoluteFill
+HybridUnistylesStyleSheet.absoluteFillObject = absoluteFillObject
 HybridUnistylesStyleSheet.absoluteFill = NativeStyleSheet.absoluteFill
 HybridUnistylesStyleSheet.flatten = NativeStyleSheet.flatten
 HybridUnistylesStyleSheet.compose = NativeStyleSheet.compose
