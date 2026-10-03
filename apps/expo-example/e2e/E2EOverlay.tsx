@@ -1,5 +1,5 @@
-import React, { useEffect, useSyncExternalStore } from 'react'
-import { Pressable, ScrollView, Text, View } from 'react-native'
+import React, { useEffect, useRef, useSyncExternalStore } from 'react'
+import { Animated as RNAnimated, Pressable, ScrollView, Text, View } from 'react-native'
 import { usePathname } from 'expo-router'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { StyleSheet } from 'react-native-unistyles'
@@ -33,6 +33,24 @@ const AnimatedProbe = () => {
     )
 }
 
+// Animated flattens [cell, nativeAnimatedProbe, transform] into one object, the color comes from the second unistyle.
+// Memoized, so the overlay re-rendering at every sync can't repaint it, only Unistyles can
+const NativeAnimatedProbe = React.memo(() => {
+    const offset = useRef(new RNAnimated.Value(1)).current
+
+    useEffect(() => {
+        RNAnimated.timing(offset, { toValue: 0, duration: 100, useNativeDriver: true }).start()
+    }, [offset])
+
+    return (
+        <RNAnimated.View
+            accessible
+            accessibilityLabel={`${LABELS.probe} native-animated`}
+            style={[styles.cell, styles.nativeAnimatedProbe, { transform: [{ translateX: offset }] }]}
+        />
+    )
+})
+
 const RunnerOverlay: React.FunctionComponent<{ state: RunnerState }> = ({ state }) => {
     const pathname = usePathname()
 
@@ -50,7 +68,7 @@ const RunnerOverlay: React.FunctionComponent<{ state: RunnerState }> = ({ state 
                     onPress={acknowledge}
                 />
                 {/* Themed probes stay mounted for the whole run, so they go through every flip */}
-                {PROBES.filter(probe => probe !== 'animated').map(probe => (
+                {PROBES.filter(probe => probe !== 'animated' && probe !== 'native-animated').map(probe => (
                     <View
                         key={probe}
                         accessible
@@ -59,6 +77,7 @@ const RunnerOverlay: React.FunctionComponent<{ state: RunnerState }> = ({ state 
                     />
                 ))}
                 <AnimatedProbe />
+                <NativeAnimatedProbe />
                 <Text style={styles.status}>{state.sync ? formatSync(state.sync) : state.status}</Text>
             </View>
         </View>
@@ -86,11 +105,14 @@ const styles = StyleSheet.create((theme, rt) => ({
         width: 28,
         height: 28
     },
-    probe: (probe: Exclude<ProbeName, 'animated'>) => ({
+    probe: (probe: Exclude<ProbeName, 'animated' | 'native-animated'>) => ({
         width: 28,
         height: 28,
         backgroundColor: theme.colors[probe]
     }),
+    nativeAnimatedProbe: {
+        backgroundColor: theme.colors.typography
+    },
     status: {
         flex: 1,
         fontSize: 10,

@@ -67,8 +67,9 @@ export const BEACON_COLORS = {
 
 export const beaconColor = (sync?: Sync) => sync ? BEACON_COLORS.waiting[sync.seq % 2]! : BEACON_COLORS.running
 
-// Themed squares in the overlay, `animated` paints through useAnimatedTheme (Reanimated)
-export const PROBES = ['background', 'surface', 'primary', 'accent', 'animated'] as const
+// Themed squares in the overlay, `animated` paints through useAnimatedTheme (Reanimated), `native-animated` is a
+// React Native Animated.View (native driver), which flattens its two unistyles into one style object
+export const PROBES = ['background', 'surface', 'primary', 'accent', 'animated', 'native-animated'] as const
 
 export type ProbeName = typeof PROBES[number]
 
@@ -82,7 +83,8 @@ export const PROBE_COLORS = Object.fromEntries(
             surface: colors.surface,
             primary: colors.primary,
             accent: colors.accent,
-            animated: colors.secondary
+            animated: colors.secondary,
+            'native-animated': colors.typography
         }]
     })
 ) as Record<ThemeName, Record<ProbeName, string>>
