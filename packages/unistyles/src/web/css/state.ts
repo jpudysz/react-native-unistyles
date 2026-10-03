@@ -3,7 +3,7 @@ import type { UnistylesServices } from '../types'
 
 import { convertUnistyles } from '../convert'
 import { hyphenate, isServer } from '../utils'
-import { convertToCSS } from './core'
+import { convertToCSS, getPointerEventsChildClassNames } from './core'
 
 type MapType = Map<string, Map<string, Map<string, any>>>
 type SetProps = {
@@ -61,6 +61,12 @@ export class CSSState {
         thirdLevelMap.set(propertyKey, value)
     }
 
+    unset = ({ className, mediaQuery = '', isMq }: Omit<SetProps, 'propertyKey' | 'value'>) => {
+        const firstLevelMap = isMq ? this.mqMap : this.mainMap
+
+        firstLevelMap.get(mediaQuery)?.delete(className)
+    }
+
     add = (hash: string, values: UnistylesValues) => {
         convertToCSS(hash, convertUnistyles(values, this.services.runtime), this)
         this.recreate()
@@ -97,12 +103,21 @@ export class CSSState {
     }
 
     remove = (hash: string) => {
-        this.mainMap.forEach((styles) => {
+        const { boxNone, boxOnly } = getPointerEventsChildClassNames(hash)
+        const pseudoPrefix = `${hash}:`
+        const deleteHash = (styles: Map<string, Map<string, any>>) => {
             styles.delete(hash)
-        })
-        this.mqMap.forEach((styles) => {
-            styles.delete(hash)
-        })
+            styles.delete(boxNone)
+            styles.delete(boxOnly)
+
+            // pseudo-class/element rules (and their pointerEvents child rules) derive from the hash
+            Array.from(styles.keys())
+                .filter((className) => className.startsWith(pseudoPrefix))
+                .forEach((className) => styles.delete(className))
+        }
+
+        this.mainMap.forEach(deleteHash)
+        this.mqMap.forEach(deleteHash)
         this.recreate()
     }
 
