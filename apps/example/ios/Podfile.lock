@@ -1799,7 +1799,7 @@ PODS:
     - Yoga
   - SocketRocket (0.7.1):
     - ReactNativeDependencies
-  - Unistyles (3.3.0):
+  - Unistyles (3.4.0):
     - hermes-engine
     - NitroModules
     - RCTRequired
@@ -2186,7 +2186,7 @@ SPEC CHECKSUMS:
   RNReanimated: 42b7605f338d3b9f64e54a93c677b4e8e6e22ab1
   RNWorklets: d2e3df4c7e1ca249c7f5169ceb8eaa26adc021a0
   SocketRocket: 37aec555668fb852ec12e3c0de59a86ca58f0871
-  Unistyles: 0463b8f1bea70ebadea3d78ffa10e6401ea9a9a2
+  Unistyles: 83e337e114f208a4b4a0d2178bd53639493d8d4b
   Yoga: d1c536142c5ff8ec8cd856ab2a7c227a1d875c8e
 
 PODFILE CHECKSUM: 3aa3b5f5253be927d355cf1499f60c53140eb9a3

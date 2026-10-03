@@ -100,9 +100,9 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     bool shouldCommit = wasSuspended;
 
     if (scopedTheme.has_value() || wasSuspended) {
-        initialScopedUpdate = parser.parseStylesToShadowTreeStyles(rt, unistylesData);
+        initialScopedUpdate = parser.parseStylesToShadowTreeUpdates(rt, unistylesData);
     } else if (shadow::hasNativeProps(&shadowNodeWrapper->getFamily())) {
-        auto update = parser.parseStylesToShadowTreeStyles(rt, unistylesData);
+        auto update = parser.parseStylesToShadowTreeUpdates(rt, unistylesData);
 
         if (shadow::hasOutdatedNativeProps(&shadowNodeWrapper->getFamily(), update)) {
             initialScopedUpdate = std::move(update);
@@ -182,6 +182,17 @@ jsi::Value HybridShadowRegistry::verify(jsi::Runtime &rt, const jsi::Value &this
     return shadow::ShadowTreeDiagnostics::verify(rt, this->_unistylesRuntime);
 }
 
+jsi::Value HybridShadowRegistry::takeCommittedTags(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    auto tags = core::UnistylesRegistry::get().takeCommittedTags();
+    auto result = jsi::Array(rt, tags.size());
+
+    for (size_t i = 0; i < tags.size(); i++) {
+        result.setValueAtIndex(rt, i, jsi::Value(static_cast<double>(tags[i])));
+    }
+
+    return result;
+}
+
 jsi::Value HybridShadowRegistry::refreshReactNodes(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count == 1 && args[0].isObject(), "Unistyles: refreshReactNodes expected to be called with an array of shadow nodes.");
 
@@ -200,6 +211,13 @@ jsi::Value HybridShadowRegistry::refreshReactNodes(jsi::Runtime &rt, const jsi::
         }
 
         auto wrapper = node.asObject(rt).getNativeState<ShadowNodeWrapper>(rt);
+
+        // never committed, React cloned it in a render that isn't committed yet (eg. a transition that yielded)
+        // it holds what React rendered since, pointing it at the committed node would drop that
+        if (!wrapper->shadowNode->getHasBeenPromoted()) {
+            continue;
+        }
+
         const auto& family = wrapper->shadowNode->getFamily();
         auto rootIt = roots.find(family.getSurfaceId());
 

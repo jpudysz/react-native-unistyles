@@ -1,5 +1,8 @@
 export type StateNode = {
     node?: ShadowNode
+    canonical?: {
+        nativeTag?: number
+    }
 }
 
 export type ShadowNode = {

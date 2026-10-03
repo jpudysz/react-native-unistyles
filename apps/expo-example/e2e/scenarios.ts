@@ -12,6 +12,8 @@ export type Actions = {
     // Runs a screen action registered with useE2EAction, the same code its buttons run
     act: (name: string, argument?: number | string) => Promise<void>,
     scroll: (target: string, y: number) => Promise<void>,
+    // Runs a check registered with useE2EAction, it returns a failure or nothing
+    expect: (name: string) => Promise<void>,
     expectNoOrphans: () => void,
     // Holds the probe strip still for the host's pixel check
     checkpoint: () => Promise<void>,
@@ -191,6 +193,23 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.act('runtime.shuffle')
         await a.flip('light')
         await a.act('runtime.restore')
+        await a.back()
+        await a.checkpoint()
+    },
+    // Unistyles commits while React yields in a transition render, React's new props must survive them
+    'transition': async a => {
+        await a.push('/transition')
+        await a.act('transition.resize')
+        await a.expect('transition.check')
+        await a.act('transition.resize', 'quiet')
+        await a.expect('transition.check')
+        await a.act('transition.resize', 'quiet')
+        await a.expect('transition.check')
+        await a.act('transition.resize', 'flip')
+        await a.expect('transition.check')
+        await a.flip('light')
+        await a.act('transition.resize', 'quiet')
+        await a.expect('transition.check')
         await a.back()
         await a.checkpoint()
     },

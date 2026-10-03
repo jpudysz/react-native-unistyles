@@ -380,3 +380,11 @@ size_t core::UnistylesRegistry::getPendingUpdatesCount() {
         return this->trafficController.getUpdatesCount();
     });
 }
+
+void core::UnistylesRegistry::setCommittedTags(std::vector<Tag>&& tags) {
+    this->_committedTags = std::move(tags);
+}
+
+std::vector<Tag> core::UnistylesRegistry::takeCommittedTags() {
+    return std::exchange(this->_committedTags, {});
+}
