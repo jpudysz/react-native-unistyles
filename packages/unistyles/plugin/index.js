@@ -76,6 +76,18 @@ var NATIVE_COMPONENTS_PATHS = {
       isDefault: true,
       path: "react-native/Libraries/Components/View/ViewNativeComponent",
       mapTo: "NativeView"
+    },
+    {
+      name: "unstable_NativeText",
+      isDefault: false,
+      path: "react-native",
+      mapTo: "NativeText"
+    },
+    {
+      name: "unstable_NativeView",
+      isDefault: false,
+      path: "react-native",
+      mapTo: "NativeView"
     }
   ]
 };
@@ -153,7 +165,7 @@ function handleExoticImport(path2, state, exoticImport) {
   specifiers.forEach((specifier) => {
     for (const rule of exoticImport.imports) {
       const hasMatchingImportType = !rule.isDefault && t2.isImportSpecifier(specifier) || rule.isDefault && t2.isImportDefaultSpecifier(specifier);
-      const hasMatchingImportName = rule.isDefault || !rule.isDefault && rule.name === specifier.local.name;
+      const hasMatchingImportName = rule.isDefault || t2.isImportSpecifier(specifier) && rule.name === getImportedName(specifier);
       const hasMatchingPath = rule.path === source.value;
       if (!hasMatchingImportType || !hasMatchingImportName || !hasMatchingPath) {
         continue;
@@ -166,10 +178,10 @@ function handleExoticImport(path2, state, exoticImport) {
         path2.replaceWith(newImport);
       } else {
         const newImport = t2.importDeclaration(
-          [t2.importSpecifier(t2.identifier(rule.mapTo), t2.identifier(rule.mapTo))],
+          [t2.importSpecifier(t2.identifier(specifier.local.name), t2.identifier(rule.mapTo))],
           t2.stringLiteral(getComponentPath(state, rule.mapTo))
         );
-        path2.node.specifiers = specifiers.filter((s) => s !== specifier);
+        path2.node.specifiers = path2.node.specifiers.filter((s) => s !== specifier);
         if (path2.node.specifiers.length === 0) {
           path2.replaceWith(newImport);
         } else {
@@ -179,6 +191,9 @@ function handleExoticImport(path2, state, exoticImport) {
       return;
     }
   });
+}
+function getImportedName(specifier) {
+  return t2.isIdentifier(specifier.imported) ? specifier.imported.name : specifier.imported.value;
 }
 
 // plugin/src/paths.ts
@@ -860,7 +875,7 @@ function index_default() {
             }
           });
         }
-        if (importSource.includes("react-native/Libraries")) {
+        if (importSource === "react-native" || importSource.includes("react-native/Libraries")) {
           handleExoticImport(path2, state, NATIVE_COMPONENTS_PATHS);
         }
         if (!state.file.forceProcessing && Array.isArray(state.opts.autoProcessImports)) {
