@@ -66,7 +66,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `pendingUpdates`      | after every step       | shadow tree updates that were queued but never committed                                 |
 | `orphans`             | `frozen-unmount`       | families unmounted while frozen that survive the sweep of a theme change                 |
 | `expect`              | after a screen check   | a prop React owns differs in the committed tree, eg. `transition.check` measures the bar, `animations.variant-color` reads the Reanimated color, or the JS thread stalled too long (`frozen-list.stall`) |
-| probe                 | at checkpoints         | the screen paints other colors than the theme (overlay squares, one through Reanimated)  |
+| probe                 | at checkpoints         | the screen paints other colors than the theme (overlay squares, Reanimated, RN Animated) |
 | crash                 | while the host waits   | the app process died, e.g. a use after free on a frozen unmount                          |
 | host `timeout`, stall | at sync points         | the screen stopped updating or the runner hung                                           |
 
@@ -83,7 +83,7 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
   through `e2eScrollRef`. `settle.ts` waits two idle callbacks and two frames: Unistyles applies theme changes from a
   native callback on the JS thread, the idle callbacks run after it.
 - The overlay (`E2EOverlay.tsx`, rendered by the root layout outside the navigator, so it never freezes) renders nothing
-  until the e2e route starts a run. Then it shows a beacon, five themed probes and the current marker
+  until the e2e route starts a run. Then it shows a beacon, six themed probes and the current marker
   (`E2E CHECKPOINT <n> <theme> #<seq>`, `E2E TAP <testID> #<seq>`, `E2E RESULT PASS|FAIL #<seq>`).
 - At a sync point the runner blocks and the beacon turns magenta or yellow (by sync parity). The host polls screenshots
   until the beacon shows the next sync, only then reads the accessibility tree, and answers by tapping the beacon or the
@@ -97,7 +97,7 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
 ## Mutation check
 
 Each fix was reverted (or its mechanism disabled) in a Release build and the suite failed with a report pointing at
-the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9, M10 added 2026-10-03 on iOS and Android):
+the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 to M11 added 2026-10-03 on iOS and Android):
 
 | mutation                                                                                   | caught by                                                         | first failure                                                                                   |
 | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
@@ -112,6 +112,7 @@ the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9, 
 | M8 `refreshReactNodes` also re-points React's uncommitted clones (no `getHasBeenPromoted`)   | `transition` (iOS and Android, 6 failures in 3 reps)              | transition `bar width expected 120 actual 200`, the clone React made before the commit is lost |
 | M9 `link` commits once per restored node of a frozen screen (#1252)                          | `frozen-list` (iOS and Android)                                   | `js stall ms expected <= 300 actual 870` (iOS) and `actual 1519` (Android) on the first restore |
 | M10 `useAnimatedVariantColor` re-applies the color of its last render when a frozen screen is revealed | `animated-variant` (iOS and Android, 3 failures in 3 reps) | `animated backgroundColor expected #ff9ff3 actual rgba(255, 107, 107, 1)`, the light accent after a flip to dark |
+| M11 `add` links only the first unistyle of an object RN Animated flattened from an array     | `shared-dynamic-fn`, `mount-after-flip`, `set-theme-on-mount` (iOS and Android) | overlay probe `native-animated` expected `#ffffff` (dark) actual `#1b1b1f` (light), 0 mismatches |
 
 #1266 can't be reverted as a whole, `verify()` reads the registry it introduced, so M4a and M4b disable its two
 mechanisms. The use after free itself (#1217, #1179) only crashes with freed families, which needs a Release build with

@@ -168,6 +168,12 @@ const refreshReactNodes = () => {
 
 StyleSheet.addChangeListener(refreshReactNodes)
 
+const splitMergedUnistyles = (style: any) => {
+    const unistylesKeys = Object.keys(style).filter((key) => key.startsWith('unistyles_'))
+
+    return unistylesKeys.length > 1 ? unistylesKeys.map((key) => ({ [key]: style[key] })) : style
+}
+
 HybridShadowRegistry.add = (handle, styles) => {
     // virtualized nodes can be null
     if (!handle || !styles) {
@@ -181,6 +187,7 @@ HybridShadowRegistry.add = (handle, styles) => {
         .filter((style) => style && Object.keys(style).length > 0)
         .flat()
         .filter(Boolean)
+        .flatMap(splitMergedUnistyles)
 
     if (filteredStyles.length > 0) {
         const node = findShadowNodeForHandle(handle)
