@@ -8,6 +8,7 @@
 #include "ShadowTreeManager.h"
 #include "ShadowTreeDiagnostics.h"
 #include <cxxreact/ReactNativeVersion.h>
+#include <atomic>
 
 namespace margelo::nitro::unistyles {
 
@@ -71,7 +72,10 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
     std::shared_ptr<const core::ShadowNode> getShadowNodeFromRef(jsi::Runtime& rt, const jsi::Value& maybeRef);
 
 private:
+    void scheduleShadowTreeUpdate(jsi::Runtime& rt);
+
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
+    std::shared_ptr<std::atomic<bool>> _isShadowTreeUpdateScheduled = std::make_shared<std::atomic<bool>>(false);
 };
 
 }

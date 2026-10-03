@@ -11,6 +11,7 @@ export const screens = [
     { route: 'lists', title: 'Lists', description: 'ScrollView, FlatList and SectionList' },
     { route: 'transition', title: 'Transition', description: 'Unistyles commits during a transition render' },
     { route: 'suspense', title: 'Suspense', description: 'Theme changes while content is suspended (#1260)' },
+    { route: 'activity', title: 'Activity', description: 'Theme changes and renders while <Activity> hides content' },
     { route: 'session', title: 'Frozen session', description: 'Frozen stack, shared styles, log out while frozen (#1262, #1217)' }
 ] as const
 

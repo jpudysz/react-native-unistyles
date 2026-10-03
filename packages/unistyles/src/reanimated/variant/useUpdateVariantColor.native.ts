@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { useSharedValue } from 'react-native-reanimated'
 
 import type { UseUpdateVariantColorConfig } from './types'
@@ -12,6 +12,7 @@ export const useUpdateVariantColor = <T extends Record<string, any>>({
 }: UseUpdateVariantColorConfig<T>) => {
     const fromValue = useSharedValue<string>(style[colorKey])
     const toValue = useSharedValue<string>(style[colorKey])
+    const applied = useRef<{ style: T; colorKey: typeof colorKey }>(undefined)
 
     useEffect(() => {
         const dispose = StyleSheet.addChangeListener((changedDependencies) => {
@@ -31,6 +32,11 @@ export const useUpdateVariantColor = <T extends Record<string, any>>({
     }, [style, colorKey])
 
     useLayoutEffect(() => {
+        if (applied.current?.style === style && applied.current.colorKey === colorKey) {
+            return
+        }
+
+        applied.current = { style, colorKey }
         fromValue.set(toValue.value)
         toValue.set(style[colorKey])
     }, [style, colorKey])
