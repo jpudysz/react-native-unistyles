@@ -9,7 +9,24 @@ import { error, extractUnistyleDependencies, generateHash } from './utils'
 export class UnistylesRegistry {
     private readonly stylesheets = new Map<StyleSheetWithSuperPowers<StyleSheet>, StyleSheet>()
     private readonly stylesCache = new Set<string>()
-    private readonly stylesCounter = new Map<string, Set<HTMLElement>>()
+    // Use counter instead of Set<HTMLElement> to avoid retaining detached DOM nodes
+    // FR is a fallback when remove() is missed
+    private readonly stylesCounter = new Map<string, number>()
+    // Bumped on reset() so stale FR callbacks are ignored
+    private cleanupGeneration = 0
+    // Per-registration unregister token, so remove() cancels only its own registration
+    private readonly finalizerTokens = new WeakMap<HTMLElement, Map<string, Array<object>>>()
+    // FR isn't available on every runtime - fall back to counter-only cleanup
+    private readonly finalizationRegistry =
+        typeof FinalizationRegistry === 'undefined'
+            ? undefined
+            : new FinalizationRegistry<{ hash: string; generation: number }>(({ hash, generation }) => {
+                  if (generation !== this.cleanupGeneration) {
+                      return
+                  }
+
+                  this.decrementAndMaybeCleanup(hash)
+              })
     private readonly disposeListenersMap = new Map<object, VoidFunction>()
     private readonly dependenciesMap = new Map<StyleSheetWithSuperPowers<StyleSheet>, Set<UnistyleDependency>>()
     readonly css: CSSState
@@ -78,33 +95,61 @@ export class UnistylesRegistry {
     }
 
     connect = (ref: HTMLElement, hash: string) => {
-        const stylesCounter = this.stylesCounter.get(hash) ?? new Set()
+        this.stylesCounter.set(hash, (this.stylesCounter.get(hash) ?? 0) + 1)
 
-        stylesCounter.add(ref)
-        this.stylesCounter.set(hash, stylesCounter)
+        if (!this.finalizationRegistry) {
+            return
+        }
+
+        const token = {}
+        const tokensByHash = this.finalizerTokens.get(ref) ?? new Map<string, Array<object>>()
+        const tokens = tokensByHash.get(hash) ?? []
+
+        tokens.push(token)
+        tokensByHash.set(hash, tokens)
+        this.finalizerTokens.set(ref, tokensByHash)
+        this.finalizationRegistry.register(ref, { hash, generation: this.cleanupGeneration }, token)
     }
 
     remove = (ref: HTMLElement, hash: string) => {
-        const stylesCounter = this.stylesCounter.get(hash) ?? new Set()
+        const token = this.finalizerTokens.get(ref)?.get(hash)?.pop()
 
-        stylesCounter.delete(ref)
-
-        if (stylesCounter.size === 0) {
-            // Move this to the end of the event loop so the element is removed from the DOM
-            return Promise.resolve().then(() => {
-                // Check if element is still in the DOM
-                if (document.querySelector(`.${hash}`)) {
-                    return false
-                }
-
-                this.css.remove(hash)
-                this.stylesCache.delete(hash)
-
-                return true
-            })
+        if (token) {
+            this.finalizationRegistry?.unregister(token)
         }
 
-        return Promise.resolve(false)
+        return this.decrementAndMaybeCleanup(hash)
+    }
+
+    private decrementAndMaybeCleanup = (hash: string): Promise<boolean> => {
+        const next = (this.stylesCounter.get(hash) ?? 0) - 1
+
+        if (next > 0) {
+            this.stylesCounter.set(hash, next)
+
+            return Promise.resolve(false)
+        }
+
+        // Drop the empty bucket from the Map
+        this.stylesCounter.delete(hash)
+
+        // Move this to the end of the event loop so the element is removed from the DOM
+        return Promise.resolve().then(() => {
+            // New connect raced in during the microtask
+            if ((this.stylesCounter.get(hash) ?? 0) > 0) {
+                return false
+            }
+
+            // Check if element is still in the DOM
+            if (document.querySelector(`.${hash}`)) {
+                return false
+            }
+
+            this.css.remove(hash)
+            this.stylesCache.delete(hash)
+
+            return true
+        })
     }
 
     add = (value: UnistylesValues, forChild?: boolean) => {
@@ -126,6 +171,8 @@ export class UnistylesRegistry {
     }
 
     reset = () => {
+        // Invalidate pending FR callbacks from this generation
+        this.cleanupGeneration += 1
         this.disposeListenersMap.forEach((dispose) => dispose())
         this.css.reset()
         this.stylesheets.clear()
