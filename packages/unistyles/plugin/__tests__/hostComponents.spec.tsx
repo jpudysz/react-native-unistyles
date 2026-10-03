@@ -103,5 +103,21 @@ pluginTester({
                 export type Example = typeof unstable_NativeText
             `,
         },
+        {
+            title: 'Should ignore inline type imports of host components',
+            code: `
+                import { type unstable_NativeText, unstable_NativeView as RawView } from 'react-native'
+
+                export type Example = typeof unstable_NativeText
+                export const View = RawView
+            `,
+            output: `
+                import { NativeView as RawView } from 'react-native-unistyles/components/native/NativeView'
+                import { type unstable_NativeText } from 'react-native'
+
+                export type Example = typeof unstable_NativeText
+                export const View = RawView
+            `,
+        },
     ],
 })

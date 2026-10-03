@@ -165,9 +165,10 @@ function handleExoticImport(path2, state, exoticImport) {
   specifiers.forEach((specifier) => {
     for (const rule of exoticImport.imports) {
       const hasMatchingImportType = !rule.isDefault && t2.isImportSpecifier(specifier) || rule.isDefault && t2.isImportDefaultSpecifier(specifier);
+      const isTypeOnly = t2.isImportSpecifier(specifier) && specifier.importKind !== "value";
       const hasMatchingImportName = rule.isDefault || t2.isImportSpecifier(specifier) && rule.name === getImportedName(specifier);
       const hasMatchingPath = rule.path === source.value;
-      if (!hasMatchingImportType || !hasMatchingImportName || !hasMatchingPath) {
+      if (isTypeOnly || !hasMatchingImportType || !hasMatchingImportName || !hasMatchingPath) {
         continue;
       }
       if (t2.isImportDefaultSpecifier(specifier)) {

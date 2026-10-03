@@ -260,12 +260,18 @@ Unistyles uses it internally to support the following imports from `react-native
 
 ```js
 // React Native 0.83+
-import { unstable_NativeText, unstable_NativeView } from "react-native"
+import { unstable_NativeText as NativeText, unstable_NativeView as NativeView } from "react-native"
 
 // deep imports, deprecated by React Native
 import { NativeText } from "react-native/Libraries/Text/TextNativeComponent"
 import View from "react-native/Libraries/Components/View/ViewNativeComponent"
 ```
+
+:::note
+Import the root exports with a capitalized alias, as JSX treats lowercase tags as host component names.
+
+TypeScript declares `unstable_NativeText` and `unstable_NativeView` by default from React Native 0.87. On React Native 0.83 - 0.86 they are only part of the [Strict TypeScript API](https://reactnative.dev/docs/strict-typescript-api), so either opt in with `"customConditions": ["react-native-strict-api"]` in your `tsconfig.json` or suppress the error with `// @ts-expect-error` above the import.
+:::
 
 Let's say you have a library called `custom-library` that imports `react-native` raw components directly:
 

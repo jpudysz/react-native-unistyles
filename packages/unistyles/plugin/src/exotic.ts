@@ -24,11 +24,12 @@ export function handleExoticImport(
             const hasMatchingImportType =
                 (!rule.isDefault && t.isImportSpecifier(specifier)) ||
                 (rule.isDefault && t.isImportDefaultSpecifier(specifier))
+            const isTypeOnly = t.isImportSpecifier(specifier) && specifier.importKind !== 'value'
             const hasMatchingImportName =
                 rule.isDefault || (t.isImportSpecifier(specifier) && rule.name === getImportedName(specifier))
             const hasMatchingPath = rule.path === source.value
 
-            if (!hasMatchingImportType || !hasMatchingImportName || !hasMatchingPath) {
+            if (isTypeOnly || !hasMatchingImportType || !hasMatchingImportName || !hasMatchingPath) {
                 continue
             }
 
