@@ -18,9 +18,9 @@ export type UnistyleImage = Omit<ImageStyle, NestedKeys>
 type UnistyleNestedStyles = {
     shadowOffset?: ToDeepUnistyles<ShadowOffset>
     textShadowOffset?: ToDeepUnistyles<ShadowOffset>
-    transform?: Array<ToDeepUnistyles<TransformStyles>>
-    boxShadow?: Array<ToDeepUnistyles<BoxShadowValue>> | string
-    filter?: Array<ToDeepUnistyles<FilterFunction>> | string
+    transform?: ReadonlyArray<ToDeepUnistyles<TransformStyles>>
+    boxShadow?: ReadonlyArray<ToDeepUnistyles<BoxShadowValue>> | string
+    filter?: ReadonlyArray<ToDeepUnistyles<FilterFunction>> | string
 }
 
 type VariantsObject = {
