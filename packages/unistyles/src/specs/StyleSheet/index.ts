@@ -34,8 +34,15 @@ export type UnistylesConfig = {
     breakpoints?: UnistylesBreakpoints
 }
 
+// React Native 0.85 dropped `absoluteFillObject`, where `absoluteFill` is already a plain
+// style object. Older versions still expose both, so the descriptor is read from React Native
+// instead of being duplicated here.
+type AbsoluteFillObject = typeof NativeStyleSheetType extends { absoluteFillObject: infer TStyle }
+    ? TStyle
+    : typeof NativeStyleSheetType.absoluteFill
+
 export interface UnistylesStyleSheet extends UnistylesStyleSheetSpec {
-    absoluteFillObject: typeof NativeStyleSheetType.absoluteFill
+    absoluteFillObject: AbsoluteFillObject
     absoluteFill: typeof NativeStyleSheetType.absoluteFill
     compose: typeof NativeStyleSheetType.compose
     flatten: typeof NativeStyleSheetType.flatten
@@ -52,7 +59,8 @@ export interface UnistylesStyleSheet extends UnistylesStyleSheetSpec {
 
 const HybridUnistylesStyleSheet = NitroModules.createHybridObject<UnistylesStyleSheet>('UnistylesStyleSheet')
 
-HybridUnistylesStyleSheet.absoluteFillObject = NativeStyleSheet.absoluteFill
+HybridUnistylesStyleSheet.absoluteFillObject = ((NativeStyleSheet as Record<string, unknown>).absoluteFillObject ??
+    NativeStyleSheet.absoluteFill) as AbsoluteFillObject
 HybridUnistylesStyleSheet.absoluteFill = NativeStyleSheet.absoluteFill
 HybridUnistylesStyleSheet.flatten = NativeStyleSheet.flatten
 HybridUnistylesStyleSheet.compose = NativeStyleSheet.compose
