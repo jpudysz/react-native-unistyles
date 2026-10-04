@@ -173,7 +173,7 @@ const splitMergedUnistyles = (style: any) => {
     let hasUnistyle = false
 
     for (const key in style) {
-        if (!key.startsWith('unistyles_')) {
+        if (!key.startsWith('unistyles_') || !Object.prototype.hasOwnProperty.call(style, key)) {
             continue
         }
 
