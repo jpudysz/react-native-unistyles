@@ -158,6 +158,16 @@ inline static jsi::Value objectFromUnistyle(jsi::Runtime& rt, std::shared_ptr<Hy
     ) {
         auto& registry = UnistylesRegistry::get();
         auto unistyle = registry.getUnistyleById(unistyleID);
+
+        // the unistyle may have been unregistered while this call was in flight,
+        // eg. UnistylesRegistry::destroy() runs during a reload while the outgoing
+        // runtime still executes queued work — throw instead of dereferencing nullptr
+        if (unistyle == nullptr) {
+            throw jsi::JSError(rt, R"(Unistyles: Style is no longer registered!
+
+You likely accessed a style while the runtime was being torn down (eg. during a reload).)");
+        }
+
         auto scopedTheme = registry.getScopedTheme();
         parser::Parser parser(unistylesRuntime);
 
