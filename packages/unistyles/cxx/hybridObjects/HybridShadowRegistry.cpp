@@ -99,7 +99,6 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     std::optional<folly::dynamic> initialScopedUpdate;
     bool shouldCommit = false;
 
-    // suspended (frozen) nodes don't need a commit when restored, theme changes update them while they are hidden
     if (scopedTheme.has_value()) {
         initialScopedUpdate = parser.parseStylesToShadowTreeUpdates(rt, unistylesData);
     } else if (shadow::hasNativeProps(&shadowNodeWrapper->getFamily())) {
@@ -125,8 +124,6 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     return jsi::Value::undefined();
 }
 
-// React links every node of a commit one by one, and each shadow tree commit clones all siblings of the updated nodes
-// committing once after React is done keeps restoring a big subtree linear
 void HybridShadowRegistry::scheduleShadowTreeUpdate(jsi::Runtime& rt) {
     if (this->_isShadowTreeUpdateScheduled->exchange(true)) {
         return;

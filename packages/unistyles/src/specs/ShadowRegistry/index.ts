@@ -168,10 +168,25 @@ const refreshReactNodes = () => {
 
 StyleSheet.addChangeListener(refreshReactNodes)
 
+// runs for every style on every link, so it allocates only for the rare merged style (eg. flattened by Animated)
 const splitMergedUnistyles = (style: any) => {
-    const unistylesKeys = Object.keys(style).filter((key) => key.startsWith('unistyles_'))
+    let hasUnistyle = false
 
-    return unistylesKeys.length > 1 ? unistylesKeys.map((key) => ({ [key]: style[key] })) : style
+    for (const key in style) {
+        if (!key.startsWith('unistyles_')) {
+            continue
+        }
+
+        if (hasUnistyle) {
+            return Object.keys(style)
+                .filter((unistyleKey) => unistyleKey.startsWith('unistyles_'))
+                .map((unistyleKey) => ({ [unistyleKey]: style[unistyleKey] }))
+        }
+
+        hasUnistyle = true
+    }
+
+    return style
 }
 
 HybridShadowRegistry.add = (handle, styles) => {
