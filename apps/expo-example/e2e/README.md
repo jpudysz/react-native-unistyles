@@ -53,6 +53,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `mount-after-flip`    | screens pushed after theme changes, list scroll, screen actions            | nodes mounted into a changed theme                       |
 | `set-theme-on-mount`  | a screen that calls `setTheme` from its mount effect                       | nodes rendered before a theme change that link after it  |
 | `update-theme`        | `updateTheme` of the current theme, theme changes, restore                 | `UnistylesRuntime.updateTheme`                           |
+| `runtime-hooks`       | follow the system while the theme already matches the OS                   | #1254, `useUnistyles` listeners skipped when no StyleSheet depends on a change |
 | `transition`          | Unistyles commits while React yields in a `startTransition` render         | props React rendered before the commit (inline styles)   |
 | `lists-scroll`        | theme changes at scrolled FlatList positions                               | virtualized rows mounted after a theme change            |
 | `touchable-highlight` | TouchableHighlight pressed after theme changes and below a ScopedTheme (host only) | its underlay re-render commits the style React rendered last |

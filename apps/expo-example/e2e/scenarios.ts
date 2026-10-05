@@ -1,3 +1,4 @@
+import { UnistylesRuntime } from 'react-native-unistyles'
 import { screens } from '../consts'
 import { THEME_NAMES, type ThemeName } from '../themes'
 import type { ScenarioId } from './protocol'
@@ -252,6 +253,28 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.flip('light')
         await a.act('runtime.restore')
         await a.back()
+        await a.checkpoint()
+    },
+    // #1254, useUnistyles re-renders for runtime changes no StyleSheet depends on
+    'runtime-hooks': async a => {
+        const scheme = UnistylesRuntime.colorScheme
+
+        if (scheme !== 'light' && scheme !== 'dark') {
+            return
+        }
+
+        if (a.theme() !== scheme) {
+            await a.flip(scheme)
+        }
+
+        // the theme matches the OS, following it changes only hasAdaptiveThemes
+        await a.followSystem()
+        await a.expect('runtime-probe.check')
+        await a.flip(scheme === 'light' ? 'premium' : 'light')
+        await a.expect('runtime-probe.check')
+        await a.flip(scheme)
+        await a.followSystem()
+        await a.expect('runtime-probe.check')
         await a.checkpoint()
     },
     // Unistyles commits while React yields in a transition render, React's new props must survive them

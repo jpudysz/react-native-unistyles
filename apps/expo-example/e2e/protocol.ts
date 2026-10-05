@@ -16,6 +16,7 @@ export const SCENARIOS = [
     'mount-after-flip',
     'set-theme-on-mount',
     'update-theme',
+    'runtime-hooks',
     'transition',
     'lists-scroll',
     'touchable-highlight',
