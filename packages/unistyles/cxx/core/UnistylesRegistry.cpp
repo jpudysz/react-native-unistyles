@@ -52,7 +52,7 @@ void core::UnistylesRegistry::createState() {
     this->_state = std::make_unique<UnistylesState>();
 }
 
-void core::UnistylesRegistry::updateTheme(jsi::Runtime& rt, std::string& themeName, jsi::Function&& callback) {
+void core::UnistylesRegistry::updateTheme(jsi::Runtime& rt, uint64_t generation, std::string& themeName, jsi::Function&& callback) {
     auto& state = this->getState();
     auto it = state._jsThemes.find(themeName);
 
@@ -62,7 +62,14 @@ void core::UnistylesRegistry::updateTheme(jsi::Runtime& rt, std::string& themeNa
 
     helpers::assertThat(rt, result.isObject(), "Unistyles: Returned theme is not an object. Please check your updateTheme function.");
 
-    it->second = result.asObject(rt);
+    auto theme = result.asObject(rt);
+    std::lock_guard<std::mutex> lock(this->_ownershipMutex);
+
+    if (!this->isCurrent(generation)) {
+        throw std::runtime_error(helpers::RUNTIME_REPLACED_ERROR);
+    }
+
+    it->second = std::move(theme);
 }
 
 void core::UnistylesRegistry::linkShadowNodeWithUnistyle(

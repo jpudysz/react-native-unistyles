@@ -49,7 +49,7 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     void registerBreakpoints(std::vector<std::pair<std::string, double>>& sortedBreakpoints);
     void setPrefersAdaptiveThemes(bool prefersAdaptiveThemes);
     void setInitialThemeName(std::string themeName);
-    void updateTheme(jsi::Runtime& rt, std::string& themeName, jsi::Function&& callback);
+    void updateTheme(jsi::Runtime& rt, uint64_t generation, std::string& themeName, jsi::Function&& callback);
 
     UnistylesState& getState();
     void createState();

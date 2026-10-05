@@ -182,7 +182,7 @@ jsi::Value HybridUnistylesRuntime::updateTheme(jsi::Runtime &rt, const jsi::Valu
 
     helpers::assertThat(rt, args[1].asObject(rt).isFunction(rt), "UnistylesRuntime.updateTheme expected second argument to be a function.");
 
-    registry.updateTheme(rt, themeName, args[1].asObject(rt).asFunction(rt));
+    registry.updateTheme(rt, this->generation, themeName, args[1].asObject(rt).asFunction(rt));
 
     this->_onDependenciesChange({UnistyleDependency::THEME});
 
