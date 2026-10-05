@@ -353,12 +353,10 @@ void HybridStyleSheet::applyDependencyChanges(jsi::Runtime& rt, std::vector<Unis
     // but their rawValue must still be refreshed so rerenders read fresh closures
     auto dependentStyleSheets = registry.getStyleSheetsToRefresh(dependencies);
 
-    if (dependencyMap.empty() && dependentStyleSheets.empty()) {
-        return;
-    }
-
     // rebuild rawValue BEFORE notifying listeners so JS rerenders read fresh closures
-    parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets, maybeMiniRuntime);
+    if (!dependencyMap.empty() || !dependentStyleSheets.empty()) {
+        parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets, maybeMiniRuntime);
+    }
 
     if (!dependencyMap.empty()) {
         parser.rebuildShadowLeafUpdates(rt, dependencyMap);
@@ -372,6 +370,7 @@ void HybridStyleSheet::applyDependencyChanges(jsi::Runtime& rt, std::vector<Unis
 
     // after the commit, so listeners can point React at the committed nodes
     registry.setCommittedTags(std::move(committedTags));
+    // also when no StyleSheet depends on the change, hooks (useUnistyles, withUnistyles, Display, Hide) may
     this->notifyJSListeners(dependencies);
 }
 

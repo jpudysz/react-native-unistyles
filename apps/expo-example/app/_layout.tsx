@@ -4,7 +4,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { useUnistyles } from 'react-native-unistyles'
 import { Header } from '../components'
 import { screens } from '../consts'
-import { E2EOverlay } from '../e2e'
+import { E2EOverlay, RuntimeProbe } from '../e2e'
 
 export default function RootLayout() {
     const { theme } = useUnistyles()
@@ -39,6 +39,7 @@ export default function RootLayout() {
                 <Stack.Screen name="e2e" options={{ title: 'E2E' }} />
             </Stack>
             <E2EOverlay />
+            <RuntimeProbe />
         </GestureHandlerRootView>
     )
 }
