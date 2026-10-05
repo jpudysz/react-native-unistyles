@@ -18,8 +18,19 @@ def reactNativeArchitectures() {
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'org.jetbrains.kotlin.android'
+// AGP 9 ships built-in Kotlin support and registers the `kotlin` extension
+// itself. Applying the Kotlin plugin on top of it fails configuration with
+// "Cannot add extension with name 'kotlin'". Only apply it when nothing has
+// registered that extension yet.
+if (project.extensions.findByName('kotlin') == null) {
+    apply plugin: 'org.jetbrains.kotlin.android'
+}
+
 apply from: '../nitrogen/generated/android/unistyles+autolinking.gradle'
+
+// Nitrogen adds its generated Kotlin files to java.srcDirs, which AGP 9 built-in Kotlin
+// doesn't compile. It only compiles Kotlin directories from the kotlin source set.
+android.sourceSets.main.kotlin.srcDirs += ["${project.projectDir}/../nitrogen/generated/android/kotlin"]
 
 def resolveBuildType() {
     Gradle gradle = getGradle()
