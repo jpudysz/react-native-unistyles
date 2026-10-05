@@ -27,7 +27,7 @@ No, Unistyles is tightly integrated with `Fabric`. There are no plans to support
 
 ### We are not ready to upgrade. What will happen with version `2.0`?
 
-We understand that some apps require more time to migrate to the `New Architecture`. We plan to support Unistyles 2.0 for a few more months or stable React Native versions.
+We understand that some apps require more time to migrate to the `New Architecture`. Unistyles 2.0 is in maintenance mode, and new features land only in Unistyles 3.x.
 
 ### Adaptive mode doesn’t work for me
 
@@ -37,7 +37,7 @@ If your app still doesn’t automatically switch themes, ensure that:
 
 - For Expo your `app.json` contains a `userInterfaceStyle` key with the value automatic
 - For bare React Native, your `Info.plist` does not have the `UIUserInterfaceStyle` key set to a hardcoded value
-- `Appearance` from `react-native` is set to null
+- You haven't forced a color scheme with `Appearance.setColorScheme('light' | 'dark')` from `react-native` (use `'unspecified'` to reset it)
 - You have phone with iOS 15+ or Android 10+
 - Your device supports dark mode
 

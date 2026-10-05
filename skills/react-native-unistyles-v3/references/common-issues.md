@@ -6,18 +6,18 @@ Curated from 150+ GitHub issues. Organized by category with symptoms, causes, an
 
 ## 1. Setup & Initialization
 
-### "Unistyles was loaded but not configured" after hot reload
+### "Unistyles was loaded, but it's not configured" after hot reload
 
 **Symptoms:** Error appears after fast refresh / hot reload, not on cold start.
 **Cause:** `StyleSheet.configure()` runs in a module scope that doesn't re-execute on HMR.
 **Solution:** Ensure `StyleSheet.configure()` is imported in your entry point file. For Expo Router, follow the [Expo Router integration steps](setup-guide.md#expo-router-integration).
 **Ref:** [#1098](https://github.com/jpudysz/react-native-unistyles/issues/1098)
 
-### "Unistyles not initialized correctly"
+### "Unistyles was loaded, but it's not configured. Did you forget to call StyleSheet.configure?"
 
 **Symptoms:** Crash on app start.
 **Cause:** `StyleSheet.create()` is called before `StyleSheet.configure()`.
-**Solution:** Move `StyleSheet.configure()` to your app's entry point, before any component imports that use `StyleSheet.create`.
+**Solution:** Move `StyleSheet.configure()` to your app's entry point, before any component imports that use `StyleSheet.create`. With no themes/breakpoints, call `StyleSheet.configure({})`.
 **Ref:** [#1010](https://github.com/jpudysz/react-native-unistyles/issues/1010)
 
 ### StyleSheet.configure timing with Expo Router
@@ -26,17 +26,17 @@ Curated from 150+ GitHub issues. Organized by category with symptoms, causes, an
 **Cause:** Expo Router resolves routes before your config runs.
 **Solution:**
 1. Set `"main": "index.ts"` in package.json
-2. Create `index.ts` with:
+2. Create `index.ts` (or `index.js`) with:
    ```ts
-   import './unistyles'        // configure first
    import 'expo-router/entry'
+   import './unistyles'        // your StyleSheet.configure() file
    ```
 3. For static rendering, also import config in `app/+html.tsx`
 
 ### "Property value expected type of number but got null" for hasAdaptiveThemes
 
 **Symptoms:** Runtime error mentioning `hasAdaptiveThemes` property.
-**Cause:** `adaptiveThemes` set to `true` without both `light` and `dark` themes registered.
+**Cause:** `adaptiveThemes` set to `true` without both `light` and `dark` themes registered (current versions throw "You're trying to enable adaptiveThemes, but you didn't register both 'light' and 'dark' themes").
 **Solution:** Ensure themes object has keys named exactly `light` and `dark`:
 ```tsx
 StyleSheet.configure({
@@ -46,14 +46,23 @@ StyleSheet.configure({
 ```
 **Ref:** [#1040](https://github.com/jpudysz/react-native-unistyles/issues/1040)
 
+### setTheme throws / initialTheme + adaptiveThemes error
+
+**Cause:** `initialTheme` and `adaptiveThemes: true` are mutually exclusive, and `UnistylesRuntime.setTheme()` throws while adaptive themes are enabled.
+**Solution:** Use one of the two settings. To switch manually at runtime, call `UnistylesRuntime.setAdaptiveThemes(false)` before `setTheme()`.
+
+### Adaptive themes don't follow the OS
+
+**Solution:** Check that Expo `app.json` has `userInterfaceStyle: "automatic"` (bare: `Info.plist` doesn't hardcode `UIUserInterfaceStyle`), and that you haven't forced a scheme with `Appearance.setColorScheme('light' | 'dark')` (use `'unspecified'` to reset). Requires iOS 15+ / Android 10+.
+
 ---
 
 ## 2. Style Spreading (Most Common Issue)
 
-### "Style is not bound!" error
+### "Style is not bound!" error / "we detected style object with 2 unistyles styles" warning
 
-**Symptoms:** Runtime error "Style is not bound!" or styles not applying.
-**Cause:** Spreading Unistyles styles with `{...styles.x}`. v3 styles are C++ proxy objects — spreading breaks the native binding.
+**Symptoms:** Runtime error "Unistyles: Style is not bound!", a `__DEV__` warning about merged Unistyles styles, or styles that stop updating.
+**Cause:** Spreading/merging Unistyles styles with `{...styles.x}` (or altering the hidden `unistyles_*` key). Each style carries C++ state — merging two into one object keeps only the first binding.
 **Solution:** ALWAYS use array syntax:
 ```tsx
 // WRONG
@@ -85,7 +94,7 @@ const animStyle = useAnimatedStyle(() => ({ ...styles.box }))
 ### Re-exporting StyleSheet from barrel files
 
 **Symptoms:** Styles not reactive; theme changes have no effect.
-**Cause:** The Babel plugin detects `StyleSheet.create` by checking the import source is `react-native-unistyles`. Re-exporting through a barrel file (e.g., `export { StyleSheet } from 'react-native-unistyles'` in `utils/index.ts`) breaks detection.
+**Cause:** Outside `root`, the Babel plugin recognizes `StyleSheet.create` only when `StyleSheet` is imported from `react-native-unistyles` (or the file matches `autoProcessImports`). Re-exporting through a barrel file (e.g., `export { StyleSheet } from 'react-native-unistyles'` in `utils/index.ts`) breaks detection there. (Inside `root` a heuristic still catches stylesheet-shaped `.create()` calls, but don't rely on it.)
 **Solution:** Always import directly:
 ```tsx
 // WRONG
@@ -98,14 +107,14 @@ import { StyleSheet } from 'react-native-unistyles'
 ### Plugin interferes with other .create() calls
 
 **Symptoms:** Other libraries' `.create()` calls break (e.g., Zustand, custom factories).
-**Cause:** The Babel plugin processes any `StyleSheet.create()` it finds.
-**Solution:** The plugin only processes `StyleSheet.create()` when `StyleSheet` is imported from `react-native-unistyles`. If you have a different `StyleSheet` variable, rename it to avoid collision.
+**Cause:** In processed files (under `root`, matching `autoProcessImports`, or importing `react-native-unistyles`), the plugin treats any `something.create(arg)` that *looks like* a stylesheet as one: a single object argument whose values are objects, or an arrow function with ≤ 2 params returning a non-empty object.
+**Solution:** Change the call shape (e.g. pass an extra argument or a non-arrow factory), or move such factories to a file the plugin doesn't process. Use `debug: true` to see what the plugin detected.
 **Ref:** [#993](https://github.com/jpudysz/react-native-unistyles/issues/993)
 
 ### Wrong root directory
 
 **Symptoms:** Styles not reactive; Babel plugin appears to do nothing.
-**Cause:** The `root` option in Babel config resolves to the project root or an incorrect directory.
+**Cause:** The `root` option is missing (the plugin throws), resolves to the project root (throws — it would include `node_modules`), or points to the wrong directory. It's resolved relative to Babel's `root` (project directory by default).
 **Solution:** `root` must point to your **source code directory**, not the project root:
 ```js
 // WRONG — root resolves to project root
@@ -119,19 +128,30 @@ import { StyleSheet } from 'react-native-unistyles'
 
 ### Files outside root not processed
 
-**Symptoms:** Shared package styles not reactive.
-**Cause:** Only files inside `root` are processed by default.
-**Solution:** Add `autoProcessPaths` for additional directories:
+**Symptoms:** Shared package / library views not reactive.
+**Cause:** Files outside `root` are only processed if they import `react-native-unistyles` (and contain a stylesheet), match `autoProcessImports`, or match `autoProcessPaths`. `node_modules` is ignored unless listed in `autoProcessPaths`.
+**Solution:**
 ```js
 ['react-native-unistyles/plugin', {
   root: 'src',
-  autoProcessPaths: ['../packages/shared/src']
+  autoProcessImports: ['@my-org/styles'],        // your monorepo files importing this are processed
+  autoProcessPaths: ['external-library/components']  // substring of the absolute path, NOT '../relative'
 }]
 ```
 
 ---
 
 ## 4. Theme Updates Not Propagating
+
+### Frozen / hidden screens show stale styles
+
+**Symptoms:** After changing the theme (or rotating) while a screen is frozen (`freezeOnBlur`, react-navigation `inactiveBehavior` / `<Activity />`, `Suspense` fallback), the screen returns with old styles, or dynamic styles look wrong.
+**Cause:** Bugs in re-linking frozen views, fixed in **3.4.0**; also non-serializable dynamic function arguments (functions are dropped, `Date`/class instances become `{}` when the function is re-run natively).
+**Solution:** Upgrade to 3.4.0+, and pass only serializable values to dynamic functions. `useUnistyles`/`withUnistyles` components update only after the screen unfreezes (React blocks frozen trees).
+
+### Component not updating at all
+
+Check, in order: the file is processed by the Babel plugin (`debug: true`); the view is a React Native view (otherwise use `withUnistyles`); styles aren't spread; `contentContainerStyle` is passed through `withUnistyles`.
 
 ### Nested Text components + Reanimated conflict
 
@@ -202,7 +222,7 @@ const UniButton = withUnistyles(Button, (theme) => ({
 ### Keyboard inset lag with react-native-keyboard-controller
 
 **Symptoms:** `rt.insets.ime` lags behind actual keyboard position.
-**Cause:** Conflict between Unistyles' IME tracking and react-native-keyboard-controller.
+**Cause:** Conflict between Unistyles' IME tracking and react-native-keyboard-controller. (Note: on Android, `ime` is the keyboard height minus the bottom inset and is only animated on Android 11+; Unistyles also guards `rt.insets.bottom` from being polluted by keyboard libraries.)
 **Solution:** Use only one keyboard tracking solution. Prefer `rt.insets.ime` and remove `react-native-keyboard-controller`, or vice versa.
 **Ref:** [#1065](https://github.com/jpudysz/react-native-unistyles/issues/1065)
 
@@ -234,15 +254,12 @@ npx react-native run-android
 ### SSR hydration mismatches
 
 **Symptoms:** React hydration warnings on page load with SSR.
-**Cause:** Server-rendered styles don't match client-side computed styles.
-**Solution:** Use the SSR utilities:
-```tsx
-// Server: inject styles
-const styles = useServerUnistyles()  // or getServerUnistyles()
-
-// Client: hydrate
-hydrateServerUnistyles()
-```
+**Cause:** Server-rendered styles don't match client-side state, or (without adaptive themes) Unistyles adds the theme class to `<html>`.
+**Solution:** Use the SSR utilities from `react-native-unistyles/server` (see [styling-patterns.md](styling-patterns.md#ssr-with-nextjs)):
+- App Router: `useServerUnistyles()` inside a `'use client'` component with `useServerInsertedHTML` (hydrates automatically on the client)
+- Pages Router: `getServerUnistyles()` + `resetServerUnistyles()` in `_document` `getInitialProps`, `hydrateServerUnistyles()` in a `useEffect` in `_app`
+- Add `suppressHydrationWarning` (or the theme class) to `<html>`
+- Styles leaking between requests (Pages Router) → you forgot `resetServerUnistyles()`
 
 ### Safari 16.3 and below not supported
 
@@ -255,7 +272,7 @@ hydrateServerUnistyles()
 
 **Symptoms:** Animated.View doesn't receive Unistyles styles on web platform.
 **Cause:** Reanimated's web implementation may not forward the style processing correctly.
-**Solution:** Use `getWebProps` or apply styles differently on web.
+**Solution:** Use `getWebProps` from `react-native-unistyles/web` (spread `{ className, ref }`) or apply styles differently on web.
 **Ref:** [#1014](https://github.com/jpudysz/react-native-unistyles/issues/1014)
 
 ### Gap polyfill incorrect margins on SmartTV
@@ -335,9 +352,9 @@ plugins: [
 
 ### useUnistyles causes re-renders
 
-**Symptoms:** Excessive re-renders, especially on theme/orientation changes.
-**Cause:** `useUnistyles()` subscribes to theme and runtime changes, triggering re-renders.
-**Solution:** Prefer `StyleSheet.create(theme => ...)` which uses zero-re-render C++ updates. Reserve `useUnistyles()` for cases where you need theme/runtime in JS logic.
+**Symptoms:** Excessive re-renders, especially on theme/orientation/keyboard changes.
+**Cause:** `useUnistyles()` re-renders the whole component when any value you **read** changes (subscriptions are created on property access, not destructuring). Reading `rt.insets.ime` re-renders on every keyboard animation frame.
+**Solution:** Prefer `StyleSheet.create(theme => ...)` which uses zero-re-render C++ updates. Reserve `useUnistyles()` for cases where you need theme/runtime in JS logic, and read only what you need.
 
 ### Variant memory in long lists
 

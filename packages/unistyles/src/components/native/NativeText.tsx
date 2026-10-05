@@ -1,1 +1,1 @@
-export { Text } from './Text'
+export { Text, Text as NativeText } from './Text'

@@ -18,48 +18,53 @@ Unistyles Web is independent from React Native Web, utilizing a custom web parse
 
 ### How It Works
 
-Unistyles web parser generates unique `classNames` for your styles and assigns them to corresponding DOM elements. This ensures that only the necessary styles are applied, avoiding redundancy. Additionally, media queries are automatically created based on your `breakpoints`, eliminating the need for recalculation on every resize.
+Unistyles web parser generates a unique `className` for the styles of every DOM element and injects the matching CSS rules. Elements with identical styles reuse the same class, so the same CSS is never generated twice. Additionally, media queries are automatically created based on your `breakpoints`, eliminating the need for recalculation on every resize.
 
-Example:
+Example (assuming you registered `xs: 0` and `lg: 1200` breakpoints):
 
-```ts
+```tsx
+const MyComponent = () => (
+    <View style={styles.container}>
+        <Text style={styles.text}>
+            Hello
+        </Text>
+    </View>
+)
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        fontSize: 32,
+        padding: 16
     },
     text: {
         fontSize: {
             xs: 28,
             lg: 40
-        },
-    },
-    parentContainer: {
-        flex: 1,
+        }
     }
 })
 ```
 
-Will produce the following CSS output:
+Will produce CSS similar to the following (class names are hashes of the styles, so they will differ in your app):
 
 ```css
-# because flex: 1 is shared across multiple styles
+/* container */
 .unistyles_1u0egm6 {
-  flex: 1;
+    flex: 1;
+    padding: 16px;
 }
 
-# to cover "container" fontSize
-@media (min-width: 0px) {
-  .unistyles_kaoph5 {
-    font-size: 32px;
-  }
+/* text - a breakpoint is active until the next breakpoint used by this property */
+@media (min-width: 0px) and (max-width: 1199px) {
+    .unistyles_kaoph5 {
+        font-size: 28px;
+    }
 }
 
-# to cover "text" fontSize
 @media (min-width: 1200px) {
-  .unistyles_kaoph5 {
-    font-size: 40px;
-  }
+    .unistyles_kaoph5 {
+        font-size: 40px;
+    }
 }
 ```
 
@@ -78,12 +83,20 @@ const styles = StyleSheet.create(theme => ({
 }))
 ```
 
-The generated CSS might look like this:
+By default, Unistyles converts your themes to [CSS variables](/v3/references/web-only#css-variables), so the generated CSS might look like this:
 
 ```css
+:root.dark {
+    --colors-background: #000;
+}
+
+:root.light {
+    --colors-background: #fff;
+}
+
 .unistyles_1u0egm6 {
-  flex: 1;
-  background-color: #000;
+    flex: 1;
+    background-color: var(--colors-background);
 }
 ```
 
@@ -93,20 +106,43 @@ Upon switching the theme:
 UnistylesRuntime.setTheme('light')
 ```
 
-The CSS will automatically update to:
+Unistyles only swaps the class of your root `html` element (or relies on `prefers-color-scheme` media query if you use adaptive themes), and the CSS engine applies the new values.
+
+If you've disabled CSS variables, Unistyles will instead recompute your styles and update the CSS rule of the same class:
 
 ```css
+/* before */
 .unistyles_1u0egm6 {
-  flex: 1;
-  background-color: #fff;
+    flex: 1;
+    background-color: #000;
+}
+
+/* after */
+.unistyles_1u0egm6 {
+    flex: 1;
+    background-color: #fff;
 }
 ```
+
+### RTL support
+
+React Native logical style props are converted to CSS logical properties, so they follow the `dir` attribute of your document:
+
+| React Native | CSS |
+| --- | --- |
+| `start` / `end` | `inset-inline-start` / `inset-inline-end` |
+| `marginStart` / `marginEnd` | `margin-inline-start` / `margin-inline-end` |
+| `paddingStart` / `paddingEnd` | `padding-inline-start` / `padding-inline-end` |
+| `borderStartColor` / `borderEndColor` | `border-inline-start-color` / `border-inline-end-color` |
+| `borderStartWidth` / `borderEndWidth` | `border-inline-start-width` / `border-inline-end-width` |
+
+Keep in mind that corner radii like `borderTopStartRadius` or `borderBottomEndRadius` are still mapped to physical `left` / `right` corners, so they won't flip in RTL.
 
 ### Limitations
 
 Due to Unistyles custom parser, styles cannot be accessed directly as they would be with React Native Web. Passing styles to the `RNW` parser would modify them and generate unnecessary new classes.
 
-As a result, when you try to `console.log` the styles, there will be no output:
+As a result, when you try to `console.log` the styles, you won't see any style values:
 
 ```ts
 const styles = StyleSheet.create({
@@ -115,8 +151,8 @@ const styles = StyleSheet.create({
     }
 })
 
-// This will result in an empty object since we generate classes instead of inline styles
-console.log(styles) // {}
+// This will log an object with only a hidden Unistyles key, since we generate classes instead of inline styles
+console.log(styles.container) // { unistyles_xyz: {} }
 ```
 
 ### Web-Only Features

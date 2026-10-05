@@ -6,7 +6,9 @@
 #include "UnistylesState.h"
 #include "UnistylesRegistry.h"
 #include "ShadowTreeManager.h"
+#include "ShadowTreeDiagnostics.h"
 #include <cxxreact/ReactNativeVersion.h>
+#include <atomic>
 
 namespace margelo::nitro::unistyles {
 
@@ -38,6 +40,18 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
                             const jsi::Value& thisValue,
                             const jsi::Value* args,
                             size_t count);
+    jsi::Value verify(jsi::Runtime& rt,
+                            const jsi::Value& thisValue,
+                            const jsi::Value* args,
+                            size_t count);
+    jsi::Value takeCommittedTags(jsi::Runtime& rt,
+                            const jsi::Value& thisValue,
+                            const jsi::Value* args,
+                            size_t count);
+    jsi::Value refreshReactNodes(jsi::Runtime& rt,
+                            const jsi::Value& thisValue,
+                            const jsi::Value* args,
+                            size_t count);
 
     void loadHybridMethods() override {
         HybridUnistylesShadowRegistrySpec::loadHybridMethods();
@@ -49,13 +63,19 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
             prototype.registerRawHybridMethod("flush", 0, &HybridShadowRegistry::flush);
             prototype.registerRawHybridMethod("setScopedTheme", 1, &HybridShadowRegistry::setScopedTheme);
             prototype.registerRawHybridMethod("getScopedTheme", 0, &HybridShadowRegistry::getScopedTheme);
+            prototype.registerRawHybridMethod("verify", 0, &HybridShadowRegistry::verify);
+            prototype.registerRawHybridMethod("takeCommittedTags", 0, &HybridShadowRegistry::takeCommittedTags);
+            prototype.registerRawHybridMethod("refreshReactNodes", 1, &HybridShadowRegistry::refreshReactNodes);
         });
     };
     
     std::shared_ptr<const core::ShadowNode> getShadowNodeFromRef(jsi::Runtime& rt, const jsi::Value& maybeRef);
 
 private:
+    void scheduleShadowTreeUpdate(jsi::Runtime& rt);
+
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
+    std::shared_ptr<std::atomic<bool>> _isShadowTreeUpdateScheduled = std::make_shared<std::atomic<bool>>(false);
 };
 
 }

@@ -45,7 +45,7 @@ export interface UnistylesPluginOptions {
     root: string
 
     /**
-     * Example: ['@codemask/styles']
+     * Example: ['@my-org/styles']
      * Enable this option if you want to process only files containing specific imports.
      */
     autoProcessImports?: Array<string>
@@ -99,12 +99,12 @@ export interface UnistylesPluginOptions {
     /**
      * Example: ['external-library/components']
      * Enable this option to process some 3rd party components under `node_modules`.
-     * Under these paths we will replace `react-native` imports with `react-native-unistyles` factories that will borrow components refs [read more](https://www.unistyl.es/v3/other/babel-plugin#3-component-factory-borrowing-ref).
+     * Under these paths we will replace `react-native` imports with `react-native-unistyles` factories that will borrow components refs [read more](https://www.unistyl.es/v3/other/babel-plugin#2-component-factory-borrowing-ref).
      *
-     * Defaults to:
+     * The following paths are always processed, and paths passed here are added to them:
      *
      * ```ts
-     * ['react-native-reanimated/src/component']
+     * ['react-native-reanimated/src/component', 'react-native-reanimated/lib/module/component']
      * ```
      */
     autoProcessPaths?: Array<string>

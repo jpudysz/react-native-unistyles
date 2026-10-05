@@ -26,7 +26,8 @@ export const StyleSheet = {
         bottom: 0,
     },
     compose: (a: object, b: object) => RNStyleSheet.compose(a, b),
-    flatten: (...styles: Array<object>) => RNStyleSheet.flatten(...styles),
+    flatten: (...styles: Array<object>) =>
+        (RNStyleSheet.flatten as unknown as (...styles: Array<object>) => object)(...styles),
     hairlineWidth: 1,
 } as unknown as typeof NativeStyleSheet
 

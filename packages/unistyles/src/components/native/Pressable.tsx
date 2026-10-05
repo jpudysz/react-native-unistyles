@@ -18,12 +18,18 @@ type WebPressableState = {
 
 type WebPressableStyle = ((state: WebPressableState) => UnistylesValues) | UnistylesValues
 
+// instance type of View for both legacy and Strict TypeScript API (RN 0.87+)
+type ViewRef = React.ComponentRef<typeof View>
+
 type PressableProps = Props & {
     variants?: Variants
     style?: WebPressableStyle
 }
 
-export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, forwardedRef) => {
+export const Pressable: React.ForwardRefExoticComponent<PressableProps & React.RefAttributes<ViewRef>> = forwardRef<
+    ViewRef,
+    PressableProps
+>(({ style, ...props }, forwardedRef) => {
     const scopedTheme = UnistylesShadowRegistry.getScopedTheme()
     let storedRef: HTMLElement | null = null
     let classNames: ReturnType<typeof getClassName> | undefined = undefined
@@ -35,9 +41,14 @@ export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, 
                 isServer()
                     ? undefined
                     : (ref) => {
+                          if (!ref) {
+                              // @ts-expect-error hidden from TS
+                              UnistylesShadowRegistry.remove(storedRef, classNames?.[0].hash)
+                          }
+
                           storedRef = ref as unknown as HTMLElement
                           // @ts-expect-error hidden from TS
-                          UnistylesShadowRegistry.add(storedRef, classNames?.hash)
+                          UnistylesShadowRegistry.add(storedRef, classNames?.[0].hash)
 
                           if (typeof forwardedRef === 'function') {
                               return forwardedRef(ref)
@@ -55,10 +66,10 @@ export const Pressable = forwardRef<View, PressableProps>(({ style, ...props }, 
                 UnistylesShadowRegistry.setScopedTheme(scopedTheme)
 
                 // @ts-expect-error hidden from TS
-                UnistylesShadowRegistry.remove(storedRef, classNames?.hash)
+                UnistylesShadowRegistry.remove(storedRef, classNames?.[0].hash)
                 classNames = getClassName(styleResult as UnistylesValues)
                 // @ts-expect-error hidden from TS
-                UnistylesShadowRegistry.add(storedRef, classNames?.hash)
+                UnistylesShadowRegistry.add(storedRef, classNames?.[0].hash)
 
                 UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
 

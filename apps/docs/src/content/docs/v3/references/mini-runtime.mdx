@@ -3,7 +3,7 @@ title: Mini Runtime
 description: Learn about mini runtime in Unistyles 3.0
 ---
 
-import { Card } from '@astrojs/starlight/components'
+import { Aside } from '@astrojs/starlight/components'
 import Seo from '../../../../components/Seo.astro'
 
 <Seo
@@ -26,19 +26,31 @@ type MiniRuntime = {
     readonly hasAdaptiveThemes: boolean, //  true if you have enabled adaptive themes
     readonly colorScheme: ColorScheme, // eg. light or dark or unspecified
     readonly screen: Dimensions, // eg. {width: 1024, height: 768}
-    readonly contentSizeCategory: string, // eg. Large
+    readonly contentSizeCategory: IOSContentSizeCategory | AndroidContentSizeCategory | WebContentSizeCategory, // eg. Large
     readonly insets: Insets, // eg. { top: 28, bottom: 40, left: 0, right: 0 , ime: 0 }
     readonly pixelRatio: number, // eg. 3.0
     readonly fontScale: number, // eg. 1.5
-    readonly rtl: boolean // true if your user prefers RTL
-    readonly statusBar: Dimensions, // eg. { width: 240, height: 20,  }
-    readonly navigationBar: Dimensions // eg. { width: 240, height: 44,  }
+    readonly rtl: boolean, // true if your user prefers RTL
+    readonly statusBar: Dimensions, // eg. { width: 240, height: 20 }
+    readonly navigationBar: Dimensions, // eg. { width: 240, height: 24 }, always 0 on iOS and web
     readonly isPortrait: boolean, // true if your device is in portrait mode
     readonly isLandscape: boolean // true if your device is in landscape mode
 }
 ```
 
 Mini runtime is automatically injected when Unistyles resolves a `StyleSheet` that depends on it.
+
+If you need to type a helper that receives the mini runtime, import the `UnistylesMiniRuntime` type:
+
+```tsx /UnistylesMiniRuntime/
+import type { UnistylesMiniRuntime } from 'react-native-unistyles'
+
+const getHeaderHeight = (rt: UnistylesMiniRuntime) => rt.insets.top + 56
+```
+
+<Aside>
+`rtl` is updated at runtime on Android and the web, while on iOS it requires an app restart. Learn more [here](/v3/references/unistyles-runtime/#rtl-updates).
+</Aside>
 
 
 </Seo>

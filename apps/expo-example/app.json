@@ -14,14 +14,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.codemask.expoexample"
+      "bundleIdentifier": "com.unistyles.expoexample"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.codemask.expoexample"
+      "package": "com.unistyles.expoexample"
     },
     "plugins": [
       [
@@ -32,7 +32,8 @@
           },
           "ios": {
             "newArchEnabled": true,
-            "deploymentTarget": "16.4"
+            "deploymentTarget": "16.4",
+            "enableSceneSupport": true
           }
         }
       ],

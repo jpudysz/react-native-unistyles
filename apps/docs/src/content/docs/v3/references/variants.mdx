@@ -51,7 +51,7 @@ const styles = StyleSheet.create(theme => ({
             otherGroupName: {}
         }
     }
-}
+}))
 ```
 
 These groups will later be used to select your variants, so remember to name them appropriately.
@@ -91,14 +91,14 @@ const styles = StyleSheet.create(theme => ({
             }
         }
     }
-}
+}))
 ```
 
 ### Selecting variants
 
 With your named groups, you can now select any variant from your stylesheet using the `useVariants`:
 
-```tsx /useStyles/ /color/ /size/
+```tsx /useVariants/ /color/ /size/
 import { StyleSheet } from 'react-native-unistyles'
 
 const Component = () => {
@@ -152,7 +152,7 @@ const styles = StyleSheet.create(theme => ({
                 // you can still specify a default variant
                 default: {
                     backgroundColor: theme.colors.barbie
-                }
+                },
                 // or other variants
                 special: {
                     backgroundColor: theme.colors.special
@@ -166,7 +166,7 @@ const styles = StyleSheet.create(theme => ({
             }
         }
     }
-})
+}))
 ```
 
 If you specify a boolean variants like "true", there is no requirement to specify a "false" variant (and vice versa).
@@ -176,6 +176,41 @@ You can mix boolean variants with other variants as well.
 Boolean variants respects other rules, eg. `false` is not equal to `default`. To select `false` variant you need to pass `false` as a value,
 to fallback to `default` variant you need to pass `undefined`.
 :::
+
+### Selecting variants with numeric values
+
+Variant names can also be numbers:
+
+```tsx /level/
+const Component = ({ level }: { level: 1 | 2 }) => {
+    styles.useVariants({
+        level
+    })
+
+    return (
+        <Text style={styles.heading}>
+            Heading
+        </Text>
+    )
+}
+
+const styles = StyleSheet.create(theme => ({
+    heading: {
+        variants: {
+            level: {
+                1: {
+                    fontSize: 32
+                },
+                2: {
+                    fontSize: 24
+                }
+            }
+        }
+    }
+}))
+```
+
+On iOS and Android, numeric values are converted to integers, so use whole numbers as variant names.
 
 ### Default variant
 
@@ -199,17 +234,18 @@ const styles = StyleSheet.create(theme => ({
             }
         }
     }
-}
+}))
 ```
 
 ### Options to select the variant
 
-If you pass `undefined` or `empty object` Unsityles will try to find the `default` variant in your stylesheet:
+If you pass an `empty object`, Unistyles will try to find the `default` variant in your stylesheet:
 
-```tsx /undefined/ /{}/
-styles.useVariants(undefined) // will use default variant (if any)
+```tsx /{}/
 styles.useVariants({}) // will use default variant (if any)
 ```
+
+`useVariants` always expects an object, so don't call it with `undefined`.
 
 <Aside type="caution" title="Default variant">
 If you don't explicitly call `styles.useVariants`, the Unistyles C++ parser will ignore your variants and will not resolve to the `default` variant, even if it is present.
@@ -220,6 +256,8 @@ styles.useVariants({
     color: undefined // will use default variant (if any)
 })
 ```
+
+At runtime, a `null` value is treated the same way as `undefined`.
 
 Lastly, you can pass the correct variant name for a variant group:
 
@@ -242,7 +280,7 @@ type ComponentProps = {
     size: 'small' | 'medium' | 'large'
 }
 
-const Component: React.FunctionComponent = ({ color, size }) => {
+const Component: React.FunctionComponent<ComponentProps> = ({ color, size }) => {
     styles.useVariants({
         color,
         size
@@ -264,7 +302,7 @@ import { StyleSheet, UnistylesVariants } from 'react-native-unistyles'
 
 type ComponentProps = UnistylesVariants<typeof styles>
 
-const Component: React.FunctionComponent = ({ color, size }) => {
+const Component: React.FunctionComponent<ComponentProps> = ({ color, size }) => {
     styles.useVariants({
         color,
         size
@@ -320,15 +358,15 @@ const styles = StyleSheet.create(theme => ({
             }
         }
     }
-}
+}))
 ```
 
-:::caution
-Unistyles will work as intended, selecting the correct variant for each style.
-However, you need to repeat all your options like `small`, `medium`, and `large` in each style to avoid TypeScript errors.
+:::tip
+Unistyles will select the correct variant for each style.
+You don't need to repeat every option in each style - TypeScript merges all options of a variant group across your styles.
 :::
 
-```tsx /size:/ /missing medium and large variants!/
+```tsx /size:/ /only small variant!/
 const styles = StyleSheet.create(theme => ({
     container: {
         flex: 1,
@@ -353,64 +391,50 @@ const styles = StyleSheet.create(theme => ({
         fontWeight: 'bold',
         variants: {
             size: {
+                // only small variant!
                 small: {
                     fontSize: 12
-                },
-                // missing medium and large variants!
+                }
             }
         }
     }
-}
+}))
 ```
 
 In this case, the generated TypeScript type will be:
 
 ```
-size: ('small' | 'medium' | 'large') | ('small')
+size?: 'small' | 'medium' | 'large'
 ```
 
-If you don't need all variants and want the correct type, please add empty variants:
+### Styles inferred from variants
 
-```tsx /size:/
-const styles = StyleSheet.create(theme => ({
+TypeScript also infers the style properties defined inside your variants.
+This works for styles that mix regular properties with variants, as well as for styles that contain only `variants`:
+
+```tsx /variants/
+const styles = StyleSheet.create({
     container: {
         flex: 1,
         variants: {
             size: {
-                small: {
-                    width: 100,
-                    height: 100
-                },
-                medium: {
-                    width: 200,
-                    height: 200
-                },
-                large: {
-                    width: 300,
-                    height: 300
-                }
+                small: { width: 100 },
+                large: { width: 300 }
             }
         }
     },
-    text: {
-        fontWeight: 'bold',
+    badge: {
         variants: {
-            size: {
-                small: {
-                    fontSize: 12
-                },
-                medium: {},
-                large: {}
+            color: {
+                red: { backgroundColor: 'red' },
+                blue: { backgroundColor: 'blue' }
             }
         }
     }
-}
-```
+})
 
-The generated TypeScript type will then be:
-
-```
-size: ('small' | 'medium' | 'large')
+styles.container.width // number
+styles.badge.backgroundColor // string
 ```
 
 </Seo>

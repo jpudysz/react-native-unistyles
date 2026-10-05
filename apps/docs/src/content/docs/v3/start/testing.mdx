@@ -18,7 +18,7 @@ Unistyles provides its own mocks to help you test your components. Follow this g
 ### Including Mocks
 
 You don't need to mock anything manually, as Unistyles supplies all necessary mocks for its core and for `NitroModules`.
-To use them, simply include `react-native-unistyles/mocks` in your `jest.setup.ts` file.
+To use them, simply add `react-native-unistyles/mocks` to the `setupFiles` of your Jest config.
 
 ```tsx title="package.json"
 {
@@ -53,12 +53,20 @@ You must include configuration file **after** the mocks as they provide all nece
 
 ### Babel Plugin
 
-The Babel plugin is automatically disabled in the `jest` test environment or when `NODE_ENV === 'test'`.
+The Babel plugin is a no-op when `NODE_ENV === 'test'` (Jest sets this by default).
 
 ### Understanding the role of mocks
 
 Mocks contain basic logic to correctly execute Unistyles code.
 The Jest environment does not provide a `screen` (width and height), pixel ratio, or any other values from `UnistylesRuntime`.
+
+Keep in mind the following limitations:
+
+- `StyleSheet.create`, `useUnistyles` and `withUnistyles` always resolve styles with the **first** registered theme. `initialTheme` and `adaptiveThemes` are ignored
+- runtime values like `screen`, `insets`, `statusBar` and `navigationBar` dimensions are always `0`
+- `variants` and `compoundVariants` are stripped from your styles and `useVariants` does nothing
+- `Display`, `Hide` and `ScopedTheme` render nothing
+- `createUnistylesElement`, `UnistyleDependency` and the SSR helpers (`useServerUnistyles`, `hydrateServerUnistyles`, `getServerUnistyles`, `resetServerUnistyles`) are not mocked and will be `undefined`
 
 You should never test how Unistyles parses your styles, whether your component has certain styles, or if it is visible.
 These tests can result in false positives.

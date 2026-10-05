@@ -3,8 +3,13 @@ import type { PressableProps as Props, View } from 'react-native'
 import React, { forwardRef, useLayoutEffect, useRef } from 'react'
 import { Pressable as NativePressableReactNative } from 'react-native'
 
+import type { Nullable } from '../../types'
+
 import { passForwardedRef } from '../../core'
 import { UnistylesShadowRegistry } from '../../specs'
+
+// instance type of View for both legacy and Strict TypeScript API (RN 0.87+)
+type ViewRef = React.ComponentRef<typeof View>
 
 type PressableProps = Props & {
     variants?: Record<string, string | boolean>
@@ -24,8 +29,11 @@ const getStyles = (styleProps: Record<string, any> = {}) => {
     }
 }
 
-export const Pressable = forwardRef<View, PressableProps>(({ variants, style, ...props }, forwardedRef) => {
-    const storedRef = useRef<View | null>(null)
+export const Pressable: React.ForwardRefExoticComponent<PressableProps & React.RefAttributes<ViewRef>> = forwardRef<
+    ViewRef,
+    PressableProps
+>(({ variants, style, ...props }, forwardedRef) => {
+    const storedRef = useRef<Nullable<ViewRef>>(null)
     const scopedTheme = UnistylesShadowRegistry.getScopedTheme()
 
     useLayoutEffect(() => {

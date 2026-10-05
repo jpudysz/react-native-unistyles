@@ -12,16 +12,18 @@
 [![platform - ssr](https://img.shields.io/badge/SSR-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
 
 
+## Requirements
+
+- React Native 0.81+ with the New Architecture
+- React 19+
+- Expo SDK 54+ (if you use Expo, development builds only, Expo Go is not supported)
+
+Need support for older React Native versions or the Old Architecture? Use [Unistyles 2.0](https://v2.unistyl.es).
+
 ## Installation
 
 ```shell
-yarn add react-native-unistyles
-```
-
-Install dependencies:
-
-```shell
-yarn add react-native-nitro-modules
+yarn add react-native-unistyles react-native-nitro-modules
 ```
 
 | react-native-unistyles | Minimum react-native-nitro-modules     |
@@ -29,6 +31,8 @@ yarn add react-native-nitro-modules
 | >= 3.0.0               | >= 0.33.9                              |
 | >= 3.1.0               | >= 0.35.0                              |
 | >= 3.2.0               | >= 0.35.2                              |
+| >= 3.3.0               | >= 0.36.1                              |
+| >= 3.4.0               | >= 0.37.1                              |
 
 > **Note:** Since v3.1.0, `react-native-edge-to-edge` is an **optional** dependency. We strongly recommend setting `edgeToEdgeEnabled=true` in your `android/gradle.properties` — it enforces translucent system bars on modals, disables legacy StatusBar hacks, and enables additional React Native core fixes. **Expo SDK 54+** enables this automatically. You can still install `react-native-edge-to-edge` for ecosystem compatibility with libraries like `react-native-bootsplash` or `react-native-permissions`.
 
@@ -39,7 +43,19 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 - [Migration from Unistyles 2.0](https://unistyl.es/v3/start/migration-guide)
 - [Learn how Unistyles 3.0 works](https://unistyl.es/v3/start/how-unistyles-works)
 - [API](https://unistyl.es/v3/references/stylesheet)
-- [Examples](https://unistyl.es/v3/examples/examples)
+- [Tutorial](https://unistyl.es/v3/tutorial/intro)
+- [LLMs](https://unistyl.es/v3/llms/info)
+
+## AI agent skills
+
+This repository ships skills for AI coding agents (Claude Code, Codex, Cursor and others):
+
+- `react-native-unistyles-v3` - setup, theming, responsive styles, variants, web and 3rd party integrations
+- `unistyles-v2-to-v3-migration` - step by step migration from Unistyles 2.0
+
+```shell
+npx skills add jpudysz/react-native-unistyles
+```
 
 ## Features
 - 🚀 Shared core with C++ and JSI bindings
@@ -57,9 +73,6 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 
 <a href="https://codemask.com">
     <img src="https://avatars.githubusercontent.com/u/51229884?s=200&v=4" height="70px" width="70px" alt="codemask" />
-</a>
-<a href="https://galaxies.dev">
-     <img src="https://avatars.githubusercontent.com/u/118431096?s=200&v=4" height="70px" width="70px" alt="galaxies-dev" />
 </a>
 <a href="https://github.com/ryanlanciaux">
      <img src="https://avatars.githubusercontent.com/u/85041?v=4" height="70px" width="70px" alt="ryanlanciaux" />
@@ -154,6 +167,9 @@ Then follow [installation guides](https://unistyl.es/v3/start/getting-started) f
 </a>
 <a href="https://github.com/AdiRishi">
      <img src="https://avatars.githubusercontent.com/u/8351234?v=4" height="60px" width="60px" alt="AdiRishi" />
+</a>
+<a href="https://galaxies.dev">
+     <img src="https://avatars.githubusercontent.com/u/118431096?s=200&v=4" height="60px" width="60px" alt="galaxies-dev" />
 </a>
 
 ## Sponsor my work

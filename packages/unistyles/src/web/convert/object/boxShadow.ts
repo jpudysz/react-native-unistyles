@@ -17,7 +17,7 @@ export const getBoxShadow = (boxShadow: Array<BoxShadowValue>) => {
         const value = shadow[key as keyof BoxShadowValue]
 
         // Breakpoints
-        if (typeof value === 'object') {
+        if (value !== null && typeof value === 'object') {
             Object.keys(value).forEach((breakpoint) => breakpoints.add(breakpoint))
         }
     })
@@ -41,7 +41,7 @@ export const getBoxShadow = (boxShadow: Array<BoxShadowValue>) => {
                 const [key] = Object.keys(shadow)
                 const value = shadow[key as keyof BoxShadowValue]
 
-                if (typeof value === 'object' && keyInObject(value, breakpoint)) {
+                if (value !== null && typeof value === 'object' && keyInObject(value, breakpoint)) {
                     return [key, value[breakpoint]]
                 }
 

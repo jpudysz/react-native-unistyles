@@ -47,11 +47,13 @@ StyleSheet.configure({
     xl: 1200
   },
   settings: {
-    adaptiveThemes: true,
-    initialTheme: 'light'
+    adaptiveThemes: true
+    // initialTheme: 'light' - only when adaptiveThemes is NOT true (v3 throws if both are set)
   }
 })
 ```
+
+In v3, `initialTheme` with `adaptiveThemes: true` throws, so don't copy both over from a v2 config. Pick one: keep `adaptiveThemes: true` (requires `light` and `dark` themes), or drop it and keep `initialTheme`.
 
 **Removed settings:**
 - `plugins` - plugin system removed entirely
@@ -59,9 +61,13 @@ StyleSheet.configure({
 - `windowResizeDebounceTimeMs` - no debouncing in v3
 - `disableAnimatedInsets` - insets no longer trigger re-renders
 
+Leaving any removed (or otherwise unknown) key in `settings` throws: `settings` accepts only `adaptiveThemes`, `initialTheme`, `CSSVars` and `nativeBreakpointsMode`.
+
 **New settings:**
 - `CSSVars` (boolean, default true) - enable/disable CSS variables on web
-- `nativeBreakpointsMode` ('pixels' | 'points', default 'pixels') - breakpoint measurement on iOS/Android
+- `nativeBreakpointsMode` ('pixels' | 'points', default 'pixels') - on iOS/Android, `'pixels'` compares breakpoints/`mq` against `UnistylesRuntime.screen` (pt/dp); `'points'` divides it by `pixelRatio` first
+
+The first breakpoint must be `0`, and `StyleSheet.configure` must run before any `StyleSheet.create` is evaluated.
 
 ---
 
@@ -106,7 +112,7 @@ StyleSheet.configure({
   }))
 ```
 
-The `rt` (miniRuntime) parameter provides: `colorScheme`, `contentSizeCategory`, `themeName`, `breakpoint`, `hasAdaptiveThemes`, `insets` (top, left, right, bottom, ime), `pixelRatio`, `fontScale`, `rtl`, `isLandscape`, `isPortrait`, `screen`, `statusBar`, `navigationBar`.
+The `rt` (miniRuntime) parameter provides: `colorScheme`, `contentSizeCategory`, `themeName`, `breakpoint`, `hasAdaptiveThemes`, `insets` (top, left, right, bottom, ime), `pixelRatio`, `fontScale`, `rtl`, `isLandscape`, `isPortrait`, `screen`, `statusBar`, `navigationBar` (dimensions only, always `0` on iOS/web). Type helpers that receive it with `import type { UnistylesMiniRuntime } from 'react-native-unistyles'`.
 
 ---
 
@@ -208,6 +214,8 @@ const MyComponent = ({ size, color }) => {
 }
 ```
 
+If v2 code called `useStyles(stylesheet)` without variants but the stylesheet relies on `default` variants, call `styles.useVariants({})` — v3 ignores variants entirely when `useVariants` isn't called, and `useVariants(undefined)` throws on iOS/Android.
+
 ### Boolean variants
 
 ```tsx
@@ -301,7 +309,7 @@ const MyComponent = ({ width, isActive }) => {
 }
 ```
 
-Dynamic functions work the same way but without the `useStyles` wrapper. Arguments must be serializable (no functions, no objects with circular references).
+Dynamic functions work the same way but without the `useStyles` wrapper. Arguments must be serializable: strings, numbers, booleans, `null`, `undefined` and plain arrays/objects built from them. Unistyles stores them in C++ and may re-run the function with the stored copy (theme/runtime changes, re-linking frozen screens), so functions are dropped (top-level ones shift the remaining arguments) and `Date` / `Map` / `Set` / class instances become plain objects. Pass precomputed values (e.g. `date.getTime()`) instead.
 
 ---
 
@@ -406,37 +414,43 @@ UnistylesRuntime.colorScheme // 'light' | 'dark' | 'unspecified'
 
 ```diff
 - UnistylesRuntime.setRootViewBackgroundColor(color, 0.5) // with alpha
-+ UnistylesRuntime.setRootViewBackgroundColor(color)
++ UnistylesRuntime.setRootViewBackgroundColor(color)     // any RN color, e.g. 'rgba(0, 0, 0, 0.5)'
++ UnistylesRuntime.setRootViewBackgroundColor()          // reset to transparent
 ```
 
-### Status bar (v3 - new object API)
+### Status bar (v3)
 
 ```diff
 - UnistylesRuntime.statusBar.setColor(theme.colors.primary)
 - UnistylesRuntime.statusBar.setColor(theme.colors.primary, 0.5)
-+ // setColor removed in v3
-+ UnistylesRuntime.statusBar.setHidden(true, 'fade') // 'fade' | 'slide' | 'none'
-+ UnistylesRuntime.statusBar.setStyle('light')        // 'light' | 'dark'
-+ UnistylesRuntime.statusBar.width                    // read-only
-+ UnistylesRuntime.statusBar.height                   // read-only
++ // setColor removed in v3 (Android 15 deprecation)
++ import { StatusBarStyle } from 'react-native-unistyles'
++
++ UnistylesRuntime.statusBar.setHidden(true, 'fade')            // animation: 'none' | 'fade' | 'slide' (iOS)
++ UnistylesRuntime.statusBar.setStyle(StatusBarStyle.Light)     // StatusBarStyle.Default | Light | Dark, optional 2nd arg `animated`
++ UnistylesRuntime.statusBar.width                              // read-only
++ UnistylesRuntime.statusBar.height                             // read-only
 ```
 
-### Navigation bar (v3 - new object API)
+### Navigation bar (v3, Android only)
 
 ```diff
 - UnistylesRuntime.navigationBar.setColor(theme.colors.black)
-+ // setColor removed in v3
++ // setColor removed in v3 (Android 15 deprecation)
 + UnistylesRuntime.navigationBar.setHidden(true)
-+ UnistylesRuntime.navigationBar.width               // read-only
-+ UnistylesRuntime.navigationBar.height               // read-only
++ UnistylesRuntime.navigationBar.width               // read-only, 0 on iOS
++ UnistylesRuntime.navigationBar.height              // read-only, 0 on iOS
 ```
 
 ### Immersive mode (v3)
 
 ```tsx
-// Hides both status bar and navigation bar
+// Android: hides status bar and navigation bar
+// iOS: hides only the status bar (with 'fade' animation)
 UnistylesRuntime.setImmersiveMode(true)
 ```
+
+System bars are only reachable through `UnistylesRuntime.statusBar` / `UnistylesRuntime.navigationBar` — don't import standalone status/navigation bar objects from `react-native-unistyles`.
 
 ### Removed properties
 
@@ -489,7 +503,7 @@ const styles = StyleSheet.create((theme, rt) => ({
 }))
 ```
 
-The `ime` (Input Method Editor) inset automatically animates with keyboard show/hide. No need for `react-native-reanimated` keyboard handling.
+The `ime` (Input Method Editor) inset automatically animates with keyboard show/hide. No need for `react-native-reanimated` keyboard handling. Platform differences: iOS reports the full keyboard height; Android reports keyboard height minus the bottom inset (animated on API 30+); web is always `0`. Read it in `StyleSheet` — reading `rt.insets.ime` in `useUnistyles` / `withUnistyles` re-renders on every animation frame.
 
 ---
 
@@ -628,7 +642,7 @@ Move any usage of $$css for React Native web to StyleSheet -> _web. Unistyles su
 ### getWebProps (v3 - for custom HTML elements)
 
 ```tsx
-import { getWebProps } from 'react-native-unistyles/web-only'
+import { getWebProps } from 'react-native-unistyles/web'
 
 const MyWebComponent = forwardRef((props, ref) => {
   const { className, ref: unistylesRef } = getWebProps(styles.container, ref)
@@ -694,14 +708,19 @@ declare module 'react-native-unistyles' {
 }
 ```
 
-### v3 (same pattern, but import from configure object)
+### v3 (same pattern, derive types from the objects passed to `StyleSheet.configure`)
 
 ```tsx
+type AppThemes = typeof themes          // { light: lightTheme, dark: darkTheme }
+type AppBreakpoints = typeof breakpoints
+
 declare module 'react-native-unistyles' {
   export interface UnistylesThemes extends AppThemes {}
-  export interface UnistylesBreakpoints extends typeof breakpoints {}
+  export interface UnistylesBreakpoints extends AppBreakpoints {}
 }
 ```
+
+Note: `interface X extends typeof y {}` is not valid TypeScript — always go through a type alias.
 
 ---
 
@@ -720,17 +739,20 @@ jest.mock('react-native-unistyles', () => ({
 
 ### v3
 
-```js
-// jest.setup.js
-require('react-native-unistyles/mocks')
-require('./unistyles.config') // file with StyleSheet.configure()
+Remove the manual `jest.mock('react-native-unistyles', ...)` and use the built-in mocks in `setupFiles`:
+
+```json
+// package.json
+{
+  "jest": {
+    "setupFiles": [
+      "react-native-unistyles/mocks",
+      "./unistyles.ts"
+    ]
+  }
+}
 ```
 
-The Babel plugin auto-disables when `NODE_ENV=test`. The built-in mock at `react-native-unistyles/mocks` provides complete mocks for `StyleSheet`, `UnistylesRuntime`, `withUnistyles`, `useUnistyles`, `mq`, `Display`, `Hide`, and `ScopedTheme`.
+The config file (with `StyleSheet.configure()`) must come after the mocks. The Babel plugin is a no-op when `NODE_ENV=test`. The built-in mock at `react-native-unistyles/mocks` covers `react-native-nitro-modules`, `StyleSheet`, `UnistylesRuntime`, `withUnistyles`, `useUnistyles`, `mq`, `Display`, `Hide`, `ScopedTheme`, the exported enums, and `react-native-unistyles/reanimated`.
 
-For Reanimated mocks:
-```js
-// Also mocked automatically via:
-require('react-native-unistyles/mocks')
-// This includes mocks for 'react-native-unistyles/reanimated'
-```
+Mock limitations: styles always use the first registered theme (`initialTheme` / `adaptiveThemes` ignored), runtime dimensions/insets are `0`, `variants` / `compoundVariants` are stripped and `useVariants` is a no-op, `Display` / `Hide` / `ScopedTheme` render nothing, and `createUnistylesElement`, `UnistyleDependency` and the SSR helpers are `undefined`.

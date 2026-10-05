@@ -12,7 +12,9 @@ module.exports = function (api) {
                 debug: true,
                 isLocal: true,
                 localPath: path.join(__dirname, '../../packages/unistyles'),
-                root: 'app'
+                root: 'app',
+                // components/ and e2e/ live outside app/
+                autoProcessImports: ['react-native-unistyles']
             }],
             [
                 'module-resolver',
@@ -20,6 +22,7 @@ module.exports = function (api) {
                     alias: {
                         // For development, we want to alias the library to the source
                         "react-native-unistyles/reanimated": path.join(__dirname, '../../packages/unistyles/src/reanimated'),
+                        "react-native-unistyles/diagnostics": path.join(__dirname, '../../packages/unistyles/src/diagnostics'),
                         [pak.name]: path.join(__dirname, '../../packages/unistyles/', pak.source)
                     }
                 }

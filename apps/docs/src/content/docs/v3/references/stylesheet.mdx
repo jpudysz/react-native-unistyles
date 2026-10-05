@@ -66,7 +66,7 @@ const styles = StyleSheet.create((theme, rt) => ({
             sm: theme.colors.text,
             md: theme.colors.textSecondary
         }
-    })
+    }
 }))
 ```
 
@@ -131,6 +131,26 @@ const styles = StyleSheet.create((theme, rt) => ({
 
 Learn more about `miniRuntime` [here](/v3/references/mini-runtime/).
 
+#### Shadows and filters as strings
+
+`boxShadow` accepts a CSS-like string, and `dropShadow` entries in the `filter` array accept a CSS-like string as well.
+Unistyles parses these strings for you on iOS and Android:
+
+```tsx /boxShadow/ /dropShadow/
+import { StyleSheet } from 'react-native-unistyles'
+
+const styles = StyleSheet.create(theme => ({
+    card: {
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+        filter: [
+            {
+                dropShadow: '2px 4px 1px red'
+            }
+        ]
+    }
+}))
+```
+
 ### configure
 
 `StyleSheet.configure` is used to configure Unistyles. It accepts an object with the following properties:
@@ -160,6 +180,31 @@ addChangeListener(
 ```
 
 The callback receives one or more `UnistyleDependency` values describing what changed. The function returns an unsubscribe callback.
+
+Available `UnistyleDependency` values:
+
+| Name | Emitted when |
+| ---- | ------------ |
+| `Theme` | the current theme changes or is updated with `updateTheme` |
+| `ThemeName` | the theme name changes |
+| `AdaptiveThemes` | adaptive themes are toggled |
+| `Breakpoints` | screen width changes, which may change the current breakpoint |
+| `Variants` | selected variants change |
+| `ColorScheme` | the device color scheme changes |
+| `Dimensions` | screen dimensions change |
+| `Orientation` | device orientation changes |
+| `ContentSizeCategory` | content size category changes |
+| `Insets` | insets change |
+| `PixelRatio` | pixel ratio changes |
+| `FontScale` | font scale changes |
+| `StatusBar` | status bar dimensions change |
+| `NavigationBar` | navigation bar dimensions change |
+| `Ime` | the IME (keyboard) inset changes |
+| `Rtl` | the layout direction changes |
+
+<Aside>
+On the web, only `Theme`, `ThemeName`, `AdaptiveThemes`, `Breakpoints`, `ColorScheme`, `Dimensions`, `Orientation` and `Rtl` are emitted.
+</Aside>
 
 ```tsx /addChangeListener/
 import { useEffect } from 'react'
@@ -194,6 +239,8 @@ const styles = StyleSheet.create(theme => ({
 }))
 ```
 
+On the web, `hairlineWidth` is always `1`.
+
 ### compose
 
 Maps to React Native's [compose function](https://reactnative.dev/docs/stylesheet#compose).
@@ -204,7 +251,7 @@ Maps to React Native's [flatten function](https://reactnative.dev/docs/styleshee
 
 ### absoluteFillObject
 
-Returns following object:
+A static object with the following value:
 
 ```ts
 {
@@ -218,7 +265,7 @@ Returns following object:
 
 ### absoluteFill
 
-Returns following object:
+A static object with the following value:
 
 ```ts
 {

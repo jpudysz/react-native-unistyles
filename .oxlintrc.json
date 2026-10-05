@@ -11,6 +11,10 @@
     "typescript/ban-types": "off",
     "typescript/triple-slash-reference": "off",
     "react-hooks/exhaustive-deps": "off",
+    "react/exhaustive-effect-dependencies": "off",
+    "react/refs": "warn",
+    "react/immutability": "warn",
+    "react/set-state-in-effect": "warn",
     "eslint/no-shadow": "off",
     "eslint/no-unused-vars": [
       "error",

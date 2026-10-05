@@ -59,7 +59,7 @@ const styles = StyleSheet.create((theme, rt) => ({
 
 ## Dynamic Functions
 
-Pass arguments to styles at the call site. Arguments must be serializable.
+Pass arguments to styles at the call site. Arguments must be serializable: Unistyles stores them in C++ and re-runs the function natively (theme/runtime changes, frozen screens re-linking). Functions are dropped and `Date`/`Map`/`Set`/class instances become plain objects — pass primitives or plain objects instead (e.g. `date.getTime()`).
 
 ```tsx
 const styles = StyleSheet.create(theme => ({
@@ -128,9 +128,9 @@ const styles = StyleSheet.create(theme => ({
 }))
 ```
 
-### Nested breakpoints (transform, shadowOffset)
+### Nested breakpoints (transform, shadowOffset, filter)
 
-For properties expecting objects (like `transform` or `shadowOffset`), use breakpoints at the nested level:
+For properties expecting objects (like `transform`, `shadowOffset` or `filter`), use breakpoints at the nested level:
 
 ```tsx
 const styles = StyleSheet.create({
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
 
 ### Built-in breakpoints: landscape / portrait
 
-Unistyles has built-in `landscape` and `portrait` breakpoints:
+Unistyles has built-in `landscape` (width > height) and `portrait` (height >= width) breakpoints. On iOS/Android they're only available when you **haven't registered your own breakpoints**; on web they always become `@media (orientation: ...)` queries:
 
 ```tsx
 const styles = StyleSheet.create({
@@ -241,6 +241,27 @@ const styles = StyleSheet.create(theme => ({
 styles.useVariants({})
 ```
 
+- Always pass an object — `useVariants(undefined)` throws on native.
+- `undefined` and `null` values fall back to `default`; boolean `false` is NOT `default`.
+- Without any `useVariants` call, variants (including `default`) are ignored.
+
+### Numeric variant keys
+
+```tsx
+const styles = StyleSheet.create({
+  heading: {
+    variants: {
+      level: {
+        1: { fontSize: 32 },
+        2: { fontSize: 24 },
+      },
+    },
+  },
+})
+
+styles.useVariants({ level: 1 })  // use whole numbers (converted to integers on native)
+```
+
 ### Compound variants
 
 Apply styles only when multiple variant values match simultaneously:
@@ -285,6 +306,7 @@ const styles = StyleSheet.create(theme => ({
 
 type ChipVariants = UnistylesVariants<typeof styles>
 // { size?: 'sm' | 'md' | 'lg'; color?: 'primary' | 'secondary' }
+// Options of a group are merged across all styles — no need to repeat empty variants
 
 type ChipProps = { label: string } & ChipVariants
 
@@ -306,26 +328,28 @@ import { mq, StyleSheet } from 'react-native-unistyles'
 const styles = StyleSheet.create({
   container: {
     padding: {
-      [mq.only.width(null, 576)]: 8,       // width <= 576
-      [mq.only.width(576, 768)]: 16,       // 576 < width <= 768
-      [mq.only.width(768)]: 24,            // width > 768
+      [mq.only.width(null, 575)]: 8,       // 0 <= width <= 575
+      [mq.only.width(576, 767)]: 16,       // 576 <= width <= 767
+      [mq.only.width(768)]: 24,            // width >= 768
     },
   },
   sidebar: {
     display: {
-      [mq.only.width(null, 768)]: 'none',
+      [mq.only.width(null, 767)]: 'none',
       [mq.only.width(768)]: 'flex',
     },
   },
 })
 ```
 
-### Mixing breakpoint names and pixel values
+**Both bounds are inclusive** — `mq.only.width(576, 768)` and `mq.only.width(768)` overlap at exactly 768 (on native the first matching query wins). `mq` has priority over breakpoint keys in the same object. Breakpoint names are resolved when `mq` is called, so `StyleSheet.configure` must run first.
+
+### Mixing breakpoint names and numeric values
 
 ```tsx
-mq.only.width('sm', 'lg')       // between sm and lg breakpoints
-mq.only.width(320, 768)         // between 320px and 768px
-mq.only.height(400)             // height > 400px
+mq.only.width('sm', 'lg')       // sm <= width <= lg
+mq.only.width(320, 768)         // 320 <= width <= 768 (same units as rt.screen)
+mq.only.height(400)             // height >= 400
 ```
 
 ### Combined width + height
@@ -334,7 +358,7 @@ mq.only.height(400)             // height > 400px
 const styles = StyleSheet.create({
   panel: {
     flexDirection: {
-      [mq.width(null, 768).and.height(null, 500)]: 'column',   // small screen
+      [mq.width(null, 767).and.height(null, 499)]: 'column',   // small screen
       [mq.width(768).and.height(500)]: 'row',                  // large screen
     },
   },
@@ -408,6 +432,11 @@ Requires themes named exactly `light` and `dark`.
 ```tsx
 import { UnistylesRuntime } from 'react-native-unistyles'
 
+// setTheme throws while adaptive themes are enabled — disable them first
+if (UnistylesRuntime.hasAdaptiveThemes) {
+  UnistylesRuntime.setAdaptiveThemes(false)
+}
+
 // Switch to specific theme
 UnistylesRuntime.setTheme('dark')
 
@@ -439,7 +468,7 @@ import { ScopedTheme } from 'react-native-unistyles'
   <DarkFooter />
 </ScopedTheme>
 
-// Invert: light→dark, dark→light
+// Invert: light→dark, dark→light (no-op unless adaptiveThemes is enabled)
 <ScopedTheme invertedAdaptive>
   <InvertedSection />
 </ScopedTheme>
@@ -461,7 +490,7 @@ const Layout = () => (
 
     <MainContent />
 
-    {/* Hide mobile nav on tablet+ */}
+    {/* Hide mobile nav on tablet+ (width >= 768) */}
     <Hide mq={mq.only.width(768)}>
       <BottomNav />
     </Hide>
@@ -490,7 +519,24 @@ const styles = StyleSheet.create(theme => ({
 }))
 ```
 
-### Pseudo-classes
+`_web` can contain breakpoints and pseudo selectors but **not** `variants`; put a `_web` block inside a variant instead:
+
+```tsx
+const styles = StyleSheet.create({
+  grid: {
+    _web: { display: { xs: 'flex', md: 'grid' } },          // breakpoints OK
+    variants: {
+      size: {
+        large: { _web: { gridTemplateColumns: 'repeat(3, 1fr)' } },  // _web inside a variant OK
+      },
+    },
+  },
+})
+```
+
+Inside `_web` use plain CSS values (e.g. `transform: 'translateX(10px)'`), not RN-specific syntax.
+
+### Pseudo-classes and pseudo-elements
 
 ```tsx
 const styles = StyleSheet.create(theme => ({
@@ -502,7 +548,7 @@ const styles = StyleSheet.create(theme => ({
       },
       _active: {
         backgroundColor: theme.colors.primaryActive,
-        transform: [{ scale: 0.98 }],
+        transform: 'scale(0.98)',  // CSS string inside _web
       },
       _focus: {
         outlineWidth: 2,
@@ -512,18 +558,21 @@ const styles = StyleSheet.create(theme => ({
         opacity: 0.5,
         cursor: 'not-allowed',
       },
-      _focusVisible: {
+      '_focus-visible': {
         outlineStyle: 'dashed',
       },
-      _focusWithin: {
+      '_focus-within': {
         borderColor: theme.colors.focus,
+      },
+      _before: {
+        content: '"*"',
       },
     },
   },
 }))
 ```
 
-Supported pseudo-classes: `_hover`, `_active`, `_focus`, `_disabled`, `_focusVisible`, `_focusWithin`.
+Any standard (non-experimental) CSS pseudo-class / pseudo-element works, including functional ones like `_nth-child(2n)`: replace `:` / `::` with `_` and keep the CSS (kebab-case) name — `_hover`, `_active`, `'_focus-visible'`, `'_first-child'`, `_before`, `_after`, `_placeholder`, etc.
 
 ### Custom CSS class names
 
@@ -531,20 +580,28 @@ Supported pseudo-classes: `_hover`, `_active`, `_focus`, `_disabled`, `_focusVis
 const styles = StyleSheet.create({
   container: {
     _web: {
-      _classNames: ['my-custom-class', 'another-class'],
+      _classNames: ['my-custom-class', 'another-class'],  // or a single string
     },
   },
 })
 ```
 
+### CSS variables
+
+With `CSSVars: true` (the default), theme strings become CSS variables (`--colors-primary`) under `:root.<themeName>` (or `prefers-color-scheme` media queries with adaptive themes), so switching themes only swaps the `html` class. Set `CSSVars: false` if your themes differ in non-string values (numbers, functions).
+
+### RTL / logical props on web
+
+RN logical props map to CSS logical properties and follow the document `dir`: `start`/`end` → `inset-inline-*`, `marginStart`/`marginEnd` → `margin-inline-*`, `paddingStart`/`paddingEnd` → `padding-inline-*`, `borderStart*`/`borderEnd*` color & width → `border-inline-*`. Corner radii (`borderTopStartRadius`, ...) still map to physical corners.
+
 ### getWebProps for custom web components
 
 ```tsx
-import { getWebProps } from 'react-native-unistyles/web-only'
+import { getWebProps } from 'react-native-unistyles/web'
 
 const CustomWebComponent = () => {
-  const { className, style } = getWebProps(styles.container)
-  return <div className={className} style={style}>Content</div>
+  const webProps = getWebProps(styles.container)  // { className, ref }
+  return <div {...webProps}>Content</div>
 }
 ```
 
@@ -552,7 +609,7 @@ const CustomWebComponent = () => {
 
 ## Reanimated Integration
 
-### useAnimatedTheme — access theme in worklets
+### useAnimatedTheme — access theme in worklets (no re-renders, respects ScopedTheme)
 
 ```tsx
 import { useAnimatedTheme } from 'react-native-unistyles/reanimated'
@@ -588,9 +645,13 @@ const styles = StyleSheet.create(theme => ({
 
 const AnimatedButton = ({ isActive }) => {
   styles.useVariants({ state: isActive ? 'active' : 'inactive' })
-  const animatedColor = useAnimatedVariantColor(styles.button, 'backgroundColor')
+  // SharedValue<string> holding the current variant color (also follows theme/breakpoint changes)
+  const color = useAnimatedVariantColor(styles.button, 'backgroundColor')
+  const animatedStyle = useAnimatedStyle(() => ({
+    backgroundColor: withTiming(color.value, { duration: 300 }),
+  }))
 
-  return <Animated.View style={[styles.button, animatedColor]} />
+  return <Animated.View style={[styles.button, animatedStyle]} />
 }
 ```
 
@@ -614,49 +675,73 @@ Never spread:
 ### App Router
 
 ```tsx
+// Style.tsx
+'use client'
+
+import { PropsWithChildren, useRef } from 'react'
+import { useServerUnistyles } from 'react-native-unistyles/server'
+import { useServerInsertedHTML } from 'next/navigation'
+import './unistyles'
+
+export const Style = ({ children }: PropsWithChildren) => {
+  const isServerInserted = useRef(false)
+  const unistyles = useServerUnistyles()  // also hydrates automatically on the client
+
+  useServerInsertedHTML(() => {
+    if (isServerInserted.current) {
+      return null
+    }
+
+    isServerInserted.current = true
+
+    return unistyles
+  })
+
+  return <>{children}</>
+}
+
 // app/layout.tsx
-import { useServerUnistyles } from 'react-native-unistyles'
+import '../unistyles'
+import { Style } from '../Style'
 
 export default function RootLayout({ children }) {
-  const styles = useServerUnistyles()
-
   return (
-    <html>
-      <head>{styles}</head>
-      <body>{children}</body>
+    <html lang="en">
+      <body>
+        <Style>{children}</Style>
+      </body>
     </html>
   )
 }
-
-// app/page.tsx (client component)
-'use client'
-import { hydrateServerUnistyles } from 'react-native-unistyles'
-
-hydrateServerUnistyles()
 ```
 
 ### Pages Router
 
 ```tsx
 // pages/_document.tsx
-import { getServerUnistyles, resetServerUnistyles } from 'react-native-unistyles'
+import { getServerUnistyles, resetServerUnistyles } from 'react-native-unistyles/server'
 
-export default function Document() {
-  const styles = getServerUnistyles()
+export default class Document extends NextDocument {
+  static async getInitialProps({ renderPage }: DocumentContext) {
+    const page = await renderPage()
+    const styles = getServerUnistyles()
 
-  return (
-    <Html>
-      <Head>{styles}</Head>
-      <body><Main /><NextScript /></body>
-    </Html>
-  )
+    resetServerUnistyles()  // required after every request
+
+    return { ...page, styles }
+  }
+  // render() ...
 }
 
 // pages/_app.tsx
-import { hydrateServerUnistyles } from 'react-native-unistyles'
+import { hydrateServerUnistyles } from 'react-native-unistyles/server'
 
-hydrateServerUnistyles()
+useEffect(() => {
+  hydrateServerUnistyles()
+}, [])
 ```
+
+Without adaptive themes, Unistyles adds the theme class to `<html>` — add `suppressHydrationWarning` (or the class itself) to avoid a hydration warning.
 
 ---
 
@@ -687,14 +772,16 @@ const styles = StyleSheet.create((theme, rt) => ({
     padding: rt.pixelRatio > 2 ? 16 : 12,
   },
   rtlAware: {
-    textAlign: rt.rtl ? 'right' : 'left',
+    textAlign: rt.rtl ? 'right' : 'left',  // rtl updates live on Android/web; iOS needs a restart
   },
 }))
 ```
 
+On web: `insets`, `statusBar` and `navigationBar` are `0`, `fontScale` is `1`, `pixelRatio` is `window.devicePixelRatio`.
+
 ### IME / Keyboard inset
 
-`rt.insets.ime` provides the keyboard height, replacing `react-native-reanimated`'s `useAnimatedKeyboard`:
+`rt.insets.ime` provides the keyboard inset, replacing `react-native-reanimated`'s `useAnimatedKeyboard`:
 
 ```tsx
 const styles = StyleSheet.create((theme, rt) => ({
@@ -703,3 +790,9 @@ const styles = StyleSheet.create((theme, rt) => ({
   },
 }))
 ```
+
+- **iOS**: full keyboard height, animated frame by frame
+- **Android**: keyboard height minus the bottom inset; animated on Android 11+ (API 30), jumps on older versions
+- **Web**: always `0`
+
+Read `ime` in `StyleSheet` (zero re-renders). Reading it in `useUnistyles`/`withUnistyles` subscribes only to `Ime` but re-renders on every animation frame.

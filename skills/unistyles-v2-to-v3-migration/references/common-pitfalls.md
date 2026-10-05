@@ -10,12 +10,12 @@ Known issues and solutions gathered from GitHub issues and migration experiences
 
 **Error (when `root` is missing):**
 ```
-Unistyles: Babel plugin requires `root` option to be set.
+Unistyles 🦄: Babel plugin requires `root` option to be set.
 ```
 
 **Error (when `root` resolves to project root):**
 ```
-Unistyles: Root option can't resolve to project root as it will include node_modules folder.
+Unistyles 🦄: Root option can't resolve to project root as it will include node_modules folder.
 ```
 
 **Fix:** Ensure `root` points to your app source directory (e.g., `'src'` or `'app'`), NOT the project root:
@@ -38,28 +38,28 @@ npx expo start --clear
 
 ---
 
-## 2. Re-exporting StyleSheet from Barrel Files
+## 2. Re-exporting StyleSheet from Barrel Files / Packages
 
-**Symptom:** Styles don't update reactively. The Babel plugin can't detect your `StyleSheet.create` calls.
+**Symptom:** Styles don't update reactively in some files. The Babel plugin doesn't process them.
 
-**Cause:** The Babel plugin specifically looks for imports from `react-native-unistyles`. If you re-export:
+**Cause:** Every file under `root` is processed regardless of imports. Outside `root`, the plugin only processes files that import from `react-native-unistyles` (or match `autoProcessImports` / `autoProcessPaths`). A file outside `root` that gets `StyleSheet` through a re-export isn't detected:
 
 ```tsx
-// ❌ BAD: utils/index.ts
+// packages/design-system/index.ts
 export { StyleSheet } from 'react-native-unistyles'
 
-// ❌ BAD: some-file.ts
-import { StyleSheet } from '../utils'  // Plugin won't detect this!
+// ❌ packages/feature/Screen.tsx (outside root)
+import { StyleSheet } from '@myorg/design-system'  // Plugin won't process this file
 ```
 
-**Fix:** Always import directly from `react-native-unistyles`:
+**Fix:** Prefer importing directly from `react-native-unistyles`:
 
 ```tsx
 // ✅ GOOD
 import { StyleSheet } from 'react-native-unistyles'
 ```
 
-If you need to process files that import from custom paths, use `autoProcessImports`:
+If you need to keep importing from a custom package/alias, whitelist it with `autoProcessImports`:
 
 ```js
 ['react-native-unistyles/plugin', {
@@ -72,7 +72,7 @@ If you need to process files that import from custom paths, use `autoProcessImpo
 
 ## 3. "Style is not bound!" Error (Style Spreading)
 
-**Symptom:** Runtime error: `Style is not bound!` or styles appear as empty objects.
+**Symptom:** Runtime error `Unistyles: Style is not bound!`, or the `__DEV__` warning `Unistyles: we detected style object with N unistyles styles. This might cause no updates or unpredictable behavior...`.
 
 **Cause:** Spreading Unistyles styles breaks C++ proxy bindings:
 
@@ -112,11 +112,11 @@ const animatedStyle = useAnimatedStyle(() => ({
 
 **Symptom:** Theme changes via `UnistylesRuntime.setTheme()` update some components but not others.
 
-**Cause:** The Babel plugin only processes files under the configured `root` directory. Files outside that path (like a shared library or a different source folder) won't be transformed.
+**Cause:** The Babel plugin processes every file under the configured `root` directory, but outside it only files that import `react-native-unistyles` (or match `autoProcessImports` / `autoProcessPaths`). A component file outside `root` that only imports styles from another file (no Unistyles import) keeps plain `react-native` components, so its views can't be updated from C++.
 
 **Fix:**
-1. Ensure all files with `StyleSheet.create` are under the `root` directory
-2. For files in other directories, add them via `autoProcessPaths`:
+1. Ensure your components and `StyleSheet.create` files are under the `root` directory
+2. For files in other directories, whitelist them via `autoProcessImports` (by import) or `autoProcessPaths` (matched as a substring of the file path):
 
 ```js
 ['react-native-unistyles/plugin', {
@@ -129,9 +129,9 @@ const animatedStyle = useAnimatedStyle(() => ({
 
 ## 5. useUnistyles() Causing Unnecessary Re-renders
 
-**Symptom:** Components using `useUnistyles()` re-render on every theme/runtime change.
+**Symptom:** Components using `useUnistyles()` re-render on theme/runtime changes (e.g. on every keyboard animation frame when reading `rt.insets.ime`).
 
-**Cause:** `useUnistyles()` returns proxified theme and runtime objects that trigger re-renders when accessed values change.
+**Cause:** `useUnistyles()` returns proxified theme and runtime objects. Reading a property subscribes to it (destructuring alone doesn't), and the whole component re-renders whenever a read value changes.
 
 **Fix:** Minimize usage of `useUnistyles()`. Prefer:
 
@@ -145,25 +145,26 @@ const animatedStyle = useAnimatedStyle(() => ({
 
 **Symptom:** Third-party library components (e.g., from `react-native-paper`, `@shopify/flash-list`) don't respond to Unistyles.
 
-**Cause:** The Babel plugin only transforms React Native core components by default. Third-party components using custom native views aren't automatically processed.
+**Cause:** The Babel plugin ignores `node_modules` (except the built-in `react-native-reanimated` component paths), so components inside third-party libraries aren't converted to Unistyles factories. They get correct styles on first render but won't update without a re-render.
 
 **Fix (in order of preference):**
 
-1. **If component accepts `style` prop and uses RN Views internally:** It should work. Check that the library's source path is processed:
+1. **If component accepts `style` prop and uses RN components internally:** Whitelist the library's path so its `react-native` imports get replaced:
 
 ```js
-autoProcessPaths: ['node_modules/the-library/src']
+autoProcessPaths: ['the-library/src']  // substring of the file path; added to the built-in reanimated paths
 ```
 
-2. **If component needs theme-derived non-style props:** Wrap with `withUnistyles`:
+2. **If component needs theme-derived non-style props (or step 1 fails):** Wrap with `withUnistyles` (it also auto-maps `style` / `contentContainerStyle`):
 
 ```tsx
-const UniFlashList = withUnistyles(FlashList, (theme) => ({
-  estimatedItemSize: theme.spacing.listItem
+const UniFlashList = withUnistyles(FlashList, (theme, rt) => ({
+  key: rt.isLandscape ? 'landscape' : 'portrait', // optional: `key` remounts the component instead of passing a prop
+  numColumns: rt.isLandscape ? 4 : 2
 }))
 ```
 
-3. **If component uses exotic native views:** Use `autoRemapImports` in Babel config.
+3. **If the library doesn't import `react-native` directly** (own factory, `react-native/Libraries/...` internals): Use `autoRemapImports` in Babel config to map those imports to Unistyles components (`NativeView`, `NativeText`, etc.).
 
 4. **Fallback:** Use `useUnistyles()` hook.
 
@@ -173,20 +174,26 @@ const UniFlashList = withUnistyles(FlashList, (theme) => ({
 
 **Symptom:** Tests fail with errors about `NitroModules` not being available or `Cannot find module 'react-native-nitro-modules'`.
 
-**Fix:** Add mocks in your Jest setup file:
+**Fix:** Add the mocks to Jest `setupFiles`, followed by your config file:
 
-```js
-// jest.setup.js
-require('react-native-unistyles/mocks')
-require('./path/to/your/unistyles.config') // your StyleSheet.configure() call
+```json
+// package.json
+{
+  "jest": {
+    "setupFiles": [
+      "react-native-unistyles/mocks",
+      "./path/to/your/unistyles.ts"
+    ]
+  }
+}
 ```
 
 The mocks file handles:
 - `react-native-nitro-modules` mock
-- `react-native-unistyles` complete mock (StyleSheet, UnistylesRuntime, etc.)
+- `react-native-unistyles` mock (StyleSheet, UnistylesRuntime, withUnistyles, useUnistyles, mq, enums, etc.)
 - `react-native-unistyles/reanimated` mock
 
-Make sure this runs BEFORE any component imports.
+The mocks must run BEFORE your `StyleSheet.configure` file and any component imports. They don't mock `createUnistylesElement`, `UnistyleDependency` or the SSR helpers, always use the first registered theme, strip variants and render nothing for `Display` / `Hide` / `ScopedTheme` — don't assert on resolved styles or visibility.
 
 ---
 
@@ -216,7 +223,7 @@ module.exports = {
 
 **Symptom:** Babel plugin doesn't process files in shared packages/workspace modules.
 
-**Fix:** The `root` option resolves relative to your Babel config's `root`. In monorepos, you may need:
+**Fix:** The `root` option resolves relative to Babel's `root` (your app directory by default). Files outside it need `autoProcessImports` (exact import source match) or `autoProcessPaths` (matched as a substring of the absolute file path, so don't use `../` relative paths). In monorepos, you may need:
 
 ```js
 // apps/mobile/babel.config.js
@@ -225,7 +232,7 @@ module.exports = {
     ['react-native-unistyles/plugin', {
       root: 'src',
       autoProcessPaths: [
-        '../../packages/shared-ui/src'
+        'packages/shared-ui/src'
       ],
       autoProcessImports: [
         '@myorg/shared-ui'
@@ -278,11 +285,11 @@ const styles = StyleSheet.create(theme => ({
 
 ## 12. React 19 Requirement
 
-**Symptom:** Error: `Unistyles: To enable full Fabric power you need to use React 19.0.0 or higher`
+**Symptom:** Error: `Unistyles 🦄: To enable full Fabric power you need to use React 19.0.0 or higher`
 
 **Cause:** v3 requires React 19+ and the New Architecture.
 
-**Fix:** Upgrade to React Native 0.78+ which includes React 19. Enable the New Architecture:
+**Fix:** Upgrade to React Native 0.81+ (minimum supported by Unistyles), which includes React 19. The New Architecture is the only architecture since RN 0.82; on RN 0.81 make sure it isn't disabled:
 
 ```js
 // For bare RN: android/gradle.properties
@@ -302,24 +309,59 @@ newArchEnabled=true
 
 **Symptom:** Hydration mismatches or missing styles on first render in Next.js/SSR.
 
-**Fix:** Use Unistyles SSR utilities:
+**Fix:** Use Unistyles SSR utilities from `react-native-unistyles/server`.
+
+**App Router** - a client component that injects styles once per request (it also hydrates on the client, no `hydrateServerUnistyles` needed):
 
 ```tsx
-import { getServerUnistyles, hydrateServerUnistyles, resetServerUnistyles } from 'react-native-unistyles'
+'use client'
 
-// In your _document.tsx or layout:
-// 1. Get server styles
-const styles = getServerUnistyles()
+import { PropsWithChildren, useRef } from 'react'
+import { useServerUnistyles } from 'react-native-unistyles/server'
+import { useServerInsertedHTML } from 'next/navigation'
+import './unistyles'
 
-// 2. Inject into HTML head
-<style dangerouslySetInnerHTML={{ __html: styles }} />
+export const Style = ({ children }: PropsWithChildren) => {
+  const isServerInserted = useRef(false)
+  const unistyles = useServerUnistyles()
 
-// 3. Hydrate on client
-hydrateServerUnistyles()
+  useServerInsertedHTML(() => {
+    if (isServerInserted.current) {
+      return null
+    }
 
-// 4. Reset between requests (important for serverless)
-resetServerUnistyles()
+    isServerInserted.current = true
+
+    return unistyles
+  })
+
+  return <>{children}</>
+}
+// wrap <body> children in layout.tsx with <Style>
 ```
+
+**Pages Router:**
+
+```tsx
+// _document.tsx
+import { getServerUnistyles, resetServerUnistyles } from 'react-native-unistyles/server'
+
+static async getInitialProps({ renderPage }: DocumentContext) {
+  const page = await renderPage()
+  const styles = getServerUnistyles() // React elements (<style> + hydration <script>), not a CSS string
+
+  resetServerUnistyles() // after EVERY request, so CSS/listeners don't leak between requests
+
+  return { ...page, styles }
+}
+
+// _app.tsx
+useEffect(() => {
+  hydrateServerUnistyles() // from 'react-native-unistyles/server'
+}, [])
+```
+
+Both `useServerUnistyles` and `getServerUnistyles` accept `{ includeRNWStyles?: boolean }` (default `true`).
 
 ---
 
@@ -327,9 +369,9 @@ resetServerUnistyles()
 
 **Symptom:** Content renders behind status bar or navigation bar on Android.
 
-**Cause:** v3 enforces edge-to-edge layout on Android for accurate inset reporting.
+**Cause:** v3 enforces edge-to-edge layout on Android for accurate inset reporting (via `WindowInsetsCompat`). `react-native-edge-to-edge` is optional since 3.1.0 — Unistyles enables edge-to-edge itself.
 
-**Fix:** Use `rt.insets` in your styles:
+**Fix:** Set `edgeToEdgeEnabled=true` in `android/gradle.properties` (strongly recommended; Expo SDK 54+ does it automatically), then use `rt.insets` in your styles:
 
 ```tsx
 const styles = StyleSheet.create((theme, rt) => ({
@@ -342,3 +384,19 @@ const styles = StyleSheet.create((theme, rt) => ({
 ```
 
 This replaces `react-native-safe-area-context` for most use cases.
+
+---
+
+## 15. `StyleSheet.configure` Throws After Migrating the v2 Config
+
+**Symptoms / errors:**
+```
+StyleSheet.configure's settings received unexpected key: 'plugins'
+Unistyles: You're trying to set initial theme and enable adaptiveThemes, but these options are mutually exclusive.
+Unistyles: You're trying to enable adaptiveThemes, but you didn't register both 'light' and 'dark' themes.
+StyleSheet.configure's first breakpoint must start from 0.
+```
+
+**Cause:** v3 validates the config strictly. `settings` accepts only `adaptiveThemes`, `initialTheme`, `CSSVars` and `nativeBreakpointsMode`.
+
+**Fix:** Remove the v2-only keys (`plugins`, `experimentalCSSMediaQueries`, `windowResizeDebounceTimeMs`, `disableAnimatedInsets`), keep either `initialTheme` or `adaptiveThemes: true` (not both), register `light` + `dark` themes when using adaptive themes, and make the smallest breakpoint `0`.

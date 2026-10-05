@@ -157,7 +157,19 @@ inline static jsi::Value objectFromUnistyle(jsi::Runtime& rt, std::shared_ptr<Hy
         [unistyleID = unistyle->unid, unistylesRuntime, variants, parsedArguments](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count
     ) {
         auto& registry = UnistylesRegistry::get();
-        auto unistyle = registry.getUnistyleById(unistyleID);
+        // ids repeat across runtimes, so a replaced runtime can't look up its unistyle anymore
+        auto unistyle = unistylesRuntime->ownsRegistry()
+            ? registry.getUnistyleById(unistyleID)
+            : nullptr;
+
+        // the unistyle may have been unregistered while this call was in flight,
+        // eg. during a reload while the outgoing runtime still executes queued work
+        if (unistyle == nullptr) {
+            throw jsi::JSError(rt, R"(Unistyles: Style is no longer registered!
+
+You likely accessed a style while the runtime was being torn down (eg. during a reload).)");
+        }
+
         auto scopedTheme = registry.getScopedTheme();
         parser::Parser parser(unistylesRuntime);
 
