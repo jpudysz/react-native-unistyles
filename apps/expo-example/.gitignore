@@ -36,3 +36,6 @@ yarn-error.*
 *.tsbuildinfo
 android
 ios
+
+# e2e artifacts
+e2e-results/

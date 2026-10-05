@@ -22,40 +22,40 @@ With Unistyles 3.0, preferred way of listening for breakpoint changes is with `D
 
 ### Display
 
-The Display component helps you show  its children based on `breakpoints` or `media queries`.
+The Display component helps you show its children based on `breakpoints` or `media queries`.
 
 ```tsx /Display/
 import React from 'react'
-import { View } from 'react-native'
+import { Text, View } from 'react-native'
 import { Display, mq } from 'react-native-unistyles'
 
 const Component = () => {
     return (
         <View style={styles.container}>
             <Display mq={mq.only.width('sm')}>
-                <View style={styles.text}>
+                <Text style={styles.text}>
                     I will be visible from 'sm' breakpoint and up
-                </View>
+                </Text>
             </Display>
         </View>
     )
 }
 ```
 
-You can also use pixel-based values:
+You can also use numeric values (in the same units as `UnistylesRuntime.screen`):
 
 ```tsx /Display/
 import React from 'react'
-import { View } from 'react-native'
+import { Text, View } from 'react-native'
 import { Display, mq } from 'react-native-unistyles'
 
 const Component = () => {
     return (
         <View style={styles.container}>
             <Display mq={mq.only.width(0, 500)}>
-                <View style={styles.text}>
-                    I will be visible from 0 to 500px
-                </View>
+                <Text style={styles.text}>
+                    I will be visible from 0 to 500 (inclusive)
+                </Text>
             </Display>
         </View>
     )
@@ -69,16 +69,16 @@ It works exactly the same way as the Display component.
 
 ```tsx /Hide/
 import React from 'react'
-import { View } from 'react-native'
+import { Text, View } from 'react-native'
 import { Hide, mq } from 'react-native-unistyles'
 
 const Component = () => {
     return (
         <View style={styles.container}>
             <Hide mq={mq.only.width('sm', 'lg')}>
-                <View style={styles.text}>
+                <Text style={styles.text}>
                     I will be hidden from 'sm' breakpoint to 'lg' breakpoint
-                </View>
+                </Text>
             </Hide>
         </View>
     )
@@ -87,11 +87,11 @@ const Component = () => {
 ```
 
 <Aside type="caution">
-Does it mean that Unistyles introduced a new components?
+Does it mean that Unistyles introduced new components?
 
 Well, no! These components are simple if-else statements used to conditionally render your JSX. We won’t wrap your components in any additional layers.
 
-We believe this saves you a lot of time and effort, eliminating the need to implement the logic yourself or causing re-renders by listening to any hooks.
+We believe this saves you a lot of time and effort, eliminating the need to implement the logic yourself. Only the `Display` or `Hide` component re-renders when the media query result changes, not its parent.
 </Aside>
 
 </Seo>

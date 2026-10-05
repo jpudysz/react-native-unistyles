@@ -439,13 +439,12 @@ void parser::Parser::rebuildShadowLeafUpdates(jsi::Runtime& rt, core::Dependency
 
         for (const auto& [shadowNode, unistyles] : dependencyMap) {
             // Parse string colors (e.g., "#000000") to int representation
-            auto rawProps = this->parseStylesToShadowTreeStyles(rt, unistyles);
+            auto rawProps = this->parseStylesToShadowTreeUpdates(rt, unistyles);
 
             updates.emplace(shadowNode, std::move(rawProps));
         }
 
-        registry.trafficController.setUpdates(updates);
-        registry.trafficController.resumeUnistylesTraffic();
+        registry.queueShadowLeafUpdatesUnsafe(updates);
     });
 }
 
@@ -1267,6 +1266,34 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
     }
 
     return jsi::dynamicFromValue(rt, jsi::Value(rt, convertedStyles));
+}
+
+// shadow tree updates skip the props an inline style sets last, React (or an animation) owns them
+// writing them would also leave them in nativeProps_DEPRECATED, which React Native applies to every later clone,
+// so a value captured at link time would undo what React rendered since
+folly::dynamic parser::Parser::parseStylesToShadowTreeUpdates(jsi::Runtime& rt, const std::vector<std::shared_ptr<UnistyleData>>& unistyles) {
+    auto props = this->parseStylesToShadowTreeStyles(rt, unistyles);
+    std::unordered_map<std::string, bool> isOwnedByInlineStyle;
+
+    for (const auto& unistyleData : unistyles) {
+        if (!unistyleData->parsedStyle.has_value()) {
+            continue;
+        }
+
+        bool isInlineStyle = unistyleData->unistyle->styleKey == helpers::EXOTIC_STYLE_KEY;
+
+        helpers::enumerateJSIObject(rt, unistyleData->parsedStyle.value(), [&isOwnedByInlineStyle, isInlineStyle](const std::string& propName, jsi::Value&) {
+            isOwnedByInlineStyle[propName] = isInlineStyle;
+        });
+    }
+
+    for (const auto& [propName, isInline] : isOwnedByInlineStyle) {
+        if (isInline) {
+            props.erase(propName);
+        }
+    }
+
+    return props;
 }
 
 

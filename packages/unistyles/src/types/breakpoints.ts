@@ -9,9 +9,11 @@ type ExtractTransformArray<T> = T extends object ? { [K in keyof T]: ExtractBrea
 type ExtractBreakpoints<T> = T extends object
     ? keyof T extends BreakpointsOrMediaQueries
         ? T[keyof T]
-        : T extends Array<ToDeepUnistyles<TransformStyles>>
-          ? Array<ExtractTransformArray<T[number]>>
-          : T extends Array<infer _U>
+        : T extends ReadonlyArray<ToDeepUnistyles<TransformStyles>>
+          ? T extends Array<infer _U>
+              ? Array<ExtractTransformArray<T[number]>>
+              : ReadonlyArray<ExtractTransformArray<T[number]>>
+          : T extends ReadonlyArray<infer _U>
             ? T
             : {
                   [K in keyof T]: ExtractBreakpoints<T[K]>

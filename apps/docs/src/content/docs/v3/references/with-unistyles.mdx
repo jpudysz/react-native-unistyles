@@ -69,12 +69,13 @@ If you don't rely on styles in these components, you should not wrap your compon
 
 <Aside type="caution">
 `withUnistyles` detects automatically your component dependencies and re-renders it only when they change.
+On iOS and Android, wrapped components are always subscribed to theme changes, so they will also re-render whenever the theme changes.
 </Aside>
 
 ### Auto mapping for `style` and `contentContainerStyle` props
 
 If your component expects the `style` or `contentContainerStyle` prop, Unistyles will automatically handle the mapping under the hood.
-You just need to wrap your custom view in `withUnistyles`. We will also respect your style dependencies, so, for example, the `Blurhash` component will only re-render when the theme changes.
+You just need to wrap your custom view in `withUnistyles`. We will also respect your style dependencies, so, for example, the `Blurhash` component will re-render when the theme changes, but not when e.g. insets or breakpoints change.
 
 
 ```ts
@@ -127,6 +128,10 @@ const MyComponent = () => {
 ```
 
 TypeScript will autocomplete all your props, so there is no need to specify type manually.
+
+<Aside>
+`style` and `contentContainerStyle` can't be returned from `mappings`, as they are mapped automatically. Pass them as regular props instead.
+</Aside>
 
 ### Custom mappings for external props
 
@@ -198,6 +203,20 @@ const MyComponent = ({ isDisabled }) => {
 Components that use `uniProps` are also aware of your dependencies. In the example above, `MySwitch` will re-render only when `theme` changes.
 </Aside>
 
+### Remounting component with `key`
+
+Some components can't handle updated props and need to be remounted instead. Both `mappings` and `uniProps` can return a `key`, which won't be passed down as a prop. Instead, it will be used as the React `key` of the wrapped component, so changing it remounts the component:
+
+```tsx /key/
+const UniFlashList = withUnistyles(FlashList, (theme, rt) => ({
+    // remount the list whenever the orientation changes
+    key: rt.isLandscape ? 'landscape' : 'portrait',
+    numColumns: rt.isLandscape ? 4 : 2
+}))
+```
+
+If both return a `key`, the one from `uniProps` wins.
+
 ### Props resolution priority
 
 We will respect your order of prop resolution, applying them with the following priority:
@@ -231,5 +250,10 @@ const UniButton = withUnistyles(Button, theme => ({
     })}
 />
 ```
+
+### Web
+
+On the web, `withUnistyles` wraps your component in a `<div>` with `display: contents`, that holds the generated `className` for the `style` prop.
+This wrapper doesn't affect layout, but keep it in mind if you rely on CSS selectors like `:first-child`.
 
 </Seo>

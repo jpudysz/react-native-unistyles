@@ -42,9 +42,14 @@ export const Pressable: React.ForwardRefExoticComponent<PressableProps & React.R
                 isServer()
                     ? undefined
                     : (ref) => {
+                          if (!ref) {
+                              // @ts-expect-error hidden from TS
+                              UnistylesShadowRegistry.remove(storedRef, classNames?.[0].hash)
+                          }
+
                           storedRef = ref as unknown as HTMLElement
                           // @ts-expect-error hidden from TS
-                          UnistylesShadowRegistry.add(storedRef, classNames?.hash)
+                          UnistylesShadowRegistry.add(storedRef, classNames?.[0].hash)
 
                           if (typeof forwardedRef === 'function') {
                               return forwardedRef(ref)
@@ -62,10 +67,10 @@ export const Pressable: React.ForwardRefExoticComponent<PressableProps & React.R
                 UnistylesShadowRegistry.setScopedTheme(scopedTheme)
 
                 // @ts-expect-error hidden from TS
-                UnistylesShadowRegistry.remove(storedRef, classNames?.hash)
+                UnistylesShadowRegistry.remove(storedRef, classNames?.[0].hash)
                 classNames = getClassName(styleResult as UnistylesValues)
                 // @ts-expect-error hidden from TS
-                UnistylesShadowRegistry.add(storedRef, classNames?.hash)
+                UnistylesShadowRegistry.add(storedRef, classNames?.[0].hash)
 
                 UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
 

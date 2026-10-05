@@ -4,7 +4,16 @@
 using namespace margelo::nitro::unistyles;
 
 core::UnistylesState& HybridUnistylesRuntime::getState() {
+    // state belongs to the runtime that replaced this one
+    if (!this->ownsRegistry()) {
+        throw std::runtime_error(helpers::RUNTIME_REPLACED_ERROR);
+    }
+
     return core::UnistylesRegistry::get().getState();
+}
+
+bool HybridUnistylesRuntime::ownsRegistry() const {
+    return core::UnistylesRegistry::get().isCurrent(this->generation);
 }
 
 ColorScheme HybridUnistylesRuntime::getColorScheme() {
@@ -166,13 +175,14 @@ jsi::Value HybridUnistylesRuntime::updateTheme(jsi::Runtime &rt, const jsi::Valu
     helpers::assertThat(rt, count == 2, "UnistylesRuntime.updateTheme expected to be called with 2 arguments.");
     helpers::assertThat(rt, args[0].isString(), "UnistylesRuntime.updateTheme expected first argument to be a string.");
     helpers::assertThat(rt, args[1].isObject(), "UnistylesRuntime.updateTheme expected first argument to be a function.");
+    helpers::assertThat(rt, this->ownsRegistry(), helpers::RUNTIME_REPLACED_ERROR);
 
     auto& registry = core::UnistylesRegistry::get();
     auto themeName = args[0].asString(rt).utf8(rt);
 
     helpers::assertThat(rt, args[1].asObject(rt).isFunction(rt), "UnistylesRuntime.updateTheme expected second argument to be a function.");
 
-    registry.updateTheme(rt, themeName, args[1].asObject(rt).asFunction(rt));
+    registry.updateTheme(rt, this->generation, themeName, args[1].asObject(rt).asFunction(rt));
 
     this->_onDependenciesChange({UnistyleDependency::THEME});
 

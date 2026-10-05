@@ -90,6 +90,9 @@ export class UnistylesRegistry {
         stylesCounter.delete(ref)
 
         if (stylesCounter.size === 0) {
+            // Safe to drop now: connect creates a new Set and the cleanup below only checks the DOM
+            this.stylesCounter.delete(hash)
+
             // Move this to the end of the event loop so the element is removed from the DOM
             return Promise.resolve().then(() => {
                 // Check if element is still in the DOM
