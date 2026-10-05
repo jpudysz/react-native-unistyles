@@ -377,20 +377,21 @@ void core::UnistylesRegistry::releaseOwnership(uint64_t generation) {
     // called when module is invalidated, before React Native destroys the runtime
     // declared before the lock, so jsi values and pins are released after unlocking
     OwnedState releasedState;
-    std::lock_guard<std::mutex> lock(this->_ownershipMutex);
 
-    if (this->isCurrent(generation)) {
-        releasedState = this->takeOwnedState();
-        this->_generation.store(0);
+    {
+        std::lock_guard<std::mutex> lock(this->_ownershipMutex);
 
-        return;
+        if (this->isCurrent(generation)) {
+            releasedState = this->takeOwnedState();
+            this->_generation.store(0);
+        } else if (auto it = this->_replacedStates.find(generation); it != this->_replacedStates.end()) {
+            releasedState = std::move(it->second);
+            this->_replacedStates.erase(it);
+        }
     }
 
-    auto it = this->_replacedStates.find(generation);
-
-    if (it != this->_replacedStates.end()) {
-        releasedState = std::move(it->second);
-        this->_replacedStates.erase(it);
+    for (auto& [_, styleSheet] : releasedState.styleSheets) {
+        styleSheet->unistyles.clear();
     }
 }
 
