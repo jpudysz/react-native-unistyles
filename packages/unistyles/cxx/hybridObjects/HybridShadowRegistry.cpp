@@ -106,6 +106,7 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
 
     if (scopedTheme.has_value()) {
         initialScopedUpdate = parser.parseStylesToShadowTreeUpdates(rt, unistylesData);
+        shouldCommit = shadow::hasNativeProps(&shadowNodeWrapper->getFamily());
     } else if (shadow::hasNativeProps(&shadowNodeWrapper->getFamily())) {
         auto update = parser.parseStylesToShadowTreeUpdates(rt, unistylesData);
 

@@ -5,6 +5,7 @@ import { verify, type VerifyReport } from 'react-native-unistyles/diagnostics'
 import { restoreThemes, selectTheme, session } from '../components'
 import type { ThemeName } from '../themes'
 import { runAction } from './actions'
+import { getPresses } from './presses'
 import { type Failure, type Report, REPORTED_FAILURES, type ScenarioId, type Sync, type SyncKind } from './protocol'
 import { type Actions, scenarios, TAP_SCENARIOS } from './scenarios'
 import { scrollTarget } from './scroll'
@@ -233,6 +234,14 @@ class E2ERun implements Actions {
         this.step(`${name}${argument === undefined ? '' : ` ${argument}`}`, () => runAction(name, argument))
 
     scroll = (target: string, y: number) => this.step(`scroll ${target} ${y}`, () => scrollTarget(target, y))
+
+    // Scenarios with presses run only with a host, JS can't press a component the way a touch does
+    press = (testID: string) =>
+        this.step(`press ${testID}`, async () => {
+            const presses = getPresses(testID)
+
+            await this.tap(testID, () => getPresses(testID) > presses)
+        })
 
     expect = (name: string) =>
         this.step(`expect ${name}`, async () => {

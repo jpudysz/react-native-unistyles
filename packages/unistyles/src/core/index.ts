@@ -1,6 +1,7 @@
 export { createUnistylesElement } from './createUnistylesElement'
 export { createUnistylesActivityIndicator } from './createUnistylesActivityIndicator'
 export { createUnistylesImageBackground } from './createUnistylesImageBackground'
+export { createUnistylesTouchableHighlight } from './createUnistylesTouchableHighlight'
 export { withUnistyles } from './withUnistyles'
 export { passForwardedRef } from './passForwardRef'
 export { getClassName } from './getClassname'

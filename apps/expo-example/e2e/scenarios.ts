@@ -12,6 +12,8 @@ export type Actions = {
     // Runs a screen action registered with useE2EAction, the same code its buttons run
     act: (name: string, argument?: number | string) => Promise<void>,
     scroll: (target: string, y: number) => Promise<void>,
+    // A touch by the host on the element with this testID, it waits for the press handler (see e2e/presses.ts)
+    press: (testID: string) => Promise<void>,
     // Runs a check registered with useE2EAction, it returns a failure or nothing
     expect: (name: string) => Promise<void>,
     expectNoOrphans: () => void,
@@ -278,6 +280,57 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.flip('premium')
         await a.scroll('lists', 0)
         await a.flip('light')
+        await a.back()
+        await a.checkpoint()
+    },
+    // TouchableHighlight re-renders itself to hide its underlay, with the style values React rendered last:
+    // an older theme, or the global theme inside a ScopedTheme
+    'touchable-highlight': async a => {
+        if (!a.hasHost) {
+            return
+        }
+
+        await a.push('/interactions')
+        await a.press('interactions-scoped-highlight')
+        await a.flip('premium')
+        await a.press('interactions-highlight')
+        await a.flip('dark')
+        await a.press('interactions-highlight')
+        await a.press('interactions-scoped-highlight')
+        await a.flip('light')
+        await a.press('interactions-highlight')
+        await a.back()
+        await a.checkpoint()
+    },
+    // Every interactive component pressed after theme changes, they re-render below Unistyles without its wrappers
+    'interactions': async a => {
+        if (!a.hasHost) {
+            return
+        }
+
+        await a.push('/interactions')
+
+        for (const theme of ['dark', 'premium'] as const) {
+            await a.flip(theme)
+            await a.press('interactions-highlight-variant')
+            await a.press('interactions-highlight-fn')
+            await a.press('interactions-opacity')
+            await a.press('interactions-pressable')
+            await a.press('interactions-pressable-fn')
+            await a.press('interactions-text')
+            await a.press('interactions-switch')
+            await a.press('interactions-input')
+            await a.act('interactions.blur')
+            await a.press('interactions-scoped-pressable-fn')
+            await a.press('interactions-scoped-highlight')
+        }
+
+        // new variants after the presses
+        await a.act('interactions.tone')
+        await a.press('interactions-highlight-variant')
+        await a.flip('light')
+        await a.press('interactions-highlight-variant')
+        await a.press('interactions-pressable-fn')
         await a.back()
         await a.checkpoint()
     },

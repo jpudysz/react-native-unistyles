@@ -9,6 +9,7 @@ export const screens = [
     { route: 'with-unistyles', title: 'withUnistyles', description: 'Third party components and useUnistyles' },
     { route: 'animations', title: 'Animations', description: 'Animated, Reanimated and useAnimatedTheme' },
     { route: 'lists', title: 'Lists', description: 'ScrollView, FlatList and SectionList' },
+    { route: 'interactions', title: 'Interactions', description: 'Touchables, inputs and switches pressed after theme changes' },
     { route: 'transition', title: 'Transition', description: 'Unistyles commits during a transition render' },
     { route: 'suspense', title: 'Suspense', description: 'Theme changes while content is suspended (#1260)' },
     { route: 'activity', title: 'Activity', description: 'Theme changes and renders while <Activity> hides content' },
