@@ -29,8 +29,8 @@ windowless from bash, a hidden window gets throttled by App Nap:
 /bin/bash -c '~/Library/Android/sdk/emulator/emulator -avd Pixel_7_Pro_API_34 -no-window -gpu host -memory 4096 -no-snapshot-load -no-audio &'
 ```
 
-Without the host, `expo-example:///e2e?scenarios=all&reps=1` runs everything (except `os-appearance`) and shows the
-result on screen, which also works in a Debug build with Metro.
+Without the host, `expo-example:///e2e?scenarios=all&reps=1` runs everything (except the host only `os-appearance`,
+`touchable-highlight` and `interactions`) and shows the result on screen, which also works in a Debug build with Metro.
 
 ## Scenarios
 
@@ -55,6 +55,8 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `update-theme`        | `updateTheme` of the current theme, theme changes, restore                 | `UnistylesRuntime.updateTheme`                           |
 | `transition`          | Unistyles commits while React yields in a `startTransition` render         | props React rendered before the commit (inline styles)   |
 | `lists-scroll`        | theme changes at scrolled FlatList positions                               | virtualized rows mounted after a theme change            |
+| `touchable-highlight` | TouchableHighlight pressed after theme changes and below a ScopedTheme (host only) | its underlay re-render commits the style React rendered last |
+| `interactions`        | every component on `interactions` pressed, toggled or focused after theme changes (host only) | components re-rendering themselves below Unistyles, scoped and variant styles |
 | `os-appearance`       | OS appearance flips with adaptive themes (host only)                       | adaptive themes, inverted adaptive scopes                |
 | `random-walk`         | 14 seeded random theme changes, pushes, backs and screen actions           | combinations of the above                                |
 
@@ -80,7 +82,10 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
 - `runner.ts` runs each step as act, `settle()`, `verify()`, record. `expect` steps run a check registered with
   `useE2EAction` that returns a failure or nothing, for props `verify()` skips because React owns them. Theme changes go through the header's
   `selectTheme`, screen actions through `useE2EAction` handlers (the same code the screen's buttons run) and scrolling
-  through `e2eScrollRef`. `settle.ts` waits two idle callbacks and two frames: Unistyles applies theme changes from a
+  through `e2eScrollRef`. Presses are real touches: the runner asks the host to tap the element with a testID and waits
+  until its press handler counted the press (`presses.ts`). The counter is not React state, a press must not re-render
+  the screen, as a re-render re-links every wrapper and hides what a component rendered below Unistyles on its own.
+  `settle.ts` waits two idle callbacks and two frames: Unistyles applies theme changes from a
   native callback on the JS thread, the idle callbacks run after it.
 - The overlay (`E2EOverlay.tsx`, rendered by the root layout outside the navigator, so it never freezes) renders nothing
   until the e2e route starts a run. Then it shows a beacon, six themed probes and the current marker
@@ -97,7 +102,7 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
 ## Mutation check
 
 Each fix was reverted (or its mechanism disabled) in a Release build and the suite failed with a report pointing at
-the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 to M11 added 2026-10-03 on iOS and Android):
+the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 to M11 added 2026-10-03 on iOS and Android, M12 and M13 added 2026-10-05):
 
 | mutation                                                                                   | caught by                                                         | first failure                                                                                   |
 | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
@@ -113,6 +118,8 @@ the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 t
 | M9 `link` commits once per restored node of a frozen screen (#1252)                          | `frozen-list` (iOS and Android)                                   | `js stall ms expected <= 300 actual 870` (iOS) and `actual 1519` (Android) on the first restore |
 | M10 `useAnimatedVariantColor` re-applies the color of its last render when a frozen screen is revealed | `animated-variant` (iOS and Android, 3 failures in 3 reps) | `animated backgroundColor expected #ff9ff3 actual rgba(255, 107, 107, 1)`, the light accent after a flip to dark |
 | M11 `add` links only the first unistyle of an object RN Animated flattened from an array     | `shared-dynamic-fn`, `mount-after-flip`, `set-theme-on-mount` (iOS and Android) | overlay probe `native-animated` expected `#ffffff` (dark) actual `#1b1b1f` (light), 0 mismatches |
+| M12 TouchableHighlight linked like a View, its underlay re-render commits the style React rendered last | `touchable-highlight`, `interactions` (both reverted: 153 failures on iOS and Android, M12 alone 147 on iOS) | `View 'highlight' backgroundColor expected <premium secondary> actual <light secondary>` after a press |
+| M13 a scoped `link` of a mounted node queues its update without committing it               | `touchable-highlight`, `interactions` (iOS, 12 failures)          | scoped `View 'highlight' backgroundColor expected <dark secondary> actual <light secondary>`, `pendingUpdates expected 0 actual 1` |
 
 #1266 can't be reverted as a whole, `verify()` reads the registry it introduced, so M4a and M4b disable its two
 mechanisms. The use after free itself (#1217, #1179) only crashes with freed families, which needs a Release build with
@@ -120,7 +127,13 @@ a sanitizer, the host still reports a crash whenever one happens.
 
 ## Known issues found by the suite
 
-None open. Both issues it found are fixed and covered by M5 (ActivityIndicator) and M6 (`updateTheme`).
+The issues it found are fixed and covered by M5 (ActivityIndicator), M6 (`updateTheme`), M12 (TouchableHighlight) and
+M13 (scoped Pressable). Open, not covered:
+
+- A component below a `ScopedTheme` that re-renders on its own (local state, or the child TouchableHighlight clones on a
+  press) links with the scope the last `ApplyScopedTheme` left behind, usually the global theme. `verify()` can't see it,
+  it compares against the scope recorded at link time. Repro: `interactions`, press `Counter` in the scoped section,
+  it turns into the global theme.
 
 ## Known limitations
 

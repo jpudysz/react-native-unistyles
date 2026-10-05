@@ -18,6 +18,8 @@ export const SCENARIOS = [
     'update-theme',
     'transition',
     'lists-scroll',
+    'touchable-highlight',
+    'interactions',
     'os-appearance',
     'random-walk'
 ] as const
