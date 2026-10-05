@@ -38,7 +38,7 @@ will resolve to `xs` breakpoint.
 
 If you use TypeScript you need to override the library's type:
 
-```tsx /name/
+```tsx /UnistylesBreakpoints/
 type AppBreakpoints = typeof breakpoints
 
 declare module 'react-native-unistyles' {
@@ -48,8 +48,8 @@ declare module 'react-native-unistyles' {
 
 Finally, to register the breakpoints, call `StyleSheet.configure`:
 
-```tsx /addBreakpoints/
-import { UnistylesRegistry } from 'react-native-unistyles'
+```tsx /configure/
+import { StyleSheet } from 'react-native-unistyles'
 
 StyleSheet.configure({
     breakpoints
@@ -81,7 +81,7 @@ const styles = StyleSheet.create(theme => ({
 }))
 ```
 
-You can even use it with nested objects like `transform`, `shadowOffset`, or `filters`:
+You can even use it with nested objects like `transform`, `shadowOffset`, or `filter`:
 
 ```ts /xs/ /sm/ /xl/
 const styles = StyleSheet.create(theme => ({
@@ -113,13 +113,14 @@ Breakpoints are also available with [variants](/v3/references/variants/) and [co
 
 ### Built-in breakpoints `landscape` and `portrait`
 
-Even if you don't use custom breakpoints, you can still utilize Unistyles' predefined breakpoints available on mobile devices: `portrait` and `landscape`.
+Even if you don't use custom breakpoints, you can still utilize Unistyles' predefined breakpoints: `portrait` and `landscape`.
 
-- `portrait` will resolve to your device's width in portrait mode
-- `landscape` will resolve to your device's width in landscape mode
+- `portrait` is used when the screen height is greater than or equal to its width
+- `landscape` is used when the screen width is greater than its height
 
 :::tip
-These breakpoints are only available on mobile unless you register your own.
+On iOS and Android, `landscape` and `portrait` are used only if you haven't registered your own breakpoints.
+On the web, they are always converted to CSS `@media (orientation: landscape)` and `@media (orientation: portrait)` queries.
 :::
 
 ```ts /landscape/ /portrait/
@@ -138,10 +139,10 @@ const styles = StyleSheet.create(theme => ({
 
 ### Pixel/Point mode for native breakpoints
 
-By default, Unistyles will use `pixels` for native breakpoints. This means that the breakpoints and [mq](/v3/references/media-queries) will be computed based on mobile screen pixels.
+By default (`nativeBreakpointsMode: 'pixels'`), native breakpoints and [mq](/v3/references/media-queries) are compared against `UnistylesRuntime.screen`, which is expressed in density-independent units (points on iOS, dp on Android).
 You can change this behavior by setting `nativeBreakpointsMode` to `points` in your [configuration](/v3/start/configuration#settings-optional).
 
-If `nativeBreakpointsMode` is set to `points`, all breakpoints and `mq` will be computed based on mobile screen points (screen in pixels divided by pixel ratio).
+If `nativeBreakpointsMode` is set to `points`, the screen dimensions are additionally divided by `UnistylesRuntime.pixelRatio` before being compared with your breakpoints and `mq`.
 
 
 ### Show/Hide your components based on breakpoints
@@ -149,16 +150,20 @@ If `nativeBreakpointsMode` is set to `points`, all breakpoints and `mq` will be 
 In order to show or hide your components based on the screen size, you can leverage the `mq` utility and one of the two built-in components: `Display` and `Hide`.
 
 ```tsx
+import React from 'react'
+import { Text } from 'react-native'
 import { Display, Hide, mq } from 'react-native-unistyles'
 
 const MyComponent = () => {
     return (
-        <Display mq={mq.only.width(0, 400)}>
-            <Text>This text is visible on small devices</Text>
-        </Display>
-        <Hide mq={mq.only.width(400)}>
-            <Text>This text is hidden on big devices</Text>
-        </Hide>
+        <React.Fragment>
+            <Display mq={mq.only.width(0, 400)}>
+                <Text>This text is visible on small devices</Text>
+            </Display>
+            <Hide mq={mq.only.width(400)}>
+                <Text>This text is hidden on big devices</Text>
+            </Hide>
+        </React.Fragment>
     )
 }
 ```

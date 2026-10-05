@@ -24,10 +24,12 @@ export function handleExoticImport(
             const hasMatchingImportType =
                 (!rule.isDefault && t.isImportSpecifier(specifier)) ||
                 (rule.isDefault && t.isImportDefaultSpecifier(specifier))
-            const hasMatchingImportName = rule.isDefault || (!rule.isDefault && rule.name === specifier.local.name)
+            const isTypeOnly = t.isImportSpecifier(specifier) && specifier.importKind !== 'value'
+            const hasMatchingImportName =
+                rule.isDefault || (t.isImportSpecifier(specifier) && rule.name === getImportedName(specifier))
             const hasMatchingPath = rule.path === source.value
 
-            if (!hasMatchingImportType || !hasMatchingImportName || !hasMatchingPath) {
+            if (isTypeOnly || !hasMatchingImportType || !hasMatchingImportName || !hasMatchingPath) {
                 continue
             }
 
@@ -39,12 +41,13 @@ export function handleExoticImport(
 
                 path.replaceWith(newImport)
             } else {
+                // keep the local name, so aliased and renamed imports (unstable_NativeText) stay bound
                 const newImport = t.importDeclaration(
-                    [t.importSpecifier(t.identifier(rule.mapTo), t.identifier(rule.mapTo))],
+                    [t.importSpecifier(t.identifier(specifier.local.name), t.identifier(rule.mapTo))],
                     t.stringLiteral(getComponentPath(state, rule.mapTo)),
                 )
 
-                path.node.specifiers = specifiers.filter((s) => s !== specifier)
+                path.node.specifiers = path.node.specifiers.filter((s) => s !== specifier)
 
                 if (path.node.specifiers.length === 0) {
                     path.replaceWith(newImport)
@@ -56,4 +59,8 @@ export function handleExoticImport(
             return
         }
     })
+}
+
+function getImportedName(specifier: t.ImportSpecifier) {
+    return t.isIdentifier(specifier.imported) ? specifier.imported.name : specifier.imported.value
 }

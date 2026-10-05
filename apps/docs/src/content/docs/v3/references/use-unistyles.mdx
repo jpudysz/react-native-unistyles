@@ -48,21 +48,27 @@ const MyComponent = () => {
 ```
 
 <Aside title="Subscriptions">
-Unistyles will monitor your destructured props and re-render your component only when the desired value changes.
-If you use `theme`, it will automatically subscribe to theme changes.
-Destructuring `rt` won't create an automatic subscription, as this object contains multiple values that can change frequently during your app's lifecycle.
-To create a subscription, you need to use a specific property on the `rt` object, such as `rt.colorScheme` or `rt.screen.width`.
+Unistyles will monitor the values you read and re-render your component only when one of them changes.
+Destructuring alone doesn't create any subscription. Reading any property of `theme` (e.g. `theme.colors.primary`) will automatically subscribe to theme changes.
+The same applies to `rt`, as this object contains multiple values that can change frequently during your app's lifecycle.
+To create a subscription, you need to read a specific property on the `rt` object, such as `rt.colorScheme` or `rt.screen.width`.
 
 ```tsx title="Case 1 - theme only subscription"
-// subscribes to theme changes, rt is not yet used
 const { theme, rt } = useUnistyles()
+
+// reading theme value subscribes to theme changes, rt is not yet used
+theme.colors.primary
 ```
 vs
 ```tsx title="Case 2 - theme and insets subscription"
-// subscribes to theme changes
 const { theme, rt } = useUnistyles()
 
-rt.insets // reading this value will automatically subscribe to insets changes
+// subscribes to theme changes
+theme.colors.primary
+// reading this value will automatically subscribe to insets changes
+rt.insets.top
+// reading `ime` subscribes only to keyboard (IME) changes
+rt.insets.ime
 ```
 
 </Aside>
@@ -73,7 +79,7 @@ We encourage using `withUnistyles` instead because it ensures only a single comp
 
 Learn more about [How Unistyles works?](/v3/start/how-unistyles-works) to understand why this is not ideal.
 
-Another advantage of `withUnistyles` is that it tracks style dependencies, ensuring only components with changed dependencies are re-rendered. In contrast, `useUnistyles` will re-render the component whenever `theme` or `rt` properties change. Note that `runtime` contains multiple values that can change frequently during your app's lifecycle.
+Another advantage of `withUnistyles` is that it tracks style dependencies, ensuring only components with changed dependencies are re-rendered. In contrast, `useUnistyles` will re-render the whole component whenever any of the values you read from `theme` or `rt` changes. Note that `runtime` contains multiple values that can change frequently during your app's lifecycle.
 
 ### How to use it correctly?
 

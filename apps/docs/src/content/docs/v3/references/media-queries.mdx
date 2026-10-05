@@ -20,13 +20,13 @@ Media queries provide more power and allow you to style cross-platform apps with
 To use media queries, you need to import the `mq` utility and convert your value to an `object`:
 
 ```diff lang="tsx" /mq/ del="backgroundColor: theme.colors.background,"  ins="backgroundColor: {"
-import { Stylesheet, mq } from 'react-native-unistyles'
+import { StyleSheet, mq } from 'react-native-unistyles'
 
-const styles = Stylesheet.create(theme => ({
+const styles = StyleSheet.create(theme => ({
     container: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
         backgroundColor: theme.colors.background,
         backgroundColor: {
 +            [mq.only.width(240, 380)]: theme.colors.background,
@@ -45,11 +45,11 @@ You can also combine `width` media queries with `height` media queries:
 ```tsx /mq/
 import { StyleSheet, mq } from 'react-native-unistyles'
 
-const styles = Stylesheet.create(theme => ({
+const styles = StyleSheet.create(theme => ({
     container: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
         backgroundColor: theme.colors.background,
         backgroundColor: {
             [mq.width(240, 380).and.height(300)]: theme.colors.background,
@@ -64,11 +64,11 @@ Or use only `height` media queries:
 ```tsx /mq/
 import { StyleSheet, mq } from 'react-native-unistyles'
 
-const styles = Stylesheet.create(theme => ({
+const styles = StyleSheet.create(theme => ({
     container: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
         backgroundColor: theme.colors.background,
         backgroundColor: {
             [mq.only.height(300, 500)]: theme.colors.background,
@@ -83,11 +83,11 @@ You can also reuse your defined [breakpoints](/v3/references/breakpoints/):
 ```tsx /xl/
 import { StyleSheet, mq } from 'react-native-unistyles'
 
-const styles = Stylesheet.create(theme => ({
+const styles = StyleSheet.create(theme => ({
     container: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
         backgroundColor: theme.colors.background,
         backgroundColor: {
             [mq.only.height(500)]: theme.colors.background,
@@ -107,39 +107,44 @@ mq.height(...).and.width(...) // target both height and width
 ```
 
 ```shell title="Available values"
-(100, 200) // from 100 to 199
-(400, 'xl') // from 400 to 'xl' breakpoint
-('sm', 'md') // from 'sm' to 'md' breakpoint
-(undefined, 1000) // from 0 to 999
-(null, 800) // from 0 to 799
+(100, 200) // from 100 to 200 (inclusive)
+(400, 'xl') // from 400 to 'xl' breakpoint value (inclusive)
+('sm', 'md') // from 'sm' to 'md' breakpoint value (inclusive)
+(undefined, 1000) // from 0 to 1000
+(null, 800) // from 0 to 800
 (500) // from 500 onwards
 ```
 
 ```shell title="Full example"
-mq.only.width(100, 200) // width from 100 to 199
-mq.height(500).and.width('sm') // heigh from 500 onwards and width from 'sm' breakpoint onwards
-mq.only.height(null, 1000) // height from 0 to 999
+mq.only.width(100, 200) // width from 100 to 200
+mq.height(500).and.width('sm') // height from 500 onwards and width from 'sm' breakpoint onwards
+mq.only.height(null, 1000) // height from 0 to 1000
 ```
 
 :::tip
 If you pass an invalid range to mq utility eg. ('xl', 'sm') or (500, 200) the media query will be marked as invalid and won't be used to resolve your styles.
 :::
 
+Both boundaries are inclusive, so adjacent ranges like `(240, 380)` and `(380)` both match a screen that is exactly `380` wide.
+On iOS and Android, the first matching media query in your style object wins.
+
+Breakpoint names are resolved to their values when `mq` is called, so make sure `StyleSheet.configure` is called before using breakpoint names in `mq`. Unknown breakpoint names resolve to `0`.
+
 ### Combining media queries with breakpoints
 
 You can mix media queries with breakpoints, but media queries will always have higher priority:
 
 ```tsx
-import { StyleSheet, mq} from 'react-native-unistyles'
+import { StyleSheet, mq } from 'react-native-unistyles'
 
-const styles = Stylesheet.create(theme => ({
+const styles = StyleSheet.create(theme => ({
     container: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
         backgroundColor: {
             sm: theme.colors.background,
-            // Unistyles will firsly resolve to this style, even though 'sm' breakpoint may be also correct
+            // Unistyles will firstly resolve to this style, even though 'sm' breakpoint may be also correct
             [mq.only.width(200, 'xl')]: theme.colors.barbie
         }
     }

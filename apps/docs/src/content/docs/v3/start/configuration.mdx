@@ -73,7 +73,7 @@ const breakpoints = {
 
 ### Settings (Optional)
 
-The `Settings` object has been simplified, and in the most recent version, it supports only four properties:
+The `Settings` object has been simplified, and in the most recent version, it supports only four properties (any other key will throw an error):
 
 - **`adaptiveThemes`** – a boolean that enables or disables adaptive themes [learn more](/v3/guides/theming#adaptive-themes)
 - **`initialTheme`** – a string or a synchronous function that sets the initial theme
@@ -101,7 +101,7 @@ const settings = {
 ```
 
 <Aside>
-In the Unistyles 3.0 setting both `initialTheme` and `adaptiveThemes` will cause an error. These options are mutually exclusive.
+Setting `initialTheme` together with `adaptiveThemes: true` will cause an error. These options are mutually exclusive.
 </Aside>
 
 ### TypeScript Types (Optional)

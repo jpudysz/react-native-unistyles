@@ -16,12 +16,13 @@ double HybridStyleSheet::getHairlineWidth() {
 jsi::Value HybridStyleSheet::create(jsi::Runtime& rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
     helpers::assertThat(rt, count == 1, "StyleSheet.create expected to be called with one argument.");
     helpers::assertThat(rt, arguments[0].isObject(), "StyleSheet.create expected to be called with object or function.");
+    helpers::assertThat(rt, this->_unistylesRuntime->ownsRegistry(), helpers::RUNTIME_REPLACED_ERROR);
 
     auto thisStyleSheet = thisVal.asObject(rt);
     auto& registry = core::UnistylesRegistry::get();
 
     jsi::Object rawStyleSheet = arguments[0].asObject(rt);
-    auto registeredStyleSheet = registry.addStyleSheetFromValue(rt, std::move(rawStyleSheet));
+    auto registeredStyleSheet = registry.addStyleSheetFromValue(rt, this->_unistylesRuntime->generation, std::move(rawStyleSheet));
 
     auto parser = parser::Parser(this->_unistylesRuntime);
 
@@ -34,6 +35,7 @@ jsi::Value HybridStyleSheet::create(jsi::Runtime& rt, const jsi::Value &thisVal,
 jsi::Value HybridStyleSheet::configure(jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *arguments, size_t count) {
     helpers::assertThat(rt, count == 1, "StyleSheet.configure expected to be called with one argument.");
     helpers::assertThat(rt, arguments[0].isObject(), "StyleSheet.configure expected to be called with object.");
+    helpers::assertThat(rt, this->_unistylesRuntime->ownsRegistry(), helpers::RUNTIME_REPLACED_ERROR);
 
     auto config = arguments[0].asObject(rt);
 
@@ -72,6 +74,8 @@ jsi::Value HybridStyleSheet::init(jsi::Runtime &rt, const jsi::Value &thisVal, c
     if (this->isInitialized) {
         return jsi::Value::undefined();
     }
+
+    helpers::assertThat(rt, this->_unistylesRuntime->ownsRegistry(), helpers::RUNTIME_REPLACED_ERROR);
 
     // create new state
     auto& registry = core::UnistylesRegistry::get();
@@ -165,7 +169,7 @@ void HybridStyleSheet::parseThemes(jsi::Runtime &rt, jsi::Object themes) {
     helpers::enumerateJSIObject(rt, themes, [&](const std::string& propertyName, jsi::Value& propertyValue){
         helpers::assertThat(rt, propertyValue.isObject(), "StyleSheet.configure's registered theme '" + propertyName + "' must be an object.");
 
-        registry.registerTheme(rt, propertyName, propertyValue);
+        registry.registerTheme(rt, this->_unistylesRuntime->generation, propertyName, propertyValue);
     });
 }
 
@@ -267,7 +271,8 @@ void HybridStyleSheet::onPlatformDependenciesChange(std::vector<UnistyleDependen
     this->_unistylesRuntime->runOnJSThread([weakSelf, dependencies](jsi::Runtime& rt) {
         auto self = std::dynamic_pointer_cast<HybridStyleSheet>(weakSelf.lock());
 
-        if (!self) {
+        // runtime was replaced in the meantime, registry belongs to the next one
+        if (!self || !self->_unistylesRuntime->ownsRegistry()) {
             return;
         }
 
@@ -288,7 +293,7 @@ void HybridStyleSheet::onPlatformNativeDependenciesChange(std::vector<UnistyleDe
     this->_unistylesRuntime->runOnJSThread([weakSelf, dependencies, miniRuntime](jsi::Runtime& rt){
         auto self = std::dynamic_pointer_cast<HybridStyleSheet>(weakSelf.lock());
 
-        if (!self) {
+        if (!self || !self->_unistylesRuntime->ownsRegistry()) {
             return;
         }
 
@@ -329,7 +334,7 @@ void HybridStyleSheet::onImeChange(UnistylesNativeMiniRuntime miniRuntime) {
     this->_unistylesRuntime->runOnJSThread([weakSelf, miniRuntime](jsi::Runtime& rt){
         auto self = std::dynamic_pointer_cast<HybridStyleSheet>(weakSelf.lock());
 
-        if (!self) {
+        if (!self || !self->_unistylesRuntime->ownsRegistry()) {
             return;
         }
 
@@ -357,14 +362,16 @@ void HybridStyleSheet::applyDependencyChanges(jsi::Runtime& rt, std::vector<Unis
         parser.rebuildShadowLeafUpdates(rt, dependencyMap);
     }
 
-    // JS listeners (useUnistyles, withUnistyles, Display/Hide, useAnimatedTheme, StyleSheet.addChangeListener)
-    // subscribe to runtime changes directly and must be notified even when no registered StyleSheet
-    // depends on the changed dependencies, otherwise they never learn about e.g. orientation changes
-    this->notifyJSListeners(dependencies);
+    std::vector<Tag> committedTags;
 
     if (!dependencyMap.empty()) {
-        shadow::ShadowTreeManager::updateShadowTree(rt);
+        committedTags = shadow::ShadowTreeManager::updateShadowTree(rt);
     }
+
+    // after the commit, so listeners can point React at the committed nodes
+    registry.setCommittedTags(std::move(committedTags));
+    // also when no StyleSheet depends on the change, hooks (useUnistyles, withUnistyles, Display, Hide) may
+    this->notifyJSListeners(dependencies);
 }
 
 void HybridStyleSheet::notifyJSListeners(std::vector<UnistyleDependency>& dependencies) {

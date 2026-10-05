@@ -8,9 +8,12 @@ if (majorReactVersions === undefined || majorReactVersions < 19) {
 
 export { StyleSheet, UnistylesRuntime } from './specs'
 export { UnistyleDependency } from './specs'
+export type { UnistylesMiniRuntime } from './specs'
+export { ColorScheme, Orientation, StatusBarStyle } from './specs/types'
 export { mq } from './mq'
 export type { UnistylesThemes, UnistylesBreakpoints } from './global'
 export { withUnistyles, useUnistyles, createUnistylesElement } from './core'
-export type { UnistylesVariants, UnistylesValues, IOSContentSizeCategory, AndroidContentSizeCategory } from './types'
+export type { UnistylesVariants, UnistylesValues } from './types'
+export { IOSContentSizeCategory, AndroidContentSizeCategory, WebContentSizeCategory } from './types'
 export { Display, Hide, ScopedTheme } from './components'
 export { useServerUnistyles, hydrateServerUnistyles, getServerUnistyles, resetServerUnistyles } from './server'

@@ -47,6 +47,11 @@ Unistyles 3.0 is fully compatible with Next.js Server Side Rendering (SSR). We'r
         }
         ```
 
+        <Aside>
+        `useServerUnistyles` returns the styles only once per request on the server, and resets the server registry right after reading them.
+        On the client, it automatically hydrates the server state, so you don't need to call `hydrateServerUnistyles` yourself.
+        </Aside>
+
         With the component in place, make sure it wraps your body's children:
 
         ```diff lang="tsx" title="layout.tsx"
@@ -102,6 +107,10 @@ Unistyles 3.0 is fully compatible with Next.js Server Side Rendering (SSR). We'r
         +       }
         ```
 
+        <Aside>
+        Make sure to call `resetServerUnistyles` after every request. It clears generated CSS, cached stylesheets and registered listeners, so they won't leak between requests.
+        </Aside>
+
         And add the following use effect to your `_app.tsx`
         ```diff lang="tsx" title="_app.tsx"
         + import { hydrateServerUnistyles } from 'react-native-unistyles/server'
@@ -121,7 +130,6 @@ Unistyles 3.0 is fully compatible with Next.js Server Side Rendering (SSR). We'r
 </Tabs>
 
 
-</Seo>
 
 ## Troubleshooting
 
@@ -143,3 +151,5 @@ Or you can directly add the className to your root html element.
 - <html lang="en">
 + <html lang="en" className="dark">
 ```
+
+</Seo>

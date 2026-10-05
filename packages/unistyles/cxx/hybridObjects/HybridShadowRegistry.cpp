@@ -6,6 +6,11 @@ using namespace facebook::react;
 jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count == 2, "Unistyles: Invalid babel transform 'ShadowRegistry link' expected 2 arguments.");
 
+    // runtime was replaced, registry belongs to the next one
+    if (!this->_unistylesRuntime->ownsRegistry()) {
+        return jsi::Value::undefined();
+    }
+
     auto shadowNodeWrapper = getShadowNodeFromRef(rt, args[0]);
 
     std::vector<core::Unistyle::Shared> unistyleWrappers = core::unistyleFromValue(rt, args[1]);
@@ -87,36 +92,78 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
             parser.rebuildUnistyleWithScopedTheme(rt, parsedStyleSheet, unistyleData);
         }
 
-        // Initialize parsedStyle from the unistyle's current computed style from withUnistyles
+        // The shared cache can belong to another view by the time React attaches refs.
+        // Restore this view's arguments and variants before saving its native styles.
         if (!unistyleData->parsedStyle.has_value() && unistyle->parsedStyle.has_value()) {
-            unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
+            parser.rebuildUnistyleWithVariants(rt, unistyleData);
         }
 
         unistylesData.emplace_back(unistyleData);
     }
 
     std::optional<folly::dynamic> initialScopedUpdate;
+    bool shouldCommit = false;
 
-    if (scopedTheme.has_value() || wasSuspended) {
-        initialScopedUpdate = parser.parseStylesToShadowTreeStyles(rt, unistylesData);
+    if (scopedTheme.has_value()) {
+        initialScopedUpdate = parser.parseStylesToShadowTreeUpdates(rt, unistylesData);
+        shouldCommit = shadow::hasNativeProps(&shadowNodeWrapper->getFamily());
+    } else if (shadow::hasNativeProps(&shadowNodeWrapper->getFamily())) {
+        auto update = parser.parseStylesToShadowTreeUpdates(rt, unistylesData);
+
+        if (shadow::hasOutdatedNativeProps(&shadowNodeWrapper->getFamily(), update)) {
+            initialScopedUpdate = std::move(update);
+            shouldCommit = true;
+        }
     }
 
     registry.linkShadowNodeWithUnistyle(
         rt,
-        &shadowNodeWrapper->getFamily(),
+        this->_unistylesRuntime->generation,
+        shadowNodeWrapper->getFamilyShared(),
         unistylesData,
         std::move(initialScopedUpdate)
     );
 
-    if (wasSuspended) {
-        shadow::ShadowTreeManager::updateShadowTree(rt);
+    if (shouldCommit) {
+        this->scheduleShadowTreeUpdate(rt);
     }
 
     return jsi::Value::undefined();
 }
 
+void HybridShadowRegistry::scheduleShadowTreeUpdate(jsi::Runtime& rt) {
+    if (this->_isShadowTreeUpdateScheduled->exchange(true)) {
+        return;
+    }
+
+    auto isShadowTreeUpdateScheduled = this->_isShadowTreeUpdateScheduled;
+    auto unistylesRuntime = this->_unistylesRuntime;
+
+    rt.queueMicrotask(jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "unistylesUpdateShadowTree"),
+        0,
+        [isShadowTreeUpdateScheduled, unistylesRuntime](jsi::Runtime& rt, const jsi::Value&, const jsi::Value*, size_t) {
+            isShadowTreeUpdateScheduled->store(false);
+
+            // pending updates belong to the runtime that replaced this one
+            if (!unistylesRuntime->ownsRegistry()) {
+                return jsi::Value::undefined();
+            }
+
+            shadow::ShadowTreeManager::updateShadowTree(rt);
+
+            return jsi::Value::undefined();
+        }
+    ));
+}
+
 jsi::Value HybridShadowRegistry::unlink(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count == 1, "Unistyles: Invalid babel transform 'ShadowRegistry unlink' expected 1 argument.");
+
+    if (!this->_unistylesRuntime->ownsRegistry()) {
+        return jsi::Value::undefined();
+    }
 
     auto shadowNodeWrapper = getShadowNodeFromRef(rt, args[0]);
 
@@ -130,6 +177,10 @@ jsi::Value HybridShadowRegistry::unlink(jsi::Runtime &rt, const jsi::Value &this
 jsi::Value HybridShadowRegistry::suspend(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count == 1, "Unistyles: Invalid babel transform 'ShadowRegistry suspend' expected 1 argument.");
 
+    if (!this->_unistylesRuntime->ownsRegistry()) {
+        return jsi::Value::undefined();
+    }
+
     auto shadowNodeWrapper = getShadowNodeFromRef(rt, args[0]);
     auto& registry = core::UnistylesRegistry::get();
 
@@ -139,6 +190,10 @@ jsi::Value HybridShadowRegistry::suspend(jsi::Runtime &rt, const jsi::Value &thi
 }
 
 jsi::Value HybridShadowRegistry::flush(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    if (!this->_unistylesRuntime->ownsRegistry()) {
+        return jsi::Value::undefined();
+    }
+
     shadow::ShadowTreeManager::updateShadowTree(rt);
 
     return jsi::Value::undefined();
@@ -146,6 +201,10 @@ jsi::Value HybridShadowRegistry::flush(jsi::Runtime &rt, const jsi::Value &thisV
 
 jsi::Value HybridShadowRegistry::setScopedTheme(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count == 1, "Unistyles: setScopedTheme expected 1 argument.");
+
+    if (!this->_unistylesRuntime->ownsRegistry()) {
+        return jsi::Value::undefined();
+    }
 
     auto& registry = core::UnistylesRegistry::get();
 
@@ -169,10 +228,68 @@ jsi::Value HybridShadowRegistry::getScopedTheme(jsi::Runtime &rt, const jsi::Val
         : jsi::Value::undefined();
 }
 
+jsi::Value HybridShadowRegistry::verify(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    return shadow::ShadowTreeDiagnostics::verify(rt, this->_unistylesRuntime);
+}
+
+jsi::Value HybridShadowRegistry::takeCommittedTags(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    auto tags = core::UnistylesRegistry::get().takeCommittedTags();
+    auto result = jsi::Array(rt, tags.size());
+
+    for (size_t i = 0; i < tags.size(); i++) {
+        result.setValueAtIndex(rt, i, jsi::Value(static_cast<double>(tags[i])));
+    }
+
+    return result;
+}
+
+jsi::Value HybridShadowRegistry::refreshReactNodes(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    helpers::assertThat(rt, count == 1 && args[0].isObject(), "Unistyles: refreshReactNodes expected to be called with an array of shadow nodes.");
+
+    auto nodes = args[0].asObject(rt).asArray(rt);
+    std::unordered_map<SurfaceId, std::shared_ptr<const RootShadowNode>> roots;
+
+    UIManagerBinding::getBinding(rt)->getUIManager().getShadowTreeRegistry().enumerate([&roots](const ShadowTree& shadowTree, bool&) {
+        roots.emplace(shadowTree.getSurfaceId(), shadowTree.getCurrentRevision().rootShadowNode);
+    });
+
+    for (size_t i = 0; i < nodes.size(rt); i++) {
+        auto node = nodes.getValueAtIndex(rt, i);
+
+        if (!node.isObject() || !node.asObject(rt).hasNativeState<ShadowNodeWrapper>(rt)) {
+            continue;
+        }
+
+        auto wrapper = node.asObject(rt).getNativeState<ShadowNodeWrapper>(rt);
+
+        // never committed, React cloned it in a render that isn't committed yet (eg. a transition that yielded)
+        // it holds what React rendered since, pointing it at the committed node would drop that
+        if (!wrapper->shadowNode->getHasBeenPromoted()) {
+            continue;
+        }
+
+        const auto& family = wrapper->shadowNode->getFamily();
+        auto rootIt = roots.find(family.getSurfaceId());
+
+        if (rootIt == roots.end()) {
+            continue;
+        }
+
+        auto ancestors = family.getAncestors(*rootIt->second);
+
+        // frozen nodes are not in the committed tree, nativeProps_DEPRECATED covers them
+        if (ancestors.empty()) {
+            continue;
+        }
+
+        const auto& [parent, index] = ancestors.back();
+
+        wrapper->shadowNode = parent.get().getChildren().at(index);
+    }
+
+    return jsi::Value::undefined();
+}
+
 std::shared_ptr<const core::ShadowNode> HybridShadowRegistry::getShadowNodeFromRef(jsi::Runtime& rt, const jsi::Value& maybeRef) {
-#if REACT_NATIVE_VERSION_MINOR >= 81
     return Bridging<std::shared_ptr<const ShadowNode>>::fromJs(rt, maybeRef);
-#else
-    return shadowNodeFromValue(rt, maybeRef);
-#endif
 }

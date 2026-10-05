@@ -40,6 +40,7 @@ export const REPLACE_WITH_UNISTYLES_EXOTIC_PATHS: Array<RemapConfig> = []
 
 /**
  * this list will additionally detect React Native direct imports
+ * RN 0.83+ exposes host components from the package root, deep imports are gone in RN 0.87+
  */
 export const NATIVE_COMPONENTS_PATHS: Pick<RemapConfig, 'imports'> = {
     imports: [
@@ -52,6 +53,18 @@ export const NATIVE_COMPONENTS_PATHS: Pick<RemapConfig, 'imports'> = {
         {
             isDefault: true,
             path: 'react-native/Libraries/Components/View/ViewNativeComponent',
+            mapTo: 'NativeView',
+        },
+        {
+            name: 'unstable_NativeText',
+            isDefault: false,
+            path: 'react-native',
+            mapTo: 'NativeText',
+        },
+        {
+            name: 'unstable_NativeView',
+            isDefault: false,
+            path: 'react-native',
             mapTo: 'NativeView',
         },
     ],

@@ -84,7 +84,34 @@ const styles = StyleSheet.create({
 })
 ```
 
-You can also use variants, breakpoints, and other Unistyles features under the `_web` key!
+You can also use breakpoints and pseudo elements under the `_web` key!
+
+Variants can't be defined inside the `_web` key, but you can place a `_web` block inside your variants instead:
+
+```ts
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        _web: {
+            // ✅ breakpoints are supported
+            display: {
+                xs: 'flex',
+                md: 'grid'
+            }
+        },
+        variants: {
+            size: {
+                large: {
+                    // ✅ web only styles inside a variant
+                    _web: {
+                        gridTemplateColumns: 'repeat(3, 1fr)'
+                    }
+                }
+            }
+        }
+    }
+})
+```
 
 ### Pseudo elements
 
