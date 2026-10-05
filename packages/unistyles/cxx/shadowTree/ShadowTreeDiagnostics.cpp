@@ -1,5 +1,7 @@
 #include "ShadowTreeDiagnostics.h"
 
+#include <array>
+#include <cstdio>
 #include <folly/Conv.h>
 #include <react/renderer/components/image/ImageProps.h>
 // ParagraphProps is platform specific and not exposed by the Android prefab
@@ -37,8 +39,26 @@ struct Mismatch {
 template <typename P>
 using VerifiedProps = std::vector<std::pair<const char*, std::string (*)(const P&)>>;
 
+// SharedColor::toString exists since React Native 0.83, same format
 std::string serialize(const SharedColor& color) {
-    return color ? color.toString() : "undefined";
+    if (!color) {
+        return "undefined";
+    }
+
+    auto components = colorComponentsFromColor(color);
+    std::array<char, 64> buffer{};
+
+    std::snprintf(
+        buffer.data(),
+        buffer.size(),
+        "rgba(%.0f, %.0f, %.0f, %g)",
+        components.red * 255.f,
+        components.green * 255.f,
+        components.blue * 255.f,
+        components.alpha
+    );
+
+    return buffer.data();
 }
 
 std::string serialize(Float value) {
