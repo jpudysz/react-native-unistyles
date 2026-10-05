@@ -12,5 +12,6 @@ static const std::string EXOTIC_STYLE_KEY = "_exotic";
 static const std::string ARGUMENTS = "__uni__args";
 static const std::string GET_STYLES = "uni__getStyles";
 static const std::string UNDEFINED_MARKER = "__unistyles_undefined__";
+static const std::string RUNTIME_REPLACED_ERROR = "Unistyles: this runtime was replaced (reload in progress)";
 
 }

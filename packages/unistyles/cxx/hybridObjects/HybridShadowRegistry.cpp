@@ -6,6 +6,11 @@ using namespace facebook::react;
 jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count == 2, "Unistyles: Invalid babel transform 'ShadowRegistry link' expected 2 arguments.");
 
+    // runtime was replaced, registry belongs to the next one
+    if (!this->_unistylesRuntime->ownsRegistry()) {
+        return jsi::Value::undefined();
+    }
+
     auto shadowNodeWrapper = getShadowNodeFromRef(rt, args[0]);
 
     std::vector<core::Unistyle::Shared> unistyleWrappers = core::unistyleFromValue(rt, args[1]);
@@ -112,6 +117,7 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
 
     registry.linkShadowNodeWithUnistyle(
         rt,
+        this->_unistylesRuntime->generation,
         shadowNodeWrapper->getFamilyShared(),
         unistylesData,
         std::move(initialScopedUpdate)
@@ -130,13 +136,20 @@ void HybridShadowRegistry::scheduleShadowTreeUpdate(jsi::Runtime& rt) {
     }
 
     auto isShadowTreeUpdateScheduled = this->_isShadowTreeUpdateScheduled;
+    auto unistylesRuntime = this->_unistylesRuntime;
 
     rt.queueMicrotask(jsi::Function::createFromHostFunction(
         rt,
         jsi::PropNameID::forAscii(rt, "unistylesUpdateShadowTree"),
         0,
-        [isShadowTreeUpdateScheduled](jsi::Runtime& rt, const jsi::Value&, const jsi::Value*, size_t) {
+        [isShadowTreeUpdateScheduled, unistylesRuntime](jsi::Runtime& rt, const jsi::Value&, const jsi::Value*, size_t) {
             isShadowTreeUpdateScheduled->store(false);
+
+            // pending updates belong to the runtime that replaced this one
+            if (!unistylesRuntime->ownsRegistry()) {
+                return jsi::Value::undefined();
+            }
+
             shadow::ShadowTreeManager::updateShadowTree(rt);
 
             return jsi::Value::undefined();
@@ -146,6 +159,10 @@ void HybridShadowRegistry::scheduleShadowTreeUpdate(jsi::Runtime& rt) {
 
 jsi::Value HybridShadowRegistry::unlink(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count == 1, "Unistyles: Invalid babel transform 'ShadowRegistry unlink' expected 1 argument.");
+
+    if (!this->_unistylesRuntime->ownsRegistry()) {
+        return jsi::Value::undefined();
+    }
 
     auto shadowNodeWrapper = getShadowNodeFromRef(rt, args[0]);
 
@@ -159,6 +176,10 @@ jsi::Value HybridShadowRegistry::unlink(jsi::Runtime &rt, const jsi::Value &this
 jsi::Value HybridShadowRegistry::suspend(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count == 1, "Unistyles: Invalid babel transform 'ShadowRegistry suspend' expected 1 argument.");
 
+    if (!this->_unistylesRuntime->ownsRegistry()) {
+        return jsi::Value::undefined();
+    }
+
     auto shadowNodeWrapper = getShadowNodeFromRef(rt, args[0]);
     auto& registry = core::UnistylesRegistry::get();
 
@@ -168,6 +189,10 @@ jsi::Value HybridShadowRegistry::suspend(jsi::Runtime &rt, const jsi::Value &thi
 }
 
 jsi::Value HybridShadowRegistry::flush(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    if (!this->_unistylesRuntime->ownsRegistry()) {
+        return jsi::Value::undefined();
+    }
+
     shadow::ShadowTreeManager::updateShadowTree(rt);
 
     return jsi::Value::undefined();
@@ -175,6 +200,10 @@ jsi::Value HybridShadowRegistry::flush(jsi::Runtime &rt, const jsi::Value &thisV
 
 jsi::Value HybridShadowRegistry::setScopedTheme(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
     helpers::assertThat(rt, count == 1, "Unistyles: setScopedTheme expected 1 argument.");
+
+    if (!this->_unistylesRuntime->ownsRegistry()) {
+        return jsi::Value::undefined();
+    }
 
     auto& registry = core::UnistylesRegistry::get();
 
