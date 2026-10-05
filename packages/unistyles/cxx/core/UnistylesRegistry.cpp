@@ -9,7 +9,13 @@ using namespace facebook::react;
 
 std::atomic<int> core::UnistylesRegistry::_nextStyleSheetTag{0};
 
-void core::UnistylesRegistry::registerTheme(jsi::Runtime& rt, std::string name, jsi::Value& theme) {
+void core::UnistylesRegistry::registerTheme(jsi::Runtime& rt, uint64_t generation, std::string name, jsi::Value& theme) {
+    std::lock_guard<std::mutex> lock(this->_ownershipMutex);
+
+    if (!this->isCurrent(generation)) {
+        throw std::runtime_error(helpers::RUNTIME_REPLACED_ERROR);
+    }
+
     auto& state = this->getState();
 
     state._jsThemes.emplace(name, std::move(theme));
@@ -46,7 +52,7 @@ void core::UnistylesRegistry::createState() {
     this->_state = std::make_unique<UnistylesState>();
 }
 
-void core::UnistylesRegistry::updateTheme(jsi::Runtime& rt, std::string& themeName, jsi::Function&& callback) {
+void core::UnistylesRegistry::updateTheme(jsi::Runtime& rt, uint64_t generation, std::string& themeName, jsi::Function&& callback) {
     auto& state = this->getState();
     auto it = state._jsThemes.find(themeName);
 
@@ -56,17 +62,30 @@ void core::UnistylesRegistry::updateTheme(jsi::Runtime& rt, std::string& themeNa
 
     helpers::assertThat(rt, result.isObject(), "Unistyles: Returned theme is not an object. Please check your updateTheme function.");
 
-    it->second = result.asObject(rt);
+    auto theme = result.asObject(rt);
+    std::lock_guard<std::mutex> lock(this->_ownershipMutex);
+
+    if (!this->isCurrent(generation)) {
+        throw std::runtime_error(helpers::RUNTIME_REPLACED_ERROR);
+    }
+
+    it->second = std::move(theme);
 }
 
 void core::UnistylesRegistry::linkShadowNodeWithUnistyle(
     jsi::Runtime& rt,
+    uint64_t generation,
     const std::shared_ptr<const ShadowNodeFamily>& shadowNodeFamily,
     std::vector<std::shared_ptr<UnistyleData>>& unistylesData,
     std::optional<folly::dynamic> initialScopedUpdate
 ) {
     // released after unlocking, so a family destructor never runs within the lock
     ReleasedFamilies releasedFamilies;
+    std::lock_guard<std::mutex> lock(this->_ownershipMutex);
+
+    if (!this->isCurrent(generation)) {
+        return;
+    }
 
     this->trafficController.withLock([this, &unistylesData, &shadowNodeFamily, &initialScopedUpdate, &releasedFamilies](){
         auto family = shadowNodeFamily.get();
@@ -183,7 +202,13 @@ bool core::UnistylesRegistry::isSuspended(const ShadowNodeFamily* family) const 
     return it != this->_shadowRegistry.end() && it->second.isSuspended;
 }
 
-std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(jsi::Runtime& rt, core::StyleSheetType type, jsi::Object&& rawValue) {
+std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(jsi::Runtime& rt, uint64_t generation, core::StyleSheetType type, jsi::Object&& rawValue) {
+    std::lock_guard<std::mutex> lock(this->_ownershipMutex);
+
+    if (!this->isCurrent(generation)) {
+        throw std::runtime_error(helpers::RUNTIME_REPLACED_ERROR);
+    }
+
     int tag = _nextStyleSheetTag.fetch_add(1);
 
     auto sheet = std::make_shared<core::StyleSheet>(tag, type, std::move(rawValue));
@@ -335,28 +360,56 @@ void core::UnistylesRegistry::setScopedTheme(std::optional<std::string> themeNam
     this->_scopedTheme = std::move(themeName);
 }
 
-void core::UnistylesRegistry::destroy() {
+uint64_t core::UnistylesRegistry::takeOwnership() {
+    std::lock_guard<std::mutex> lock(this->_ownershipMutex);
+    auto previousGeneration = this->_generation.load();
+
+    if (previousGeneration != 0) {
+        this->_replacedStates[previousGeneration] = this->takeOwnedState();
+    }
+
+    this->_generation.store(++this->_lastGeneration);
+
+    return this->_lastGeneration;
+}
+
+void core::UnistylesRegistry::releaseOwnership(uint64_t generation) {
     // called when module is invalidated, before React Native destroys the runtime
-    // pins must be released now, as families hold JS handles that can't outlive the runtime
-    ReleasedFamilies releasedFamilies;
+    // declared before the lock, so jsi values and pins are released after unlocking
+    OwnedState releasedState;
+    std::lock_guard<std::mutex> lock(this->_ownershipMutex);
 
-    this->trafficController.withLock([this, &releasedFamilies](){
-        for (auto& [_, linkedFamily] : this->_shadowRegistry) {
-            releasedFamilies.emplace_back(std::move(linkedFamily.family));
-        }
+    if (this->isCurrent(generation)) {
+        releasedState = this->takeOwnedState();
+        this->_generation.store(0);
 
-        for (auto& [_, pendingUpdate] : this->trafficController.takeUpdates()) {
-            releasedFamilies.emplace_back(std::move(pendingUpdate.family));
-        }
+        return;
+    }
 
-        this->_shadowRegistry.clear();
+    auto it = this->_replacedStates.find(generation);
+
+    if (it != this->_replacedStates.end()) {
+        releasedState = std::move(it->second);
+        this->_replacedStates.erase(it);
+    }
+}
+
+core::UnistylesRegistry::OwnedState core::UnistylesRegistry::takeOwnedState() {
+    OwnedState ownedState;
+
+    this->trafficController.withLock([this, &ownedState](){
+        ownedState.shadowRegistry = std::exchange(this->_shadowRegistry, {});
+        ownedState.updates = this->trafficController.takeUpdates();
         this->_sweepThreshold = MIN_SWEEP_THRESHOLD;
     });
 
-    this->_state.reset();
-    this->_styleSheetRegistry.clear();
+    ownedState.styleSheets = std::exchange(this->_styleSheetRegistry, {});
+    ownedState.state = std::move(this->_state);
     this->_scopedTheme = std::nullopt;
+    this->_committedTags.clear();
     _nextStyleSheetTag.store(0);
+
+    return ownedState;
 }
 
 std::vector<core::LinkedFamilySnapshot> core::UnistylesRegistry::getLinkedFamiliesSnapshot() {

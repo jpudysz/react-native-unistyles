@@ -6,7 +6,9 @@
 
 using namespace margelo::nitro;
 
-@implementation UnistylesModule
+@implementation UnistylesModule {
+    uint64_t _generation;
+}
 
 RCT_EXPORT_MODULE(Unistyles)
 
@@ -16,6 +18,9 @@ RCT_EXPORT_MODULE(Unistyles)
 
 - (void)installJSIBindingsWithRuntime:(jsi::Runtime&)rt callInvoker:(const std::shared_ptr<facebook::react::CallInvoker> &)callInvoker {
     // function is called on: first init and every live reload
+    // newest runtime owns the registry, previous runtime's state is kept until it releases ownership
+    _generation = core::UnistylesRegistry::get().takeOwnership();
+
     // check if this is live reload, if so let's replace UnistylesRuntime with new runtime
     auto hasUnistylesRuntime = HybridObjectRegistry::hasHybridObject("UnistylesRuntime");
 
@@ -34,7 +39,7 @@ RCT_EXPORT_MODULE(Unistyles)
     };
 
     auto nativePlatform = Unistyles::NativePlatform::create().getCxxPart();
-    auto unistylesRuntime = std::make_shared<HybridUnistylesRuntime>(nativePlatform, runOnJSThread);
+    auto unistylesRuntime = std::make_shared<HybridUnistylesRuntime>(nativePlatform, runOnJSThread, _generation);
     auto styleSheet = std::make_shared<HybridStyleSheet>(unistylesRuntime);
 
     HybridObjectRegistry::registerHybridObjectConstructor("UnistylesRuntime", [unistylesRuntime]() -> std::shared_ptr<HybridObject>{
@@ -53,7 +58,8 @@ RCT_EXPORT_MODULE(Unistyles)
 }
 
 - (void)invalidate {
-    core::UnistylesRegistry::get().destroy();
+    // releases this runtime's state, also when a newer runtime already replaced it
+    core::UnistylesRegistry::get().releaseOwnership(_generation);
 
     [super invalidate];
 }
