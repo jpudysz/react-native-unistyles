@@ -61,6 +61,11 @@ std::string serialize(const SharedColor& color) {
     return buffer.data();
 }
 
+// ImageProps::tintColor is optional since React Native 0.88, unused before
+[[maybe_unused]] std::string serialize(const std::optional<SharedColor>& color) {
+    return color ? serialize(*color) : "undefined";
+}
+
 std::string serialize(Float value) {
     return folly::to<std::string>(value);
 }
