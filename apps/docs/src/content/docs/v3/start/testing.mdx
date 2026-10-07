@@ -65,10 +65,6 @@ If `StyleSheet.configure` is called from a design system package rather than you
 }
 ```
 
-<Aside type="caution">
-Never `moduleNameMapper` `react-native-unistyles` to a custom mock. The official mocks are registered with `jest.mock()` inside `react-native-unistyles/mocks`, and a mapper replaces the whole package, silently dropping the `react-native-nitro-modules` and `react-native-unistyles/reanimated` stubs along with it.
-</Aside>
-
 ### Babel Plugin
 
 The Babel plugin is automatically disabled in the `jest` test environment or when `NODE_ENV === 'test'`.
