@@ -51,6 +51,20 @@ Extend the configuration from the previous step by including the file where you 
 You must include configuration file **after** the mocks as they provide all necessary stubs for `StyleSheet.configure`.
 </Aside>
 
+If `StyleSheet.configure` is called from a design system package rather than your app, point `setupFiles` at that package's entry instead of a local file:
+
+```tsx title="package.json"
+{
+    "jest": {
+        "preset": "jest-expo",
+        "setupFiles": [
+            "react-native-unistyles/mocks",
+            "@your-ds/unistyles" // wherever StyleSheet.configure is actually called
+        ]
+    }
+}
+```
+
 ### Babel Plugin
 
 The Babel plugin is a no-op when `NODE_ENV === 'test'` (Jest sets this by default).

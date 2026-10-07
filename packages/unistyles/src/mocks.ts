@@ -11,6 +11,10 @@ type Registry = {
     breakpoints: UnistylesBreakpoints
 }
 
+type GlobalWithRegistry = typeof globalThis & {
+    __UNISTYLES_MOCK_REGISTRY__?: Registry
+}
+
 jest.mock('react-native-nitro-modules', () => ({
     NitroModules: {
         createHybridObject: () => ({
@@ -26,10 +30,10 @@ jest.mock('react-native-nitro-modules', () => ({
 
 jest.mock('react-native-unistyles', () => {
     const React = require('react')
-    const _REGISTRY: Registry = {
+    const _REGISTRY = ((globalThis as GlobalWithRegistry).__UNISTYLES_MOCK_REGISTRY__ ??= {
         themes: {},
         breakpoints: {},
-    }
+    })
     const miniRuntime = {
         themeName: undefined,
         breakpoint: undefined,
