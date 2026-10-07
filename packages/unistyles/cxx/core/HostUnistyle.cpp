@@ -23,7 +23,19 @@ HostUnistyle::~HostUnistyle() {
     }
 }
 
+bool HostUnistyle::isWorkletRuntime(jsi::Runtime& rt) {
+    auto isWorklet = rt.global().getProperty(rt, "_WORKLET");
+
+    return isWorklet.isBool() && isWorklet.getBool();
+}
+
 jsi::Value HostUnistyle::get(jsi::Runtime& rt, const jsi::PropNameID& propNameId) {
+    // worklets share host objects with other runtimes, eg. when useAnimatedStyle captures `styles`
+    // cached styles and unistyles hold values of our runtime, reading them from another one corrupts both heaps
+    if (&rt != this->_runtime && this->isWorkletRuntime(rt)) {
+        throw jsi::JSError(rt, helpers::WORKLET_ACCESS_ERROR);
+    }
+
     auto propertyName = propNameId.utf8(rt);
 
     if (propertyName == helpers::STYLESHEET_ID.c_str()) {
@@ -114,7 +126,7 @@ jsi::Function HostUnistyle::createAddVariantsProxyFunction(jsi::Runtime& rt) {
             }
         });
 
-        auto style = std::make_shared<core::HostUnistyle>(stylesheetCopy, this->_unistylesRuntime, variants, true);
+        auto style = std::make_shared<core::HostUnistyle>(rt, stylesheetCopy, this->_unistylesRuntime, variants, true);
         auto styleHostObject = jsi::Object::createFromHostObject(rt, style);
 
         return styleHostObject;

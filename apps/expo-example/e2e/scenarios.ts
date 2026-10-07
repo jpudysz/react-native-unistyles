@@ -154,6 +154,7 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.push('/animations')
         await a.act('animations.move')
         await a.expect('animations.variant-color')
+        await a.expect('animations.worklet-styles')
         await a.push('/basics')
         await a.push('/variants')
         await a.flip('dark')
