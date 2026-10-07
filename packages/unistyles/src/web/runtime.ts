@@ -76,11 +76,14 @@ export class UnistylesRuntime {
     }
 
     get orientation() {
-        // `screen.orientation` is undefined in browsers without the Screen
-        // Orientation API (e.g. iOS Safari <= 16.3). Guard it so the runtime
-        // does not throw during initialization on those browsers.
-        if (isServer() || !screen.orientation) {
+        if (isServer()) {
             return Orientation.Portrait
+        }
+
+        // `screen.orientation` is undefined in browsers without the Screen
+        // Orientation API (e.g. iOS Safari <= 16.3), fall back to the viewport
+        if (!screen.orientation) {
+            return window.matchMedia('(orientation: portrait)').matches ? Orientation.Portrait : Orientation.Landscape
         }
 
         return screen.orientation.type.includes('portrait') ? Orientation.Portrait : Orientation.Landscape
