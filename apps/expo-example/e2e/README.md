@@ -46,7 +46,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `suspense`            | suspend and resume a Suspense boundary around theme changes                | #1260, per-view styles restored by Suspense (d5f8a851)   |
 | `activity`            | theme changes and new arguments while `<Activity>` hides content           | hidden content that keeps rendering, shown again         |
 | `frozen-list`         | a 300 row screen frozen and restored, with a theme change while frozen      | #1252, restoring a frozen screen blocked JS for seconds  |
-| `animated-variant`    | `useAnimatedVariantColor` restored from a frozen stack after a theme change | a reveal re-applying the color of the last render        |
+| `animated-variant`    | `useAnimatedVariantColor` restored from a frozen stack after a theme change, `styles` read from the UI runtime | a reveal re-applying the color of the last render, #1213 |
 | `frozen-unmount`      | log out with frozen steps, churn memory, log in, unfreeze, theme change    | #1217 / #1179, families unmounted while frozen (9afc15b6) |
 | `scoped`              | theme changes, adaptive themes and a late mounted scope on `scoped-theme`  | scoped theme resolution                                  |
 | `variants-after-flip` | variant changes after theme changes                                       | variants with fresh theme values                         |
@@ -103,7 +103,7 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
 ## Mutation check
 
 Each fix was reverted (or its mechanism disabled) in a Release build and the suite failed with a report pointing at
-the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 to M11 added 2026-10-03 on iOS and Android, M12 and M13 added 2026-10-05):
+the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 to M11 added 2026-10-03 on iOS and Android, M12 and M13 added 2026-10-05, M14 added 2026-10-06):
 
 | mutation                                                                                   | caught by                                                         | first failure                                                                                   |
 | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
@@ -121,6 +121,7 @@ the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 t
 | M11 `add` links only the first unistyle of an object RN Animated flattened from an array     | `shared-dynamic-fn`, `mount-after-flip`, `set-theme-on-mount` (iOS and Android) | overlay probe `native-animated` expected `#ffffff` (dark) actual `#1b1b1f` (light), 0 mismatches |
 | M12 TouchableHighlight linked like a View, its underlay re-render commits the style React rendered last | `touchable-highlight`, `interactions` (both reverted: 153 failures on iOS and Android, M12 alone 147 on iOS) | `View 'highlight' backgroundColor expected <premium secondary> actual <light secondary>` after a press |
 | M13 a scoped `link` of a mounted node queues its update without committing it               | `touchable-highlight`, `interactions` (iOS, 12 failures)          | scoped `View 'highlight' backgroundColor expected <dark secondary> actual <light secondary>`, `pendingUpdates expected 0 actual 1` |
+| M14 no worklet runtime guard in `HostUnistyle::get` (#1213), a worklet reads RN runtime values | `animated-variant` (iOS and Android, Android 3 of 3 runs crash)    | iOS `worklet access expected Unistyles worklet error actual no error, width undefined`, Android SIGSEGV on `mqt_v_js` |
 
 #1266 can't be reverted as a whole, `verify()` reads the registry it introduced, so M4a and M4b disable its two
 mechanisms. The use after free itself (#1217, #1179) only crashes with freed families, which needs a Release build with

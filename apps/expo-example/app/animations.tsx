@@ -4,6 +4,7 @@ import { Animated as RNAnimated, processColor, Text } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
 import { useAnimatedTheme, useAnimatedVariantColor } from 'react-native-unistyles/reanimated'
+import { runOnUISync } from 'react-native-worklets'
 import { Button, Screen, Section } from '../components'
 import { useE2EAction } from '../e2e/actions'
 import { themes, type ThemeName } from '../themes'
@@ -45,6 +46,23 @@ export default function AnimationsScreen() {
         return processColor(actual) === processColor(expected)
             ? undefined
             : { styleKey: 'variantBox', prop: 'animated backgroundColor', expected, actual: String(actual) }
+    })
+    // A worklet that captures `styles` reads the StyleSheet from the UI runtime, it must throw instead of handing out
+    // objects of the RN runtime (#1213, memory corruption and crashes)
+    useE2EAction('animations.worklet-styles', () => {
+        const actual = runOnUISync(() => {
+            'worklet'
+
+            try {
+                return `no error, width ${styles.moving.width}`
+            } catch (error) {
+                return error instanceof Error ? error.message : String(error)
+            }
+        })
+
+        return actual.startsWith('Unistyles: styles can\'t be read inside a worklet')
+            ? undefined
+            : { styleKey: 'moving', prop: 'worklet access', expected: 'Unistyles worklet error', actual }
     })
 
     return (
