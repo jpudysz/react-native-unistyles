@@ -1,12 +1,13 @@
 import type { PressableProps as Props, View } from 'react-native'
 
-import React, { forwardRef, useLayoutEffect, useRef } from 'react'
+import React, { forwardRef, useContext, useLayoutEffect, useRef } from 'react'
 import { Pressable as NativePressableReactNative } from 'react-native'
 
 import type { Nullable } from '../../types'
 
 import { passForwardedRef } from '../../core'
 import { UnistylesShadowRegistry } from '../../specs'
+import { ScopedThemeContext } from '../ScopedThemeContext'
 
 // instance type of View for both legacy and Strict TypeScript API (RN 0.87+)
 type ViewRef = React.ComponentRef<typeof View>
@@ -34,7 +35,7 @@ export const Pressable: React.ForwardRefExoticComponent<PressableProps & React.R
     PressableProps
 >(({ variants, style, ...props }, forwardedRef) => {
     const storedRef = useRef<Nullable<ViewRef>>(null)
-    const scopedTheme = UnistylesShadowRegistry.getScopedTheme()
+    const scope = useContext(ScopedThemeContext)
 
     useLayoutEffect(() => {
         return () => {
@@ -63,7 +64,7 @@ export const Pressable: React.ForwardRefExoticComponent<PressableProps & React.R
                     forwardedRef,
                     () => {
                         // @ts-expect-error - this is hidden from TS
-                        UnistylesShadowRegistry.add(ref, unistyles)
+                        UnistylesShadowRegistry.add(ref, unistyles, scope)
                     },
                     () => {
                         // @ts-expect-error - this is hidden from TS
@@ -75,11 +76,13 @@ export const Pressable: React.ForwardRefExoticComponent<PressableProps & React.R
                 const isPropStyleAFunction = typeof style === 'function'
                 const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
 
-                UnistylesShadowRegistry.setScopedTheme(scopedTheme)
+                UnistylesShadowRegistry.setScopedTheme(scope?.name)
 
                 const unistyles = isPropStyleAFunction
                     ? style.call(style, state)
                     : getStyles(style as unknown as Record<string, any>)
+
+                UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
 
                 if (!storedRef.current) {
                     return unistyles
@@ -89,9 +92,7 @@ export const Pressable: React.ForwardRefExoticComponent<PressableProps & React.R
                 UnistylesShadowRegistry.remove(storedRef.current)
 
                 // @ts-expect-error - this is hidden from TS
-                UnistylesShadowRegistry.add(storedRef.current, unistyles)
-
-                UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
+                UnistylesShadowRegistry.add(storedRef.current, unistyles, scope)
 
                 return unistyles
             }}

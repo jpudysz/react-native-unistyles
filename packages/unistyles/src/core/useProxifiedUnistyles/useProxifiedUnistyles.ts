@@ -1,8 +1,9 @@
-import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
+import { useContext, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
 
 import type { UnistylesTheme } from '../../types'
 
-import { type UnistylesMiniRuntime, UnistylesRuntime, UnistylesShadowRegistry } from '../../specs'
+import { ScopedThemeContext } from '../../components/ScopedThemeContext'
+import { type UnistylesMiniRuntime, UnistylesRuntime } from '../../specs'
 // It's imported that way because of circular dependency
 import { UnistyleDependency } from '../../specs/NativePlatform'
 import { listener } from './listener'
@@ -29,10 +30,9 @@ const RTDependencyMap = {
     rtl: UnistyleDependency.Rtl,
 } satisfies Partial<Record<keyof UnistylesMiniRuntime, UnistyleDependency>>
 
-export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
-    const [scopedTheme, setScopedTheme] = useState(
-        forcedTheme ?? (UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme),
-    )
+export const useProxifiedUnistyles = () => {
+    const scope = useContext(ScopedThemeContext)
+    const [scopedTheme, setScopedTheme] = useState(scope?.name as UnistylesTheme)
     const [dependencies] = useState(() => new Set<number>())
     const [theme, setTheme] = useState(UnistylesRuntime.getTheme(scopedTheme))
     const [_, runtimeChanged] = useReducer(() => ({}), {})
@@ -68,10 +68,11 @@ export const useProxifiedUnistyles = (forcedTheme?: UnistylesTheme) => {
         }
     }, [disposeRef])
 
-    const maybeNewScopedTheme = UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme
-
-    if (scopedTheme && maybeNewScopedTheme && scopedTheme !== maybeNewScopedTheme) {
-        setScopedTheme(maybeNewScopedTheme)
+    // Follow the closest ScopedTheme, `reset` included. Every ScopedTheme provides the context, so the registry isn't read:
+    // a suspended ScopedTheme can leave its theme there
+    if (scope && scopedTheme !== scope.name) {
+        setScopedTheme(scope.name as UnistylesTheme)
+        setTheme(UnistylesRuntime.getTheme(scope.name as UnistylesTheme))
     }
 
     const proxifiedTheme = new Proxy(theme, {

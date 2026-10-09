@@ -1,8 +1,16 @@
-import React, { forwardRef, useEffect, useRef, type ComponentProps, type ComponentRef, type ComponentType } from 'react'
+import React, {
+    forwardRef,
+    useContext,
+    useEffect,
+    type ComponentProps,
+    type ComponentRef,
+    type ComponentType,
+} from 'react'
 
-import type { UnistylesTheme, UnistylesValues } from '../../types'
+import type { UnistylesValues } from '../../types'
 import type { Mappings } from './types'
 
+import { ScopedThemeContext } from '../../components/ScopedThemeContext'
 import { type UnistyleDependency, UnistylesShadowRegistry } from '../../specs'
 import { deepMergeObjects } from '../../utils'
 import { useProxifiedUnistyles } from '../useProxifiedUnistyles'
@@ -72,8 +80,8 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         // prettier-ignore
         maybeWarnAboutMultipleUnistyles(narrowedProps.contentContainerStyle, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
 
-        const scopedTheme = useRef(UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme)
-        const { proxifiedRuntime, proxifiedTheme, addDependencies } = useProxifiedUnistyles(scopedTheme.current)
+        const scope = useContext(ScopedThemeContext)
+        const { proxifiedRuntime, proxifiedTheme, addDependencies } = useProxifiedUnistyles()
 
         // Always track Theme dependency — accessing any property on proxifiedTheme
         // triggers the Proxy get trap which adds Theme to the dependency Set
@@ -93,8 +101,19 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
             ? narrowedProps.uniProps(proxifiedTheme, proxifiedRuntime)
             : {}
 
+        // styles resolve in the registry's scoped theme, which is already restored when this re-renders or mounts later
+        const previousScopedTheme = scope ? UnistylesShadowRegistry.getScopedTheme() : undefined
+
+        if (scope) {
+            UnistylesShadowRegistry.setScopedTheme(scope.name)
+        }
+
         const styleSecrets = getSecrets(narrowedProps.style)
         const contentContainerStyleSecrets = getSecrets(narrowedProps.contentContainerStyle)
+
+        if (scope) {
+            UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
+        }
 
         const finalProps = {
             ...deepMergeObjects(mappingsProps, unistyleProps, props),
