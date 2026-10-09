@@ -760,6 +760,7 @@ function extractVariants(path2, state) {
   const rest = path2.node.body.slice(pathIndex + 1);
   const statement = t5.blockStatement([finalDeclaration, ...rest]);
   path2.node.body = [...path2.node.body.slice(0, pathIndex), shadowDeclaration, statement];
+  path2.scope.crawl();
   state.file.hasVariants = true;
 }
 
