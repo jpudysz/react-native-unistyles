@@ -31,6 +31,28 @@ type MappedSecrets = {
     dependencies: Array<UnistyleDependency>
 }
 
+export const getSecrets = (styleProps: Record<string, any> = {}): MappedSecrets => {
+    const styles = Array.isArray(styleProps) ? styleProps.flat(Infinity) : [styleProps]
+
+    const secrets: Array<UnistylesSecrets> = styles.filter(Boolean).reduce((acc, style) => {
+        const unistyleKey = Object.keys(style).find((key) => key.startsWith('unistyles_'))
+
+        return acc.concat([
+            unistyleKey
+                ? style[unistyleKey]
+                : {
+                      uni__getStyles: () => style,
+                      uni__dependencies: [],
+                  },
+        ])
+    }, [])
+
+    return {
+        styles: secrets.reduce((acc, secret) => Object.assign(acc, secret.uni__getStyles()), {} as Record<string, any>),
+        dependencies: secrets.flatMap((secret) => secret.uni__dependencies),
+    }
+}
+
 export const withUnistyles = <TComponent, TMappings extends GenericComponentProps<TComponent>>(
     Component: TComponent,
     mappings?: Mappings<TMappings>,
@@ -42,31 +64,6 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
     type UnistyleStyles = {
         style?: UnistylesValues
         contentContainerStyle?: UnistylesValues
-    }
-
-    const getSecrets = (styleProps: Record<string, any> = {}): MappedSecrets => {
-        const styles = Array.isArray(styleProps) ? styleProps.flat() : [styleProps]
-
-        const secrets: Array<UnistylesSecrets> = styles.filter(Boolean).reduce((acc, style) => {
-            const unistyleKey = Object.keys(style).find((key) => key.startsWith('unistyles_'))
-
-            return acc.concat([
-                unistyleKey
-                    ? style[unistyleKey]
-                    : {
-                          uni__getStyles: () => style,
-                          uni__dependencies: [],
-                      },
-            ])
-        }, [])
-
-        return {
-            styles: secrets.reduce(
-                (acc, secret) => Object.assign(acc, secret.uni__getStyles()),
-                {} as Record<string, any>,
-            ),
-            dependencies: secrets.flatMap((secret) => secret.uni__dependencies),
-        }
     }
 
     return forwardRef<GenericComponentRef<TComponent>, PropsWithUnistyles>((props, ref) => {
