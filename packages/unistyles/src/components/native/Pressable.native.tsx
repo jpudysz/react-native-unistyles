@@ -82,6 +82,8 @@ export const Pressable: React.ForwardRefExoticComponent<PressableProps & React.R
                     ? style.call(style, state)
                     : getStyles(style as unknown as Record<string, any>)
 
+                UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
+
                 if (!storedRef.current) {
                     return unistyles
                 }
@@ -90,9 +92,7 @@ export const Pressable: React.ForwardRefExoticComponent<PressableProps & React.R
                 UnistylesShadowRegistry.remove(storedRef.current)
 
                 // @ts-expect-error - this is hidden from TS
-                UnistylesShadowRegistry.add(storedRef.current, unistyles)
-
-                UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
+                UnistylesShadowRegistry.add(storedRef.current, unistyles, scope)
 
                 return unistyles
             }}
