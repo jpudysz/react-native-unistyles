@@ -42,6 +42,7 @@ Pod::Spec.new do |s|
     end
 
     add_dependency(s, "React-rendererconsistency", :framework_name => "React_rendererconsistency")
+    add_dependency(s, "React-FabricComponents")
   end
 
   load "nitrogen/generated/ios/Unistyles+autolinking.rb"
