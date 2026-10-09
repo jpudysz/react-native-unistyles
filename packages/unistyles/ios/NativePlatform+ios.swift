@@ -120,8 +120,10 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
                     return cachedRuntime.screen;
                 }
                 
-                // this should never happen, but it's better to return zeros
-                return Dimensions(width: 0, height: 0)
+                // when the app is launched in the background there is no foreground window yet, fall back to the screen
+                let screenSize = UIScreen.main.bounds.size
+
+                return Dimensions(width: screenSize.width, height: screenSize.height)
             }
 
             let width = windowFrame.size.width
@@ -280,8 +282,8 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
                     return cachedRuntime.pixelRatio;
                 }
                 
-                // this should never happen, but it's better to return default
-                return 1
+                // when the app is launched in the background there is no foreground window yet, fall back to the screen
+                return UIScreen.main.scale
             }
 
             return window.screen.scale
