@@ -196,12 +196,11 @@ HybridShadowRegistry.add = (handle, styles, scope) => {
         return
     }
 
-    const stylesArray = Array.isArray(styles) ? styles.flat() : [styles]
+    const stylesArray = Array.isArray(styles) ? styles.flat(Infinity) : [styles]
 
     // filter styles that are undefined or with no keys
     const filteredStyles = stylesArray
         .filter((style) => style && Object.keys(style).length > 0)
-        .flat()
         .filter(Boolean)
         .flatMap(splitMergedUnistyles)
 
