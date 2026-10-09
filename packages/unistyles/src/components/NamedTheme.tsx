@@ -1,11 +1,13 @@
 import type { PropsWithChildren } from 'react'
 
-import React, { useLayoutEffect } from 'react'
+import React, { useLayoutEffect, useMemo } from 'react'
 
 import type { UnistylesThemes } from '../global'
 
 import { UnistylesShadowRegistry } from '../specs'
 import { ApplyScopedTheme } from './ApplyScopedTheme'
+import { scopeChildren } from './scopeChildren'
+import { ScopedThemeContext } from './ScopedThemeContext'
 
 interface NamedThemeProps extends PropsWithChildren {
     name: keyof UnistylesThemes | undefined
@@ -13,9 +15,13 @@ interface NamedThemeProps extends PropsWithChildren {
 }
 
 export const NamedTheme: React.FunctionComponent<NamedThemeProps> = ({ name, children, previousScopedTheme }) => {
+    const scope = useMemo(() => ({ name }), [name])
+
     const mappedChildren = [
         <ApplyScopedTheme key="apply" name={name} />,
-        children,
+        <ScopedThemeContext.Provider key="scope" value={scope}>
+            {scopeChildren(name, children)}
+        </ScopedThemeContext.Provider>,
         <ApplyScopedTheme key="dispose" name={previousScopedTheme as keyof UnistylesThemes | undefined} />,
     ]
 

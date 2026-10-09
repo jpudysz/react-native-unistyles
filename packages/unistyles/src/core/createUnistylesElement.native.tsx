@@ -1,7 +1,8 @@
 import type { ScrollView } from 'react-native'
 
-import React, { useRef } from 'react'
+import React, { useContext, useRef } from 'react'
 
+import { ScopedThemeContext } from '../components/ScopedThemeContext'
 import { UnistylesShadowRegistry } from '../specs'
 import { copyComponentProperties } from '../utils'
 import { passForwardedRef } from './passForwardRef'
@@ -10,6 +11,7 @@ import { maybeWarnAboutMultipleUnistyles } from './warn'
 export const createUnistylesElement = (Component: any) => {
     const UnistylesComponent = (props: any) => {
         const scrollViewRef = useRef<ScrollView>(null)
+        const scope = useContext(ScopedThemeContext)
 
         return (
             <Component
@@ -38,7 +40,7 @@ export const createUnistylesElement = (Component: any) => {
                         props.ref,
                         () => {
                             // @ts-ignore this is hidden from TS
-                            UnistylesShadowRegistry.add(ref, props.style)
+                            UnistylesShadowRegistry.add(ref, props.style, scope)
                         },
                         () => {
                             // @ts-ignore this is hidden from TS

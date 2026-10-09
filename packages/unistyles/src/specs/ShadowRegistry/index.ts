@@ -1,5 +1,6 @@
 import { NitroModules } from 'react-native-nitro-modules'
 
+import type { Scope } from '../../components/ScopedThemeContext'
 import type { VerifyReport } from '../../diagnostics/types'
 import type { UnistylesShadowRegistry as UnistylesShadowRegistrySpec } from './ShadowRegistry.nitro'
 import type { ShadowNode, Unistyle, ViewHandle } from './types'
@@ -8,7 +9,7 @@ import { StyleSheet } from '../StyleSheet'
 
 interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     // Babel API
-    add(handle?: ViewHandle, styles?: Array<Unistyle>): void
+    add(handle?: ViewHandle, styles?: Array<Unistyle>, scope?: Scope | null): void
     remove(handle?: ViewHandle): void
     // JSI
     link(node: ShadowNode, styles?: Array<Unistyle>): void
@@ -189,7 +190,7 @@ const splitMergedUnistyles = (style: any) => {
     return style
 }
 
-HybridShadowRegistry.add = (handle, styles) => {
+HybridShadowRegistry.add = (handle, styles, scope) => {
     // virtualized nodes can be null
     if (!handle || !styles) {
         return
@@ -213,7 +214,19 @@ HybridShadowRegistry.add = (handle, styles) => {
             )
         }
 
+        // the view can link after its ScopedTheme rendered, when the registry is already restored
+        const previousScopedTheme = scope ? HybridShadowRegistry.getScopedTheme() : undefined
+
+        if (scope) {
+            HybridShadowRegistry.setScopedTheme(scope.name)
+        }
+
         HybridShadowRegistry.link(node, filteredStyles)
+
+        if (scope) {
+            HybridShadowRegistry.setScopedTheme(previousScopedTheme)
+        }
+
         trackHandle(handle)
     }
 }

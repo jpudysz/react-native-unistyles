@@ -48,7 +48,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `frozen-list`         | a 300 row screen frozen and restored, with a theme change while frozen      | #1252, restoring a frozen screen blocked JS for seconds  |
 | `animated-variant`    | `useAnimatedVariantColor` restored from a frozen stack after a theme change, `styles` read from the UI runtime | a reveal re-applying the color of the last render, #1213 |
 | `frozen-unmount`      | log out with frozen steps, churn memory, log in, unfreeze, theme change    | #1217 / #1179, families unmounted while frozen (9afc15b6) |
-| `scoped`              | theme changes, adaptive themes and a late mounted scope on `scoped-theme`  | scoped theme resolution                                  |
+| `scoped`              | theme changes, adaptive themes and a late mounted scope on `scoped-theme`, hooks of a component mounted below the overlay's scope | scoped theme resolution                                  |
 | `variants-after-flip` | variant changes after theme changes                                       | variants with fresh theme values                         |
 | `mount-after-flip`    | screens pushed after theme changes, list scroll, screen actions            | nodes mounted into a changed theme                       |
 | `set-theme-on-mount`  | a screen that calls `setTheme` from its mount effect                       | nodes rendered before a theme change that link after it  |
@@ -69,7 +69,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `pendingUpdates`      | after every step       | shadow tree updates that were queued but never committed                                 |
 | `orphans`             | `frozen-unmount`       | families unmounted while frozen that survive the sweep of a theme change                 |
 | `expect`              | after a screen check   | a prop React owns differs in the committed tree, eg. `transition.check` measures the bar, `animations.variant-color` reads the Reanimated color, or the JS thread stalled too long (`frozen-list.stall`) |
-| probe                 | at checkpoints         | the screen paints other colors than the theme (overlay squares, Reanimated, RN Animated) |
+| probe                 | at checkpoints         | the screen paints other colors than the theme (overlay squares, Reanimated, RN Animated), or a `ScopedTheme` square other colors than its scope |
 | crash                 | while the host waits   | the app process died, e.g. a use after free on a frozen unmount                          |
 | host `timeout`, stall | at sync points         | the screen stopped updating or the runner hung                                           |
 
@@ -89,7 +89,8 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
   `settle.ts` waits two idle callbacks and two frames: Unistyles applies theme changes from a
   native callback on the JS thread, the idle callbacks run after it.
 - The overlay (`E2EOverlay.tsx`, rendered by the root layout outside the navigator, so it never freezes) renders nothing
-  until the e2e route starts a run. Then it shows a beacon, six themed probes and the current marker
+  until the e2e route starts a run. Then it shows a beacon, six themed probes, three probes below `<ScopedTheme name="dark">`
+  (one re-renders by itself, two mount after the scope rendered, the scope itself never renders again) and the current marker
   (`E2E CHECKPOINT <n> <theme> #<seq>`, `E2E TAP <testID> #<seq>`, `E2E RESULT PASS|FAIL #<seq>`).
 - At a sync point the runner blocks and the beacon turns magenta or yellow (by sync parity). The host polls screenshots
   until the beacon shows the next sync, only then reads the accessibility tree, and answers by tapping the beacon or the
@@ -122,6 +123,7 @@ the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 t
 | M12 TouchableHighlight linked like a View, its underlay re-render commits the style React rendered last | `touchable-highlight`, `interactions` (both reverted: 153 failures on iOS and Android, M12 alone 147 on iOS) | `View 'highlight' backgroundColor expected <premium secondary> actual <light secondary>` after a press |
 | M13 a scoped `link` of a mounted node queues its update without committing it               | `touchable-highlight`, `interactions` (iOS, 12 failures)          | scoped `View 'highlight' backgroundColor expected <dark secondary> actual <light secondary>`, `pendingUpdates expected 0 actual 1` |
 | M14 no worklet runtime guard in `HostUnistyle::get` (#1213), a worklet reads RN runtime values | `animated-variant` (iOS and Android, Android 3 of 3 runs crash)    | iOS `worklet access expected Unistyles worklet error actual no error, width undefined`, Android SIGSEGV on `mqt_v_js` |
+| M15 main before the ScopedTheme fix (views and hooks below a scope that re-render or mount by themselves) | `scoped`, every checkpoint (iOS, 21 probe failures in 8 checkpoints, 6 hook failures, 0 mismatches) | overlay probe `scoped-rerender` expected `#341f97` (dark) actual `#3498db` (light), `useUnistyles theme.colors.primary expected #341f97 actual #3498db` |
 
 #1266 can't be reverted as a whole, `verify()` reads the registry it introduced, so M4a and M4b disable its two
 mechanisms. The use after free itself (#1217, #1179) only crashes with freed families, which needs a Release build with
@@ -130,12 +132,8 @@ a sanitizer, the host still reports a crash whenever one happens.
 ## Known issues found by the suite
 
 The issues it found are fixed and covered by M5 (ActivityIndicator), M6 (`updateTheme`), M12 (TouchableHighlight) and
-M13 (scoped Pressable). Open, not covered:
-
-- A component below a `ScopedTheme` that re-renders on its own (local state, or the child TouchableHighlight clones on a
-  press) links with the scope the last `ApplyScopedTheme` left behind, usually the global theme. `verify()` can't see it,
-  it compares against the scope recorded at link time. Repro: `interactions`, press `Counter` in the scoped section,
-  it turns into the global theme.
+M13 (scoped Pressable) and M15 (views and hooks below a `ScopedTheme` that re-render or mount by themselves, `verify()`
+can't see them as it compares against the scope recorded at link time, the overlay's scoped probes do).
 
 ## Known limitations
 

@@ -73,7 +73,10 @@ export const beaconColor = (sync?: Sync) => sync ? BEACON_COLORS.waiting[sync.se
 
 // Themed squares in the overlay, `animated` paints through useAnimatedTheme (Reanimated), `native-animated` is a
 // React Native Animated.View (native driver), which flattens its two unistyles into one style object
-export const PROBES = ['background', 'surface', 'primary', 'accent', 'animated', 'native-animated'] as const
+// Painted below <ScopedTheme name="dark"> in every theme: one re-renders by itself, the others mount after the scope rendered
+export const SCOPED_PROBES = ['scoped-rerender', 'scoped-late', 'scoped-with-unistyles'] as const
+
+export const PROBES = ['background', 'surface', 'primary', 'accent', 'animated', 'native-animated', ...SCOPED_PROBES] as const
 
 export type ProbeName = typeof PROBES[number]
 
@@ -88,7 +91,8 @@ export const PROBE_COLORS = Object.fromEntries(
             primary: colors.primary,
             accent: colors.accent,
             animated: colors.secondary,
-            'native-animated': colors.typography
+            'native-animated': colors.typography,
+            ...Object.fromEntries(SCOPED_PROBES.map(probe => [probe, themes.dark.colors.primary]))
         }]
     })
 ) as Record<ThemeName, Record<ProbeName, string>>

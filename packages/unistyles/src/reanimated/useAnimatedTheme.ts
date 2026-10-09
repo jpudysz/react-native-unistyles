@@ -1,21 +1,21 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { type SharedValue, useSharedValue } from 'react-native-reanimated'
 
 import type { UnistylesTheme } from '../types'
 
-import { UnistyleDependency, UnistylesRuntime, UnistylesShadowRegistry } from '../specs'
+import { ScopedThemeContext } from '../components/ScopedThemeContext'
+import { UnistyleDependency, UnistylesRuntime } from '../specs'
 import { services } from '../web/services'
 
 export const useAnimatedTheme = () => {
-    const [scopedTheme, setScopedTheme] = useState(
-        () => UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme | undefined,
-    )
+    const scope = useContext(ScopedThemeContext)
+    const [scopedTheme, setScopedTheme] = useState(scope?.name as UnistylesTheme | undefined)
     const theme = useSharedValue(UnistylesRuntime.getTheme(scopedTheme))
-    const maybeNewScopedTheme = UnistylesShadowRegistry.getScopedTheme() as UnistylesTheme | undefined
 
-    if (scopedTheme !== maybeNewScopedTheme) {
-        setScopedTheme(maybeNewScopedTheme)
-        theme.set(UnistylesRuntime.getTheme(maybeNewScopedTheme))
+    // Follow the closest ScopedTheme, see useProxifiedUnistyles
+    if (scope && scopedTheme !== scope.name) {
+        setScopedTheme(scope.name as UnistylesTheme | undefined)
+        theme.set(UnistylesRuntime.getTheme(scope.name as UnistylesTheme | undefined))
     }
 
     useEffect(() => {

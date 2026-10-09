@@ -193,6 +193,7 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.checkpoint()
     },
     'scoped': async a => {
+        await a.expect('scoped-probe.check')
         await a.push('/scoped-theme')
         await a.flip('dark')
         await a.act('scoped.mount')
@@ -201,6 +202,7 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.act('scoped.mount')
         await a.act('scoped.mount')
         await a.flip('light')
+        await a.expect('scoped-probe.check')
         await a.back()
         await a.checkpoint()
     },

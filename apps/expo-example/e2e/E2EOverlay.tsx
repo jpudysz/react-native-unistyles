@@ -1,10 +1,12 @@
-import React, { useEffect, useRef, useSyncExternalStore } from 'react'
+import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { Animated as RNAnimated, Pressable, ScrollView, Text, View } from 'react-native'
 import { usePathname } from 'expo-router'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
-import { StyleSheet } from 'react-native-unistyles'
+import { ScopedTheme, StyleSheet, useUnistyles, withUnistyles } from 'react-native-unistyles'
 import { useAnimatedTheme } from 'react-native-unistyles/reanimated'
-import { beaconColor, formatFailure, formatReport, formatSync, LABELS, PROBES, type ProbeName, type Report } from './protocol'
+import { themes } from '../themes'
+import { useE2EAction } from './actions'
+import { beaconColor, formatFailure, formatReport, formatSync, LABELS, type Report } from './protocol'
 import { acknowledge, bindRunner, type RunnerState, runnerStore } from './runner'
 
 const ReportPanel: React.FunctionComponent<{ report: Report }> = ({ report }) => (
@@ -51,6 +53,54 @@ const NativeAnimatedProbe = React.memo(() => {
     )
 })
 
+// Painted with the probe's theme color, the other probes render their own components
+const THEMED_PROBES = ['background', 'surface', 'primary', 'accent'] as const
+
+const ScopedView = withUnistyles(View)
+
+// useUnistyles and useAnimatedTheme of a component mounted after its ScopedTheme rendered
+const LateScopedHooks = () => {
+    const { theme } = useUnistyles()
+    const animatedTheme = useAnimatedTheme()
+
+    useE2EAction('scoped-probe.check', () => {
+        const expected = themes.dark.colors.primary
+        const actual = { useUnistyles: theme.colors.primary, useAnimatedTheme: animatedTheme.value.colors.primary }
+        const hook = (Object.keys(actual) as Array<keyof typeof actual>).find(key => actual[key] !== expected)
+
+        return hook ? { component: hook, prop: 'theme.colors.primary', expected, actual: actual[hook] } : undefined
+    })
+
+    return null
+}
+
+const ScopedProbeCells = () => {
+    const [isMounted, setIsMounted] = useState(false)
+
+    // re-renders by itself, ScopedTheme doesn't
+    useEffect(() => setIsMounted(true), [])
+
+    return (
+        <React.Fragment>
+            <View accessible accessibilityLabel={`${LABELS.probe} scoped-rerender`} style={styles.scopedProbe} />
+            {isMounted ? (
+                <React.Fragment>
+                    <View accessible accessibilityLabel={`${LABELS.probe} scoped-late`} style={styles.scopedProbe} />
+                    <ScopedView accessible accessibilityLabel={`${LABELS.probe} scoped-with-unistyles`} style={styles.scopedProbe} />
+                    <LateScopedHooks />
+                </React.Fragment>
+            ) : null}
+        </React.Fragment>
+    )
+}
+
+// Memoized, so the overlay re-rendering at every sync can't render the scope again
+const ScopedProbes = React.memo(() => (
+    <ScopedTheme name="dark">
+        <ScopedProbeCells />
+    </ScopedTheme>
+))
+
 const RunnerOverlay: React.FunctionComponent<{ state: RunnerState }> = ({ state }) => {
     const pathname = usePathname()
 
@@ -68,7 +118,7 @@ const RunnerOverlay: React.FunctionComponent<{ state: RunnerState }> = ({ state 
                     onPress={acknowledge}
                 />
                 {/* Themed probes stay mounted for the whole run, so they go through every flip */}
-                {PROBES.filter(probe => probe !== 'animated' && probe !== 'native-animated').map(probe => (
+                {THEMED_PROBES.map(probe => (
                     <View
                         key={probe}
                         accessible
@@ -78,7 +128,9 @@ const RunnerOverlay: React.FunctionComponent<{ state: RunnerState }> = ({ state 
                 ))}
                 <AnimatedProbe />
                 <NativeAnimatedProbe />
-                <Text style={styles.status}>{state.sync ? formatSync(state.sync) : state.status}</Text>
+                <ScopedProbes />
+                {/* One line, so a long sync label can't grow the bar over the elements the host taps (the host reads the label) */}
+                <Text numberOfLines={1} style={styles.status}>{state.sync ? formatSync(state.sync) : state.status}</Text>
             </View>
         </View>
     )
@@ -105,11 +157,16 @@ const styles = StyleSheet.create((theme, rt) => ({
         width: 28,
         height: 28
     },
-    probe: (probe: Exclude<ProbeName, 'animated' | 'native-animated'>) => ({
+    probe: (probe: typeof THEMED_PROBES[number]) => ({
         width: 28,
         height: 28,
         backgroundColor: theme.colors[probe]
     }),
+    scopedProbe: {
+        width: 28,
+        height: 28,
+        backgroundColor: theme.colors.primary
+    },
     nativeAnimatedProbe: {
         backgroundColor: theme.colors.typography
     },

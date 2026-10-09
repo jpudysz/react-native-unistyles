@@ -101,7 +101,9 @@ export class UnistylesShadowRegistry {
     }
 
     setScopedTheme = (theme?: UnistylesTheme) => {
-        this.scopedTheme = theme
+        // With CSS variables, the closest ScopedTheme element picks the theme, so styles are the same in every scope.
+        // Keeping no scope here also means a suspended ScopedTheme can't leave it behind
+        this.scopedTheme = this.services.state.CSSVars ? undefined : theme
     }
 
     getScopedTheme = () => this.scopedTheme

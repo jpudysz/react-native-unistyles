@@ -1,8 +1,9 @@
 import type { ActivityIndicator } from 'react-native'
 
-import React from 'react'
+import React, { useContext } from 'react'
 
 import { isAndroid } from '../common'
+import { ScopedThemeContext } from '../components/ScopedThemeContext'
 import { UnistylesShadowRegistry } from '../specs'
 import { copyComponentProperties } from '../utils'
 import { passForwardedRef } from './passForwardRef'
@@ -18,6 +19,8 @@ const getWrapperHandle = (ref: any) => {
 
 export const createUnistylesActivityIndicator = (Component: typeof ActivityIndicator) => {
     const UnistylesActivityIndicator = (props: any) => {
+        const scope = useContext(ScopedThemeContext)
+
         return (
             <Component
                 {...props}
@@ -31,7 +34,7 @@ export const createUnistylesActivityIndicator = (Component: typeof ActivityIndic
                         props.ref,
                         () => {
                             // @ts-ignore this is hidden from TS
-                            UnistylesShadowRegistry.add(wrapperHandle, props.style)
+                            UnistylesShadowRegistry.add(wrapperHandle, props.style, scope)
                         },
                         () => {
                             // @ts-ignore this is hidden from TS

@@ -1,7 +1,8 @@
 import type { TouchableHighlight } from 'react-native'
 
-import React, { useCallback, useLayoutEffect, useRef, useState } from 'react'
+import React, { useCallback, useContext, useLayoutEffect, useRef, useState } from 'react'
 
+import { ScopedThemeContext } from '../components/ScopedThemeContext'
 import { UnistylesShadowRegistry } from '../specs'
 import { copyComponentProperties } from '../utils'
 import { passForwardedRef } from './passForwardRef'
@@ -9,6 +10,7 @@ import { maybeWarnAboutMultipleUnistyles } from './warn'
 
 export const createUnistylesTouchableHighlight = (Component: typeof TouchableHighlight) => {
     const UnistylesTouchableHighlight = (props: any) => {
+        const scope = useContext(ScopedThemeContext)
         const relinkRef = useRef<() => void>(undefined)
         const [hiddenUnderlays, setHiddenUnderlays] = useState(0)
 
@@ -18,22 +20,16 @@ export const createUnistylesTouchableHighlight = (Component: typeof TouchableHig
             }
         }, [hiddenUnderlays])
 
-        // new props come with a parent render, re-renders for the underlay keep the ref and the scoped theme it captured
+        // new props come with a parent render, re-renders for the underlay keep the ref
         const ref = useCallback(
             (ref: unknown) => {
                 maybeWarnAboutMultipleUnistyles(props.style, 'TouchableHighlight')
 
-                const scopedTheme = UnistylesShadowRegistry.getScopedTheme()
-
                 relinkRef.current = () => {
-                    const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
-
-                    UnistylesShadowRegistry.setScopedTheme(scopedTheme)
                     // @ts-ignore this is hidden from TS
                     UnistylesShadowRegistry.remove(ref)
                     // @ts-ignore this is hidden from TS
-                    UnistylesShadowRegistry.add(ref, props.style)
-                    UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
+                    UnistylesShadowRegistry.add(ref, props.style, scope)
                 }
 
                 return passForwardedRef(
@@ -41,7 +37,7 @@ export const createUnistylesTouchableHighlight = (Component: typeof TouchableHig
                     props.ref,
                     () => {
                         // @ts-ignore this is hidden from TS
-                        UnistylesShadowRegistry.add(ref, props.style)
+                        UnistylesShadowRegistry.add(ref, props.style, scope)
                     },
                     () => {
                         relinkRef.current = undefined
@@ -50,7 +46,7 @@ export const createUnistylesTouchableHighlight = (Component: typeof TouchableHig
                     },
                 )
             },
-            [props],
+            [props, scope],
         )
 
         return (
