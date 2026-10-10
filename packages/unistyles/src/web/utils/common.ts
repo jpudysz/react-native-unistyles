@@ -60,8 +60,11 @@ const cyrb53 = (data: string, seed = 0) => {
     return 4294967296 * (2097151 & h2) + (h1 >>> 0)
 }
 
-export const generateHash = (value: any) => {
+export const generateHash = (value: any, forChild?: boolean) => {
     const serialized = serialize(value)
+    // Child styles are emitted under a `.hash > *` selector, so they must not
+    // reuse the class name of an identical style applied to the element itself
+    const seed = forChild ? `> * ${serialized}` : serialized
 
-    return `unistyles_${cyrb53(serialized).toString(36)}`
+    return `unistyles_${cyrb53(seed).toString(36)}`
 }
