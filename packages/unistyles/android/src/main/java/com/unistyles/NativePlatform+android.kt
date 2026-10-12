@@ -62,6 +62,8 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
 
     override fun onHostResume() {
         observeActivityConfiguration()
+        // a configuration change handled while no Activity was attached read the Application resources
+        onConfigChange()
         _insets.getInitialInsets(false)
         _insets.startInsetsListener()
     }
