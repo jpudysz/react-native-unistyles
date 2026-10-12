@@ -37,14 +37,11 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
     private var _miniRuntime: UnistylesNativeMiniRuntime = buildMiniRuntime()
     private val _listener = NativePlatformListener(reactContext, this::getMiniRuntime) { this.diffMiniRuntime() }
     private var _configurationProvider: WeakReference<OnConfigurationChangedProvider>? = null
-    // posted so that AppCompatDelegate finishes applying night mode to the Activity resources first
     private val _activityConfigurationListener = Consumer<Configuration> {
         Handler(Looper.getMainLooper()).post { this.onConfigChange() }
     }
 
-    // The Application resources are updated by a separate transaction that can land after
-    // ACTION_CONFIGURATION_CHANGED (+25ms), so reading them there returns the previous configuration.
-    // The Activity resources are already updated when Activity.onConfigurationChanged runs.
+    // Application resources can lag behind configuration changes
     private val configurationResources: Resources
         get() = reactContext.currentActivity?.resources ?: reactContext.resources
 
@@ -62,7 +59,7 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
 
     override fun onHostResume() {
         observeActivityConfiguration()
-        // a configuration change handled while no Activity was attached read the Application resources
+        // catch configuration changes missed while no Activity was attached
         onConfigChange()
         _insets.getInitialInsets(false)
         _insets.startInsetsListener()
