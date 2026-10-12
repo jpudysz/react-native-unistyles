@@ -365,9 +365,9 @@ void parser::Parser::rebuildUnistylesInDependencyMap(
                 );
                 unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
                 unistyle->isDirty = true;
+                // unistyles rebuilt only for a scoped theme stay out of this set, so the loop below refreshes their global rawValue
+                parsedUnistyles.insert(unistyle);
             }
-
-            parsedUnistyles.insert(unistyle);
         }
     }
 
