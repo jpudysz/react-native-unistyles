@@ -33,8 +33,7 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
             try {
                 auto rawStyle = args[1].asObject(rt).asArray(rt).getValueAtIndex(rt, i);
                 auto rawStyleObj = rawStyle.getObject(rt);
-                auto unistyleHashKeys = core::getUnistylesHashKeys(rt, rawStyleObj);
-                auto secrets = rawStyleObj.getProperty(rt, unistyleHashKeys.at(0).c_str()).asObject(rt);
+                auto secrets = getUnistyleSecrets(rt, rawStyleObj, unistyleWrappers[i]).value();
                 auto secretArguments = secrets.getProperty(rt, helpers::ARGUMENTS.c_str()).asObject(rt).asArray(rt);
 
                 arguments.push_back(helpers::parseDynamicFunctionArguments(rt, secretArguments));
@@ -65,15 +64,14 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
         core::Unistyle::Shared& unistyle = unistyleWrappers[i];
         auto rawStyle = args[1].asObject(rt).asArray(rt).getValueAtIndex(rt, i);
         auto rawStyleObj = rawStyle.getObject(rt);
-        auto unistyleHashKeys = core::getUnistylesHashKeys(rt, rawStyleObj);
+        auto secrets = getUnistyleSecrets(rt, rawStyleObj, unistyle);
         core::Variants variants{};
 
-        if (unistyleHashKeys.size() == 1) {
-            auto secrets = rawStyleObj.getProperty(rt, unistyleHashKeys.at(0).c_str()).asObject(rt);
-            auto hasVariants = secrets.hasProperty(rt, helpers::STYLESHEET_VARIANTS.c_str());
+        if (secrets.has_value()) {
+            auto rawVariants = secrets->getProperty(rt, helpers::STYLESHEET_VARIANTS.c_str());
 
-            if (hasVariants) {
-                variants = helpers::variantsToPairs(rt, secrets.getProperty(rt, helpers::STYLESHEET_VARIANTS.c_str()).asObject(rt));
+            if (rawVariants.isObject()) {
+                variants = helpers::variantsToPairs(rt, rawVariants.asObject(rt));
             }
         }
 
@@ -94,8 +92,18 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
 
         // The shared cache can belong to another view by the time React attaches refs.
         // Restore this view's arguments and variants before saving its native styles.
+        // An object style without variants is the same for every view, so it's reused unless it's stale (dirty).
         if (!unistyleData->parsedStyle.has_value() && unistyle->parsedStyle.has_value()) {
-            parser.rebuildUnistyleWithVariants(rt, unistyleData);
+            auto isSharedStyle = unistyle->type == core::UnistyleType::Object &&
+                unistyle->styleKey != helpers::EXOTIC_STYLE_KEY &&
+                !unistyle->isDirty &&
+                !unistyle->rawValue.hasProperty(rt, "variants");
+
+            if (isSharedStyle) {
+                unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
+            } else {
+                parser.rebuildUnistyleWithVariants(rt, unistyleData);
+            }
         }
 
         unistylesData.emplace_back(unistyleData);
@@ -129,6 +137,29 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     }
 
     return jsi::Value::undefined();
+}
+
+// a style made by Unistyles keeps its secrets (variants, arguments) under the unistyle's id,
+// reading it directly spares enumerating (and converting to strings) every prop of every linked style
+std::optional<jsi::Object> HybridShadowRegistry::getUnistyleSecrets(jsi::Runtime& rt, jsi::Object& style, const core::Unistyle::Shared& unistyle) {
+    // inline and React Native styles have no secrets
+    if (unistyle->styleKey == helpers::EXOTIC_STYLE_KEY) {
+        return std::nullopt;
+    }
+
+    auto secrets = style.getProperty(rt, unistyle->unid.c_str());
+
+    if (secrets.isObject()) {
+        return secrets.asObject(rt);
+    }
+
+    auto unistyleHashKeys = core::getUnistylesHashKeys(rt, style);
+
+    if (unistyleHashKeys.size() != 1) {
+        return std::nullopt;
+    }
+
+    return style.getProperty(rt, unistyleHashKeys.at(0).c_str()).asObject(rt);
 }
 
 void HybridShadowRegistry::scheduleShadowTreeUpdate(jsi::Runtime& rt) {
@@ -232,12 +263,15 @@ jsi::Value HybridShadowRegistry::verify(jsi::Runtime &rt, const jsi::Value &this
     return shadow::ShadowTreeDiagnostics::verify(rt, this->_unistylesRuntime);
 }
 
-jsi::Value HybridShadowRegistry::takeCommittedTags(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
-    auto tags = core::UnistylesRegistry::get().takeCommittedTags();
-    auto result = jsi::Array(rt, tags.size());
+// the fibers React created the committed nodes with (weak, null once collected)
+jsi::Value HybridShadowRegistry::takeCommittedInstanceHandles(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    auto instanceHandles = core::UnistylesRegistry::get().takeCommittedInstanceHandles();
+    auto result = jsi::Array(rt, instanceHandles.size());
 
-    for (size_t i = 0; i < tags.size(); i++) {
-        result.setValueAtIndex(rt, i, jsi::Value(static_cast<double>(tags[i])));
+    for (size_t i = 0; i < instanceHandles.size(); i++) {
+        auto& instanceHandle = instanceHandles[i];
+
+        result.setValueAtIndex(rt, i, instanceHandle ? instanceHandle->getInstanceHandle(rt) : jsi::Value::null());
     }
 
     return result;

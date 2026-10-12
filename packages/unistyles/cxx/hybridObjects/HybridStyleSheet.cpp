@@ -362,14 +362,14 @@ void HybridStyleSheet::applyDependencyChanges(jsi::Runtime& rt, std::vector<Unis
         parser.rebuildShadowLeafUpdates(rt, dependencyMap);
     }
 
-    std::vector<Tag> committedTags;
+    std::vector<InstanceHandle::Shared> committedInstanceHandles;
 
     if (!dependencyMap.empty()) {
-        committedTags = shadow::ShadowTreeManager::updateShadowTree(rt);
+        committedInstanceHandles = shadow::ShadowTreeManager::updateShadowTree(rt);
     }
 
     // after the commit, so listeners can point React at the committed nodes
-    registry.setCommittedTags(std::move(committedTags));
+    registry.setCommittedInstanceHandles(std::move(committedInstanceHandles));
     // also when no StyleSheet depends on the change, hooks (useUnistyles, withUnistyles, Display, Hide) may
     this->notifyJSListeners(dependencies);
 }

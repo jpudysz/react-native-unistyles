@@ -19,7 +19,7 @@ interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     setScopedTheme(themeName?: string): void
     getScopedTheme(): string | undefined
     verify(): VerifyReport
-    takeCommittedTags(): Array<number>
+    takeCommittedInstanceHandles(): Array<any>
     refreshReactNodes(nodes: Array<ShadowNode>): void
 }
 
@@ -73,121 +73,107 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
     return node
 }
 
-const getNativeTag = (handle: ViewHandle): number | undefined =>
-    findFiberForHandle(handle)?.stateNode?.canonical?.nativeTag
-
-// by native tag, weak: views unmounted while frozen never unlink, their dead refs are dropped when the map doubles
-const linkedHandles = new Map<number, WeakRef<ViewHandle>>()
-const MIN_SWEEP_SIZE = 256
-let sweepSize = MIN_SWEEP_SIZE
-
-const sweepUnmountedHandles = () => {
-    linkedHandles.forEach((ref, tag) => {
-        if (!ref.deref()) {
-            linkedHandles.delete(tag)
-        }
-    })
-
-    sweepSize = Math.max(MIN_SWEEP_SIZE, linkedHandles.size * 2)
-}
-
-const trackHandle = (handle: ViewHandle) => {
-    const tag = getNativeTag(handle)
-
-    // views re-link on every render
-    if (tag === undefined || linkedHandles.get(tag)?.deref() === handle) {
-        return
-    }
-
-    linkedHandles.set(tag, new WeakRef(handle))
-
-    if (linkedHandles.size >= sweepSize) {
-        sweepUnmountedHandles()
-    }
-}
-
-const untrackHandle = (handle: ViewHandle) => {
-    const tag = getNativeTag(handle)
-
-    if (tag !== undefined && linkedHandles.get(tag)?.deref() === handle) {
-        linkedHandles.delete(tag)
-    }
-}
-
 // React re-attaches an untouched subtree through its root's node and only follows clones made on the JS thread.
 // Once a node was cloned elsewhere (state updates, Reanimated), React would commit a subtree from before a Unistyles
 // update, so after a Unistyles commit the committed nodes and their host ancestors must point at the committed tree
 const refreshReactNodes = () => {
-    const tags = HybridShadowRegistry.takeCommittedTags()
+    const fibers = HybridShadowRegistry.takeCommittedInstanceHandles()
 
-    if (tags.length === 0) {
+    if (fibers.length === 0) {
         return
     }
 
-    const nodes = new Set<ShadowNode>()
-    const visited = new Set<any>()
+    const nodes: Array<ShadowNode> = []
+    const refreshedTags = new Set<number>()
+    const hostFibers: Array<any> = []
 
-    for (const tag of tags) {
-        const handle = linkedHandles.get(tag)?.deref()
-
-        if (!handle) {
+    for (const fiber of fibers) {
+        // collected, unmounted since
+        if (!fiber) {
             continue
         }
 
-        const fiber = findFiberForHandle(handle)
+        let isHidden = false
 
-        // hidden by Suspense or a frozen screen
-        if (!fiber || isInsideSuspendedBoundary(fiber)) {
-            continue
-        }
+        hostFibers.length = 0
 
-        for (let current: any = fiber; current && !visited.has(current); current = current.return) {
-            visited.add(current)
-
-            if (current.alternate) {
-                visited.add(current.alternate)
+        for (let current: any = fiber; current; current = current.return) {
+            // hidden by Suspense or a frozen screen
+            if ((current.tag === SUSPENSE_TAG || current.tag === OFFSCREEN_TAG) && current.memoizedState !== null) {
+                isHidden = true
             }
 
             if (current.tag !== HOST_COMPONENT_TAG) {
                 continue
             }
 
-            for (const target of [current, current.alternate]) {
-                const node = target?.stateNode?.node
+            // its ancestors are visible and already collected
+            if (refreshedTags.has(current.stateNode?.canonical?.nativeTag)) {
+                break
+            }
 
-                if (node) {
-                    nodes.add(node)
-                }
+            hostFibers.push(current)
+        }
+
+        if (isHidden) {
+            continue
+        }
+
+        for (const hostFiber of hostFibers) {
+            const node = hostFiber.stateNode?.node
+            const alternateNode = hostFiber.alternate?.stateNode?.node
+            const hostTag = hostFiber.stateNode?.canonical?.nativeTag
+
+            if (hostTag !== undefined) {
+                refreshedTags.add(hostTag)
+            }
+
+            if (node) {
+                nodes.push(node)
+            }
+
+            if (alternateNode && alternateNode !== node) {
+                nodes.push(alternateNode)
             }
         }
     }
 
-    if (nodes.size > 0) {
-        HybridShadowRegistry.refreshReactNodes(Array.from(nodes))
+    if (nodes.length > 0) {
+        HybridShadowRegistry.refreshReactNodes(nodes)
     }
 }
 
 StyleSheet.addChangeListener(refreshReactNodes)
 
-// runs for every style on every link, so it allocates only for the rare merged style (eg. flattened by Animated)
-const splitMergedUnistyles = (style: any) => {
-    let hasUnistyle = false
-
-    for (const key in style) {
-        if (!key.startsWith('unistyles_') || !Object.prototype.hasOwnProperty.call(style, key)) {
-            continue
-        }
-
-        if (hasUnistyle) {
-            return Object.keys(style)
-                .filter((unistyleKey) => unistyleKey.startsWith('unistyles_'))
-                .map((unistyleKey) => ({ [unistyleKey]: style[unistyleKey] }))
-        }
-
-        hasUnistyle = true
+// skips empty styles and splits a style merged from many unistyles (eg. flattened by Animated) into one per unistyle
+// runs for every style on every link, so it reads the keys once and allocates only for the rare merged style
+const collectStyle = (style: any, collected: Array<any>) => {
+    if (!style) {
+        return
     }
 
-    return style
+    const keys = Object.keys(style)
+    let unistylesCount = 0
+
+    for (const key of keys) {
+        if (key.startsWith('unistyles_')) {
+            unistylesCount++
+        }
+    }
+
+    if (unistylesCount < 2) {
+        if (keys.length > 0) {
+            collected.push(style)
+        }
+
+        return
+    }
+
+    for (const key of keys) {
+        if (key.startsWith('unistyles_')) {
+            collected.push({ [key]: style[key] })
+        }
+    }
 }
 
 HybridShadowRegistry.add = (handle, styles, scope) => {
@@ -196,13 +182,13 @@ HybridShadowRegistry.add = (handle, styles, scope) => {
         return
     }
 
-    const stylesArray = Array.isArray(styles) ? styles.flat(Infinity) : [styles]
+    const filteredStyles: Array<any> = []
 
-    // filter styles that are undefined or with no keys
-    const filteredStyles = stylesArray
-        .filter((style) => style && Object.keys(style).length > 0)
-        .filter(Boolean)
-        .flatMap(splitMergedUnistyles)
+    if (Array.isArray(styles)) {
+        styles.flat(Infinity).forEach((style) => collectStyle(style, filteredStyles))
+    } else {
+        collectStyle(styles, filteredStyles)
+    }
 
     if (filteredStyles.length > 0) {
         const node = findShadowNodeForHandle(handle)
@@ -225,8 +211,6 @@ HybridShadowRegistry.add = (handle, styles, scope) => {
         if (scope) {
             HybridShadowRegistry.setScopedTheme(previousScopedTheme)
         }
-
-        trackHandle(handle)
     }
 }
 
@@ -244,11 +228,17 @@ HybridShadowRegistry.remove = (handle) => {
             HybridShadowRegistry.suspend(maybeNode)
         } else {
             HybridShadowRegistry.unlink(maybeNode)
-            untrackHandle(handle)
         }
     }
 }
 
-type PrivateMethods = 'add' | 'remove' | 'link' | 'unlink' | 'suspend' | 'takeCommittedTags' | 'refreshReactNodes'
+type PrivateMethods =
+    | 'add'
+    | 'remove'
+    | 'link'
+    | 'unlink'
+    | 'suspend'
+    | 'takeCommittedInstanceHandles'
+    | 'refreshReactNodes'
 
 export const UnistylesShadowRegistry = HybridShadowRegistry as Omit<ShadowRegistry, PrivateMethods>
