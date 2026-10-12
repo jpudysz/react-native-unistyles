@@ -3,11 +3,16 @@ package com.unistyles
 import android.os.Build
 import android.content.Context
 import android.content.res.Configuration
+import android.content.res.Resources
+import android.os.Handler
+import android.os.Looper
 import android.util.DisplayMetrics
 import android.view.View
 import android.view.WindowManager
 import androidx.annotation.Keep
+import androidx.core.content.OnConfigurationChangedProvider
 import androidx.core.text.TextUtilsCompat
+import androidx.core.util.Consumer
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -22,6 +27,7 @@ import com.margelo.nitro.unistyles.Insets
 import com.margelo.nitro.unistyles.Orientation
 import com.margelo.nitro.unistyles.UnistyleDependency
 import com.margelo.nitro.unistyles.UnistylesNativeMiniRuntime
+import java.lang.ref.WeakReference
 import java.util.Locale
 
 @Keep
@@ -30,6 +36,17 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
     private val _insets = NativePlatformInsets(reactContext, this::getMiniRuntime) { this.onConfigChange() }
     private var _miniRuntime: UnistylesNativeMiniRuntime = buildMiniRuntime()
     private val _listener = NativePlatformListener(reactContext, this::getMiniRuntime) { this.diffMiniRuntime() }
+    private var _configurationProvider: WeakReference<OnConfigurationChangedProvider>? = null
+    // posted so that AppCompatDelegate finishes applying night mode to the Activity resources first
+    private val _activityConfigurationListener = Consumer<Configuration> {
+        Handler(Looper.getMainLooper()).post { this.onConfigChange() }
+    }
+
+    // The Application resources are updated by a separate transaction that can land after
+    // ACTION_CONFIGURATION_CHANGED (+25ms), so reading them there returns the previous uiMode.
+    // The Activity resources are already updated when Activity.onConfigurationChanged runs.
+    private val configurationResources: Resources
+        get() = reactContext.currentActivity?.resources ?: reactContext.resources
 
     init {
         checkEdgeToEdge()
@@ -37,12 +54,14 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
     }
 
     fun onDestroy() {
+        stopObservingActivityConfiguration()
         _listener.onDestroy()
         _insets.onDestroy()
         reactContext.removeLifecycleEventListener(this)
     }
 
     override fun onHostResume() {
+        observeActivityConfiguration()
         _insets.getInitialInsets(false)
         _insets.startInsetsListener()
     }
@@ -51,7 +70,26 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
         _insets.stopInsetsListener()
     }
 
-    override fun onHostDestroy() {}
+    override fun onHostDestroy() {
+        stopObservingActivityConfiguration()
+    }
+
+    private fun observeActivityConfiguration() {
+        val provider = reactContext.currentActivity as? OnConfigurationChangedProvider
+
+        if (_configurationProvider?.get() === provider) {
+            return
+        }
+
+        stopObservingActivityConfiguration()
+        provider?.addOnConfigurationChangedListener(_activityConfigurationListener)
+        _configurationProvider = provider?.let { WeakReference(it) }
+    }
+
+    private fun stopObservingActivityConfiguration() {
+        _configurationProvider?.get()?.removeOnConfigurationChangedListener(_activityConfigurationListener)
+        _configurationProvider = null
+    }
 
     override val memorySize: Long
         get() = 0
@@ -61,7 +99,7 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
     }
 
     override fun getColorScheme(): ColorScheme {
-        val uiMode = reactContext.resources.configuration.uiMode
+        val uiMode = configurationResources.configuration.uiMode
 
         val colorScheme = when (uiMode.and(Configuration.UI_MODE_NIGHT_MASK)) {
             Configuration.UI_MODE_NIGHT_YES -> ColorScheme.DARK
