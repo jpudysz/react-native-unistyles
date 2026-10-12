@@ -44,7 +44,7 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
                             const jsi::Value& thisValue,
                             const jsi::Value* args,
                             size_t count);
-    jsi::Value takeCommittedTags(jsi::Runtime& rt,
+    jsi::Value takeCommittedInstanceHandles(jsi::Runtime& rt,
                             const jsi::Value& thisValue,
                             const jsi::Value* args,
                             size_t count);
@@ -64,7 +64,7 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
             prototype.registerRawHybridMethod("setScopedTheme", 1, &HybridShadowRegistry::setScopedTheme);
             prototype.registerRawHybridMethod("getScopedTheme", 0, &HybridShadowRegistry::getScopedTheme);
             prototype.registerRawHybridMethod("verify", 0, &HybridShadowRegistry::verify);
-            prototype.registerRawHybridMethod("takeCommittedTags", 0, &HybridShadowRegistry::takeCommittedTags);
+            prototype.registerRawHybridMethod("takeCommittedInstanceHandles", 0, &HybridShadowRegistry::takeCommittedInstanceHandles);
             prototype.registerRawHybridMethod("refreshReactNodes", 1, &HybridShadowRegistry::refreshReactNodes);
         });
     };
@@ -73,6 +73,7 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
 
 private:
     void scheduleShadowTreeUpdate(jsi::Runtime& rt);
+    static std::optional<jsi::Object> getUnistyleSecrets(jsi::Runtime& rt, jsi::Object& style, const core::Unistyle::Shared& unistyle);
 
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
     std::shared_ptr<std::atomic<bool>> _isShadowTreeUpdateScheduled = std::make_shared<std::atomic<bool>>(false);

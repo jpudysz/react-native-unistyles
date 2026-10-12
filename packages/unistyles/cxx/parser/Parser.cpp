@@ -281,6 +281,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(
     std::unordered_map<std::shared_ptr<StyleSheet>, jsi::Value> parsedStyleSheetsWithDefaultTheme;
     std::unordered_map<std::string, std::unordered_map<std::shared_ptr<StyleSheet>, jsi::Value>> parsedStyleSheetsWithScopedTheme;
     std::unordered_set<std::shared_ptr<core::Unistyle>> parsedUnistyles;
+    std::unordered_set<std::shared_ptr<core::Unistyle>> sharedUnistyles;
 
     // Parse all stylesheets that depend on changes
     for (const auto& styleSheet : styleSheets) {
@@ -355,6 +356,8 @@ void parser::Parser::rebuildUnistylesInDependencyMap(
                 }
 
                 this->rebuildUnistyleWithScopedTheme(rt, parsedStyleSheet, unistyleData);
+            } else if (sharedUnistyles.contains(unistyle)) {
+                unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
             } else {
                 unistyle->rawValue = parsedSheetObj
                     .getProperty(rt, unistyle->styleKey.c_str())
@@ -365,6 +368,10 @@ void parser::Parser::rebuildUnistylesInDependencyMap(
                 );
                 unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
                 unistyle->isDirty = true;
+
+                if (unistyle->type == core::UnistyleType::Object && !unistyle->rawValue.hasProperty(rt, "variants")) {
+                    sharedUnistyles.insert(unistyle);
+                }
             }
 
             parsedUnistyles.insert(unistyle);
@@ -1273,6 +1280,14 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
 // so a value captured at link time would undo what React rendered since
 folly::dynamic parser::Parser::parseStylesToShadowTreeUpdates(jsi::Runtime& rt, const std::vector<std::shared_ptr<UnistyleData>>& unistyles) {
     auto props = this->parseStylesToShadowTreeStyles(rt, unistyles);
+    auto hasInlineStyle = std::any_of(unistyles.begin(), unistyles.end(), [](const std::shared_ptr<UnistyleData>& unistyleData) {
+        return unistyleData->parsedStyle.has_value() && unistyleData->unistyle->styleKey == helpers::EXOTIC_STYLE_KEY;
+    });
+
+    if (!hasInlineStyle) {
+        return props;
+    }
+
     std::unordered_map<std::string, bool> isOwnedByInlineStyle;
 
     for (const auto& unistyleData : unistyles) {
