@@ -43,7 +43,7 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
     }
 
     // The Application resources are updated by a separate transaction that can land after
-    // ACTION_CONFIGURATION_CHANGED (+25ms), so reading them there returns the previous uiMode.
+    // ACTION_CONFIGURATION_CHANGED (+25ms), so reading them there returns the previous configuration.
     // The Activity resources are already updated when Activity.onConfigurationChanged runs.
     private val configurationResources: Resources
         get() = reactContext.currentActivity?.resources ?: reactContext.resources
@@ -113,15 +113,15 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
     }
 
     override fun getFontScale(): Double {
-        return reactContext.resources.configuration.fontScale.toDouble()
+        return configurationResources.configuration.fontScale.toDouble()
     }
 
     override fun getPixelRatio(): Double {
-        return reactContext.resources.displayMetrics.density.toDouble()
+        return configurationResources.displayMetrics.density.toDouble()
     }
 
     override fun getOrientation(): Orientation {
-        val orientation = when (reactContext.resources.configuration.orientation) {
+        val orientation = when (configurationResources.configuration.orientation) {
             Configuration.ORIENTATION_PORTRAIT -> Orientation.PORTRAIT
             Configuration.ORIENTATION_LANDSCAPE -> Orientation.LANDSCAPE
             else -> Orientation.PORTRAIT
@@ -162,7 +162,7 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
                 return Dimensions(screenWidth, screenHeight)
             }
             else -> {
-                val displayMetrics = reactContext.resources.displayMetrics
+                val displayMetrics = configurationResources.displayMetrics
 
                 reactContext.currentActivity?.windowManager?.currentWindowMetrics?.bounds?.let {
                     val boundsWidth = (it.width() / displayMetrics.density).toDouble()
@@ -197,7 +197,7 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
             "com.facebook.react.modules.i18nmanager.I18nUtil",
             Context.MODE_PRIVATE
         )
-        val resourcesLocale = reactContext.resources.configuration.locales[0]
+        val resourcesLocale = configurationResources.configuration.locales[0]
         val hasForcedRtl = sharedPrefs.getBoolean("RCTI18nUtil_forceRTL", false)
         // user preferences
         val isRtl = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == ViewCompat.LAYOUT_DIRECTION_RTL
