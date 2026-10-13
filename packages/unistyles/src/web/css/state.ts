@@ -3,7 +3,7 @@ import type { UnistylesServices } from '../types'
 
 import { convertUnistyles } from '../convert'
 import { hyphenate, isServer } from '../utils'
-import { convertToCSS } from './core'
+import { convertToCSS, getChildrenClassName } from './core'
 
 type MapType = Map<string, Map<string, Map<string, any>>>
 type SetProps = {
@@ -105,11 +105,15 @@ export class CSSState {
     }
 
     remove = (hash: string) => {
+        const childrenClassName = getChildrenClassName(hash)
+
         this.mainMap.forEach((styles) => {
             styles.delete(hash)
+            styles.delete(childrenClassName)
         })
         this.mqMap.forEach((styles) => {
             styles.delete(hash)
+            styles.delete(childrenClassName)
         })
         this.recreate()
     }
@@ -125,7 +129,7 @@ export class CSSState {
             }
 
             for (const [className, thirdLevelMap] of secondLevelMap) {
-                styles += `.${className}{`
+                styles += className[0] === ':' ? `${className}{` : `.${className}{`
 
                 for (const [propertyKey, value] of thirdLevelMap) {
                     if (value === undefined) {
