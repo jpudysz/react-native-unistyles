@@ -44,7 +44,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `frozen-stack`        | session steps 1 to 3 and back, theme change on step 3                      | #1262, frozen screens re-linked with another caller's args |
 | `frozen-flip`         | theme changes while home and other screens are frozen                      | suspended nodes restored with the new theme              |
 | `suspense`            | suspend and resume a Suspense boundary around theme changes                | #1260, per-view styles restored by Suspense (d5f8a851)   |
-| `activity`            | theme changes and new arguments while `<Activity>` hides content           | hidden content that keeps rendering, shown again         |
+| `activity`            | theme changes and new arguments while `<Activity>` hides content, a `useUnistyles` theme that doesn't re-render when shown | hidden content that keeps rendering, shown again, #1297  |
 | `frozen-list`         | a 300 row screen frozen and restored, with a theme change while frozen      | #1252, restoring a frozen screen blocked JS for seconds  |
 | `animated-variant`    | `useAnimatedVariantColor` restored from a frozen stack after a theme change, `styles` read from the UI runtime | a reveal re-applying the color of the last render, #1213 |
 | `frozen-unmount`      | log out with frozen steps, churn memory, log in, unfreeze, theme change    | #1217 / #1179, families unmounted while frozen (9afc15b6) |
