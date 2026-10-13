@@ -14,6 +14,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
 
     var dependencyListeners: Array<CxxDependencyListener> = []
     var imeListeners: Array<CxxImeListener> = []
+    var interfaceStyle: UIUserInterfaceStyle?
 
     override init() {
         super.init()
@@ -52,17 +53,27 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
     }
 
     func getColorScheme() -> ColorScheme {
-        let interfaceStyle = UIScreen.main.traitCollection.userInterfaceStyle
+        func getColorSchemeFn() -> ColorScheme {
+            let interfaceStyle = self.interfaceStyle ?? (RCTKeyWindow()?.traitCollection ?? UIScreen.main.traitCollection).userInterfaceStyle
 
-        switch (interfaceStyle) {
-        case .dark:
-            return ColorScheme.dark
-        case .light:
-            return ColorScheme.light
-        case .unspecified:
-            return ColorScheme.unspecified
-        default:
-            return ColorScheme.unspecified
+            switch (interfaceStyle) {
+            case .dark:
+                return ColorScheme.dark
+            case .light:
+                return ColorScheme.light
+            case .unspecified:
+                return ColorScheme.unspecified
+            default:
+                return ColorScheme.unspecified
+            }
+        }
+
+        if Thread.isMainThread {
+            return getColorSchemeFn()
+        }
+
+        return DispatchQueue.main.sync {
+            return getColorSchemeFn()
         }
     }
 
