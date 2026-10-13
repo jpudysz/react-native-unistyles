@@ -63,15 +63,14 @@ const findShadowNodeForHandle = (handle: ViewHandle) => {
         handle?.viewRef?.current?.__internalInstanceHandle?.stateNode?.node ??
         handle?._nativeRef?.__internalInstanceHandle?.stateNode?.node
 
-    // @ts-ignore we don't know the type of handle
-    if (!node && handle?.props?.horizontal && handle?.constructor?.name === 'FlatList') {
-        throw new Error(
-            'Unistyles: detected an unsupported FlatList with the horizontal prop. This will cause crashes on Android due to a bug in React Native core. Read more: https://github.com/facebook/react-native/issues/51601',
-        )
-    }
-
     return node
 }
+
+// A component can point at another native view by the time its ref is cleaned up, eg. FlatList on Android remounts
+// its native ScrollView when `horizontal` changes, so remove unlinks the fiber it was linked with
+// The fiber points at its current node, while a stored node would keep its first revision (and children) alive
+// Native views always resolve to their own node, so they skip it
+const linkedFibers = new WeakMap<object, any>()
 
 // React re-attaches an untouched subtree through its root's node and only follows clones made on the JS thread.
 // Once a node was cloned elsewhere (state updates, Reanimated), React would commit a subtree from before a Unistyles
@@ -208,6 +207,10 @@ HybridShadowRegistry.add = (handle, styles, scope) => {
 
         HybridShadowRegistry.link(node, filteredStyles)
 
+        if (!handle.__internalInstanceHandle) {
+            linkedFibers.set(handle, findFiberForHandle(handle))
+        }
+
         if (scope) {
             HybridShadowRegistry.setScopedTheme(previousScopedTheme)
         }
@@ -219,10 +222,15 @@ HybridShadowRegistry.remove = (handle) => {
         return
     }
 
-    const maybeNode = findShadowNodeForHandle(handle)
+    const linkedFiber = handle.__internalInstanceHandle ? undefined : linkedFibers.get(handle)
+    const maybeNode = linkedFiber ? linkedFiber.stateNode?.node : findShadowNodeForHandle(handle)
+
+    if (linkedFiber) {
+        linkedFibers.delete(handle)
+    }
 
     if (maybeNode) {
-        const fiber = findFiberForHandle(handle)
+        const fiber = linkedFiber ?? findFiberForHandle(handle)
 
         if (fiber && isInsideSuspendedBoundary(fiber)) {
             HybridShadowRegistry.suspend(maybeNode)
