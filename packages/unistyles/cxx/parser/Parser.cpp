@@ -372,9 +372,10 @@ void parser::Parser::rebuildUnistylesInDependencyMap(
                 if (unistyle->type == core::UnistyleType::Object && !unistyle->rawValue.hasProperty(rt, "variants")) {
                     sharedUnistyles.insert(unistyle);
                 }
-            }
 
-            parsedUnistyles.insert(unistyle);
+                // unistyles rebuilt only for a scoped theme stay out of this set, so the loop below refreshes their global rawValue
+                parsedUnistyles.insert(unistyle);
+            }
         }
     }
 
