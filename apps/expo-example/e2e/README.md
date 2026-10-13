@@ -58,6 +58,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `lists-scroll`        | theme changes at scrolled FlatList positions                               | virtualized rows mounted after a theme change            |
 | `touchable-highlight` | TouchableHighlight pressed after theme changes and below a ScopedTheme (host only) | its underlay re-render commits the style React rendered last |
 | `interactions`        | every component on `interactions` pressed, toggled or focused after theme changes (host only) | components re-rendering themselves below Unistyles, scoped and variant styles |
+| `rn-appearance`       | `Appearance.setColorScheme` against the OS scheme with adaptive themes, on a pushed screen, then `unspecified` | adaptive themes follow RN's override on both platforms (iOS key window, Android Activity `uiMode`) |
 | `os-appearance`       | OS appearance flips with adaptive themes (host only)                       | adaptive themes, inverted adaptive scopes                |
 | `random-walk`         | 14 seeded random theme changes, pushes, backs and screen actions           | combinations of the above                                |
 

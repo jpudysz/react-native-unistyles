@@ -1,5 +1,5 @@
 import { type Href, router } from 'expo-router'
-import { Platform } from 'react-native'
+import { Appearance, Platform } from 'react-native'
 import { UnistylesRuntime } from 'react-native-unistyles'
 import { verify, type VerifyReport } from 'react-native-unistyles/diagnostics'
 import { restoreThemes, selectTheme, session } from '../components'
@@ -107,6 +107,7 @@ class E2ERun implements Actions {
     private seq = 0
     private checkpoints = 0
     private failureSyncs = 0
+    private colorSchemeOverridden = false
     private position = { scenario: 'tour' as ScenarioId, rep: 0, step: 0, action: '' }
     random = Math.random
     readonly report: Report
@@ -194,6 +195,21 @@ class E2ERun implements Actions {
                 await this.tap('theme-system', () => UnistylesRuntime.hasAdaptiveThemes)
             } else {
                 selectTheme('system')
+            }
+        })
+
+    // RN's override of the app's color scheme, adaptive themes follow it like the OS
+    colorScheme = (scheme: 'light' | 'dark' | 'unspecified', expected: 'light' | 'dark') =>
+        this.step(`color scheme ${scheme}`, async () => {
+            if (!UnistylesRuntime.hasAdaptiveThemes) {
+                throw new Error(`Color scheme ${scheme} without adaptive themes`)
+            }
+
+            this.colorSchemeOverridden = scheme !== 'unspecified'
+            Appearance.setColorScheme(scheme)
+
+            if (!await waitUntil(() => UnistylesRuntime.colorScheme === expected && this.theme() === expected, ARRIVAL_TIMEOUT_MS)) {
+                throw new Error(`Color scheme ${scheme} left colorScheme ${UnistylesRuntime.colorScheme} and theme ${this.theme()}, expected ${expected}`)
             }
         })
 
@@ -289,6 +305,14 @@ class E2ERun implements Actions {
         }
 
         await this.step('reset themes', restoreThemes)
+
+        // left behind by a failed rn-appearance
+        if (this.colorSchemeOverridden) {
+            await this.step('reset color scheme', () => {
+                Appearance.setColorScheme('unspecified')
+                this.colorSchemeOverridden = false
+            })
+        }
 
         if (this.theme() !== 'light' || UnistylesRuntime.hasAdaptiveThemes) {
             await this.step('reset theme', () => selectTheme('light'))

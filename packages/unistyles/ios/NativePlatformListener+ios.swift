@@ -7,6 +7,15 @@ extension NativeIOSPlatform {
         let orientationPublisher = NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)
         let colorSchemePublisher = NotificationCenter.default.publisher(for: NSNotification.Name("RCTUserInterfaceStyleDidChangeNotification"))
 
+        colorSchemePublisher
+            .sink { [weak self] notification in
+                if let traitCollection = notification.userInfo?["traitCollection"] as? UITraitCollection,
+                   traitCollection.userInterfaceStyle != .unspecified {
+                    self?.interfaceStyle = traitCollection.userInterfaceStyle
+                }
+            }
+            .store(in: &cancellables)
+
         Publishers
             .MergeMany([windowPublisher, orientationPublisher, colorSchemePublisher])
             .throttle(for: .milliseconds(25), scheduler: RunLoop.main, latest: true)

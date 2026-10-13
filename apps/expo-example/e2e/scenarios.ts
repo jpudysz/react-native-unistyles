@@ -6,6 +6,8 @@ import type { ScenarioId } from './protocol'
 export type Actions = {
     flip: (theme: ThemeName) => Promise<void>,
     followSystem: () => Promise<void>,
+    // Appearance.setColorScheme, waits until colorScheme and the theme are `expected`
+    colorScheme: (scheme: 'light' | 'dark' | 'unspecified', expected: 'light' | 'dark') => Promise<void>,
     // OS appearance via the host
     appearance: (scheme: 'light' | 'dark') => Promise<void>,
     back: () => Promise<void>,
@@ -364,6 +366,27 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.checkpoint()
     },
     // Needs the host to flip the OS appearance
+    // Appearance.setColorScheme overrides the app's color scheme (iOS key window, Android Activity uiMode),
+    // adaptive themes follow it like the OS and go back to the OS once it is unspecified
+    'rn-appearance': async a => {
+        const system = UnistylesRuntime.colorScheme
+
+        if (system !== 'light' && system !== 'dark') {
+            return
+        }
+
+        const other = system === 'dark' ? 'light' : 'dark'
+
+        await a.followSystem()
+        await a.colorScheme(other, other)
+        await a.push('/basics')
+        await a.checkpoint()
+        await a.colorScheme(system, system)
+        await a.colorScheme(other, other)
+        await a.back()
+        await a.colorScheme('unspecified', system)
+        await a.checkpoint()
+    },
     'os-appearance': async a => {
         if (!a.hasHost) {
             return

@@ -265,6 +265,11 @@ jsi::Value HybridShadowRegistry::verify(jsi::Runtime &rt, const jsi::Value &this
 
 // the fibers React created the committed nodes with (weak, null once collected)
 jsi::Value HybridShadowRegistry::takeCommittedInstanceHandles(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
+    // runtime was replaced, the handles belong to the next one
+    if (!this->_unistylesRuntime->ownsRegistry()) {
+        return jsi::Array(rt, 0);
+    }
+
     auto instanceHandles = core::UnistylesRegistry::get().takeCommittedInstanceHandles();
     auto result = jsi::Array(rt, instanceHandles.size());
 
