@@ -41,3 +41,23 @@ jobs:
 
       - name: Run tests
         run: bun run test
+
+  nextjs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Next.js App Router e2e
+        run: bun run e2e:nextjs

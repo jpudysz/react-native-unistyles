@@ -12,7 +12,8 @@
     "test": "bun run --cwd packages/unistyles test",
     "tsc": "bun run --cwd packages/unistyles tsc",
     "check": "bun run --cwd packages/unistyles check",
-    "check:ci": "bun run --cwd packages/unistyles check:ci"
+    "check:ci": "bun run --cwd packages/unistyles check:ci",
+    "e2e:nextjs": "bun e2e/nextjs/run.ts"
   },
   "devDependencies": {
     "husky": "9.1.7"
