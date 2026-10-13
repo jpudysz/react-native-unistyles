@@ -38,7 +38,7 @@ class NativePlatformInsets(
     }
 
     fun getInsets(): Insets {
-        val density = reactContext.resources.displayMetrics.density
+        val density = (reactContext.currentActivity?.resources ?: reactContext.resources).displayMetrics.density
 
         return Insets(
             this._insets.top / density,

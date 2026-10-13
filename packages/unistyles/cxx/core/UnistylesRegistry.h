@@ -70,8 +70,8 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     core::Unistyle::Shared getUnistyleById(std::string unistyleID);
     std::vector<LinkedFamilySnapshot> getLinkedFamiliesSnapshot();
     size_t getPendingUpdatesCount();
-    void setCommittedTags(std::vector<Tag>&& tags);
-    std::vector<Tag> takeCommittedTags();
+    void setCommittedInstanceHandles(std::vector<InstanceHandle::Shared>&& instanceHandles);
+    std::vector<InstanceHandle::Shared> takeCommittedInstanceHandles();
 
     // newest installed runtime owns the registry, generation 0 means no owner
     // previous runtime's state is kept aside until it releases ownership, as it may still run JS
@@ -119,7 +119,7 @@ private:
     std::unordered_map<int, std::shared_ptr<core::StyleSheet>> _styleSheetRegistry{};
     std::unordered_map<const ShadowNodeFamily*, LinkedFamily> _shadowRegistry{};
     size_t _sweepThreshold = MIN_SWEEP_THRESHOLD;
-    std::vector<Tag> _committedTags{};
+    std::vector<InstanceHandle::Shared> _committedInstanceHandles{};
 };
 
 inline UnistylesRegistry& UnistylesRegistry::get() {

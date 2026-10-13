@@ -407,7 +407,7 @@ core::UnistylesRegistry::OwnedState core::UnistylesRegistry::takeOwnedState() {
     ownedState.styleSheets = std::exchange(this->_styleSheetRegistry, {});
     ownedState.state = std::move(this->_state);
     this->_scopedTheme = std::nullopt;
-    this->_committedTags.clear();
+    this->_committedInstanceHandles.clear();
     _nextStyleSheetTag.store(0);
 
     return ownedState;
@@ -435,10 +435,10 @@ size_t core::UnistylesRegistry::getPendingUpdatesCount() {
     });
 }
 
-void core::UnistylesRegistry::setCommittedTags(std::vector<Tag>&& tags) {
-    this->_committedTags = std::move(tags);
+void core::UnistylesRegistry::setCommittedInstanceHandles(std::vector<InstanceHandle::Shared>&& instanceHandles) {
+    this->_committedInstanceHandles = std::move(instanceHandles);
 }
 
-std::vector<Tag> core::UnistylesRegistry::takeCommittedTags() {
-    return std::exchange(this->_committedTags, {});
+std::vector<InstanceHandle::Shared> core::UnistylesRegistry::takeCommittedInstanceHandles() {
+    return std::exchange(this->_committedInstanceHandles, {});
 }
