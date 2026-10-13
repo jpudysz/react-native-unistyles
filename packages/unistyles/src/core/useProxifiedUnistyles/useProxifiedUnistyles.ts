@@ -39,6 +39,7 @@ export const useProxifiedUnistyles = () => {
     const disposeRef = useRef<VoidFunction>(undefined)
     const syncedDependenciesSizeRef = useRef(-1)
     const syncedScopedThemeRef = useRef<UnistylesTheme | undefined>(undefined)
+    const wasDisposedRef = useRef(false)
 
     const reinitListener = () => {
         disposeRef.current?.()
@@ -59,12 +60,22 @@ export const useProxifiedUnistyles = () => {
                 runtimeChanged()
             },
         })
+
+        // <Activity> cleans up effects, a theme change made while hidden was missed (#1297)
+        if (wasDisposedRef.current) {
+            wasDisposedRef.current = false
+
+            if (!scopedTheme) {
+                setTheme(UnistylesRuntime.getTheme())
+            }
+        }
     }
 
     useEffect(() => {
         return () => {
             disposeRef.current?.()
             syncedDependenciesSizeRef.current = -1
+            wasDisposedRef.current = true
         }
     }, [disposeRef])
 
