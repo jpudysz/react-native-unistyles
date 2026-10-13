@@ -52,16 +52,21 @@ writeFileSync(join(WORK_DIR, 'package.json'), JSON.stringify(manifest, null, 2))
 
 run('npm', ['install', '--no-audit', '--no-fund'], WORK_DIR)
 
+// One deadline for the whole wait: a server that accepts connections but never answers must not hang the job.
 const fetchPage = async () => {
-    for (let attempt = 0; attempt < 120; attempt++) {
+    const deadline = Date.now() + 120_000
+
+    while (Date.now() < deadline) {
         try {
-            return await fetch(`http://localhost:${PORT}/`)
+            return await fetch(`http://localhost:${PORT}/`, {
+                signal: AbortSignal.timeout(deadline - Date.now()),
+            })
         } catch {
-            await new Promise((resolve) => setTimeout(resolve, 1000))
+            await new Promise((resolve) => setTimeout(resolve, Math.min(1000, Math.max(deadline - Date.now(), 0))))
         }
     }
 
-    return fail(`server did not start on port ${PORT}`)
+    return fail(`server did not respond on port ${PORT} within 120s`)
 }
 
 const checkServer = async (mode: string, args: Array<string>) => {
@@ -78,7 +83,10 @@ const checkServer = async (mode: string, args: Array<string>) => {
 
     if (response.status !== 200) fail(`${mode}: GET / returned ${response.status}`)
     if (!html.includes('Hello from Unistyles')) fail(`${mode}: page content was not rendered`)
-    if (!html.includes('<style id="unistyles-web">')) fail(`${mode}: server rendered Unistyles styles are missing`)
+    // The tag is emitted even with empty CSS, so look for the theme the page renders with (unistyles.ts).
+    const css = html.match(/<style id="unistyles-web">([^<]*)<\/style>/)?.[1] ?? ''
+
+    if (!css.includes('--colors-text:#111111')) fail(`${mode}: server rendered Unistyles CSS is missing the theme`)
 
     console.log(`nextjs e2e: ${mode} passed`)
 }
