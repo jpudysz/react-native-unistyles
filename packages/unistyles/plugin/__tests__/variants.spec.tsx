@@ -1,6 +1,6 @@
 import type { NodePath, PluginObj } from '@babel/core'
 
-import { pluginTester, runPluginUnderTestHere } from 'babel-plugin-tester'
+import { pluginTester } from 'babel-plugin-tester'
 
 import plugin from '../src/index'
 
@@ -356,18 +356,24 @@ pluginTester({
 })
 
 // React Compiler runs in the same pass and resolves every declaration through babel's scope (#1002)
+// checks on exit, so it runs after the plugin under test regardless of the plugin order
 const bindingsChecker = (): PluginObj => ({
     visitor: {
-        Program(path) {
-            path.traverse({
-                VariableDeclarator(declaratorPath: NodePath) {
-                    const id = declaratorPath.get('id') as NodePath
+        Program: {
+            exit(path) {
+                path.traverse({
+                    VariableDeclarator(declaratorPath: NodePath) {
+                        const id = declaratorPath.get('id') as NodePath
 
-                    if (id.isIdentifier() && declaratorPath.scope.getBinding(id.node.name)?.identifier !== id.node) {
-                        throw new Error(`Missing binding for ${id.node.name}`)
-                    }
-                },
-            })
+                        if (
+                            id.isIdentifier() &&
+                            declaratorPath.scope.getBinding(id.node.name)?.identifier !== id.node
+                        ) {
+                            throw new Error(`Missing binding for ${id.node.name}`)
+                        }
+                    },
+                })
+            },
         },
     },
 })
@@ -379,7 +385,7 @@ pluginTester({
         root: 'src',
     },
     babelOptions: {
-        plugins: ['@babel/plugin-syntax-jsx', runPluginUnderTestHere, bindingsChecker],
+        plugins: ['@babel/plugin-syntax-jsx', bindingsChecker],
     },
     tests: [
         {
