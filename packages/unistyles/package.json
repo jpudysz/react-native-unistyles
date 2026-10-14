@@ -25,22 +25,22 @@
   "exports": {
     ".": {
       "types": "./lib/typescript/src/index.d.ts",
+      "browser": "./lib/module/index.js",
       "react-native": "./src/index.ts",
       "import": "./lib/module/index.js",
-      "browser": "./lib/module/index.js",
       "default": "./lib/commonjs/index.js"
     },
     "./mocks": {
       "types": "./lib/typescript/src/mocks.d.ts",
+      "browser": "./lib/module/mocks.js",
       "react-native": "./src/mocks.ts",
       "import": "./lib/module/mocks.js",
-      "browser": "./lib/module/mocks.js",
       "default": "./lib/commonjs/mocks.js"
     },
     "./components/native/*": {
+      "browser": "./lib/module/components/native/*",
       "react-native": "./src/components/native/*",
       "import": "./lib/module/components/native/*",
-      "browser": "./lib/module/components/native/*",
       "default": "./lib/commonjs/components/native/*"
     },
     "./plugin": {
@@ -56,30 +56,30 @@
     "./package.json": "./package.json",
     "./server": {
       "types": "./lib/typescript/src/server/index.d.ts",
+      "browser": "./lib/module/server/index.js",
       "react-native": "./src/server/index.ts",
       "import": "./lib/module/server/index.js",
-      "browser": "./lib/module/server/index.js",
       "default": "./lib/commonjs/server/index.js"
     },
     "./web": {
       "types": "./lib/typescript/src/web-only/index.d.ts",
+      "browser": "./lib/module/web-only/index.js",
       "react-native": "./src/web-only/index.ts",
       "import": "./lib/module/web-only/index.js",
-      "browser": "./lib/module/web-only/index.js",
       "default": "./lib/commonjs/web-only/index.js"
     },
     "./reanimated": {
       "types": "./lib/typescript/src/reanimated/index.d.ts",
+      "browser": "./lib/module/reanimated/index.js",
       "react-native": "./src/reanimated/index.ts",
       "import": "./lib/module/reanimated/index.js",
-      "browser": "./lib/module/reanimated/index.js",
       "default": "./lib/commonjs/reanimated/index.js"
     },
     "./diagnostics": {
       "types": "./lib/typescript/src/diagnostics/index.d.ts",
+      "browser": "./lib/module/diagnostics/index.js",
       "react-native": "./src/diagnostics/index.ts",
       "import": "./lib/module/diagnostics/index.js",
-      "browser": "./lib/module/diagnostics/index.js",
       "default": "./lib/commonjs/diagnostics/index.js"
     }
   },
