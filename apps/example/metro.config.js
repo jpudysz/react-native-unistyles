@@ -4,6 +4,7 @@ const { default: exclusionList } = require(
     require.resolve("metro-config").replace("index.js", "defaults/exclusionList.js"),
 );
 
+const { withUnistylesConfig } = require("react-native-unistyles/metro");
 const pak = require("../../packages/unistyles/package.json");
 
 const monorepoRoot = path.resolve(__dirname, "../..");
@@ -39,4 +40,5 @@ const config = {
     },
 };
 
-module.exports = config;
+// UNISTYLES_BUNDLER=babel runs the Babel plugin (babel.config.js) instead
+module.exports = process.env.UNISTYLES_BUNDLER === "babel" ? config : withUnistylesConfig(config, { debug: true });

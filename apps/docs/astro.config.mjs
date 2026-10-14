@@ -146,6 +146,7 @@ export default defineConfig({
                     label: 'Other',
                     items: [
                         { label: 'Babel plugin', slug: 'v3/other/babel-plugin', badge: 'Updated!' },
+                        { label: 'Metro integration', slug: 'v3/other/metro', badge: 'New!' },
                         { label: 'Dependencies', slug: 'v3/other/dependencies' },
                         { label: 'For library authors', slug: 'v3/other/for-library-authors' },
                         { label: 'For sponsors', slug: 'v3/other/for-sponsors' },

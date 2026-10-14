@@ -45,6 +45,13 @@ export interface UnistylesPluginOptions {
     root: string
 
     /**
+     * Set by react-native-unistyles/metro, don't use it!
+     * Metro picks the files to process and swaps imports in its resolver,
+     * so `root`, `autoProcessImports`, `autoProcessPaths` and `autoRemapImports` are ignored
+     */
+    isMetro?: boolean
+
+    /**
      * Example: ['@my-org/styles']
      * Enable this option if you want to process only files containing specific imports.
      */

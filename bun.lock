@@ -64,6 +64,7 @@
       "version": "1.0.0",
       "dependencies": {
         "@expo/metro-runtime": "57.0.16",
+        "e2e-third-party-card": "file:./e2e/third-party-card",
         "expo": "57.0.25",
         "expo-build-properties": "57.0.22",
         "expo-constants": "57.0.19",
@@ -99,17 +100,19 @@
     },
     "packages/unistyles": {
       "name": "react-native-unistyles",
-      "version": "3.4.0",
+      "version": "3.5.3",
       "dependencies": {
         "@babel/types": "7.29.8",
       },
       "devDependencies": {
+        "@babel/core": "7.29.7",
         "@babel/plugin-syntax-jsx": "7.29.7",
         "@babel/runtime": "7.29.7",
         "@callstack/repack": "5.4.0",
         "@commitlint/config-conventional": "21.2.3",
         "@react-native/babel-preset": "0.87.1",
         "@react-native/jest-preset": "0.87.1",
+        "@react-native/metro-babel-transformer": "0.87.1",
         "@react-native/normalize-colors": "0.87.1",
         "@rspack/core": "2.2.7",
         "@types/jest": "30.0.0",
@@ -3761,6 +3764,8 @@
     "expect/jest-util": ["jest-util@30.2.0", "", { "dependencies": { "@jest/types": "30.2.0", "@types/node": "*", "chalk": "^4.1.2", "ci-info": "^4.2.0", "graceful-fs": "^4.2.11", "picomatch": "^4.0.2" } }, "sha512-QKNsM0o3Xe6ISQU869e+DhG+4CK/48aHYdJZGlFQVTjnbvgpcKyxpzk29fGiO7i/J8VENZ+d2iGnSsvmuHywlA=="],
 
     "expo-build-properties/semver": ["semver@7.7.4", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA=="],
+
+    "expo-example/e2e-third-party-card": ["e2e-third-party-card@file:apps/expo-example/e2e/third-party-card", {}],
 
     "expo-example/metro-config": ["metro-config@0.84.6", "", { "dependencies": { "connect": "^3.6.5", "flow-enums-runtime": "^0.0.6", "jest-validate": "^29.7.0", "metro": "0.84.6", "metro-cache": "0.84.6", "metro-core": "0.84.6", "metro-runtime": "0.84.6", "yaml": "^2.6.1" } }, "sha512-cD2mLEofcuV26kxSV4hfV1Pbuh6igdUhYQriO8ZVeJ7HyZfq4/wqHV0gSR7fEO8NUp9odr60/Kzm5YakmghWwQ=="],
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { Animated as RNAnimated, Pressable, ScrollView, Text, View } from 'react-native'
 import { usePathname } from 'expo-router'
+import { Card } from 'e2e-third-party-card'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { ScopedTheme, StyleSheet, useUnistyles, withUnistyles } from 'react-native-unistyles'
 import { useAnimatedTheme } from 'react-native-unistyles/reanimated'
@@ -52,6 +53,12 @@ const NativeAnimatedProbe = React.memo(() => {
         />
     )
 })
+
+// A 3rd party component that forwards a unistyle to its React Native View.
+// Memoized like the component, so only Unistyles can repaint it
+const ThirdPartyProbe = React.memo(() => (
+    <Card accessible accessibilityLabel={`${LABELS.probe} third-party`} style={styles.thirdPartyProbe} />
+))
 
 // Painted with the probe's theme color, the other probes render their own components
 const THEMED_PROBES = ['background', 'surface', 'primary', 'accent'] as const
@@ -128,6 +135,7 @@ const RunnerOverlay: React.FunctionComponent<{ state: RunnerState }> = ({ state 
                 ))}
                 <AnimatedProbe />
                 <NativeAnimatedProbe />
+                <ThirdPartyProbe />
                 <ScopedProbes />
                 {/* One line, so a long sync label can't grow the bar over the elements the host taps (the host reads the label) */}
                 <Text numberOfLines={1} style={styles.status}>{state.sync ? formatSync(state.sync) : state.status}</Text>
@@ -169,6 +177,11 @@ const styles = StyleSheet.create((theme, rt) => ({
     },
     nativeAnimatedProbe: {
         backgroundColor: theme.colors.typography
+    },
+    thirdPartyProbe: {
+        width: 28,
+        height: 28,
+        backgroundColor: theme.colors.accent
     },
     status: {
         flex: 1,

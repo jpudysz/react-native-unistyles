@@ -10,9 +10,12 @@ import { createIOS } from './host/ios'
 import { colorDistance, parseHex, readPng, sampleColor, toHex } from './host/png'
 import {
     BEACON_COLORS,
+    type Bundler,
+    BUNDLERS,
     formatFailure,
     formatSync,
     LABELS,
+    METRO_ONLY_PROBES,
     parseReport,
     parseRunInteger,
     parseSync,
@@ -24,7 +27,7 @@ import {
     type Sync,
 } from './protocol'
 
-const USAGE = 'Usage: bun e2e/run.ts <ios|android> --device <udid|serial> [--scenarios <ids|all>] [--reps <n>] [--seed <n>] [--taps] [--skip-build]'
+const USAGE = 'Usage: bun e2e/run.ts <ios|android> --device <udid|serial> [--scenarios <ids|all>] [--reps <n>] [--seed <n>] [--taps] [--bundler <metro|babel>] [--skip-build]'
 
 const POLL_MS = 500
 const READY_TIMEOUT_MS = 90_000
@@ -53,6 +56,8 @@ const { positionals, values } = parseArgs({
         'reps': { type: 'string', default: '20' },
         'seed': { type: 'string', default: '1' },
         'taps': { type: 'boolean', default: false },
+        // metro: react-native-unistyles/metro, babel: the Babel plugin, read by babel.config.js and metro.config.js
+        'bundler': { type: 'string', default: 'metro' },
         'skip-build': { type: 'boolean', default: false },
     },
 })
@@ -62,6 +67,17 @@ if ((platform !== 'ios' && platform !== 'android') || values.device === undefine
     console.error(USAGE)
     process.exit(2)
 }
+
+if (!BUNDLERS.includes(values.bundler as Bundler)) {
+    console.error(`Unknown bundler "${values.bundler}", expected one of: ${BUNDLERS.join(', ')}`)
+    process.exit(2)
+}
+
+const bundler = values.bundler as Bundler
+// the Release build bundles the JS, with this mode
+process.env.UNISTYLES_BUNDLER = bundler
+// the Babel plugin skips node_modules, so only Metro paints the 3rd party probe
+const probes = PROBES.filter(probe => bundler === 'metro' || !METRO_ONLY_PROBES.includes(probe))
 
 const unknownScenario = values.scenarios.split(',').find(id => id !== 'all' && !SCENARIOS.includes(id as never))
 
@@ -202,16 +218,16 @@ const waitForSync = async (beacon: Rect, previous: Sync) => {
     throw new Error(`Runner stalled before sync #${seq}, last saw ${seen}`)
 }
 
-const checkProbes = (sync: Sync, probes: Record<ProbeName, Rect>) => {
+const checkProbes = (sync: Sync, frames: Record<ProbeName, Rect>) => {
     const [, theme] = sync.detail.split(' ') as [string, string]
     const path = screenshot(`checkpoint-${sync.detail.replace(' ', '-')}`)
     const image = readPng(path)
 
     checkpoints++
 
-    for (const probe of PROBES) {
+    for (const probe of probes) {
         const expected = PROBE_COLORS[theme as keyof typeof PROBE_COLORS]![probe]
-        const { x, y } = center(probes[probe])
+        const { x, y } = center(frames[probe])
         const actual = sampleColor(image, x, y)
 
         if (colorDistance(actual, parseHex(expected)) > PROBE_TOLERANCE) {
@@ -224,8 +240,8 @@ const checkProbes = (sync: Sync, probes: Record<ProbeName, Rect>) => {
 const serve = async (): Promise<Report> => {
     let { elements, sync } = await waitForReady()
     const beacon = findElement(elements, element => element.label === LABELS.beacon, 'beacon').frame
-    const probes = Object.fromEntries(
-        PROBES.map(probe => [probe, findElement(elements, element => element.label === `${LABELS.probe} ${probe}`, `${probe} probe`).frame]),
+    const frames = Object.fromEntries(
+        probes.map(probe => [probe, findElement(elements, element => element.label === `${LABELS.probe} ${probe}`, `${probe} probe`).frame]),
     ) as Record<ProbeName, Rect>
 
     while (true) {
@@ -234,7 +250,7 @@ const serve = async (): Promise<Report> => {
                 acknowledge(beacon)
                 break
             case 'CHECKPOINT':
-                checkProbes(sync, probes)
+                checkProbes(sync, frames)
                 acknowledge(beacon)
                 break
             case 'FAILURE':
@@ -273,7 +289,7 @@ const printSummary = (report: Report, startedAt: number) => {
     const passed = report.result === 'PASS' && probeFailures.length === 0
 
     console.log(`\nE2E ${platform} ${passed ? 'PASS' : 'FAIL'} in ${seconds(startedAt)} (runner ${Math.round(report.durationMs / 1000)}s)`)
-    console.log(`scenarios ${values.scenarios}, reps ${report.reps}, seed ${report.seed}, taps ${report.taps ? 'on' : 'off'}`)
+    console.log(`scenarios ${values.scenarios}, reps ${report.reps}, seed ${report.seed}, taps ${report.taps ? 'on' : 'off'}, bundler ${bundler}`)
     console.log(
         `steps ${report.steps}, nodes checked ${report.checked}, detached ${report.detached}, suspended ${report.suspended}, mismatches ${report.mismatches}`,
     )
@@ -299,7 +315,7 @@ const main = async () => {
     const startedAt = Date.now()
 
     if (!values['skip-build']) {
-        console.log(`Building ${platform} Release (log: ${relative(process.cwd(), join(outDir, 'build.log'))})`)
+        console.log(`Building ${platform} Release with ${bundler} (log: ${relative(process.cwd(), join(outDir, 'build.log'))})`)
         device.build(join(outDir, 'build.log'))
         console.log(`Built in ${seconds(startedAt)}`)
     }
@@ -319,12 +335,12 @@ const main = async () => {
     try {
         const report = await serve()
 
-        writeFileSync(join(outDir, 'report.json'), JSON.stringify({ platform, report, checkpoints, probeFailures }, null, 4))
+        writeFileSync(join(outDir, 'report.json'), JSON.stringify({ platform, bundler, report, checkpoints, probeFailures }, null, 4))
 
         return printSummary(report, runStartedAt)
     } catch (error) {
         screenshot('error')
-        writeFileSync(join(outDir, 'report.json'), JSON.stringify({ platform, error: String(error), checkpoints, probeFailures }, null, 4))
+        writeFileSync(join(outDir, 'report.json'), JSON.stringify({ platform, bundler, error: String(error), checkpoints, probeFailures }, null, 4))
         console.error(`\nE2E ${platform} ERROR: ${error instanceof Error ? error.message : error}\nartifacts: ${relative(process.cwd(), outDir)}`)
 
         return false

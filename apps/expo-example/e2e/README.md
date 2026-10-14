@@ -12,17 +12,22 @@ runner through a deep link, pixel-checks themed probes at checkpoints and fails 
 # from apps/expo-example
 bun e2e/run.ts ios --device <simulator udid> --scenarios all --reps 3
 bun e2e/run.ts android --device <adb serial> --scenarios frozen-stack,frozen-unmount --reps 10 --taps
+bun e2e/run.ts ios --device <simulator udid> --scenarios all --reps 1 --bundler babel
 ```
 
 - `--scenarios` comma separated ids from `protocol.ts` or `all` (default), `--reps` default 20, `--seed` default 1.
 - `--taps` makes the host tap the header theme pills and back button (in `TAP_SCENARIOS`) instead of calling the same
   `selectTheme` / `router.back` from JS.
-- `--skip-build` reuses the last Release build (`ios/build`, `android/app/build`).
+- `--bundler` picks how Unistyles is set up, `metro` (default) is `react-native-unistyles/metro` in `metro.config.js`,
+  `babel` is the Babel plugin in `babel.config.js`. Both read `UNISTYLES_BUNDLER`, the host sets it for the Release
+  build. The `third-party` probe is checked only with `metro`, the Babel plugin doesn't process `node_modules`.
+- `--skip-build` reuses the last Release build (`ios/build`, `android/app/build`), built with any bundler.
 - Artifacts (report JSON, checkpoint, failure and result screenshots, build log) land in the gitignored
   `e2e-results/<timestamp>/`. The script prints a summary and exits non-zero on any failure, stall or crash.
 
 Prerequisites: a prebuilt `ios/` and `android/` (`bun run ios` / `bun run android` once, they are gitignored), the
-babel plugin built (`bun run --cwd packages/unistyles plugin:build`), `argent` on PATH for iOS. Start the Android emulator
+Metro integration and the Babel plugin built (`bun run --cwd packages/unistyles metro:build` and `plugin:build`), `argent` on PATH for iOS.
+`e2e/third-party-card` is a dependency (`file:`), bun copies it into `node_modules`, run `bun install` after changing it. Start the Android emulator
 windowless from bash, a hidden window gets throttled by App Nap:
 
 ```sh
@@ -69,7 +74,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `pendingUpdates`      | after every step       | shadow tree updates that were queued but never committed                                 |
 | `orphans`             | `frozen-unmount`       | families unmounted while frozen that survive the sweep of a theme change                 |
 | `expect`              | after a screen check   | a prop React owns differs in the committed tree, eg. `transition.check` measures the bar, `animations.variant-color` reads the Reanimated color, or the JS thread stalled too long (`frozen-list.stall`) |
-| probe                 | at checkpoints         | the screen paints other colors than the theme (overlay squares, Reanimated, RN Animated), or a `ScopedTheme` square other colors than its scope |
+| probe                 | at checkpoints         | the screen paints other colors than the theme (overlay squares, Reanimated, RN Animated, a 3rd party component from `node_modules`), or a `ScopedTheme` square other colors than its scope |
 | crash                 | while the host waits   | the app process died, e.g. a use after free on a frozen unmount                          |
 | host `timeout`, stall | at sync points         | the screen stopped updating or the runner hung                                           |
 
@@ -89,9 +94,11 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
   `settle.ts` waits two idle callbacks and two frames: Unistyles applies theme changes from a
   native callback on the JS thread, the idle callbacks run after it.
 - The overlay (`E2EOverlay.tsx`, rendered by the root layout outside the navigator, so it never freezes) renders nothing
-  until the e2e route starts a run. Then it shows a beacon, six themed probes, three probes below `<ScopedTheme name="dark">`
-  (one re-renders by itself, two mount after the scope rendered, the scope itself never renders again) and the current marker
-  (`E2E CHECKPOINT <n> <theme> #<seq>`, `E2E TAP <testID> #<seq>`, `E2E RESULT PASS|FAIL #<seq>`).
+  until the e2e route starts a run. Then it shows a beacon, six themed probes, a 3rd party component from
+  `node_modules` (`third-party`, a memoized `Card` of `e2e/third-party-card` that forwards a unistyle to its View),
+  three probes below `<ScopedTheme name="dark">` (one re-renders by itself, two mount after the scope rendered, the
+  scope itself never renders again) and the current marker (`E2E CHECKPOINT <n> <theme> #<seq>`, `E2E TAP <testID> #<seq>`,
+  `E2E RESULT PASS|FAIL #<seq>`).
 - At a sync point the runner blocks and the beacon turns magenta or yellow (by sync parity). The host polls screenshots
   until the beacon shows the next sync, only then reads the accessibility tree, and answers by tapping the beacon or the
   requested element, or flips the OS appearance (`xcrun simctl ui`, `adb shell cmd uimode night`) for `APPEARANCE`

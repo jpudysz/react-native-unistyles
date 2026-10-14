@@ -6,6 +6,7 @@ import nodePath from 'node:path'
 import type { UnistylesPluginPass } from './types'
 
 import {
+    METRO_UPSTREAM_TRANSFORMER_ENV,
     NATIVE_COMPONENTS_PATHS,
     REACT_NATIVE_COMPONENT_NAMES,
     REPLACE_WITH_UNISTYLES_EXOTIC_PATHS,
@@ -40,15 +41,22 @@ export default function (): PluginObj<UnistylesPluginPass> {
         visitor: {
             Program: {
                 enter(path, state) {
-                    if (!state.opts.root) {
+                    // the Metro integration runs this plugin itself, a second run would also swap the imports
+                    if (!state.opts.isMetro && process.env[METRO_UPSTREAM_TRANSFORMER_ENV]) {
+                        throw new Error(
+                            'Unistyles 🦄: react-native-unistyles/metro is enabled in metro.config.js, remove react-native-unistyles/plugin from babel.config.js',
+                        )
+                    }
+
+                    if (!state.opts.root && !state.opts.isMetro) {
                         throw new Error(
                             'Unistyles 🦄: Babel plugin requires `root` option to be set. Please check https://www.unistyl.es/v3/other/babel-plugin#extra-configuration',
                         )
                     }
 
-                    const appRoot = toPlatformPath(nodePath.join(state.file.opts.root as string, state.opts.root))
+                    const appRoot = toPlatformPath(nodePath.join(state.file.opts.root as string, state.opts.root ?? ''))
 
-                    if (state.file.opts.root === appRoot) {
+                    if (!state.opts.isMetro && state.file.opts.root === appRoot) {
                         throw new Error(
                             "Unistyles 🦄: Root option can't resolve to project root as it will include node_modules folder. Please check https://www.unistyl.es/v3/other/babel-plugin#extra-configuration",
                         )
@@ -67,7 +75,8 @@ export default function (): PluginObj<UnistylesPluginPass> {
                     state.file.styleSheetLocalName = ''
                     state.file.reactNativeCommonJSName = ''
                     state.reactNativeImports = {}
-                    state.file.forceProcessing = state.filename?.includes(appRoot) ?? false
+                    // Metro hands over only the files to process, there is no root or import list to configure
+                    state.file.forceProcessing = state.opts.isMetro || (state.filename?.includes(appRoot) ?? false)
 
                     path.traverse({
                         BlockStatement(blockPath) {
@@ -80,7 +89,7 @@ export default function (): PluginObj<UnistylesPluginPass> {
                     })
                 },
                 exit(path, state) {
-                    if (isInsideNodeModules(state)) {
+                    if (state.opts.isMetro || isInsideNodeModules(state)) {
                         return
                     }
 
@@ -137,9 +146,12 @@ export default function (): PluginObj<UnistylesPluginPass> {
                 })
             },
             ImportDeclaration(path, state) {
-                const exoticImport = REPLACE_WITH_UNISTYLES_EXOTIC_PATHS.concat(state.opts.autoRemapImports ?? []).find(
-                    (exotic) => state.filename?.includes(exotic.path),
-                )
+                // the Metro resolver swaps the imports
+                const exoticImport = state.opts.isMetro
+                    ? undefined
+                    : REPLACE_WITH_UNISTYLES_EXOTIC_PATHS.concat(state.opts.autoRemapImports ?? []).find((exotic) =>
+                          state.filename?.includes(exotic.path),
+                      )
 
                 if (exoticImport) {
                     return handleExoticImport(path, state, exoticImport)
@@ -163,6 +175,10 @@ export default function (): PluginObj<UnistylesPluginPass> {
                             state.file.styleSheetLocalName = specifier.local.name
                         }
                     })
+                }
+
+                if (state.opts.isMetro) {
+                    return
                 }
 
                 if (importSource === 'react-native') {
@@ -195,7 +211,7 @@ export default function (): PluginObj<UnistylesPluginPass> {
                 }
             },
             MemberExpression(path, state) {
-                if (isInsideNodeModules(state)) {
+                if (state.opts.isMetro || isInsideNodeModules(state)) {
                     return
                 }
 

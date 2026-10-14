@@ -69,3 +69,9 @@ export const NATIVE_COMPONENTS_PATHS: Pick<RemapConfig, 'imports'> = {
         },
     ],
 }
+
+/**
+ * set by react-native-unistyles/metro in the Metro process, its workers inherit it
+ */
+export const METRO_UPSTREAM_TRANSFORMER_ENV = 'UNISTYLES_METRO_UPSTREAM_TRANSFORMER'
+export const METRO_OPTIONS_ENV = 'UNISTYLES_METRO_OPTIONS'
