@@ -1,4 +1,11 @@
-import type { MetroConfig } from 'metro-config'
+type MetroConfig = {
+    transformer?: {
+        babelTransformerPath?: string
+    }
+    resolver?: {
+        resolveRequest?: ((...args: Array<any>) => any) | null
+    }
+}
 
 export interface UnistylesMetroOptions {
     /**

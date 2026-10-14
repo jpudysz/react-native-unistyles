@@ -21,7 +21,7 @@ bun e2e/run.ts ios --device <simulator udid> --scenarios all --reps 1 --bundler 
 - `--bundler` picks how Unistyles is set up, `metro` (default) is `react-native-unistyles/metro` in `metro.config.js`,
   `babel` is the Babel plugin in `babel.config.js`. Both read `UNISTYLES_BUNDLER`, the host sets it for the Release
   build. The `third-party` probe is checked only with `metro`, the Babel plugin doesn't process `node_modules`.
-- `--skip-build` reuses the last Release build (`ios/build`, `android/app/build`), built with any bundler.
+- `--skip-build` reuses the last Release build (`ios/build`, `android/app/build`), pass the `--bundler` it was built with.
 - Artifacts (report JSON, checkpoint, failure and result screenshots, build log) land in the gitignored
   `e2e-results/<timestamp>/`. The script prints a summary and exits non-zero on any failure, stall or crash.
 
