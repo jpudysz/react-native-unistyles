@@ -1,14 +1,17 @@
 const path = require('path')
 const pak = require('../../packages/unistyles/package.json')
 
+// react-native-unistyles/metro (metro.config.js) runs Unistyles, UNISTYLES_BUNDLER=babel runs the Babel plugin instead
+const useBabelPlugin = process.env.UNISTYLES_BUNDLER === 'babel'
+
 module.exports = function (api) {
-    api.cache(true)
+    api.cache.using(() => useBabelPlugin)
 
     return {
         presets: ['babel-preset-expo'],
         plugins: [
             "react-native-worklets/plugin",
-            [path.join(__dirname, '../../packages/unistyles/plugin'), {
+            useBabelPlugin && [path.join(__dirname, '../../packages/unistyles/plugin'), {
                 debug: true,
                 isLocal: true,
                 localPath: path.join(__dirname, '../../packages/unistyles'),
@@ -27,6 +30,6 @@ module.exports = function (api) {
                     }
                 }
             ]
-        ]
+        ].filter(Boolean)
     }
 }

@@ -1,0 +1,65 @@
+---
+title: Metro integration
+description: Set up Unistyles in metro.config.js instead of the Babel plugin
+---
+
+import { Aside } from '@astrojs/starlight/components'
+import Seo from '../../../../components/Seo.astro'
+
+<Seo
+    seo={{
+        title: 'Unistyles Metro integration',
+        description: 'Set up Unistyles in metro.config.js instead of the Babel plugin'
+    }}
+>
+
+<Aside type="caution" title="Experimental">
+The Metro integration is experimental. The [Babel plugin](/v3/other/babel-plugin) stays the default and keeps working as before.
+</Aside>
+
+`react-native-unistyles/metro` replaces the Babel plugin with a single line in `metro.config.js`. There is nothing to configure: no `root`, `autoProcessImports`, `autoProcessPaths` or `autoRemapImports`.
+
+```js title="metro.config.js"
+const { getDefaultConfig } = require('expo/metro-config')
+// or for bare React Native
+// const { getDefaultConfig } = require('@react-native/metro-config')
+const { withUnistylesConfig } = require('react-native-unistyles/metro')
+
+const config = getDefaultConfig(__dirname)
+
+module.exports = withUnistylesConfig(config)
+```
+
+Then remove `react-native-unistyles/plugin` from your `babel.config.js`. Metro runs it for you, Unistyles throws an error if both are set up.
+
+### What it does
+
+The Babel plugin has two jobs, the Metro integration covers both:
+
+1. **Every `react-native` import resolves to Unistyles components.** A Metro resolver swaps `View`, `Text`, `Pressable` and the [other supported components](/v3/other/babel-plugin#2-component-factory-borrowing-ref) for Unistyles components. It also covers `node_modules`, so a 3rd party component that passes your `style` to a React Native view updates with your theme, without `withUnistyles`. The internals of React Native, React Native Web and Unistyles stay untouched.
+2. **StyleSheets get their dependencies and variants get their scope.** Metro runs the [Babel plugin's transforms](/v3/other/babel-plugin#1-detecting-stylesheet-dependencies) on every file of your app that calls `StyleSheet.create` or `useVariants`, also with a `StyleSheet` re-exported from your own module, and on libraries built with Unistyles.
+
+Both produce the same code as the Babel plugin, which the test suite checks with every test case of the Babel plugin.
+
+### Options
+
+```js title="metro.config.js"
+module.exports = withUnistylesConfig(config, {
+    // logs the dependencies detected in every StyleSheet, like the Babel plugin's `debug` option
+    debug: true
+})
+```
+
+### Other Metro plugins
+
+`withUnistylesConfig` wraps the `babelTransformerPath` and `resolveRequest` of the config it receives. Apply it last, or make sure that a plugin applied after it keeps both.
+
+To render a raw React Native component, import it from `react-native/index.js`, which Unistyles doesn't swap.
+
+### Limitations
+
+- Metro only. Re.Pack, Vite, Next.js and other web bundlers keep using the [Babel plugin](/v3/other/babel-plugin)
+- Babel runs plugins from your `babel.config.js` before the ones added by Metro. If you add `babel-plugin-react-compiler` to the `plugins` of a bare React Native app, it runs before Unistyles processes `useVariants`, keep using the Babel plugin there. Expo adds React Compiler with `babel-preset-expo`, presets run after plugins
+- Jest doesn't use Metro, your [testing setup](/v3/start/testing) stays the same
+
+</Seo>

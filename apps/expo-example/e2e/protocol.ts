@@ -77,9 +77,16 @@ export const beaconColor = (sync?: Sync) => sync ? BEACON_COLORS.waiting[sync.se
 // Painted below <ScopedTheme name="dark"> in every theme: one re-renders by itself, the others mount after the scope rendered
 export const SCOPED_PROBES = ['scoped-rerender', 'scoped-late', 'scoped-with-unistyles'] as const
 
-export const PROBES = ['background', 'surface', 'primary', 'accent', 'animated', 'native-animated', ...SCOPED_PROBES] as const
+export const PROBES = ['background', 'surface', 'primary', 'accent', 'animated', 'native-animated', 'third-party', ...SCOPED_PROBES] as const
 
 export type ProbeName = typeof PROBES[number]
+
+// A 3rd party component from node_modules, only react-native-unistyles/metro swaps its React Native View
+export const METRO_ONLY_PROBES: ReadonlyArray<ProbeName> = ['third-party']
+
+export type Bundler = 'metro' | 'babel'
+
+export const BUNDLERS: ReadonlyArray<Bundler> = ['metro', 'babel']
 
 // The expected paint of every probe per theme, straight from the registered themes
 export const PROBE_COLORS = Object.fromEntries(
@@ -93,6 +100,7 @@ export const PROBE_COLORS = Object.fromEntries(
             accent: colors.accent,
             animated: colors.secondary,
             'native-animated': colors.typography,
+            'third-party': colors.accent,
             ...Object.fromEntries(SCOPED_PROBES.map(probe => [probe, themes.dark.colors.primary]))
         }]
     })

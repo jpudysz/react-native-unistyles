@@ -18,6 +18,10 @@ Unistyles 3.0 relies heavily on the Babel plugin, which helps convert your code 
 
 Our golden rule is to never introduce any component that could pollute your native view hierarchy. In other words, if you use a `View`, it will be rendered as-is in the native view hierarchy.
 
+<Aside>
+With Metro, you can set up Unistyles in `metro.config.js` instead, without any options. Check the experimental [Metro integration](/v3/other/metro).
+</Aside>
+
 Let's discuss the responsibilities of the Babel plugin:
 
 ### 1. Detecting StyleSheet dependencies

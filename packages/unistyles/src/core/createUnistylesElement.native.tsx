@@ -5,6 +5,7 @@ import React, { useContext, useRef } from 'react'
 import { ScopedThemeContext } from '../components/ScopedThemeContext'
 import { UnistylesShadowRegistry } from '../specs'
 import { copyComponentProperties } from '../utils'
+import { hasUnistyles } from './hasUnistyles'
 import { passForwardedRef } from './passForwardRef'
 import { maybeWarnAboutMultipleUnistyles } from './warn'
 
@@ -12,6 +13,10 @@ export const createUnistylesElement = (Component: any) => {
     const UnistylesComponent = (props: any) => {
         const scrollViewRef = useRef<ScrollView>(null)
         const scope = useContext(ScopedThemeContext)
+
+        if (!hasUnistyles(props.style)) {
+            return <Component {...props} />
+        }
 
         return (
             <Component

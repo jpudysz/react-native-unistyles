@@ -5,6 +5,7 @@ import React, { useCallback, useContext, useLayoutEffect, useRef, useState } fro
 import { ScopedThemeContext } from '../components/ScopedThemeContext'
 import { UnistylesShadowRegistry } from '../specs'
 import { copyComponentProperties } from '../utils'
+import { hasUnistyles } from './hasUnistyles'
 import { passForwardedRef } from './passForwardRef'
 import { maybeWarnAboutMultipleUnistyles } from './warn'
 
@@ -48,6 +49,10 @@ export const createUnistylesTouchableHighlight = (Component: typeof TouchableHig
             },
             [props, scope],
         )
+
+        if (!hasUnistyles(props.style)) {
+            return <Component {...props} />
+        }
 
         return (
             <Component

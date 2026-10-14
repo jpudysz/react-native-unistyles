@@ -6,6 +6,7 @@ import { isAndroid } from '../common'
 import { ScopedThemeContext } from '../components/ScopedThemeContext'
 import { UnistylesShadowRegistry } from '../specs'
 import { copyComponentProperties } from '../utils'
+import { hasUnistyles } from './hasUnistyles'
 import { passForwardedRef } from './passForwardRef'
 import { maybeWarnAboutMultipleUnistyles } from './warn'
 
@@ -20,6 +21,10 @@ const getWrapperHandle = (ref: any) => {
 export const createUnistylesActivityIndicator = (Component: typeof ActivityIndicator) => {
     const UnistylesActivityIndicator = (props: any) => {
         const scope = useContext(ScopedThemeContext)
+
+        if (!hasUnistyles(props.style)) {
+            return <Component {...props} />
+        }
 
         return (
             <Component

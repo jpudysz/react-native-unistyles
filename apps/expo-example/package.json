@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "57.0.16",
+    "e2e-third-party-card": "file:./e2e/third-party-card",
     "expo": "57.0.25",
     "expo-build-properties": "57.0.22",
     "expo-constants": "57.0.19",

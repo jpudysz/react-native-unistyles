@@ -68,6 +68,11 @@ export function addUnistylesImport(path: NodePath<t.Program>, state: UnistylesPl
 }
 
 export function isInsideNodeModules(state: UnistylesPluginPass) {
+    // Metro picks the node_modules files that use Unistyles
+    if (state.opts.isMetro) {
+        return false
+    }
+
     return state.file.opts.filename?.includes('node_modules') && !state.file.replaceWithUnistyles
 }
 

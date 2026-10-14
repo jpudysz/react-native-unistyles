@@ -10,13 +10,16 @@ const unistylesPluginOptions = {
     autoProcessImports: ['@lib/theme', './st'],
 }
 
+// react-native-unistyles/metro (metro.config.js) runs Unistyles, UNISTYLES_BUNDLER=babel runs the Babel plugin instead
+const useBabelPlugin = process.env.UNISTYLES_BUNDLER === 'babel'
+
 module.exports = api => {
-    api.cache(true)
+    api.cache.using(() => useBabelPlugin)
 
     return {
         presets: ['module:@react-native/babel-preset'],
         plugins: [
-            [
+            useBabelPlugin && [
                 path.join(__dirname, '../../packages/unistyles/plugin'),
                 unistylesPluginOptions
             ],
@@ -30,6 +33,6 @@ module.exports = api => {
                 }
             ],
             'react-native-worklets/plugin'
-        ]
+        ].filter(Boolean)
     }
 }
