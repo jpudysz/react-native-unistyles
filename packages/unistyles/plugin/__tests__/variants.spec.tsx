@@ -1,4 +1,6 @@
-import { pluginTester } from 'babel-plugin-tester'
+import type { NodePath, PluginObj } from '@babel/core'
+
+import { pluginTester, runPluginUnderTestHere } from 'babel-plugin-tester'
 
 import plugin from '../src/index'
 
@@ -188,9 +190,8 @@ pluginTester({
                         const styles = _styles.useVariants({
                             size: 'small'
                         })
-                        const _styles2 = styles
                         {
-                            const styles = _styles2.useVariants({
+                            const styles = _styles.useVariants({
                                 size: 'small'
                             })
 
@@ -198,9 +199,8 @@ pluginTester({
                                 <View style={styles.container}>
                                     <Text>Hello world</Text>
                                     {[1, 2, 3].map((_, index) => {
-                                        const _styles3 = styles
                                         {
-                                            const styles = _styles3.useVariants({
+                                            const styles = _styles.useVariants({
                                                 size: 'large'
                                             })
 
@@ -345,6 +345,98 @@ pluginTester({
                             size: {
                                 small: { width: 100 },
                                 large: { width: 300 }
+                            }
+                        },
+                        uni__dependencies: [4]
+                    }
+                })
+            `,
+        },
+    ],
+})
+
+// React Compiler runs in the same pass and resolves every declaration through babel's scope (#1002)
+const bindingsChecker = (): PluginObj => ({
+    visitor: {
+        Program(path) {
+            path.traverse({
+                VariableDeclarator(declaratorPath: NodePath) {
+                    const id = declaratorPath.get('id') as NodePath
+
+                    if (id.isIdentifier() && declaratorPath.scope.getBinding(id.node.name)?.identifier !== id.node) {
+                        throw new Error(`Missing binding for ${id.node.name}`)
+                    }
+                },
+            })
+        },
+    },
+})
+
+pluginTester({
+    plugin,
+    pluginOptions: {
+        debug: false,
+        root: 'src',
+    },
+    babelOptions: {
+        plugins: ['@babel/plugin-syntax-jsx', runPluginUnderTestHere, bindingsChecker],
+    },
+    tests: [
+        {
+            title: 'Should register bindings for scoped variants',
+            code: `
+                import { View } from 'react-native'
+                import { StyleSheet } from 'react-native-unistyles'
+
+                export const Example = ({ size }) => {
+                    styles.useVariants({ size })
+
+                    const label = size === 'small' ? 'S' : 'L'
+
+                    styles.useVariants({ size: 'large' })
+
+                    return <View style={styles.container} accessibilityLabel={label} />
+                }
+
+                const styles = StyleSheet.create({
+                    container: {
+                        variants: {
+                            size: {
+                                small: { width: 100 },
+                                large: { width: 300 },
+                            },
+                        },
+                    },
+                })
+            `,
+            output: `
+                import { View } from 'react-native-unistyles/components/native/View'
+                import { StyleSheet } from 'react-native-unistyles'
+                export const Example = ({ size }) => {
+                    const _styles = styles
+                    {
+                        const styles = _styles.useVariants({
+                            size
+                        })
+                        const label = size === 'small' ? 'S' : 'L'
+                        {
+                            const styles = _styles.useVariants({
+                                size: 'large'
+                            })
+                            return <View style={styles.container} accessibilityLabel={label} />
+                        }
+                    }
+                }
+                const styles = StyleSheet.create({
+                    container: {
+                        variants: {
+                            size: {
+                                small: {
+                                    width: 100
+                                },
+                                large: {
+                                    width: 300
+                                }
                             }
                         },
                         uni__dependencies: [4]
