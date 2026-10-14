@@ -732,6 +732,7 @@ function addDependencies(state, styleName, unistyle, detectedDependencies) {
 
 // plugin/src/variants.ts
 var t5 = __toESM(require("@babel/types"));
+var scopedVariants = /* @__PURE__ */ new WeakMap();
 function extractVariants(path3, state) {
   const maybeVariants = path3.node.body.filter(
     (node2) => t5.isExpressionStatement(node2) && t5.isCallExpression(node2.expression) && t5.isMemberExpression(node2.expression.callee)
@@ -758,22 +759,29 @@ function extractVariants(path3, state) {
     return;
   }
   const calleeName = callee.object.name;
-  const newUniqueName = path3.scope.generateUidIdentifier(calleeName);
-  const shadowDeclaration = t5.variableDeclaration("const", [
-    t5.variableDeclarator(newUniqueName, t5.identifier(calleeName))
-  ]);
+  const binding = path3.scope.getBinding(calleeName);
+  const existingShadowName = binding && t5.isVariableDeclarator(binding.path.node) ? scopedVariants.get(binding.path.node) : void 0;
+  const shadowName = existingShadowName ?? path3.scope.generateUidIdentifier(calleeName).name;
   const newCallExpression = t5.callExpression(
-    t5.memberExpression(t5.identifier(newUniqueName.name), t5.identifier("useVariants")),
+    t5.memberExpression(t5.identifier(shadowName), t5.identifier("useVariants")),
     node.arguments
   );
-  const finalDeclaration = t5.variableDeclaration("const", [
-    t5.variableDeclarator(t5.identifier(calleeName), newCallExpression)
-  ]);
+  const finalDeclarator = t5.variableDeclarator(t5.identifier(calleeName), newCallExpression);
+  const finalDeclaration = t5.variableDeclaration("const", [finalDeclarator]);
+  scopedVariants.set(finalDeclarator, shadowName);
   const pathIndex = path3.node.body.findIndex((bodyPath) => bodyPath === targetVariant);
   const rest = path3.node.body.slice(pathIndex + 1);
   const statement = t5.blockStatement([finalDeclaration, ...rest]);
-  path3.node.body = [...path3.node.body.slice(0, pathIndex), shadowDeclaration, statement];
   state.file.hasVariants = true;
+  if (existingShadowName) {
+    path3.node.body = [...path3.node.body.slice(0, pathIndex), statement];
+    return;
+  }
+  const shadowDeclaration = t5.variableDeclaration("const", [
+    t5.variableDeclarator(t5.identifier(shadowName), t5.identifier(calleeName))
+  ]);
+  path3.node.body = [...path3.node.body.slice(0, pathIndex), shadowDeclaration, statement];
+  path3.scope.registerDeclaration(path3.get(`body.${pathIndex}`));
 }
 
 // plugin/src/index.ts
