@@ -82,4 +82,42 @@ export default function Root({ children }: PropsWithChildren) {
 
 This ensures that Unistyles is initialized whenever Expo Router renders the next static page.
 
+### Expo Router Web - Server rendering
+
+With server rendering (`"output": "server"`, SDK 58 and later), Expo renders every page on request, with the same `+html.tsx` file.
+Import the config file in it, and add the styles of the page with `useServerUnistyles`:
+
+```tsx title="+html.tsx"
+import '../unistyles' // <-- file that initializes Unistyles
+import { useServerDocumentContext } from 'expo-router/html'
+import { type PropsWithChildren } from 'react'
+import { useServerUnistyles } from 'react-native-unistyles/server'
+
+export default function Root({ children }: PropsWithChildren) {
+    const { htmlAttributes, bodyAttributes, headNodes, bodyNodes } = useServerDocumentContext()
+    // Expo already adds react-native-web's styles to `headNodes`
+    const unistyles = useServerUnistyles({ includeRNWStyles: false })
+
+    return (
+        <html {...htmlAttributes}>
+            <head>
+                {headNodes}
+                {/* After react-native-web's styles, so that Unistyles' ones win */}
+                {unistyles}
+            </head>
+            <body {...bodyAttributes}>
+                {children}
+                {bodyNodes}
+            </body>
+        </html>
+    )
+}
+```
+
+Expo Router loads every route before rendering `+html.tsx`, so their `StyleSheets` are created before the configuration: Unistyles creates them when they're first used, once configured. In the browser, Unistyles takes over the styles rendered by the server on its own.
+
+:::caution
+Expo renders `+html.tsx` before the page, so `useServerUnistyles` can only add the styles collected until then: the page's own styles are applied in the browser, once its JavaScript runs.
+:::
+
 </Seo>
