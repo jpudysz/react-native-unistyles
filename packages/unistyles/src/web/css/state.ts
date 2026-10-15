@@ -45,6 +45,13 @@ export class CSSState {
         if (ssrTag) {
             this.styleTag = ssrTag as HTMLStyleElement
 
+            // Take over the server's styles, as `hydrateServerUnistyles` does: some frameworks never render the
+            // component calling `useServerUnistyles` in the browser (e.g. Expo Router's `+html`)
+            if (window.__UNISTYLES_STATE__) {
+                this.hydrate(window.__UNISTYLES_STATE__)
+                document.querySelector('#unistyles-script')?.remove()
+            }
+
             return
         }
 
