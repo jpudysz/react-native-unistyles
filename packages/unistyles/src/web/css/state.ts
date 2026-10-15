@@ -2,7 +2,7 @@ import type { UnistylesValues } from '../../types'
 import type { UnistylesServices } from '../types'
 
 import { convertUnistyles } from '../convert'
-import { hyphenate } from '../utils'
+import { hyphenate, isServer } from '../utils'
 import { convertToCSS, getClassNameHash } from './core'
 import { CSSSheet, getDeclarations, getSelector } from './sheet'
 import { safeGetMap } from './utils'
@@ -204,6 +204,18 @@ export class CSSState {
 
         hydrateState(state.mainState)
         hydrateState(state.mqState)
+    }
+
+    // Takes over the server's styles, as `hydrateServerUnistyles` does: some frameworks never render the component
+    // calling `useServerUnistyles` in the browser (e.g. Expo Router's `+html`). Called once the themes are added: the
+    // first synced class clears the server's text, its themes included
+    hydrateFromServer = () => {
+        if (isServer() || !window.__UNISTYLES_STATE__) {
+            return
+        }
+
+        this.hydrate(window.__UNISTYLES_STATE__)
+        document.querySelector('#unistyles-script')?.remove()
     }
 
     reset = () => {

@@ -51,6 +51,8 @@ export class UnistylesState {
             return
         }
 
+        this.services.registry.css.hydrateFromServer()
+
         // Ensure we have a themeName before calling this
         // classList.add throws a "SyntaxError" DOMException if one of the arguments is an empty string.
         if (!this.hasAdaptiveThemes && this.CSSVars && this.themeName) {
