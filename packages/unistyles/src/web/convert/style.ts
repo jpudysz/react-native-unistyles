@@ -121,6 +121,14 @@ const convertMap = {
     resizeMode: (value: string) => ({
         backgroundSize: value,
     }),
+    fontVariant: (value: string | Array<string>) => ({
+        fontVariant: Array.isArray(value) ? value.join(' ') : value,
+    }),
+    transformOrigin: (value: string | Array<string | number>) => ({
+        transformOrigin: Array.isArray(value)
+            ? value.map((origin) => convertNumber('transformOrigin', origin)).join(' ')
+            : value,
+    }),
 } as Record<PropertyKey, (value: any) => Record<string, any>>
 
 const convertNumber = (key: string, value: any) => {

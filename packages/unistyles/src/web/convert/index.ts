@@ -65,8 +65,8 @@ export const convertUnistyles = (value: UnistylesValues, runtime: UnistylesRunti
             return getTransformStyle(unistylesValue)
         }
 
-        // Breakpoints
-        if (typeof unistylesValue === 'object' && unistylesValue !== null) {
+        // Breakpoints, arrays like fontVariant are regular values
+        if (typeof unistylesValue === 'object' && unistylesValue !== null && !Array.isArray(unistylesValue)) {
             return Object.entries(unistylesValue).map(([breakpointKey, breakpointValue]) => {
                 return { [breakpointKey]: getStyle(unistylesKey, breakpointValue) }
             })
