@@ -98,9 +98,13 @@ export const getMediaQuery = (query: string, allBreakpoints: Array<string>) => {
         .map((b) => unistyles.services.runtime.breakpoints[b] as number)
         .sort((a, b) => a - b)
         .find((b) => b > breakpointValue)
+    // Viewport widths are fractional CSS px under browser zoom / OS scaling, so an integer
+    // `max-width: next - 1` leaves a dead band (e.g. 767 < width < 768) that matches neither
+    // this breakpoint nor the next one. 0.02px below the next breakpoint (the Bootstrap
+    // convention) closes it without overlapping `(min-width: next)`.
     const queries = [
         `(min-width: ${breakpointValue}px)`,
-        nextBreakpoint ? `(max-width: ${nextBreakpoint - 1}px)` : undefined,
+        nextBreakpoint ? `(max-width: ${nextBreakpoint - 0.02}px)` : undefined,
     ]
         .filter(Boolean)
         .join(' and ')
