@@ -124,7 +124,13 @@
     "!android/local.properties",
     "!**/*.spec.ts",
     "!**/*.spec.tsx",
-    "!**/.*"
+    "!**/__tests__",
+    "!**/.*",
+    "!src/unifiber/test",
+    "!src/unifiber/bench",
+    "!src/unifiber/package.json",
+    "!src/unifiber/tsconfig.json",
+    "!src/unifiber/bun.lock"
   ],
   "keywords": [
     "react-native",
@@ -220,6 +226,7 @@
   "react-native-builder-bob": {
     "source": "src",
     "output": "lib",
+    "exclude": "{**/{__tests__,__fixtures__,__mocks__}/**,**/unifiber/{test,bench}/**,**/unifiber/*}",
     "targets": [
       "commonjs",
       "module",

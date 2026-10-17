@@ -1,7 +1,7 @@
 {
   "singleQuote": true,
   "semi": false,
-  "ignorePatterns": ["**/plugin/index.js", "**/repack-plugin/index.js", "**/metro/index.js", "**/metro/babel-transformer.js", "apps/**"],
+  "ignorePatterns": ["**/plugin/index.js", "**/repack-plugin/index.js", "**/metro/index.js", "**/metro/babel-transformer.js", "apps/**", "**/src/unifiber/**"],
   "sortImports": {
     "groups": [
       "type-import",

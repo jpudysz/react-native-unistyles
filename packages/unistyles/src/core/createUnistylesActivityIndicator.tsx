@@ -2,19 +2,21 @@ import type { ActivityIndicator } from 'react-native'
 
 import React, { useContext } from 'react'
 
-import { isAndroid } from '../common'
 import { ScopedThemeContext } from '../components/ScopedThemeContext'
 import { UnistylesShadowRegistry } from '../specs'
+import { Fiber } from '../unifiber/src'
 import { copyComponentProperties } from '../utils'
 import { hasUnistyles } from './hasUnistyles'
 import { passForwardedRef } from './passForwardRef'
 import { maybeWarnAboutMultipleUnistyles } from './warn'
 
-const getWrapperHandle = (ref: any) => {
-    const spinner = ref?.__internalInstanceHandle
+const { getHostFor, getParentHost } = Fiber
+
+const getWrapperHandle = (ref: unknown) => {
+    const spinner = getHostFor(ref)
 
     return {
-        __internalInstanceHandle: isAndroid ? spinner?.return?.return : spinner?.return,
+        __internalInstanceHandle: spinner && getParentHost(spinner),
     }
 }
 
