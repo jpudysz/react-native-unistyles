@@ -28,5 +28,9 @@ describe('getClassName', () => {
 
         expect(getClassName([{ flex: 1 }, handle] as never)).toEqual([generated, [handle]])
         expect(addStyles).toHaveBeenCalledWith([{ flex: 1 }], undefined)
+
+        // Without a hash it's not a complete generated style
+        getClassName([{ injectedClassName: 'custom' }, { opacity: 0.5 }] as never)
+        expect(addStyles).toHaveBeenLastCalledWith([{ injectedClassName: 'custom' }, { opacity: 0.5 }], undefined)
     })
 })

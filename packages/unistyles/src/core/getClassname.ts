@@ -15,12 +15,10 @@ export const getClassName = (unistyle: UnistylesValues | undefined | Array<Unist
 
     // Already processed by an outer Unistyles component, e.g. createUnistylesElement(Animated.View),
     // styles added after it (like Reanimated's initial animated values) stay inline
-    if (firstStyle && isGeneratedUnistyle(firstStyle)) {
+    if (firstStyle && isGeneratedUnistyle(firstStyle) && firstStyle.hash) {
         const { hash, injectedClassName } = firstStyle
 
-        return hash
-            ? ([{ $$css: true, hash, injectedClassName }, otherStyles.concat(animatedStyles)] as const)
-            : undefined
+        return [{ $$css: true, hash, injectedClassName }, otherStyles.concat(animatedStyles)] as const
     }
 
     const { hash, injectedClassName } = unistyles.services.shadowRegistry.addStyles(regularStyles, forChild)
