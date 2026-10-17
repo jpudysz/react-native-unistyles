@@ -6,7 +6,7 @@
     "apps/*"
   ],
   "scripts": {
-    "prepare": "husky",
+    "prepare": "node scripts/ensure-unifiber.mjs && husky",
     "precommit": "bun run --cwd packages/unistyles precommit",
     "lint": "bun run --cwd packages/unistyles lint",
     "test": "bun run --cwd packages/unistyles test",

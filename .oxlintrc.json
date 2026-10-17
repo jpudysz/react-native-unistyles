@@ -31,5 +31,5 @@
       }
     ]
   },
-  "ignorePatterns": ["**/lib/**", "**/*.js", "apps/**"]
+  "ignorePatterns": ["**/lib/**", "**/*.js", "apps/**", "**/src/unifiber/**"]
 }

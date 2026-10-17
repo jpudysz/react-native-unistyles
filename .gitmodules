@@ -1,0 +1,3 @@
+[submodule "packages/unistyles/src/unifiber"]
+	path = packages/unistyles/src/unifiber
+	url = https://github.com/uni-stack/unifiber.git

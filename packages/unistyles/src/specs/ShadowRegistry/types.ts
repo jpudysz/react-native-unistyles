@@ -1,48 +1,8 @@
-export type StateNode = {
-    node?: ShadowNode
-    canonical?: {
-        nativeTag?: number
-    }
-}
-
-export type ShadowNode = {
-    __hostObjectShadowNodeWrapper: any
-}
+export type { ShadowNode } from '../../unifiber/src'
 
 export type ViewHandle = {
-    __internalInstanceHandle?: {
-        stateNode?: StateNode
-        elementType?: string
-    }
-    getScrollResponder?: () => {
-        getNativeScrollRef?: () => {
-            __internalInstanceHandle?: {
-                stateNode?: StateNode
-            }
-        }
-    }
-    getNativeScrollRef?: () => {
-        __internalInstanceHandle?: {
-            stateNode?: StateNode
-        }
-    }
-    _viewRef?: {
-        __internalInstanceHandle?: {
-            stateNode?: StateNode
-        }
-    }
-    viewRef?: {
-        current?: {
-            __internalInstanceHandle?: {
-                stateNode?: StateNode
-            }
-        }
-    }
-    _nativeRef?: {
-        __internalInstanceHandle?: {
-            stateNode?: StateNode
-        }
-    }
+    __internalInstanceHandle?: unknown
+    constructor?: { name?: string }
 }
 
 export type Unistyle = {

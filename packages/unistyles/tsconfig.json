@@ -11,6 +11,8 @@
     "plugin",
     "repack-plugin",
     "metro",
-    "lib"
+    "lib",
+    "src/unifiber/test",
+    "src/unifiber/bench"
   ]
 }
