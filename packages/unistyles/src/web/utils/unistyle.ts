@@ -138,22 +138,16 @@ export const checkForAnimated = (value: any): boolean => {
     }
 
     if (typeof value === 'object' && value !== null) {
-        const objectValues = Object.values(value)
-        const secrets = extractSecrets(value)
-
-        // Reanimated 3's `useAnimatedStyle` return value is a plain object
-        // `{ viewDescriptors, initial, styleUpdaterContainer }` and is NOT an
-        // instance of `Animated.Node`, so the legacy check below misses it
-        // and the animated style gets routed through `getClassName` as a
-        // regular style. Detect the shape explicitly so the descriptor reaches
-        // Reanimated's `AnimatedComponent` and inline-style updates work on web.
+        // Reanimated useAnimatedStyle handle, it's a plain object, not an Animated.Node
         if ('viewDescriptors' in value && 'initial' in value && 'styleUpdaterContainer' in value) {
             return true
         }
 
-        // @ts-expect-error React Native Web exports Animated.AnimatedNode as Animated.Node
+        const objectValues = Object.values(value)
+        const secrets = extractSecrets(value)
+
         // prettier-ignore
-        return value instanceof Animated.Node || objectValues.length > 0 && objectValues.some(checkForAnimated) || secrets && Object.keys(secrets).length === 0
+        return value instanceof Animated.Node || objectValues.length > 0 && objectValues.some(checkForAnimated) || !!secrets && Object.keys(secrets).length === 0
     }
 
     return false
