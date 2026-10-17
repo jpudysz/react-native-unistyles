@@ -138,12 +138,17 @@ export const checkForAnimated = (value: any): boolean => {
     }
 
     if (typeof value === 'object' && value !== null) {
+        // Reanimated useAnimatedStyle handle, it's a plain object, not an Animated.Node
+        // styleUpdaterContainer was added in Reanimated 4.1, so check only the keys every version has
+        if ('viewDescriptors' in value && 'initial' in value) {
+            return true
+        }
+
         const objectValues = Object.values(value)
         const secrets = extractSecrets(value)
 
-        // @ts-expect-error React Native Web exports Animated.AnimatedNode as Animated.Node
         // prettier-ignore
-        return value instanceof Animated.Node || objectValues.length > 0 && objectValues.some(checkForAnimated) || secrets && Object.keys(secrets).length === 0
+        return value instanceof Animated.Node || objectValues.length > 0 && objectValues.some(checkForAnimated) || !!secrets && Object.keys(secrets).length === 0
     }
 
     return false
