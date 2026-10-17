@@ -139,7 +139,8 @@ export const checkForAnimated = (value: any): boolean => {
 
     if (typeof value === 'object' && value !== null) {
         // Reanimated useAnimatedStyle handle, it's a plain object, not an Animated.Node
-        if ('viewDescriptors' in value && 'initial' in value && 'styleUpdaterContainer' in value) {
+        // styleUpdaterContainer was added in Reanimated 4.1, so check only the keys every version has
+        if ('viewDescriptors' in value && 'initial' in value) {
             return true
         }
 

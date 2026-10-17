@@ -22,20 +22,19 @@ describe('checkForAnimated', () => {
     })
 
     it('returns true for Reanimated useAnimatedStyle handles', () => {
-        const handle = {
-            viewDescriptors: { shareableViewDescriptors: {}, add: jest.fn(), remove: jest.fn(), has: jest.fn() },
-            initial: { value: { opacity: 0 }, updater: jest.fn() },
-            styleUpdaterContainer: { current: jest.fn() },
-        }
+        const viewDescriptors = { shareableViewDescriptors: {}, add: jest.fn(), remove: jest.fn(), has: jest.fn() }
+        const initial = { value: { opacity: 0 }, updater: jest.fn() }
 
-        expect(checkForAnimated(handle)).toBe(true)
+        // Reanimated 3.x and 4.0
+        expect(checkForAnimated({ viewDescriptors, initial })).toBe(true)
+        // Reanimated 4.1+
+        expect(checkForAnimated({ viewDescriptors, initial, styleUpdaterContainer: { current: jest.fn() } })).toBe(true)
     })
 
     it('returns false for objects with only some of the Reanimated handle keys', () => {
         expect(checkForAnimated({ viewDescriptors: {} })).toBe(false)
         expect(checkForAnimated({ initial: {} })).toBe(false)
         expect(checkForAnimated({ styleUpdaterContainer: {} })).toBe(false)
-        expect(checkForAnimated({ viewDescriptors: {}, initial: {} })).toBe(false)
     })
 
     it('finds animated values in arrays and nested objects', () => {
