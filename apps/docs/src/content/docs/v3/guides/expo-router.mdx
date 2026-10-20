@@ -117,7 +117,7 @@ export default function Root({ children }: PropsWithChildren) {
 Expo Router loads every route before rendering `+html.tsx`, so their `StyleSheets` are created before the configuration: Unistyles creates them when they're first used, once configured. In the browser, Unistyles takes over the styles rendered by the server on its own.
 
 :::caution
-Expo renders `+html.tsx` before the page, so `useServerUnistyles` can only add the styles collected until then: the page's own styles are applied in the browser, once its JavaScript runs.
+Expo renders `+html.tsx` before the page, so `useServerUnistyles` can only add the styles collected until then: those of the page rendered by the previous request, as the server keeps them between requests until `useServerUnistyles` collects them. The page's own styles are applied in the browser, once its JavaScript runs, next to the ones rendered by the server, which stay.
 :::
 
 </Seo>
