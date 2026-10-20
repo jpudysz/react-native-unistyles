@@ -1,6 +1,8 @@
 #include "BackgroundImageConverter.h"
 
 #include <algorithm>
+#include <cxxreact/ReactNativeVersion.h>
+#include <react/featureflags/ReactNativeFeatureFlags.h>
 
 #if defined(RN_SERIALIZABLE_STATE) &&                                          \
     __has_include(                                                             \
@@ -49,6 +51,17 @@ parseBackgroundImageString(const std::string &backgroundImageString) {
              : folly::dynamic::array();
 #else
   return std::nullopt;
+#endif
+}
+
+// React Native parses background image strings natively since 0.83, but only
+// with enableNativeCSSParsing. Otherwise its view props expect the processed
+// array and read a string as no background image.
+bool canReactNativeParseBackgroundImageString() {
+#if REACT_NATIVE_VERSION_MAJOR > 0 || REACT_NATIVE_VERSION_MINOR >= 83
+  return facebook::react::ReactNativeFeatureFlags::enableNativeCSSParsing();
+#else
+  return false;
 #endif
 }
 

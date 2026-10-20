@@ -1094,11 +1094,15 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
                         return;
                     }
 
-                    convertedStyles.setProperty(
-                        rt,
-                        propertyName.c_str(),
-                        propertyValue
-                    );
+                    // without a converter (eg. iOS) React Native reads a raw string as no background image,
+                    // unless it parses CSS natively, so leave the prop to React, which processes it in JS
+                    if (converters::canReactNativeParseBackgroundImageString()) {
+                        convertedStyles.setProperty(
+                            rt,
+                            propertyName.c_str(),
+                            propertyValue
+                        );
+                    }
 
                     return;
                 }
