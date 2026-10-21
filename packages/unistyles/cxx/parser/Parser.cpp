@@ -1071,6 +1071,7 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, Unistyle::Shared u
 folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, const std::vector<std::shared_ptr<UnistyleData>>& unistyles) {
     jsi::Object convertedStyles(rt);
     auto& state = core::UnistylesRegistry::get().getState();
+    std::unordered_set<std::string> skippedBackgroundImages;
 
     for (const auto& unistyleData : unistyles) {
         if (!unistyleData->parsedStyle.has_value()) {
@@ -1080,7 +1081,11 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
         helpers::enumerateJSIObject(
             rt,
             unistyleData->parsedStyle.value(),
-            [this, &rt, &state, &convertedStyles](const std::string& propertyName, jsi::Value& propertyValue) {
+            [this, &rt, &state, &convertedStyles, &skippedBackgroundImages](const std::string& propertyName, jsi::Value& propertyValue) {
+                if (converters::isBackgroundImagePropName(propertyName)) {
+                    skippedBackgroundImages.erase(propertyName);
+                }
+
                 if (converters::isBackgroundImagePropName(propertyName) && propertyValue.isString()) {
                     auto maybeBackgroundImage = converters::parseBackgroundImageString(propertyValue.asString(rt).utf8(rt));
 
@@ -1094,11 +1099,17 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
                         return;
                     }
 
-                    convertedStyles.setProperty(
-                        rt,
-                        propertyName.c_str(),
-                        propertyValue
-                    );
+                    // without a converter (eg. iOS) React Native reads a raw string as no background image,
+                    // unless it parses CSS natively, so leave the prop to React, which processes it in JS
+                    if (converters::canReactNativeParseBackgroundImageString()) {
+                        convertedStyles.setProperty(
+                            rt,
+                            propertyName.c_str(),
+                            propertyValue
+                        );
+                    } else {
+                        skippedBackgroundImages.insert(propertyName);
+                    }
 
                     return;
                 }
@@ -1273,7 +1284,15 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
         );
     }
 
-    return jsi::dynamicFromValue(rt, jsi::Value(rt, convertedStyles));
+    auto props = jsi::dynamicFromValue(rt, jsi::Value(rt, convertedStyles));
+
+    // a skipped string still wins over earlier styles in React,
+    // so drop the prop instead of writing an earlier style's value
+    for (const auto& propName : skippedBackgroundImages) {
+        props.erase(propName);
+    }
+
+    return props;
 }
 
 // shadow tree updates skip the props an inline style sets last, React (or an animation) owns them
