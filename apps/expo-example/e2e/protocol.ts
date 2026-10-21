@@ -77,7 +77,10 @@ export const beaconColor = (sync?: Sync) => sync ? BEACON_COLORS.waiting[sync.se
 // Painted below <ScopedTheme name="dark"> in every theme: one re-renders by itself, the others mount after the scope rendered
 export const SCOPED_PROBES = ['scoped-rerender', 'scoped-late', 'scoped-with-unistyles'] as const
 
-export const PROBES = ['background', 'surface', 'primary', 'accent', 'animated', 'native-animated', 'third-party', ...SCOPED_PROBES] as const
+// Gradients from an `experimental_backgroundImage` string, the host reads their center color, #1030
+export const GRADIENT_PROBES = ['linear-gradient', 'radial-gradient'] as const
+
+export const PROBES = ['background', 'surface', 'primary', 'accent', 'animated', 'native-animated', 'third-party', ...GRADIENT_PROBES, ...SCOPED_PROBES] as const
 
 export type ProbeName = typeof PROBES[number]
 
@@ -101,6 +104,8 @@ export const PROBE_COLORS = Object.fromEntries(
             animated: colors.secondary,
             'native-animated': colors.typography,
             'third-party': colors.accent,
+            'linear-gradient': colors.steps[0]!,
+            'radial-gradient': colors.steps[1]!,
             ...Object.fromEntries(SCOPED_PROBES.map(probe => [probe, themes.dark.colors.primary]))
         }]
     })

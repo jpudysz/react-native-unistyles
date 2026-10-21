@@ -75,7 +75,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `pendingUpdates`      | after every step       | shadow tree updates that were queued but never committed                                 |
 | `orphans`             | `frozen-unmount`       | families unmounted while frozen that survive the sweep of a theme change                 |
 | `expect`              | after a screen check   | a prop React owns differs in the committed tree, eg. `transition.check` measures the bar, `animations.variant-color` reads the Reanimated color, or the JS thread stalled too long (`frozen-list.stall`) |
-| probe                 | at checkpoints         | the screen paints other colors than the theme (overlay squares, Reanimated, RN Animated, a 3rd party component from `node_modules`), or a `ScopedTheme` square other colors than its scope |
+| probe                 | at checkpoints         | the screen paints other colors than the theme (overlay squares, Reanimated, RN Animated, a 3rd party component from `node_modules`, gradients), or a `ScopedTheme` square other colors than its scope |
 | crash                 | while the host waits   | the app process died, e.g. a use after free on a frozen unmount                          |
 | host `timeout`, stall | at sync points         | the screen stopped updating or the runner hung                                           |
 
@@ -97,6 +97,8 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
 - The overlay (`E2EOverlay.tsx`, rendered by the root layout outside the navigator, so it never freezes) renders nothing
   until the e2e route starts a run. Then it shows a beacon, six themed probes, a 3rd party component from
   `node_modules` (`third-party`, a memoized `Card` of `e2e/third-party-card` that forwards a unistyle to its View),
+  two memoized gradients from `experimental_backgroundImage` strings (`linear-gradient`, `radial-gradient`, only a
+  shadow tree update repaints them, #1030),
   three probes below `<ScopedTheme name="dark">` (one re-renders by itself, two mount after the scope rendered, the
   scope itself never renders again) and the current marker (`E2E CHECKPOINT <n> <theme> #<seq>`, `E2E TAP <testID> #<seq>`,
   `E2E RESULT PASS|FAIL #<seq>`).
@@ -132,6 +134,7 @@ the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 t
 | M13 a scoped `link` of a mounted node queues its update without committing it               | `touchable-highlight`, `interactions` (iOS, 12 failures)          | scoped `View 'highlight' backgroundColor expected <dark secondary> actual <light secondary>`, `pendingUpdates expected 0 actual 1` |
 | M14 no worklet runtime guard in `HostUnistyle::get` (#1213), a worklet reads RN runtime values | `animated-variant` (iOS and Android, Android 3 of 3 runs crash)    | iOS `worklet access expected Unistyles worklet error actual no error, width undefined`, Android SIGSEGV on `mqt_v_js` |
 | M15 main before the ScopedTheme fix (views and hooks below a scope that re-render or mount by themselves) | `scoped`, every checkpoint (iOS, 21 probe failures in 8 checkpoints, 6 hook failures, 0 mismatches) | overlay probe `scoped-rerender` expected `#341f97` (dark) actual `#3498db` (light), `useUnistyles theme.colors.primary expected #341f97 actual #3498db` |
+| M16 #1030 without the C++ CSS parser converter (main after #1319), a background image string is skipped on iOS | every checkpoint in another theme than the overlay mounted in (iOS, `shared-dynamic-fn`: 2 probe failures, 0 mismatches) | overlay probe `linear-gradient` expected `#16a085` (dark) actual `#1abc9c` (light), React keeps the gradient it processed at mount |
 
 #1266 can't be reverted as a whole, `verify()` reads the registry it introduced, so M4a and M4b disable its two
 mechanisms. The use after free itself (#1217, #1179) only crashes with freed families, which needs a Release build with

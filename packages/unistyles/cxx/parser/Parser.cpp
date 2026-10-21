@@ -1087,6 +1087,17 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
                 }
 
                 if (converters::isBackgroundImagePropName(propertyName) && propertyValue.isString()) {
+                    // React Native parses the raw string natively and reads an array as the unprocessed syntax
+                    if (converters::canReactNativeParseBackgroundImageString()) {
+                        convertedStyles.setProperty(
+                            rt,
+                            propertyName.c_str(),
+                            propertyValue
+                        );
+
+                        return;
+                    }
+
                     auto maybeBackgroundImage = converters::parseBackgroundImageString(propertyValue.asString(rt).utf8(rt));
 
                     if (maybeBackgroundImage.has_value()) {
@@ -1099,17 +1110,9 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
                         return;
                     }
 
-                    // without a converter (eg. iOS) React Native reads a raw string as no background image,
-                    // unless it parses CSS natively, so leave the prop to React, which processes it in JS
-                    if (converters::canReactNativeParseBackgroundImageString()) {
-                        convertedStyles.setProperty(
-                            rt,
-                            propertyName.c_str(),
-                            propertyValue
-                        );
-                    } else {
-                        skippedBackgroundImages.insert(propertyName);
-                    }
+                    // without a converter (React Native < 0.83) a raw string reads as no background image,
+                    // so leave the prop to React, which processes it in JS
+                    skippedBackgroundImages.insert(propertyName);
 
                     return;
                 }
