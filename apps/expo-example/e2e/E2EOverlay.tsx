@@ -60,6 +60,14 @@ const ThirdPartyProbe = React.memo(() => (
     <Card accessible accessibilityLabel={`${LABELS.probe} third-party`} style={styles.thirdPartyProbe} />
 ))
 
+// Memoized, so only a Unistyles shadow tree update can repaint the gradients, React keeps what it processed last
+const GradientProbes = React.memo(() => (
+    <React.Fragment>
+        <View accessible accessibilityLabel={`${LABELS.probe} linear-gradient`} style={styles.linearGradientProbe} />
+        <View accessible accessibilityLabel={`${LABELS.probe} radial-gradient`} style={styles.radialGradientProbe} />
+    </React.Fragment>
+))
+
 // Painted with the probe's theme color, the other probes render their own components
 const THEMED_PROBES = ['background', 'surface', 'primary', 'accent'] as const
 
@@ -136,6 +144,7 @@ const RunnerOverlay: React.FunctionComponent<{ state: RunnerState }> = ({ state 
                 <AnimatedProbe />
                 <NativeAnimatedProbe />
                 <ThirdPartyProbe />
+                <GradientProbes />
                 <ScopedProbes />
                 {/* One line, so a long sync label can't grow the bar over the elements the host taps (the host reads the label) */}
                 <Text numberOfLines={1} style={styles.status}>{state.sync ? formatSync(state.sync) : state.status}</Text>
@@ -162,26 +171,37 @@ const styles = StyleSheet.create((theme, rt) => ({
         gap: 4
     },
     cell: {
-        width: 28,
-        height: 28
+        width: 24,
+        height: 24
     },
     probe: (probe: typeof THEMED_PROBES[number]) => ({
-        width: 28,
-        height: 28,
+        width: 24,
+        height: 24,
         backgroundColor: theme.colors[probe]
     }),
     scopedProbe: {
-        width: 28,
-        height: 28,
+        width: 24,
+        height: 24,
         backgroundColor: theme.colors.primary
     },
     nativeAnimatedProbe: {
         backgroundColor: theme.colors.typography
     },
     thirdPartyProbe: {
-        width: 28,
-        height: 28,
+        width: 24,
+        height: 24,
         backgroundColor: theme.colors.accent
+    },
+    // the center is the first color, hard stops paint the second one around it
+    linearGradientProbe: {
+        width: 24,
+        height: 24,
+        experimental_backgroundImage: `linear-gradient(90deg, ${theme.colors.steps[0]} 0% 70%, ${theme.colors.steps[2]} 70%)`
+    },
+    radialGradientProbe: {
+        width: 24,
+        height: 24,
+        experimental_backgroundImage: `radial-gradient(circle, ${theme.colors.steps[1]} 0% 40%, ${theme.colors.steps[2]} 40%)`
     },
     status: {
         flex: 1,
