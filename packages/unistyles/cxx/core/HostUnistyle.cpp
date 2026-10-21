@@ -19,6 +19,12 @@ std::vector<jsi::PropNameID> HostUnistyle::getPropertyNames(jsi::Runtime& rt) {
 
 HostUnistyle::~HostUnistyle() {
     if (this->_ownsStyleSheet) {
+        for (const auto& [_, unistyle] : this->_stylesheet->unistyles) {
+            if (unistyle->type == UnistyleType::DynamicFunction) {
+                std::static_pointer_cast<UnistyleDynamicFunction>(unistyle)->proxiedFunction.reset();
+            }
+        }
+
         this->_stylesheet->unistyles.clear();
     }
 }
