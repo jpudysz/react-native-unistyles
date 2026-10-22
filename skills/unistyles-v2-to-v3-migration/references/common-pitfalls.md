@@ -369,7 +369,7 @@ Both `useServerUnistyles` and `getServerUnistyles` accept `{ includeRNWStyles?: 
 
 **Symptom:** Content renders behind status bar or navigation bar on Android.
 
-**Cause:** v3 enforces edge-to-edge layout on Android for accurate inset reporting (via `WindowInsetsCompat`). `react-native-edge-to-edge` is optional since 3.1.0 — Unistyles enables edge-to-edge itself.
+**Cause:** v3 enforces edge-to-edge layout on Android for accurate inset reporting (via `WindowInsetsCompat`). `react-native-edge-to-edge` is not needed (optional since 3.1.0, now deprecated) — Unistyles enables edge-to-edge itself.
 
 **Fix:** Set `edgeToEdgeEnabled=true` in `android/gradle.properties` (strongly recommended; Expo SDK 54+ does it automatically), then use `rt.insets` in your styles:
 

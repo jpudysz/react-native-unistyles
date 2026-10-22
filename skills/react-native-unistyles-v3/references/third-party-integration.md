@@ -251,7 +251,7 @@ const animatedStyle = useAnimatedStyle(() => ({
 
 ## Edge-to-edge (Android)
 
-Unistyles reads insets with `WindowInsetsCompat`, which needs an edge-to-edge layout — Unistyles enables it automatically. `react-native-edge-to-edge` is **optional** since v3.1.0; instead set `edgeToEdgeEnabled=true` in `android/gradle.properties` (Expo SDK 54+ does this for you). Keep `react-native-edge-to-edge` only if other libraries detect it (e.g. `react-native-bootsplash`, `react-native-permissions`). Then use `rt.insets` in styles:
+Unistyles reads insets with `WindowInsetsCompat`, which needs an edge-to-edge layout — Unistyles enables it automatically. `react-native-edge-to-edge` is **deprecated** and not needed; set `edgeToEdgeEnabled=true` in `android/gradle.properties` instead (Expo SDK 54+ does this for you). To control the navigation bar style, use `@zoontek/react-native-navigation-bar`. Unistyles still works if `react-native-edge-to-edge` is installed, but recommend removing it. Then use `rt.insets` in styles:
 
 ```tsx
 const styles = StyleSheet.create((theme, rt) => ({

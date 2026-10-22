@@ -29,15 +29,14 @@ Developed by: [Marc Rousavy](https://github.com/mrousavy)
 
 We highly encourage you to give Nitro a star ⭐ or support Marc through sponsorship.
 
-### React Native Edge to Edge (optional since v3.1.0)
+### React Native Edge to Edge (deprecated)
 
 Developed by: [Mathieu Acthernoene](https://github.com/zoontek)
 
-[React Native Edge to Edge](https://github.com/zoontek/react-native-edge-to-edge) is a library aimed at unifying the handling of edge-to-edge layouts on Android.
+[React Native Edge to Edge](https://github.com/zoontek/react-native-edge-to-edge) was a library aimed at unifying the handling of edge-to-edge layouts on Android.
+Since v3.1.0, Unistyles no longer depends on it, and the library itself is now **deprecated** — React Native ships edge-to-edge support and fixes out of the box.
 
-Since v3.1.0, `react-native-edge-to-edge` is **optional** as a direct dependency. Unistyles enables edge-to-edge layout automatically on Android if `react-native-edge-to-edge` is not installed.
-
-However, we **strongly recommend** enabling `edgeToEdgeEnabled` in your `gradle.properties`:
+Unistyles enables edge-to-edge layout automatically on Android, but we **strongly recommend** enabling the built-in `edgeToEdgeEnabled` property in your `gradle.properties`:
 
 ```properties title="android/gradle.properties" /edgeToEdgeEnabled/
 edgeToEdgeEnabled=true
@@ -45,7 +44,8 @@ edgeToEdgeEnabled=true
 
 This property does more than just enabling edge-to-edge layout — it enforces `statusBarTranslucent` / `navigationBarTranslucent` on modals, disables `backgroundColor` / `translucent` on `StatusBar`, and enables additional fixes in React Native core. **Expo SDK 54+** enables this automatically.
 
-You can still install `react-native-edge-to-edge` alongside this property if you use libraries that detect it for ecosystem-wide edge-to-edge detection (e.g. `react-native-bootsplash`, `react-native-permissions`).
+If you want to control the navigation bar style, use [`@zoontek/react-native-navigation-bar`](https://github.com/zoontek/react-native-navigation-bar).
+If your app still has `react-native-edge-to-edge` installed, Unistyles will keep working with it, but we recommend migrating to `edgeToEdgeEnabled=true` and removing it.
 
 If you use any of Mathieu’s libraries, we encourage you to give them a star ⭐ and support him through sponsorship.
 
