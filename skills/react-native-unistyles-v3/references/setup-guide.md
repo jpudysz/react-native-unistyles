@@ -20,7 +20,7 @@ npx react-native run-android  # Android
 
 ## Babel Plugin Configuration
 
-The Babel plugin is **mandatory**. It transforms `StyleSheet.create` calls at build time to enable zero-re-render reactivity.
+The Babel plugin is **mandatory**, unless you use the [Metro integration](#metro-integration-experimental). It transforms `StyleSheet.create` calls at build time to enable zero-re-render reactivity.
 
 ```js
 // babel.config.js
@@ -64,6 +64,24 @@ module.exports = {
 ```
 
 Note: `autoProcessPaths` is a substring match against the absolute file path — relative paths like `'../shared-ui/src'` never match.
+
+### Metro integration (experimental)
+
+Since 3.6.0, `react-native-unistyles/metro` can replace the Babel plugin. It has no `root` or other options to set: every `react-native` import, including those in `node_modules`, resolves to Unistyles components, and Metro processes every file that calls `StyleSheet.create` or `useVariants`.
+
+```js
+// metro.config.js
+const { getDefaultConfig } = require('expo/metro-config') // or '@react-native/metro-config'
+const { withUnistylesConfig } = require('react-native-unistyles/metro')
+
+module.exports = withUnistylesConfig(getDefaultConfig(__dirname)) // optional 2nd arg: { debug: true }
+```
+
+- Remove `react-native-unistyles/plugin` from `babel.config.js`, Unistyles throws if both are set up
+- Apply `withUnistylesConfig` last, it wraps `babelTransformerPath` and `resolveRequest`
+- Import from `react-native/index.js` to render a raw React Native component
+- Metro only: Re.Pack, Vite, Next.js and other web bundlers keep the Babel plugin, Jest setup doesn't change
+- Bare React Native with `babel-plugin-react-compiler` in `plugins`: keep the Babel plugin (React Compiler would run before Unistyles)
 
 ### Re.Pack
 
