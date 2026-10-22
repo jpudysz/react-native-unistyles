@@ -32,6 +32,10 @@ Files inside `node_modules` are ignored, unless they match `autoProcessPaths`.
 Views usually stop updating when a component lives outside of `root` (e.g. in a shared monorepo package) in a file that doesn't create its own `StyleSheet` (for example, it imports styles from another file), or inside a 3rd party library.
 For such cases, use the `autoProcessPaths`, `autoProcessImports` or `autoRemapImports` options. Be sure to [check them out](/v3/other/babel-plugin#extra-configuration).
 
+<Aside>
+The experimental [Metro integration](/v3/other/metro) processes every file that needs it, including 3rd party libraries in `node_modules`, without any options.
+</Aside>
+
 ### Problem 2: Dependency detection
 
 

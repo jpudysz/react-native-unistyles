@@ -20,7 +20,7 @@ npx react-native run-android  # Android
 
 ## Babel Plugin Configuration
 
-A build-time integration is **mandatory**: the Babel plugin (default), the experimental [Metro integration](#metro-integration-experimental-360) (3.6.0+), or the [Re.Pack plugin](#repack). It transforms `StyleSheet.create` calls at build time to enable zero-re-render reactivity.
+A build-time integration is **mandatory**: the Babel plugin (default), the experimental [Metro integration](#metro-integration-experimental) (3.6.0+), or the [Re.Pack plugin](#repack). It transforms `StyleSheet.create` calls at build time to enable zero-re-render reactivity.
 
 ```js
 // babel.config.js
@@ -65,9 +65,9 @@ module.exports = {
 
 Note: `autoProcessPaths` is a substring match against the absolute file path — relative paths like `'../shared-ui/src'` never match.
 
-### Metro integration (experimental, 3.6.0+)
+### Metro integration (experimental)
 
-A zero-config alternative to the Babel plugin for apps bundled with Metro (Expo or bare React Native). Wrap the Metro config and **remove** `react-native-unistyles/plugin` from `babel.config.js` — Unistyles throws if both are set up:
+Since 3.6.0, `react-native-unistyles/metro` is a zero-config alternative to the Babel plugin for apps bundled with Metro (Expo or bare React Native). Wrap the Metro config and **remove** `react-native-unistyles/plugin` from `babel.config.js` — Unistyles throws if both are set up:
 
 ```js
 // metro.config.js
@@ -80,7 +80,7 @@ module.exports = withUnistylesConfig(getDefaultConfig(__dirname))
 ```
 
 - No `root`, `autoProcessImports`, `autoProcessPaths` or `autoRemapImports`: every `react-native` import resolves to Unistyles components, **including in `node_modules`**, so 3rd party components that pass `style` to RN views follow theme changes without `withUnistyles` (non-style props like `color` still need it)
-- Every file calling `StyleSheet.create` / `useVariants` is processed, also with a `StyleSheet` re-exported from your own module, and libraries built with Unistyles; the output is the same as the Babel plugin's
+- Metro runs the Unistyles Babel transforms on every file that calls `.create(` / `.useVariants(`, also with a `StyleSheet` re-exported from your own module; the output is the same as the Babel plugin's. Files in `node_modules` are transformed only if they import `react-native-unistyles` (libraries built with Unistyles), and Unistyles' own files are skipped
 - The bundle contains a single copy of Unistyles
 - `withUnistylesConfig` wraps `transformer.babelTransformerPath` and `resolver.resolveRequest`: apply it **last** (or make sure later plugins keep both). It throws if applied twice or if the config has no `babelTransformerPath` (pass the config returned by `getDefaultConfig`)
 - To render a raw React Native component, import it from `react-native/index.js` (not swapped)

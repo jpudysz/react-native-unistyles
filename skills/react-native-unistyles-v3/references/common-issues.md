@@ -58,7 +58,7 @@ StyleSheet.configure({
 ### "react-native-unistyles/metro is enabled in metro.config.js, remove react-native-unistyles/plugin from babel.config.js"
 
 **Cause:** The Metro integration (3.6.0+) and the Babel plugin are both set up.
-**Solution:** Use one of them — remove `react-native-unistyles/plugin` from `babel.config.js` when using `withUnistylesConfig`. Related Metro errors: "withUnistylesConfig was applied twice" (wrap the config once) and "Metro config has no babelTransformerPath" (pass the config returned by `getDefaultConfig`). See [setup-guide.md](setup-guide.md#metro-integration-experimental-360).
+**Solution:** Use one of them — remove `react-native-unistyles/plugin` from `babel.config.js` when using `withUnistylesConfig`. Related Metro errors: "withUnistylesConfig was applied twice" (wrap the config once) and "Metro config has no babelTransformerPath" (pass the config returned by `getDefaultConfig`). See [setup-guide.md](setup-guide.md#metro-integration-experimental).
 
 ---
 

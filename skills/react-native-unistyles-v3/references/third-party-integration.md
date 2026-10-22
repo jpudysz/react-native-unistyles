@@ -97,7 +97,7 @@ const UniScrollView = withUnistyles(ScrollView)
 
 ## Babel Plugin: autoProcessPaths
 
-With the [Metro integration](setup-guide.md#metro-integration-experimental-360) (3.6.0+) you don't need this, `autoProcessImports` or `autoRemapImports` — it covers `node_modules` and files outside your app automatically.
+With the [Metro integration](setup-guide.md#metro-integration-experimental) (3.6.0+) you don't need this, `autoProcessImports` or `autoRemapImports` — it covers `node_modules` and files outside your app automatically.
 
 The plugin processes every file under `root` and always ignores `node_modules`. `autoProcessPaths` opts 3rd party code in: inside these paths, `react-native` imports are replaced with Unistyles ref-borrowing factories, so the library's views update from C++:
 
