@@ -67,7 +67,7 @@ Note: `autoProcessPaths` is a substring match against the absolute file path —
 
 ### Metro integration (experimental)
 
-Since 3.6.0, `react-native-unistyles/metro` can replace the Babel plugin. It has no `root` or other options to set: every `react-native` import, including those in `node_modules`, resolves to Unistyles components, and Metro processes every file that calls `StyleSheet.create` or `useVariants`.
+Since 3.6.0, `react-native-unistyles/metro` can replace the Babel plugin. It has no `root` or other options to set: every `react-native` import, including those in `node_modules`, resolves to Unistyles components, and Metro runs the Unistyles Babel transforms on files that call `.create(` or `.useVariants(`. Files in `node_modules` are transformed only if they import `react-native-unistyles` (libraries built with Unistyles), and Unistyles' own files are skipped.
 
 ```js
 // metro.config.js
