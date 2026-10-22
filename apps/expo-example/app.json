@@ -7,11 +7,6 @@
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.unistyles.expoexample"
@@ -27,17 +22,20 @@
       [
         "expo-build-properties",
         {
-          "android": {
-            "newArchEnabled": true
-          },
           "ios": {
-            "newArchEnabled": true,
-            "deploymentTarget": "16.4",
-            "enableSceneSupport": true
+            "deploymentTarget": "16.4"
           }
         }
       ],
-      "expo-router"
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ]
     ],
     "web": {
       "favicon": "./assets/images/favicon.png",
