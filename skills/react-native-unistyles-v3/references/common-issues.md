@@ -53,7 +53,12 @@ StyleSheet.configure({
 
 ### Adaptive themes don't follow the OS
 
-**Solution:** Check that Expo `app.json` has `userInterfaceStyle: "automatic"` (bare: `Info.plist` doesn't hardcode `UIUserInterfaceStyle`), and that you haven't forced a scheme with `Appearance.setColorScheme('light' | 'dark')` (use `'unspecified'` to reset). Requires iOS 15+ / Android 10+.
+**Solution:** Check that Expo `app.json` has `userInterfaceStyle: "automatic"` (bare: `Info.plist` doesn't hardcode `UIUserInterfaceStyle`), and that you haven't forced a scheme with `Appearance.setColorScheme('light' | 'dark')` (use `'unspecified'` to reset; iOS follows this override since 3.6.0, Android before). Requires iOS 15+ / Android 10+.
+
+### "react-native-unistyles/metro is enabled in metro.config.js, remove react-native-unistyles/plugin from babel.config.js"
+
+**Cause:** The Metro integration (3.6.0+) and the Babel plugin are both set up.
+**Solution:** Use one of them — remove `react-native-unistyles/plugin` from `babel.config.js` when using `withUnistylesConfig`. Related Metro errors: "withUnistylesConfig was applied twice" (wrap the config once) and "Metro config has no babelTransformerPath" (pass the config returned by `getDefaultConfig`). See [setup-guide.md](setup-guide.md#metro-integration-experimental-360).
 
 ---
 
@@ -153,12 +158,12 @@ import { StyleSheet } from 'react-native-unistyles'
 
 Check, in order: the file is processed by the Babel plugin (`debug: true`); the view is a React Native view (otherwise use `withUnistyles`); styles aren't spread; `contentContainerStyle` is passed through `withUnistyles`.
 
-### Nested Text components + Reanimated conflict
+### Nested Text / Animated.Text don't fully switch themes with Reanimated
 
-**Symptoms:** Nested `<Text>` components don't update color when theme changes while using Reanimated.
-**Cause:** Reanimated's animated components can interfere with Unistyles' ShadowTree updates on nested text.
-**Solution:** Ensure nested Text components have explicit style bindings. If using Reanimated, avoid wrapping Text in Animated containers for theme-dependent colors.
-**Ref:** [#1045](https://github.com/jpudysz/react-native-unistyles/issues/1045)
+**Symptoms:** With Reanimated in the tree, nested `<Text>` keeps the old theme color, or variant styles on `Animated.Text` are stale after a breakpoint change.
+**Cause:** Reanimated's UI-thread updates interfered with Unistyles' ShadowTree updates.
+**Solution:** Fixed in **3.6.0** — upgrade.
+**Ref:** [#1045](https://github.com/jpudysz/react-native-unistyles/issues/1045), [#1170](https://github.com/jpudysz/react-native-unistyles/issues/1170), [#1142](https://github.com/jpudysz/react-native-unistyles/issues/1142)
 
 ### ScopedTheme not applied to dynamic children
 
@@ -179,14 +184,16 @@ Check, in order: the file is processed by the Babel plugin (`debug: true`); the 
 
 ### Reanimated CSS transitions stale colors
 
-**Symptoms:** After theme switch, CSS transition colors show the old theme's value.
-**Cause:** Reanimated CSS transitions cache the initial color value.
-**Solution:** Use `key={rt.themeName}` to force re-mount on theme change:
-```tsx
-const { rt } = useUnistyles()
-<Animated.View key={rt.themeName} style={styles.card} />
-```
+**Symptoms:** After theme switch, CSS transition (`transitionProperty`) colors show the old theme's value.
+**Cause:** Reanimated CSS transitions kept the previously rendered colors.
+**Solution:** Fixed in **3.6.0** — upgrade. On older versions, remount with `key={rt.themeName}` (from `useUnistyles()`).
 **Ref:** [#1007](https://github.com/jpudysz/react-native-unistyles/issues/1007)
+
+### iOS gradients (`backgroundImage`) cleared on theme change
+
+**Symptoms:** A `experimental_backgroundImage` / `backgroundImage` string gradient from a StyleSheet disappears on iOS after a theme change.
+**Solution:** Fixed in **3.6.0** for React Native 0.83+ (gradients follow theme changes). On older React Native versions they keep the colors React rendered last.
+**Ref:** [#1030](https://github.com/jpudysz/react-native-unistyles/issues/1030)
 
 ### withUnistyles not always updating
 
@@ -212,11 +219,11 @@ const UniButton = withUnistyles(Button, (theme) => ({
 
 ## 5. Android-Specific
 
-### FlatList crash on orientation change
+### "detected an unsupported FlatList with the horizontal prop" error
 
-**Symptoms:** App crashes when rotating device while FlatList is visible.
-**Cause:** React Native core FlatList issue, not Unistyles-specific.
-**Solution:** Use FlashList or Legend List instead of FlatList.
+**Symptoms:** Render error when `horizontal` on a `FlatList` flips (e.g. `horizontal={rt.isLandscape}` on rotation); flipping back leaks a registry entry.
+**Cause:** On Android the native scroll view remounts when `horizontal` changes, and a Unistyles guard threw during that remount (not a React Native bug).
+**Solution:** Fixed in **3.6.0** — upgrade. On older versions, remount the list with a `key` tied to `horizontal`, or use FlashList / Legend List.
 **Ref:** [#803](https://github.com/jpudysz/react-native-unistyles/issues/803)
 
 ### Keyboard inset lag with react-native-keyboard-controller
@@ -268,12 +275,17 @@ npx react-native run-android
 **Solution:** Require Safari 16.4+ or provide a fallback.
 **Ref:** [#1073](https://github.com/jpudysz/react-native-unistyles/issues/1073)
 
-### Styles not working on Reanimated Animated.View on web
+### Reanimated animated styles dropped on web
 
-**Symptoms:** Animated.View doesn't receive Unistyles styles on web platform.
-**Cause:** Reanimated's web implementation may not forward the style processing correctly.
-**Solution:** Use `getWebProps` from `react-native-unistyles/web` (spread `{ className, ref }`) or apply styles differently on web.
-**Ref:** [#1014](https://github.com/jpudysz/react-native-unistyles/issues/1014)
+**Symptoms:** On web, a component wrapped with `createUnistylesElement` (e.g. a wrapped `Animated.View`) never animates — `useAnimatedStyle` is silently dropped.
+**Solution:** Fixed in **3.6.0** — upgrade. On older versions, use `getWebProps` from `react-native-unistyles/web` (spread `{ className, ref }`) for the Unistyles part.
+**Ref:** [#1199](https://github.com/jpudysz/react-native-unistyles/issues/1199), [#1014](https://github.com/jpudysz/react-native-unistyles/issues/1014)
+
+### Breakpoint styles missing at fractional viewport widths
+
+**Symptoms:** On web, under browser zoom (e.g. a 767.5px wide viewport), no breakpoint style applies.
+**Solution:** Fixed in **3.6.0**: a breakpoint's media query now ends at `next − 0.02px` (e.g. `max-width: 1199.98px`) instead of `next − 1px`.
+**Ref:** [#1241](https://github.com/jpudysz/react-native-unistyles/issues/1241)
 
 ### Gap polyfill incorrect margins on SmartTV
 
@@ -328,16 +340,14 @@ const UniButton = withUnistyles<typeof Button, { color: string }>(
 
 ### useVariants breaks with panicThreshold: 'all_errors'
 
-**Symptoms:** Build error or runtime crash when using `styles.useVariants()` with React Compiler `panicThreshold: 'all_errors'`.
-**Cause:** React Compiler can't analyze the `useVariants` call pattern.
-**Status:** Known issue, planned fix in v4.
-**Workaround:** Use `panicThreshold: 'none'` (default) or `'critical_errors'`.
+**Symptoms:** Build error with React Compiler `panicThreshold: 'all_errors'` in components calling `styles.useVariants()`; with the default threshold the compiler silently skips them.
+**Solution:** Fixed in **3.6.0** — upgrade (keep the Unistyles plugin before React Compiler). On older versions, avoid `'all_errors'`.
 **Ref:** [#1002](https://github.com/jpudysz/react-native-unistyles/issues/1002)
 
 ### Plugin ordering
 
 **Symptoms:** Styles not reactive, build errors.
-**Cause:** React Compiler runs before Unistyles plugin.
+**Cause:** React Compiler runs before Unistyles plugin. With the Metro integration in a bare RN app, a React Compiler entry in `babel.config.js` `plugins` always runs first — keep the Babel plugin there (Expo's preset-based setup is fine).
 **Solution:** Unistyles plugin MUST come BEFORE React Compiler in babel.config.js:
 ```js
 plugins: [
@@ -373,6 +383,12 @@ const styles = StyleSheet.create(theme => ({
 <View style={styles.item(isActive)} />
 ```
 **Ref:** [#1034](https://github.com/jpudysz/react-native-unistyles/issues/1034)
+
+### Memory grows with useVariants + dynamic functions
+
+**Symptoms:** Heap grows on every render of a screen calling `styles.useVariants()` when the StyleSheet has a dynamic function (~270 B per call).
+**Solution:** Fixed in **3.6.0** — upgrade.
+**Ref:** [#1323](https://github.com/jpudysz/react-native-unistyles/pull/1323)
 
 ### Tab navigation slow theme change
 

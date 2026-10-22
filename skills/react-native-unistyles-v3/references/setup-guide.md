@@ -20,7 +20,7 @@ npx react-native run-android  # Android
 
 ## Babel Plugin Configuration
 
-The Babel plugin is **mandatory**. It transforms `StyleSheet.create` calls at build time to enable zero-re-render reactivity.
+A build-time integration is **mandatory**: the Babel plugin (default), the experimental [Metro integration](#metro-integration-experimental-360) (3.6.0+), or the [Re.Pack plugin](#repack). It transforms `StyleSheet.create` calls at build time to enable zero-re-render reactivity.
 
 ```js
 // babel.config.js
@@ -65,6 +65,31 @@ module.exports = {
 
 Note: `autoProcessPaths` is a substring match against the absolute file path — relative paths like `'../shared-ui/src'` never match.
 
+### Metro integration (experimental, 3.6.0+)
+
+A zero-config alternative to the Babel plugin for apps bundled with Metro (Expo or bare React Native). Wrap the Metro config and **remove** `react-native-unistyles/plugin` from `babel.config.js` — Unistyles throws if both are set up:
+
+```js
+// metro.config.js
+const { getDefaultConfig } = require('expo/metro-config')
+// or for bare React Native: const { getDefaultConfig } = require('@react-native/metro-config')
+const { withUnistylesConfig } = require('react-native-unistyles/metro')
+
+module.exports = withUnistylesConfig(getDefaultConfig(__dirname))
+// only option: withUnistylesConfig(config, { debug: true }) — same as the Babel plugin's `debug`
+```
+
+- No `root`, `autoProcessImports`, `autoProcessPaths` or `autoRemapImports`: every `react-native` import resolves to Unistyles components, **including in `node_modules`**, so 3rd party components that pass `style` to RN views follow theme changes without `withUnistyles` (non-style props like `color` still need it)
+- Every file calling `StyleSheet.create` / `useVariants` is processed, also with a `StyleSheet` re-exported from your own module, and libraries built with Unistyles; the output is the same as the Babel plugin's
+- The bundle contains a single copy of Unistyles
+- `withUnistylesConfig` wraps `transformer.babelTransformerPath` and `resolver.resolveRequest`: apply it **last** (or make sure later plugins keep both). It throws if applied twice or if the config has no `babelTransformerPath` (pass the config returned by `getDefaultConfig`)
+- To render a raw React Native component, import it from `react-native/index.js` (not swapped)
+
+Limitations:
+- Metro only — Re.Pack, Vite, Next.js and other web bundlers keep using the Babel plugin
+- Bare RN + `babel-plugin-react-compiler` in `babel.config.js` `plugins`: those run before Metro's plugins, so React Compiler would see `useVariants` first — keep the Babel plugin there. Expo is fine (`babel-preset-expo` adds React Compiler, and presets run after plugins)
+- Jest doesn't use Metro, so the [testing setup](#testing--mocks-setup) is unchanged
+
 ### Re.Pack
 
 With Re.Pack, don't add the plugin to `babel.config.js`; use the Rspack plugin instead (it runs the same Babel plugin through a loader):
@@ -89,7 +114,7 @@ The loader needs `@babel/plugin-syntax-typescript` and `babel-plugin-syntax-herm
 
 ### React Compiler ordering
 
-If using React Compiler, the Unistyles plugin **MUST come BEFORE** React Compiler:
+If using React Compiler, the Unistyles plugin **MUST come BEFORE** React Compiler (still true in 3.6.0, which made `useVariants` compile with React Compiler):
 
 ```js
 // babel.config.js
@@ -246,7 +271,7 @@ The Babel plugin is a no-op when `NODE_ENV === 'test'` (Jest sets this by defaul
 }
 ```
 
-The config file must come **after** the mocks (they stub `StyleSheet.configure`).
+The config file must come **after** the mocks (they stub `StyleSheet.configure`). If `StyleSheet.configure` is called from a design system package, list that package's entry instead (e.g. `"@your-ds/unistyles"`).
 
 Mock behavior and limitations:
 - `StyleSheet.create`, `useUnistyles` and `withUnistyles` always resolve with the **first** registered theme (`initialTheme` / `adaptiveThemes` are ignored)

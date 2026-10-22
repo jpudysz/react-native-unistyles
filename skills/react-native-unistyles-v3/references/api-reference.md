@@ -54,7 +54,7 @@ const styles = StyleSheet.create(theme => ({
 
 Arguments must be serializable (strings, numbers, booleans, `null`, `undefined`, plain arrays/objects): they're stored in C++ and the function is re-run natively on theme/runtime changes. Functions are dropped (shifting the remaining arguments); `Date`, `Map`, `Set` and class instances become plain objects.
 
-`boxShadow` and `filter: [{ dropShadow }]` also accept CSS-like strings (e.g. `boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'`), parsed on iOS/Android.
+`boxShadow` and `filter: [{ dropShadow }]` also accept CSS-like strings (e.g. `boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'`), parsed on iOS/Android. `experimental_backgroundImage` / `backgroundImage` gradient strings follow theme changes on iOS since 3.6.0 (React Native 0.83+).
 
 ### StyleSheet.configure(config)
 
@@ -542,11 +542,11 @@ Settings: `{ includeRNWStyles?: boolean }` (default `true`)
 
 ## Native Components (Babel factories)
 
-The Babel plugin rewrites `react-native` imports in processed files to ref-borrowing factories (no extra views, no styling of their own) so C++ can update the native views:
+The Babel plugin (or, with the 3.6.0+ Metro integration, the Metro resolver — for every file including `node_modules`) rewrites `react-native` imports in processed files to ref-borrowing factories (no extra views, no styling of their own) so C++ can update the native views:
 
 ```tsx
 // what the plugin generates — you don't write this yourself
 import { View } from 'react-native-unistyles/components/native/View'
 ```
 
-They are built with `createUnistylesElement(Component)` (exported from the root). On native, only the `style` prop is bound — use `withUnistyles` for `contentContainerStyle`.
+They are built with `createUnistylesElement(Component)` (exported from the root). On native, only the `style` prop is bound — use `withUnistyles` for `contentContainerStyle`. Since 3.6.0, views whose `style` holds no unistyle aren't linked at all (refs and styles pass through unchanged).

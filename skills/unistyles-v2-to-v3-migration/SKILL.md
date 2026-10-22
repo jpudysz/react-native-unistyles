@@ -51,6 +51,8 @@ The `root` option is REQUIRED (the plugin throws without it, and it can't resolv
 
 If using React Compiler, the Unistyles plugin MUST come BEFORE React Compiler in the plugins array.
 
+Since 3.6.0, Metro apps can use the experimental zero-config Metro integration instead: `module.exports = withUnistylesConfig(getDefaultConfig(__dirname))` with `withUnistylesConfig` from `react-native-unistyles/metro`, and no Unistyles entry in `babel.config.js` (having both throws). It needs no `root`/`autoProcess*` options and covers `node_modules`. Keep the Babel plugin for bare RN apps that list `babel-plugin-react-compiler` in `babel.config.js` `plugins`. The Babel plugin stays the default.
+
 If the app is bundled with Re.Pack, don't add the plugin to `babel.config.js` — use `RepackUnistylePlugin` from `react-native-unistyles/repack-plugin` with `unistylesPluginOptions: { root: 'src' }` instead.
 
 ### Step 2: Replace UnistylesRegistry with StyleSheet.configure
