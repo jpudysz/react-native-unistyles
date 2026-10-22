@@ -109,8 +109,8 @@ export default defineConfig({
                     label: 'Guides',
                     items: [
                         { label: 'Merging styles', slug: 'v3/guides/merging-styles' },
-                        { label: 'Why my view doesn\'t update?', slug: 'v3/guides/why-my-view-doesnt-update', badge: 'Updated!' },
-                        { label: 'Theming', slug: 'v3/guides/theming' },
+                        { label: 'Why my view doesn\'t update?', slug: 'v3/guides/why-my-view-doesnt-update' },
+                        { label: 'Theming', slug: 'v3/guides/theming', badge: 'Updated!' },
                         { label: 'Avoiding Keyboard', slug: 'v3/guides/avoiding-keyboard' },
                         { label: 'Expo Router', slug: 'v3/guides/expo-router' },
                         { label: 'React Compiler', slug: 'v3/guides/react-compiler' },
@@ -122,7 +122,7 @@ export default defineConfig({
                 {
                     label: 'API reference',
                     items: [
-                        { label: 'StyleSheet', slug: 'v3/references/stylesheet', badge: 'Updated!' },
+                        { label: 'StyleSheet', slug: 'v3/references/stylesheet' },
                         { label: 'Unistyles Runtime', slug: 'v3/references/unistyles-runtime', badge: 'Updated!' },
                         { label: 'Mini Runtime', slug: 'v3/references/mini-runtime' },
                         { label: 'Dynamic Functions', slug: 'v3/references/dynamic-functions' },
@@ -145,7 +145,7 @@ export default defineConfig({
                 {
                     label: 'Other',
                     items: [
-                        { label: 'Babel plugin', slug: 'v3/other/babel-plugin', badge: 'Updated!' },
+                        { label: 'Babel plugin', slug: 'v3/other/babel-plugin' },
                         { label: 'Metro integration', slug: 'v3/other/metro', badge: 'New!' },
                         { label: 'Dependencies', slug: 'v3/other/dependencies' },
                         { label: 'For library authors', slug: 'v3/other/for-library-authors' },

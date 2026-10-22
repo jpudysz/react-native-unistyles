@@ -37,4 +37,8 @@ module.exports = function () {
   }
 }
 ```
+
+<Aside type="caution">
+The experimental [Metro integration](/v3/other/metro) runs Unistyles after the plugins from your `babel.config.js`, so it can't run before `babel-plugin-react-compiler`. Keep using the Babel plugin if you add React Compiler to `plugins`.
+</Aside>
 </Seo>

@@ -37,7 +37,7 @@ If your app still doesn’t automatically switch themes, ensure that:
 
 - For Expo your `app.json` contains a `userInterfaceStyle` key with the value automatic
 - For bare React Native, your `Info.plist` does not have the `UIUserInterfaceStyle` key set to a hardcoded value
-- You haven't forced a color scheme with `Appearance.setColorScheme('light' | 'dark')` from `react-native` (use `'unspecified'` to reset it)
+- You haven't forced a color scheme with `Appearance.setColorScheme('light' | 'dark')` from `react-native`. Adaptive themes follow it instead of the device settings, use `'unspecified'` to reset it
 - You have phone with iOS 15+ or Android 10+
 - Your device supports dark mode
 
