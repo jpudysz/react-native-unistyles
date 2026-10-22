@@ -22,7 +22,7 @@ You are assisting with React Native Unistyles v3 styling. v3 is a zero-re-render
 - React 19+ (enforced at runtime)
 - `react-native-nitro-modules` (native bridge dependency; pin an exact version — Unistyles 3.4.0+ needs `>= 0.37.1`)
 - iOS 15.1+, Android 7+
-- `react-native-edge-to-edge` is optional since v3.1.0 (set `edgeToEdgeEnabled=true` in `android/gradle.properties` instead; Expo SDK 54+ enables it automatically)
+- `react-native-edge-to-edge` is not needed (optional since v3.1.0, now deprecated) — set `edgeToEdgeEnabled=true` in `android/gradle.properties` instead (Expo SDK 54+ enables it automatically)
 - Expo SDK 54+ (if using Expo; **not compatible with Expo Go** — requires dev client or prebuild)
 - Xcode 16.4+ (iOS, required by Nitro Modules)
 

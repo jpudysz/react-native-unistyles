@@ -10,7 +10,7 @@ yarn add react-native-unistyles react-native-nitro-modules@0.37.1
 
 Always pin an exact `react-native-nitro-modules` version that matches the compatibility table in the Unistyles README (Unistyles 3.4.0+ requires `>= 0.37.1`).
 
-On Android, `react-native-edge-to-edge` is optional (since v3.1.0). Set `edgeToEdgeEnabled=true` in `android/gradle.properties` (Expo SDK 54+ does it automatically).
+On Android, don't install `react-native-edge-to-edge` (optional since v3.1.0, now deprecated). Set `edgeToEdgeEnabled=true` in `android/gradle.properties` (Expo SDK 54+ does it automatically).
 
 Then rebuild your native project:
 ```bash

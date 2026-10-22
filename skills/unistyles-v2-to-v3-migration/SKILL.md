@@ -20,7 +20,7 @@ You are migrating a React Native codebase from react-native-unistyles v2 to v3. 
 - React Native 0.81.0+ with New Architecture **mandatory** (enabled by default since RN 0.76, the only architecture since RN 0.82)
 - React 19+ (enforced at runtime by Unistyles)
 - `react-native-nitro-modules` (native bridge dependency; Unistyles 3.4.0+ requires 0.37.1+)
-- `react-native-edge-to-edge` is optional since v3.1.0 (we strongly recommend setting `edgeToEdgeEnabled=true` in `android/gradle.properties`; Expo SDK 54+ enables it automatically)
+- `react-native-edge-to-edge` is not needed (optional since v3.1.0, now deprecated) — set `edgeToEdgeEnabled=true` in `android/gradle.properties` instead (Expo SDK 54+ enables it automatically)
 - Expo SDK 54+ (if using Expo; not compatible with Expo Go — requires dev client or prebuild)
 - Xcode 16.4+ (iOS, required by Nitro Modules), iOS 15.1+
 

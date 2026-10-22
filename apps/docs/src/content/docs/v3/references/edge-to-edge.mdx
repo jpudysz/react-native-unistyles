@@ -66,8 +66,8 @@ Apps are edge-to-edge by default on devices running Android 15 if the app is tar
 <Aside type="tip" title="Enable edgeToEdgeEnabled in gradle.properties">
 We **strongly recommend** setting `edgeToEdgeEnabled=true` in your `android/gradle.properties`. Beyond enabling edge-to-edge layout, it enforces translucent system bars on modals, disables legacy StatusBar hacks, and enables additional React Native core fixes. **Expo SDK 54+** enables this automatically.
 
-Since v3.1.0, `react-native-edge-to-edge` is optional — you can still install it for ecosystem compatibility.
-Learn more [here](/v3/other/dependencies#react-native-edge-to-edge-optional-since-v310).
+`react-native-edge-to-edge` is deprecated and not needed — use this built-in property instead, and [`@zoontek/react-native-navigation-bar`](https://github.com/zoontek/react-native-navigation-bar) if you want to control the navigation bar style.
+Learn more [here](/v3/other/dependencies#react-native-edge-to-edge-deprecated).
 </Aside>
 
 </Seo>
