@@ -1,5 +1,5 @@
 const path = require('path')
-const { getDefaultConfig } = require('@expo/metro-config')
+const { getDefaultConfig } = require('expo/metro-config')
 const { default: exclusionList } = require(
     require.resolve('metro-config').replace('index.js', 'defaults/exclusionList.js'),
 )
