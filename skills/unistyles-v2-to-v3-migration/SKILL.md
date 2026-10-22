@@ -367,7 +367,7 @@ When a third-party component needs theme values or Unistyles styles:
 
 1. **New Architecture is mandatory** - it's enabled by default since RN 0.76 and is the only architecture since RN 0.82; on RN 0.81 make sure you haven't opted out
 2. **NEVER spread styles** - always use array syntax `[styles.a, styles.b]`
-3. **Babel plugin is REQUIRED** - without it, styles won't be reactive
+3. **A build-time integration is REQUIRED** - the Babel plugin (default), the experimental Metro integration (3.6.0+, never together with the Babel plugin) or `RepackUnistylePlugin` for Re.Pack; without one, styles won't be reactive. Bare RN apps that list `babel-plugin-react-compiler` in `babel.config.js` `plugins` must keep the Babel plugin
 4. **Import `StyleSheet` from `react-native-unistyles` only** - it polyfills all RN StyleSheet APIs (`hairlineWidth`, `compose`, `flatten`, `absoluteFill`, etc.), so remove any `import { StyleSheet } from 'react-native'`
 5. **Prefer importing `StyleSheet` directly from `react-native-unistyles`** - if you re-export it from your own package/alias (e.g. `@myorg/design-system`), files outside `root` that use it must be listed via `autoProcessImports`
 6. **`styles.useVariants({...})` must be called before accessing styles** in the component render (always with an object)

@@ -125,7 +125,7 @@ const UniButton = withUnistyles(Button, (theme, rt) => ({
 2. **NEVER re-export StyleSheet from barrel files** — import it directly from `react-native-unistyles`. Outside `root`, the Babel plugin only recognizes `StyleSheet.create` via that import (or `autoProcessImports`), so a re-export silently breaks detection. (The Metro integration also detects re-exports from your own modules, but direct imports work everywhere.)
 3. **A build-time integration is REQUIRED** — one of:
    - Babel plugin (default): `['react-native-unistyles/plugin', { root: 'src' }]` in babel.config.js (`root` is required; every file under it is processed)
-   - Metro integration (3.6.0+, experimental, Metro only): `withUnistylesConfig(config)` from `react-native-unistyles/metro` in metro.config.js, no options, and remove the Babel plugin (having both throws)
+   - Metro integration (3.6.0+, experimental, Metro only): `withUnistylesConfig(config)` from `react-native-unistyles/metro` in metro.config.js, no options, and remove the Babel plugin (having both throws). Bare RN apps that list `babel-plugin-react-compiler` in `babel.config.js` `plugins` must keep the Babel plugin — those plugins run before Metro's, so React Compiler would see `useVariants` first
    - Re.Pack: `RepackUnistylePlugin` from `react-native-unistyles/repack-plugin`
 
    Without one of them, styles won't be reactive.
