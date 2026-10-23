@@ -29,6 +29,8 @@ class NativePlatformInsets(
     private val _imeListeners: MutableList<CxxImeListener> = mutableListOf()
     private var _insets: Insets = Insets(0.0, 0.0, 0.0, 0.0, 0.0)
     private val _extraWindows: MutableList<Window> = mutableListOf()
+    // the extra window that reported the keyboard last
+    private var _imeWindow: Window? = null
 
     init {
         // for SDK below 35, it's possible to get it synchronously
@@ -228,6 +230,7 @@ class NativePlatformInsets(
                     }?.let {
                         val bottomInset = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom.toDouble() - this@NativePlatformInsets._insets.bottom
 
+                        this@NativePlatformInsets._imeWindow = window
                         this@NativePlatformInsets.setImeInsets(maxOf(bottomInset, 0.0))
                     }
 
@@ -246,8 +249,11 @@ class NativePlatformInsets(
             ViewCompat.setWindowInsetsAnimationCallback(mainView, null)
         }
 
-        // keyboard is gone together with the window
-        setImeInsets(0.0)
+        // keyboard is gone together with the window, closing another Modal keeps it
+        if (_imeWindow === window) {
+            _imeWindow = null
+            setImeInsets(0.0)
+        }
     }
 
     private fun setImeInsets(imeInsets: Double) {

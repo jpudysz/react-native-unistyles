@@ -1,3 +1,4 @@
+import { Platform } from 'react-native'
 import { UnistylesRuntime } from 'react-native-unistyles'
 import { screens } from '../consts'
 import { THEME_NAMES, type ThemeName } from '../themes'
@@ -427,6 +428,19 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.expect('keyboard.shown')
         await a.act('keyboard.modal', 'close')
         await a.expect('keyboard.hidden')
+
+        // Android: a Modal closed below the one with the keyboard keeps it (iOS dismisses the Modals above it too)
+        if (Platform.OS === 'android') {
+            await a.act('keyboard.background-modal', 'open')
+            await a.act('keyboard.modal', 'open')
+            await a.act('keyboard.focus')
+            await a.expect('keyboard.shown')
+            await a.act('keyboard.background-modal', 'close')
+            await a.expect('keyboard.shown')
+            await a.act('keyboard.modal', 'close')
+            await a.expect('keyboard.hidden')
+        }
+
         await a.flip('light')
         await a.back()
         await a.checkpoint()

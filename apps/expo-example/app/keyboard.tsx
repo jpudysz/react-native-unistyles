@@ -43,6 +43,7 @@ const isClose = (value: number | undefined, expected: number) => value !== undef
 
 export default function KeyboardScreen() {
     const [isModalVisible, setIsModalVisible] = useState(false)
+    const [isBackgroundModalVisible, setIsBackgroundModalVisible] = useState(false)
     const isModalVisibleRef = useRef(false)
     const onShowRef = useRef<() => void>(undefined)
     const inputs = useRef<Record<Target, TextInputRef | null>>({ screen: null, modal: null })
@@ -96,6 +97,11 @@ export default function KeyboardScreen() {
     useE2EAction('keyboard.focus', () => inputs.current[isModalVisibleRef.current ? 'modal' : 'screen']?.focus())
     useE2EAction('keyboard.dismiss', () => Keyboard.dismiss())
     useE2EAction('keyboard.modal', isVisible => toggleModal(isVisible === 'open'))
+    // a Modal below the one with the keyboard, closing it must keep the keyboard height
+    useE2EAction('keyboard.background-modal', async isVisible => {
+        setIsBackgroundModalVisible(isVisible === 'open')
+        await sleep(MODAL_MS)
+    })
     useE2EAction('keyboard.shown', () => expectIme(true))
     useE2EAction('keyboard.hidden', () => expectIme(false))
 
@@ -112,6 +118,9 @@ export default function KeyboardScreen() {
                 />
                 <Button title="Open Modal" onPress={() => toggleModal(true)} />
             </Section>
+            <Modal visible={isBackgroundModalVisible} animationType="none" statusBarTranslucent navigationBarTranslucent>
+                <View style={styles.modal} />
+            </Modal>
             <Modal
                 visible={isModalVisible}
                 animationType="none"

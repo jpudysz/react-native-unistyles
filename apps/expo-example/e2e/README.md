@@ -64,7 +64,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `lists-scroll`        | theme changes at scrolled FlatList positions                               | virtualized rows mounted after a theme change            |
 | `touchable-highlight` | TouchableHighlight pressed after theme changes and below a ScopedTheme (host only) | its underlay re-render commits the style React rendered last |
 | `interactions`        | every component on `interactions` pressed, toggled or focused after theme changes (host only) | components re-rendering themselves below Unistyles, scoped and variant styles |
-| `ime`                 | the keyboard focused on `keyboard` and inside a translucent Modal, a theme change while it's up, the Modal closed with the keyboard up | `rt.insets.ime` in a StyleSheet, `useUnistyles` and `UnistylesRuntime` agree, Android Modals get the keyboard in their own window (#810) |
+| `ime`                 | the keyboard focused on `keyboard` and inside a translucent Modal, a theme change while it's up, the Modal closed with the keyboard up, a Modal below it closed (Android) | `rt.insets.ime` in a StyleSheet, `useUnistyles` and `UnistylesRuntime` agree, Android Modals get the keyboard in their own window (#810) |
 | `rn-appearance`       | `Appearance.setColorScheme` against the OS scheme with adaptive themes, on a pushed screen, then `unspecified` | adaptive themes follow RN's override on both platforms (iOS key window, Android Activity `uiMode`) |
 | `os-appearance`       | OS appearance flips with adaptive themes (host only)                       | adaptive themes, inverted adaptive scopes                |
 | `random-walk`         | 14 seeded random theme changes, pushes, backs and screen actions           | combinations of the above                                |
@@ -116,7 +116,7 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
 ## Mutation check
 
 Each fix was reverted (or its mechanism disabled) in a Release build and the suite failed with a report pointing at
-the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 to M11 added 2026-10-03 on iOS and Android, M12 and M13 added 2026-10-05, M14 added 2026-10-06, M17 and M18 added 2026-10-22):
+the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 to M11 added 2026-10-03 on iOS and Android, M12 and M13 added 2026-10-05, M14 added 2026-10-06, M17 and M18 added 2026-10-22, M19 added 2026-10-23):
 
 | mutation                                                                                   | caught by                                                         | first failure                                                                                   |
 | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
@@ -139,6 +139,7 @@ the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 t
 | M16 #1030 without the C++ CSS parser converter (main after #1319), a background image string is skipped on iOS | every checkpoint in another theme than the overlay mounted in (iOS, `shared-dynamic-fn`: 2 probe failures, 0 mismatches) | overlay probe `linear-gradient` expected `#16a085` (dark) actual `#1abc9c` (light), React keeps the gradient it processed at mount |
 | M17 Android's cached mini runtime doesn't follow the keyboard (no `onImeChange`), `useUnistyles` and theme rebuilds read a stale `ime` | `ime` (Android, 4 failures) | `ime expected the keyboard height actual native 317.67 StyleSheet 317.67 useUnistyles 0`, after `flip dark` also `StyleSheet 0` |
 | M18 #810 Android compiled with the stub below React Native 0.86, no IME listener on a Modal's window | `ime` (Android, the 2 Modal steps) | `ime expected the keyboard height actual native 0 StyleSheet 0 useUnistyles 0` with the keyboard up in the Modal |
+| M19 closing any Modal resets `ime` (not only the one that reported the keyboard) | `ime` (Android, the stacked Modal step) | `ime expected the keyboard height actual native 0 StyleSheet 0 useUnistyles 0` after the Modal below the keyboard's one closed |
 
 #1266 can't be reverted as a whole, `verify()` reads the registry it introduced, so M4a and M4b disable its two
 mechanisms. The use after free itself (#1217, #1179) only crashes with freed families, which needs a Release build with
