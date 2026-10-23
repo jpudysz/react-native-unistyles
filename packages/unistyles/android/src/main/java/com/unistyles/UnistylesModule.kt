@@ -4,7 +4,6 @@ import com.facebook.fbreact.specs.NativeTurboUnistylesSpec
 import com.facebook.jni.HybridData
 import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.RuntimeExecutor
 import com.facebook.react.turbomodule.core.interfaces.BindingsInstallerHolder
 import com.facebook.react.turbomodule.core.interfaces.TurboModuleWithJSIBindings
 import com.margelo.nitro.unistyles.HybridNativePlatformSpec
@@ -30,24 +29,14 @@ class UnistylesModule(reactContext: ReactApplicationContext): NativeTurboUnistyl
     }
 
     init {
-        mHybridData = initializeHybridData(reactContext)
-    }
-
-    private fun initializeHybridData(reactContext: ReactApplicationContext): HybridData {
-        val runtimeExecutor = reactContext.catalystInstance?.runtimeExecutor
-            ?: throw IllegalStateException("Unistyles: React Native runtime executor is not available. Please follow installation guides.")
-
-        return initHybrid(runtimeExecutor, _nativePlatform)
+        mHybridData = initHybrid(_nativePlatform)
     }
 
     @DoNotStrip
     external override fun getBindingsInstaller(): BindingsInstallerHolder
 
     @DoNotStrip
-    private external fun initHybrid(
-        runtimeExecutor: RuntimeExecutor,
-        nativePlatform: HybridNativePlatformSpec
-    ): HybridData
+    private external fun initHybrid(nativePlatform: HybridNativePlatformSpec): HybridData
 
     @DoNotStrip
     private external fun invalidateNative()
