@@ -9,17 +9,14 @@ using namespace facebook::react;
 
 UnistylesModule::UnistylesModule(
     jni::alias_ref<UnistylesModule::jhybridobject> jThis,
-    jni::alias_ref<react::JRuntimeExecutor::javaobject> runtimeExecutorHolder,
     jni::alias_ref<JHybridNativePlatformSpec::JavaPart> nativePlatform
-):  _runtimeExecutor(runtimeExecutorHolder->cthis()->get()),
-    _nativePlatform(nativePlatform->getJHybridNativePlatformSpec()) {}
+):  _nativePlatform(nativePlatform->getJHybridNativePlatformSpec()) {}
 
 jni::local_ref<UnistylesModule::jhybriddata> UnistylesModule::initHybrid(
     jni::alias_ref<UnistylesModule::jhybridobject> jThis,
-    jni::alias_ref<JRuntimeExecutor::javaobject> runtimeExecutorHolder,
     jni::alias_ref<JHybridNativePlatformSpec::JavaPart> nativePlatform
 ) {
-    return makeCxxInstance(jThis, runtimeExecutorHolder, nativePlatform);
+    return makeCxxInstance(jThis, nativePlatform);
 }
 
 void UnistylesModule::registerNatives() {
@@ -32,10 +29,9 @@ void UnistylesModule::registerNatives() {
 
 jni::local_ref<BindingsInstallerHolder::javaobject> UnistylesModule::getBindingsInstaller(jni::alias_ref<UnistylesModule::javaobject> jobj) {
     auto* self = jobj->cthis();
-    auto& runtimeExecutor = self->_runtimeExecutor;
     auto& nativePlatform = self->_nativePlatform;
 
-    return BindingsInstallerHolder::newObjectCxxArgs([self, &runtimeExecutor, &nativePlatform](jsi::Runtime& rt) {
+    return BindingsInstallerHolder::newObjectCxxArgs([self, &nativePlatform](jsi::Runtime& rt, const std::shared_ptr<CallInvoker>& callInvoker) {
         // function is called on: first init and every live reload
         // newest runtime owns the registry, previous runtime's state is kept until it releases ownership
         self->_generation = core::UnistylesRegistry::get().takeOwnership();
@@ -49,10 +45,8 @@ jni::local_ref<BindingsInstallerHolder::javaobject> UnistylesModule::getBindings
             HybridObjectRegistry::unregisterHybridObjectConstructor("UnistylesShadowRegistry");
         }
 
-        auto runOnJSThread = [&runtimeExecutor](std::function<void(jsi::Runtime&)>&& callback) {
-            runtimeExecutor([callback = std::move(callback)](jsi::Runtime &rt) {
-                callback(rt);
-            });
+        auto runOnJSThread = [callInvoker](std::function<void(jsi::Runtime&)>&& callback) {
+            callInvoker->invokeAsync(std::move(callback));
         };
 
         // init hybrids
