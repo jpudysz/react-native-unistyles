@@ -9,6 +9,7 @@ import type { ShadowNode, Unistyle, ViewHandle } from './types'
 import { Fiber, Reanimated } from '../../unifiber/src'
 import { StyleSheet } from '../StyleSheet'
 import { createUnistylesStyleSource } from './styleSource'
+import { traceSection } from './tracing'
 
 interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     // Babel API
@@ -74,7 +75,7 @@ const refreshReactNodes = () => {
             HybridShadowRegistry.refreshReactNodes(refreshNodes)
         }
 
-        owners.refresh(committedHosts)
+        traceSection('refreshOwners', () => owners.refresh(committedHosts))
     } finally {
         committedHosts.length = 0
         refreshNodes = []
