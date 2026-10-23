@@ -21,6 +21,7 @@ export const SCENARIOS = [
     'lists-scroll',
     'touchable-highlight',
     'interactions',
+    'ime',
     'rn-appearance',
     'os-appearance',
     'random-walk'
