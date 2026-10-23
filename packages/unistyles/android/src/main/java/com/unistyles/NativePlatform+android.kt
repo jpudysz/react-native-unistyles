@@ -8,6 +8,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.DisplayMetrics
 import android.view.View
+import android.view.Window
 import android.view.WindowManager
 import androidx.annotation.Keep
 import androidx.core.content.OnConfigurationChangedProvider
@@ -33,13 +34,17 @@ import java.util.Locale
 @Keep
 @DoNotStrip
 class NativePlatformAndroid(private val reactContext: ReactApplicationContext): HybridNativePlatformSpec(), LifecycleEventListener {
-    private val _insets = NativePlatformInsets(reactContext, this::getMiniRuntime) { this.onConfigChange() }
+    private val _insets = NativePlatformInsets(reactContext, this::getMiniRuntime, this::onImeChange) { this.onConfigChange() }
+    @Volatile
     private var _miniRuntime: UnistylesNativeMiniRuntime = buildMiniRuntime()
     private val _listener = NativePlatformListener(reactContext, this::getMiniRuntime) { this.diffMiniRuntime() }
     private var _configurationProvider: WeakReference<OnConfigurationChangedProvider>? = null
     private val _activityConfigurationListener = Consumer<Configuration> {
         Handler(Looper.getMainLooper()).post { this.onConfigChange() }
     }
+    // windows created on top of the Activity, e.g. Modal's Dialog (React Native 0.86+)
+    private val _extraWindows: MutableList<Window> = mutableListOf()
+    private val _extraWindowsObserver = NativePlatformExtraWindows(reactContext, this::onExtraWindowCreate, this::onExtraWindowDestroy)
 
     // Application resources can lag behind configuration changes
     private val configurationResources: Resources
@@ -48,9 +53,12 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
     init {
         checkEdgeToEdge()
         reactContext.addLifecycleEventListener(this)
+        _extraWindowsObserver.startObserving()
     }
 
     fun onDestroy() {
+        _extraWindowsObserver.stopObserving()
+        _extraWindows.clear()
         stopObservingActivityConfiguration()
         _listener.onDestroy()
         _insets.onDestroy()
@@ -88,6 +96,16 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
     private fun stopObservingActivityConfiguration() {
         _configurationProvider?.get()?.removeOnConfigurationChangedListener(_activityConfigurationListener)
         _configurationProvider = null
+    }
+
+    private fun onExtraWindowCreate(window: Window) {
+        _extraWindows.add(window)
+        _insets.attachToExtraWindow(window)
+    }
+
+    private fun onExtraWindowDestroy(window: Window) {
+        _extraWindows.remove(window)
+        _insets.detachFromExtraWindow(window)
     }
 
     override val memorySize: Long
@@ -216,54 +234,74 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
 
     override fun setNavigationBarHidden(isHidden: Boolean) {
         reactContext.currentActivity?.let { activity ->
-            WindowInsetsControllerCompat(activity.window, activity.window.decorView).apply {
-                activity.window?.decorView?.let { decorView ->
-                    @Suppress("DEPRECATION")
-                    activity.runOnUiThread {
-                        if (isHidden) {
-                            // below Android 11, we need to use window flags to hide the navigation bar
-                            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
-                                decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
-                            } else {
-                                hide(WindowInsetsCompat.Type.navigationBars())
-                                systemBarsBehavior =
-                                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                            }
+            activity.window?.let { window ->
+                activity.runOnUiThread {
+                    setNavigationBarHidden(window, isHidden)
 
-                            // dispatch new insets to invoke the insets listener
-                            val newInsets = WindowInsetsCompat.Builder()
-                                .setInsets(WindowInsetsCompat.Type.navigationBars(), androidx.core.graphics.Insets.of(0, 0, 0, 0))
-                                .build()
+                    if (isHidden) {
+                        // dispatch new insets to invoke the insets listener
+                        val newInsets = WindowInsetsCompat.Builder()
+                            .setInsets(WindowInsetsCompat.Type.navigationBars(), androidx.core.graphics.Insets.of(0, 0, 0, 0))
+                            .build()
 
-                            ViewCompat.dispatchApplyWindowInsets(activity.findViewById(android.R.id.content), newInsets)
-                        } else {
-                            show(WindowInsetsCompat.Type.navigationBars())
-                        }
+                        ViewCompat.dispatchApplyWindowInsets(activity.findViewById(android.R.id.content), newInsets)
+                    }
+
+                    // otherwise opened Modals would keep the previous state
+                    _extraWindows.forEach { extraWindow ->
+                        setNavigationBarHidden(extraWindow, isHidden)
                     }
                 }
             }
         }
     }
 
+    @Suppress("DEPRECATION")
+    private fun setNavigationBarHidden(window: Window, isHidden: Boolean) {
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            if (isHidden) {
+                // below Android 11, we need to use window flags to hide the navigation bar
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+                    window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+                } else {
+                    hide(WindowInsetsCompat.Type.navigationBars())
+                    systemBarsBehavior =
+                        WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                }
+            } else {
+                show(WindowInsetsCompat.Type.navigationBars())
+            }
+        }
+    }
+
     override fun setStatusBarHidden(isHidden: Boolean) {
         reactContext.currentActivity?.let { activity ->
-            WindowInsetsControllerCompat(activity.window, activity.window.decorView).apply {
-                activity.window?.let { window ->
-                    @Suppress("DEPRECATION")
-                    activity.runOnUiThread {
-                        if (isHidden) {
-                            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
-                                window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-                                window.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN)
-                            } else {
-                                hide(WindowInsetsCompat.Type.statusBars())
-                            }
-                        } else {
-                            show(WindowInsetsCompat.Type.statusBars())
-                        }
+            activity.window?.let { window ->
+                activity.runOnUiThread {
+                    setStatusBarHidden(window, isHidden)
+
+                    // otherwise opened Modals would keep the previous state
+                    _extraWindows.forEach { extraWindow ->
+                        setStatusBarHidden(extraWindow, isHidden)
                     }
                 }
+            }
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun setStatusBarHidden(window: Window, isHidden: Boolean) {
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            if (isHidden) {
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+                    window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN)
+                } else {
+                    hide(WindowInsetsCompat.Type.statusBars())
+                }
+            } else {
+                show(WindowInsetsCompat.Type.statusBars())
             }
         }
     }
@@ -308,6 +346,11 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
 
     private fun onConfigChange() {
         this._listener.onConfigChange()
+    }
+
+    // only the IME, other insets are diffed by onConfigChange
+    private fun onImeChange(ime: Double) {
+        this._miniRuntime = this._miniRuntime.copy(insets = this._miniRuntime.insets.copy(ime = ime))
     }
 
     override fun registerPlatformListener(callback: (dependencies: Array<UnistyleDependency>, miniRuntime: UnistylesNativeMiniRuntime) -> Unit) {

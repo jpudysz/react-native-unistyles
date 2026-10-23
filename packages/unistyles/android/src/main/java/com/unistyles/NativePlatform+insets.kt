@@ -21,12 +21,14 @@ typealias CxxImeListener = (miniRuntime: UnistylesNativeMiniRuntime) -> Unit
 class NativePlatformInsets(
     private val reactContext: ReactApplicationContext,
     private val getMiniRuntime: () -> UnistylesNativeMiniRuntime,
+    private val onImeChange: (ime: Double) -> Unit,
     private val onConfigChange: () -> Unit
 ) {
     private var _didGetInsets = false
     private var _shouldListenToImeEvents = false
     private val _imeListeners: MutableList<CxxImeListener> = mutableListOf()
     private var _insets: Insets = Insets(0.0, 0.0, 0.0, 0.0, 0.0)
+    private val _extraWindows: MutableList<Window> = mutableListOf()
 
     init {
         // for SDK below 35, it's possible to get it synchronously
@@ -35,6 +37,9 @@ class NativePlatformInsets(
 
     fun onDestroy() {
         this.removeImeListeners()
+        _extraWindows.toList().forEach { window ->
+            detachFromExtraWindow(window)
+        }
     }
 
     fun getInsets(): Insets {
@@ -195,7 +200,69 @@ class NativePlatformInsets(
         }
     }
 
+    // From Android 11 IME insets are dispatched only to the window with the focused input (e.g. Modal's Dialog),
+    // so we need to listen to them there, as the Activity won't receive them. Below Android 11 the Activity's listener
+    // still gets them
+    fun attachToExtraWindow(window: Window) {
+        if (Build.VERSION.SDK_INT < 30) {
+            return
+        }
+
+        val mainView = window.decorView.findViewById<View>(android.R.id.content) ?: return
+
+        _extraWindows.add(window)
+
+        ViewCompat.setWindowInsetsAnimationCallback(
+            mainView,
+            object : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_CONTINUE_ON_SUBTREE) {
+                override fun onProgress(
+                    insets: WindowInsetsCompat,
+                    runningAnimations: List<WindowInsetsAnimationCompat>
+                ): WindowInsetsCompat {
+                    if (!_shouldListenToImeEvents) {
+                        return insets
+                    }
+
+                    runningAnimations.firstOrNull { animation ->
+                        animation.typeMask and WindowInsetsCompat.Type.ime() != 0
+                    }?.let {
+                        val bottomInset = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom.toDouble() - this@NativePlatformInsets._insets.bottom
+
+                        this@NativePlatformInsets.setImeInsets(maxOf(bottomInset, 0.0))
+                    }
+
+                    return insets
+                }
+            }
+        )
+    }
+
+    fun detachFromExtraWindow(window: Window) {
+        if (!_extraWindows.remove(window)) {
+            return
+        }
+
+        window.decorView.findViewById<View>(android.R.id.content)?.let { mainView ->
+            ViewCompat.setWindowInsetsAnimationCallback(mainView, null)
+        }
+
+        // keyboard is gone together with the window
+        setImeInsets(0.0)
+    }
+
+    private fun setImeInsets(imeInsets: Double) {
+        if (this._insets.ime == imeInsets) {
+            return
+        }
+
+        this._insets = this._insets.copy(ime = imeInsets)
+        this.emitImeEvent(this.getMiniRuntime().copy(insets = this.getInsets()))
+    }
+
     fun emitImeEvent(miniRuntime: UnistylesNativeMiniRuntime) {
+        // like on iOS, the cached mini runtime follows the keyboard, useUnistyles reads it
+        onImeChange(miniRuntime.insets.ime)
+
         _imeListeners.forEach { listener ->
             listener(miniRuntime)
         }

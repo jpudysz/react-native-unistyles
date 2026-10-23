@@ -406,6 +406,31 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.back()
         await a.checkpoint()
     },
+    // The keyboard height in StyleSheets, useUnistyles and natively, on the screen and inside a Modal (#810), the
+    // software keyboard must show up (an emulator without a hardware keyboard, a simulator without one connected)
+    'ime': async a => {
+        await a.push('/keyboard')
+        await a.act('keyboard.focus')
+        await a.expect('keyboard.shown')
+        // styles rebuilt by a theme change read the current keyboard height
+        await a.flip('dark')
+        await a.expect('keyboard.shown')
+        await a.act('keyboard.dismiss')
+        await a.expect('keyboard.hidden')
+        await a.act('keyboard.modal', 'open')
+        await a.act('keyboard.focus')
+        await a.expect('keyboard.shown')
+        await a.act('keyboard.dismiss')
+        await a.expect('keyboard.hidden')
+        // closed with the keyboard up, it goes away with the Modal's window
+        await a.act('keyboard.focus')
+        await a.expect('keyboard.shown')
+        await a.act('keyboard.modal', 'close')
+        await a.expect('keyboard.hidden')
+        await a.flip('light')
+        await a.back()
+        await a.checkpoint()
+    },
     // Seeded combinations of flips, pushes, backs and screen actions
     'random-walk': async a => {
         let depth = 0

@@ -10,6 +10,7 @@ export const screens = [
     { route: 'animations', title: 'Animations', description: 'Animated, Reanimated and useAnimatedTheme' },
     { route: 'lists', title: 'Lists', description: 'ScrollView, FlatList and SectionList' },
     { route: 'interactions', title: 'Interactions', description: 'Touchables, inputs and switches pressed after theme changes' },
+    { route: 'keyboard', title: 'Keyboard', description: 'rt.insets.ime in StyleSheets, useUnistyles and a Modal (#810)' },
     { route: 'transition', title: 'Transition', description: 'Unistyles commits during a transition render' },
     { route: 'suspense', title: 'Suspense', description: 'Theme changes while content is suspended (#1260)' },
     { route: 'activity', title: 'Activity', description: 'Theme changes and renders while <Activity> hides content' },
