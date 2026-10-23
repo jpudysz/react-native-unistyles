@@ -18,6 +18,8 @@ jsi::Value HybridStyleSheet::create(jsi::Runtime& rt, const jsi::Value &thisVal,
     helpers::assertThat(rt, arguments[0].isObject(), "StyleSheet.create expected to be called with object or function.");
     helpers::assertThat(rt, this->_unistylesRuntime->ownsRegistry(), helpers::RUNTIME_REPLACED_ERROR);
 
+    UNISTYLES_TRACE_SECTION("createStyleSheet");
+
     auto thisStyleSheet = thisVal.asObject(rt);
     auto& registry = core::UnistylesRegistry::get();
 
@@ -345,6 +347,8 @@ void HybridStyleSheet::onImeChange(UnistylesNativeMiniRuntime miniRuntime) {
 }
 
 void HybridStyleSheet::applyDependencyChanges(jsi::Runtime& rt, std::vector<UnistyleDependency>& dependencies, std::optional<UnistylesNativeMiniRuntime> maybeMiniRuntime) {
+    UNISTYLES_TRACE_SECTION("applyDependencyChanges", "dependencies", helpers::dependenciesToString(dependencies));
+
     auto& registry = core::UnistylesRegistry::get();
     auto parser = parser::Parser(this->_unistylesRuntime);
     auto dependencyMap = registry.buildDependencyMap(dependencies);
@@ -355,10 +359,14 @@ void HybridStyleSheet::applyDependencyChanges(jsi::Runtime& rt, std::vector<Unis
 
     // rebuild rawValue BEFORE notifying listeners so JS rerenders read fresh closures
     if (!dependencyMap.empty() || !dependentStyleSheets.empty()) {
+        UNISTYLES_TRACE_SECTION("rebuildUnistyles");
+
         parser.rebuildUnistylesInDependencyMap(rt, dependencyMap, dependentStyleSheets, maybeMiniRuntime);
     }
 
     if (!dependencyMap.empty()) {
+        UNISTYLES_TRACE_SECTION("rebuildShadowLeafUpdates");
+
         parser.rebuildShadowLeafUpdates(rt, dependencyMap);
     }
 
@@ -370,6 +378,9 @@ void HybridStyleSheet::applyDependencyChanges(jsi::Runtime& rt, std::vector<Unis
 
     // after the commit, so listeners can point React at the committed nodes
     registry.setCommittedInstanceHandles(std::move(committedInstanceHandles));
+
+    UNISTYLES_TRACE_SECTION("notifyListeners");
+
     // also when no StyleSheet depends on the change, hooks (useUnistyles, withUnistyles, Display, Hide) may
     this->notifyJSListeners(dependencies);
 }
