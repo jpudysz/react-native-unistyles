@@ -148,3 +148,32 @@ describe('mock registry persistence', () => {
         }
     })
 })
+
+describe('withUnistyles mock', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { withUnistyles } = require('react-native-unistyles') as { withUnistyles: any }
+    const Component = () => null
+
+    it('should resolve uniProps and merge mappings < uniProps < props', () => {
+        const uniProps = jest.fn(() => ({ key: 'uni', color: 'blue', style: { margin: 1 } }))
+        const Mapped = withUnistyles(Component, () => ({ color: 'red', size: 10, style: { padding: 2 } }))
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const element = Mapped({ uniProps, style: { flex: 1 } })
+
+        expect(uniProps).toHaveBeenCalledWith(expect.any(Object), expect.any(Object))
+        expect(element.key).toBe('uni')
+        expect(element.props).toEqual({ color: 'blue', size: 10, style: { padding: 2, margin: 1, flex: 1 } })
+        expect(element.props).not.toHaveProperty('uniProps')
+    })
+
+    it('should use the mappings key when uniProps has none', () => {
+        const Mapped = withUnistyles(Component, () => ({ key: 'mapped', color: 'red' }))
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const element = Mapped({ uniProps: () => ({ color: 'blue' }) })
+
+        expect(element.key).toBe('mapped')
+        expect(element.props).toEqual({ color: 'blue' })
+    })
+})
