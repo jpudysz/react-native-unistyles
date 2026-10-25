@@ -156,7 +156,12 @@ describe('withUnistyles mock', () => {
 
     it('should resolve uniProps and merge mappings < uniProps < props', () => {
         const uniProps = jest.fn(() => ({ key: 'uni', color: 'blue', style: { margin: 1 } }))
-        const Mapped = withUnistyles(Component, () => ({ color: 'red', size: 10, style: { padding: 2 } }))
+        const Mapped = withUnistyles(Component, () => ({
+            key: 'mapped',
+            color: 'red',
+            size: 10,
+            style: { padding: 2 },
+        }))
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const element = Mapped({ uniProps, style: { flex: 1 } })
