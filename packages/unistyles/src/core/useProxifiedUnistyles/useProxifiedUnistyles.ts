@@ -6,11 +6,23 @@ import { ScopedThemeContext } from '../../components/ScopedThemeContext'
 import { type UnistylesMiniRuntime, UnistylesRuntime } from '../../specs'
 // It's imported that way because of circular dependency
 import { UnistyleDependency } from '../../specs/NativePlatform'
+import { useIsHydrated } from '../useIsHydrated'
 import { listener } from './listener'
 
 const getMiniRuntime = (): UnistylesMiniRuntime => {
     // @ts-expect-error This is hidden from TS
     return UnistylesRuntime.miniRuntime
+}
+
+// Web only: what the server renders with, see useIsHydrated
+const getServerMiniRuntime = (): UnistylesMiniRuntime => {
+    // @ts-expect-error This is hidden from TS
+    return UnistylesRuntime.serverMiniRuntime
+}
+
+const getServerTheme = (): UnistylesTheme => {
+    // @ts-expect-error This is hidden from TS
+    return UnistylesRuntime.getServerTheme()
 }
 
 const RTDependencyMap = {
@@ -32,6 +44,9 @@ const RTDependencyMap = {
 
 export const useProxifiedUnistyles = () => {
     const scope = useContext(ScopedThemeContext)
+    // On the server and while hydrating, the values the server renders with: the browser's (color scheme, screen,
+    // breakpoint...) would make the first render differ from the server's HTML
+    const isHydrated = useIsHydrated()
     const [scopedTheme, setScopedTheme] = useState(scope?.name as UnistylesTheme)
     const [dependencies] = useState(() => new Set<number>())
     const [theme, setTheme] = useState(UnistylesRuntime.getTheme(scopedTheme))
@@ -86,14 +101,14 @@ export const useProxifiedUnistyles = () => {
         setTheme(UnistylesRuntime.getTheme(scope.name as UnistylesTheme))
     }
 
-    const proxifiedTheme = new Proxy(theme, {
+    const proxifiedTheme = new Proxy(isHydrated || scopedTheme ? theme : getServerTheme(), {
         get: (target, prop) => {
             dependencies.add(UnistyleDependency.Theme)
 
             return target[prop]
         },
     })
-    const proxifiedRuntime = new Proxy(getMiniRuntime(), {
+    const proxifiedRuntime = new Proxy(isHydrated ? getMiniRuntime() : getServerMiniRuntime(), {
         get: (target, prop) => {
             if (prop === 'insets') {
                 return new Proxy(target.insets, {

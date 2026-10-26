@@ -185,8 +185,9 @@ export class CSSState {
         const mainState = getState(this.mainMap)
         const mqState = getState(this.mqMap)
         const config = this.services.state.getConfig()
+        const themeName = this.services.runtime.serverThemeName
 
-        return { mainState, mqState, config }
+        return { mainState, mqState, config, themeName }
     }
 
     hydrate = ({ mainState, mqState }: ReturnType<typeof this.getState>) => {

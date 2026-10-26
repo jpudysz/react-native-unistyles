@@ -149,6 +149,43 @@ export class UnistylesRuntime {
         return NavigationBar
     }
 
+    // The theme the server renders with: it can't know the color scheme, and the browser's initial theme can differ
+    // from the server's (e.g. read from the browser's storage), so the browser reads it from the server's state
+    get serverThemeName() {
+        if (this.services.state.hasAdaptiveThemes) {
+            return schemeToTheme(ColorScheme.Unspecified) as AppThemeName
+        }
+
+        if (isServer()) {
+            return this.services.state.themeName
+        }
+
+        return window.__UNISTYLES_STATE__?.themeName ?? this.services.state.themeName
+    }
+
+    // What `miniRuntime` gives on the server, where there is neither a window nor a color scheme. The browser renders a
+    // page the server rendered with it while hydrating, so that its first render matches the server's HTML
+    get serverMiniRuntime(): UnistylesMiniRuntime {
+        return {
+            ...this.miniRuntime,
+            colorScheme: ColorScheme.Unspecified,
+            themeName: this.serverThemeName,
+            breakpoint: undefined,
+            isLandscape: false,
+            isPortrait: true,
+            pixelRatio: 1,
+            screen: {
+                width: 0,
+                height: 0,
+            },
+            rtl: true,
+        }
+    }
+
+    // The theme the server renders with: its CSS variables, as its StyleSheets use them, which follow the color scheme
+    // from the server's HTML on. Its values without CSS variables
+    getServerTheme = () => this.getTheme(this.serverThemeName, this.services.state.CSSVars)
+
     get miniRuntime(): UnistylesMiniRuntime {
         return {
             colorScheme: this.colorScheme,
