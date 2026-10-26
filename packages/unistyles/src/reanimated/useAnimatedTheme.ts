@@ -4,13 +4,21 @@ import { type SharedValue, useSharedValue } from 'react-native-reanimated'
 import type { UnistylesTheme } from '../types'
 
 import { ScopedThemeContext } from '../components/ScopedThemeContext'
+import { useIsHydrated } from '../core/useIsHydrated'
 import { UnistyleDependency, UnistylesRuntime } from '../specs'
 import { services } from '../web/services'
+
+const getServerTheme = (): UnistylesTheme => {
+    // @ts-expect-error This is hidden from TS
+    return UnistylesRuntime.getServerTheme()
+}
 
 export const useAnimatedTheme = () => {
     const scope = useContext(ScopedThemeContext)
     const [scopedTheme, setScopedTheme] = useState(scope?.name as UnistylesTheme | undefined)
-    const theme = useSharedValue(UnistylesRuntime.getTheme(scopedTheme))
+    // While hydrating, the theme the server rendered with, see useProxifiedUnistyles
+    const isHydrated = useIsHydrated()
+    const theme = useSharedValue(isHydrated || scopedTheme ? UnistylesRuntime.getTheme(scopedTheme) : getServerTheme())
 
     // Follow the closest ScopedTheme, see useProxifiedUnistyles
     if (scope && scopedTheme !== scope.name) {
@@ -26,6 +34,11 @@ export const useAnimatedTheme = () => {
 
             theme.set(UnistylesRuntime.getTheme())
         })
+
+        // Hydrated: the browser's theme
+        if (!scopedTheme) {
+            theme.set(UnistylesRuntime.getTheme())
+        }
 
         return () => {
             dispose()

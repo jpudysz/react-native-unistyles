@@ -17,6 +17,9 @@ type SetProps = {
 }
 type HydrateState = Array<[string, Array<[string, Array<[string, any]>]>]>
 
+// The server theme's name is only read by the runtime, so hydrating doesn't need it
+type HydrateInput = Omit<ReturnType<CSSState['getState']>, 'themeName'>
+
 const forEachClassName = (
     classNames: ClassNames | undefined,
     callback: (mediaQuery: string, className: string) => void,
@@ -28,7 +31,7 @@ export class CSSState {
     mainMap: MapType = new Map([['', new Map()]])
     private themesCSS = new Map<string, string>()
     private owners = new Map<string, ClassNames>()
-    private hydratedState?: ReturnType<CSSState['getState']>
+    private hydratedState?: HydrateInput
     private sheet = new CSSSheet(this.themesCSS, this.mainMap)
 
     constructor(private services: UnistylesServices) {}
@@ -175,11 +178,12 @@ export class CSSState {
         // Always empty, media query styles live in mainState. Kept for compatibility, drop it in 4.0
         const mqState: HydrateState = []
         const config = this.services.state.getConfig()
+        const themeName = this.services.runtime.serverThemeName
 
-        return { mainState, mqState, config }
+        return { mainState, mqState, config, themeName }
     }
 
-    hydrate = (state: ReturnType<typeof this.getState>) => {
+    hydrate = (state: HydrateInput) => {
         if (state === this.hydratedState) {
             return
         }
