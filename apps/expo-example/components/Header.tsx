@@ -87,6 +87,8 @@ const styles = StyleSheet.create(theme => ({
         flex: 1,
         fontSize: 18,
         fontWeight: 'bold',
+        // re-rendered after every theme change, so diagnostics compare React's string with the converted object
+        fontVariationSettings: { wght: 650.5 },
         color: theme.colors.typography
     },
     pill: (isSelected: boolean) => ({

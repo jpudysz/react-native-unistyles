@@ -81,8 +81,10 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | crash                 | while the host waits   | the app process died, e.g. a use after free on a frozen unmount                          |
 | host `timeout`, stall | at sync points         | the screen stopped updating or the runner hung                                           |
 
-`verify()` compares `backgroundColor`, border colors, `opacity`, `shadowColor`, text `color`, `fontSize`, `fontWeight`,
-text decoration and background colors and Image `tintColor` (`cxx/shadowTree/ShadowTreeDiagnostics.cpp`). Props set
+`verify()` compares `backgroundColor`, border colors, `opacity`, `shadowColor`, `backgroundSize`, `backgroundPosition`,
+`backgroundRepeat`, text `color`, `fontSize`, `fontWeight`, `fontVariationSettings` (RN 0.88+), text decoration and
+background colors and Image `tintColor` (`cxx/shadowTree/ShadowTreeDiagnostics.cpp`). For a node React rendered last it
+compares what React processed in JS with what Unistyles converts in C++, eg. the header title's `fontVariationSettings` object. Props set
 last by an inline style (or a Reanimated animated style) belong to React and are skipped. Suspended (frozen or hidden by
 Suspense) nodes are counted, not compared, they get fresh styles when restored.
 
@@ -100,7 +102,9 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
   until the e2e route starts a run. Then it shows a beacon, six themed probes, a 3rd party component from
   `node_modules` (`third-party`, a memoized `Card` of `e2e/third-party-card` that forwards a unistyle to its View),
   two memoized gradients from `experimental_backgroundImage` strings (`linear-gradient`, `radial-gradient`, only a
-  shadow tree update repaints them, #1030),
+  shadow tree update repaints them, #1030), drawn as one tile placed with `backgroundSize`, `backgroundPosition` and
+  `backgroundRepeat` (strings on `linear-gradient`, React Native's array syntax on `radial-gradient`), so a lost layer
+  prop moves another color under the center,
   three probes below `<ScopedTheme name="dark">` (one re-renders by itself, two mount after the scope rendered, the
   scope itself never renders again) and the current marker (`E2E CHECKPOINT <n> <theme> #<seq>`, `E2E TAP <testID> #<seq>`,
   `E2E RESULT PASS|FAIL #<seq>`).
@@ -116,7 +120,7 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
 ## Mutation check
 
 Each fix was reverted (or its mechanism disabled) in a Release build and the suite failed with a report pointing at
-the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 to M11 added 2026-10-03 on iOS and Android, M12 and M13 added 2026-10-05, M14 added 2026-10-06, M17 and M18 added 2026-10-22, M19 added 2026-10-23):
+the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 to M11 added 2026-10-03 on iOS and Android, M12 and M13 added 2026-10-05, M14 added 2026-10-06, M17 and M18 added 2026-10-22, M19 added 2026-10-23, M20 to M22 added 2026-10-22):
 
 | mutation                                                                                   | caught by                                                         | first failure                                                                                   |
 | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
@@ -140,6 +144,9 @@ the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 t
 | M17 Android's cached mini runtime doesn't follow the keyboard (no `onImeChange`), `useUnistyles` and theme rebuilds read a stale `ime` | `ime` (Android, 4 failures) | `ime expected the keyboard height actual native 317.67 StyleSheet 317.67 useUnistyles 0`, after `flip dark` also `StyleSheet 0` |
 | M18 #810 Android compiled with the stub below React Native 0.86, no IME listener on a Modal's window | `ime` (Android, the 2 Modal steps) | `ime expected the keyboard height actual native 0 StyleSheet 0 useUnistyles 0` with the keyboard up in the Modal |
 | M19 closing any Modal resets `ime` (not only the one that reported the keyboard) | `ime` (Android, the stacked Modal step) | `ime expected the keyboard height actual native 0 StyleSheet 0 useUnistyles 0` after the Modal below the keyboard's one closed |
+| M20 RN 0.88 background layer strings (`backgroundSize`, `backgroundPosition`, `backgroundRepeat`) sent raw by shadow tree updates (2026-10-22) | checkpoints in another theme than the overlay mounted in (iOS, `shared-dynamic-fn`) | overlay probe `linear-gradient` expected `#16a085` (dark) actual `#8e44ad`, the native props read a string as no layer |
+| M21 background layer arrays read as breakpoints by the parser (2026-10-22)                 | every checkpoint (iOS, `shared-dynamic-fn`)                       | overlay probe `radial-gradient` expected `#d35400` (dark) actual `#8e44ad`, the array is dropped before React renders it |
+| M22 the `fontVariationSettings` object sent unconverted by shadow tree updates (2026-10-22) | every step after a theme change with the header rendered (iOS, `shared-dynamic-fn`) | header `Paragraph 'title' fontVariationSettings expected undefined actual 'wght' 650.5`, the native props only read a string |
 
 #1266 can't be reverted as a whole, `verify()` reads the registry it introduced, so M4a and M4b disable its two
 mechanisms. The use after free itself (#1217, #1179) only crashes with freed families, which needs a Release build with
