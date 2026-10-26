@@ -21,6 +21,17 @@ export const isFilter = (key: string, value: any): value is Array<Filters> => ke
 export const isBoxShadow = (key: string, value: any): value is Array<BoxShadowValue> =>
     key === 'boxShadow' && Array.isArray(value)
 
+export const isBackgroundLayer = (key: string, value: any): value is Array<unknown> =>
+    ['backgroundSize', 'backgroundPosition', 'backgroundRepeat'].includes(key) && Array.isArray(value)
+
+// { wght: 700 } is the object syntax, a breakpoints object holds strings or objects
+export const isFontVariationSettings = (key: string, value: any): value is Record<string, number> =>
+    key === 'fontVariationSettings' &&
+    typeof value === 'object' &&
+    value !== null &&
+    !Array.isArray(value) &&
+    Object.values(value).every((axisValue) => typeof axisValue === 'number')
+
 export const normalizeNumericValue = (value: number | string) =>
     value && typeof value === 'number' ? `${value}px` : value
 

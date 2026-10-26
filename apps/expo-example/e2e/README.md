@@ -79,8 +79,10 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | crash                 | while the host waits   | the app process died, e.g. a use after free on a frozen unmount                          |
 | host `timeout`, stall | at sync points         | the screen stopped updating or the runner hung                                           |
 
-`verify()` compares `backgroundColor`, border colors, `opacity`, `shadowColor`, text `color`, `fontSize`, `fontWeight`,
-text decoration and background colors and Image `tintColor` (`cxx/shadowTree/ShadowTreeDiagnostics.cpp`). Props set
+`verify()` compares `backgroundColor`, border colors, `opacity`, `shadowColor`, `backgroundSize`, `backgroundPosition`,
+`backgroundRepeat`, text `color`, `fontSize`, `fontWeight`, `fontVariationSettings` (RN 0.88+), text decoration and
+background colors and Image `tintColor` (`cxx/shadowTree/ShadowTreeDiagnostics.cpp`). For a node React rendered last it
+compares what React processed in JS with what Unistyles converts in C++, eg. the header title's `fontVariationSettings` object. Props set
 last by an inline style (or a Reanimated animated style) belong to React and are skipped. Suspended (frozen or hidden by
 Suspense) nodes are counted, not compared, they get fresh styles when restored.
 
@@ -98,7 +100,9 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
   until the e2e route starts a run. Then it shows a beacon, six themed probes, a 3rd party component from
   `node_modules` (`third-party`, a memoized `Card` of `e2e/third-party-card` that forwards a unistyle to its View),
   two memoized gradients from `experimental_backgroundImage` strings (`linear-gradient`, `radial-gradient`, only a
-  shadow tree update repaints them, #1030),
+  shadow tree update repaints them, #1030), drawn as one tile placed with `backgroundSize`, `backgroundPosition` and
+  `backgroundRepeat` (strings on `linear-gradient`, React Native's array syntax on `radial-gradient`), so a lost layer
+  prop moves another color under the center,
   three probes below `<ScopedTheme name="dark">` (one re-renders by itself, two mount after the scope rendered, the
   scope itself never renders again) and the current marker (`E2E CHECKPOINT <n> <theme> #<seq>`, `E2E TAP <testID> #<seq>`,
   `E2E RESULT PASS|FAIL #<seq>`).
@@ -135,6 +139,9 @@ the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 t
 | M14 no worklet runtime guard in `HostUnistyle::get` (#1213), a worklet reads RN runtime values | `animated-variant` (iOS and Android, Android 3 of 3 runs crash)    | iOS `worklet access expected Unistyles worklet error actual no error, width undefined`, Android SIGSEGV on `mqt_v_js` |
 | M15 main before the ScopedTheme fix (views and hooks below a scope that re-render or mount by themselves) | `scoped`, every checkpoint (iOS, 21 probe failures in 8 checkpoints, 6 hook failures, 0 mismatches) | overlay probe `scoped-rerender` expected `#341f97` (dark) actual `#3498db` (light), `useUnistyles theme.colors.primary expected #341f97 actual #3498db` |
 | M16 #1030 without the C++ CSS parser converter (main after #1319), a background image string is skipped on iOS | every checkpoint in another theme than the overlay mounted in (iOS, `shared-dynamic-fn`: 2 probe failures, 0 mismatches) | overlay probe `linear-gradient` expected `#16a085` (dark) actual `#1abc9c` (light), React keeps the gradient it processed at mount |
+| M17 RN 0.88 background layer strings (`backgroundSize`, `backgroundPosition`, `backgroundRepeat`) sent raw by shadow tree updates (2026-10-22) | checkpoints in another theme than the overlay mounted in (iOS, `shared-dynamic-fn`) | overlay probe `linear-gradient` expected `#16a085` (dark) actual `#8e44ad`, the native props read a string as no layer |
+| M18 background layer arrays read as breakpoints by the parser (2026-10-22)                 | every checkpoint (iOS, `shared-dynamic-fn`)                       | overlay probe `radial-gradient` expected `#d35400` (dark) actual `#8e44ad`, the array is dropped before React renders it |
+| M19 the `fontVariationSettings` object sent unconverted by shadow tree updates (2026-10-22) | every step after a theme change with the header rendered (iOS, `shared-dynamic-fn`) | header `Paragraph 'title' fontVariationSettings expected undefined actual 'wght' 650.5`, the native props only read a string |
 
 #1266 can't be reverted as a whole, `verify()` reads the registry it introduced, so M4a and M4b disable its two
 mechanisms. The use after free itself (#1217, #1179) only crashes with freed families, which needs a Release build with

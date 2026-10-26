@@ -1,6 +1,8 @@
 #include "Parser.h"
 #include "UnistyleWrapper.h"
 #include "BackgroundImageConverter.h"
+#include "BackgroundLayerConverter.h"
+#include "FontVariationSettingsConverter.h"
 #include "TransformOriginConverter.h"
 #include <iomanip>
 #include <sstream>
@@ -563,8 +565,27 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared u
             return;
         }
 
+        // { wght: 700 } is the object syntax, not breakpoints
+        if (converters::isFontVariationSettingsPropName(propertyName) && converters::isFontVariationSettingsObject(rt, propertyValueObject)) {
+            parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), propertyValue);
+
+            return;
+        }
+
+        if (converters::isBackgroundLayerPropName(propertyName) && propertyValueObject.isArray(rt)) {
+            parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), propertyValue);
+
+            return;
+        }
+
         // 'mq' or 'breakpoints'
         auto valueFromBreakpoint = getValueFromBreakpoints(rt, unistyle, propertyValueObject);
+
+        if (converters::isBackgroundLayerPropName(propertyName) && valueFromBreakpoint.isObject() && valueFromBreakpoint.asObject(rt).isArray(rt)) {
+            parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), valueFromBreakpoint);
+
+            return;
+        }
 
         parsedStyle.setProperty(rt, jsi::PropNameID::forUtf8(rt, propertyName), this->parseSecondLevel(rt, unistyle, valueFromBreakpoint));
     });
@@ -1026,7 +1047,20 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, Unistyle::Shared u
             return;
         }
 
+        // { wght: 700 } is the object syntax, not breakpoints
+        if (converters::isFontVariationSettingsPropName(propertyName) && converters::isFontVariationSettingsObject(rt, nestedObjectStyle)) {
+            parsedStyle.setProperty(rt, propertyName.c_str(), propertyValue);
+
+            return;
+        }
+
         auto isArray = nestedObjectStyle.isArray(rt);
+
+        if (converters::isBackgroundLayerPropName(propertyName) && isArray) {
+            parsedStyle.setProperty(rt, propertyName.c_str(), propertyValue);
+
+            return;
+        }
 
         if (!isArray) {
             parsedStyle.setProperty(rt, propertyName.c_str(), this->getValueFromBreakpoints(rt, unistyle, nestedObjectStyle));
@@ -1071,7 +1105,7 @@ jsi::Value parser::Parser::parseSecondLevel(jsi::Runtime &rt, Unistyle::Shared u
 folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, const std::vector<std::shared_ptr<UnistyleData>>& unistyles) {
     jsi::Object convertedStyles(rt);
     auto& state = core::UnistylesRegistry::get().getState();
-    std::unordered_set<std::string> skippedBackgroundImages;
+    std::unordered_set<std::string> skippedPropNames;
 
     for (const auto& unistyleData : unistyles) {
         if (!unistyleData->parsedStyle.has_value()) {
@@ -1081,10 +1115,9 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
         helpers::enumerateJSIObject(
             rt,
             unistyleData->parsedStyle.value(),
-            [this, &rt, &state, &convertedStyles, &skippedBackgroundImages](const std::string& propertyName, jsi::Value& propertyValue) {
-                if (converters::isBackgroundImagePropName(propertyName)) {
-                    skippedBackgroundImages.erase(propertyName);
-                }
+            [this, &rt, &state, &convertedStyles, &skippedPropNames](const std::string& propertyName, jsi::Value& propertyValue) {
+                // a later style replaces a skipped value
+                skippedPropNames.erase(propertyName);
 
                 if (converters::isBackgroundImagePropName(propertyName) && propertyValue.isString()) {
                     // React Native parses the raw string natively and reads an array as the unprocessed syntax
@@ -1112,7 +1145,39 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
 
                     // without a converter (React Native < 0.83) a raw string reads as no background image,
                     // so leave the prop to React, which processes it in JS
-                    skippedBackgroundImages.insert(propertyName);
+                    skippedPropNames.insert(propertyName);
+
+                    return;
+                }
+
+                // React Native processes these strings in JS, its native props only read the processed arrays
+                if (converters::isBackgroundLayerPropName(propertyName) && propertyValue.isString()) {
+                    convertedStyles.setProperty(
+                        rt,
+                        propertyName.c_str(),
+                        jsi::valueFromDynamic(rt, converters::parseBackgroundLayerString(propertyName, propertyValue.asString(rt).utf8(rt)))
+                    );
+
+                    return;
+                }
+
+                // React Native converts the object syntax in JS, its native props only read the string
+                if (converters::isFontVariationSettingsPropName(propertyName) && propertyValue.isObject()) {
+                    auto fontVariationSettings = propertyValue.asObject(rt);
+                    auto maybeFontVariationSettings = converters::fontVariationSettingsToString(rt, fontVariationSettings);
+
+                    if (maybeFontVariationSettings.has_value()) {
+                        convertedStyles.setProperty(
+                            rt,
+                            propertyName.c_str(),
+                            jsi::String::createFromUtf8(rt, maybeFontVariationSettings.value())
+                        );
+
+                        return;
+                    }
+
+                    // React throws for an invalid value, so leave the prop to React
+                    skippedPropNames.insert(propertyName);
 
                     return;
                 }
@@ -1289,9 +1354,9 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
 
     auto props = jsi::dynamicFromValue(rt, jsi::Value(rt, convertedStyles));
 
-    // a skipped string still wins over earlier styles in React,
+    // a skipped value still wins over earlier styles in React,
     // so drop the prop instead of writing an earlier style's value
-    for (const auto& propName : skippedBackgroundImages) {
+    for (const auto& propName : skippedPropNames) {
         props.erase(propName);
     }
 

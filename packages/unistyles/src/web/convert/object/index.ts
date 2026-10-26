@@ -1,3 +1,5 @@
 export * from './transform'
 export * from './boxShadow'
 export * from './filter'
+export * from './backgroundLayers'
+export * from './fontVariationSettings'

@@ -193,15 +193,23 @@ const styles = StyleSheet.create((theme, rt) => ({
         backgroundColor: theme.colors.accent
     },
     // the center is the first color, hard stops paint the second one around it
+    // one 15px tile from x = 9 puts the center in the first color, a full size tile at 0 in the second one
     linearGradientProbe: {
         width: 24,
         height: 24,
-        experimental_backgroundImage: `linear-gradient(90deg, ${theme.colors.steps[0]} 0% 70%, ${theme.colors.steps[2]} 70%)`
+        experimental_backgroundImage: `linear-gradient(90deg, ${theme.colors.steps[0]} 0% 40%, ${theme.colors.steps[2]} 40%)`,
+        backgroundSize: '15px 24px',
+        backgroundPosition: '9px 0',
+        backgroundRepeat: 'no-repeat'
     },
+    // one 16px tile from 8, 8 centers the circle in the probe, a full size tile at 0 moves it to 6, 6
     radialGradientProbe: {
         width: 24,
         height: 24,
-        experimental_backgroundImage: `radial-gradient(circle, ${theme.colors.steps[1]} 0% 40%, ${theme.colors.steps[2]} 40%)`
+        experimental_backgroundImage: `radial-gradient(circle at 25% 25%, ${theme.colors.steps[1]} 0% 20%, ${theme.colors.steps[2]} 20%)`,
+        backgroundSize: [{ x: 16, y: 16 }],
+        backgroundPosition: [{ top: 8, left: 8 }],
+        backgroundRepeat: [{ x: 'no-repeat', y: 'no-repeat' }]
     },
     status: {
         flex: 1,

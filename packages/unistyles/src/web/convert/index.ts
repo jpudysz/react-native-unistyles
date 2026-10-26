@@ -2,11 +2,38 @@ import type { UnistylesValues } from '../../types'
 import type { UnistylesRuntime } from '../runtime'
 
 import { deepMergeObjects } from '../../utils'
-import { getBoxShadow, getFilterStyle, getTransformStyle } from './object'
+import {
+    getBackgroundLayers,
+    getBoxShadow,
+    getFilterStyle,
+    getFontVariationSettings,
+    getTransformStyle,
+} from './object'
 import { isPseudo } from './pseudo'
 import { getBoxShadowStyle, getTextShadowStyle } from './shadow'
 import { getStyle } from './style'
-import { isBoxShadow, isFilter, isShadow, isTextShadow, isTransform } from './utils'
+import {
+    isBackgroundLayer,
+    isBoxShadow,
+    isFilter,
+    isFontVariationSettings,
+    isShadow,
+    isTextShadow,
+    isTransform,
+} from './utils'
+
+// a breakpoint can hold React Native's array or object syntax too
+const getBreakpointStyle = (key: string, value: any) => {
+    if (isBackgroundLayer(key, value)) {
+        return getBackgroundLayers(key, value)
+    }
+
+    if (isFontVariationSettings(key, value)) {
+        return getFontVariationSettings(value)
+    }
+
+    return getStyle(key, value)
+}
 
 export const convertUnistyles = (value: UnistylesValues, runtime: UnistylesRuntime) => {
     // Flag to mark if textShadow is already created
@@ -65,10 +92,19 @@ export const convertUnistyles = (value: UnistylesValues, runtime: UnistylesRunti
             return getTransformStyle(unistylesValue)
         }
 
+        // React Native's array and object syntaxes, not breakpoints
+        if (isBackgroundLayer(unistylesKey, unistylesValue)) {
+            return getBackgroundLayers(unistylesKey, unistylesValue)
+        }
+
+        if (isFontVariationSettings(unistylesKey, unistylesValue)) {
+            return getFontVariationSettings(unistylesValue)
+        }
+
         // Breakpoints
         if (typeof unistylesValue === 'object' && unistylesValue !== null) {
             return Object.entries(unistylesValue).map(([breakpointKey, breakpointValue]) => {
-                return { [breakpointKey]: getStyle(unistylesKey, breakpointValue) }
+                return { [breakpointKey]: getBreakpointStyle(unistylesKey, breakpointValue) }
             })
         }
 
