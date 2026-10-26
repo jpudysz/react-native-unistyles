@@ -56,6 +56,18 @@ jest.mock('../specs', () => ({
 }))
 jest.mock('../core/useProxifiedUnistyles/listener', () => ({ listener: () => () => {} }))
 
+// Once hydrated, React renders again with `useIsHydrated()` true: rendered here as such, the server renderer only
+// giving the server snapshot
+let mockIsHydrated = false
+jest.mock('../core/useIsHydrated', () => ({
+    useIsHydrated: () => {
+        const { useIsHydrated } = jest.requireActual('../core/useIsHydrated')
+        const isHydrated = useIsHydrated()
+
+        return mockIsHydrated || isHydrated
+    },
+}))
+
 // Required after the mocks
 const { useProxifiedUnistyles } =
     require('../core/useProxifiedUnistyles') as typeof import('../core/useProxifiedUnistyles')
@@ -86,6 +98,7 @@ const render = () =>
 
 describe('Server rendered page in the browser, while hydrating', () => {
     afterEach(() => {
+        mockIsHydrated = false
         // @ts-expect-error cleanup of browser globals
         delete globalThis.window
         // @ts-expect-error cleanup of browser globals
@@ -124,14 +137,16 @@ describe('Server rendered page in the browser, while hydrating', () => {
         expect(render()).toMatchObject({ background: '#fff', themeName: 'light' })
     })
 
-    it('gives the browser values once hydrated', () => {
-        mockRuntimeInstance = mockRuntime({})
+    it('gives useUnistyles the browser values once hydrated', () => {
+        mockRuntimeInstance = mockRuntime({ CSSVars: false })
+        mockIsHydrated = true
 
-        expect(mockRuntimeInstance.miniRuntime).toMatchObject({
+        expect(render()).toEqual({
+            background: '#000',
             themeName: 'dark',
             colorScheme: 'dark',
             breakpoint: 'md',
-            screen: { width: 1280, height: 800 },
+            width: 1280,
             rtl: false,
         })
     })
