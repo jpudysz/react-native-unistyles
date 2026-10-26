@@ -1,4 +1,5 @@
 #include "ShadowTreeManager.h"
+#include "PerformanceTracing.h"
 
 using namespace margelo::nitro::unistyles;
 using namespace facebook::react;
@@ -18,6 +19,8 @@ std::vector<InstanceHandle::Shared> shadow::ShadowTreeManager::updateShadowTree(
         if (updates.empty()) {
             return;
         }
+
+        UNISTYLES_TRACE_SECTION("commit", "nodes", static_cast<int64_t>(updates.size()));
 
         std::unordered_map<Tag, folly::dynamic> tagToProps;
 

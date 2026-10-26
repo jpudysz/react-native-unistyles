@@ -27,8 +27,9 @@ bun e2e/run.ts ios --device <simulator udid> --scenarios all --reps 1 --bundler 
 
 Prerequisites: a prebuilt `ios/` and `android/` (`bun run ios` / `bun run android` once, they are gitignored), the
 Metro integration and the Babel plugin built (`bun run --cwd packages/unistyles metro:build` and `plugin:build`), `argent` on PATH for iOS.
-`e2e/third-party-card` is a dependency (`file:`), bun copies it into `node_modules`, run `bun install` after changing it. Start the Android emulator
-windowless from bash, a hidden window gets throttled by App Nap:
+`e2e/third-party-card` is a dependency (`file:`), bun copies it into `node_modules`, run `bun install` after changing it.
+`ime` needs the software keyboard, an AVD with `hw.keyboard=no` (Pixel_7_Pro_API_34) and a simulator without a connected
+hardware keyboard (a headless one). Start the Android emulator windowless from bash, a hidden window gets throttled by App Nap:
 
 ```sh
 /bin/bash -c '~/Library/Android/sdk/emulator/emulator -avd Pixel_7_Pro_API_34 -no-window -gpu host -memory 4096 -no-snapshot-load -no-audio &'
@@ -63,6 +64,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `lists-scroll`        | theme changes at scrolled FlatList positions                               | virtualized rows mounted after a theme change            |
 | `touchable-highlight` | TouchableHighlight pressed after theme changes and below a ScopedTheme (host only) | its underlay re-render commits the style React rendered last |
 | `interactions`        | every component on `interactions` pressed, toggled or focused after theme changes (host only) | components re-rendering themselves below Unistyles, scoped and variant styles |
+| `ime`                 | the keyboard focused on `keyboard` and inside a translucent Modal, a theme change while it's up, the Modal closed with the keyboard up, a Modal below it closed (Android) | `rt.insets.ime` in a StyleSheet, `useUnistyles` and `UnistylesRuntime` agree, Android Modals get the keyboard in their own window (#810) |
 | `rn-appearance`       | `Appearance.setColorScheme` against the OS scheme with adaptive themes, on a pushed screen, then `unspecified` | adaptive themes follow RN's override on both platforms (iOS key window, Android Activity `uiMode`) |
 | `os-appearance`       | OS appearance flips with adaptive themes (host only)                       | adaptive themes, inverted adaptive scopes                |
 | `random-walk`         | 14 seeded random theme changes, pushes, backs and screen actions           | combinations of the above                                |
@@ -118,7 +120,7 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
 ## Mutation check
 
 Each fix was reverted (or its mechanism disabled) in a Release build and the suite failed with a report pointing at
-the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 to M11 added 2026-10-03 on iOS and Android, M12 and M13 added 2026-10-05, M14 added 2026-10-06):
+the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 to M11 added 2026-10-03 on iOS and Android, M12 and M13 added 2026-10-05, M14 added 2026-10-06, M17 and M18 added 2026-10-22, M19 added 2026-10-23, M20 to M22 added 2026-10-22):
 
 | mutation                                                                                   | caught by                                                         | first failure                                                                                   |
 | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
@@ -139,9 +141,12 @@ the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 t
 | M14 no worklet runtime guard in `HostUnistyle::get` (#1213), a worklet reads RN runtime values | `animated-variant` (iOS and Android, Android 3 of 3 runs crash)    | iOS `worklet access expected Unistyles worklet error actual no error, width undefined`, Android SIGSEGV on `mqt_v_js` |
 | M15 main before the ScopedTheme fix (views and hooks below a scope that re-render or mount by themselves) | `scoped`, every checkpoint (iOS, 21 probe failures in 8 checkpoints, 6 hook failures, 0 mismatches) | overlay probe `scoped-rerender` expected `#341f97` (dark) actual `#3498db` (light), `useUnistyles theme.colors.primary expected #341f97 actual #3498db` |
 | M16 #1030 without the C++ CSS parser converter (main after #1319), a background image string is skipped on iOS | every checkpoint in another theme than the overlay mounted in (iOS, `shared-dynamic-fn`: 2 probe failures, 0 mismatches) | overlay probe `linear-gradient` expected `#16a085` (dark) actual `#1abc9c` (light), React keeps the gradient it processed at mount |
-| M17 RN 0.88 background layer strings (`backgroundSize`, `backgroundPosition`, `backgroundRepeat`) sent raw by shadow tree updates (2026-10-22) | checkpoints in another theme than the overlay mounted in (iOS, `shared-dynamic-fn`) | overlay probe `linear-gradient` expected `#16a085` (dark) actual `#8e44ad`, the native props read a string as no layer |
-| M18 background layer arrays read as breakpoints by the parser (2026-10-22)                 | every checkpoint (iOS, `shared-dynamic-fn`)                       | overlay probe `radial-gradient` expected `#d35400` (dark) actual `#8e44ad`, the array is dropped before React renders it |
-| M19 the `fontVariationSettings` object sent unconverted by shadow tree updates (2026-10-22) | every step after a theme change with the header rendered (iOS, `shared-dynamic-fn`) | header `Paragraph 'title' fontVariationSettings expected undefined actual 'wght' 650.5`, the native props only read a string |
+| M17 Android's cached mini runtime doesn't follow the keyboard (no `onImeChange`), `useUnistyles` and theme rebuilds read a stale `ime` | `ime` (Android, 4 failures) | `ime expected the keyboard height actual native 317.67 StyleSheet 317.67 useUnistyles 0`, after `flip dark` also `StyleSheet 0` |
+| M18 #810 Android compiled with the stub below React Native 0.86, no IME listener on a Modal's window | `ime` (Android, the 2 Modal steps) | `ime expected the keyboard height actual native 0 StyleSheet 0 useUnistyles 0` with the keyboard up in the Modal |
+| M19 closing any Modal resets `ime` (not only the one that reported the keyboard) | `ime` (Android, the stacked Modal step) | `ime expected the keyboard height actual native 0 StyleSheet 0 useUnistyles 0` after the Modal below the keyboard's one closed |
+| M20 RN 0.88 background layer strings (`backgroundSize`, `backgroundPosition`, `backgroundRepeat`) sent raw by shadow tree updates (2026-10-22) | checkpoints in another theme than the overlay mounted in (iOS, `shared-dynamic-fn`) | overlay probe `linear-gradient` expected `#16a085` (dark) actual `#8e44ad`, the native props read a string as no layer |
+| M21 background layer arrays read as breakpoints by the parser (2026-10-22)                 | every checkpoint (iOS, `shared-dynamic-fn`)                       | overlay probe `radial-gradient` expected `#d35400` (dark) actual `#8e44ad`, the array is dropped before React renders it |
+| M22 the `fontVariationSettings` object sent unconverted by shadow tree updates (2026-10-22) | every step after a theme change with the header rendered (iOS, `shared-dynamic-fn`) | header `Paragraph 'title' fontVariationSettings expected undefined actual 'wght' 650.5`, the native props only read a string |
 
 #1266 can't be reverted as a whole, `verify()` reads the registry it introduced, so M4a and M4b disable its two
 mechanisms. The use after free itself (#1217, #1179) only crashes with freed families, which needs a Release build with

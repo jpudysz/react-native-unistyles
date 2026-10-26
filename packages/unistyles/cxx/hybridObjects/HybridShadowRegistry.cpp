@@ -1,4 +1,5 @@
 #include "HybridShadowRegistry.h"
+#include "PerformanceTracing.h"
 
 using namespace margelo::nitro::unistyles;
 using namespace facebook::react;
@@ -182,6 +183,8 @@ void HybridShadowRegistry::scheduleShadowTreeUpdate(jsi::Runtime& rt) {
                 return jsi::Value::undefined();
             }
 
+            UNISTYLES_TRACE_SECTION("updateShadowTree");
+
             shadow::ShadowTreeManager::updateShadowTree(rt);
 
             return jsi::Value::undefined();
@@ -224,6 +227,8 @@ jsi::Value HybridShadowRegistry::flush(jsi::Runtime &rt, const jsi::Value &thisV
     if (!this->_unistylesRuntime->ownsRegistry()) {
         return jsi::Value::undefined();
     }
+
+    UNISTYLES_TRACE_SECTION("flush");
 
     shadow::ShadowTreeManager::updateShadowTree(rt);
 
@@ -286,6 +291,9 @@ jsi::Value HybridShadowRegistry::refreshReactNodes(jsi::Runtime &rt, const jsi::
     helpers::assertThat(rt, count == 1 && args[0].isObject(), "Unistyles: refreshReactNodes expected to be called with an array of shadow nodes.");
 
     auto nodes = args[0].asObject(rt).asArray(rt);
+
+    UNISTYLES_TRACE_SECTION("refreshReactNodes", "nodes", static_cast<int64_t>(nodes.size(rt)));
+
     std::unordered_map<SurfaceId, std::shared_ptr<const RootShadowNode>> roots;
 
     UIManagerBinding::getBinding(rt)->getUIManager().getShadowTreeRegistry().enumerate([&roots](const ShadowTree& shadowTree, bool&) {

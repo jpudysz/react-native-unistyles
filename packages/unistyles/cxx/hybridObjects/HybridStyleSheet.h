@@ -9,6 +9,7 @@
 #include "HybridUnistylesStyleSheetSpec.hpp"
 #include "RNStyle.h"
 #include "Helpers.h"
+#include "PerformanceTracing.h"
 #include "UnistylesConstants.h"
 #include "Breakpoints.h"
 #include "Parser.h"

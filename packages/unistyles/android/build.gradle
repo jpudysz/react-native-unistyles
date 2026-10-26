@@ -32,6 +32,48 @@ apply from: '../nitrogen/generated/android/unistyles+autolinking.gradle'
 // doesn't compile. It only compiles Kotlin directories from the kotlin source set.
 android.sourceSets.main.kotlin.srcDirs += ["${project.projectDir}/../nitrogen/generated/android/kotlin"]
 
+def resolveReactNativeMinorVersion() {
+    def reactNativeDir = safeExtGet("REACT_NATIVE_NODE_MODULES_DIR", null)
+
+    if (reactNativeDir == null) {
+        try {
+            def reactNativePackageJson = providers.exec {
+                workingDir(rootDir)
+                commandLine("node", "--print", "require.resolve('react-native/package.json')")
+            }.standardOutput.asText.get().trim()
+
+            reactNativeDir = file(reactNativePackageJson).parentFile
+        } catch (Exception ignored) {
+            reactNativeDir = file("${rootDir}/../node_modules/react-native")
+        }
+    }
+
+    def reactNativePackageJson = file("${reactNativeDir}/package.json")
+
+    if (!reactNativePackageJson.exists()) {
+        logger.warn("🦄 Unistyles: React Native not found. Set REACT_NATIVE_NODE_MODULES_DIR in your root build.gradle to enable features that require React Native 0.86+.")
+
+        return 0
+    }
+
+    String version = new groovy.json.JsonSlurper().parse(reactNativePackageJson).version
+
+    // nightlies
+    if (version.startsWith("0.0.0")) {
+        return Integer.MAX_VALUE
+    }
+
+    def (major, minor) = version.tokenize('.')
+
+    return major.toInteger() > 0 ? Integer.MAX_VALUE : minor.toInteger()
+}
+
+// Kotlin sources that use APIs available only in newer React Native versions
+def reactNativeSourceDir = resolveReactNativeMinorVersion() >= 86 ? "src/rn86/java" : "src/legacy/java"
+
+android.sourceSets.main.java.srcDirs += [reactNativeSourceDir]
+android.sourceSets.main.kotlin.srcDirs += [reactNativeSourceDir]
+
 def resolveBuildType() {
     Gradle gradle = getGradle()
     String tskReqStr = gradle.getStartParameter().getTaskRequests()['args'].toString()

@@ -249,8 +249,8 @@ export const UserTheme = () => (
 
 Available options are: `dark`, `light` or `unspecified` for devices that don't support color schemes.
 
-:::caution
-Unistyles will read your device settings, not user preferences. It's not compatible with the React Native `Appearance` module.
+:::note
+On iOS and Android, `colorScheme` and adaptive themes follow React Native's `Appearance.setColorScheme('light' | 'dark')`. Call `Appearance.setColorScheme('unspecified')` to go back to the device settings.
 :::
 
 If your app's theme is not changing based on device settings, please refer to the [FAQ](/v3/other/frequently-asked-questions/#adaptive-mode-doesnt-work-for-me)

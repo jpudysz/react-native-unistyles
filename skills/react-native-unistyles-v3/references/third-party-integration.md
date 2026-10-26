@@ -97,6 +97,8 @@ const UniScrollView = withUnistyles(ScrollView)
 
 ## Babel Plugin: autoProcessPaths
 
+With the [Metro integration](setup-guide.md#metro-integration-experimental) (3.6.0+) you don't need this, `autoProcessImports` or `autoRemapImports` — it covers `node_modules` and files outside your app automatically.
+
 The plugin processes every file under `root` and always ignores `node_modules`. `autoProcessPaths` opts 3rd party code in: inside these paths, `react-native` imports are replaced with Unistyles ref-borrowing factories, so the library's views update from C++:
 
 ```js
@@ -155,7 +157,7 @@ module.exports = {
             {
               isDefault: false,
               name: 'NativeText',
-              path: 'react-native/Libraries/Text/TextNativeComponent',
+              path: 'react-native/Libraries/Text/TextNativeComponent',  // deep import, deprecated by RN
               mapTo: 'NativeText',
             },
             {
@@ -171,6 +173,8 @@ module.exports = {
 }
 ```
 
+Unistyles itself also handles the React Native 0.83+ root exports `import { unstable_NativeText as NativeText, unstable_NativeView as NativeView } from 'react-native'` (use a capitalized alias — lowercase JSX tags are host components; on RN 0.83–0.86 TypeScript needs `"customConditions": ["react-native-strict-api"]` or `// @ts-expect-error`).
+
 It doesn't make non-RN views (e.g. SVG, icon fonts) reactive — use `withUnistyles` for those.
 
 ---
@@ -185,7 +189,7 @@ Use `RepackUnistylePlugin` from `react-native-unistyles/repack-plugin` in your R
 
 ### Plugin ordering
 
-The Unistyles Babel plugin **MUST come BEFORE** React Compiler:
+The Unistyles Babel plugin **MUST come BEFORE** React Compiler (it has to process `useVariants` first):
 
 ```js
 // babel.config.js
@@ -197,11 +201,11 @@ module.exports = {
 }
 ```
 
-### useVariants incompatibility
+### useVariants
 
-`styles.useVariants()` may break with React Compiler's `panicThreshold: 'all_errors'` setting ([#1002](https://github.com/jpudysz/react-native-unistyles/issues/1002)). This is a known issue planned for fix in v4.
+Fixed in **3.6.0**: components calling `styles.useVariants()` compile with React Compiler. Before, `panicThreshold: 'all_errors'` failed the build and with the default threshold the compiler silently skipped those components ([#1002](https://github.com/jpudysz/react-native-unistyles/issues/1002)). On older versions, upgrade or avoid `'all_errors'`.
 
-**Workaround:** Use `panicThreshold: 'none'` (default) or `'critical_errors'` instead of `'all_errors'`.
+With the Metro integration in a bare RN app, `babel-plugin-react-compiler` listed in `babel.config.js` `plugins` runs before Unistyles — keep the Babel plugin there (Expo's `babel-preset-expo` setup is fine).
 
 ---
 
@@ -215,21 +219,15 @@ module.exports = {
 
 Use `useAnimatedTheme()` from `react-native-unistyles/reanimated` (a `SharedValue`, no re-renders, follows `ScopedTheme`) instead of `UnistylesRuntime.getTheme()` (doesn't update worklets) or `useUnistyles()` (re-renders). Animate variant colors with `useAnimatedVariantColor(styles.x, 'backgroundColor')`, which returns a `SharedValue<string>` to use inside `useAnimatedStyle`.
 
-### CSS transitions workaround
+### CSS transitions
 
-When using Reanimated's CSS transitions, theme-dependent colors may become stale after theme changes. Force re-mount with `key`:
+Since **3.6.0**, Reanimated CSS transitions (`transitionProperty`) animate to the new theme's colors after a theme change — no workaround needed, also for frozen / `Suspense` / hidden `<Activity>` screens when revealed ([#1007](https://github.com/jpudysz/react-native-unistyles/issues/1007)). Before 3.6.0 they kept the previous theme's colors; the workaround there was remounting with `key={rt.themeName}` (from `useUnistyles()`).
 
-```tsx
-const { rt } = useUnistyles()
+3.6.0 also fixed views that didn't fully switch themes with Reanimated in the tree (nested `Text`, variant styles on `Animated.Text` after a breakpoint change).
 
-// key forces re-mount when theme changes, refreshing CSS transitions
-<Animated.View
-  key={rt.themeName}
-  style={[styles.card, { transition: [{ property: 'backgroundColor', duration: 300 }] }]}
-/>
-```
+### Web
 
-See [#1007](https://github.com/jpudysz/react-native-unistyles/issues/1007).
+Since **3.6.0**, `useAnimatedStyle` works on components wrapped with `createUnistylesElement` on web (before, the animated style was silently dropped, [#1199](https://github.com/jpudysz/react-native-unistyles/issues/1199)).
 
 ### Array syntax for combining styles
 
@@ -270,19 +268,13 @@ This replaces `react-native-safe-area-context` for most use cases. No `<SafeArea
 
 ## Frozen / hidden screens
 
-Screens hidden without unmounting keep their Unistyles bindings: `freezeOnBlur` (react-navigation / react-native-screens, via `react-freeze`), react-navigation `inactiveBehavior` (React `<Activity />`), and `Suspense` fallbacks. Theme/runtime changes made while hidden are applied when the screen becomes visible (Suspense/react-freeze since 3.2.0, `<Activity />` since 3.3.0, stale-style fixes in **3.4.0** — upgrade if frozen screens come back with outdated styles). Components using `useUnistyles`/`withUnistyles` re-render only after unfreezing.
+Screens hidden without unmounting keep their Unistyles bindings: `freezeOnBlur` (react-navigation / react-native-screens, via `react-freeze`), react-navigation `inactiveBehavior` (React `<Activity />`), and `Suspense` fallbacks. Theme/runtime changes made while hidden are applied when the screen becomes visible (Suspense/react-freeze since 3.2.0, `<Activity />` since 3.3.0, stale-style fixes in **3.4.0** — upgrade if frozen screens come back with outdated styles). Since **3.6.0**, views inside a `Suspense` fallback are refreshed on theme change too. Components using `useUnistyles`/`withUnistyles` re-render only after unfreezing.
 
 ---
 
-## FlatList Alternatives
+## FlatList `horizontal`
 
-`FlatList` has a known crash on orientation change ([#803](https://github.com/jpudysz/react-native-unistyles/issues/803)) — this is a React Native core issue, not Unistyles-specific.
-
-**Recommended alternatives:**
-- [FlashList](https://github.com/Shopify/flash-list) by Shopify
-- [Legend List](https://github.com/LegendApp/legend-list) by LegendApp
-
-Both work correctly with Unistyles orientation changes.
+Before **3.6.0**, flipping `horizontal` on a `FlatList` (e.g. `horizontal={rt.isLandscape}`) threw the "detected an unsupported FlatList with the horizontal prop" render error on Android, and flipping it back leaked a registry entry ([#803](https://github.com/jpudysz/react-native-unistyles/issues/803)). Both are fixed in 3.6.0 — upgrade. On older versions, remount the list with a `key` tied to `horizontal`, or use [FlashList](https://github.com/Shopify/flash-list) / [Legend List](https://github.com/LegendApp/legend-list).
 
 ---
 
