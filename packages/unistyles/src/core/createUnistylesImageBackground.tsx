@@ -10,7 +10,11 @@ import { passForwardedRef } from './passForwardRef'
 import { maybeWarnAboutMultipleUnistyles } from './warn'
 
 export const createUnistylesImageBackground = (Component: typeof ImageBackground) => {
-    const UnistylesImageBackground = React.forwardRef<ImageBackground, ImageBackgroundProps>((props, forwardedRef) => {
+    const UnistylesImageBackground = ({
+        ref,
+        ...props
+    }: ImageBackgroundProps & { ref?: React.ForwardedRef<ImageBackground> }) => {
+        const forwardedRef: React.ForwardedRef<ImageBackground> = ref ?? null
         const scope = useContext(ScopedThemeContext)
 
         // @ts-expect-error we don't know the type of the component
@@ -49,7 +53,7 @@ export const createUnistylesImageBackground = (Component: typeof ImageBackground
                 imageRef={hasUnistyles(props.imageStyle) ? linkImageRef : props.imageRef}
             />
         )
-    })
+    }
 
     return copyComponentProperties(Component, UnistylesImageBackground)
 }
