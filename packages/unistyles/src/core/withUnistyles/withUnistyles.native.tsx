@@ -1,10 +1,10 @@
 import React, {
-    forwardRef,
     useContext,
     useEffect,
     type ComponentProps,
     type ComponentRef,
     type ComponentType,
+    type Ref,
 } from 'react'
 
 import type { UnistylesValues } from '../../types'
@@ -66,7 +66,7 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         contentContainerStyle?: UnistylesValues
     }
 
-    return forwardRef<GenericComponentRef<TComponent>, PropsWithUnistyles>((props, ref) => {
+    return ({ ref, ...props }: PropsWithUnistyles & { ref?: Ref<GenericComponentRef<TComponent>> }) => {
         const narrowedProps = props as PropsWithUnistyles & UnistyleStyles
         const NativeComponent = Component as ComponentType
 
@@ -127,5 +127,5 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         } as any
 
         return <NativeComponent key={uniPropsKey || mappingsKey} {...finalProps} ref={ref} />
-    })
+    }
 }
