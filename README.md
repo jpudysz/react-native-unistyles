@@ -80,9 +80,6 @@ npx skills add jpudysz/react-native-unistyles
 <a href="https://github.com/jordmccord">
      <img src="https://avatars.githubusercontent.com/u/7591840?v=4" height="70px" width="70px" alt="jordmccord" />
 </a>
-<a href="https://github.com/kerwanp">
-     <img src="https://avatars.githubusercontent.com/u/36955373?v=4" height="70px" width="70px" alt="kerwanp" />
-</a>
 <a href="https://github.com/andkindness">
      <img src="https://avatars.githubusercontent.com/u/143941782?v=4" height="70px" width="70px" alt="andkindness" />
 </a>
@@ -170,6 +167,9 @@ npx skills add jpudysz/react-native-unistyles
 </a>
 <a href="https://galaxies.dev">
      <img src="https://avatars.githubusercontent.com/u/118431096?s=200&v=4" height="60px" width="60px" alt="galaxies-dev" />
+</a>
+<a href="https://github.com/kerwanp">
+     <img src="https://avatars.githubusercontent.com/u/36955373?v=4" height="60px" width="60px" alt="kerwanp" />
 </a>
 
 ## Sponsor my work
