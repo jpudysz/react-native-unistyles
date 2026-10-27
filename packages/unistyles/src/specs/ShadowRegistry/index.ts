@@ -84,6 +84,16 @@ const refreshReactNodes = () => {
 
 StyleSheet.addChangeListener(refreshReactNodes)
 
+// a unistyle key holds its secrets object. A unistyle spread into another StyleSheet.create keeps its key,
+// but the parser resolves the (hidden) secrets to undefined, so the key no longer points at a unistyle
+const isUnistyleKey = (style: any, key: string) => {
+    if (!key.startsWith('unistyles_')) {
+        return false
+    }
+
+    return typeof style[key] === 'object' && style[key] !== null
+}
+
 // skips empty styles and splits a style merged from many unistyles (eg. flattened by Animated) into one per unistyle
 // runs for every style on every link, so it reads the keys once and allocates only for the rare merged style
 const collectStyle = (style: any, collected: Array<any>) => {
@@ -95,7 +105,7 @@ const collectStyle = (style: any, collected: Array<any>) => {
     let unistylesCount = 0
 
     for (const key of keys) {
-        if (key.startsWith('unistyles_')) {
+        if (isUnistyleKey(style, key)) {
             unistylesCount++
         }
     }
@@ -109,7 +119,7 @@ const collectStyle = (style: any, collected: Array<any>) => {
     }
 
     for (const key of keys) {
-        if (key.startsWith('unistyles_')) {
+        if (isUnistyleKey(style, key)) {
             collected.push({ [key]: style[key] })
         }
     }
