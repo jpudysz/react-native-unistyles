@@ -207,6 +207,8 @@ jest.mock('react-native-unistyles', () => {
 
                 return React.createElement(Component, {
                     ...deepMergeObjects(mappingsProps, unistyleProps, props),
+                    ...(props.style ? { style: props.style } : {}),
+                    ...(props.contentContainerStyle ? { contentContainerStyle: props.contentContainerStyle } : {}),
                     key: uniPropsKey || mappingsKey,
                 })
             },

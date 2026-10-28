@@ -168,8 +168,18 @@ describe('withUnistyles mock', () => {
 
         expect(uniProps).toHaveBeenCalledWith(expect.any(Object), expect.any(Object))
         expect(element.key).toBe('uni')
-        expect(element.props).toEqual({ color: 'blue', size: 10, style: { padding: 2, margin: 1, flex: 1 } })
+        expect(element.props).toEqual({ color: 'blue', size: 10, style: { flex: 1 } })
         expect(element.props).not.toHaveProperty('uniProps')
+    })
+
+    it('should deep merge styles only when there is no inline style', () => {
+        const Mapped = withUnistyles(Component, () => ({ style: { padding: 2 } }))
+        const uniProps = () => ({ style: { margin: 1 } })
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        expect(Mapped({ uniProps }).props.style).toEqual({ padding: 2, margin: 1 })
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        expect(Mapped({ uniProps, style: [{ flex: 1 }] }).props.style).toEqual([{ flex: 1 }])
     })
 
     it('should use the mappings key when uniProps has none', () => {
