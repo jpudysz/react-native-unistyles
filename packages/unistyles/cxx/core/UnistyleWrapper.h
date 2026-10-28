@@ -192,11 +192,6 @@ You likely accessed a style while the runtime was being torn down (eg. during a 
             }
         }
 
-        // Rebuild into a per-call UnistyleData instead of the shared unistyle, as the scoped path above and
-        // HybridShadowRegistry::link (since 3.4.0) do. rebuildUnistyle() clears `isDirty` on the shared unistyle
-        // without erasing HostUnistyle's per-key cache, so after a theme change a plain view that later reads the
-        // same style key (eg. `styles.root` shared by a withUnistyles ScrollView and a View) gets the previous
-        // theme's cached value.
         if (unistyle->styleKey != helpers::EXOTIC_STYLE_KEY) {
             std::vector<folly::dynamic> arguments = parsedArguments.has_value()
                 ? parsedArguments.value()
