@@ -1,5 +1,3 @@
-// Next.js App Router smoke test. Packs react-native-unistyles, installs the tarball into a copy of this app
-// (outside the workspace, the way users consume it), then checks the server rendered page with next dev and next start.
 import { spawn, spawnSync } from 'node:child_process'
 import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
