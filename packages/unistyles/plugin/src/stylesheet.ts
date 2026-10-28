@@ -739,7 +739,7 @@ export function addDependencies(
 
             if (unsupportedReason) {
                 console.warn(
-                    `Unistyles 🦄: ${style}: detected [${mappedDeps}], but ${unsupportedReason}. The style won't update when these dependencies change. Return an object literal, or a ternary/logical expression of object literals.`,
+                    `Unistyles 🦄: ${style}: detected [${mappedDeps}], but ${unsupportedReason}. Return an object literal, or a ternary/logical expression of object literals.`,
                 )
 
                 return
@@ -796,9 +796,18 @@ export function addDependencies(
                         : [],
                 )
 
-            debugMessage(uniqueDependencies, `they can't be attached to: ${reasons.join(', ')}`)
+            // native reads dependencies only from the first returned value
+            const consequence =
+                targets.length > 0
+                    ? 'the style may not update when these dependencies change, eg. when one of these values is returned first'
+                    : "the style won't update when these dependencies change"
+
+            debugMessage(uniqueDependencies, `they can't be attached to: ${reasons.join(', ')}, so ${consequence}`)
         } else if (targets.length === 0) {
-            debugMessage(uniqueDependencies, 'no returned object was found to attach them to')
+            debugMessage(
+                uniqueDependencies,
+                "no returned object was found to attach them to, so the style won't update when these dependencies change",
+            )
         } else {
             debugMessage(uniqueDependencies)
         }

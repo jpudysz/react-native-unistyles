@@ -720,7 +720,7 @@ function addDependencies(state, styleName, unistyle, detectedDependencies) {
       const style = `${state.filename?.replace(`${state.file.opts.root}/`, "")}: styles.${styleName}`;
       if (unsupportedReason) {
         console.warn(
-          `Unistyles \u{1F984}: ${style}: detected [${mappedDeps}], but ${unsupportedReason}. The style won't update when these dependencies change. Return an object literal, or a ternary/logical expression of object literals.`
+          `Unistyles \u{1F984}: ${style}: detected [${mappedDeps}], but ${unsupportedReason}. Return an object literal, or a ternary/logical expression of object literals.`
         );
         return;
       }
@@ -758,9 +758,13 @@ function addDependencies(state, styleName, unistyle, detectedDependencies) {
       const reasons = unsupported.map((node) => `${node.type}${node.loc ? ` (line ${node.loc.start.line})` : ""}`).concat(
         unsupportedReturns > 0 ? `${unsupportedReturns} return statement(s) inside switch, loop or try blocks` : []
       );
-      debugMessage(uniqueDependencies, `they can't be attached to: ${reasons.join(", ")}`);
+      const consequence = targets.length > 0 ? "the style may not update when these dependencies change, eg. when one of these values is returned first" : "the style won't update when these dependencies change";
+      debugMessage(uniqueDependencies, `they can't be attached to: ${reasons.join(", ")}, so ${consequence}`);
     } else if (targets.length === 0) {
-      debugMessage(uniqueDependencies, "no returned object was found to attach them to");
+      debugMessage(
+        uniqueDependencies,
+        "no returned object was found to attach them to, so the style won't update when these dependencies change"
+      );
     } else {
       debugMessage(uniqueDependencies);
     }

@@ -305,7 +305,7 @@ describe('Babel plugin debug output for returned values', () => {
         expect(logs).toEqual([])
         expect(warnings).toHaveLength(1)
         expect(warnings[0]).toContain('src/styles.tsx: styles.tinted: detected [Theme]')
-        expect(warnings[0]).toContain('CallExpression')
+        expect(warnings[0]).toContain("CallExpression (line 5), so the style won't update")
     })
 
     it('warns when a branch is not an object literal', () => {
@@ -316,7 +316,7 @@ describe('Babel plugin debug output for returned values', () => {
         expect(logs).toEqual([])
         expect(warnings).toHaveLength(1)
         expect(warnings[0]).toContain('styles.toggle: detected [Theme]')
-        expect(warnings[0]).toContain('Identifier')
+        expect(warnings[0]).toContain('Identifier (line 5), so the style may not update')
     })
 
     it('warns about return statements inside a switch', () => {
