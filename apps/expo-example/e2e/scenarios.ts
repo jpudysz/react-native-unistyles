@@ -205,6 +205,7 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.flip('dark')
         await a.act('scoped.mount')
         await a.flip('premium')
+        await a.expect('scoped-probe.runtime')
         await a.followSystem()
         await a.act('scoped.mount')
         await a.act('scoped.mount')
