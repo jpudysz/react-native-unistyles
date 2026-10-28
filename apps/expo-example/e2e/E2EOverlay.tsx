@@ -3,7 +3,7 @@ import { Animated as RNAnimated, Pressable, ScrollView, Text, View } from 'react
 import { usePathname } from 'expo-router'
 import { Card } from 'e2e-third-party-card'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
-import { ScopedTheme, StyleSheet, useUnistyles, withUnistyles } from 'react-native-unistyles'
+import { ScopedTheme, StyleSheet, UnistylesRuntime, useUnistyles, withUnistyles } from 'react-native-unistyles'
 import { useAnimatedTheme } from 'react-native-unistyles/reanimated'
 import { themes } from '../themes'
 import { useE2EAction } from './actions'
@@ -91,6 +91,22 @@ const LateScopedHooks = () => {
 
 const ScopedProbeCells = () => {
     const [isMounted, setIsMounted] = useState(false)
+    // Mount render only. It runs while ApplyScopedTheme still has the registry scoped.
+    // The setIsMounted re-render is this cell alone, after dispose restores it, and useE2EAction keeps that later closure.
+    const runtimeThemeName = useRef(UnistylesRuntime.themeName)
+
+    useE2EAction('scoped-probe.runtime', () => {
+        const expected = (Object.keys(themes) as Array<keyof typeof themes>).find(name => (
+            themes[name].colors.primary === UnistylesRuntime.getTheme().colors.primary
+        ))
+        const actual = {
+            render: runtimeThemeName.current,
+            callback: UnistylesRuntime.themeName
+        }
+        const read = (Object.keys(actual) as Array<keyof typeof actual>).find(key => actual[key] !== expected)
+
+        return read ? { component: read, prop: 'UnistylesRuntime.themeName', expected: expected ?? '', actual: actual[read] ?? '' } : undefined
+    })
 
     // re-renders by itself, ScopedTheme doesn't
     useEffect(() => setIsMounted(true), [])

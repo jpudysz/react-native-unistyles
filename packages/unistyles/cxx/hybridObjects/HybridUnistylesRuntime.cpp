@@ -3,6 +3,17 @@
 
 using namespace margelo::nitro::unistyles;
 
+namespace {
+std::optional<std::string> getScopedThemeName(core::UnistylesState& state) {
+    auto& registry = core::UnistylesRegistry::get();
+    auto maybeScopedTheme = registry.getScopedTheme();
+
+    return maybeScopedTheme.has_value()
+        ? maybeScopedTheme
+        : state.getCurrentThemeName();
+}
+}
+
 core::UnistylesState& HybridUnistylesRuntime::getState() {
     // state belongs to the runtime that replaced this one
     if (!this->ownsRegistry()) {
@@ -31,13 +42,6 @@ Dimensions HybridUnistylesRuntime::getScreen() {
 };
 
 std::optional<std::string> HybridUnistylesRuntime::getThemeName() {
-    auto& registry = core::UnistylesRegistry::get();
-    auto maybeScopedTheme = registry.getScopedTheme();
-
-    if (maybeScopedTheme.has_value()) {
-        return maybeScopedTheme.value();
-    }
-
     return this->getState().getCurrentThemeName();
 };
 
@@ -216,7 +220,7 @@ jsi::Value HybridUnistylesRuntime::createHybridNavigationBar(jsi::Runtime &rt, c
 UnistylesCxxMiniRuntime HybridUnistylesRuntime::getMiniRuntime() {
     UnistylesNativeMiniRuntime nativeMiniRuntime = this->_nativePlatform->getMiniRuntime();
     UnistylesCxxMiniRuntime cxxMiniRuntime{
-        this->getThemeName(),
+        getScopedThemeName(this->getState()),
         this->getBreakpoint(),
         this->getHasAdaptiveThemes(),
         nativeMiniRuntime.colorScheme,
@@ -237,7 +241,7 @@ UnistylesCxxMiniRuntime HybridUnistylesRuntime::getMiniRuntime() {
 
 UnistylesCxxMiniRuntime HybridUnistylesRuntime::buildMiniRuntimeFromNativeRuntime(UnistylesNativeMiniRuntime& nativeMiniRuntime) {
     UnistylesCxxMiniRuntime cxxMiniRuntime{
-        this->getThemeName(),
+        getScopedThemeName(this->getState()),
         this->getBreakpoint(),
         this->getHasAdaptiveThemes(),
         nativeMiniRuntime.colorScheme,
