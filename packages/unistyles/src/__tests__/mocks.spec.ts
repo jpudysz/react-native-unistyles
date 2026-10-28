@@ -149,6 +149,50 @@ describe('mock registry persistence', () => {
     })
 })
 
+describe('withUnistyles mock', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { withUnistyles } = require('react-native-unistyles') as { withUnistyles: any }
+    const Component = () => null
+
+    it('should resolve uniProps and merge mappings < uniProps < props', () => {
+        const uniProps = jest.fn(() => ({ key: 'uni', color: 'blue', style: { margin: 1 } }))
+        const Mapped = withUnistyles(Component, () => ({
+            key: 'mapped',
+            color: 'red',
+            size: 10,
+            style: { padding: 2 },
+        }))
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const element = Mapped({ uniProps, style: { flex: 1 } })
+
+        expect(uniProps).toHaveBeenCalledWith(expect.any(Object), expect.any(Object))
+        expect(element.key).toBe('uni')
+        expect(element.props).toEqual({ color: 'blue', size: 10, style: { flex: 1 } })
+        expect(element.props).not.toHaveProperty('uniProps')
+    })
+
+    it('should deep merge styles only when there is no inline style', () => {
+        const Mapped = withUnistyles(Component, () => ({ style: { padding: 2 } }))
+        const uniProps = () => ({ style: { margin: 1 } })
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        expect(Mapped({ uniProps }).props.style).toEqual({ padding: 2, margin: 1 })
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        expect(Mapped({ uniProps, style: [{ flex: 1 }] }).props.style).toEqual([{ flex: 1 }])
+    })
+
+    it('should use the mappings key when uniProps has none', () => {
+        const Mapped = withUnistyles(Component, () => ({ key: 'mapped', color: 'red' }))
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const element = Mapped({ uniProps: () => ({ color: 'blue' }) })
+
+        expect(element.key).toBe('mapped')
+        expect(element.props).toEqual({ color: 'blue' })
+    })
+})
+
 // entry points that aren't mocked load the native core, so the nitro mock has to cover what it calls at module load
 describe('unmocked entry points', () => {
     it.each([

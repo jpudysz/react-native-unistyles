@@ -200,11 +200,19 @@ jest.mock('react-native-unistyles', () => {
                 Component: TComponent,
                 mapper?: (theme: UnistylesTheme, runtime: typeof miniRuntime) => TComponent,
             ) =>
-            (props: any) =>
-                React.createElement(Component, {
-                    ...mapper?.((Object.values(_REGISTRY.themes).at(0) ?? {}) as UnistylesTheme, miniRuntime),
-                    ...props,
-                }),
+            ({ uniProps, ...props }: any) => {
+                const { deepMergeObjects } = require('./utils')
+                const theme = (Object.values(_REGISTRY.themes).at(0) ?? {}) as UnistylesTheme
+                const { key: mappingsKey, ...mappingsProps } = mapper?.(theme, miniRuntime) ?? ({} as any)
+                const { key: uniPropsKey, ...unistyleProps } = uniProps?.(theme, miniRuntime) ?? {}
+
+                return React.createElement(Component, {
+                    ...deepMergeObjects(mappingsProps, unistyleProps, props),
+                    ...(props.style ? { style: props.style } : {}),
+                    ...(props.contentContainerStyle ? { contentContainerStyle: props.contentContainerStyle } : {}),
+                    key: uniPropsKey || mappingsKey,
+                })
+            },
         mq: {
             only: {
                 width: () => ({
