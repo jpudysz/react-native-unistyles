@@ -83,7 +83,6 @@ export default defineConfig({
             social: [
                 { icon: 'github', label: 'GitHub', href: 'https://github.com/jpudysz/react-native-unistyles' },
                 { icon: 'x.com', label: 'X', href: 'https://x.com/jpudysz' },
-                { icon: 'discord', label: 'Discord', href: 'https://discord.gg/akGHf27P4C' },
             ],
 			sidebar: [
                 {

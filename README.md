@@ -185,11 +185,6 @@ Ko-fi: https://ko-fi.com/jpudysz
 Your support is greatly appreciated and helps me dedicate more time and resources to creating quality libraries. Thank you for all the support!
 
 
-## Discord
-Looking for help or you want to chat with me?
-
-[Join Discord](https://discord.gg/akGHf27P4C)
-
 ## Contributing
 The repository uses a git submodule ([unifiber](https://github.com/uni-stack/unifiber)). Clone it with `git clone --recurse-submodules`, or run `git submodule update --init` in an existing clone.
 
