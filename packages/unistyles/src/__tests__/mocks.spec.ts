@@ -192,3 +192,26 @@ describe('withUnistyles mock', () => {
         expect(element.props).toEqual({ color: 'blue' })
     })
 })
+
+// entry points that aren't mocked load the native core, so the nitro mock has to cover what it calls at module load
+describe('unmocked entry points', () => {
+    it.each([
+        'react-native-unistyles/web',
+        'react-native-unistyles/diagnostics',
+        'react-native-unistyles/components/native/View',
+    ])('should load %s', (entry) => {
+        jest.isolateModules(() => {
+            expect(() => require(entry)).not.toThrow()
+        })
+    })
+
+    it('should return web props from getWebProps', () => {
+        jest.isolateModules(() => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const { getWebProps } = require('react-native-unistyles/web')
+
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            expect(getWebProps({ flex: 1 }).className).toBe('')
+        })
+    })
+})

@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdio>
+#include <cxxreact/ReactNativeVersion.h>
 #include <folly/Conv.h>
 #include <react/renderer/components/image/ImageProps.h>
 // ParagraphProps is platform specific and not exposed by the Android prefab
@@ -13,6 +14,13 @@
 #endif
 #include <react/renderer/components/text/TextProps.h>
 #include <react/renderer/components/view/BaseViewProps.h>
+// background size, position and repeat exist since React Native 0.83
+#if __has_include(<react/renderer/graphics/BackgroundSize.h>)
+#include <react/renderer/graphics/BackgroundPosition.h>
+#include <react/renderer/graphics/BackgroundRepeat.h>
+#include <react/renderer/graphics/BackgroundSize.h>
+#define UNISTYLES_HAS_BACKGROUND_LAYER_PROPS 1
+#endif
 #include <react/renderer/uimanager/UIManagerBinding.h>
 #include <string_view>
 #include "Parser.h"
@@ -74,6 +82,64 @@ std::string serialize(const std::optional<FontWeight>& fontWeight) {
     return fontWeight ? std::to_string(static_cast<int>(*fontWeight)) : "undefined";
 }
 
+#if UNISTYLES_HAS_BACKGROUND_LAYER_PROPS
+std::string serialize(const ValueUnit& valueUnit) {
+    switch (valueUnit.unit) {
+        case UnitType::Point:
+            return serialize(valueUnit.value) + "px";
+        case UnitType::Percent:
+            return serialize(valueUnit.value) + "%";
+        default:
+            return "undefined";
+    }
+}
+
+std::string serialize(const std::variant<std::monostate, ValueUnit>& value) {
+    return std::holds_alternative<ValueUnit>(value) ? serialize(std::get<ValueUnit>(value)) : "auto";
+}
+
+std::string serialize(const BackgroundSize& backgroundSize) {
+    if (std::holds_alternative<BackgroundSizeKeyword>(backgroundSize)) {
+        return std::get<BackgroundSizeKeyword>(backgroundSize) == BackgroundSizeKeyword::Cover ? "cover" : "contain";
+    }
+
+    const auto& size = std::get<BackgroundSizeLengthPercentage>(backgroundSize);
+
+    return serialize(size.x) + " " + serialize(size.y);
+}
+
+std::string serialize(const BackgroundPosition& backgroundPosition) {
+    std::string result;
+    auto append = [&result](const char* edge, const std::optional<ValueUnit>& value) {
+        if (value) {
+            result += (result.empty() ? "" : " ") + std::string(edge) + " " + serialize(*value);
+        }
+    };
+
+    append("top", backgroundPosition.top);
+    append("left", backgroundPosition.left);
+    append("right", backgroundPosition.right);
+    append("bottom", backgroundPosition.bottom);
+
+    return result;
+}
+
+std::string serialize(const BackgroundRepeat& backgroundRepeat) {
+    return std::to_string(static_cast<int>(backgroundRepeat.x)) + " " + std::to_string(static_cast<int>(backgroundRepeat.y));
+}
+
+template <typename T>
+std::string serialize(const std::vector<T>& values) {
+    std::string result;
+
+    for (const auto& value : values) {
+        result += (result.empty() ? "" : ", ") + serialize(value);
+    }
+
+    return "[" + result + "]";
+}
+#endif
+
 RectangleEdges<SharedColor> borderColors(const BaseViewProps& props) {
     return props.borderColors.resolve(false, {});
 }
@@ -87,6 +153,11 @@ const VerifiedProps<BaseViewProps> viewProps{
     {"borderBottomColor", [](const BaseViewProps& props) { return serialize(borderColors(props).bottom); }},
     {"opacity", [](const BaseViewProps& props) { return serialize(props.opacity); }},
     {"shadowColor", [](const BaseViewProps& props) { return serialize(props.shadowColor); }},
+#if UNISTYLES_HAS_BACKGROUND_LAYER_PROPS
+    {"backgroundSize", [](const BaseViewProps& props) { return serialize(props.backgroundSize); }},
+    {"backgroundPosition", [](const BaseViewProps& props) { return serialize(props.backgroundPosition); }},
+    {"backgroundRepeat", [](const BaseViewProps& props) { return serialize(props.backgroundRepeat); }},
+#endif
 };
 
 const VerifiedProps<BaseTextProps> textProps{
@@ -95,6 +166,9 @@ const VerifiedProps<BaseTextProps> textProps{
     {"fontSize", [](const BaseTextProps& props) { return serialize(props.textAttributes.fontSize); }},
     {"fontWeight", [](const BaseTextProps& props) { return serialize(props.textAttributes.fontWeight); }},
     {"textDecorationColor", [](const BaseTextProps& props) { return serialize(props.textAttributes.textDecorationColor); }},
+#if REACT_NATIVE_VERSION_MAJOR > 0 || REACT_NATIVE_VERSION_MINOR >= 88
+    {"fontVariationSettings", [](const BaseTextProps& props) { return props.textAttributes.fontVariationSettings.value_or("undefined"); }},
+#endif
 };
 
 const VerifiedProps<ImageProps> imageProps{

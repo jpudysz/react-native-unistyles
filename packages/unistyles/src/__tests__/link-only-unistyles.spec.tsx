@@ -101,7 +101,7 @@ describe.each([
 describe('createUnistylesImageBackground', () => {
     const ImageBackground = createUnistylesImageBackground(Host as any) as any
     const render = (props: Record<string, unknown>, forwardedRef: unknown) =>
-        ImageBackground.render(props, forwardedRef) as Element
+        ImageBackground({ ...props, ref: forwardedRef }) as Element
 
     it('should link the view and the image apart', () => {
         const forwardedRef = jest.fn()

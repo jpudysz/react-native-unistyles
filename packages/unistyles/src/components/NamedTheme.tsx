@@ -17,6 +17,11 @@ interface NamedThemeProps extends PropsWithChildren {
 export const NamedTheme: React.FunctionComponent<NamedThemeProps> = ({ name, children, previousScopedTheme }) => {
     const scope = useMemo(() => ({ name }), [name])
 
+    useLayoutEffect(() => {
+        // this will affect only scoped styles as other styles are not yet mounted
+        UnistylesShadowRegistry.flush()
+    })
+
     const mappedChildren = [
         <ApplyScopedTheme key="apply" name={name} />,
         <ScopedThemeContext.Provider key="scope" value={scope}>
@@ -24,11 +29,6 @@ export const NamedTheme: React.FunctionComponent<NamedThemeProps> = ({ name, chi
         </ScopedThemeContext.Provider>,
         <ApplyScopedTheme key="dispose" name={previousScopedTheme as keyof UnistylesThemes | undefined} />,
     ]
-
-    useLayoutEffect(() => {
-        // this will affect only scoped styles as other styles are not yet mounted
-        UnistylesShadowRegistry.flush()
-    })
 
     return <React.Fragment>{mappedChildren}</React.Fragment>
 }

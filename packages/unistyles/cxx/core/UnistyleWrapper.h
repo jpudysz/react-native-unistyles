@@ -44,7 +44,7 @@ inline static std::vector<std::string> getUnistylesHashKeys(jsi::Runtime& rt, js
         auto propertyName = propertyNames.getValueAtIndex(rt, i).getString(rt);
         std::string key = propertyName.utf8(rt);
 
-        if (key.compare(0, prefix.length(), prefix) == 0) {
+        if (key.compare(0, prefix.length(), prefix) == 0 && object.getProperty(rt, propertyName).isObject()) {
             matchingKeys.push_back(key);
         }
     }

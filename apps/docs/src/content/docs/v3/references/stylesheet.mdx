@@ -151,6 +151,30 @@ const styles = StyleSheet.create(theme => ({
 }))
 ```
 
+#### Background layers and variable fonts
+
+`backgroundSize`, `backgroundPosition` and `backgroundRepeat` accept both a CSS-like string and React Native's array syntax.
+`fontVariationSettings` accepts both a string and the object syntax from React Native 0.88. Unistyles keeps them up to date
+when the theme or breakpoint changes:
+
+```tsx /backgroundSize/ /backgroundPosition/ /backgroundRepeat/ /fontVariationSettings/
+import { StyleSheet } from 'react-native-unistyles'
+
+const styles = StyleSheet.create(theme => ({
+    banner: {
+        backgroundImage: `linear-gradient(90deg, ${theme.colors.primary}, ${theme.colors.accent})`,
+        backgroundSize: '20px 20px',
+        backgroundPosition: [{ top: 0, left: 10 }],
+        backgroundRepeat: 'repeat-x'
+    },
+    title: {
+        fontVariationSettings: { wght: 650, slnt: -10 }
+    }
+}))
+```
+
+An object whose values are all numbers is read as `fontVariationSettings` axes. To use breakpoints, give every breakpoint a string or an axes object, eg. `{ xs: { wght: 400 }, md: { wght: 700 } }`.
+
 ### configure
 
 `StyleSheet.configure` is used to configure Unistyles. It accepts an object with the following properties:

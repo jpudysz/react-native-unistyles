@@ -20,6 +20,7 @@ jest.mock('react-native-nitro-modules', () => ({
         createHybridObject: () => ({
             add: () => {},
             init: () => {},
+            addChangeListener: () => () => {},
             createHybridStatusBar: () => ({
                 setStyle: () => {},
             }),

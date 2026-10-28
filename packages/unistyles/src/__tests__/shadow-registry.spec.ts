@@ -78,6 +78,39 @@ describe('UnistylesShadowRegistry.add', () => {
 
         expect(link.mock.calls[0]).toStrictEqual([node, [fontSize]])
     })
+
+    it('should split a style merged from many unistyles into one style per unistyle', () => {
+        const node = {}
+        const link = jest.fn()
+
+        shadowRegistry.link = link
+
+        const boxSecrets = {}
+        const textSecrets = {}
+
+        // eg. flattened by Animated
+        shadowRegistry.add(handleFor(node), [{ unistyles_box: boxSecrets, unistyles_text: textSecrets, color: 'red' }])
+
+        expect(link.mock.calls[0]).toStrictEqual([
+            node,
+            [{ unistyles_box: boxSecrets }, { unistyles_text: textSecrets }],
+        ])
+    })
+
+    it('should not split a unistyle created from a spread unistyle', () => {
+        const node = {}
+        const link = jest.fn()
+
+        shadowRegistry.link = link
+
+        // StyleSheet.create({ code: { ...styles.code } }), the parser resolves the spread hidden secrets to undefined
+        const code = { unistyles_code: {}, fontFamily: 'monospace', unistyles_spread: undefined }
+        const inline = { color: 'white' }
+
+        shadowRegistry.add(handleFor(node), [inline, code, false])
+
+        expect(link.mock.calls[0]).toStrictEqual([node, [inline, code]])
+    })
 })
 
 describe('UnistylesShadowRegistry.remove', () => {
