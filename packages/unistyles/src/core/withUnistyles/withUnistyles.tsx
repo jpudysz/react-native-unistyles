@@ -28,7 +28,7 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
 
     return ({ ref, ...props }: PropsWithUnistyles & { ref?: Ref<GenericComponentRef<TComponent>> }) => {
         const narrowedProps = props as PropsWithUnistyles & UnistyleStyles
-        const styleClassNames = getClassName(narrowedProps.style, true)
+        const [classNames, animatedStyles] = getClassName(narrowedProps.style, true) ?? []
         const contentContainerStyleClassNames = getClassName(narrowedProps.contentContainerStyle)
         const { proxifiedRuntime, proxifiedTheme } = useProxifiedUnistyles()
 
@@ -50,7 +50,8 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
             ...(narrowedProps.style
                 ? {
                       // Override default component styles with undefined values to reset them
-                      style: emptyStyles,
+                      // animated styles can't be a class, so they stay inline
+                      style: animatedStyles?.length ? [emptyStyles, ...animatedStyles] : emptyStyles,
                   }
                 : {}),
             ...(narrowedProps.contentContainerStyle
@@ -68,7 +69,6 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         maybeWarnAboutMultipleUnistyles(narrowedProps.contentContainerStyle, `withUnistyles(${Component.displayName ?? Component.name ?? 'Unknown'})`)
 
         const NativeComponent = Component as ComponentType
-        const [classNames] = styleClassNames ?? []
 
         return (
             <div className={classNames?.hash} style={{ display: 'contents' }}>

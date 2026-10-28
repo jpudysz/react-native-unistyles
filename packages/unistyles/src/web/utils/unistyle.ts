@@ -6,7 +6,7 @@ import type { StyleSheet, StyleSheetWithSuperPowers, UnistylesValues } from '../
 import type { UnistylesRuntime } from '../runtime'
 
 import { ColorScheme, Orientation } from '../../specs/types'
-import { isDefined, isUnistylesMq, parseMq } from '../../utils'
+import { isAnimatedStyleHandle, isDefined, isUnistylesMq, parseMq } from '../../utils'
 import * as unistyles from '../services'
 import { UNI_GENERATED_KEYS, type UniGeneratedKey, type UniGeneratedStyle } from '../types'
 import { hyphenate, keyInObject, reduceObject } from './common'
@@ -142,9 +142,7 @@ export const checkForAnimated = (value: any): boolean => {
     }
 
     if (typeof value === 'object' && value !== null) {
-        // Reanimated useAnimatedStyle handle, it's a plain object, not an Animated.Node
-        // styleUpdaterContainer was added in Reanimated 4.1, so check only the keys every version has
-        if ('viewDescriptors' in value && 'initial' in value) {
+        if (isAnimatedStyleHandle(value)) {
             return true
         }
 

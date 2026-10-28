@@ -12,7 +12,7 @@ import type { Mappings } from './types'
 
 import { ScopedThemeContext } from '../../components/ScopedThemeContext'
 import { type UnistyleDependency, UnistylesShadowRegistry } from '../../specs'
-import { deepMergeObjects } from '../../utils'
+import { deepMergeObjects, isAnimatedStyleHandle } from '../../utils'
 import { useProxifiedUnistyles } from '../useProxifiedUnistyles'
 import { maybeWarnAboutMultipleUnistyles } from '../warn'
 
@@ -27,9 +27,29 @@ type UnistylesSecrets = {
 }
 
 type MappedSecrets = {
-    styles: Record<string, any>
+    styles: Record<string, any> | Array<Record<string, any>>
     dependencies: Array<UnistyleDependency>
 }
+
+// Reanimated finds animated styles by their keys, merged with other styles they would hide them
+// so keep every animated style as a separate entry and merge only the styles between them, in order
+const mergeAroundAnimatedStyles = (secrets: Array<UnistylesSecrets>) =>
+    secrets.reduce<Array<Record<string, any>>>((acc, secret) => {
+        const style = secret.uni__getStyles()
+        const lastStyle = acc.at(-1)
+
+        if (isAnimatedStyleHandle(style)) {
+            return acc.concat([style])
+        }
+
+        if (lastStyle && !isAnimatedStyleHandle(lastStyle)) {
+            Object.assign(lastStyle, style)
+
+            return acc
+        }
+
+        return acc.concat([{ ...style }])
+    }, [])
 
 export const getSecrets = (styleProps: Record<string, any> = {}): MappedSecrets => {
     const styles = Array.isArray(styleProps) ? styleProps.flat(Infinity) : [styleProps]
@@ -48,7 +68,9 @@ export const getSecrets = (styleProps: Record<string, any> = {}): MappedSecrets 
     }, [])
 
     return {
-        styles: secrets.reduce((acc, secret) => Object.assign(acc, secret.uni__getStyles()), {} as Record<string, any>),
+        styles: styles.some(isAnimatedStyleHandle)
+            ? mergeAroundAnimatedStyles(secrets)
+            : secrets.reduce((acc, secret) => Object.assign(acc, secret.uni__getStyles()), {} as Record<string, any>),
         dependencies: secrets.flatMap((secret) => secret.uni__dependencies),
     }
 }
