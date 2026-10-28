@@ -41,7 +41,7 @@ export class UnistylesRegistry {
             return computedStylesheet
         }
 
-        const themeName = this.services.runtime.appThemeName
+        const themeName = this.services.runtime.themeName
         const currentTheme = this.services.runtime.getTheme(themeName, this.services.state.CSSVars)
         const createdStylesheet = stylesheet(currentTheme, this.services.runtime.getMiniRuntime(themeName))
         const dependencies = Object.values(createdStylesheet).flatMap((value) => extractUnistyleDependencies(value))
@@ -63,7 +63,7 @@ export class UnistylesRegistry {
         dependencies.forEach((dependency) => dependenciesMap.add(dependency))
 
         const dispose = this.services.listener.addStylesheetListeners(Array.from(dependenciesMap), () => {
-            const themeName = this.services.runtime.appThemeName
+            const themeName = this.services.runtime.themeName
             const newComputedStylesheet = stylesheet(
                 this.services.runtime.getTheme(themeName, this.services.state.CSSVars),
                 this.services.runtime.getMiniRuntime(themeName),

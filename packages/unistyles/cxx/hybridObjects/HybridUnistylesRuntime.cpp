@@ -30,16 +30,8 @@ Dimensions HybridUnistylesRuntime::getScreen() {
     return this->_nativePlatform->getScreenDimensions();
 };
 
-// public getter, reflects the ScopedTheme only while its subtree renders (#1295)
-// internal code should use the app theme (state) or the scoped theme it's parsing for
+// app theme, like getTheme(). ScopedTheme is read from React Context (useUnistyles) (#1295)
 std::optional<std::string> HybridUnistylesRuntime::getThemeName() {
-    auto& registry = core::UnistylesRegistry::get();
-    auto maybeScopedTheme = registry.getScopedTheme();
-
-    if (maybeScopedTheme.has_value()) {
-        return maybeScopedTheme.value();
-    }
-
     return this->getState().getCurrentThemeName();
 };
 
@@ -138,8 +130,7 @@ void HybridUnistylesRuntime::setAdaptiveThemes(bool isEnabled) {
 
 void HybridUnistylesRuntime::calculateNewThemeAndDependencies(std::vector<UnistyleDependency>& changedDependencies) {
     auto colorScheme = this->getColorScheme();
-    // compare with the app theme, a ScopedTheme left in the registry (eg. suspended) is not the current theme
-    auto currentThemeName = this->getState().getCurrentThemeName();
+    auto currentThemeName = this->getThemeName();
     auto nextTheme = colorScheme == ColorScheme::LIGHT
         ? "light"
         : "dark";

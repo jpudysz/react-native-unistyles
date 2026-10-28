@@ -49,19 +49,8 @@ export class UnistylesRuntime {
         }
     }
 
-    // Reflects the ScopedTheme only while its subtree renders (#1295)
+    // App theme, like on native. ScopedTheme is read from React Context (useUnistyles) (#1295)
     get themeName() {
-        const scopedTheme = this.services.shadowRegistry.getScopedTheme()
-
-        if (scopedTheme) {
-            return scopedTheme
-        }
-
-        return this.appThemeName
-    }
-
-    // Theme of the app, without the ScopedTheme that may be rendering (or was left behind by a suspended one)
-    get appThemeName() {
         if (this.services.state.hasAdaptiveThemes) {
             return schemeToTheme(this.colorScheme) as AppThemeName
         }
@@ -190,7 +179,7 @@ export class UnistylesRuntime {
             throw error(`You're trying to set theme to: '${themeName}', but adaptiveThemes are enabled.`)
         }
 
-        if (themeName === this.appThemeName) {
+        if (themeName === this.themeName) {
             return
         }
 
@@ -214,12 +203,12 @@ export class UnistylesRuntime {
 
         if (!isEnabled) {
             this.services.state.hasAdaptiveThemes = isEnabled
-            this.rootElement?.classList.add(this.appThemeName ?? '')
+            this.rootElement?.classList.add(this.themeName ?? '')
 
             return
         }
 
-        this.rootElement?.classList.remove(this.appThemeName ?? '')
+        this.rootElement?.classList.remove(this.themeName ?? '')
         this.setTheme(schemeToTheme(this.colorScheme) as AppThemeName)
         this.services.state.hasAdaptiveThemes = isEnabled
     }

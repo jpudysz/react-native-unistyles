@@ -3,7 +3,7 @@ import { Animated as RNAnimated, Pressable, ScrollView, Text, View } from 'react
 import { usePathname } from 'expo-router'
 import { Card } from 'e2e-third-party-card'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
-import { ScopedTheme, StyleSheet, useUnistyles, withUnistyles } from 'react-native-unistyles'
+import { ScopedTheme, StyleSheet, UnistylesRuntime, useUnistyles, withUnistyles } from 'react-native-unistyles'
 import { useAnimatedTheme } from 'react-native-unistyles/reanimated'
 import { themes } from '../themes'
 import { useE2EAction } from './actions'
@@ -73,6 +73,10 @@ const THEMED_PROBES = ['background', 'surface', 'primary', 'accent'] as const
 
 const ScopedView = withUnistyles(View)
 
+// UnistylesRuntime.getTheme() ignores ScopedTheme
+const getAppThemeName = () => (Object.keys(themes) as Array<keyof typeof themes>)
+    .find(name => UnistylesRuntime.getTheme() === UnistylesRuntime.getTheme(name))
+
 // useUnistyles and useAnimatedTheme of a component mounted after its ScopedTheme rendered
 const LateScopedHooks = () => {
     const { theme, rt } = useUnistyles()
@@ -97,6 +101,18 @@ const LateScopedHooks = () => {
 
 const ScopedProbeCells = () => {
     const [isMounted, setIsMounted] = useState(false)
+    // read while the ScopedTheme renders this cell, UnistylesRuntime returns the app theme anyway (#1295)
+    const [renderRead] = useState(() => ({ themeName: UnistylesRuntime.themeName, appThemeName: getAppThemeName() }))
+
+    useE2EAction('scoped-probe.runtime', () => {
+        const actual = { render: renderRead.themeName, callback: UnistylesRuntime.themeName }
+        const expected = { render: renderRead.appThemeName, callback: getAppThemeName() }
+        const read = (Object.keys(actual) as Array<keyof typeof actual>).find(key => actual[key] !== expected[key])
+
+        return read
+            ? { component: `UnistylesRuntime (${read})`, prop: 'themeName', expected: expected[read] ?? '', actual: actual[read] ?? '' }
+            : undefined
+    })
 
     // re-renders by itself, ScopedTheme doesn't
     useEffect(() => setIsMounted(true), [])

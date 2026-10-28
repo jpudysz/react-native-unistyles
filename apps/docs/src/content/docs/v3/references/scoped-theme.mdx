@@ -128,20 +128,13 @@ If you wrap multiple children in `ScopedTheme` you can disable scoped theme for 
 
 ### Reading current scoped theme
 
-Information about the current `ScopedTheme` is temporary. `UnistylesRuntime.themeName` returns the scoped theme name only while the `ScopedTheme` renders its children. Everywhere else it returns the theme of your app:
-
-- when a child re-renders on its own, eg. after its state changes
-- in callbacks and effects, eg. `onPress` or `useEffect`
-
-On the web with CSS variables (default), `UnistylesRuntime.themeName` always returns the theme of your app.
-
-For the following example, `themeName` will be different based on the place where we access it:
+`UnistylesRuntime` is global, so it doesn't know where you read it from. `UnistylesRuntime.themeName` and `UnistylesRuntime.getTheme()` always return the theme of your app, also inside a `ScopedTheme`:
 
 ```tsx /themeName/
 import { UnistylesRuntime, ScopedTheme } from 'react-native-unistyles'
 
 const MyComponent = () => {
-    // themeName will be 'light' here 💥
+    // themeName will be 'light' here
     const themeName = UnistylesRuntime.themeName
 
     return (
@@ -154,10 +147,7 @@ const MyComponent = () => {
 }
 
 const ScopedText = ({ children }) => {
-    // themeName will be 'dark' here ✅
-    // because we're "inside" of the ScopedTheme
-    // but it will be 'light' again 💥 if ScopedText re-renders on its own
-    // or if you read it in a callback, eg. onPress
+    // themeName will be 'light' here too 💥
     const themeName = UnistylesRuntime.themeName
 
     return (
@@ -168,7 +158,11 @@ const ScopedText = ({ children }) => {
 }
 ```
 
-If you want to read the scoped theme name reliably, or react to its changes, use the `useUnistyles` hook or the `withUnistyles` helper:
+:::caution
+Before 3.7.0, `UnistylesRuntime.themeName` returned the scoped theme name while the `ScopedTheme` rendered its children, but the theme of your app when a child re-rendered on its own or in callbacks. If you relied on it, read `rt.themeName` from `useUnistyles` instead.
+:::
+
+To read the scoped theme name, or react to its changes, use the `useUnistyles` hook or the `withUnistyles` helper:
 
 ```tsx /useUnistyles/
 import { useUnistyles, ScopedTheme } from 'react-native-unistyles'

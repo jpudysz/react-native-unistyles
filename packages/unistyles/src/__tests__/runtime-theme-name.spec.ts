@@ -107,6 +107,38 @@ describe('UnistylesRuntime.themeName and ScopedTheme (#1295)', () => {
             expect(runtime.getTheme()).toBe(darkTheme)
         })
 
+        it('returns the app theme while a ScopedTheme renders, like getTheme()', () => {
+            const { runtime, shadowRegistry } = createServices()
+
+            shadowRegistry.setScopedTheme('light')
+
+            expect(runtime.themeName).toBe('dark')
+            expect(runtime.theme).toBe(darkTheme)
+            expect(runtime.getTheme()).toBe(darkTheme)
+            expect(runtime.miniRuntime.themeName).toBe('dark')
+        })
+
+        it('returns the app theme inside nested scopes and a reset scope', () => {
+            const { runtime, shadowRegistry } = createServices()
+
+            for (const scope of ['light', 'premium', undefined]) {
+                shadowRegistry.setScopedTheme(scope)
+
+                expect(runtime.themeName).toBe('dark')
+            }
+        })
+
+        it('follows the color scheme with adaptive themes, not the scope', () => {
+            mockBrowser('light')
+
+            const { runtime, shadowRegistry } = createServices({ hasAdaptiveThemes: true })
+
+            shadowRegistry.setScopedTheme('dark')
+
+            expect(runtime.themeName).toBe('light')
+            expect(runtime.getTheme()).toBe(lightTheme)
+        })
+
         it('builds the mini runtime for the theme a StyleSheet is called with', () => {
             const { runtime, shadowRegistry } = createServices()
 
