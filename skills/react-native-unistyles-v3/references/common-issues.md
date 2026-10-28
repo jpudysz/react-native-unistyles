@@ -116,6 +116,12 @@ import { StyleSheet } from 'react-native-unistyles'
 **Solution:** Change the call shape (e.g. pass an extra argument or a non-arrow factory), or move such factories to a file the plugin doesn't process. Use `debug: true` to see what the plugin detected.
 **Ref:** [#993](https://github.com/jpudysz/react-native-unistyles/issues/993)
 
+### Style returned from a ternary doesn't update
+
+**Symptoms:** A style like `(on) => on ? { color: theme.colors.primary } : {}` (or `cond && { ... }`) keeps its first value after a theme / `rt` change, although `debug: true` lists its dependencies.
+**Cause:** Before 3.6.1, the Babel plugin attached dependencies only to a returned object literal, not to the branches of a returned ternary or logical expression.
+**Solution:** Upgrade to 3.6.1+. On older versions, put the condition inside the object or use `if` with separate `return`s. Styles that return a function call, a variable inside a ternary, or `return` inside `switch` / loops / `try` are still not tracked; `debug: true` warns about them.
+
 ### Wrong root directory
 
 **Symptoms:** Styles not reactive; Babel plugin appears to do nothing.

@@ -76,11 +76,16 @@ We put a lot of effort into making dependency detection as accurate as possible,
 - ternary operators
 - logical operators
 - binary operators
+- styles that resolve to a ternary or logical expression of objects, eg. `(on) => on ? { ... } : { ... }`
 - and much more...
 
 **What we don't support**:
 - moving functions/arrow functions out of StyleSheet.create
 - `theme` and `rt` reassignment to other variables (we don't track them)
+- styles that resolve to something other than an object literal, eg. a function call `() => getStyle(theme)` or a variable in a ternary `on ? active : {}` (a returned variable `return style` is fine)
+- `return` statements inside `switch`, loops or `try` blocks, use `if` statements instead
+
+With `debug: true`, the plugin warns about styles with dependencies it can't attach.
 </Aside>
 
 
@@ -333,6 +338,7 @@ The following paths are always processed, and any paths you pass are added to th
 
 In order to list detected dependencies by the Babel plugin you can enable the `debug` flag.
 It will `console.log` name of the file and component with Unistyles dependencies.
+If it detects dependencies but can't attach them to the returned style, it prints a `console.warn` instead.
 
 ### Usage with React Compiler
 

@@ -62,6 +62,7 @@ module.exports = function (api) {
 ```
 
 Then, restart the Metro server cache and check the console, where you'll find every file and style with its detected dependencies.
+If the plugin detected dependencies but couldn't attach them, eg. because the style returns a function call, it prints a warning instead. Check the [supported syntax](/v3/other/babel-plugin#1-detecting-stylesheet-dependencies) and return an object literal, or a ternary of object literals.
 
 ### Problem 3: Non React Native components
 

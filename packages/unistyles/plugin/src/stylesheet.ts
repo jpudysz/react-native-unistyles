@@ -173,6 +173,66 @@ function getReturnStatementsFromBody(node: t.BlockStatement | t.Statement, resul
     return results
 }
 
+// counts return statements of a function body, skipping nested functions and classes
+function countReturnStatements(node: t.Node): number {
+    if (t.isFunction(node) || t.isClass(node)) {
+        return 0
+    }
+
+    if (t.isReturnStatement(node)) {
+        return 1
+    }
+
+    return (t.VISITOR_KEYS[node.type] ?? []).reduce((count, key) => {
+        const child = (node as unknown as Record<string, unknown>)[key]
+        const children = (Array.isArray(child) ? child : [child]).filter((childNode): childNode is t.Node =>
+            t.isNode(childNode),
+        )
+
+        return count + children.reduce((childCount, childNode) => childCount + countReturnStatements(childNode), 0)
+    }, 0)
+}
+
+// collects every object literal that a style can resolve to, eg. both branches of `cond ? {} : {}`
+function collectReturnedObjects(node: t.Node, targets: t.ObjectExpression[], unsupported: t.Node[]) {
+    if (t.isObjectExpression(node)) {
+        targets.push(node)
+
+        return
+    }
+
+    if (t.isConditionalExpression(node)) {
+        collectReturnedObjects(node.consequent, targets, unsupported)
+        collectReturnedObjects(node.alternate, targets, unsupported)
+
+        return
+    }
+
+    if (t.isLogicalExpression(node)) {
+        // `a && b` resolves to `a` only when it's falsy, so it can't be a style
+        if (node.operator !== '&&') {
+            collectReturnedObjects(node.left, targets, unsupported)
+        }
+
+        collectReturnedObjects(node.right, targets, unsupported)
+
+        return
+    }
+
+    if (t.isTSAsExpression(node) || t.isTSSatisfiesExpression(node) || t.isParenthesizedExpression(node)) {
+        collectReturnedObjects(node.expression, targets, unsupported)
+
+        return
+    }
+
+    // no style to update
+    if (t.isNullLiteral(node) || t.isBooleanLiteral(node) || (t.isIdentifier(node) && node.name === 'undefined')) {
+        return
+    }
+
+    unsupported.push(node)
+}
+
 export function isUnistylesStyleSheet(path: NodePath<t.CallExpression>, state: UnistylesPluginPass) {
     const { callee } = path.node
 
@@ -666,7 +726,7 @@ export function addDependencies(
     unistyle: t.ObjectProperty,
     detectedDependencies: string[],
 ) {
-    const debugMessage = (deps: (number | null)[]) => {
+    const debugMessage = (deps: (number | null)[], unsupportedReason?: string) => {
         if (state.opts.debug) {
             const mappedDeps = deps
                 .map((dep) =>
@@ -675,10 +735,17 @@ export function addDependencies(
                     ),
                 )
                 .join(', ')
+            const style = `${state.filename?.replace(`${state.file.opts.root}/`, '')}: styles.${styleName}`
 
-            console.log(
-                `${state.filename?.replace(`${state.file.opts.root}/`, '')}: styles.${styleName}: [${mappedDeps}]`,
-            )
+            if (unsupportedReason) {
+                console.warn(
+                    `Unistyles 🦄: ${style}: detected [${mappedDeps}], but ${unsupportedReason}. The style won't update when these dependencies change. Return an object literal, or a ternary/logical expression of object literals.`,
+                )
+
+                return
+            }
+
+            console.log(`${style}: [${mappedDeps}]`)
         }
     }
 
@@ -688,37 +755,52 @@ export function addDependencies(
     if (styleDependencies.length > 0) {
         const uniqueDependencies = Array.from(new Set(styleDependencies))
 
-        debugMessage(uniqueDependencies)
-
-        let targets: t.ObjectExpression[] = []
+        const targets: t.ObjectExpression[] = []
+        const unsupported: t.Node[] = []
+        let unsupportedReturns = 0
 
         if (t.isArrowFunctionExpression(unistyle.value) || t.isFunctionExpression(unistyle.value)) {
-            if (t.isObjectExpression(unistyle.value.body)) {
-                targets.push(unistyle.value.body)
-            }
-
             if (t.isBlockStatement(unistyle.value.body)) {
-                targets = getReturnStatementsFromBody(unistyle.value.body)
-                    .map((node) => {
-                        if (t.isIdentifier(node.argument)) {
-                            node.argument = t.objectExpression([t.spreadElement(node.argument)])
-                        }
+                const returnStatements = getReturnStatementsFromBody(unistyle.value.body)
 
-                        return node.argument
-                    })
-                    .filter((node): node is t.ObjectExpression => t.isObjectExpression(node))
+                // returns inside eg. switch, loops or try blocks
+                unsupportedReturns = countReturnStatements(unistyle.value.body) - returnStatements.length
+
+                returnStatements.forEach((node) => {
+                    if (t.isIdentifier(node.argument)) {
+                        node.argument = t.objectExpression([t.spreadElement(node.argument)])
+                    }
+
+                    if (node.argument) {
+                        collectReturnedObjects(node.argument, targets, unsupported)
+                    }
+                })
+            } else {
+                collectReturnedObjects(unistyle.value.body, targets, unsupported)
             }
-        }
-
-        if (t.isObjectExpression(unistyle.value)) {
-            targets.push(unistyle.value)
-        }
-
-        if (t.isMemberExpression(unistyle.value)) {
+        } else if (t.isMemberExpression(unistyle.value)) {
             // convert to object
             unistyle.value = t.objectExpression([t.spreadElement(unistyle.value)])
 
             targets.push(unistyle.value)
+        } else {
+            collectReturnedObjects(unistyle.value, targets, unsupported)
+        }
+
+        if (unsupported.length > 0 || unsupportedReturns > 0) {
+            const reasons = unsupported
+                .map((node) => `${node.type}${node.loc ? ` (line ${node.loc.start.line})` : ''}`)
+                .concat(
+                    unsupportedReturns > 0
+                        ? `${unsupportedReturns} return statement(s) inside switch, loop or try blocks`
+                        : [],
+                )
+
+            debugMessage(uniqueDependencies, `they can't be attached to: ${reasons.join(', ')}`)
+        } else if (targets.length === 0) {
+            debugMessage(uniqueDependencies, 'no returned object was found to attach them to')
+        } else {
+            debugMessage(uniqueDependencies)
         }
 
         if (targets.length > 0) {
