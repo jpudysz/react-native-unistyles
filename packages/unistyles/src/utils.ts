@@ -1,5 +1,10 @@
 export const isDefined = <T>(value: T): value is NonNullable<T> => value !== undefined && value !== null
 
+// Reanimated useAnimatedStyle handle, it's a plain object, not an Animated.Node
+// styleUpdaterContainer was added in Reanimated 4.1, so check only the keys every version has
+export const isAnimatedStyleHandle = (value: unknown): boolean =>
+    typeof value === 'object' && value !== null && 'viewDescriptors' in value && 'initial' in value
+
 export const deepMergeObjects = <T extends Record<PropertyKey, any>>(...sources: Array<T>) => {
     const target = {} as T
 
