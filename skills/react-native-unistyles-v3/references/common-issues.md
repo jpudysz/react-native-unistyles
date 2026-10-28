@@ -188,6 +188,13 @@ Check, in order: the file is processed by the Babel plugin (`debug: true`); the 
 ```
 **Ref:** [#955](https://github.com/jpudysz/react-native-unistyles/issues/955)
 
+### `UnistylesRuntime.themeName` ignores `ScopedTheme`
+
+**Symptoms:** Inside `<ScopedTheme>`, `UnistylesRuntime.themeName` returns the app theme. Before **3.7.0** it returned the scoped name on the first render, but the app theme after the component re-rendered on its own or when read in a callback (`onPress`, `useEffect`).
+**Cause:** By design: `UnistylesRuntime` is global and can't read React Context. Since **3.7.0** it always returns the app theme, like `UnistylesRuntime.getTheme()`.
+**Solution:** Read `rt.themeName` from `useUnistyles()` (or use `withUnistyles`), it follows the closest `ScopedTheme`. Before **3.6.1**, `rt.themeName` in a `StyleSheet` inside a `ScopedTheme` also fell back to the app theme after styles were rebuilt (rotation, breakpoint, theme change), and adaptive themes could stop following the OS after a suspended `ScopedTheme`.
+**Ref:** [#1295](https://github.com/jpudysz/react-native-unistyles/issues/1295)
+
 ### Reanimated CSS transitions stale colors
 
 **Symptoms:** After theme switch, CSS transition (`transitionProperty`) colors show the old theme's value.

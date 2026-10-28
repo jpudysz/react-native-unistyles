@@ -75,8 +75,9 @@ export const beaconColor = (sync?: Sync) => sync ? BEACON_COLORS.waiting[sync.se
 
 // Themed squares in the overlay, `animated` paints through useAnimatedTheme (Reanimated), `native-animated` is a
 // React Native Animated.View (native driver), which flattens its two unistyles into one style object
-// Painted below <ScopedTheme name="dark"> in every theme: one re-renders by itself, the others mount after the scope rendered
-export const SCOPED_PROBES = ['scoped-rerender', 'scoped-late', 'scoped-with-unistyles'] as const
+// Painted below <ScopedTheme name="dark"> in every theme: one re-renders by itself, the others mount after the scope rendered,
+// `scoped-theme-name` is painted from `rt.themeName`
+export const SCOPED_PROBES = ['scoped-rerender', 'scoped-theme-name', 'scoped-late', 'scoped-with-unistyles'] as const
 
 // Gradients from an `experimental_backgroundImage` string, the host reads their center color, #1030
 export const GRADIENT_PROBES = ['linear-gradient', 'radial-gradient'] as const

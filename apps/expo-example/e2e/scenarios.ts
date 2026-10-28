@@ -200,15 +200,18 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
     },
     'scoped': async a => {
         await a.expect('scoped-probe.check')
+        await a.expect('scoped-probe.runtime')
         await a.push('/scoped-theme')
         await a.flip('dark')
         await a.act('scoped.mount')
         await a.flip('premium')
+        await a.expect('scoped-probe.runtime')
         await a.followSystem()
         await a.act('scoped.mount')
         await a.act('scoped.mount')
         await a.flip('light')
         await a.expect('scoped-probe.check')
+        await a.expect('scoped-probe.runtime')
         await a.back()
         await a.checkpoint()
     },

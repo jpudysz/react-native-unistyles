@@ -3,7 +3,7 @@ import { Animated as RNAnimated, Pressable, ScrollView, Text, View } from 'react
 import { usePathname } from 'expo-router'
 import { Card } from 'e2e-third-party-card'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
-import { ScopedTheme, StyleSheet, useUnistyles, withUnistyles } from 'react-native-unistyles'
+import { ScopedTheme, StyleSheet, UnistylesRuntime, useUnistyles, withUnistyles } from 'react-native-unistyles'
 import { useAnimatedTheme } from 'react-native-unistyles/reanimated'
 import { themes } from '../themes'
 import { useE2EAction } from './actions'
@@ -73,9 +73,13 @@ const THEMED_PROBES = ['background', 'surface', 'primary', 'accent'] as const
 
 const ScopedView = withUnistyles(View)
 
+// UnistylesRuntime.getTheme() ignores ScopedTheme
+const getAppThemeName = () => (Object.keys(themes) as Array<keyof typeof themes>)
+    .find(name => UnistylesRuntime.getTheme() === UnistylesRuntime.getTheme(name))
+
 // useUnistyles and useAnimatedTheme of a component mounted after its ScopedTheme rendered
 const LateScopedHooks = () => {
-    const { theme } = useUnistyles()
+    const { theme, rt } = useUnistyles()
     const animatedTheme = useAnimatedTheme()
 
     useE2EAction('scoped-probe.check', () => {
@@ -83,7 +87,13 @@ const LateScopedHooks = () => {
         const actual = { useUnistyles: theme.colors.primary, useAnimatedTheme: animatedTheme.value.colors.primary }
         const hook = (Object.keys(actual) as Array<keyof typeof actual>).find(key => actual[key] !== expected)
 
-        return hook ? { component: hook, prop: 'theme.colors.primary', expected, actual: actual[hook] } : undefined
+        if (hook) {
+            return { component: hook, prop: 'theme.colors.primary', expected, actual: actual[hook] }
+        }
+
+        return rt.themeName !== 'dark'
+            ? { component: 'useUnistyles', prop: 'rt.themeName', expected: 'dark', actual: rt.themeName ?? '' }
+            : undefined
     })
 
     return null
@@ -91,6 +101,18 @@ const LateScopedHooks = () => {
 
 const ScopedProbeCells = () => {
     const [isMounted, setIsMounted] = useState(false)
+    // read while the ScopedTheme renders this cell, UnistylesRuntime returns the app theme anyway (#1295)
+    const [renderRead] = useState(() => ({ themeName: UnistylesRuntime.themeName, appThemeName: getAppThemeName() }))
+
+    useE2EAction('scoped-probe.runtime', () => {
+        const actual = { render: renderRead.themeName, callback: UnistylesRuntime.themeName }
+        const expected = { render: renderRead.appThemeName, callback: getAppThemeName() }
+        const read = (Object.keys(actual) as Array<keyof typeof actual>).find(key => actual[key] !== expected[key])
+
+        return read
+            ? { component: `UnistylesRuntime (${read})`, prop: 'themeName', expected: expected[read] ?? '', actual: actual[read] ?? '' }
+            : undefined
+    })
 
     // re-renders by itself, ScopedTheme doesn't
     useEffect(() => setIsMounted(true), [])
@@ -98,6 +120,7 @@ const ScopedProbeCells = () => {
     return (
         <React.Fragment>
             <View accessible accessibilityLabel={`${LABELS.probe} scoped-rerender`} style={styles.scopedProbe} />
+            <View accessible accessibilityLabel={`${LABELS.probe} scoped-theme-name`} style={styles.scopedThemeNameProbe} />
             {isMounted ? (
                 <React.Fragment>
                     <View accessible accessibilityLabel={`${LABELS.probe} scoped-late`} style={styles.scopedProbe} />
@@ -183,6 +206,12 @@ const styles = StyleSheet.create((theme, rt) => ({
         width: 24,
         height: 24,
         backgroundColor: theme.colors.primary
+    },
+    // rt.themeName is the scope too, also when a theme change rebuilds the style outside of render (#1295)
+    scopedThemeNameProbe: {
+        width: 24,
+        height: 24,
+        backgroundColor: rt.themeName === 'dark' ? theme.colors.primary : theme.colors.accent
     },
     nativeAnimatedProbe: {
         backgroundColor: theme.colors.typography

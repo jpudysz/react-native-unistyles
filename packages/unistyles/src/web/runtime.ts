@@ -49,13 +49,8 @@ export class UnistylesRuntime {
         }
     }
 
+    // App theme, like on native. ScopedTheme is read from React Context (useUnistyles) (#1295)
     get themeName() {
-        const scopedTheme = this.services.shadowRegistry.getScopedTheme()
-
-        if (scopedTheme) {
-            return scopedTheme
-        }
-
         if (this.services.state.hasAdaptiveThemes) {
             return schemeToTheme(this.colorScheme) as AppThemeName
         }
@@ -150,9 +145,14 @@ export class UnistylesRuntime {
     }
 
     get miniRuntime(): UnistylesMiniRuntime {
+        return this.getMiniRuntime(this.themeName)
+    }
+
+    // StyleSheets get the name of the theme they are called with
+    getMiniRuntime = (themeName?: AppThemeName): UnistylesMiniRuntime => {
         return {
             colorScheme: this.colorScheme,
-            themeName: this.themeName,
+            themeName,
             contentSizeCategory: this.contentSizeCategory,
             breakpoint: this.breakpoint,
             isLandscape: this.orientation === Orientation.Landscape,
