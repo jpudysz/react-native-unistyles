@@ -49,6 +49,7 @@ export class UnistylesRuntime {
         }
     }
 
+    // Reflects the ScopedTheme only while its subtree renders (#1295)
     get themeName() {
         const scopedTheme = this.services.shadowRegistry.getScopedTheme()
 
@@ -56,6 +57,11 @@ export class UnistylesRuntime {
             return scopedTheme
         }
 
+        return this.appThemeName
+    }
+
+    // Theme of the app, without the ScopedTheme that may be rendering (or was left behind by a suspended one)
+    get appThemeName() {
         if (this.services.state.hasAdaptiveThemes) {
             return schemeToTheme(this.colorScheme) as AppThemeName
         }
@@ -150,9 +156,14 @@ export class UnistylesRuntime {
     }
 
     get miniRuntime(): UnistylesMiniRuntime {
+        return this.getMiniRuntime(this.themeName)
+    }
+
+    // StyleSheets get the name of the theme they are called with
+    getMiniRuntime = (themeName?: AppThemeName): UnistylesMiniRuntime => {
         return {
             colorScheme: this.colorScheme,
-            themeName: this.themeName,
+            themeName,
             contentSizeCategory: this.contentSizeCategory,
             breakpoint: this.breakpoint,
             isLandscape: this.orientation === Orientation.Landscape,
@@ -179,7 +190,7 @@ export class UnistylesRuntime {
             throw error(`You're trying to set theme to: '${themeName}', but adaptiveThemes are enabled.`)
         }
 
-        if (themeName === this.themeName) {
+        if (themeName === this.appThemeName) {
             return
         }
 
@@ -203,12 +214,12 @@ export class UnistylesRuntime {
 
         if (!isEnabled) {
             this.services.state.hasAdaptiveThemes = isEnabled
-            this.rootElement?.classList.add(this.themeName ?? '')
+            this.rootElement?.classList.add(this.appThemeName ?? '')
 
             return
         }
 
-        this.rootElement?.classList.remove(this.themeName ?? '')
+        this.rootElement?.classList.remove(this.appThemeName ?? '')
         this.setTheme(schemeToTheme(this.colorScheme) as AppThemeName)
         this.services.state.hasAdaptiveThemes = isEnabled
     }

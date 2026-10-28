@@ -117,7 +117,7 @@ import { UnistylesRuntime } from 'react-native-unistyles'
 | Property | Type | Description |
 |----------|------|-------------|
 | `colorScheme` | `ColorScheme` (`'light' \| 'dark' \| 'unspecified'`) | OS color scheme |
-| `themeName` | `string \| undefined` | Current theme name (inside a `ScopedTheme` during render: the scoped name) |
+| `themeName` | `string \| undefined` | Current theme name. Inside a `ScopedTheme`, the scoped name only while the `ScopedTheme` renders its children (not on a child's own re-render, in callbacks or effects): use `useUnistyles().rt.themeName` |
 | `breakpoint` | `string \| undefined` | Current active breakpoint name |
 | `hasAdaptiveThemes` | `boolean` | Whether adaptive themes are enabled |
 | `screen` | `{ width: number, height: number }` | Screen dimensions (points on iOS, dp on Android; `window.innerWidth/innerHeight` on web) |
@@ -384,7 +384,7 @@ Props are **mutually exclusive** — use only one:
 </ScopedTheme>
 ```
 
-The scoped theme is only known during render (no React Context): `UnistylesRuntime.themeName`, `useUnistyles`, `withUnistyles` and `useAnimatedTheme` respect it inside the subtree. With `Suspense`, put `ScopedTheme` inside the suspending component.
+Styles, `useUnistyles`, `withUnistyles` and `useAnimatedTheme` follow the closest `ScopedTheme`. `UnistylesRuntime.themeName` returns the scoped name only while the `ScopedTheme` renders its children: a child's own re-render, callbacks and effects get the app theme (on web with CSS variables, always the app theme). With `Suspense`, put `ScopedTheme` inside the suspending component.
 
 ---
 

@@ -361,7 +361,7 @@ import { UnistylesRuntime } from 'react-native-unistyles'
 | `colorScheme` | `ColorScheme` (`'light' \| 'dark' \| 'unspecified'`) | Device color scheme |
 | `hasAdaptiveThemes` | `boolean` | Whether adaptive themes are enabled |
 | `screen` | `{ width, height }` | Screen dimensions (pt on iOS, dp on Android) |
-| `themeName` | `string \| undefined` | Current theme name (scoped theme name when read during render inside `ScopedTheme`) |
+| `themeName` | `string \| undefined` | Current theme name (scoped theme name only while the `ScopedTheme` renders its children; use `useUnistyles().rt.themeName` in a scope) |
 | `contentSizeCategory` | `IOSContentSizeCategory \| AndroidContentSizeCategory \| WebContentSizeCategory` | Accessibility text size (enums exported as values) |
 | `breakpoint` | `string \| undefined` | Current active breakpoint |
 | `breakpoints` | `Record<string, number>` | Registered breakpoints |

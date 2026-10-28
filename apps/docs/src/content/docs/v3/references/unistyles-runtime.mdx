@@ -32,7 +32,7 @@ and use it anywhere in your code, even outside a React component.
 | ----| ---- | ----------- |
 | colorScheme | string | Get your device's color scheme, or the one forced with `Appearance.setColorScheme`. Available options `dark`, `light` or `unspecified` |
 | hasAdaptiveThemes | boolean | Indicates if you have enabled [adaptive themes](/v3/guides/theming#adaptive-themes) |
-| themeName | string? | Name of the selected theme or `undefined` if you haven't registered any theme. When read while rendering inside a [ScopedTheme](/v3/references/scoped-theme/), it returns the scoped theme name |
+| themeName | string? | Name of the selected theme or `undefined` if you haven't registered any theme. Inside a [ScopedTheme](/v3/references/scoped-theme/), it returns the scoped theme name only while the `ScopedTheme` renders its children, see [Reading current scoped theme](/v3/references/scoped-theme/#reading-current-scoped-theme) |
 | breakpoint | string? | Current breakpoint or undefined if you haven't registered any |
 | breakpoints | Object | Your registered breakpoints |
 | screen | \{width: number, height: number\} | Screen dimensions |

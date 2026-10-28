@@ -115,7 +115,7 @@ jsi::Value parser::Parser::getParsedStyleSheetForScopedTheme(jsi::Runtime& rt, c
             .asObject(rt);
     }
 
-    auto miniRuntime = this->_unistylesRuntime->getMiniRuntimeAsValue(rt, std::nullopt);
+    auto miniRuntime = this->_unistylesRuntime->getMiniRuntimeAsValue(rt, std::nullopt, scopedTheme);
 
     return unistyle->parent->rawValue
         .asFunction(rt)
@@ -200,7 +200,7 @@ jsi::Object parser::Parser::unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<S
 
     // stylesheet also has a mini runtime dependency
     // StyleSheetType::ThemableWithMiniRuntime
-    auto miniRuntime = this->_unistylesRuntime->getMiniRuntimeAsValue(rt, maybeMiniRuntime);
+    auto miniRuntime = this->_unistylesRuntime->getMiniRuntimeAsValue(rt, maybeMiniRuntime, state.getCurrentThemeName());
 
     return styleSheet->rawValue
         .asFunction(rt)

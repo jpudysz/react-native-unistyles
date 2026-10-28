@@ -128,7 +128,12 @@ If you wrap multiple children in `ScopedTheme` you can disable scoped theme for 
 
 ### Reading current scoped theme
 
-Information about the current `ScopedTheme` is temporary and only available during the component render phase.
+Information about the current `ScopedTheme` is temporary. `UnistylesRuntime.themeName` returns the scoped theme name only while the `ScopedTheme` renders its children. Everywhere else it returns the theme of your app:
+
+- when a child re-renders on its own, eg. after its state changes
+- in callbacks and effects, eg. `onPress` or `useEffect`
+
+On the web with CSS variables (default), `UnistylesRuntime.themeName` always returns the theme of your app.
 
 For the following example, `themeName` will be different based on the place where we access it:
 
@@ -151,6 +156,8 @@ const MyComponent = () => {
 const ScopedText = ({ children }) => {
     // themeName will be 'dark' here ✅
     // because we're "inside" of the ScopedTheme
+    // but it will be 'light' again 💥 if ScopedText re-renders on its own
+    // or if you read it in a callback, eg. onPress
     const themeName = UnistylesRuntime.themeName
 
     return (
@@ -161,7 +168,7 @@ const ScopedText = ({ children }) => {
 }
 ```
 
-If you want to react to changes in the scoped theme, you can use the `useUnistyles` hook or the `withUnistyles` helper:
+If you want to read the scoped theme name reliably, or react to its changes, use the `useUnistyles` hook or the `withUnistyles` helper:
 
 ```tsx /useUnistyles/
 import { useUnistyles, ScopedTheme } from 'react-native-unistyles'

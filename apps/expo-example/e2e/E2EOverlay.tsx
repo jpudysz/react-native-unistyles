@@ -75,7 +75,7 @@ const ScopedView = withUnistyles(View)
 
 // useUnistyles and useAnimatedTheme of a component mounted after its ScopedTheme rendered
 const LateScopedHooks = () => {
-    const { theme } = useUnistyles()
+    const { theme, rt } = useUnistyles()
     const animatedTheme = useAnimatedTheme()
 
     useE2EAction('scoped-probe.check', () => {
@@ -83,7 +83,13 @@ const LateScopedHooks = () => {
         const actual = { useUnistyles: theme.colors.primary, useAnimatedTheme: animatedTheme.value.colors.primary }
         const hook = (Object.keys(actual) as Array<keyof typeof actual>).find(key => actual[key] !== expected)
 
-        return hook ? { component: hook, prop: 'theme.colors.primary', expected, actual: actual[hook] } : undefined
+        if (hook) {
+            return { component: hook, prop: 'theme.colors.primary', expected, actual: actual[hook] }
+        }
+
+        return rt.themeName !== 'dark'
+            ? { component: 'useUnistyles', prop: 'rt.themeName', expected: 'dark', actual: rt.themeName ?? '' }
+            : undefined
     })
 
     return null
@@ -98,6 +104,7 @@ const ScopedProbeCells = () => {
     return (
         <React.Fragment>
             <View accessible accessibilityLabel={`${LABELS.probe} scoped-rerender`} style={styles.scopedProbe} />
+            <View accessible accessibilityLabel={`${LABELS.probe} scoped-theme-name`} style={styles.scopedThemeNameProbe} />
             {isMounted ? (
                 <React.Fragment>
                     <View accessible accessibilityLabel={`${LABELS.probe} scoped-late`} style={styles.scopedProbe} />
@@ -183,6 +190,12 @@ const styles = StyleSheet.create((theme, rt) => ({
         width: 24,
         height: 24,
         backgroundColor: theme.colors.primary
+    },
+    // rt.themeName is the scope too, also when a theme change rebuilds the style outside of render (#1295)
+    scopedThemeNameProbe: {
+        width: 24,
+        height: 24,
+        backgroundColor: rt.themeName === 'dark' ? theme.colors.primary : theme.colors.accent
     },
     nativeAnimatedProbe: {
         backgroundColor: theme.colors.typography
