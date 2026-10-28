@@ -355,6 +355,47 @@ function getReturnStatementsFromBody(node, results = []) {
   }
   return results;
 }
+function countReturnStatements(node) {
+  if (t4.isFunction(node) || t4.isClass(node)) {
+    return 0;
+  }
+  if (t4.isReturnStatement(node)) {
+    return 1;
+  }
+  return (t4.VISITOR_KEYS[node.type] ?? []).reduce((count, key) => {
+    const child = node[key];
+    const children = (Array.isArray(child) ? child : [child]).filter(
+      (childNode) => t4.isNode(childNode)
+    );
+    return count + children.reduce((childCount, childNode) => childCount + countReturnStatements(childNode), 0);
+  }, 0);
+}
+function collectReturnedObjects(node, targets, unsupported) {
+  if (t4.isObjectExpression(node)) {
+    targets.push(node);
+    return;
+  }
+  if (t4.isConditionalExpression(node)) {
+    collectReturnedObjects(node.consequent, targets, unsupported);
+    collectReturnedObjects(node.alternate, targets, unsupported);
+    return;
+  }
+  if (t4.isLogicalExpression(node)) {
+    if (node.operator !== "&&") {
+      collectReturnedObjects(node.left, targets, unsupported);
+    }
+    collectReturnedObjects(node.right, targets, unsupported);
+    return;
+  }
+  if (t4.isTSAsExpression(node) || t4.isTSSatisfiesExpression(node) || t4.isParenthesizedExpression(node)) {
+    collectReturnedObjects(node.expression, targets, unsupported);
+    return;
+  }
+  if (t4.isNullLiteral(node) || t4.isBooleanLiteral(node) || t4.isIdentifier(node) && node.name === "undefined") {
+    return;
+  }
+  unsupported.push(node);
+}
 function isUnistylesStyleSheet(path2, state) {
   const { callee } = path2.node;
   if (!t4.isMemberExpression(callee) || !t4.isIdentifier(callee.property)) {
@@ -669,42 +710,63 @@ function getStylesDependenciesFromFunction(funcPath) {
   }, {});
 }
 function addDependencies(state, styleName, unistyle, detectedDependencies) {
-  const debugMessage = (deps) => {
+  const debugMessage = (deps, unsupportedReason) => {
     if (state.opts.debug) {
       const mappedDeps = deps.map(
         (dep) => Object.keys(UnistyleDependency).find(
           (key) => UnistyleDependency[key] === dep
         )
       ).join(", ");
-      console.log(
-        `${state.filename?.replace(`${state.file.opts.root}/`, "")}: styles.${styleName}: [${mappedDeps}]`
-      );
+      const style = `${state.filename?.replace(`${state.file.opts.root}/`, "")}: styles.${styleName}`;
+      if (unsupportedReason) {
+        console.warn(
+          `Unistyles \u{1F984}: ${style}: detected [${mappedDeps}], but ${unsupportedReason}. Return an object literal, or a ternary/logical expression of object literals.`
+        );
+        return;
+      }
+      console.log(`${style}: [${mappedDeps}]`);
     }
   };
   const styleDependencies = detectedDependencies.map(toUnistylesDependency);
   if (styleDependencies.length > 0) {
     const uniqueDependencies = Array.from(new Set(styleDependencies));
-    debugMessage(uniqueDependencies);
-    let targets = [];
+    const targets = [];
+    const unsupported = [];
+    let unsupportedReturns = 0;
     if (t4.isArrowFunctionExpression(unistyle.value) || t4.isFunctionExpression(unistyle.value)) {
-      if (t4.isObjectExpression(unistyle.value.body)) {
-        targets.push(unistyle.value.body);
-      }
       if (t4.isBlockStatement(unistyle.value.body)) {
-        targets = getReturnStatementsFromBody(unistyle.value.body).map((node) => {
+        const returnStatements = getReturnStatementsFromBody(unistyle.value.body);
+        unsupportedReturns = countReturnStatements(unistyle.value.body) - returnStatements.length;
+        returnStatements.forEach((node) => {
           if (t4.isIdentifier(node.argument)) {
             node.argument = t4.objectExpression([t4.spreadElement(node.argument)]);
           }
-          return node.argument;
-        }).filter((node) => t4.isObjectExpression(node));
+          if (node.argument) {
+            collectReturnedObjects(node.argument, targets, unsupported);
+          }
+        });
+      } else {
+        collectReturnedObjects(unistyle.value.body, targets, unsupported);
       }
-    }
-    if (t4.isObjectExpression(unistyle.value)) {
-      targets.push(unistyle.value);
-    }
-    if (t4.isMemberExpression(unistyle.value)) {
+    } else if (t4.isMemberExpression(unistyle.value)) {
       unistyle.value = t4.objectExpression([t4.spreadElement(unistyle.value)]);
       targets.push(unistyle.value);
+    } else {
+      collectReturnedObjects(unistyle.value, targets, unsupported);
+    }
+    if (unsupported.length > 0 || unsupportedReturns > 0) {
+      const reasons = unsupported.map((node) => `${node.type}${node.loc ? ` (line ${node.loc.start.line})` : ""}`).concat(
+        unsupportedReturns > 0 ? `${unsupportedReturns} return statement(s) inside switch, loop or try blocks` : []
+      );
+      const consequence = targets.length > 0 ? "the style may not update when these dependencies change, eg. when one of these values is returned first" : "the style won't update when these dependencies change";
+      debugMessage(uniqueDependencies, `they can't be attached to: ${reasons.join(", ")}, so ${consequence}`);
+    } else if (targets.length === 0) {
+      debugMessage(
+        uniqueDependencies,
+        "no returned object was found to attach them to, so the style won't update when these dependencies change"
+      );
+    } else {
+      debugMessage(uniqueDependencies);
     }
     if (targets.length > 0) {
       targets.forEach((target) => {
