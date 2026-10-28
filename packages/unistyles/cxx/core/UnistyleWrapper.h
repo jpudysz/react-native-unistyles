@@ -192,6 +192,21 @@ You likely accessed a style while the runtime was being torn down (eg. during a 
             }
         }
 
+        if (unistyle->styleKey != helpers::EXOTIC_STYLE_KEY) {
+            std::vector<folly::dynamic> arguments = parsedArguments.has_value()
+                ? parsedArguments.value()
+                : std::vector<folly::dynamic>{};
+
+            auto unistyleData = std::make_shared<UnistyleData>(unistyle, variants, arguments, std::nullopt);
+
+            parser.rebuildUnistyleWithVariants(rt, unistyleData);
+
+            if (unistyleData->parsedStyle.has_value()) {
+                return jsi::Value(rt, unistyleData->parsedStyle.value()).asObject(rt);
+            }
+        }
+
+        // exotic (unbound) styles have no unistyle data to rebuild into
         parser.rebuildUnistyle(rt, unistyle, variants, parsedArguments);
 
         return jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
