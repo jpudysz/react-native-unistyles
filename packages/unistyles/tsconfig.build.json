@@ -3,5 +3,5 @@
   "compilerOptions": {
     "noEmit": false
   },
-  "exclude": ["plugin", "repack-plugin", "metro", "lib", "src/unifiber/test", "src/unifiber/bench"]
+  "exclude": ["plugin", "repack-plugin", "vite-plugin", "metro", "lib", "src/unifiber/test", "src/unifiber/bench"]
 }
