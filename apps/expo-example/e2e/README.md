@@ -52,7 +52,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `suspense`            | suspend and resume a Suspense boundary around theme changes                | #1260, per-view styles restored by Suspense (d5f8a851)   |
 | `activity`            | theme changes and new arguments while `<Activity>` hides content, a `useUnistyles` theme that doesn't re-render when shown | hidden content that keeps rendering, shown again, #1297  |
 | `frozen-list`         | a 300 row screen frozen and restored, with a theme change while frozen      | #1252, restoring a frozen screen blocked JS for seconds  |
-| `animated-variant`    | `useAnimatedVariantColor` restored from a frozen stack after a theme change, `styles` read from the UI runtime | a reveal re-applying the color of the last render, #1213 |
+| `animated-variant`    | `useAnimatedVariantColor` restored from a frozen stack after a theme change, `styles` read from the UI runtime, a nested `Text` below an animated row after the screen re-rendered | a reveal re-applying the color of the last render, #1213, React re-attaching nodes Reanimated replaced before they were mounted, #1329 |
 | `frozen-unmount`      | log out with frozen steps, churn memory, log in, unfreeze, theme change    | #1217 / #1179, families unmounted while frozen (9afc15b6) |
 | `scoped`              | theme changes, adaptive themes and a late mounted scope on `scoped-theme`, hooks of a component mounted below the overlay's scope | scoped theme resolution                                  |
 | `variants-after-flip` | variant changes after theme changes                                       | variants with fresh theme values                         |

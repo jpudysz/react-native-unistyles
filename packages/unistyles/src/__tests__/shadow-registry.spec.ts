@@ -15,7 +15,7 @@ jest.mock('react-native-nitro-modules', () => {
                 unlink: () => {},
                 suspend: () => {},
                 takeCommittedInstanceHandles: () => [],
-                refreshReactNodes: () => {},
+                refreshReactNodes: () => [],
             }),
         },
     }
@@ -228,7 +228,7 @@ describe('UnistylesShadowRegistry.remove on hidden views', () => {
 
 describe('UnistylesShadowRegistry change listener', () => {
     beforeEach(() => {
-        shadowRegistry.refreshReactNodes = jest.fn()
+        shadowRegistry.refreshReactNodes = jest.fn(() => [])
     })
 
     const refreshedNodes = () => shadowRegistry.refreshReactNodes.mock.calls.flatMap((call) => call[0]) as Array<object>
@@ -269,6 +269,75 @@ describe('UnistylesShadowRegistry change listener', () => {
         emitChange()
 
         expect(refreshedNodes()).toStrictEqual([node, inFlightNode])
+    })
+
+    // like the native side: without includeUnpromoted it skips the nodes that were never mounted and returns their indices
+    const skippingUnmounted = (unmounted: Set<object>) =>
+        jest.fn((nodes: Array<object>, includeUnpromoted: boolean) =>
+            includeUnpromoted ? [] : nodes.flatMap((node, index) => (unmounted.has(node) ? [index] : [])),
+        )
+
+    // a committed host and its other half, each under its own half of the root
+    const hostPair = (node: object, otherNode: object) => {
+        const host = hostFiber(node)
+        const other = { ...host, stateNode: { ...host.stateNode, node: otherNode }, alternate: host }
+        const top = root()
+        const otherTop = { ...root(), alternate: top }
+        const fiberRoot = { current: top }
+
+        host.alternate = other
+        top.alternate = otherTop
+        top.stateNode = fiberRoot
+        otherTop.stateNode = fiberRoot
+        chain(host, top)
+        chain(other, otherTop)
+
+        return { host, fiberRoot, otherTop }
+    }
+
+    it('refreshes the committed nodes a commit hook replaced before they were mounted', () => {
+        // eg. Reanimated clones the ancestors of an animated view in the commit hook of the commit that mounts them
+        const nodes = { animated: {}, ancestor: {}, text: {} }
+        const top = root()
+        const ancestor = hostFiber(nodes.ancestor)
+        const animated = hostFiber(nodes.animated)
+        const text = hostFiber(nodes.text)
+
+        chain(text, animated, ancestor, top)
+        shadowRegistry.takeCommittedInstanceHandles = jest.fn(() => [text])
+        shadowRegistry.refreshReactNodes = skippingUnmounted(new Set([nodes.animated, nodes.ancestor]))
+
+        emitChange()
+
+        expect(shadowRegistry.refreshReactNodes).toHaveBeenCalledTimes(2)
+        expect(shadowRegistry.refreshReactNodes.mock.calls[1]).toStrictEqual([[nodes.animated, nodes.ancestor], true])
+    })
+
+    it('keeps the unmounted node of a render React has not committed yet', () => {
+        const committedNode = {}
+        const inFlightNode = {}
+        const { host } = hostPair(committedNode, inFlightNode)
+
+        shadowRegistry.takeCommittedInstanceHandles = jest.fn(() => [host])
+        shadowRegistry.refreshReactNodes = skippingUnmounted(new Set([committedNode, inFlightNode]))
+
+        emitChange()
+
+        expect(shadowRegistry.refreshReactNodes.mock.calls[1]).toStrictEqual([[committedNode], true])
+    })
+
+    it('refreshes the other half of a view when it is the committed one', () => {
+        const node = {}
+        const committedNode = {}
+        const { host, fiberRoot, otherTop } = hostPair(node, committedNode)
+
+        fiberRoot.current = otherTop
+        shadowRegistry.takeCommittedInstanceHandles = jest.fn(() => [host])
+        shadowRegistry.refreshReactNodes = skippingUnmounted(new Set([node, committedNode]))
+
+        emitChange()
+
+        expect(shadowRegistry.refreshReactNodes.mock.calls[1]).toStrictEqual([[committedNode], true])
     })
 
     it('refreshes views in a Suspense fallback', () => {
