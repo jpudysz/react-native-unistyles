@@ -2,74 +2,83 @@ import type { UnistylesValues } from '../../types'
 import type { UnistylesServices } from '../types'
 
 import { convertUnistyles } from '../convert'
-import { hyphenate, isServer } from '../utils'
+import { hyphenate } from '../utils'
 import { convertToCSS, getChildrenClassName } from './core'
+import { CSSSheet, getDeclarations, getSelector } from './sheet'
+import { safeGetMap } from './utils'
 
 type MapType = Map<string, Map<string, Map<string, any>>>
+type ClassNames = Map<string, Set<string>>
 type SetProps = {
     mediaQuery?: string
     className: string
-    isMq?: boolean
     propertyKey: string
     value: any
 }
 type HydrateState = Array<[string, Array<[string, Array<[string, any]>]>]>
 
-const safeGetMap = (map: Map<string, Map<string, any>>, key: string) => {
-    const nextLevelMap = map.get(key)
-
-    if (!nextLevelMap) {
-        const newMap = new Map<string, any>()
-
-        map.set(key, newMap)
-
-        return newMap
-    }
-
-    return nextLevelMap
+const forEachClassName = (
+    classNames: ClassNames | undefined,
+    callback: (mediaQuery: string, className: string) => void,
+) => {
+    classNames?.forEach((names, mediaQuery) => names.forEach((className) => callback(mediaQuery, className)))
 }
 
 export class CSSState {
-    mainMap: MapType = new Map()
-    mqMap: MapType = new Map()
-    private styleTag: HTMLStyleElement | null = null
+    // The base group goes first, so a media query always overrides it at the same specificity
+    mainMap: MapType = new Map([['', new Map()]])
     private themesCSS = new Map<string, string>()
+    // Every class name a hash produced, pseudo and children selectors included, so re-applying or removing it is exact
+    private owners = new Map<string, ClassNames>()
+    private currentOwner?: ClassNames
+    private sheet = new CSSSheet(this.themesCSS, this.mainMap)
 
-    constructor(private services: UnistylesServices) {
-        if (isServer()) {
-            return
-        }
+    constructor(private services: UnistylesServices) {}
 
-        const ssrTag = document.getElementById('unistyles-web')
-
-        if (ssrTag) {
-            this.styleTag = ssrTag as HTMLStyleElement
-
-            return
-        }
-
-        this.styleTag = document.createElement('style')
-        this.styleTag.id = 'unistyles-web'
-        document.head.appendChild(this.styleTag)
-    }
-
-    set = ({ className, propertyKey, value, mediaQuery = '', isMq }: SetProps) => {
-        const firstLevelMap = isMq ? this.mqMap : this.mainMap
-        const secondLevelMap = safeGetMap(firstLevelMap, mediaQuery)
+    set = ({ className, propertyKey, value, mediaQuery = '' }: SetProps) => {
+        const secondLevelMap = safeGetMap(this.mainMap, mediaQuery)
         const thirdLevelMap = safeGetMap(secondLevelMap, className)
 
         thirdLevelMap.set(propertyKey, value)
+
+        if (this.currentOwner) {
+            const classNames = this.currentOwner.get(mediaQuery) ?? new Set()
+
+            classNames.add(className)
+            this.currentOwner.set(mediaQuery, classNames)
+        }
     }
 
     add = (hash: string, values: UnistylesValues) => {
-        convertToCSS(hash, convertUnistyles(values, this.services.runtime), this)
-        this.recreate()
+        const previousClassNames = this.owners.get(hash)
+        const classNames: ClassNames = new Map()
+
+        // Re-applying a hash replaces its styles, so a property or selector it doesn't produce anymore doesn't linger.
+        // Clearing keeps each class in place: its rule is edited where it is, and the cascade order doesn't change
+        forEachClassName(previousClassNames, (mediaQuery, className) => {
+            this.mainMap.get(mediaQuery)?.get(className)?.clear()
+        })
+
+        this.currentOwner = classNames
+
+        try {
+            convertToCSS(hash, convertUnistyles(values, this.services.runtime), this)
+        } finally {
+            this.currentOwner = undefined
+        }
+
+        this.owners.set(hash, classNames)
+        forEachClassName(previousClassNames, (mediaQuery, className) => {
+            if (!classNames.get(mediaQuery)?.has(className)) {
+                this.mainMap.get(mediaQuery)?.delete(className)
+                this.sheet.syncClass(mediaQuery, className)
+            }
+        })
+        forEachClassName(classNames, this.sheet.syncClass)
     }
 
     recreate = () => {
-        if (this.styleTag) {
-            this.styleTag.innerText = this.getStyles()
-        }
+        this.sheet.rebuild()
     }
 
     addTheme = (theme: string, values: Record<string, any>) => {
@@ -96,26 +105,30 @@ export class CSSState {
                 `media ${theme}`,
                 `@media (prefers-color-scheme: ${theme}){:root,[data-unistyles-reset]{${themeVars}}}`,
             )
+            this.sheet.syncTheme(`media ${theme}`)
         }
 
         this.themesCSS.set(
             theme,
             `:root.${theme},:root.${theme} [data-unistyles-reset],[data-unistyles-theme="${theme}"]{${themeVars}}`,
         )
+        this.sheet.syncTheme(theme)
     }
 
     remove = (hash: string) => {
+        const ownClassNames = this.owners.get(hash)
         const childrenClassName = getChildrenClassName(hash)
 
-        this.mainMap.forEach((styles) => {
-            styles.delete(hash)
-            styles.delete(childrenClassName)
+        this.owners.delete(hash)
+        this.mainMap.forEach((styles, mediaQuery) => {
+            const classNames = new Set(ownClassNames?.get(mediaQuery)).add(hash).add(childrenClassName)
+
+            classNames.forEach((className) => {
+                if (styles.delete(className)) {
+                    this.sheet.syncClass(mediaQuery, className)
+                }
+            })
         })
-        this.mqMap.forEach((styles) => {
-            styles.delete(hash)
-            styles.delete(childrenClassName)
-        })
-        this.recreate()
     }
 
     getStyles = () => {
@@ -123,67 +136,46 @@ export class CSSState {
             return acc + themeCss
         }, '')
 
-        const generate = (mediaQuery: string, secondLevelMap: Map<string, Map<string, string>>) => {
+        for (const [mediaQuery, secondLevelMap] of this.mainMap) {
             if (mediaQuery) {
                 styles += `${mediaQuery}{`
             }
 
             for (const [className, thirdLevelMap] of secondLevelMap) {
-                styles += className[0] === ':' ? `${className}{` : `.${className}{`
-
-                for (const [propertyKey, value] of thirdLevelMap) {
-                    if (value === undefined) {
-                        continue
-                    }
-
-                    styles += `${hyphenate(propertyKey)}:${value};`
-                }
-
-                styles += '}'
+                styles += `${getSelector(className)}{${getDeclarations(thirdLevelMap)}}`
             }
 
             if (mediaQuery) {
                 styles += '}'
             }
-        }
-
-        for (const [mediaQuery, secondLevelMap] of this.mainMap) {
-            generate(mediaQuery, secondLevelMap)
-        }
-
-        for (const [mediaQuery, secondLevelMap] of this.mqMap) {
-            generate(mediaQuery, secondLevelMap)
         }
 
         return styles
     }
 
     getState = () => {
-        const getState = (map: MapType) => {
-            return Array.from(map).map(([mediaQuery, classNames]) => {
-                return [
-                    mediaQuery,
-                    Array.from(classNames.entries()).map(([className, style]) => {
-                        return [
-                            className,
-                            Array.from(style.entries()).map(([property, value]) => {
-                                return [property, value]
-                            }),
-                        ]
-                    }),
-                ]
-            }) as HydrateState
-        }
-
-        const mainState = getState(this.mainMap)
-        const mqState = getState(this.mqMap)
+        const mainState = Array.from(this.mainMap).map(([mediaQuery, classNames]) => {
+            return [
+                mediaQuery,
+                Array.from(classNames.entries()).map(([className, style]) => {
+                    return [
+                        className,
+                        Array.from(style.entries()).map(([property, value]) => {
+                            return [property, value]
+                        }),
+                    ]
+                }),
+            ]
+        }) as HydrateState
+        // Media query styles live in mainState with the rest, the field stays for clients that read it
+        const mqState: HydrateState = []
         const config = this.services.state.getConfig()
 
         return { mainState, mqState, config }
     }
 
     hydrate = ({ mainState, mqState }: ReturnType<typeof this.getState>) => {
-        const hydrateState = (map: HydrateState, isMq = false) => {
+        const hydrateState = (map: HydrateState) => {
             map.forEach(([mediaQuery, classNames]) => {
                 classNames.forEach(([className, style]) => {
                     style.forEach(([propertyKey, value]) => {
@@ -192,19 +184,22 @@ export class CSSState {
                             propertyKey,
                             value,
                             mediaQuery,
-                            isMq,
                         })
                     })
+                    this.sheet.syncClass(mediaQuery, className)
                 })
             })
         }
 
         hydrateState(mainState)
-        hydrateState(mqState, true)
+        // A server that sent media query styles apart still gets them into the same groups
+        hydrateState(mqState)
     }
 
     reset = () => {
-        this.mqMap.clear()
         this.mainMap.clear()
+        this.mainMap.set('', new Map())
+        this.owners.clear()
+        this.sheet.reset()
     }
 }

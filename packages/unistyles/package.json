@@ -166,6 +166,7 @@
     "dpdm": "4.3.0",
     "esbuild": "0.28.2",
     "jest": "30.5.2",
+    "jsdom": "26.1.0",
     "@babel/core": "7.29.7",
     "@babel/plugin-syntax-jsx": "7.29.7",
     "@babel/runtime": "7.29.10",

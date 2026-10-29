@@ -245,7 +245,6 @@ export class UnistylesRuntime {
                 ) as UnistylesTheme,
             )
             this.services.registry.css.addTheme(themeName, newTheme)
-            this.services.registry.css.recreate()
         }
     }
 
