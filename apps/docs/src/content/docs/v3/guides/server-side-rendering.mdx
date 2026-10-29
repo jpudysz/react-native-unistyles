@@ -13,7 +13,12 @@ import Seo from '../../../../components/Seo.astro'
     }}
 >
 
-Unistyles 3.0 is fully compatible with Next.js Server Side Rendering (SSR). We're supporting both client and server components.
+Unistyles 3.0 is fully compatible with Next.js Server Side Rendering (SSR). Components styled with Unistyles are rendered on the server and their CSS is injected into the HTML.
+
+<Aside type="caution">
+React Server Components (RSC) are not officially supported. Render components styled with Unistyles inside Client Components (files marked with `'use client'`).
+Your server components (like the root layout or pages) can still import and render these Client Components.
+</Aside>
 
 ### Usage
 
@@ -80,6 +85,29 @@ Unistyles 3.0 is fully compatible with Next.js Server Side Rendering (SSR). We'r
         </Aside>
 
         With this setup, we will ensure that Unistyles is initialized correctly and injects CSS on the server-side.
+
+        Keep every component that uses Unistyles styles in a Client Component:
+
+        ```tsx title="page.tsx" /'use client'/
+        'use client'
+
+        import { Text, View } from 'react-native'
+        import { StyleSheet } from 'react-native-unistyles'
+
+        export default function Page() {
+            return (
+                <View style={styles.container}>
+                    <Text>Hello from Unistyles</Text>
+                </View>
+            )
+        }
+
+        const styles = StyleSheet.create(theme => ({
+            container: {
+                backgroundColor: theme.colors.background
+            }
+        }))
+        ```
 
         ### Config (Optional)
 
@@ -151,5 +179,12 @@ Or you can directly add the className to your root html element.
 - <html lang="en">
 + <html lang="en" className="dark">
 ```
+
+### Errors in Server Components
+
+Errors like `useRef is not a function`, `Right-hand side of 'instanceof' is not an object` or
+`You're importing a module that depends on useState into a React Server Component module` mean that a component styled with Unistyles is rendered inside a React Server Component.
+
+React Server Components are not officially supported. Add `'use client'` at the top of the file that renders the styled components.
 
 </Seo>
