@@ -16,7 +16,7 @@ jest.mock('react-native-nitro-modules', () => {
                 unlink: () => {},
                 suspend: () => {},
                 takeCommittedInstanceHandles: () => [],
-                refreshReactNodes: () => {},
+                refreshReactNodes: () => [],
             }),
         },
     }

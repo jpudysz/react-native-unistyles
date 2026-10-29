@@ -16,6 +16,7 @@ export default function AnimationsScreen() {
 
     const theme = useAnimatedTheme()
     const offset = useSharedValue(0)
+    const rowOffset = useSharedValue(0)
     const rnOffset = useRef(new RNAnimated.Value(0)).current
     const variantColor = useAnimatedVariantColor(styles.variantBox, 'backgroundColor')
 
@@ -27,6 +28,9 @@ export default function AnimationsScreen() {
     }))
     const variantStyle = useAnimatedStyle(() => ({
         backgroundColor: variantColor.value
+    }))
+    const rowStyle = useAnimatedStyle(() => ({
+        transform: [{ translateX: rowOffset.value }]
     }))
 
     const move = () => {
@@ -67,7 +71,7 @@ export default function AnimationsScreen() {
 
     return (
         <Screen>
-            <Section title="Reanimated" description="useAnimatedTheme, useAnimatedVariantColor and a Unistyles style next to an animated one">
+            <Section title="Reanimated" description="useAnimatedTheme, useAnimatedVariantColor, a Unistyles style next to an animated one and a nested Text below one">
                 <Animated.View style={[styles.box, animatedThemeStyle]}>
                     <Text style={styles.text}>useAnimatedTheme</Text>
                 </Animated.View>
@@ -75,6 +79,11 @@ export default function AnimationsScreen() {
                     <Text style={styles.text}>useAnimatedVariantColor</Text>
                 </Animated.View>
                 <Animated.View style={[styles.box, styles.moving, translateStyle]} />
+                <Animated.View style={[styles.box, rowStyle]}>
+                    <Text style={styles.text}>
+                        A <Text style={styles.nestedText}>nested Text</Text> in an animated row
+                    </Text>
+                </Animated.View>
             </Section>
             <Section title="React Native Animated">
                 <RNAnimated.View style={[styles.box, styles.moving, { transform: [{ translateX: rnOffset }] }]} />
@@ -96,6 +105,10 @@ const styles = StyleSheet.create(theme => ({
         backgroundColor: theme.colors.accent
     },
     text: {
+        color: theme.colors.typography
+    },
+    nestedText: {
+        fontWeight: '700',
         color: theme.colors.typography
     },
     variantBox: {

@@ -3,10 +3,12 @@ import { NitroModules } from 'react-native-nitro-modules'
 import type { Scope } from '../../components/ScopedThemeContext'
 import type { VerifyReport } from '../../diagnostics/types'
 import type { Host } from '../../unifiber/src'
+import type { FiberNode } from '../../unifiber/src/fiber'
 import type { UnistylesShadowRegistry as UnistylesShadowRegistrySpec } from './ShadowRegistry.nitro'
 import type { ShadowNode, Unistyle, ViewHandle } from './types'
 
 import { Fiber, Reanimated } from '../../unifiber/src'
+import * as FiberInternals from '../../unifiber/src/fiber'
 import { StyleSheet } from '../StyleSheet'
 import { createUnistylesStyleSource } from './styleSource'
 import { traceSection } from './tracing'
@@ -24,12 +26,13 @@ interface ShadowRegistry extends UnistylesShadowRegistrySpec {
     getScopedTheme(): string | undefined
     verify(): VerifyReport
     takeCommittedInstanceHandles(): Array<any>
-    refreshReactNodes(nodes: Array<ShadowNode>): void
+    refreshReactNodes(nodes: Array<ShadowNode>, includeUnpromoted: boolean): Array<number>
 }
 
 const HybridShadowRegistry = NitroModules.createHybridObject<ShadowRegistry>('UnistylesShadowRegistry')
 
 const { collectVisibleAncestors, getHostFor, getHostForInstanceHandle, getShadowNode, getShadowNodes, isHidden } = Fiber
+const { committedOf, raw } = FiberInternals
 
 const { source: styleSource, bumpEpoch } = createUnistylesStyleSource({
     get: () => HybridShadowRegistry.getScopedTheme(),
@@ -47,9 +50,32 @@ const linkedHosts = new WeakMap<object, Host>()
 
 const committedHosts: Array<Host | undefined> = []
 let refreshNodes: Array<ShadowNode> = []
+let refreshNodeHosts: Array<Host> = []
 
 const collectShadowNodes = (host: Host) => {
     getShadowNodes(host, refreshNodes)
+
+    while (refreshNodeHosts.length < refreshNodes.length) {
+        refreshNodeHosts.push(host)
+    }
+}
+
+const refreshUnmountedCommittedNodes = (unpromotedIndices: Array<number>) => {
+    const nodes: Array<ShadowNode> = []
+
+    for (let i = 0; i < unpromotedIndices.length; i++) {
+        const index = unpromotedIndices[i]!
+        const node = refreshNodes[index]
+        const committedFiber = raw(committedOf(refreshNodeHosts[index] as unknown as FiberNode))
+
+        if (node && committedFiber?.stateNode?.node === node) {
+            nodes.push(node)
+        }
+    }
+
+    if (nodes.length > 0) {
+        HybridShadowRegistry.refreshReactNodes(nodes, true)
+    }
 }
 
 // React re-attaches an untouched subtree through its root's node and only follows clones made on the JS thread.
@@ -72,13 +98,14 @@ const refreshReactNodes = () => {
         collectVisibleAncestors(committedHosts, collectShadowNodes)
 
         if (refreshNodes.length > 0) {
-            HybridShadowRegistry.refreshReactNodes(refreshNodes)
+            refreshUnmountedCommittedNodes(HybridShadowRegistry.refreshReactNodes(refreshNodes, false))
         }
 
         traceSection('refreshOwners', () => owners.refresh(committedHosts))
     } finally {
         committedHosts.length = 0
         refreshNodes = []
+        refreshNodeHosts = []
     }
 }
 
