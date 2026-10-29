@@ -109,8 +109,9 @@ export class CSSSheet {
             sheet.deleteRule(currentIndex)
         }
 
-        // An updated theme takes the place of the old one, so the order of the themes doesn't change
-        const rule = insertRule(sheet, css, currentIndex >= 0 ? currentIndex : sheet.cssRules.length)
+        // An updated theme goes last, so it wins over the same theme another runtime on the tag registered later.
+        // Theme rules only set variables, and on one element their specificity tells them apart, not their order
+        const rule = insertRule(sheet, css)
 
         if (rule) {
             this.themes.set(key, { rule, css })

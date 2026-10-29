@@ -124,7 +124,7 @@ describe('Web CSS sheet', () => {
         expect(state.getStyles()).toBe('.other{color:black;}')
     })
 
-    it('updates a theme in place without touching the styles', () => {
+    it('updates a theme without touching the styles', () => {
         const state = createState()
 
         state.addTheme('light', { colors: { background: '#ffffff' } })
@@ -134,11 +134,27 @@ describe('Web CSS sheet', () => {
 
         state.addTheme('light', { colors: { background: '#000000' } })
 
-        expect(getGroup(2)).toBe(group)
+        expect(getGroup(0)).toBe(group)
         expect(describeSheet()).toEqual([
+            '@media all{.hash{color: red;}}',
             '@media (prefers-color-scheme: light){:root,[data-unistyles-reset]{--colors-background: #000000;}}',
             ':root.light,:root.light [data-unistyles-reset],[data-unistyles-theme="light"]{--colors-background: #000000;}',
-            '@media all{.hash{color: red;}}',
+        ])
+    })
+
+    it('puts an updated theme after the same theme of another runtime sharing the tag', () => {
+        const host = createState()
+
+        host.addTheme('premium', { colors: { background: '#ff9ff3' } })
+
+        const widget = createState()
+
+        widget.addTheme('premium', { colors: { background: '#ff9ff3' } })
+        host.addTheme('premium', { colors: { background: '#000000' } })
+
+        expect(describeSheet()).toEqual([
+            ':root.premium,:root.premium [data-unistyles-reset],[data-unistyles-theme="premium"]{--colors-background: #ff9ff3;}',
+            ':root.premium,:root.premium [data-unistyles-reset],[data-unistyles-theme="premium"]{--colors-background: #000000;}',
         ])
     })
 
