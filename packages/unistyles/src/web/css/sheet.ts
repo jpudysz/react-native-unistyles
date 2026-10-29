@@ -77,6 +77,15 @@ export class CSSSheet {
         this.sheet = this.tag.sheet
     }
 
+    // Every style change brings the rules back if the tag lost them, as rewriting the whole tag did
+    refresh = () => {
+        const sheet = this.getSheet()
+
+        if (sheet) {
+            this.insertGroups(sheet)
+        }
+    }
+
     syncClass = (mediaQuery: string, className: string) => {
         const sheet = this.getSheet()
 

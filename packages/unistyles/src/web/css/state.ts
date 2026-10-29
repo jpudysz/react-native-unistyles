@@ -75,6 +75,7 @@ export class CSSState {
             }
         })
         forEachClassName(classNames, this.sheet.syncClass)
+        this.sheet.refresh()
     }
 
     recreate = () => {
@@ -129,6 +130,7 @@ export class CSSState {
                 }
             })
         })
+        this.sheet.refresh()
     }
 
     getStyles = () => {
