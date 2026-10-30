@@ -102,9 +102,9 @@ export class CSSSheet {
         }
     }
 
-    syncTheme = (key: string) => {
-        // Theme variables come with the server styles, so they don't replace them
-        const sheet = this.getSheet(false)
+    // Registering a theme keeps the server styles, they already hold its variables, while updating one replaces them
+    syncTheme = (key: string, isUpdate: boolean) => {
+        const sheet = this.getSheet(isUpdate)
         const css = this.themesCSS.get(key)
         const current = this.themes.get(key)
 
@@ -187,7 +187,7 @@ export class CSSSheet {
     private insertAll = (sheet: CSSStyleSheet) => {
         this.groups.clear()
         this.themes.clear()
-        this.themesCSS.forEach((_, key) => this.syncTheme(key))
+        this.themesCSS.forEach((_, key) => this.syncTheme(key, false))
         this.insertGroups(sheet)
         this.groups.forEach((group, mediaQuery) => {
             this.styles.get(mediaQuery)?.forEach((styles, className) => {

@@ -205,6 +205,21 @@ describe('Web CSS sheet', () => {
         ])
     })
 
+    it('replaces server styles when a theme is updated before any style change', () => {
+        document.head.innerHTML = '<style id="unistyles-web">.hash{color:red;}</style>'
+
+        const state = createState()
+
+        state.addTheme('premium', { colors: { background: '#ff9ff3' } })
+        state.addTheme('premium', { colors: { background: '#000000' } })
+
+        expect(getTag().textContent).toBe('')
+        expect(describeSheet()).toEqual([
+            ':root.premium,:root.premium [data-unistyles-reset],[data-unistyles-theme="premium"]{--colors-background: #000000;}',
+            '@media all{}',
+        ])
+    })
+
     it('hydrates media query styles sent apart into the same groups', () => {
         const state = createState()
 
