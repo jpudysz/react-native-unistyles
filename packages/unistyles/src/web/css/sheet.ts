@@ -48,7 +48,7 @@ export class CSSSheet {
     private sheet: CSSStyleSheet | null = null
     // In the order of the styles map: the base group first, then media queries as they first appear
     private groups = new Map<string, Group | null>()
-    private themes = new Map<string, { rule: CSSRule; css: string }>()
+    private themes = new Map<string, CSSRule>()
     // Server-rendered CSS stays until the first style change, which replaces it with the same styles
     private hasServerStyles = false
 
@@ -107,22 +107,22 @@ export class CSSSheet {
         const css = this.themesCSS.get(key)
         const current = this.themes.get(key)
 
-        if (!sheet || css === undefined || current?.css === css) {
+        if (!sheet || css === undefined) {
             return
         }
 
-        const currentIndex = current ? indexOfRule(sheet, current.rule) : -1
+        const currentIndex = current ? indexOfRule(sheet, current) : -1
 
         if (currentIndex >= 0) {
             sheet.deleteRule(currentIndex)
         }
 
-        // An updated theme goes last, so it wins over the same theme another runtime on the tag registered later.
-        // Theme rules only set variables, and on one element their specificity tells them apart, not their order
+        // The theme goes last on every update, even an unchanged one, so it wins over the same theme another runtime
+        // on the tag added later. Theme rules only set variables, and on one element specificity tells them apart
         const rule = insertRule(sheet, css)
 
         if (rule) {
-            this.themes.set(key, { rule, css })
+            this.themes.set(key, rule)
 
             return
         }
@@ -147,10 +147,7 @@ export class CSSSheet {
         if (sheet && sheet === this.sheet) {
             this.deleteOwnRules(
                 sheet,
-                new Set([
-                    ...Array.from(this.themes.values(), (theme) => theme.rule),
-                    ...Array.from(this.groups.values(), (group) => group?.rule),
-                ]),
+                new Set([...this.themes.values(), ...Array.from(this.groups.values(), (group) => group?.rule)]),
             )
         }
 

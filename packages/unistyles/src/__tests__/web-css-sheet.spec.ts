@@ -158,6 +158,22 @@ describe('Web CSS sheet', () => {
         ])
     })
 
+    it('puts a theme updated with the same values after the same theme of another runtime again', () => {
+        const host = createState()
+
+        host.addTheme('premium', { colors: { background: '#000000' } })
+
+        const widget = createState()
+
+        widget.addTheme('premium', { colors: { background: '#ff9ff3' } })
+        host.addTheme('premium', { colors: { background: '#000000' } })
+
+        expect(describeSheet()).toEqual([
+            ':root.premium,:root.premium [data-unistyles-reset],[data-unistyles-theme="premium"]{--colors-background: #ff9ff3;}',
+            ':root.premium,:root.premium [data-unistyles-reset],[data-unistyles-theme="premium"]{--colors-background: #000000;}',
+        ])
+    })
+
     it('keeps the rules of another runtime sharing the tag', () => {
         const host = createState()
 
