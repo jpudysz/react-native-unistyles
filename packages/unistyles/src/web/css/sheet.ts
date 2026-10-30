@@ -8,6 +8,9 @@ type Group = {
     // Mirrors rule.cssRules, so finding a rule doesn't create a CSSOM wrapper for every rule in the group
     rules: Array<CSSRule>
     classes: Map<string, { rule: CSSStyleRule; declarations: string }>
+    // Class names whose selector the browser rejected, so a re-applied style doesn't throw again on every resize.
+    // Dropped with the style, so removed styles don't pile up here
+    rejected: Set<string>
 }
 
 // Styles without a media query get a group too, so every group is an ordinary child list of one top level rule
@@ -33,7 +36,7 @@ const insertRule = (parent: RuleParent, rule: string, index = parent.cssRules.le
     try {
         return parent.cssRules[parent.insertRule(rule, index)]
     } catch {
-        // The browser can't parse it, like another engine's vendor pseudo-element: a text sheet drops it too
+        // The browser can't parse it, like a pseudo-element it doesn't support yet: a text sheet drops it too
         return undefined
     }
 }
@@ -201,7 +204,7 @@ export class CSSSheet {
 
             const rule = insertRule(sheet, `${mediaQuery || BASE_MEDIA_QUERY}{}`) as CSSGroupingRule | undefined
 
-            this.groups.set(mediaQuery, rule ? { rule, rules: [], classes: new Map() } : null)
+            this.groups.set(mediaQuery, rule ? { rule, rules: [], classes: new Map(), rejected: new Set() } : null)
         })
     }
 
@@ -209,6 +212,8 @@ export class CSSSheet {
         const current = group.classes.get(className)
 
         if (!styles) {
+            group.rejected.delete(className)
+
             if (current) {
                 const mirrorIndex = group.rules.indexOf(current.rule)
                 const index =
@@ -242,12 +247,20 @@ export class CSSSheet {
             return
         }
 
+        if (group.rejected.has(className)) {
+            return
+        }
+
         const rule = insertRule(group.rule, `${getSelector(className)}{${declarations}}`) as CSSStyleRule | undefined
 
         if (rule) {
             group.rules.push(rule)
             group.classes.set(className, { rule, declarations })
+
+            return
         }
+
+        group.rejected.add(className)
     }
 
     private deleteOwnRules = (sheet: CSSStyleSheet, rules: Set<CSSRule | undefined>) => {

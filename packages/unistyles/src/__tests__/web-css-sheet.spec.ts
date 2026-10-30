@@ -359,4 +359,48 @@ describe('Web CSS sheet', () => {
         expect(describeSheet()).toEqual(['@media all{.last{color: green;}}'])
         expect(state.getStyles()).toBe('.rejected{color:blue;}.last{color:green;}')
     })
+
+    it("doesn't insert a rejected rule again until its style is removed", () => {
+        const state = createState()
+
+        add(state, 'other', { color: 'black' })
+
+        const group = getGroup(0)
+        const insertGroupRule = group.insertRule.bind(group)
+        const insertRule = jest.spyOn(group, 'insertRule').mockImplementation((rule, index) => {
+            if (rule.startsWith('.hash::incorrect-pseudo')) {
+                throw new SyntaxError('unsupported selector')
+            }
+
+            return insertGroupRule(rule, index)
+        })
+        const getRejectedInserts = () =>
+            insertRule.mock.calls.filter(([rule]) => rule.startsWith('.hash::incorrect-pseudo')).length
+        // Hydration takes class names as they come, and useServerUnistyles hydrates on every render
+        const hydrate = () =>
+            state.hydrate({
+                mainState: [
+                    [
+                        '',
+                        [
+                            ['hash', [['color', 'red']]],
+                            ['hash::incorrect-pseudo', [['display', 'none']]],
+                        ],
+                    ],
+                ],
+                mqState: [],
+                config: {} as never,
+            })
+
+        hydrate()
+        hydrate()
+
+        expect(getRejectedInserts()).toBe(1)
+
+        state.remove('hash')
+        hydrate()
+
+        expect(getRejectedInserts()).toBe(2)
+        expect(describeSheet()).toEqual(['@media all{.other{color: black;}.hash{color: red;}}'])
+    })
 })
