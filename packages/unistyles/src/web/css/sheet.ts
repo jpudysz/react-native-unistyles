@@ -9,9 +9,9 @@ type Group = {
     // Only this runtime edits its groups, so the mirror never drifts
     rules: Array<CSSRule>
     classes: Map<string, { rule: CSSStyleRule; declarations: string }>
-    // Class names whose selector the browser rejected, so a re-applied style doesn't throw again on every resize.
-    // Dropped with the style, so removed styles don't pile up here
-    rejected: Set<string>
+    // Declarations of each class whose rule the browser rejected, for its selector or a value like `red}`, so the same
+    // style re-applied on every resize doesn't throw again. Dropped with the style, so removed styles don't pile up here
+    rejected: Map<string, string>
 }
 
 // Styles without a media query get a group too, so every group is an ordinary child list of one top level rule
@@ -205,7 +205,7 @@ export class CSSSheet {
 
             const rule = insertRule(sheet, `${mediaQuery || BASE_MEDIA_QUERY}{}`) as CSSGroupingRule | undefined
 
-            this.groups.set(mediaQuery, rule ? { rule, rules: [], classes: new Map(), rejected: new Set() } : null)
+            this.groups.set(mediaQuery, rule ? { rule, rules: [], classes: new Map(), rejected: new Map() } : null)
         })
     }
 
@@ -238,7 +238,7 @@ export class CSSSheet {
             return
         }
 
-        if (group.rejected.has(className)) {
+        if (group.rejected.get(className) === declarations) {
             return
         }
 
@@ -247,11 +247,12 @@ export class CSSSheet {
         if (rule) {
             group.rules.push(rule)
             group.classes.set(className, { rule, declarations })
+            group.rejected.delete(className)
 
             return
         }
 
-        group.rejected.add(className)
+        group.rejected.set(className, declarations)
     }
 
     private deleteOwnRules = (sheet: CSSStyleSheet, rules: Set<CSSRule | undefined>) => {

@@ -449,4 +449,26 @@ describe('Web CSS sheet', () => {
         expect(getRejectedInserts()).toBe(2)
         expect(describeSheet()).toEqual(['@media all{.other{color: black;}.hash{color: red;}}'])
     })
+
+    it('inserts a rejected rule once its declarations change', () => {
+        const state = createState()
+
+        add(state, 'other', { color: 'black' })
+
+        const group = getGroup(0)
+        const insertGroupRule = group.insertRule.bind(group)
+
+        // A value with } closes the rule early, so the browser rejects it whatever the selector
+        jest.spyOn(group, 'insertRule').mockImplementation((rule, index) => {
+            if (rule.includes('}body{')) {
+                throw new SyntaxError('unexpected content after the rule')
+            }
+
+            return insertGroupRule(rule, index)
+        })
+        add(state, 'hash', { color: 'red}body{display:none' })
+        add(state, 'hash', { color: 'green' })
+
+        expect(describeSheet()).toEqual(['@media all{.other{color: black;}.hash{color: green;}}'])
+    })
 })
