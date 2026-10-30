@@ -3,7 +3,7 @@ import type { UnistylesServices } from '../types'
 
 import { convertUnistyles } from '../convert'
 import { hyphenate } from '../utils'
-import { convertToCSS, getChildrenClassName } from './core'
+import { convertToCSS, getClassNameHash } from './core'
 import { CSSSheet, getDeclarations, getSelector } from './sheet'
 import { safeGetMap } from './utils'
 
@@ -39,6 +39,13 @@ export class CSSState {
         const thirdLevelMap = safeGetMap(secondLevelMap, className)
 
         thirdLevelMap.set(propertyKey, value)
+
+        // The owner comes from the class name, so styles written without add, like hydrated ones, are removed whole
+        const owner: ClassNames = safeGetMap(this.owners, getClassNameHash(className))
+        const classNames = owner.get(mediaQuery) ?? new Set()
+
+        classNames.add(className)
+        owner.set(mediaQuery, classNames)
     }
 
     add = (hash: string, values: UnistylesValues) => {
@@ -52,23 +59,24 @@ export class CSSState {
         })
 
         const previousClassNames = this.owners.get(hash)
-        const classNames: ClassNames = new Map(
-            Array.from(styles, ([mediaQuery, classes]) => [mediaQuery, new Set(classes.keys())]),
-        )
 
         // Re-applying a hash replaces its styles, so a property or selector it doesn't produce anymore doesn't linger.
         // Clearing keeps each class in place: its rule is edited where it is, and the cascade order doesn't change
         forEachClassName(previousClassNames, (mediaQuery, className) => {
             this.mainMap.get(mediaQuery)?.get(className)?.clear()
         })
+        // set gives the hash only the class names it produces now
+        this.owners.delete(hash)
         styles.forEach((classes, mediaQuery) => {
             classes.forEach((properties, className) => {
                 properties.forEach((value, propertyKey) => this.set({ mediaQuery, className, propertyKey, value }))
             })
         })
-        this.owners.set(hash, classNames)
+
+        const classNames = this.owners.get(hash)
+
         forEachClassName(previousClassNames, (mediaQuery, className) => {
-            if (!classNames.get(mediaQuery)?.has(className)) {
+            if (!classNames?.get(mediaQuery)?.has(className)) {
                 this.mainMap.get(mediaQuery)?.delete(className)
                 this.sheet.syncClass(mediaQuery, className)
             }
@@ -112,19 +120,12 @@ export class CSSState {
     }
 
     remove = (hash: string) => {
-        const ownClassNames = this.owners.get(hash)
-        const childrenClassName = getChildrenClassName(hash)
-
-        this.owners.delete(hash)
-        this.mainMap.forEach((styles, mediaQuery) => {
-            const classNames = new Set(ownClassNames?.get(mediaQuery)).add(hash).add(childrenClassName)
-
-            classNames.forEach((className) => {
-                if (styles.delete(className)) {
-                    this.sheet.syncClass(mediaQuery, className)
-                }
-            })
+        forEachClassName(this.owners.get(hash), (mediaQuery, className) => {
+            if (this.mainMap.get(mediaQuery)?.delete(className)) {
+                this.sheet.syncClass(mediaQuery, className)
+            }
         })
+        this.owners.delete(hash)
         this.sheet.refresh()
     }
 

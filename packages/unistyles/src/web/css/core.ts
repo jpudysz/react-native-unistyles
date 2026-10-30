@@ -12,7 +12,21 @@ const POINTER_EVENTS: Record<string, [string, string]> = {
     'box-only': ['auto', 'none'],
 }
 
-export const getChildrenClassName = (className: string) => `:where(.${className})>*`
+const CHILDREN_PREFIX = ':where(.'
+const CHILDREN_SUFFIX = ')>*'
+
+export const getChildrenClassName = (className: string) => `${CHILDREN_PREFIX}${className}${CHILDREN_SUFFIX}`
+
+// The hash a class name was made from: hash, hash:hover, hash::before or :where(.hash)>*.
+// Hashes have no colons, and a forChild hash keeps its ' > *', as the registry caches it whole
+export const getClassNameHash = (className: string) => {
+    const name = className.startsWith(CHILDREN_PREFIX)
+        ? className.slice(CHILDREN_PREFIX.length, -CHILDREN_SUFFIX.length)
+        : className
+    const pseudoIndex = name.indexOf(':')
+
+    return pseudoIndex === -1 ? name : name.slice(0, pseudoIndex)
+}
 
 const setStyle = (state: StyleTarget, props: SetProps) => {
     if (props.propertyKey !== 'pointerEvents') {

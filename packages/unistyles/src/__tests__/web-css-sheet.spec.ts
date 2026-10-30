@@ -140,6 +140,80 @@ describe('Web CSS sheet', () => {
         expect(state.getStyles()).toBe('.other{color:black;}')
     })
 
+    it('removes the pseudo, children and media query rules of a hydrated style', () => {
+        const state = createState()
+
+        state.hydrate({
+            mainState: [
+                [
+                    '',
+                    [
+                        ['hash', [['color', 'red']]],
+                        ['hash:hover', [['color', 'blue']]],
+                        [':where(.hash)>*', [['pointer-events', 'auto']]],
+                        ['other', [['color', 'black']]],
+                    ],
+                ],
+                ['@media (min-width: 768px)', [['hash', [['color', 'green']]]]],
+            ],
+            mqState: [],
+            config: {} as never,
+        })
+        state.remove('hash')
+
+        expect(describeSheet()).toEqual(['@media all{.other{color: black;}}', '@media (min-width: 768px){}'])
+        expect(state.getStyles()).toBe('.other{color:black;}@media (min-width: 768px){}')
+    })
+
+    it('replaces a hydrated style when it is re-applied', () => {
+        const state = createState()
+
+        state.hydrate({
+            mainState: [
+                [
+                    '',
+                    [
+                        ['hash', [['color', 'red']]],
+                        ['hash:hover', [['color', 'blue']]],
+                    ],
+                ],
+            ],
+            mqState: [],
+            config: {} as never,
+        })
+        add(state, 'hash', { color: 'green' })
+
+        expect(describeSheet()).toEqual(['@media all{.hash{color: green;}}'])
+        expect(state.getStyles()).toBe('.hash{color:green;}')
+    })
+
+    it('keeps the styles of a forChild hash when its class name is removed', () => {
+        const state = createState()
+
+        // The registry caches forChild styles under the whole hash and removes the class name, so removing them
+        // here would leave a cached hash without styles
+        state.hydrate({
+            mainState: [
+                [
+                    '',
+                    [
+                        ['server_child > *', [['color', 'red']]],
+                        ['server_child > *:hover', [['color', 'blue']]],
+                    ],
+                ],
+            ],
+            mqState: [],
+            config: {} as never,
+        })
+        add(state, 'parent_child > *', { color: 'red', _hover: { color: 'blue' } })
+        state.remove('server_child')
+        state.remove('parent_child')
+
+        expect(describeSheet()).toEqual([
+            '@media all{.server_child > *{color: red;}.server_child > *:hover{color: blue;}.parent_child > *{color: red;}.parent_child > *:hover{color: blue;}}',
+        ])
+    })
+
     it('updates a theme without touching the styles', () => {
         const state = createState()
 
