@@ -279,8 +279,10 @@ describe('Web CSS sheet', () => {
         ])
     })
 
-    it('keeps the previous theme when the browser rejects the updated one', () => {
+    it('keeps the previous theme when the browser rejects the updated one, in a new sheet too', () => {
         const state = createState()
+        const theme =
+            ':root.premium,:root.premium [data-unistyles-reset],[data-unistyles-theme="premium"]{--colors-background: #ff9ff3;}'
 
         state.addTheme('premium', { colors: { background: '#ff9ff3' } })
 
@@ -297,9 +299,12 @@ describe('Web CSS sheet', () => {
         })
         state.addTheme('premium', { colors: { background: 'red}body{display:none' } })
 
-        expect(describeSheet()).toEqual([
-            ':root.premium,:root.premium [data-unistyles-reset],[data-unistyles-theme="premium"]{--colors-background: #ff9ff3;}',
-        ])
+        expect(describeSheet()).toEqual([theme])
+
+        getTag().textContent = '.foreign{color:blue}'
+        add(state, 'hash', { color: 'red' })
+
+        expect(describeSheet()).toEqual(['.foreign{color: blue;}', theme, '@media all{.hash{color: red;}}'])
     })
 
     it('keeps the rules of another runtime sharing the tag', () => {

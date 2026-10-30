@@ -109,18 +109,23 @@ export class CSSState {
         // ScopedTheme renders an element with data-unistyles-theme (or data-unistyles-reset for `reset`),
         // so the variables follow the closest scope and styles don't need to know it while they render
         if (theme === 'light' || theme === 'dark') {
-            this.themesCSS.set(
+            this.setThemeCSS(
                 `media ${theme}`,
                 `@media (prefers-color-scheme: ${theme}){:root,[data-unistyles-reset]{${themeVars}}}`,
             )
-            this.sheet.syncTheme(`media ${theme}`)
         }
 
-        this.themesCSS.set(
+        this.setThemeCSS(
             theme,
             `:root.${theme},:root.${theme} [data-unistyles-reset],[data-unistyles-theme="${theme}"]{${themeVars}}`,
         )
-        this.sheet.syncTheme(theme)
+    }
+
+    // themesCSS keeps the last theme the browser accepted, so a new sheet gets the variables that apply now
+    private setThemeCSS = (key: string, css: string) => {
+        if (this.sheet.syncTheme(key, css)) {
+            this.themesCSS.set(key, css)
+        }
     }
 
     remove = (hash: string) => {

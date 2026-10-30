@@ -106,13 +106,13 @@ export class CSSSheet {
         }
     }
 
-    syncTheme = (key: string) => {
+    // False only when the browser rejects the theme, so CSSState keeps the CSS that is applied
+    syncTheme = (key: string, css = this.themesCSS.get(key)) => {
         const sheet = this.getThemeSheet()
-        const css = this.themesCSS.get(key)
         const current = this.themes.get(key)
 
         if (!sheet || css === undefined) {
-            return
+            return true
         }
 
         // The theme goes last on every update, even an unchanged one, so it wins over the same theme another runtime
@@ -121,7 +121,7 @@ export class CSSSheet {
 
         // A theme the browser rejects, like one with a value such as `red}`, leaves the previous variables applied
         if (!rule) {
-            return
+            return false
         }
 
         const currentIndex = current ? indexOfRule(sheet, current) : -1
@@ -131,6 +131,8 @@ export class CSSSheet {
         }
 
         this.themes.set(key, rule)
+
+        return true
     }
 
     // Drops the style groups and keeps the themes, as CSSState keeps them on reset
