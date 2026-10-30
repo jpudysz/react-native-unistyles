@@ -269,6 +269,10 @@ void core::UnistylesRegistry::queueShadowLeafUpdatesUnsafe(shadow::ShadowLeafUpd
             continue;
         }
 
+        if (this->shouldTrackDependencies && !this->trafficController.hasUpdate(family) && shadow::hasCommittedNativeProps(family, props)) {
+            continue;
+        }
+
         this->trafficController.setUpdate(it->second.family, std::move(props));
     }
 }
@@ -435,8 +439,18 @@ size_t core::UnistylesRegistry::getPendingUpdatesCount() {
     });
 }
 
-void core::UnistylesRegistry::setCommittedInstanceHandles(std::vector<InstanceHandle::Shared>&& instanceHandles) {
-    this->_committedInstanceHandles = std::move(instanceHandles);
+void core::UnistylesRegistry::addCommittedInstanceHandles(std::vector<InstanceHandle::Shared>&& instanceHandles) {
+    if (this->_committedInstanceHandles.empty()) {
+        this->_committedInstanceHandles = std::move(instanceHandles);
+
+        return;
+    }
+
+    this->_committedInstanceHandles.insert(
+        this->_committedInstanceHandles.end(),
+        std::make_move_iterator(instanceHandles.begin()),
+        std::make_move_iterator(instanceHandles.end())
+    );
 }
 
 std::vector<InstanceHandle::Shared> core::UnistylesRegistry::takeCommittedInstanceHandles() {

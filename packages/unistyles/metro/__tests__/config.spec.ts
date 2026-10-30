@@ -1,13 +1,12 @@
-// tests the build users get, metro/index.js and metro/babel-transformer.js
+// tests the build users get, metro/index.js
 import { buildSync } from 'esbuild'
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { METRO_OPTIONS_ENV, METRO_UPSTREAM_TRANSFORMER_ENV } from '../../plugin/src/consts'
+import { METRO_ENV } from '../../plugin/src/consts'
 
 const METRO_DIR = path.join(__dirname, '..')
-const BABEL_TRANSFORMER_PATH = path.join(METRO_DIR, 'babel-transformer.js')
-const UPSTREAM_PATH = path.join(METRO_DIR, '__tests__', 'upstream-transformer.mock.js')
+const BABEL_TRANSFORMER_PATH = '/project/node_modules/@react-native/metro-babel-transformer/src/index.js'
 
 const { withUnistylesConfig } = require('../index.js')
 
@@ -15,7 +14,7 @@ const createConfig = () => ({
     projectRoot: '/project',
     watchFolders: ['/packages'],
     transformer: {
-        babelTransformerPath: UPSTREAM_PATH,
+        babelTransformerPath: BABEL_TRANSFORMER_PATH,
         minifierPath: 'metro-minify-terser',
     },
     resolver: {
@@ -29,24 +28,19 @@ const createConfig = () => ({
 
 describe('withUnistylesConfig', () => {
     afterEach(() => {
-        delete process.env[METRO_UPSTREAM_TRANSFORMER_ENV]
-        delete process.env[METRO_OPTIONS_ENV]
+        delete process.env[METRO_ENV]
     })
 
-    it('should run its babel transformer on top of the one from the config', () => {
+    it("should keep the config's transformer, there is no Babel transform", () => {
         const config = withUnistylesConfig(createConfig())
 
-        expect(config.transformer.babelTransformerPath).toBe(BABEL_TRANSFORMER_PATH)
-        expect(fs.existsSync(config.transformer.babelTransformerPath)).toBe(true)
-        expect(process.env[METRO_UPSTREAM_TRANSFORMER_ENV]).toBe(UPSTREAM_PATH)
+        expect(config.transformer).toEqual(createConfig().transformer)
     })
 
-    it('should pass the options to the workers and to the cache key', () => {
-        const config = withUnistylesConfig(createConfig(), { debug: true })
+    it('should let the Babel plugin know it runs next to the Metro integration', () => {
+        withUnistylesConfig(createConfig())
 
-        expect(JSON.parse(process.env[METRO_OPTIONS_ENV]!)).toEqual({ debug: true })
-        expect(config.transformer.unistyles).toEqual({ debug: true })
-        expect(withUnistylesConfig(createConfig()).transformer.unistyles).toEqual({ debug: false })
+        expect(process.env[METRO_ENV]).toBe('true')
     })
 
     it('should keep the rest of the config', () => {
@@ -55,10 +49,9 @@ describe('withUnistylesConfig', () => {
 
         expect(config.projectRoot).toBe('/project')
         expect(config.watchFolders).toEqual(['/packages'])
-        expect(config.transformer.minifierPath).toBe('metro-minify-terser')
         expect(config.resolver.sourceExts).toEqual(['ts', 'tsx', 'js'])
         // the input stays untouched
-        expect(input.transformer.babelTransformerPath).toBe(UPSTREAM_PATH)
+        expect(input.resolver.resolveRequest).not.toBe(config.resolver.resolveRequest)
     })
 
     it("should resolve with the config's resolveRequest", () => {
@@ -77,52 +70,26 @@ describe('withUnistylesConfig', () => {
         })
     })
 
-    it('should throw without a babel transformer to wrap', () => {
-        expect(() => withUnistylesConfig({ resolver: {} })).toThrow('Metro config has no babelTransformerPath')
-    })
+    it("should resolve with Metro's resolveRequest when the config has none", () => {
+        const resolveRequest = jest.fn(() => ({ type: 'assetFiles' }))
+        const config = withUnistylesConfig({ resolver: {} })
 
-    it('should throw when applied twice', () => {
-        expect(() => withUnistylesConfig(withUnistylesConfig(createConfig()))).toThrow('applied twice')
-    })
-})
-
-describe('metro/babel-transformer.js', () => {
-    afterEach(() => {
-        delete process.env[METRO_UPSTREAM_TRANSFORMER_ENV]
-        delete process.env[METRO_OPTIONS_ENV]
-    })
-
-    const loadBabelTransformer = () => {
-        let babelTransformer: any
-
-        jest.isolateModules(() => {
-            babelTransformer = require('../babel-transformer.js')
-        })
-
-        return babelTransformer
-    }
-
-    it('should wrap the transformer set by withUnistylesConfig', () => {
-        withUnistylesConfig(createConfig(), { debug: true })
-
-        const babelTransformer = loadBabelTransformer()
-        const args = { filename: 'src/App.tsx', src: 'StyleSheet.create({})', options: { projectRoot: '/project' } }
-        const result = babelTransformer.transform(args)
-
-        expect(result.plugins[0][1]).toEqual({ debug: true, isMetro: true })
-        expect(babelTransformer.getCacheKey()).toBe('upstream-cache-key')
-    })
-
-    it('should throw outside of withUnistylesConfig', () => {
-        expect(loadBabelTransformer).toThrow('can be only set by withUnistylesConfig')
+        expect(
+            config.resolver.resolveRequest(
+                { originModulePath: '/project/src/App.tsx', resolveRequest },
+                './a.png',
+                'ios',
+            ),
+        ).toEqual({ type: 'assetFiles' })
+        expect(resolveRequest).toHaveBeenCalled()
     })
 })
 
 describe('metro build', () => {
     // esbuild output is deterministic, a stale build means `bun run metro:build` wasn't run
-    it.each(['index', 'babel-transformer'])('should match metro/src/%s.ts', (entry) => {
+    it('should match metro/src/index.ts', () => {
         const [output] = buildSync({
-            entryPoints: [path.join(METRO_DIR, 'src', `${entry}.ts`)],
+            entryPoints: [path.join(METRO_DIR, 'src', 'index.ts')],
             outdir: METRO_DIR,
             bundle: true,
             packages: 'external',
@@ -131,6 +98,6 @@ describe('metro build', () => {
             logLevel: 'silent',
         }).outputFiles
 
-        expect(output!.text).toBe(fs.readFileSync(path.join(METRO_DIR, `${entry}.js`), 'utf8'))
+        expect(output!.text).toBe(fs.readFileSync(path.join(METRO_DIR, 'index.js'), 'utf8'))
     })
 })

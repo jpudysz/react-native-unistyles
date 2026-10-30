@@ -16,7 +16,7 @@ export const Typography: React.FunctionComponent<TypographyProps> = ({
     isPrimary,
     value,
 }) => {
-    styles.useVariants({
+    const variantStyles = styles.useVariants({
         isBold,
         isCentered,
         isPrimary,
@@ -24,7 +24,7 @@ export const Typography: React.FunctionComponent<TypographyProps> = ({
     })
 
     return (
-        <Text style={styles.title(value)}>
+        <Text style={variantStyles.title(value)}>
             {children}
         </Text>
     )

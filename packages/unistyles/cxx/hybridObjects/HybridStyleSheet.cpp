@@ -83,6 +83,13 @@ jsi::Value HybridStyleSheet::init(jsi::Runtime &rt, const jsi::Value &thisVal, c
     auto& registry = core::UnistylesRegistry::get();
 
     registry.createState();
+    registry.shouldTrackDependencies = false;
+
+    if (count > 0 && arguments[0].isObject()) {
+        auto trackDependencies = arguments[0].asObject(rt).getProperty(rt, "trackDependencies");
+
+        registry.shouldTrackDependencies = trackDependencies.isBool() && trackDependencies.getBool();
+    }
 
     loadExternalMethods(thisVal, rt);
 
@@ -377,7 +384,7 @@ void HybridStyleSheet::applyDependencyChanges(jsi::Runtime& rt, std::vector<Unis
     }
 
     // after the commit, so listeners can point React at the committed nodes
-    registry.setCommittedInstanceHandles(std::move(committedInstanceHandles));
+    registry.addCommittedInstanceHandles(std::move(committedInstanceHandles));
 
     UNISTYLES_TRACE_SECTION("notifyListeners");
 

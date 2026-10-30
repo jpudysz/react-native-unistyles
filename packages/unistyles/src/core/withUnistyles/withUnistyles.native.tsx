@@ -1,6 +1,7 @@
 import React, {
     useContext,
     useEffect,
+    useReducer,
     type ComponentProps,
     type ComponentRef,
     type ComponentType,
@@ -11,9 +12,11 @@ import type { UnistylesValues } from '../../types'
 import type { Mappings } from './types'
 
 import { ScopedThemeContext } from '../../components/ScopedThemeContext'
-import { type UnistyleDependency, UnistylesShadowRegistry } from '../../specs'
+import { UnistyleDependency, UnistylesShadowRegistry } from '../../specs'
 import { deepMergeObjects, isAnimatedStyleHandle } from '../../utils'
+import { TRACK_DEPENDENCIES } from '../trackDependencies'
 import { useProxifiedUnistyles } from '../useProxifiedUnistyles'
+import { listener } from '../useProxifiedUnistyles/listener'
 import { maybeWarnAboutMultipleUnistyles } from '../warn'
 
 // @ts-expect-error
@@ -75,6 +78,38 @@ export const getSecrets = (styleProps: Record<string, any> = {}): MappedSecrets 
     }
 }
 
+// undefined when it can't be compared (eg. a circular value), then it always counts as changed
+const serializeStyles = (styles: unknown) => {
+    try {
+        return JSON.stringify(styles)
+    } catch {
+        return undefined
+    }
+}
+
+// without the Babel plugin, a style depends on everything its StyleSheet read, so re-render only when it changed
+// the component re-renders for theme changes anyway
+export const listenToStyleChanges = (
+    dependencies: Array<UnistyleDependency>,
+    getStyles: () => unknown,
+    onChange: VoidFunction,
+) => {
+    let lastStyles = serializeStyles(getStyles())
+
+    return listener({
+        dependencies: dependencies.filter((dependency) => dependency !== UnistyleDependency.Theme),
+        updateTheme: () => {},
+        updateRuntime: () => {
+            const styles = serializeStyles(getStyles())
+
+            if (styles === undefined || styles !== lastStyles) {
+                lastStyles = styles
+                onChange()
+            }
+        },
+    })
+}
+
 export const withUnistyles = <TComponent, TMappings extends GenericComponentProps<TComponent>>(
     Component: TComponent,
     mappings?: Mappings<TMappings>,
@@ -106,12 +141,46 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         // triggers the Proxy get trap which adds Theme to the dependency Set
         void (proxifiedTheme as Record<string, unknown>).__uni
 
-        useEffect(() => {
+        const [, stylesChanged] = useReducer(() => ({}), {})
+
+        const getScopedSecrets = () => {
+            const previousScopedTheme = scope ? UnistylesShadowRegistry.getScopedTheme() : undefined
+
+            if (scope) {
+                UnistylesShadowRegistry.setScopedTheme(scope.name)
+            }
+
             const styleSecrets = getSecrets(narrowedProps.style)
             const contentContainerStyleSecrets = getSecrets(narrowedProps.contentContainerStyle)
 
-            addDependencies(
-                Array.from(new Set([...styleSecrets.dependencies, ...contentContainerStyleSecrets.dependencies])),
+            if (scope) {
+                UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
+            }
+
+            return { styleSecrets, contentContainerStyleSecrets }
+        }
+
+        useEffect(() => {
+            const styleSecrets = getSecrets(narrowedProps.style)
+            const contentContainerStyleSecrets = getSecrets(narrowedProps.contentContainerStyle)
+            const dependencies = Array.from(
+                new Set([...styleSecrets.dependencies, ...contentContainerStyleSecrets.dependencies]),
+            )
+
+            if (!TRACK_DEPENDENCIES) {
+                addDependencies(dependencies)
+
+                return
+            }
+
+            return listenToStyleChanges(
+                dependencies,
+                () => {
+                    const secrets = getScopedSecrets()
+
+                    return [secrets.styleSecrets.styles, secrets.contentContainerStyleSecrets.styles]
+                },
+                stylesChanged,
             )
         }, [narrowedProps.style, narrowedProps.contentContainerStyle])
 
@@ -120,19 +189,7 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
             ? narrowedProps.uniProps(proxifiedTheme, proxifiedRuntime)
             : {}
 
-        // styles resolve in the registry's scoped theme, which is already restored when this re-renders or mounts later
-        const previousScopedTheme = scope ? UnistylesShadowRegistry.getScopedTheme() : undefined
-
-        if (scope) {
-            UnistylesShadowRegistry.setScopedTheme(scope.name)
-        }
-
-        const styleSecrets = getSecrets(narrowedProps.style)
-        const contentContainerStyleSecrets = getSecrets(narrowedProps.contentContainerStyle)
-
-        if (scope) {
-            UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
-        }
+        const { styleSecrets, contentContainerStyleSecrets } = getScopedSecrets()
 
         const finalProps = {
             ...deepMergeObjects(mappingsProps, unistyleProps, props),

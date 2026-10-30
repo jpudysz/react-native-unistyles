@@ -3,8 +3,13 @@ import type { UnistylesTheme, UnistylesValues } from '../types'
 import type { StyleSheet, StyleSheetWithSuperPowers } from '../types/stylesheet'
 import type { UnistylesServices } from './types'
 
+import { TRACK_DEPENDENCIES } from '../core/trackDependencies'
+import { UnistyleDependency as Dependency } from '../specs/NativePlatform/NativePlatform.nitro'
 import { CSSState } from './css'
+import { createTrackedMiniRuntime, trackDependencies } from './dependencyTracker'
 import { error, extractUnistyleDependencies, generateHash } from './utils'
+
+type StyleSheetFunction = (theme: UnistylesTheme, miniRuntime: UnistylesMiniRuntime) => StyleSheet
 
 export class UnistylesRegistry {
     private readonly stylesheets = new Map<StyleSheetWithSuperPowers<StyleSheet>, StyleSheet>()
@@ -12,6 +17,9 @@ export class UnistylesRegistry {
     private readonly stylesCounter = new Map<string, Set<HTMLElement>>()
     private readonly disposeListenersMap = new Map<object, VoidFunction>()
     private readonly dependenciesMap = new Map<StyleSheetWithSuperPowers<StyleSheet>, Set<UnistyleDependency>>()
+    // without the Babel plugin, what the StyleSheet function itself read, without the reads of its dynamic functions
+    private readonly readDependenciesMap = new Map<StyleSheetWithSuperPowers<StyleSheet>, Set<UnistyleDependency>>()
+    private readonly readDependenciesWatchers = new Map<StyleSheetWithSuperPowers<StyleSheet>, Set<VoidFunction>>()
     readonly css: CSSState
 
     constructor(private services: UnistylesServices) {
@@ -32,7 +40,15 @@ export class UnistylesRegistry {
                 )
             }
 
-            return stylesheet(scopedTheme, this.services.runtime.getMiniRuntime(scopedThemeName))
+            const { result, dependencies } = this.callStylesheet(
+                stylesheet,
+                scopedTheme,
+                this.services.runtime.getMiniRuntime(scopedThemeName),
+            )
+
+            this.addRuntimeDependenciesToStylesheet(stylesheet, dependencies)
+
+            return result
         }
 
         const computedStylesheet = this.stylesheets.get(stylesheet)
@@ -43,8 +59,14 @@ export class UnistylesRegistry {
 
         const themeName = this.services.runtime.themeName
         const currentTheme = this.services.runtime.getTheme(themeName, this.services.state.CSSVars)
-        const createdStylesheet = stylesheet(currentTheme, this.services.runtime.getMiniRuntime(themeName))
-        const dependencies = Object.values(createdStylesheet).flatMap((value) => extractUnistyleDependencies(value))
+        const { result: createdStylesheet, dependencies: runtimeDependencies } = this.callStylesheet(
+            stylesheet,
+            currentTheme,
+            this.services.runtime.getMiniRuntime(themeName),
+        )
+        const dependencies = Object.values(createdStylesheet)
+            .flatMap((value) => extractUnistyleDependencies(value))
+            .concat(runtimeDependencies)
 
         this.addDependenciesToStylesheet(stylesheet, dependencies)
         this.stylesheets.set(stylesheet, createdStylesheet)
@@ -52,10 +74,24 @@ export class UnistylesRegistry {
         return createdStylesheet
     }
 
-    addDependenciesToStylesheet = (
-        stylesheet: (theme: UnistylesTheme, miniRuntime: UnistylesMiniRuntime) => StyleSheet,
-        dependencies: Array<UnistyleDependency>,
-    ) => {
+    // without the Babel plugin, every dependency the StyleSheet function read so far
+    // a dynamic function's reads belong to the views that call it, see shadowRegistry
+    getStylesheetDependencies = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) =>
+        Array.from(this.readDependenciesMap.get(stylesheet) ?? [])
+
+    // without the Babel plugin, called when the StyleSheet function reads something new
+    watchStylesheetDependencies = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>, onChange: VoidFunction) => {
+        const watchers = this.readDependenciesWatchers.get(stylesheet) ?? new Set()
+
+        watchers.add(onChange)
+        this.readDependenciesWatchers.set(stylesheet, watchers)
+
+        return () => {
+            watchers.delete(onChange)
+        }
+    }
+
+    addDependenciesToStylesheet = (stylesheet: StyleSheetFunction, dependencies: Array<UnistyleDependency>) => {
         this.disposeListenersMap.get(stylesheet)?.()
 
         const dependenciesMap = this.dependenciesMap.get(stylesheet) ?? new Set(dependencies)
@@ -64,16 +100,58 @@ export class UnistylesRegistry {
 
         const dispose = this.services.listener.addStylesheetListeners(Array.from(dependenciesMap), () => {
             const themeName = this.services.runtime.themeName
-            const newComputedStylesheet = stylesheet(
+            const { result: newComputedStylesheet, dependencies: runtimeDependencies } = this.callStylesheet(
+                stylesheet,
                 this.services.runtime.getTheme(themeName, this.services.state.CSSVars),
                 this.services.runtime.getMiniRuntime(themeName),
             )
 
             this.stylesheets.set(stylesheet, newComputedStylesheet)
+            this.addRuntimeDependenciesToStylesheet(stylesheet, runtimeDependencies)
         })
 
         this.dependenciesMap.set(stylesheet, dependenciesMap)
         this.disposeListenersMap.set(stylesheet, dispose)
+    }
+
+    // a StyleSheet may read new dependencies each time it runs, eg. behind a condition
+    private addRuntimeDependenciesToStylesheet = (
+        stylesheet: StyleSheetFunction,
+        dependencies: Array<UnistyleDependency>,
+    ) => {
+        const knownDependencies = this.dependenciesMap.get(stylesheet)
+
+        if (dependencies.some((dependency) => !knownDependencies?.has(dependency))) {
+            this.addDependenciesToStylesheet(stylesheet, dependencies)
+        }
+    }
+
+    // calls the user's StyleSheet function, without the Babel plugin it also returns the dependencies it read
+    private callStylesheet = (
+        stylesheet: StyleSheetFunction,
+        theme: UnistylesTheme,
+        miniRuntime: UnistylesMiniRuntime,
+    ): { result: StyleSheet; dependencies: Array<UnistyleDependency> } => {
+        if (!TRACK_DEPENDENCIES) {
+            return { result: stylesheet(theme, miniRuntime), dependencies: [] }
+        }
+
+        const { result, dependencies: readDependencies } = trackDependencies(() =>
+            stylesheet(theme, createTrackedMiniRuntime(miniRuntime)),
+        )
+        // every StyleSheet function receives the theme
+        const dependencies = readDependencies.concat(Dependency.Theme)
+        const knownDependencies = this.readDependenciesMap.get(stylesheet) ?? new Set()
+        const hasNewDependencies = dependencies.some((dependency) => !knownDependencies.has(dependency))
+
+        dependencies.forEach((dependency) => knownDependencies.add(dependency))
+        this.readDependenciesMap.set(stylesheet, knownDependencies)
+
+        if (hasNewDependencies) {
+            this.readDependenciesWatchers.get(stylesheet)?.forEach((onChange) => onChange())
+        }
+
+        return { result, dependencies }
     }
 
     connect = (ref: HTMLElement, hash: string) => {
@@ -133,6 +211,8 @@ export class UnistylesRegistry {
         this.stylesheets.clear()
         this.stylesCache.clear()
         this.dependenciesMap.clear()
+        this.readDependenciesMap.clear()
+        this.readDependenciesWatchers.clear()
         this.disposeListenersMap.clear()
         this.stylesCounter.clear()
     }

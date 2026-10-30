@@ -1,6 +1,5 @@
-// react-native-unistyles/metro must behave like the Babel plugin. The Babel plugin's own test cases are the reference:
-// every case runs through both, the StyleSheet code has to match and every import the Babel plugin swaps
-// has to reach the same Unistyles component through the Metro resolver
+// react-native-unistyles/metro must swap the same components as the Babel plugin. The Babel plugin's own test cases
+// are the reference: every import the Babel plugin swaps has to reach the same Unistyles component through the Metro resolver
 import { type PluginItem, transformSync, type TransformOptions } from '@babel/core'
 import path from 'node:path'
 
@@ -43,9 +42,6 @@ const UNISTYLES_ROOT = path.join(__dirname, '../..')
 const APP_FILE = path.join(UNISTYLES_ROOT, 'src', 'fixture.tsx')
 const COMPONENTS_PATH = 'react-native-unistyles/components/native/'
 
-const isSwappedSource = (source: string) =>
-    source === 'react-native' || source.startsWith('react-native/Libraries/') || source.startsWith(COMPONENTS_PATH)
-
 const transform = (code: string, babelOptions: TransformOptions, plugins: Array<PluginItem>) =>
     transformSync(code, {
         babelrc: false,
@@ -58,12 +54,6 @@ const transform = (code: string, babelOptions: TransformOptions, plugins: Array<
 const transformWithBabel = (testCase: Case) =>
     transform(testCase.code, { ...testCase.config.babelOptions, ...testCase.babelOptions }, [
         [plugin, { ...testCase.config.pluginOptions, ...testCase.pluginOptions }],
-    ])
-
-// what react-native-unistyles/metro runs, it has no options to configure
-const transformWithMetro = (testCase: Case) =>
-    transform(testCase.code, { ...testCase.config.babelOptions, ...testCase.babelOptions }, [
-        [plugin, { debug: false, isMetro: true }],
     ])
 
 type ImportBinding = { source: string; imported: string }
@@ -101,21 +91,7 @@ const getImports = (code: string, babelOptions: TransformOptions) => {
     return imports
 }
 
-// the swapped imports are the only difference, the rest has to be the same code
-const withoutSwappedImports = (code: string, babelOptions: TransformOptions) =>
-    transform(code, { parserOpts: babelOptions.parserOpts, plugins: babelOptions.plugins }, [
-        () => ({
-            visitor: {
-                ImportDeclaration(declaration: any) {
-                    if (isSwappedSource(declaration.node.source.value)) {
-                        declaration.remove()
-                    }
-                },
-            },
-        }),
-    ])
-
-describe('react-native-unistyles/metro matches the Babel plugin', () => {
+describe('react-native-unistyles/metro swaps the components of the Babel plugin', () => {
     it('should run every test case of the Babel plugin', () => {
         expect(mockCases.length).toBeGreaterThanOrEqual(41)
         expect(new Set(mockCases.map((testCase) => testCase.spec))).toEqual(new Set(SPECS))
@@ -125,20 +101,6 @@ describe('react-native-unistyles/metro matches the Babel plugin', () => {
         '%s',
         (_, testCase) => {
             const babelOptions = { ...testCase.config.babelOptions, ...testCase.babelOptions }
-
-            it('should produce the same code, without the swapped imports', () => {
-                const babel = withoutSwappedImports(transformWithBabel(testCase), babelOptions)
-                const metro = withoutSwappedImports(transformWithMetro(testCase), babelOptions)
-
-                expect(metro).toEqual(babel)
-            })
-
-            it('should leave the imports to the Metro resolver', () => {
-                const imports = getImports(testCase.code, babelOptions)
-                const metroImports = getImports(transformWithMetro(testCase), babelOptions)
-
-                expect(metroImports).toEqual(imports)
-            })
 
             it('should resolve every import the Babel plugin swaps to the same Unistyles component', () => {
                 const imports = getImports(testCase.code, babelOptions)

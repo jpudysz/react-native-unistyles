@@ -91,7 +91,7 @@ var NATIVE_COMPONENTS_PATHS = {
     }
   ]
 };
-var METRO_UPSTREAM_TRANSFORMER_ENV = "UNISTYLES_METRO_UPSTREAM_TRANSFORMER";
+var METRO_ENV = "UNISTYLES_METRO";
 
 // plugin/src/exotic.ts
 var t2 = __toESM(require("@babel/types"));
@@ -140,9 +140,6 @@ function addUnistylesImport(path2, state) {
   nodesToRemove.forEach((node) => path2.node.body.splice(path2.node.body.indexOf(node), 1));
 }
 function isInsideNodeModules(state) {
-  if (state.opts.isMetro) {
-    return false;
-  }
   return state.file.opts.filename?.includes("node_modules") && !state.file.replaceWithUnistyles;
 }
 function addUnistylesRequire(path2, state) {
@@ -850,18 +847,18 @@ function index_default() {
     visitor: {
       Program: {
         enter(path2, state) {
-          if (!state.opts.isMetro && process.env[METRO_UPSTREAM_TRANSFORMER_ENV]) {
+          if (process.env[METRO_ENV]) {
             throw new Error(
               "Unistyles \u{1F984}: react-native-unistyles/metro is enabled in metro.config.js, remove react-native-unistyles/plugin from babel.config.js"
             );
           }
-          if (!state.opts.root && !state.opts.isMetro) {
+          if (!state.opts.root) {
             throw new Error(
               "Unistyles \u{1F984}: Babel plugin requires `root` option to be set. Please check https://www.unistyl.es/v3/other/babel-plugin#extra-configuration"
             );
           }
-          const appRoot = toPlatformPath(import_node_path2.default.join(state.file.opts.root, state.opts.root ?? ""));
-          if (!state.opts.isMetro && state.file.opts.root === appRoot) {
+          const appRoot = toPlatformPath(import_node_path2.default.join(state.file.opts.root, state.opts.root));
+          if (state.file.opts.root === appRoot) {
             throw new Error(
               "Unistyles \u{1F984}: Root option can't resolve to project root as it will include node_modules folder. Please check https://www.unistyl.es/v3/other/babel-plugin#extra-configuration"
             );
@@ -876,7 +873,7 @@ function index_default() {
           state.file.styleSheetLocalName = "";
           state.file.reactNativeCommonJSName = "";
           state.reactNativeImports = {};
-          state.file.forceProcessing = state.opts.isMetro || (state.filename?.includes(appRoot) ?? false);
+          state.file.forceProcessing = state.filename?.includes(appRoot) ?? false;
           path2.traverse({
             BlockStatement(blockPath) {
               if (isInsideNodeModules(state)) {
@@ -887,7 +884,7 @@ function index_default() {
           });
         },
         exit(path2, state) {
-          if (state.opts.isMetro || isInsideNodeModules(state)) {
+          if (isInsideNodeModules(state)) {
             return;
           }
           if (state.file.addUnistylesRequire) {
@@ -930,7 +927,7 @@ function index_default() {
         });
       },
       ImportDeclaration(path2, state) {
-        const exoticImport = state.opts.isMetro ? void 0 : REPLACE_WITH_UNISTYLES_EXOTIC_PATHS.concat(state.opts.autoRemapImports ?? []).find(
+        const exoticImport = REPLACE_WITH_UNISTYLES_EXOTIC_PATHS.concat(state.opts.autoRemapImports ?? []).find(
           (exotic) => state.filename?.includes(exotic.path)
         );
         if (exoticImport) {
@@ -947,9 +944,6 @@ function index_default() {
               state.file.styleSheetLocalName = specifier.local.name;
             }
           });
-        }
-        if (state.opts.isMetro) {
-          return;
         }
         if (importSource === "react-native") {
           path2.node.specifiers.forEach((specifier) => {
@@ -974,7 +968,7 @@ function index_default() {
         }
       },
       MemberExpression(path2, state) {
-        if (state.opts.isMetro || isInsideNodeModules(state)) {
+        if (isInsideNodeModules(state)) {
           return;
         }
         if (!state.file.reactNativeCommonJSName || !t6.isIdentifier(path2.node.object)) {

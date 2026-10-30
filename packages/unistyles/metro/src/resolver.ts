@@ -1,6 +1,7 @@
+import fs from 'node:fs'
 import nodePath from 'node:path'
 
-import type { ResolveRequest } from './types'
+import type { Resolution, ResolveRequest } from './types'
 
 import { REACT_NATIVE_COMPONENT_NAMES } from '../../plugin/src/consts'
 
@@ -18,13 +19,31 @@ type ResolverConfig = {
     upstream?: ResolveRequest | null
     // replaced by path.win32 in tests
     path?: typeof nodePath.posix
+    // replaced in tests
+    realpath?: (filePath: string) => string
 }
 
-export const createResolveRequest = ({ unistylesRoot, upstream, path = nodePath }: ResolverConfig): ResolveRequest => {
+const getRealPath = (filePath: string) => {
+    try {
+        return fs.realpathSync(filePath)
+    } catch {
+        return filePath
+    }
+}
+
+export const createResolveRequest = ({
+    unistylesRoot,
+    upstream,
+    path = nodePath,
+    realpath = getRealPath,
+}: ResolverConfig): ResolveRequest => {
     const { sep } = path
     const sourceDir = path.join(unistylesRoot, 'src')
     const componentsDir = path.join(sourceDir, 'components', 'native')
     const componentsIndex = path.join(componentsDir, 'index.ts')
+    // there is no Babel plugin, Unistyles records the dependencies of every StyleSheet while it runs
+    const trackDependencies = path.join(sourceDir, 'core', 'trackDependencies.ts')
+    const trackDependenciesWithMetro = path.join(sourceDir, 'core', 'trackDependencies.metro.ts')
     const builds = [path.join(unistylesRoot, 'lib', 'module'), path.join(unistylesRoot, 'lib', 'commonjs')]
 
     // Unistyles resolves to its source or to a build depending on the import (eg. `import` -> lib/module, `require` -> src),
@@ -97,18 +116,67 @@ export const createResolveRequest = ({ unistylesRoot, upstream, path = nodePath 
             : undefined
     }
 
+    // real path of every react-native-unistyles in node_modules that isn't unistylesRoot
+    const copies = new Map<string, string>()
+    const packageDir = `${sep}node_modules${sep}react-native-unistyles${sep}`
+
+    // the same Unistyles through a symlink resolves to unistylesRoot, so its swaps apply
+    // another copy (eg. nested in a library's node_modules) has its own registry and runs without tracking, so it can't update
+    const toUnistylesPath = (filePath: string) => {
+        if (filePath.startsWith(`${unistylesRoot}${sep}`)) {
+            return filePath
+        }
+
+        const index = filePath.lastIndexOf(packageDir)
+
+        if (index === -1) {
+            return filePath
+        }
+
+        const copyRoot = filePath.slice(0, index + packageDir.length - 1)
+
+        if (!copies.has(copyRoot)) {
+            const realCopyRoot = realpath(copyRoot)
+
+            copies.set(copyRoot, realCopyRoot)
+
+            if (realCopyRoot !== unistylesRoot) {
+                console.warn(
+                    `Unistyles 🦄: Found a second copy of react-native-unistyles at ${realCopyRoot}, withUnistylesConfig handles only ${unistylesRoot}. Styles of the second copy won't update, make sure that your app installs react-native-unistyles once.`,
+                )
+            }
+        }
+
+        return copies.get(copyRoot) === unistylesRoot
+            ? path.join(unistylesRoot, filePath.slice(copyRoot.length + 1))
+            : filePath
+    }
+
+    const withTrackedDependencies = (resolution: Resolution): Resolution =>
+        resolution.type === 'sourceFile' && 'filePath' in resolution && resolution.filePath === trackDependencies
+            ? { type: 'sourceFile', filePath: trackDependenciesWithMetro }
+            : resolution
+
     return (context, moduleName, platform) => {
         const resolve = upstream ?? context.resolveRequest
-        const resolution = resolve(context, moduleName, platform)
+        const upstreamResolution = resolve(context, moduleName, platform)
 
-        if (resolution.type !== 'sourceFile' || !('filePath' in resolution)) {
-            return resolution
+        if (upstreamResolution.type !== 'sourceFile' || !('filePath' in upstreamResolution)) {
+            return upstreamResolution
         }
+
+        const filePath = toUnistylesPath(upstreamResolution.filePath)
+        const resolution: Resolution =
+            filePath === upstreamResolution.filePath ? upstreamResolution : { type: 'sourceFile', filePath }
 
         const sourcePath = getSourcePath(resolution.filePath)
 
         if (sourcePath) {
-            return resolve(context, sourcePath, platform)
+            return withTrackedDependencies(resolve(context, sourcePath, platform))
+        }
+
+        if (resolution.filePath === trackDependencies) {
+            return withTrackedDependencies(resolution)
         }
 
         if (!shouldSwapFrom(context.originModulePath)) {

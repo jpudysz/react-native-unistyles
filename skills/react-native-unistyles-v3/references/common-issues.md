@@ -58,7 +58,7 @@ StyleSheet.configure({
 ### "react-native-unistyles/metro is enabled in metro.config.js, remove react-native-unistyles/plugin from babel.config.js"
 
 **Cause:** The Metro integration (3.6.0+) and the Babel plugin are both set up.
-**Solution:** Use one of them — remove `react-native-unistyles/plugin` from `babel.config.js` when using `withUnistylesConfig`. Related Metro errors: "withUnistylesConfig was applied twice" (wrap the config once) and "Metro config has no babelTransformerPath" (pass the config returned by `getDefaultConfig`). See [setup-guide.md](setup-guide.md#metro-integration-experimental).
+**Solution:** Use one of them — remove `react-native-unistyles/plugin` from `babel.config.js` when using `withUnistylesConfig`. See [setup-guide.md](setup-guide.md#metro-integration-experimental).
 
 ---
 
@@ -360,7 +360,7 @@ const UniButton = withUnistyles<typeof Button, { color: string }>(
 ### Plugin ordering
 
 **Symptoms:** Styles not reactive, build errors.
-**Cause:** React Compiler runs before Unistyles plugin. With the Metro integration in a bare RN app, a React Compiler entry in `babel.config.js` `plugins` always runs first — keep the Babel plugin there (Expo's preset-based setup is fine).
+**Cause:** React Compiler runs before Unistyles plugin. (The Metro integration has no Babel transform, so plugin order doesn't matter there.)
 **Solution:** Unistyles plugin MUST come BEFORE React Compiler in babel.config.js:
 ```js
 plugins: [

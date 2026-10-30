@@ -33,7 +33,7 @@ __export(index_exports, {
   withUnistylesConfig: () => withUnistylesConfig
 });
 module.exports = __toCommonJS(index_exports);
-var import_node_fs = __toESM(require("node:fs"));
+var import_node_fs2 = __toESM(require("node:fs"));
 var import_node_path2 = __toESM(require("node:path"));
 
 // plugin/src/consts.ts
@@ -59,18 +59,32 @@ var REACT_NATIVE_COMPONENT_NAMES = [
   // Modal - there is no exposed native handle
   // TouchableWithoutFeedback - can't accept a ref
 ];
-var METRO_UPSTREAM_TRANSFORMER_ENV = "UNISTYLES_METRO_UPSTREAM_TRANSFORMER";
-var METRO_OPTIONS_ENV = "UNISTYLES_METRO_OPTIONS";
+var METRO_ENV = "UNISTYLES_METRO";
 
 // metro/src/resolver.ts
+var import_node_fs = __toESM(require("node:fs"));
 var import_node_path = __toESM(require("node:path"));
 var DEEP_IMPORTS = [...REACT_NATIVE_COMPONENT_NAMES, "ViewNativeComponent", "TextNativeComponent"];
 var PASSTHROUGH_PACKAGES = ["react-native", "@react-native", "react-native-web"];
-var createResolveRequest = ({ unistylesRoot, upstream, path: path2 = import_node_path.default }) => {
+var getRealPath = (filePath) => {
+  try {
+    return import_node_fs.default.realpathSync(filePath);
+  } catch {
+    return filePath;
+  }
+};
+var createResolveRequest = ({
+  unistylesRoot,
+  upstream,
+  path: path2 = import_node_path.default,
+  realpath = getRealPath
+}) => {
   const { sep } = path2;
   const sourceDir = path2.join(unistylesRoot, "src");
   const componentsDir = path2.join(sourceDir, "components", "native");
   const componentsIndex = path2.join(componentsDir, "index.ts");
+  const trackDependencies = path2.join(sourceDir, "core", "trackDependencies.ts");
+  const trackDependenciesWithMetro = path2.join(sourceDir, "core", "trackDependencies.metro.ts");
   const builds = [path2.join(unistylesRoot, "lib", "module"), path2.join(unistylesRoot, "lib", "commonjs")];
   const getSourcePath = (filePath) => {
     const build = builds.find((buildDir) => filePath.startsWith(`${buildDir}${sep}`));
@@ -112,15 +126,43 @@ var createResolveRequest = ({ unistylesRoot, upstream, path: path2 = import_node
     const deepImport = getDeepImport(filePath);
     return deepImport && DEEP_IMPORTS.includes(deepImport) ? path2.join(componentsDir, "deep", `${deepImport}.ts`) : void 0;
   };
+  const copies = /* @__PURE__ */ new Map();
+  const packageDir = `${sep}node_modules${sep}react-native-unistyles${sep}`;
+  const toUnistylesPath = (filePath) => {
+    if (filePath.startsWith(`${unistylesRoot}${sep}`)) {
+      return filePath;
+    }
+    const index = filePath.lastIndexOf(packageDir);
+    if (index === -1) {
+      return filePath;
+    }
+    const copyRoot = filePath.slice(0, index + packageDir.length - 1);
+    if (!copies.has(copyRoot)) {
+      const realCopyRoot = realpath(copyRoot);
+      copies.set(copyRoot, realCopyRoot);
+      if (realCopyRoot !== unistylesRoot) {
+        console.warn(
+          `Unistyles \u{1F984}: Found a second copy of react-native-unistyles at ${realCopyRoot}, withUnistylesConfig handles only ${unistylesRoot}. Styles of the second copy won't update, make sure that your app installs react-native-unistyles once.`
+        );
+      }
+    }
+    return copies.get(copyRoot) === unistylesRoot ? path2.join(unistylesRoot, filePath.slice(copyRoot.length + 1)) : filePath;
+  };
+  const withTrackedDependencies = (resolution) => resolution.type === "sourceFile" && "filePath" in resolution && resolution.filePath === trackDependencies ? { type: "sourceFile", filePath: trackDependenciesWithMetro } : resolution;
   return (context, moduleName, platform) => {
     const resolve = upstream ?? context.resolveRequest;
-    const resolution = resolve(context, moduleName, platform);
-    if (resolution.type !== "sourceFile" || !("filePath" in resolution)) {
-      return resolution;
+    const upstreamResolution = resolve(context, moduleName, platform);
+    if (upstreamResolution.type !== "sourceFile" || !("filePath" in upstreamResolution)) {
+      return upstreamResolution;
     }
+    const filePath = toUnistylesPath(upstreamResolution.filePath);
+    const resolution = filePath === upstreamResolution.filePath ? upstreamResolution : { type: "sourceFile", filePath };
     const sourcePath = getSourcePath(resolution.filePath);
     if (sourcePath) {
-      return resolve(context, sourcePath, platform);
+      return withTrackedDependencies(resolve(context, sourcePath, platform));
+    }
+    if (resolution.filePath === trackDependencies) {
+      return withTrackedDependencies(resolution);
     }
     if (!shouldSwapFrom(context.originModulePath)) {
       return resolution;
@@ -131,34 +173,14 @@ var createResolveRequest = ({ unistylesRoot, upstream, path: path2 = import_node
 };
 
 // metro/src/index.ts
-var withUnistylesConfig = (config, options = {}) => {
-  const babelTransformerPath = import_node_path2.default.join(__dirname, "babel-transformer.js");
-  const upstreamBabelTransformerPath = config.transformer?.babelTransformerPath;
-  if (upstreamBabelTransformerPath === babelTransformerPath) {
-    throw new Error("Unistyles \u{1F984}: withUnistylesConfig was applied twice to the same Metro config");
-  }
-  if (!upstreamBabelTransformerPath) {
-    throw new Error(
-      "Unistyles \u{1F984}: Metro config has no babelTransformerPath, pass the config returned by getDefaultConfig to withUnistylesConfig"
-    );
-  }
-  const unistylesOptions = {
-    debug: options.debug ?? false
-  };
-  process.env[METRO_UPSTREAM_TRANSFORMER_ENV] = upstreamBabelTransformerPath;
-  process.env[METRO_OPTIONS_ENV] = JSON.stringify(unistylesOptions);
+var withUnistylesConfig = (config) => {
+  process.env[METRO_ENV] = "true";
   return {
     ...config,
-    transformer: {
-      ...config.transformer,
-      babelTransformerPath,
-      // part of Metro's transform cache key
-      unistyles: unistylesOptions
-    },
     resolver: {
       ...config.resolver,
       resolveRequest: createResolveRequest({
-        unistylesRoot: import_node_fs.default.realpathSync(import_node_path2.default.join(__dirname, "..")),
+        unistylesRoot: import_node_fs2.default.realpathSync(import_node_path2.default.join(__dirname, "..")),
         upstream: config.resolver?.resolveRequest
       })
     }

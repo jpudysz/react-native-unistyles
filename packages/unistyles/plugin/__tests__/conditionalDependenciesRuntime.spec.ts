@@ -1,4 +1,5 @@
 import { transformSync } from '@babel/core'
+import path from 'node:path'
 
 import { UnistyleDependency } from '../../src/specs/NativePlatform/NativePlatform.nitro'
 import { extractUnistyleDependencies } from '../../src/web/utils'
@@ -11,10 +12,11 @@ type StyleFn = (...args: Array<unknown>) => Record<string, unknown>
 // compiles a StyleSheet with the plugin and evaluates it like the runtime would
 const createStyles = (styles: string) => {
     const result = transformSync(`const styles = StyleSheet.create((theme, rt) => ({ ${styles} }))`, {
-        filename: '/app/src/styles.ts',
+        // inside the plugin's root, so the StyleSheet is processed without a Unistyles import
+        filename: path.join(process.cwd(), 'src', 'styles.ts'),
         babelrc: false,
         configFile: false,
-        plugins: [[plugin, { isMetro: true }]],
+        plugins: [[plugin, { root: 'src' }]],
     })
     const theme = { colors: { primary: 'red', secondary: 'blue' } }
     const rt = { fontScale: 2, isPortrait: true }

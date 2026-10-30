@@ -85,4 +85,27 @@ inline bool hasOutdatedNativeProps(const ShadowNodeFamily* family, const folly::
     return false;
 }
 
+inline bool hasCommittedNativeProps(const ShadowNodeFamily* family, const folly::dynamic& props) {
+#if UNISTYLES_HAS_NATIVE_PROPS_MUTEX
+    std::lock_guard<std::mutex> lock(family->nativePropsMutex);
+#endif
+
+    if (!family->nativeProps_DEPRECATED || !family->nativeProps_DEPRECATED->isObject() || !props.isObject()) {
+        return false;
+    }
+
+    auto& nativeProps = *family->nativeProps_DEPRECATED;
+
+    for (const auto& [propName, propValue] : props.items()) {
+        auto it = nativeProps.find(propName);
+
+        // never pushed by Unistyles, only React knows what is committed
+        if (it == nativeProps.items().end() || !isSamePropValue(propName.asString(), it->second, propValue)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 }

@@ -53,11 +53,14 @@ struct Unistyle {
 
     inline void addBreakpointDependency() {
         // this dependency can skip sealed check, as useVariants hook is called during React component render
-        // also this is the only dependency that is not staticly deducted from Babel plugin
-        auto it = std::find(this->dependencies.begin(), this->dependencies.end(), UnistyleDependency::BREAKPOINTS);
+        this->addRuntimeDependency(UnistyleDependency::BREAKPOINTS);
+    }
+
+    inline void addRuntimeDependency(UnistyleDependency dependency) {
+        auto it = std::find(this->dependencies.begin(), this->dependencies.end(), dependency);
 
         if (it == this->dependencies.end()) {
-            this->dependencies.push_back(UnistyleDependency::BREAKPOINTS);
+            this->dependencies.push_back(dependency);
         }
     }
 

@@ -11,29 +11,7 @@ export type ResolveRequest = (context: ResolutionContext, moduleName: string, pl
 
 export type MetroConfig = {
     projectRoot?: string
-    transformer?: {
-        babelTransformerPath?: string
-    }
     resolver?: {
         resolveRequest?: ResolveRequest | null
     }
-}
-
-export type BabelTransformerArgs = {
-    // relative to the project root
-    filename: string
-    src: string
-    options: {
-        projectRoot: string
-    }
-    plugins?: Array<unknown>
-}
-
-export type BabelTransformer = {
-    transform: (args: BabelTransformerArgs) => unknown
-    getCacheKey?: (...args: Array<unknown>) => string
-}
-
-export type UnistylesMetroOptions = {
-    debug?: boolean
 }
