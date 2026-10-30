@@ -36,6 +36,11 @@ struct ShadowTrafficController {
         return family;
     }
 
+    inline bool hasUpdate(const ShadowNodeFamily* shadowNodeFamily) const {
+        // call it only within withLock!
+        return _unistylesUpdates.contains(shadowNodeFamily);
+    }
+
     inline size_t getUpdatesCount() const {
         return _unistylesUpdates.size();
     }

@@ -12,13 +12,13 @@ import { themes, type ThemeName } from '../themes'
 export default function AnimationsScreen() {
     const [tone, setTone] = useState<'primary' | 'accent'>('primary')
 
-    styles.useVariants({ tone })
+    const variantStyles = styles.useVariants({ tone })
 
     const theme = useAnimatedTheme()
     const offset = useSharedValue(0)
     const rowOffset = useSharedValue(0)
     const rnOffset = useRef(new RNAnimated.Value(0)).current
-    const variantColor = useAnimatedVariantColor(styles.variantBox, 'backgroundColor')
+    const variantColor = useAnimatedVariantColor(variantStyles.variantBox, 'backgroundColor')
 
     const animatedThemeStyle = useAnimatedStyle(() => ({
         backgroundColor: theme.value.colors.secondary
@@ -58,7 +58,7 @@ export default function AnimationsScreen() {
             'worklet'
 
             try {
-                return `no error, width ${styles.moving.width}`
+                return `no error, width ${variantStyles.moving.width}`
             } catch (error) {
                 return error instanceof Error ? error.message : String(error)
             }
@@ -72,21 +72,21 @@ export default function AnimationsScreen() {
     return (
         <Screen>
             <Section title="Reanimated" description="useAnimatedTheme, useAnimatedVariantColor, a Unistyles style next to an animated one and a nested Text below one">
-                <Animated.View style={[styles.box, animatedThemeStyle]}>
-                    <Text style={styles.text}>useAnimatedTheme</Text>
+                <Animated.View style={[variantStyles.box, animatedThemeStyle]}>
+                    <Text style={variantStyles.text}>useAnimatedTheme</Text>
                 </Animated.View>
-                <Animated.View style={[styles.box, variantStyle]}>
-                    <Text style={styles.text}>useAnimatedVariantColor</Text>
+                <Animated.View style={[variantStyles.box, variantStyle]}>
+                    <Text style={variantStyles.text}>useAnimatedVariantColor</Text>
                 </Animated.View>
-                <Animated.View style={[styles.box, styles.moving, translateStyle]} />
-                <Animated.View style={[styles.box, rowStyle]}>
-                    <Text style={styles.text}>
-                        A <Text style={styles.nestedText}>nested Text</Text> in an animated row
+                <Animated.View style={[variantStyles.box, variantStyles.moving, translateStyle]} />
+                <Animated.View style={[variantStyles.box, rowStyle]}>
+                    <Text style={variantStyles.text}>
+                        A <Text style={variantStyles.nestedText}>nested Text</Text> in an animated row
                     </Text>
                 </Animated.View>
             </Section>
             <Section title="React Native Animated">
-                <RNAnimated.View style={[styles.box, styles.moving, { transform: [{ translateX: rnOffset }] }]} />
+                <RNAnimated.View style={[variantStyles.box, variantStyles.moving, { transform: [{ translateX: rnOffset }] }]} />
             </Section>
             <Button title="Move" onPress={move} />
         </Screen>

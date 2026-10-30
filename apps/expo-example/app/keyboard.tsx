@@ -1,6 +1,6 @@
 // The keyboard height (rt.insets.ime) read three ways: a StyleSheet (committed to the shadow tree), useUnistyles
 // (React) and UnistylesRuntime (native), on the screen and inside a Modal, which on Android gets the keyboard in its own
-// window (#810)
+// window (#810). On the screen a second bar reads it in a getter, which runs only when the style is parsed
 import React, { useRef, useState } from 'react'
 import { Keyboard, Modal, Text, TextInput, View } from 'react-native'
 import { StyleSheet, UnistylesRuntime, useUnistyles } from 'react-native-unistyles'
@@ -48,6 +48,7 @@ export default function KeyboardScreen() {
     const onShowRef = useRef<() => void>(undefined)
     const inputs = useRef<Record<Target, TextInputRef | null>>({ screen: null, modal: null })
     const bars = useRef<Record<Target, ViewRef | null>>({ screen: null, modal: null })
+    const getterBar = useRef<ViewRef | null>(null)
 
     const toggleModal = async (isVisible: boolean) => {
         isModalVisibleRef.current = isVisible
@@ -70,15 +71,21 @@ export default function KeyboardScreen() {
         const target: Target = isModalVisibleRef.current ? 'modal' : 'screen'
         const deadline = Date.now() + KEYBOARD_TIMEOUT_MS
         let previous: number | undefined
-        let values = { native: 0, styleSheet: undefined as number | undefined, hook: undefined as number | undefined }
+        let values = { native: 0, styleSheet: undefined as number | undefined, getter: undefined as number | undefined, hook: undefined as number | undefined }
 
         while (Date.now() < deadline) {
-            values = { native: UnistylesRuntime.insets.ime, styleSheet: await measureWidth(bars.current[target]), hook: hookIme[target] }
+            values = {
+                native: UnistylesRuntime.insets.ime,
+                styleSheet: await measureWidth(bars.current[target]),
+                getter: target === 'screen' ? await measureWidth(getterBar.current) : undefined,
+                hook: hookIme[target]
+            }
 
             const expected = isShown ? values.native : 0
             const isSettled = isShown ? values.native > 0 && values.native === previous : values.native === 0
+            const isGetterClose = target !== 'screen' || isClose(values.getter, expected)
 
-            if (isSettled && isClose(values.styleSheet, expected) && isClose(values.hook, expected)) {
+            if (isSettled && isClose(values.styleSheet, expected) && isGetterClose && isClose(values.hook, expected)) {
                 return undefined
             }
 
@@ -90,7 +97,7 @@ export default function KeyboardScreen() {
             styleKey: target,
             prop: 'ime',
             expected: isShown ? 'the keyboard height in native, StyleSheet and useUnistyles (is the software keyboard enabled?)' : '0',
-            actual: `native ${values.native} StyleSheet ${values.styleSheet} useUnistyles ${values.hook}`
+            actual: `native ${values.native} StyleSheet ${values.styleSheet} getter ${values.getter} useUnistyles ${values.hook}`
         }
     }
 
@@ -110,6 +117,7 @@ export default function KeyboardScreen() {
             <Section title="Keyboard" description="The bar is as wide as rt.insets.ime">
                 <HookReadout target="screen" />
                 <View ref={view => { bars.current.screen = view }} style={styles.imeBar} />
+                <View ref={view => { getterBar.current = view }} style={getterStyles.imeBar} />
                 <TextInput
                     ref={input => { inputs.current.screen = input }}
                     style={styles.input}
@@ -169,5 +177,17 @@ const styles = StyleSheet.create((theme, rt) => ({
         paddingHorizontal: theme.gap(2),
         gap: theme.gap(2),
         backgroundColor: theme.colors.background
+    }
+}))
+
+// rt.insets.ime is read only by the getter, not while the StyleSheet runs
+const getterStyles = StyleSheet.create((theme, rt) => ({
+    imeBar: {
+        height: 8,
+        get width() {
+            return rt.insets.ime
+        },
+        borderRadius: 4,
+        backgroundColor: theme.colors.primary
     }
 }))

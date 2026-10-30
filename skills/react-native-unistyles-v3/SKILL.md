@@ -14,7 +14,7 @@ allowed-tools: Read, Grep, Glob, Edit, Write, Bash(npx *)
 
 # React Native Unistyles v3 Skill
 
-You are assisting with React Native Unistyles v3 styling. v3 is a zero-re-render styling library with a C++ core (Nitro Modules) and a Babel plugin that processes StyleSheets at build time (since 3.6.0, Metro apps can use the experimental zero-config Metro integration instead). It replaces React Native's `StyleSheet` with a reactive, theme-aware, responsive system.
+You are assisting with React Native Unistyles v3 styling. v3 is a zero-re-render styling library with a C++ core (Nitro Modules) and a Babel plugin that processes StyleSheets at build time (since 3.6.0, Metro apps can use the experimental zero-config Metro integration instead, which needs no Babel transform). It replaces React Native's `StyleSheet` with a reactive, theme-aware, responsive system.
 
 ## Prerequisites
 
@@ -98,8 +98,8 @@ const styles = StyleSheet.create(theme => ({
 }))
 
 // In component — call useVariants BEFORE accessing styles (always pass an object, `{}` for defaults)
-styles.useVariants({ size: 'large', color: 'primary' })
-return <View style={styles.button} />
+const variantStyles = styles.useVariants({ size: 'large', color: 'primary' })
+return <View style={variantStyles.button} />
 ```
 
 ### withUnistyles — map theme/runtime to non-style props, or wrap views Unistyles can't bind to
@@ -122,15 +122,15 @@ const UniButton = withUnistyles(Button, (theme, rt) => ({
 ## Critical Rules
 
 1. **NEVER spread styles** — `{...styles.x}` breaks C++ proxy binding. ALWAYS use array syntax: `[styles.x, styles.y]` or `[styles.x, { marginTop: 10 }]`
-2. **NEVER re-export StyleSheet from barrel files** — import it directly from `react-native-unistyles`. Outside `root`, the Babel plugin only recognizes `StyleSheet.create` via that import (or `autoProcessImports`), so a re-export silently breaks detection. (The Metro integration also detects re-exports from your own modules, but direct imports work everywhere.)
+2. **NEVER re-export StyleSheet from barrel files** — import it directly from `react-native-unistyles`. Outside `root`, the Babel plugin only recognizes `StyleSheet.create` via that import (or `autoProcessImports`), so a re-export silently breaks detection. (The Metro integration has no such limitation, but direct imports work everywhere.)
 3. **A build-time integration is REQUIRED** — one of:
    - Babel plugin (default): `['react-native-unistyles/plugin', { root: 'src' }]` in babel.config.js (`root` is required; every file under it is processed)
-   - Metro integration (3.6.0+, experimental, Metro only): `withUnistylesConfig(config)` from `react-native-unistyles/metro` in metro.config.js, no options, and remove the Babel plugin (having both throws). Bare RN apps that list `babel-plugin-react-compiler` in `babel.config.js` `plugins` must keep the Babel plugin — those plugins run before Metro's, so React Compiler would see `useVariants` first
+   - Metro integration (3.6.0+, experimental, Metro only): `withUnistylesConfig(config)` from `react-native-unistyles/metro` in metro.config.js, no options, and remove the Babel plugin (having both throws). Dependencies are tracked at runtime, and `useVariants` must use the returned styles: `const variantStyles = styles.useVariants({ size })`
    - Re.Pack: `RepackUnistylePlugin` from `react-native-unistyles/repack-plugin`
 
    Without one of them, styles won't be reactive.
 4. **Import StyleSheet from `react-native-unistyles` only** — it polyfills all RN StyleSheet APIs (`hairlineWidth`, `compose`, `flatten`, `absoluteFill`). Replace all `import { StyleSheet } from 'react-native'`.
-5. **`styles.useVariants()` must be called before accessing variant-dependent styles** — treat it like a React hook (top of component). Always pass an object: `useVariants(undefined)` throws on native, use `{}` to select `default` variants.
+5. **`styles.useVariants()` must be called before accessing variant-dependent styles** — treat it like a React hook (top of component). Always pass an object: `useVariants(undefined)` throws on native, use `{}` to select `default` variants. With the Metro integration (no Babel plugin) use its return value: `const variantStyles = styles.useVariants({...})`.
 6. **Prefer `StyleSheet.create(theme => ...)` over `useUnistyles()`** — theme functions cause zero re-renders; `useUnistyles()` re-renders whenever a `theme`/`rt` value you *read* changes (never read `rt.insets.ime` there — it re-renders every keyboard frame).
 7. **`StyleSheet.configure()` must be called before any `StyleSheet.create()`** — typically in your app entry point, before any component renders.
 8. **Dynamic function arguments must be serializable** — Unistyles stores them in C++ and re-runs the function on theme/runtime changes. Functions are dropped; `Date`/`Map`/`Set`/class instances become plain objects. Pass primitives / plain objects (e.g. `date.getTime()`).

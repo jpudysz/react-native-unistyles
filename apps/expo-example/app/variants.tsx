@@ -20,7 +20,7 @@ export default function VariantsScreen() {
     useE2EAction('variants.color', nextColor)
     useE2EAction('variants.outline', toggleOutline)
 
-    styles.useVariants({
+    const variantStyles = styles.useVariants({
         size: SIZES[sizeIndex],
         color: COLORS[colorIndex],
         outlined: isOutlined
@@ -29,11 +29,11 @@ export default function VariantsScreen() {
     return (
         <Screen>
             <Section title="Selected variants" description={`size ${SIZES[sizeIndex]}, color ${COLORS[colorIndex]}, outlined ${isOutlined}`}>
-                <View style={styles.badge}>
-                    <Text style={styles.label}>Badge</Text>
+                <View style={variantStyles.badge}>
+                    <Text style={variantStyles.label}>Badge</Text>
                 </View>
-                <View style={styles.defaultVariant}>
-                    <Text style={styles.label}>Default variant (size only)</Text>
+                <View style={variantStyles.defaultVariant}>
+                    <Text style={variantStyles.label}>Default variant (size only)</Text>
                 </View>
             </Section>
             <Section title="Change variants">

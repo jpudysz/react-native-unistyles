@@ -117,6 +117,27 @@ const styles = ...
 
 TypeScript will provide perfect autocompletion for your variants, ensuring accuracy!
 
+`useVariants` also returns the styles with the selected variants. With the [Metro integration](/v3/other/metro) there is no Babel plugin to scope the call, so use the returned styles instead:
+
+```tsx /variantStyles/
+const Component = () => {
+    const variantStyles = styles.useVariants({
+        color: 'primary',
+        size: 'small'
+    })
+
+    return (
+        <View style={variantStyles.container} />
+    )
+}
+```
+
+This form works with the Babel plugin too. To convert existing components, run the codemod:
+
+```sh
+npx jscodeshift --parser=tsx --extensions=tsx,ts,jsx,js -t node_modules/react-native-unistyles/codemods/use-variants.js src
+```
+
 ### Selecting variants with boolean values
 
 

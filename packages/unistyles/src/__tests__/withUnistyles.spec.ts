@@ -1,7 +1,71 @@
-import { getSecrets } from '../core/withUnistyles/withUnistyles.native'
+import { getSecrets, listenToStyleChanges } from '../core/withUnistyles/withUnistyles.native'
 import { UnistyleDependency } from '../specs/NativePlatform/NativePlatform.nitro'
 
-jest.mock('../specs', () => ({ UnistylesShadowRegistry: {} }))
+const mockChangeListeners = new Set<(dependencies: Array<UnistyleDependency>) => void>()
+
+jest.mock('../specs', () => ({
+    UnistylesShadowRegistry: {},
+    UnistyleDependency: jest.requireActual('../specs/NativePlatform/NativePlatform.nitro').UnistyleDependency,
+    StyleSheet: {
+        addChangeListener: (onChange: (dependencies: Array<UnistyleDependency>) => void) => {
+            mockChangeListeners.add(onChange)
+
+            return () => mockChangeListeners.delete(onChange)
+        },
+    },
+}))
+
+const emit = (...dependencies: Array<UnistyleDependency>) =>
+    mockChangeListeners.forEach((onChange) => onChange(dependencies))
+
+// react-native-unistyles/metro, a style depends on everything its StyleSheet read
+describe('withUnistyles native without the Babel plugin', () => {
+    it('re-renders only when the styles changed', () => {
+        let width = 100
+        const onChange = jest.fn()
+        const dispose = listenToStyleChanges(
+            [UnistyleDependency.Theme, UnistyleDependency.Dimensions, UnistyleDependency.Ime],
+            () => ({ width }),
+            onChange,
+        )
+
+        emit(UnistyleDependency.Ime)
+        expect(onChange).not.toHaveBeenCalled()
+
+        width = 200
+        emit(UnistyleDependency.Dimensions)
+        expect(onChange).toHaveBeenCalledTimes(1)
+
+        emit(UnistyleDependency.Dimensions)
+        expect(onChange).toHaveBeenCalledTimes(1)
+
+        dispose()
+        width = 300
+        emit(UnistyleDependency.Dimensions)
+        expect(onChange).toHaveBeenCalledTimes(1)
+    })
+
+    it("leaves theme changes to the component and re-renders for styles it can't compare", () => {
+        const circular: Record<string, unknown> = {}
+        const onChange = jest.fn()
+
+        circular.self = circular
+
+        const dispose = listenToStyleChanges(
+            [UnistyleDependency.Theme, UnistyleDependency.Insets],
+            () => circular,
+            onChange,
+        )
+
+        emit(UnistyleDependency.Theme)
+        expect(onChange).not.toHaveBeenCalled()
+
+        emit(UnistyleDependency.Insets)
+        expect(onChange).toHaveBeenCalledTimes(1)
+
+        dispose()
+    })
+})
 
 const nestedStyle = [{ color: 'black' }, [{ flex: 1 }, { fontSize: 17 }]]
 const flatStyle = { color: 'black', flex: 1, fontSize: 17 }

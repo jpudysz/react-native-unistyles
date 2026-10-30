@@ -44,7 +44,7 @@ export default function InteractionsScreen() {
     const [tone, setTone] = useState<'primary' | 'accent'>('primary')
     const inputRef = useRef<TextInput>(null)
 
-    styles.useVariants({ tone })
+    const variantStyles = styles.useVariants({ tone })
 
     useE2EAction('interactions.tone', () => setTone(value => value === 'primary' ? 'accent' : 'primary'))
     useE2EAction('interactions.blur', () => inputRef.current?.blur())
@@ -52,48 +52,48 @@ export default function InteractionsScreen() {
     return (
         <Screen>
             <Section title="Touchables">
-                <View style={styles.row}>
-                    <TouchableHighlight testID="interactions-highlight" style={styles.highlight} onPress={() => countPress('interactions-highlight')}>
-                        <Text style={styles.tileText}>Highlight</Text>
+                <View style={variantStyles.row}>
+                    <TouchableHighlight testID="interactions-highlight" style={variantStyles.highlight} onPress={() => countPress('interactions-highlight')}>
+                        <Text style={variantStyles.tileText}>Highlight</Text>
                     </TouchableHighlight>
-                    <TouchableOpacity testID="interactions-opacity" style={styles.highlight} onPress={() => countPress('interactions-opacity')}>
-                        <Text style={styles.tileText}>Opacity</Text>
+                    <TouchableOpacity testID="interactions-opacity" style={variantStyles.highlight} onPress={() => countPress('interactions-opacity')}>
+                        <Text style={variantStyles.tileText}>Opacity</Text>
                     </TouchableOpacity>
                 </View>
-                <View style={styles.row}>
+                <View style={variantStyles.row}>
                     <TouchableHighlight
                         testID="interactions-highlight-variant"
-                        style={[styles.variantTile, styles.bordered]}
+                        style={[variantStyles.variantTile, variantStyles.bordered]}
                         onPress={() => countPress('interactions-highlight-variant')}
                     >
-                        <Text style={styles.tileText}>Variant</Text>
+                        <Text style={variantStyles.tileText}>Variant</Text>
                     </TouchableHighlight>
                     <TouchableHighlight
                         testID="interactions-highlight-fn"
-                        style={styles.dynamicTile(2)}
+                        style={variantStyles.dynamicTile(2)}
                         onPress={() => countPress('interactions-highlight-fn')}
                     >
-                        <Text style={styles.tileText}>Function</Text>
+                        <Text style={variantStyles.tileText}>Function</Text>
                     </TouchableHighlight>
                 </View>
-                <View style={styles.row}>
-                    <Pressable testID="interactions-pressable" style={styles.tile} onPress={() => countPress('interactions-pressable')}>
-                        <Text style={styles.tileText}>Pressable</Text>
+                <View style={variantStyles.row}>
+                    <Pressable testID="interactions-pressable" style={variantStyles.tile} onPress={() => countPress('interactions-pressable')}>
+                        <Text style={variantStyles.tileText}>Pressable</Text>
                     </Pressable>
                     <Pressable
                         testID="interactions-pressable-fn"
-                        style={state => styles.pressedTile(state.pressed)}
+                        style={state => variantStyles.pressedTile(state.pressed)}
                         onPress={() => countPress('interactions-pressable-fn')}
                     >
-                        <Text style={styles.tileText}>Style function</Text>
+                        <Text style={variantStyles.tileText}>Style function</Text>
                     </Pressable>
                 </View>
             </Section>
             <Section title="Text, inputs and switches">
-                <View style={styles.row}>
+                <View style={variantStyles.row}>
                     {/* iOS doesn't expose the testID of a pressable Text, the host taps the center of this box */}
-                    <View accessible testID="interactions-text" style={styles.textBox}>
-                        <Text style={styles.pressableText} onPress={() => countPress('interactions-text')}>
+                    <View accessible testID="interactions-text" style={variantStyles.textBox}>
+                        <Text style={variantStyles.pressableText} onPress={() => countPress('interactions-text')}>
                             Pressable text
                         </Text>
                     </View>
@@ -102,28 +102,28 @@ export default function InteractionsScreen() {
                 <TextInput
                     ref={inputRef}
                     testID="interactions-input"
-                    style={styles.input}
+                    style={variantStyles.input}
                     defaultValue="TextInput"
                     onFocus={() => countPress('interactions-input')}
                 />
             </Section>
             <Section title="Scoped dark theme">
                 <ScopedTheme name="dark">
-                    <View style={styles.row}>
+                    <View style={variantStyles.row}>
                         <ScopedCounter />
                         <Pressable
                             testID="interactions-scoped-pressable-fn"
-                            style={state => styles.pressedTile(state.pressed)}
+                            style={state => variantStyles.pressedTile(state.pressed)}
                             onPress={() => countPress('interactions-scoped-pressable-fn')}
                         >
-                            <Text style={styles.tileText}>Style function</Text>
+                            <Text style={variantStyles.tileText}>Style function</Text>
                         </Pressable>
                         <TouchableHighlight
                             testID="interactions-scoped-highlight"
-                            style={styles.highlight}
+                            style={variantStyles.highlight}
                             onPress={() => countPress('interactions-scoped-highlight')}
                         >
-                            <Text style={styles.tileText}>Highlight</Text>
+                            <Text style={variantStyles.tileText}>Highlight</Text>
                         </TouchableHighlight>
                     </View>
                 </ScopedTheme>

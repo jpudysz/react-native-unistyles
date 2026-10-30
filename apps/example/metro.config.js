@@ -41,4 +41,4 @@ const config = {
 };
 
 // UNISTYLES_BUNDLER=babel runs the Babel plugin (babel.config.js) instead
-module.exports = process.env.UNISTYLES_BUNDLER === "babel" ? config : withUnistylesConfig(config, { debug: true });
+module.exports = process.env.UNISTYLES_BUNDLER === "babel" ? config : withUnistylesConfig(config);

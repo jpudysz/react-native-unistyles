@@ -76,18 +76,18 @@ const { getDefaultConfig } = require('expo/metro-config')
 const { withUnistylesConfig } = require('react-native-unistyles/metro')
 
 module.exports = withUnistylesConfig(getDefaultConfig(__dirname))
-// only option: withUnistylesConfig(config, { debug: true }) — same as the Babel plugin's `debug`
+// no options
 ```
 
 - No `root`, `autoProcessImports`, `autoProcessPaths` or `autoRemapImports`: every `react-native` import resolves to Unistyles components, **including in `node_modules`**, so 3rd party components that pass `style` to RN views follow theme changes without `withUnistyles` (non-style props like `color` still need it)
-- Metro runs the Unistyles Babel transforms on every file that calls `.create(` / `.useVariants(`, also with a `StyleSheet` re-exported from your own module; the output is the same as the Babel plugin's. Files in `node_modules` are transformed only if they import `react-native-unistyles` (libraries built with Unistyles), and Unistyles' own files are skipped
+- No Babel transform runs: StyleSheets record their dependencies **at runtime**, from what they read on the mini runtime (`rt.screen` → screen changes, `rt.insets.ime` → keyboard, a StyleSheet function always depends on the theme). Reads behind conditions, in helper functions and in dynamic functions count too. When anything a StyleSheet function reads changes, every style of that StyleSheet is recomputed, but only views whose styles came out different are updated. Reads inside a dynamic function (or a getter) belong to the views that use that style, so read per-frame values like `rt.insets.ime` inside a dynamic function (`keyboard: () => ({ paddingBottom: rt.insets.ime })`), not destructured in the StyleSheet's arguments. The app must install a single copy of `react-native-unistyles`, Metro warns about a second one
+- **`useVariants` must use the returned styles**: `const variantStyles = styles.useVariants({ size })`, then `variantStyles.button`. Calling `styles.useVariants()` as a statement does nothing without the Babel plugin (`styles` ignores its variants, also the defaults). The returned form works with the Babel plugin too. Codemod: `npx jscodeshift --parser=tsx --extensions=tsx,ts,jsx,js -t node_modules/react-native-unistyles/codemods/use-variants.js src` (adds semicolons to the changed lines, run the formatter afterwards)
 - The bundle contains a single copy of Unistyles
-- `withUnistylesConfig` wraps `transformer.babelTransformerPath` and `resolver.resolveRequest`: apply it **last** (or make sure later plugins keep both). It throws if applied twice or if the config has no `babelTransformerPath` (pass the config returned by `getDefaultConfig`)
+- `withUnistylesConfig` wraps `resolver.resolveRequest`: apply it **last** (or make sure later plugins keep it)
 - To render a raw React Native component, import it from `react-native/index.js` (not swapped)
 
 Limitations:
 - Metro only — Re.Pack, Vite, Next.js and other web bundlers keep using the Babel plugin
-- Bare RN + `babel-plugin-react-compiler` in `babel.config.js` `plugins`: those run before Metro's plugins, so React Compiler would see `useVariants` first — keep the Babel plugin there. Expo is fine (`babel-preset-expo` adds React Compiler, and presets run after plugins)
 - Jest doesn't use Metro, so the [testing setup](#testing--mocks-setup) is unchanged
 
 ### Re.Pack

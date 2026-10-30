@@ -44,6 +44,7 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     UnistylesRegistry(const UnistylesRegistry&&) = delete;
 
     bool shouldUsePointsForBreakpoints = false;
+    bool shouldTrackDependencies = false;
 
     void registerTheme(jsi::Runtime& rt, uint64_t generation, std::string name, jsi::Value& theme);
     void registerBreakpoints(std::vector<std::pair<std::string, double>>& sortedBreakpoints);
@@ -70,7 +71,7 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     core::Unistyle::Shared getUnistyleById(std::string unistyleID);
     std::vector<LinkedFamilySnapshot> getLinkedFamiliesSnapshot();
     size_t getPendingUpdatesCount();
-    void setCommittedInstanceHandles(std::vector<InstanceHandle::Shared>&& instanceHandles);
+    void addCommittedInstanceHandles(std::vector<InstanceHandle::Shared>&& instanceHandles);
     std::vector<InstanceHandle::Shared> takeCommittedInstanceHandles();
 
     // newest installed runtime owns the registry, generation 0 means no owner
