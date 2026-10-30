@@ -173,7 +173,8 @@ export class CSSState {
                 }),
             ]
         }) as HydrateState
-        // Media query styles live in mainState with the rest, the field stays for clients that read it
+        // Always empty: media query styles live in mainState with the rest.
+        // Kept only for compatibility with clients that read it, drop it in 4.0
         const mqState: HydrateState = []
         const config = this.services.state.getConfig()
 
