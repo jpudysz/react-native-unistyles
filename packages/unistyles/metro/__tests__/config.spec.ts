@@ -83,6 +83,26 @@ describe('withUnistylesConfig', () => {
         ).toEqual({ type: 'assetFiles' })
         expect(resolveRequest).toHaveBeenCalled()
     })
+
+    it("should swap react-native resolved by Metro's resolveRequest", () => {
+        const resolveRequest = jest.fn(() => ({
+            type: 'sourceFile',
+            filePath: '/project/node_modules/react-native/index.js',
+        }))
+        const config = withUnistylesConfig({ resolver: {} })
+
+        expect(
+            config.resolver.resolveRequest(
+                { originModulePath: '/project/src/App.tsx', resolveRequest },
+                'react-native',
+                'ios',
+            ),
+        ).toEqual({
+            type: 'sourceFile',
+            filePath: path.join(fs.realpathSync(path.join(METRO_DIR, '..')), 'src', 'components', 'native', 'index.ts'),
+        })
+        expect(resolveRequest).toHaveBeenCalled()
+    })
 })
 
 describe('metro build', () => {

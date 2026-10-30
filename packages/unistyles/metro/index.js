@@ -164,7 +164,7 @@ var createResolveRequest = ({
     if (resolution.filePath === trackDependencies) {
       return withTrackedDependencies(resolution);
     }
-    if (!shouldSwapFrom(context.originModulePath)) {
+    if (!shouldSwapFrom(toUnistylesPath(context.originModulePath))) {
       return resolution;
     }
     const swapTarget = getSwapTarget(moduleName, resolution.filePath);

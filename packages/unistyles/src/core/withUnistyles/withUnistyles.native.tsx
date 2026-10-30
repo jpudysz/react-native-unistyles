@@ -150,14 +150,16 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
                 UnistylesShadowRegistry.setScopedTheme(scope.name)
             }
 
-            const styleSecrets = getSecrets(narrowedProps.style)
-            const contentContainerStyleSecrets = getSecrets(narrowedProps.contentContainerStyle)
+            try {
+                const styleSecrets = getSecrets(narrowedProps.style)
+                const contentContainerStyleSecrets = getSecrets(narrowedProps.contentContainerStyle)
 
-            if (scope) {
-                UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
+                return { styleSecrets, contentContainerStyleSecrets }
+            } finally {
+                if (scope) {
+                    UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
+                }
             }
-
-            return { styleSecrets, contentContainerStyleSecrets }
         }
 
         useEffect(() => {
@@ -182,7 +184,7 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
                 },
                 stylesChanged,
             )
-        }, [narrowedProps.style, narrowedProps.contentContainerStyle])
+        }, [narrowedProps.style, narrowedProps.contentContainerStyle, scope])
 
         const { key: mappingsKey, ...mappingsProps } = mappings ? mappings(proxifiedTheme, proxifiedRuntime) : {}
         const { key: uniPropsKey, ...unistyleProps } = narrowedProps.uniProps

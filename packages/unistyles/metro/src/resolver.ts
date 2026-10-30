@@ -179,7 +179,7 @@ export const createResolveRequest = ({
             return withTrackedDependencies(resolution)
         }
 
-        if (!shouldSwapFrom(context.originModulePath)) {
+        if (!shouldSwapFrom(toUnistylesPath(context.originModulePath))) {
             return resolution
         }
 

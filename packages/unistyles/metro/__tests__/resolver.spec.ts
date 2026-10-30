@@ -306,6 +306,24 @@ describe.each([
                 expect(warn).not.toHaveBeenCalled()
             })
 
+            it('should keep react-native for files of Unistyles linked from another path', () => {
+                const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+                const filePath = RESOLUTIONS['react-native']!
+                const resolveLinked = createResolver(filePath)
+
+                expect(
+                    resolveLinked(
+                        {
+                            originModulePath: platformPath.join(linked, 'src', 'components', 'native', 'View.tsx'),
+                            resolveRequest: upstream,
+                        },
+                        'react-native',
+                        'ios',
+                    ),
+                ).toEqual({ type: 'sourceFile', filePath })
+                expect(warn).not.toHaveBeenCalled()
+            })
+
             it('should warn once about a second copy and keep it', () => {
                 const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
                 const filePath = platformPath.join(nested, 'src', 'core', 'trackDependencies.ts')

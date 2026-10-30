@@ -98,8 +98,8 @@ const styles = StyleSheet.create(theme => ({
 }))
 
 // In component — call useVariants BEFORE accessing styles (always pass an object, `{}` for defaults)
-styles.useVariants({ size: 'large', color: 'primary' })
-return <View style={styles.button} />
+const variantStyles = styles.useVariants({ size: 'large', color: 'primary' })
+return <View style={variantStyles.button} />
 ```
 
 ### withUnistyles — map theme/runtime to non-style props, or wrap views Unistyles can't bind to
