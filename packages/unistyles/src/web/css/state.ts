@@ -30,7 +30,6 @@ export class CSSState {
     private themesCSS = new Map<string, string>()
     // Every class name a hash produced, pseudo and children selectors included, so re-applying or removing it is exact
     private owners = new Map<string, ClassNames>()
-    private currentOwner?: ClassNames
     private sheet = new CSSSheet(this.themesCSS, this.mainMap)
 
     constructor(private services: UnistylesServices) {}
@@ -40,33 +39,33 @@ export class CSSState {
         const thirdLevelMap = safeGetMap(secondLevelMap, className)
 
         thirdLevelMap.set(propertyKey, value)
-
-        if (this.currentOwner) {
-            const classNames = this.currentOwner.get(mediaQuery) ?? new Set()
-
-            classNames.add(className)
-            this.currentOwner.set(mediaQuery, classNames)
-        }
     }
 
     add = (hash: string, values: UnistylesValues) => {
+        // Converted apart first, so a style that fails to convert keeps its previous declarations
+        const styles: MapType = new Map()
+
+        convertToCSS(hash, convertUnistyles(values, this.services.runtime), {
+            set: ({ className, propertyKey, value, mediaQuery = '' }) => {
+                safeGetMap(safeGetMap(styles, mediaQuery), className).set(propertyKey, value)
+            },
+        })
+
         const previousClassNames = this.owners.get(hash)
-        const classNames: ClassNames = new Map()
+        const classNames: ClassNames = new Map(
+            Array.from(styles, ([mediaQuery, classes]) => [mediaQuery, new Set(classes.keys())]),
+        )
 
         // Re-applying a hash replaces its styles, so a property or selector it doesn't produce anymore doesn't linger.
         // Clearing keeps each class in place: its rule is edited where it is, and the cascade order doesn't change
         forEachClassName(previousClassNames, (mediaQuery, className) => {
             this.mainMap.get(mediaQuery)?.get(className)?.clear()
         })
-
-        this.currentOwner = classNames
-
-        try {
-            convertToCSS(hash, convertUnistyles(values, this.services.runtime), this)
-        } finally {
-            this.currentOwner = undefined
-        }
-
+        styles.forEach((classes, mediaQuery) => {
+            classes.forEach((properties, className) => {
+                properties.forEach((value, propertyKey) => this.set({ mediaQuery, className, propertyKey, value }))
+            })
+        })
         this.owners.set(hash, classNames)
         forEachClassName(previousClassNames, (mediaQuery, className) => {
             if (!classNames.get(mediaQuery)?.has(className)) {

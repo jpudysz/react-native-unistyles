@@ -85,6 +85,22 @@ describe('Web CSS sheet', () => {
         expect(state.getStyles()).toBe('.hash{color:green;}')
     })
 
+    it('keeps the previous declarations when a re-applied style fails to convert', () => {
+        const state = createState()
+
+        add(state, 'hash', { color: 'red', _hover: { color: 'blue' } })
+
+        expect(() =>
+            add(state, 'hash', {
+                get color() {
+                    throw new Error('conversion failed')
+                },
+            }),
+        ).toThrow('conversion failed')
+        expect(state.getStyles()).toBe('.hash{color:red;}.hash:hover{color:blue;}')
+        expect(describeSheet()).toEqual(['@media all{.hash{color: red;}.hash:hover{color: blue;}}'])
+    })
+
     it('leaves the sheet alone when a style is re-applied with the same values', () => {
         const state = createState()
 

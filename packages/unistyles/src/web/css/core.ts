@@ -4,6 +4,7 @@ import { isPseudoClass } from '../convert/pseudo'
 import { getMediaQuery } from '../utils'
 
 type SetProps = Parameters<CSSState['set']>[0]
+type StyleTarget = Pick<CSSState, 'set'>
 
 // box-none and box-only aren't CSS values, polyfill them like react-native-web: [element, children]
 const POINTER_EVENTS: Record<string, [string, string]> = {
@@ -13,7 +14,7 @@ const POINTER_EVENTS: Record<string, [string, string]> = {
 
 export const getChildrenClassName = (className: string) => `:where(.${className})>*`
 
-const setStyle = (state: CSSState, props: SetProps) => {
+const setStyle = (state: StyleTarget, props: SetProps) => {
     if (props.propertyKey !== 'pointerEvents') {
         state.set(props)
 
@@ -28,7 +29,7 @@ const setStyle = (state: CSSState, props: SetProps) => {
     state.set({ ...props, className: getChildrenClassName(props.className), value: childrenValue })
 }
 
-export const convertToCSS = (hash: string, value: Record<string, any>, state: CSSState) => {
+export const convertToCSS = (hash: string, value: Record<string, any>, state: StyleTarget) => {
     Object.entries(value).forEach(([styleKey, styleValue]) => {
         if (styleKey[0] === '_') {
             const isStylePseudoClass = isPseudoClass(styleKey)
