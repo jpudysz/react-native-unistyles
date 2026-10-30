@@ -99,8 +99,6 @@ export class CSSState {
 
         Object.entries(values).forEach(([key, value]) => convertToCSS(key, value))
 
-        const isUpdate = this.themesCSS.has(theme)
-
         // ScopedTheme renders an element with data-unistyles-theme (or data-unistyles-reset for `reset`),
         // so the variables follow the closest scope and styles don't need to know it while they render
         if (theme === 'light' || theme === 'dark') {
@@ -108,14 +106,14 @@ export class CSSState {
                 `media ${theme}`,
                 `@media (prefers-color-scheme: ${theme}){:root,[data-unistyles-reset]{${themeVars}}}`,
             )
-            this.sheet.syncTheme(`media ${theme}`, isUpdate)
+            this.sheet.syncTheme(`media ${theme}`)
         }
 
         this.themesCSS.set(
             theme,
             `:root.${theme},:root.${theme} [data-unistyles-reset],[data-unistyles-theme="${theme}"]{${themeVars}}`,
         )
-        this.sheet.syncTheme(theme, isUpdate)
+        this.sheet.syncTheme(theme)
     }
 
     remove = (hash: string) => {

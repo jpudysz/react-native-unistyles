@@ -205,19 +205,23 @@ describe('Web CSS sheet', () => {
         ])
     })
 
-    it('replaces server styles when a theme is updated before any style change', () => {
+    it('applies a theme update on top of the server styles until hydration', () => {
         document.head.innerHTML = '<style id="unistyles-web">.hash{color:red;}</style>'
 
         const state = createState()
+        const theme = (background: string) =>
+            `:root.premium,:root.premium [data-unistyles-reset],[data-unistyles-theme="premium"]{--colors-background: ${background};}`
 
         state.addTheme('premium', { colors: { background: '#ff9ff3' } })
         state.addTheme('premium', { colors: { background: '#000000' } })
 
+        expect(getTag().textContent).toBe('.hash{color:red;}')
+        expect(describeSheet()).toEqual(['.hash{color: red;}', theme('#000000')])
+
+        state.hydrate({ mainState: [['', [['hash', [['color', 'red']]]]]], mqState: [], config: {} as never })
+
         expect(getTag().textContent).toBe('')
-        expect(describeSheet()).toEqual([
-            ':root.premium,:root.premium [data-unistyles-reset],[data-unistyles-theme="premium"]{--colors-background: #000000;}',
-            '@media all{}',
-        ])
+        expect(describeSheet()).toEqual([theme('#000000'), '@media all{.hash{color: red;}}'])
     })
 
     it('hydrates media query styles sent apart into the same groups', () => {
