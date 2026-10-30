@@ -141,20 +141,6 @@ export class CSSSheet {
         this.groups.clear()
     }
 
-    rebuild = () => {
-        const sheet = this.tag?.sheet
-
-        if (sheet && sheet === this.sheet) {
-            this.deleteOwnRules(
-                sheet,
-                new Set([...this.themes.values(), ...Array.from(this.groups.values(), (group) => group?.rule)]),
-            )
-        }
-
-        this.sheet = null
-        this.getSheet()
-    }
-
     private getSheet = () => {
         if (!this.tag) {
             return null

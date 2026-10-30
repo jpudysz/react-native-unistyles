@@ -77,10 +77,6 @@ export class CSSState {
         this.sheet.refresh()
     }
 
-    recreate = () => {
-        this.sheet.rebuild()
-    }
-
     addTheme = (theme: string, values: Record<string, any>) => {
         let themeVars = ''
 
