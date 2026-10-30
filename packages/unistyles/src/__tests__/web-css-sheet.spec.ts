@@ -293,6 +293,37 @@ describe('Web CSS sheet', () => {
         ])
     })
 
+    it('brings its rules back when the tag text is rewritten and a change syncs no class', () => {
+        const state = createState()
+
+        add(state, 'first', { color: 'red' })
+        getTag().textContent = '.foreign{color:blue}'
+        state.remove('unknown')
+
+        expect(describeSheet()).toEqual(['.foreign{color: blue;}', '@media all{.first{color: red;}}'])
+
+        getTag().textContent = '.foreign{color:blue}'
+        add(state, 'empty', {})
+
+        expect(describeSheet()).toEqual(['.foreign{color: blue;}', '@media all{.first{color: red;}}'])
+    })
+
+    it('refreshes the sheet only for a change that syncs no class', () => {
+        const state = createState()
+        const refresh = jest.spyOn(state['sheet'], 'refresh')
+
+        add(state, 'hash', { color: 'red' })
+        add(state, 'hash', { color: 'green' })
+        state.remove('hash')
+
+        expect(refresh).not.toHaveBeenCalled()
+
+        state.remove('hash')
+        add(state, 'empty', {})
+
+        expect(refresh).toHaveBeenCalledTimes(2)
+    })
+
     it('keeps server styles until the first style change and replaces them with the same styles', () => {
         document.head.innerHTML = '<style id="unistyles-web">.hash{color:red;}</style>'
 

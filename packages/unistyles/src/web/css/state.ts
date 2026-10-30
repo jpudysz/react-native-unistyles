@@ -82,7 +82,11 @@ export class CSSState {
             }
         })
         forEachClassName(classNames, this.sheet.syncClass)
-        this.sheet.refresh()
+
+        // syncClass brings the rules back if the tag lost them, without a class to sync refresh does it
+        if (!previousClassNames && !classNames) {
+            this.sheet.refresh()
+        }
     }
 
     addTheme = (theme: string, values: Record<string, any>) => {
@@ -120,13 +124,17 @@ export class CSSState {
     }
 
     remove = (hash: string) => {
-        forEachClassName(this.owners.get(hash), (mediaQuery, className) => {
-            if (this.mainMap.get(mediaQuery)?.delete(className)) {
-                this.sheet.syncClass(mediaQuery, className)
-            }
-        })
+        const classNames = this.owners.get(hash)
+
         this.owners.delete(hash)
-        this.sheet.refresh()
+        forEachClassName(classNames, (mediaQuery, className) => {
+            this.mainMap.get(mediaQuery)?.delete(className)
+            this.sheet.syncClass(mediaQuery, className)
+        })
+
+        if (!classNames) {
+            this.sheet.refresh()
+        }
     }
 
     getStyles = () => {
