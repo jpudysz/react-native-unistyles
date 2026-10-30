@@ -76,9 +76,14 @@ export const createResolveRequest = ({
         return segments[0]?.startsWith('@') ? `${segments[0]}${sep}${segments[1]}` : segments[0]
     }
 
+    const nestedModules = path.join(unistylesRoot, 'node_modules')
+
     const shouldSwapFrom = (originModulePath: string) => {
-        // Unistyles renders the components it swaps
-        if (originModulePath.startsWith(`${unistylesRoot}${sep}`)) {
+        // Unistyles renders the components it swaps, its dependencies are libraries like any other
+        if (
+            originModulePath.startsWith(`${unistylesRoot}${sep}`) &&
+            !originModulePath.startsWith(`${nestedModules}${sep}`)
+        ) {
             return false
         }
 
@@ -147,8 +152,11 @@ export const createResolveRequest = ({
             }
         }
 
-        return copies.get(copyRoot) === unistylesRoot
-            ? path.join(unistylesRoot, filePath.slice(copyRoot.length + 1))
+        const copyPath = filePath.slice(copyRoot.length + 1)
+
+        // a dependency installed inside the copy isn't Unistyles
+        return copies.get(copyRoot) === unistylesRoot && !copyPath.startsWith(`node_modules${sep}`)
+            ? path.join(unistylesRoot, copyPath)
             : filePath
     }
 

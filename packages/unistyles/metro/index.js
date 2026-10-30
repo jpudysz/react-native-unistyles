@@ -102,8 +102,9 @@ var createResolveRequest = ({
     const segments = parts.at(-1).split(sep);
     return segments[0]?.startsWith("@") ? `${segments[0]}${sep}${segments[1]}` : segments[0];
   };
+  const nestedModules = path2.join(unistylesRoot, "node_modules");
   const shouldSwapFrom = (originModulePath) => {
-    if (originModulePath.startsWith(`${unistylesRoot}${sep}`)) {
+    if (originModulePath.startsWith(`${unistylesRoot}${sep}`) && !originModulePath.startsWith(`${nestedModules}${sep}`)) {
       return false;
     }
     const packageName = getPackageName(originModulePath);
@@ -146,7 +147,8 @@ var createResolveRequest = ({
         );
       }
     }
-    return copies.get(copyRoot) === unistylesRoot ? path2.join(unistylesRoot, filePath.slice(copyRoot.length + 1)) : filePath;
+    const copyPath = filePath.slice(copyRoot.length + 1);
+    return copies.get(copyRoot) === unistylesRoot && !copyPath.startsWith(`node_modules${sep}`) ? path2.join(unistylesRoot, copyPath) : filePath;
   };
   const withTrackedDependencies = (resolution) => resolution.type === "sourceFile" && "filePath" in resolution && resolution.filePath === trackDependencies ? { type: "sourceFile", filePath: trackDependenciesWithMetro } : resolution;
   return (context, moduleName, platform) => {

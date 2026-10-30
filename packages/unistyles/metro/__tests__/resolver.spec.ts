@@ -324,6 +324,26 @@ describe.each([
                 expect(warn).not.toHaveBeenCalled()
             })
 
+            it.each([
+                ['linked', () => linked],
+                ['resolved', () => unistylesRoot],
+            ])('should swap react-native for dependencies installed in a %s Unistyles', (_, getRoot) => {
+                const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+                const resolveNested = createResolver(RESOLUTIONS['react-native']!)
+
+                expect(
+                    resolveNested(
+                        {
+                            originModulePath: platformPath.join(getRoot(), 'node_modules', 'some-library', 'index.js'),
+                            resolveRequest: upstream,
+                        },
+                        'react-native',
+                        'ios',
+                    ),
+                ).toEqual({ type: 'sourceFile', filePath: componentsIndex })
+                expect(warn).not.toHaveBeenCalled()
+            })
+
             it('should warn once about a second copy and keep it', () => {
                 const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
                 const filePath = platformPath.join(nested, 'src', 'core', 'trackDependencies.ts')
