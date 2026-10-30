@@ -13,14 +13,14 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
     disabled = false,
     ...props
 }: ButtonProps) => {
-    styles.useVariants({
+    const variantStyles = styles.useVariants({
         variant,
         disabled,
     });
 
     return (
-        <Pressable style={styles.button} {...props}>
-            <Text style={styles.text}>{children}</Text>
+        <Pressable style={variantStyles.button} {...props}>
+            <Text style={variantStyles.text}>{children}</Text>
         </Pressable>
     );
 }

@@ -104,6 +104,14 @@ describe.each([
             componentsDir,
             'View.tsx',
         ),
+        './trackDependencies': platformPath.join(unistylesRoot, 'src', 'core', 'trackDependencies.ts'),
+        '../core/trackDependencies': platformPath.join(unistylesRoot, 'lib', 'module', 'core', 'trackDependencies.js'),
+        [platformPath.join(unistylesRoot, 'src', 'core', 'trackDependencies')]: platformPath.join(
+            unistylesRoot,
+            'src',
+            'core',
+            'trackDependencies.ts',
+        ),
     }
 
     const upstream = jest.fn((_context: ResolutionContext, moduleName: string, platform: string | null) => {
@@ -252,6 +260,111 @@ describe.each([
                 type: 'sourceFile',
                 filePath: RESOLUTIONS['react-native-unistyles/diagnostics'],
             })
+        })
+    })
+
+    describe('dependency tracking', () => {
+        const trackDependenciesWithMetro = platformPath.join(unistylesRoot, 'src', 'core', 'trackDependencies.metro.ts')
+
+        it('should track the dependencies of StyleSheets, there is no Babel plugin', () => {
+            expect(resolve(platformPath.join(unistylesRoot, 'src', 'core', 'index.ts'), './trackDependencies')).toEqual(
+                {
+                    type: 'sourceFile',
+                    filePath: trackDependenciesWithMetro,
+                },
+            )
+        })
+
+        describe('copies of Unistyles', () => {
+            const linked = join('apps', 'app', 'node_modules', 'react-native-unistyles')
+            const nested = join('node_modules', 'some-library', 'node_modules', 'react-native-unistyles')
+            const createResolver = (filePath: string) =>
+                createResolveRequest({
+                    unistylesRoot,
+                    upstream: () => ({ type: 'sourceFile', filePath }),
+                    path: platformPath,
+                    realpath: (copyRoot) => (copyRoot === linked ? unistylesRoot : copyRoot),
+                })
+            const resolveFrom = (filePath: string) =>
+                createResolver(filePath)(
+                    { originModulePath: join('src', 'App.tsx'), resolveRequest: upstream },
+                    './trackDependencies',
+                    'ios',
+                )
+
+            afterEach(() => {
+                jest.restoreAllMocks()
+            })
+
+            it('should track the dependencies of Unistyles linked from another path', () => {
+                const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+
+                expect(resolveFrom(platformPath.join(linked, 'src', 'core', 'trackDependencies.ts'))).toEqual({
+                    type: 'sourceFile',
+                    filePath: trackDependenciesWithMetro,
+                })
+                expect(warn).not.toHaveBeenCalled()
+            })
+
+            it('should keep react-native for files of Unistyles linked from another path', () => {
+                const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+                const filePath = RESOLUTIONS['react-native']!
+                const resolveLinked = createResolver(filePath)
+
+                expect(
+                    resolveLinked(
+                        {
+                            originModulePath: platformPath.join(linked, 'src', 'components', 'native', 'View.tsx'),
+                            resolveRequest: upstream,
+                        },
+                        'react-native',
+                        'ios',
+                    ),
+                ).toEqual({ type: 'sourceFile', filePath })
+                expect(warn).not.toHaveBeenCalled()
+            })
+
+            it.each([
+                ['linked', () => linked],
+                ['resolved', () => unistylesRoot],
+            ])('should swap react-native for dependencies installed in a %s Unistyles', (_, getRoot) => {
+                const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+                const resolveNested = createResolver(RESOLUTIONS['react-native']!)
+
+                expect(
+                    resolveNested(
+                        {
+                            originModulePath: platformPath.join(getRoot(), 'node_modules', 'some-library', 'index.js'),
+                            resolveRequest: upstream,
+                        },
+                        'react-native',
+                        'ios',
+                    ),
+                ).toEqual({ type: 'sourceFile', filePath: componentsIndex })
+                expect(warn).not.toHaveBeenCalled()
+            })
+
+            it('should warn once about a second copy and keep it', () => {
+                const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+                const filePath = platformPath.join(nested, 'src', 'core', 'trackDependencies.ts')
+                const resolveNested = createResolver(filePath)
+                const context = { originModulePath: join('src', 'App.tsx'), resolveRequest: upstream }
+
+                expect(resolveNested(context, './trackDependencies', 'ios')).toEqual({ type: 'sourceFile', filePath })
+                resolveNested(context, './trackDependencies', 'ios')
+
+                expect(warn).toHaveBeenCalledTimes(1)
+                expect(warn.mock.calls[0]![0]).toContain(nested)
+            })
+        })
+
+        it('should track them also when the build is imported', () => {
+            expect(
+                resolve(
+                    platformPath.join(unistylesRoot, 'lib', 'module', 'web', 'registry.js'),
+                    '../core/trackDependencies',
+                ),
+            ).toEqual({ type: 'sourceFile', filePath: trackDependenciesWithMetro })
         })
     })
 

@@ -30,36 +30,64 @@ const config = getDefaultConfig(__dirname)
 module.exports = withUnistylesConfig(config)
 ```
 
-Then remove `react-native-unistyles/plugin` from your `babel.config.js`. Metro runs it for you, Unistyles throws an error if both are set up.
+Then remove `react-native-unistyles/plugin` from your `babel.config.js`. Unistyles throws an error if both are set up.
 
 ### What it does
 
-The Babel plugin has two jobs, the Metro integration covers both:
+The Metro integration doesn't run any Babel transform, it covers both jobs of the Babel plugin at runtime:
 
 1. **Every `react-native` import resolves to Unistyles components.** A Metro resolver swaps `View`, `Text`, `Pressable` and the [other supported components](/v3/other/babel-plugin#2-component-factory-borrowing-ref) for Unistyles components. It also covers `node_modules`, so a 3rd party component that passes your `style` to a React Native view updates with your theme, without `withUnistyles`. The internals of React Native, React Native Web and Unistyles stay untouched.
-2. **StyleSheets get their dependencies and variants get their scope.** Metro runs the [Babel plugin's transforms](/v3/other/babel-plugin#1-detecting-stylesheet-dependencies) on every file of your app that calls `StyleSheet.create` or `useVariants`, also with a `StyleSheet` re-exported from your own module, and on libraries built with Unistyles.
+2. **StyleSheets record their dependencies while they run.** Instead of reading the [dependencies detected by the Babel plugin](/v3/other/babel-plugin#1-detecting-stylesheet-dependencies), Unistyles tracks what your StyleSheet reads from the [mini runtime](/v3/references/mini-runtime): `rt.screen` subscribes it to screen changes, `rt.insets.ime` to the keyboard and so on. A StyleSheet function always depends on the theme. Dependencies read behind a condition, in a helper function or in a dynamic function are picked up as well, the first time the code reads them.
 
-Both produce the same code as the Babel plugin, which the test suite checks with every test case of the Babel plugin.
+Unistyles can't tell which style of a StyleSheet read a value, so when anything a StyleSheet function reads changes, Unistyles recomputes every style of that StyleSheet. It only updates the views whose styles came out different, the others stay untouched. On iOS and Android, the first change after a view mounts updates it either way, as Unistyles compares with what it applied itself. On iOS and Android, a component wrapped with [`withUnistyles`](/v3/references/with-unistyles) re-renders for theme changes, and for other changes only when its styles came out different.
 
-### Options
+Reads inside a [dynamic function](/v3/references/dynamic-functions) or a getter belong to the views that use that style. For a value that changes on every frame, like `rt.insets.ime`, read it in a dynamic function, so only the views that call it are recomputed while the keyboard animates. Read it inside the function: destructuring it in the StyleSheet's arguments, eg. `(theme, { insets: { ime } })`, reads it for the whole StyleSheet.
 
-```js title="metro.config.js"
-module.exports = withUnistylesConfig(config, {
-    // logs the dependencies detected in every StyleSheet, like the Babel plugin's `debug` option
-    debug: true
-})
+```ts
+const styles = StyleSheet.create((theme, rt) => ({
+    container: {
+        flex: 1,
+        backgroundColor: theme.colors.background
+    },
+    // only the views that call styles.keyboard() depend on the keyboard
+    keyboard: () => ({
+        paddingBottom: rt.insets.ime
+    })
+}))
 ```
+
+### Variants
+
+Without the Babel plugin, `styles.useVariants()` doesn't change `styles`. Use the styles it returns:
+
+```tsx /variantStyles/
+const Button = ({ size }) => {
+    const variantStyles = styles.useVariants({ size })
+
+    return <View style={variantStyles.button} />
+}
+```
+
+This form also works with the Babel plugin. The codemod converts your components, reads of `styles` below the call (in the same block, also in callbacks) read the returned styles:
+
+```sh
+npx jscodeshift --parser=tsx --extensions=tsx,ts,jsx,js -t node_modules/react-native-unistyles/codemods/use-variants.js src
+```
+
+The codemod adds semicolons to the lines it changes, run your formatter afterwards.
 
 ### Other Metro plugins
 
-`withUnistylesConfig` wraps the `babelTransformerPath` and `resolveRequest` of the config it receives. Apply it last, or make sure that a plugin applied after it keeps both.
+`withUnistylesConfig` wraps the `resolveRequest` of the config it receives. Apply it last, or make sure that a plugin applied after it keeps it.
 
 To render a raw React Native component, import it from `react-native/index.js`, which Unistyles doesn't swap.
 
 ### Limitations
 
 - Metro only. Re.Pack, Vite, Next.js and other web bundlers keep using the [Babel plugin](/v3/other/babel-plugin)
-- Babel runs plugins from your `babel.config.js` before the ones added by Metro. If you add `babel-plugin-react-compiler` to the `plugins` of a bare React Native app, it runs before Unistyles processes `useVariants`, keep using the Babel plugin there. Expo adds React Compiler with `babel-preset-expo`, presets run after plugins
+- A StyleSheet recomputes more styles than with the Babel plugin, see [What it does](#what-it-does)
+- `styles.useVariants()` has no effect when the returned styles aren't used, `styles` ignores its variants (also the default ones), see [Variants](#variants)
 - Jest doesn't use Metro, your [testing setup](/v3/start/testing) stays the same
+- Your app has to install `react-native-unistyles` once, Metro warns about a second copy (eg. nested in a library's `node_modules`), its styles won't update
 
 </Seo>

@@ -268,10 +268,13 @@ jest.mock('react-native-unistyles', () => {
                         ? styles(Object.values(_REGISTRY.themes).at(0) ?? {}, miniRuntime)
                         : styles
 
-                return {
+                const stylesheet = {
                     ...stripVariants(resolved),
-                    useVariants: () => {},
+                    // returns the styles, eg. for react-native-unistyles/metro
+                    useVariants: () => stylesheet,
                 }
+
+                return stylesheet
             },
             configure: (config: UnistylesConfig) => {
                 if (config.breakpoints) {

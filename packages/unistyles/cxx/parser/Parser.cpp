@@ -97,6 +97,11 @@ void parser::Parser::buildUnistyles(jsi::Runtime& rt, std::shared_ptr<StyleSheet
             styleSheet
         );
     });
+
+    // the StyleSheet function ran before its unistyles existed
+    auto runtimeDependencies = styleSheet->runtimeDependencies;
+
+    styleSheet->addRuntimeDependencies(runtimeDependencies);
 }
 
 jsi::Value parser::Parser::getParsedStyleSheetForScopedTheme(jsi::Runtime& rt, core::Unistyle::Shared unistyle, std::string& scopedTheme) {
@@ -109,18 +114,12 @@ jsi::Value parser::Parser::getParsedStyleSheetForScopedTheme(jsi::Runtime& rt, c
     auto jsTheme = state.getJSThemeByName(rt, scopedTheme);
 
     if (unistyle->parent->type == StyleSheetType::Themable) {
-        return unistyle->parent->rawValue
-            .asFunction(rt)
-            .call(rt, std::move(jsTheme))
-            .asObject(rt);
+        return this->callStyleSheet(rt, unistyle->parent, std::move(jsTheme), std::nullopt);
     }
 
     auto miniRuntime = this->_unistylesRuntime->getMiniRuntimeAsValue(rt, std::nullopt, scopedTheme);
 
-    return unistyle->parent->rawValue
-        .asFunction(rt)
-        .call(rt, std::move(jsTheme), std::move(miniRuntime))
-        .asObject(rt);
+    return this->callStyleSheet(rt, unistyle->parent, std::move(jsTheme), std::move(miniRuntime));
 }
 
 void parser::Parser::rebuildUnistyleWithScopedTheme(jsi::Runtime& rt, jsi::Value& scopedStyleSheet, std::shared_ptr<core::UnistyleData> unistyleData) {
@@ -168,10 +167,7 @@ void parser::Parser::rebuildUnistyleWithScopedTheme(jsi::Runtime& rt, jsi::Value
     auto sharedUnprocessedValue = std::move(unistyleFn->unprocessedValue);
 
     // call cached function with memoized arguments
-    auto functionResult = targetStyle
-        .asFunction(rt)
-        .call(rt, argStart, arguments.size())
-        .asObject(rt);
+    auto functionResult = this->callDynamicFunction(rt, unistyleFn, targetStyle.asFunction(rt), argStart, arguments.size());
 
     unistyleFn->unprocessedValue = std::move(functionResult);
     unistyleData->parsedStyle = this->parseFirstLevel(rt, unistyleFn, unistyleData->variants);
@@ -192,20 +188,59 @@ jsi::Object parser::Parser::unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<S
     auto theme = state.getCurrentJSTheme(rt);
 
     if (styleSheet->type == StyleSheetType::Themable) {
-        return styleSheet->rawValue
-            .asFunction(rt)
-            .call(rt, std::move(theme))
-            .asObject(rt);
+        return this->callStyleSheet(rt, styleSheet, std::move(theme), std::nullopt);
     }
 
     // stylesheet also has a mini runtime dependency
     // StyleSheetType::ThemableWithMiniRuntime
     auto miniRuntime = this->_unistylesRuntime->getMiniRuntimeAsValue(rt, maybeMiniRuntime, state.getCurrentThemeName());
 
-    return styleSheet->rawValue
-        .asFunction(rt)
-        .call(rt, std::move(theme), std::move(miniRuntime))
-        .asObject(rt);
+    return this->callStyleSheet(rt, styleSheet, std::move(theme), std::move(miniRuntime));
+}
+
+bool parser::Parser::shouldTrackDependencies() {
+    return core::UnistylesRegistry::get().shouldTrackDependencies;
+}
+
+// calls the user's StyleSheet function, without the Babel plugin it also collects the dependencies it reads
+jsi::Object parser::Parser::callStyleSheet(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, jsi::Value&& theme, std::optional<jsi::Value> miniRuntime) {
+    auto styleSheetFn = styleSheet->rawValue.asFunction(rt);
+
+    if (!this->shouldTrackDependencies()) {
+        return miniRuntime.has_value()
+            ? styleSheetFn.call(rt, std::move(theme), std::move(miniRuntime.value())).asObject(rt)
+            : styleSheetFn.call(rt, std::move(theme)).asObject(rt);
+    }
+
+    core::DependencyTracker::Scope scope{};
+
+    auto result = miniRuntime.has_value()
+        ? styleSheetFn.call(rt, std::move(theme), core::TrackedMiniRuntime::create(rt, std::move(miniRuntime.value()))).asObject(rt)
+        : styleSheetFn.call(rt, std::move(theme)).asObject(rt);
+    auto dependencies = scope.getDependencies();
+
+    // every StyleSheet function receives the theme
+    dependencies.push_back(UnistyleDependency::THEME);
+    styleSheet->addRuntimeDependencies(dependencies);
+
+    return result;
+}
+
+// calls the user's dynamic function, without the Babel plugin it also collects the dependencies it reads
+jsi::Object parser::Parser::callDynamicFunction(jsi::Runtime& rt, Unistyle::Shared unistyle, const jsi::Function& function, const jsi::Value* args, size_t count) {
+    if (!this->shouldTrackDependencies()) {
+        return function.call(rt, args, count).asObject(rt);
+    }
+
+    core::DependencyTracker::Scope scope{};
+
+    auto result = function.call(rt, args, count).asObject(rt);
+
+    for (const auto& dependency : scope.getDependencies()) {
+        unistyle->addRuntimeDependency(dependency);
+    }
+
+    return result;
 }
 
 // parses all unistyles in StyleSheet
@@ -263,10 +298,7 @@ void parser::Parser::rebuildUnistyleWithVariants(jsi::Runtime& rt, std::shared_p
     auto sharedUnprocessedValue = std::move(unistyleFn->unprocessedValue);
 
     // call cached function with memoized arguments
-    auto functionResult = unistyleFn->rawValue
-        .asFunction(rt)
-        .call(rt, argStart, arguments.size())
-        .asObject(rt);
+    auto functionResult = this->callDynamicFunction(rt, unistyleFn, unistyleFn->rawValue.asFunction(rt), argStart, arguments.size());
 
     unistyleFn->unprocessedValue = std::move(functionResult);
     unistyleData->parsedStyle = this->parseFirstLevel(rt, unistyleFn, unistyleData->variants);
@@ -425,10 +457,7 @@ void parser::Parser::rebuildUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle
         const jsi::Value *argStart = args.data();
 
         // call cached function with memoized arguments
-        auto functionResult = unistyleFn->rawValue
-            .asFunction(rt)
-            .call(rt, argStart, dynamicFunctionMetadata.size())
-            .asObject(rt);
+        auto functionResult = this->callDynamicFunction(rt, unistyleFn, unistyleFn->rawValue.asFunction(rt), argStart, dynamicFunctionMetadata.size());
 
         unistyleFn->unprocessedValue = std::move(functionResult);
         unistyleFn->parsedStyle = this->parseFirstLevel(rt, unistyleFn, variants);
@@ -459,9 +488,27 @@ void parser::Parser::rebuildShadowLeafUpdates(jsi::Runtime& rt, core::Dependency
 }
 
 
+// without the Babel plugin, getters (eg. `get width() { return rt.screen.width }`) read the mini runtime
+// while the style is parsed, so what they read belongs to this unistyle only
+jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared unistyle, std::optional<Variants> variants) {
+    if (!this->shouldTrackDependencies()) {
+        return this->parseStyle(rt, unistyle, variants);
+    }
+
+    core::DependencyTracker::Scope scope{};
+
+    auto parsedStyle = this->parseStyle(rt, unistyle, variants);
+
+    for (const auto& dependency : scope.getDependencies()) {
+        unistyle->addRuntimeDependency(dependency);
+    }
+
+    return parsedStyle;
+}
+
 // first level of StyleSheet, we can expect here different properties than on second level
 // eg. variants, compoundVariants, mq, breakpoints etc.
-jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared unistyle, std::optional<Variants> variants) {
+jsi::Object parser::Parser::parseStyle(jsi::Runtime& rt, Unistyle::Shared unistyle, std::optional<Variants> variants) {
     // for objects - we simply operate on them
     // for functions we need to work on the unprocessed result (object)
     auto& style = unistyle->type == core::UnistyleType::Object
@@ -472,6 +519,11 @@ jsi::Object parser::Parser::parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared u
     // we need to be sure that compoundVariants are parsed after variants and after every other style
     bool shouldParseVariants = style.hasProperty(rt, "variants");
     bool shouldParseCompoundVariants = style.hasProperty(rt, "compoundVariants") && shouldParseVariants;
+
+    // without the Babel plugin, useVariants finds the styles to rebuild by this dependency
+    if (shouldParseVariants && this->shouldTrackDependencies()) {
+        unistyle->addRuntimeDependency(UnistyleDependency::VARIANTS);
+    }
 
     helpers::enumerateJSIObject(rt, style, [&](const std::string& propertyName, jsi::Value& propertyValue){
         // parse dependencies only once
@@ -621,12 +673,12 @@ jsi::Function parser::Parser::createDynamicFunctionProxy(jsi::Runtime& rt, Unist
                 : jsi::Object(rt);
             auto parser = parser::Parser(unistylesRuntime);
             // call user function
-            auto result = unistyle->rawValue.asFunction(rt).call(rt, args, count);
+            auto result = parser.callDynamicFunction(rt, unistyle, unistyle->rawValue.asFunction(rt), args, count);
 
             // memoize metadata to call it later
             auto unistyleFn = std::dynamic_pointer_cast<UnistyleDynamicFunction>(unistyle);
 
-            unistyleFn->unprocessedValue = jsi::Value(rt, result).asObject(rt);
+            unistyleFn->unprocessedValue = std::move(result);
 
             jsi::Value rawVariants = thisObject.hasProperty(rt, helpers::STYLESHEET_VARIANTS.c_str())
                 ? thisObject.getProperty(rt, helpers::STYLESHEET_VARIANTS.c_str())

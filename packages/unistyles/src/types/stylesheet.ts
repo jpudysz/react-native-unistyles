@@ -80,13 +80,14 @@ export type StyleSheetWithSuperPowers<S extends StyleSheet> =
     | ((theme: UnistylesTheme, miniRuntime: UnistylesMiniRuntime) => S)
     | S
 
-type UseVariantsFn<T> = {
-    useVariants: (variants: ExtractVariantNames<T>) => void
+type UseVariantsFn<S extends StyleSheet, T> = {
+    // returns the styles with the selected variants, react-native-unistyles/metro uses only the returned styles
+    useVariants: (variants: ExtractVariantNames<T>) => ReactNativeStyleSheet<S>
 }
 
 const create = <S extends StyleSheet>(
     stylesheet: StyleSheetWithSuperPowers<S>,
-): ReactNativeStyleSheet<S> & UseVariantsFn<typeof stylesheet> =>
-    stylesheet as ReactNativeStyleSheet<S> & UseVariantsFn<typeof stylesheet>
+): ReactNativeStyleSheet<S> & UseVariantsFn<S, typeof stylesheet> =>
+    stylesheet as ReactNativeStyleSheet<S> & UseVariantsFn<S, typeof stylesheet>
 
 export type CreateUnistylesStyleSheet = typeof create

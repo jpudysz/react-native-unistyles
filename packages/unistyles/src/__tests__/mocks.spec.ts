@@ -40,6 +40,8 @@ describe('StyleSheet.create mock', () => {
         expect(styles.container).not.toHaveProperty('compoundVariants')
         expect(styles.text).toEqual({ fontSize: 14 })
         expect(styles.useVariants).toBeDefined()
+        // the returning form, eg. for react-native-unistyles/metro
+        expect(styles.useVariants({}).container).toEqual({ flex: 1, backgroundColor: 'red' })
     })
 
     it('should strip variants from dynamic style entries', () => {

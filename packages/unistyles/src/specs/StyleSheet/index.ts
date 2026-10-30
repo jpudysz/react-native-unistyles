@@ -8,6 +8,7 @@ import type { CreateUnistylesStyleSheet } from '../../types'
 import type { UnistylesStyleSheet as UnistylesStyleSheetSpec } from './UnistylesStyleSheet.nitro'
 
 import { parseBoxShadowString } from '../../core/parseBoxShadow'
+import { TRACK_DEPENDENCIES } from '../../core/trackDependencies'
 
 type UnistylesThemeSettings =
     | {
@@ -48,7 +49,7 @@ export interface UnistylesStyleSheet extends UnistylesStyleSheetSpec {
     flatten: typeof NativeStyleSheetType.flatten
 
     // overridden methods
-    init(): void
+    init(options: { trackDependencies: boolean }): void
     create: CreateUnistylesStyleSheet
     configure(config: UnistylesConfig): void
     jsMethods: {
@@ -69,7 +70,8 @@ HybridUnistylesStyleSheet.jsMethods = {
     parseBoxShadowString,
 }
 
-HybridUnistylesStyleSheet.init()
+// without the Babel plugin (react-native-unistyles/metro), native records what every StyleSheet reads
+HybridUnistylesStyleSheet.init({ trackDependencies: TRACK_DEPENDENCIES })
 
 type PrivateMethods = 'jsMethods' | 'init'
 

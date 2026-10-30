@@ -11,6 +11,7 @@
 #include "StyleSheet.h"
 #include "ShadowLeafUpdate.h"
 #include "HashGenerator.h"
+#include "DependencyTracker.h"
 
 namespace margelo::nitro::unistyles::parser {
 
@@ -35,6 +36,10 @@ struct Parser {
 
 private:
     jsi::Object unwrapStyleSheet(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, std::optional<UnistylesNativeMiniRuntime>);
+    jsi::Object callStyleSheet(jsi::Runtime& rt, std::shared_ptr<StyleSheet> styleSheet, jsi::Value&& theme, std::optional<jsi::Value> miniRuntime);
+    jsi::Object callDynamicFunction(jsi::Runtime& rt, Unistyle::Shared unistyle, const jsi::Function& function, const jsi::Value* args, size_t count);
+    jsi::Object parseStyle(jsi::Runtime& rt, Unistyle::Shared unistyle, std::optional<Variants> variants);
+    bool shouldTrackDependencies();
     jsi::Object parseFirstLevel(jsi::Runtime& rt, Unistyle::Shared unistyle, std::optional<Variants> variants);
     jsi::Value parseSecondLevel(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Value& nestedObject);
     jsi::Function createDynamicFunctionProxy(jsi::Runtime& rt, Unistyle::Shared unistyle);
