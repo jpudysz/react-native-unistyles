@@ -129,6 +129,21 @@ describe('Web CSS sheet', () => {
         expect(describeSheet()).toEqual(['@media all{.parent_child > *{color: green;}.child{color: blue;}}'])
     })
 
+    it('deletes the right rules when styles are removed from different places in a group', () => {
+        const state = createState()
+
+        add(state, 'first', { color: 'red' })
+        add(state, 'second', { color: 'red' })
+        add(state, 'third', { color: 'red' })
+        add(state, 'fourth', { color: 'red' })
+        state.remove('second')
+        state.remove('fourth')
+        add(state, 'fifth', { color: 'red' })
+        state.remove('first')
+
+        expect(describeSheet()).toEqual(['@media all{.third{color: red;}.fifth{color: red;}}'])
+    })
+
     it('removes the pseudo and children rules together with the style', () => {
         const state = createState()
 

@@ -5,7 +5,8 @@ type StylesMap = Map<string, Map<string, Styles>>
 type RuleParent = CSSStyleSheet | CSSGroupingRule
 type Group = {
     rule: CSSGroupingRule
-    // Mirrors rule.cssRules, so finding a rule doesn't create a CSSOM wrapper for every rule in the group
+    // Mirrors rule.cssRules, so finding a rule doesn't create a CSSOM wrapper for every rule in the group.
+    // Only this runtime edits its groups, so the mirror never drifts
     rules: Array<CSSRule>
     classes: Map<string, { rule: CSSStyleRule; declarations: string }>
     // Class names whose selector the browser rejected, so a re-applied style doesn't throw again on every resize.
@@ -215,20 +216,10 @@ export class CSSSheet {
             group.rejected.delete(className)
 
             if (current) {
-                const mirrorIndex = group.rules.indexOf(current.rule)
-                const index =
-                    group.rule.cssRules[mirrorIndex] === current.rule
-                        ? mirrorIndex
-                        : indexOfRule(group.rule, current.rule)
+                const index = group.rules.indexOf(current.rule)
 
-                if (index >= 0) {
-                    group.rule.deleteRule(index)
-                }
-
-                if (mirrorIndex >= 0) {
-                    group.rules.splice(mirrorIndex, 1)
-                }
-
+                group.rule.deleteRule(index)
+                group.rules.splice(index, 1)
                 group.classes.delete(className)
             }
 
