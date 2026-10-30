@@ -279,6 +279,29 @@ describe('Web CSS sheet', () => {
         ])
     })
 
+    it('keeps the previous theme when the browser rejects the updated one', () => {
+        const state = createState()
+
+        state.addTheme('premium', { colors: { background: '#ff9ff3' } })
+
+        const sheet = getSheet()
+        const insertSheetRule = sheet.insertRule.bind(sheet)
+
+        // A value with } closes the rule early, so the browser rejects it
+        jest.spyOn(sheet, 'insertRule').mockImplementation((rule, index) => {
+            if (rule.includes('}body{')) {
+                throw new SyntaxError('unexpected content after the rule')
+            }
+
+            return insertSheetRule(rule, index)
+        })
+        state.addTheme('premium', { colors: { background: 'red}body{display:none' } })
+
+        expect(describeSheet()).toEqual([
+            ':root.premium,:root.premium [data-unistyles-reset],[data-unistyles-theme="premium"]{--colors-background: #ff9ff3;}',
+        ])
+    })
+
     it('keeps the rules of another runtime sharing the tag', () => {
         const host = createState()
 

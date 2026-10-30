@@ -115,23 +115,22 @@ export class CSSSheet {
             return
         }
 
+        // The theme goes last on every update, even an unchanged one, so it wins over the same theme another runtime
+        // on the tag added later. Theme rules only set variables, and on one element specificity tells them apart
+        const rule = insertRule(sheet, css)
+
+        // A theme the browser rejects, like one with a value such as `red}`, leaves the previous variables applied
+        if (!rule) {
+            return
+        }
+
         const currentIndex = current ? indexOfRule(sheet, current) : -1
 
         if (currentIndex >= 0) {
             sheet.deleteRule(currentIndex)
         }
 
-        // The theme goes last on every update, even an unchanged one, so it wins over the same theme another runtime
-        // on the tag added later. Theme rules only set variables, and on one element specificity tells them apart
-        const rule = insertRule(sheet, css)
-
-        if (rule) {
-            this.themes.set(key, rule)
-
-            return
-        }
-
-        this.themes.delete(key)
+        this.themes.set(key, rule)
     }
 
     // Drops the style groups and keeps the themes, as CSSState keeps them on reset
