@@ -16,6 +16,7 @@ export default function AnimationsScreen() {
 
     const theme = useAnimatedTheme()
     const offset = useSharedValue(0)
+    const rowOffset = useSharedValue(0)
     const rnOffset = useRef(new RNAnimated.Value(0)).current
     const variantColor = useAnimatedVariantColor(variantStyles.variantBox, 'backgroundColor')
 
@@ -27,6 +28,9 @@ export default function AnimationsScreen() {
     }))
     const variantStyle = useAnimatedStyle(() => ({
         backgroundColor: variantColor.value
+    }))
+    const rowStyle = useAnimatedStyle(() => ({
+        transform: [{ translateX: rowOffset.value }]
     }))
 
     const move = () => {
@@ -67,7 +71,7 @@ export default function AnimationsScreen() {
 
     return (
         <Screen>
-            <Section title="Reanimated" description="useAnimatedTheme, useAnimatedVariantColor and a Unistyles style next to an animated one">
+            <Section title="Reanimated" description="useAnimatedTheme, useAnimatedVariantColor, a Unistyles style next to an animated one and a nested Text below one">
                 <Animated.View style={[variantStyles.box, animatedThemeStyle]}>
                     <Text style={variantStyles.text}>useAnimatedTheme</Text>
                 </Animated.View>
@@ -75,6 +79,11 @@ export default function AnimationsScreen() {
                     <Text style={variantStyles.text}>useAnimatedVariantColor</Text>
                 </Animated.View>
                 <Animated.View style={[variantStyles.box, variantStyles.moving, translateStyle]} />
+                <Animated.View style={[variantStyles.box, rowStyle]}>
+                    <Text style={variantStyles.text}>
+                        A <Text style={variantStyles.nestedText}>nested Text</Text> in an animated row
+                    </Text>
+                </Animated.View>
             </Section>
             <Section title="React Native Animated">
                 <RNAnimated.View style={[variantStyles.box, variantStyles.moving, { transform: [{ translateX: rnOffset }] }]} />
@@ -96,6 +105,10 @@ const styles = StyleSheet.create(theme => ({
         backgroundColor: theme.colors.accent
     },
     text: {
+        color: theme.colors.typography
+    },
+    nestedText: {
+        fontWeight: '700',
         color: theme.colors.typography
     },
     variantBox: {

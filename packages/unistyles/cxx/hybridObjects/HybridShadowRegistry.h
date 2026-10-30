@@ -65,7 +65,7 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
             prototype.registerRawHybridMethod("getScopedTheme", 0, &HybridShadowRegistry::getScopedTheme);
             prototype.registerRawHybridMethod("verify", 0, &HybridShadowRegistry::verify);
             prototype.registerRawHybridMethod("takeCommittedInstanceHandles", 0, &HybridShadowRegistry::takeCommittedInstanceHandles);
-            prototype.registerRawHybridMethod("refreshReactNodes", 1, &HybridShadowRegistry::refreshReactNodes);
+            prototype.registerRawHybridMethod("refreshReactNodes", 2, &HybridShadowRegistry::refreshReactNodes);
         });
     };
     

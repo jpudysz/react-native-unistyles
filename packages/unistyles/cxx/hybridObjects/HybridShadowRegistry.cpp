@@ -288,9 +288,11 @@ jsi::Value HybridShadowRegistry::takeCommittedInstanceHandles(jsi::Runtime &rt, 
 }
 
 jsi::Value HybridShadowRegistry::refreshReactNodes(jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) {
-    helpers::assertThat(rt, count == 1 && args[0].isObject(), "Unistyles: refreshReactNodes expected to be called with an array of shadow nodes.");
+    helpers::assertThat(rt, count >= 1 && args[0].isObject(), "Unistyles: refreshReactNodes expected to be called with an array of shadow nodes.");
 
     auto nodes = args[0].asObject(rt).asArray(rt);
+    const bool includeUnpromoted = count > 1 && args[1].isBool() && args[1].getBool();
+    std::vector<size_t> unpromotedIndices;
 
     UNISTYLES_TRACE_SECTION("refreshReactNodes", "nodes", static_cast<int64_t>(nodes.size(rt)));
 
@@ -309,9 +311,12 @@ jsi::Value HybridShadowRegistry::refreshReactNodes(jsi::Runtime &rt, const jsi::
 
         auto wrapper = node.asObject(rt).getNativeState<ShadowNodeWrapper>(rt);
 
-        // never committed, React cloned it in a render that isn't committed yet (eg. a transition that yielded)
-        // it holds what React rendered since, pointing it at the committed node would drop that
-        if (!wrapper->shadowNode->getHasBeenPromoted()) {
+        // never mounted: React cloned it in a render that isn't committed yet (eg. a transition that yielded),
+        // pointing it at the committed node would drop what React rendered since. A commit hook (eg. Reanimated)
+        // can also replace the nodes React committed before they're mounted, only the caller can tell them apart
+        if (!includeUnpromoted && !wrapper->shadowNode->getHasBeenPromoted()) {
+            unpromotedIndices.push_back(i);
+
             continue;
         }
 
@@ -334,7 +339,13 @@ jsi::Value HybridShadowRegistry::refreshReactNodes(jsi::Runtime &rt, const jsi::
         wrapper->shadowNode = parent.get().getChildren().at(index);
     }
 
-    return jsi::Value::undefined();
+    auto result = jsi::Array(rt, unpromotedIndices.size());
+
+    for (size_t i = 0; i < unpromotedIndices.size(); i++) {
+        result.setValueAtIndex(rt, i, static_cast<double>(unpromotedIndices[i]));
+    }
+
+    return result;
 }
 
 std::shared_ptr<const core::ShadowNode> HybridShadowRegistry::getShadowNodeFromRef(jsi::Runtime& rt, const jsi::Value& maybeRef) {
