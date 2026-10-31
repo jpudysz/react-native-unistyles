@@ -308,13 +308,14 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
 
     func setRootViewBackgroundColor(color: Double) throws {
         DispatchQueue.main.async {
-            guard let presentedViewController = RCTPresentedViewController() else {
+            // use the root view controller, not the presented one, so an open modal isn't painted instead
+            guard let rootViewController = RCTKeyWindow()?.rootViewController else {
                 print("🦄 Unistyles: Couldn't set rootView backgroundColor")
 
                 return
             }
 
-            presentedViewController.view.backgroundColor = UIColor.fromInt(Int(color))
+            rootViewController.view.backgroundColor = UIColor.fromInt(Int(color))
         }
     }
 
