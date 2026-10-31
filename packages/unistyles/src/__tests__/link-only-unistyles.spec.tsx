@@ -27,6 +27,7 @@ jest.mock('react', () => {
         useRef: (value: unknown) => ({ current: value }),
         useState: (value: unknown) => [value, () => {}],
         useCallback: (callback: unknown) => callback,
+        useMemo: (factory: () => unknown) => factory(),
         useLayoutEffect: () => {},
     }
 })

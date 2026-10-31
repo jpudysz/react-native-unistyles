@@ -20,6 +20,7 @@ jest.mock('react', () => {
         ...actual,
         useContext: () => null,
         useRef: (value: unknown) => ({ current: value }),
+        useMemo: (factory: () => unknown) => factory(),
     }
 })
 
