@@ -33,6 +33,7 @@ export class CSSState {
     mainMap: MapType = new Map()
     mqMap: MapType = new Map()
     private styleTag: HTMLStyleElement | null = null
+    private recreateQueued = false
     private themesCSS = new Map<string, string>()
 
     constructor(private services: UnistylesServices) {
@@ -67,9 +68,18 @@ export class CSSState {
     }
 
     recreate = () => {
-        if (this.styleTag) {
-            this.styleTag.innerText = this.getStyles()
+        if (!this.styleTag || this.recreateQueued) {
+            return
         }
+
+        this.recreateQueued = true
+        queueMicrotask(() => {
+            this.recreateQueued = false
+
+            if (this.styleTag) {
+                this.styleTag.innerText = this.getStyles()
+            }
+        })
     }
 
     addTheme = (theme: string, values: Record<string, any>) => {
