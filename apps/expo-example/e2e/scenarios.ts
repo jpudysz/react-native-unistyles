@@ -391,6 +391,16 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.colorScheme('unspecified', system)
         await a.checkpoint()
     },
+    // rt.rtl equals I18nManager.isRTL, run it with an RTL device language, forceRTL or allowRTL(false) to exercise it
+    'rtl': async a => {
+        await a.expect('runtime-probe.rtl')
+        await a.flip('dark')
+        await a.expect('runtime-probe.rtl')
+        await a.push('/basics')
+        await a.expect('runtime-probe.rtl')
+        await a.back()
+        await a.checkpoint()
+    },
     'os-appearance': async a => {
         if (!a.hasHost) {
             return

@@ -66,6 +66,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `interactions`        | every component on `interactions` pressed, toggled or focused after theme changes (host only) | components re-rendering themselves below Unistyles, scoped and variant styles |
 | `ime`                 | the keyboard focused on `keyboard` and inside a translucent Modal, a theme change while it's up, the Modal closed with the keyboard up, a Modal below it closed (Android) | `rt.insets.ime` in a StyleSheet, `useUnistyles` and `UnistylesRuntime` agree, Android Modals get the keyboard in their own window (#810) |
 | `rn-appearance`       | `Appearance.setColorScheme` against the OS scheme with adaptive themes, on a pushed screen, then `unspecified` | adaptive themes follow RN's override on both platforms (iOS key window, Android Activity `uiMode`) |
+| `rtl`                 | `rt.rtl` read by a StyleSheet, `useUnistyles` and `UnistylesRuntime` at start, after a theme change and on a pushed screen | `rt.rtl` equals `I18nManager.isRTL` (forceRTL, allowRTL, Android `supportsRtl`, React Native's locale rule), only meaningful with an RTL device language, eg. `-AppleLanguages (ar)`, or forceRTL |
 | `os-appearance`       | OS appearance flips with adaptive themes (host only)                       | adaptive themes, inverted adaptive scopes                |
 | `random-walk`         | 14 seeded random theme changes, pushes, backs and screen actions           | combinations of the above                                |
 
@@ -120,7 +121,7 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
 ## Mutation check
 
 Each fix was reverted (or its mechanism disabled) in a Release build and the suite failed with a report pointing at
-the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 to M11 added 2026-10-03 on iOS and Android, M12 and M13 added 2026-10-05, M14 added 2026-10-06, M17 and M18 added 2026-10-22, M19 added 2026-10-23, M20 to M22 added 2026-10-22):
+the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 to M11 added 2026-10-03 on iOS and Android, M12 and M13 added 2026-10-05, M14 added 2026-10-06, M17 and M18 added 2026-10-22, M19 added 2026-10-23, M20 to M22 added 2026-10-22, M23 added 2026-10-30):
 
 | mutation                                                                                   | caught by                                                         | first failure                                                                                   |
 | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
@@ -147,6 +148,7 @@ the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 t
 | M20 RN 0.88 background layer strings (`backgroundSize`, `backgroundPosition`, `backgroundRepeat`) sent raw by shadow tree updates (2026-10-22) | checkpoints in another theme than the overlay mounted in (iOS, `shared-dynamic-fn`) | overlay probe `linear-gradient` expected `#16a085` (dark) actual `#8e44ad`, the native props read a string as no layer |
 | M21 background layer arrays read as breakpoints by the parser (2026-10-22)                 | every checkpoint (iOS, `shared-dynamic-fn`)                       | overlay probe `radial-gradient` expected `#d35400` (dark) actual `#8e44ad`, the array is dropped before React renders it |
 | M22 the `fontVariationSettings` object sent unconverted by shadow tree updates (2026-10-22) | every step after a theme change with the header rendered (iOS, `shared-dynamic-fn`) | header `Paragraph 'title' fontVariationSettings expected undefined actual 'wght' 650.5`, the native props only read a string |
+| M23 `rt.rtl` computed by Unistyles' own rule (forceRTL or an RTL locale, ignoring `allowRTL`) instead of React Native's (2026-10-30, Debug builds through the deep link) | `rtl` with an RTL device language and `allowRTL(false)` (Android emulator in `ar-EG`, 3 failures, iOS simulator with `-AppleLanguages (ar)` and an `ar` localization) | `rt rtl expected I18nManager.isRTL false actual native true StyleSheet true useUnistyles true` |
 
 #1266 can't be reverted as a whole, `verify()` reads the registry it introduced, so M4a and M4b disable its two
 mechanisms. The use after free itself (#1217, #1179) only crashes with freed families, which needs a Release build with

@@ -127,7 +127,7 @@ import { UnistylesRuntime } from 'react-native-unistyles'
 | `isLandscape` | `boolean` | Shorthand for landscape check |
 | `pixelRatio` | `number` | Device pixel ratio |
 | `fontScale` | `number` | User font scale preference |
-| `rtl` | `boolean` | Whether layout direction is RTL. Updates at runtime on Android (`I18nManager.forceRTL` / locale change) and web (`dir` on `<html>`); on iOS read at startup (restart required) |
+| `rtl` | `boolean` | Whether layout direction is RTL, same rule as React Native's `I18nManager.isRTL` (`forceRTL`, `allowRTL`, Android `supportsRtl`, the app's localizations on iOS). Updates at runtime on Android (`I18nManager.forceRTL` / `allowRTL` / locale change) and web (`dir` on `<html>`); on iOS read at startup (restart required) |
 | `contentSizeCategory` | `IOSContentSizeCategory \| AndroidContentSizeCategory \| WebContentSizeCategory` | Accessibility text size (`'web-unspecified'` on web) |
 | `breakpoints` | `UnistylesBreakpoints` | Registered breakpoints object |
 
