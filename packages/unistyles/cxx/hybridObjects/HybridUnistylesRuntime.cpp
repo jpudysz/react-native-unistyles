@@ -44,7 +44,7 @@ std::optional<std::string> HybridUnistylesRuntime::getBreakpoint() {
 };
 
 bool HybridUnistylesRuntime::getRtl() {
-    return this->_nativePlatform->getPrefersRtlDirection();
+    return this->_nativePlatform->getMiniRuntime().rtl;
 }
 
 Insets HybridUnistylesRuntime::getInsets() {

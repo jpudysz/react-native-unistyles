@@ -75,7 +75,7 @@ On the web, `statusBar` and `navigationBar` always report `0` dimensions, and `s
 
 ### RTL updates
 
-`rtl` follows React Native's rule for `I18nManager.isRTL`: it's `true` when `I18nManager.forceRTL(true)` was called, or when the app's language is RTL and `I18nManager.allowRTL(false)` wasn't called. On Android the app also needs `android:supportsRtl="true"` in `AndroidManifest.xml`, on iOS the RTL language must be one of the app's localizations.
+`rtl` follows React Native's rule for `I18nManager.isRTL`: it's `true` when `I18nManager.forceRTL(true)` was called, or when the app's language is RTL and `I18nManager.allowRTL(false)` wasn't called. On Android the app also needs `android:supportsRtl="true"` in `AndroidManifest.xml`, even with `forceRTL`. On iOS an RTL app language counts only if it's one of the app's localizations, `forceRTL` works without it.
 
 `rtl` is updated at runtime:
 
