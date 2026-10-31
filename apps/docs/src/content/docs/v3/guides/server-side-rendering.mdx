@@ -20,6 +20,41 @@ React Server Components (RSC) are not officially supported. Render components st
 Your server components (like the root layout or pages) can still import and render these Client Components.
 </Aside>
 
+### Next.js setup
+
+Unistyles relies on its Babel plugin, so Next.js has to compile your app with Babel and webpack instead of SWC and Turbopack.
+Next.js picks up a `babel.config.js` automatically. Set `root` to the folder with your components:
+
+```js title="babel.config.js"
+module.exports = api => {
+    api.cache(true)
+
+    return {
+        presets: ['next/babel'],
+        plugins: [['react-native-unistyles/plugin', { root: 'app' }]]
+    }
+}
+```
+
+Then resolve `react-native` to `react-native-web` and define `__DEV__`, which React Native libraries expect:
+
+```js title="next.config.js"
+const webpack = require('webpack')
+
+module.exports = {
+    transpilePackages: ['react-native-web', 'react-native-unistyles'],
+    webpack: (config, { dev }) => {
+        config.resolve.alias = { ...config.resolve.alias, 'react-native$': 'react-native-web' }
+        config.resolve.extensions = ['.web.js', '.web.jsx', '.web.ts', '.web.tsx', ...config.resolve.extensions]
+        config.plugins.push(new webpack.DefinePlugin({ __DEV__: JSON.stringify(dev) }))
+
+        return config
+    }
+}
+```
+
+Next.js 16 uses Turbopack by default, so run it with webpack: `next dev --webpack` and `next build --webpack`.
+
 ### Usage
 
 <Tabs>
