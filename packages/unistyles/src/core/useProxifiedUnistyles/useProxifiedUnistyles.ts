@@ -72,6 +72,11 @@ export const useProxifiedUnistyles = () => {
     }
 
     useEffect(() => {
+        // make sure it runs after fast refesh
+        if (wasDisposedRef.current) {
+            reinitListener()
+        }
+
         return () => {
             disposeRef.current?.()
             syncedDependenciesSizeRef.current = -1
