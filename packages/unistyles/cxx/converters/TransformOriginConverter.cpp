@@ -28,7 +28,8 @@ namespace {
 // must not reach it. Returns null (default origin) for an invalid value.
 folly::dynamic processTransformOriginString(const std::string &value) {
   static const std::regex tokenRegex(
-      "(top|bottom|left|right|center|\\d+(?:%|px)|0)", std::regex::icase);
+      "(top|bottom|left|right|center|-?\\d*\\.?\\d+(?:%|px)|0)",
+      std::regex::icase);
   constexpr size_t INDEX_X = 0;
   constexpr size_t INDEX_Y = 1;
   constexpr size_t INDEX_Z = 2;
@@ -99,7 +100,7 @@ folly::dynamic processTransformOriginString(const std::string &value) {
 
       result[index] = token;
     } else {
-      // 0 or <digits>px
+      // 0 or <number>px
       result[index] = std::strtod(token.c_str(), nullptr);
     }
 

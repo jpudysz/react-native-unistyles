@@ -23,6 +23,7 @@ export const SCENARIOS = [
     'interactions',
     'ime',
     'rn-appearance',
+    'rtl',
     'os-appearance',
     'random-walk'
 ] as const

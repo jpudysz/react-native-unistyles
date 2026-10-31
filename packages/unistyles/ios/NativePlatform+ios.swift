@@ -246,10 +246,7 @@ class NativeIOSPlatform: HybridNativePlatformSpec {
 
     func getPrefersRtlDirection() -> Bool {
         func getPrefersRtlDirectionFn() -> Bool {
-            let hasForcedRtl = UserDefaults.standard.bool(forKey: "RCTI18nUtil_forceRTL")
-            let isRtl = UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
-
-            return hasForcedRtl || isRtl
+            return RCTI18nUtil.sharedInstance().isRTL()
         }
 
         if Thread.isMainThread {

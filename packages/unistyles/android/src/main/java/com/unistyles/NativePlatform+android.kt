@@ -12,7 +12,6 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.annotation.Keep
 import androidx.core.content.OnConfigurationChangedProvider
-import androidx.core.text.TextUtilsCompat
 import androidx.core.util.Consumer
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -21,6 +20,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.modules.i18nmanager.I18nUtil
 import com.margelo.nitro.unistyles.ColorScheme
 import com.margelo.nitro.unistyles.Dimensions
 import com.margelo.nitro.unistyles.HybridNativePlatformSpec
@@ -29,7 +29,6 @@ import com.margelo.nitro.unistyles.Orientation
 import com.margelo.nitro.unistyles.UnistyleDependency
 import com.margelo.nitro.unistyles.UnistylesNativeMiniRuntime
 import java.lang.ref.WeakReference
-import java.util.Locale
 
 @Keep
 @DoNotStrip
@@ -207,19 +206,7 @@ class NativePlatformAndroid(private val reactContext: ReactApplicationContext): 
     }
 
     override fun getPrefersRtlDirection(): Boolean {
-        // forced by React Native
-        val sharedPrefs = reactContext.getSharedPreferences(
-            "com.facebook.react.modules.i18nmanager.I18nUtil",
-            Context.MODE_PRIVATE
-        )
-        val resourcesLocale = configurationResources.configuration.locales[0]
-        val hasForcedRtl = sharedPrefs.getBoolean("RCTI18nUtil_forceRTL", false)
-        // user preferences
-        val isRtl = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == ViewCompat.LAYOUT_DIRECTION_RTL
-        val isResourcesRtl = TextUtilsCompat.getLayoutDirectionFromLocale(resourcesLocale) == ViewCompat.LAYOUT_DIRECTION_RTL
-
-
-        return hasForcedRtl || isRtl || isResourcesRtl
+        return I18nUtil.instance.isRTL(reactContext.currentActivity ?: reactContext)
     }
 
     override fun setRootViewBackgroundColor(color: Double) {

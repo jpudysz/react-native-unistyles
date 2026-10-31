@@ -37,7 +37,7 @@ class NativePlatformListener(
     }
 
     private val rtlPreferenceListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
-        if (key == "RCTI18nUtil_forceRTL") {
+        if (key == "RCTI18nUtil_forceRTL" || key == "RCTI18nUtil_allowRTL") {
             notifyConfigChangedWithDelay()
         }
     }

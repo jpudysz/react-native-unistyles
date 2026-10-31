@@ -45,7 +45,7 @@ and use it anywhere in your code, even outside a React component.
 | navigationBar | \{width: number, height: number\} | Navigation bar dimensions (Android only) |
 | pixelRatio | number | Pixel density of the device |
 | fontScale | number | Font scale of the device |
-| rtl | boolean | Indicates if the device is in RTL mode |
+| rtl | boolean | Indicates if the app is laid out right-to-left, same as React Native's `I18nManager.isRTL` |
 
 ## Methods
 
@@ -75,9 +75,11 @@ On the web, `statusBar` and `navigationBar` always report `0` dimensions, and `s
 
 ### RTL updates
 
+`rtl` follows React Native's rule for `I18nManager.isRTL`: it's `true` when `I18nManager.forceRTL(true)` was called, or when the app's language is RTL and `I18nManager.allowRTL(false)` wasn't called. On Android the app also needs `android:supportsRtl="true"` in `AndroidManifest.xml`, even with `forceRTL`. On iOS an RTL app language counts only if it's one of the app's localizations, `forceRTL` works without it.
+
 `rtl` is updated at runtime:
 
-- **Android** – when you call `I18nManager.forceRTL` or the app locale changes
+- **Android** – when you call `I18nManager.forceRTL` / `I18nManager.allowRTL` or the app locale changes (React Native applies them to the layout only after a reload)
 - **Web** – when the `dir` attribute of the `html` element changes
 - **iOS** – the value is read at app start, so changing it requires an app restart
 
