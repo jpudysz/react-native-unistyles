@@ -5,10 +5,8 @@ type StylesMap = Map<string, Map<string, Styles>>
 type RuleParent = CSSStyleSheet | CSSGroupingRule
 type Group = {
     rule: CSSGroupingRule
-    // Mirrors rule.cssRules without a CSSOM wrapper per rule, only this runtime edits the group
     rules: Array<CSSRule>
     classes: Map<string, { rule: CSSStyleRule; declarations: string }>
-    // Declarations a rule was rejected with, so the same style re-applied on resize doesn't throw again
     rejected: Map<string, string>
 }
 
@@ -48,7 +46,6 @@ export class CSSSheet {
     private sheet: CSSStyleSheet | null = null
     private groups = new Map<string, Group | null>()
     private themes = new Map<string, CSSRule>()
-    // Server-rendered CSS stays until the first style change, which replaces it with the same styles
     private hasServerStyles = false
 
     constructor(
@@ -76,7 +73,6 @@ export class CSSSheet {
         this.sheet = this.tag.sheet
     }
 
-    // Brings the rules back if the tag lost them, for a change that syncs no class
     refresh = () => {
         const sheet = this.getSheet()
 
@@ -129,7 +125,6 @@ export class CSSSheet {
         return true
     }
 
-    // Drops the style groups and keeps the themes, as CSSState keeps them on reset
     reset = () => {
         const sheet = this.tag?.sheet
 
@@ -179,6 +174,8 @@ export class CSSSheet {
 
     private insertAll = (sheet: CSSStyleSheet) => {
         this.groups.clear()
+        // A theme added on top of server styles another runtime already replaced is still in this sheet
+        this.deleteOwnRules(sheet, new Set(this.themes.values()))
         this.themes.clear()
         this.themesCSS.forEach((_, key) => this.syncTheme(key))
         this.insertGroups(sheet)

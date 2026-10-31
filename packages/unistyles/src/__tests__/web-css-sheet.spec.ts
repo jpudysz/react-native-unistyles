@@ -401,6 +401,26 @@ describe('Web CSS sheet', () => {
         expect(describeSheet()).toEqual(['@media all{.host{color: red;}}', '@media all{.widget{color: blue;}}'])
     })
 
+    it("doesn't duplicate a theme added before the first style change once another runtime replaced the server styles", () => {
+        document.head.innerHTML = '<style id="unistyles-web">.hash{color:red;}</style>'
+
+        const host = createState()
+        const widget = createState()
+        const theme = (background: string) =>
+            `:root.premium,:root.premium [data-unistyles-reset],[data-unistyles-theme="premium"]{--colors-background: ${background};}`
+
+        add(host, 'host', { color: 'red' })
+        widget.addTheme('premium', { colors: { background: '#ff9ff3' } })
+        add(widget, 'widget', { color: 'blue' })
+        widget.addTheme('premium', { colors: { background: '#000000' } })
+
+        expect(describeSheet()).toEqual([
+            '@media all{.host{color: red;}}',
+            '@media all{.widget{color: blue;}}',
+            theme('#000000'),
+        ])
+    })
+
     it('applies a theme update on top of the server styles until hydration', () => {
         document.head.innerHTML = '<style id="unistyles-web">.hash{color:red;}</style>'
 

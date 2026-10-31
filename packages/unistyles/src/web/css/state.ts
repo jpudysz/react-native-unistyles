@@ -25,10 +25,8 @@ const forEachClassName = (
 }
 
 export class CSSState {
-    // The base group goes first, so a media query always overrides it at the same specificity
     mainMap: MapType = new Map([['', new Map()]])
     private themesCSS = new Map<string, string>()
-    // Every class name each hash produced, pseudo and children selectors included
     private owners = new Map<string, ClassNames>()
     private hydratedState?: ReturnType<CSSState['getState']>
     private sheet = new CSSSheet(this.themesCSS, this.mainMap)
@@ -50,7 +48,6 @@ export class CSSState {
     }
 
     add = (hash: string, values: UnistylesValues) => {
-        // Converted apart first, so a style that fails to convert keeps its previous declarations
         const styles: MapType = new Map()
 
         convertToCSS(hash, convertUnistyles(values, this.services.runtime), {
@@ -61,7 +58,6 @@ export class CSSState {
 
         const previousClassNames = this.owners.get(hash)
 
-        // Cleared in place, so each rule is edited where it is and the cascade order doesn't change
         forEachClassName(previousClassNames, (mediaQuery, className) => {
             this.mainMap.get(mediaQuery)?.get(className)?.clear()
         })
@@ -120,7 +116,6 @@ export class CSSState {
         )
     }
 
-    // themesCSS keeps the last theme the browser accepted, so a new sheet gets the variables that apply now
     private setThemeCSS = (key: string, css: string) => {
         if (this.sheet.syncTheme(key, css)) {
             this.themesCSS.set(key, css)
@@ -185,7 +180,6 @@ export class CSSState {
     }
 
     hydrate = (state: ReturnType<typeof this.getState>) => {
-        // useServerUnistyles hydrates the same state on every render, a second run would undo later changes
         if (state === this.hydratedState) {
             return
         }
@@ -209,7 +203,6 @@ export class CSSState {
         }
 
         hydrateState(state.mainState)
-        // An older server sends media query styles apart
         hydrateState(state.mqState)
     }
 
