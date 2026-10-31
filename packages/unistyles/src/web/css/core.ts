@@ -4,6 +4,7 @@ import { isPseudoClass } from '../convert/pseudo'
 import { getMediaQuery } from '../utils'
 
 type SetProps = Parameters<CSSState['set']>[0]
+type StyleTarget = Pick<CSSState, 'set'>
 
 // box-none and box-only aren't CSS values, polyfill them like react-native-web: [element, children]
 const POINTER_EVENTS: Record<string, [string, string]> = {
@@ -11,9 +12,22 @@ const POINTER_EVENTS: Record<string, [string, string]> = {
     'box-only': ['auto', 'none'],
 }
 
-export const getChildrenClassName = (className: string) => `:where(.${className})>*`
+const CHILDREN_PREFIX = ':where(.'
+const CHILDREN_SUFFIX = ')>*'
 
-const setStyle = (state: CSSState, props: SetProps) => {
+export const getChildrenClassName = (className: string) => `${CHILDREN_PREFIX}${className}${CHILDREN_SUFFIX}`
+
+// hash:hover, hash::before and :where(.hash)>* belong to hash. Hashes have no colons, a forChild one keeps ' > *'
+export const getClassNameHash = (className: string) => {
+    const name = className.startsWith(CHILDREN_PREFIX)
+        ? className.slice(CHILDREN_PREFIX.length, -CHILDREN_SUFFIX.length)
+        : className
+    const pseudoIndex = name.indexOf(':')
+
+    return pseudoIndex === -1 ? name : name.slice(0, pseudoIndex)
+}
+
+const setStyle = (state: StyleTarget, props: SetProps) => {
     if (props.propertyKey !== 'pointerEvents') {
         state.set(props)
 
@@ -28,7 +42,7 @@ const setStyle = (state: CSSState, props: SetProps) => {
     state.set({ ...props, className: getChildrenClassName(props.className), value: childrenValue })
 }
 
-export const convertToCSS = (hash: string, value: Record<string, any>, state: CSSState) => {
+export const convertToCSS = (hash: string, value: Record<string, any>, state: StyleTarget) => {
     Object.entries(value).forEach(([styleKey, styleValue]) => {
         if (styleKey[0] === '_') {
             const isStylePseudoClass = isPseudoClass(styleKey)

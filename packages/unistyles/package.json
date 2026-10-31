@@ -176,6 +176,7 @@
     "esbuild": "0.28.2",
     "jest": "30.5.2",
     "jscodeshift": "17.4.0",
+    "jsdom": "26.1.0",
     "nitrogen": "0.37.1",
     "oxfmt": "0.74.0",
     "oxlint": "1.89.0",
