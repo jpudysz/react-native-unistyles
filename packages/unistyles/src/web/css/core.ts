@@ -17,8 +17,7 @@ const CHILDREN_SUFFIX = ')>*'
 
 export const getChildrenClassName = (className: string) => `${CHILDREN_PREFIX}${className}${CHILDREN_SUFFIX}`
 
-// The hash a class name was made from: hash, hash:hover, hash::before or :where(.hash)>*.
-// Hashes have no colons, and a forChild hash keeps its ' > *', as the registry caches it whole
+// hash:hover, hash::before and :where(.hash)>* belong to hash. Hashes have no colons, a forChild one keeps ' > *'
 export const getClassNameHash = (className: string) => {
     const name = className.startsWith(CHILDREN_PREFIX)
         ? className.slice(CHILDREN_PREFIX.length, -CHILDREN_SUFFIX.length)

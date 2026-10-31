@@ -28,8 +28,9 @@ export class CSSState {
     // The base group goes first, so a media query always overrides it at the same specificity
     mainMap: MapType = new Map([['', new Map()]])
     private themesCSS = new Map<string, string>()
-    // Every class name a hash produced, pseudo and children selectors included, so re-applying or removing it is exact
+    // Every class name each hash produced, pseudo and children selectors included
     private owners = new Map<string, ClassNames>()
+    private hydratedState?: ReturnType<CSSState['getState']>
     private sheet = new CSSSheet(this.themesCSS, this.mainMap)
 
     constructor(private services: UnistylesServices) {}
@@ -40,7 +41,7 @@ export class CSSState {
 
         thirdLevelMap.set(propertyKey, value)
 
-        // The owner comes from the class name, so styles written without add, like hydrated ones, are removed whole
+        // The owner comes from the class name, so hydrated styles have one too
         const owner: ClassNames = safeGetMap(this.owners, getClassNameHash(className))
         const classNames = owner.get(mediaQuery) ?? new Set()
 
@@ -60,12 +61,10 @@ export class CSSState {
 
         const previousClassNames = this.owners.get(hash)
 
-        // Re-applying a hash replaces its styles, so a property or selector it doesn't produce anymore doesn't linger.
-        // Clearing keeps each class in place: its rule is edited where it is, and the cascade order doesn't change
+        // Cleared in place, so each rule is edited where it is and the cascade order doesn't change
         forEachClassName(previousClassNames, (mediaQuery, className) => {
             this.mainMap.get(mediaQuery)?.get(className)?.clear()
         })
-        // set gives the hash only the class names it produces now
         this.owners.delete(hash)
         styles.forEach((classes, mediaQuery) => {
             classes.forEach((properties, className) => {
@@ -83,7 +82,7 @@ export class CSSState {
         })
         forEachClassName(classNames, this.sheet.syncClass)
 
-        // syncClass brings the rules back if the tag lost them, without a class to sync refresh does it
+        // syncClass already brings back the rules the tag lost, refresh does it when nothing was synced
         if (!previousClassNames && !classNames) {
             this.sheet.refresh()
         }
@@ -178,15 +177,21 @@ export class CSSState {
                 }),
             ]
         }) as HydrateState
-        // Always empty: media query styles live in mainState with the rest.
-        // Kept only for compatibility with clients that read it, drop it in 4.0
+        // Always empty, media query styles live in mainState. Kept for compatibility, drop it in 4.0
         const mqState: HydrateState = []
         const config = this.services.state.getConfig()
 
         return { mainState, mqState, config }
     }
 
-    hydrate = ({ mainState, mqState }: ReturnType<typeof this.getState>) => {
+    hydrate = (state: ReturnType<typeof this.getState>) => {
+        // useServerUnistyles hydrates the same state on every render, a second run would undo later changes
+        if (state === this.hydratedState) {
+            return
+        }
+
+        this.hydratedState = state
+
         const hydrateState = (map: HydrateState) => {
             map.forEach(([mediaQuery, classNames]) => {
                 classNames.forEach(([className, style]) => {
@@ -203,15 +208,16 @@ export class CSSState {
             })
         }
 
-        hydrateState(mainState)
-        // A server that sent media query styles apart still gets them into the same groups
-        hydrateState(mqState)
+        hydrateState(state.mainState)
+        // An older server sends media query styles apart
+        hydrateState(state.mqState)
     }
 
     reset = () => {
         this.mainMap.clear()
         this.mainMap.set('', new Map())
         this.owners.clear()
+        this.hydratedState = undefined
         this.sheet.reset()
     }
 }

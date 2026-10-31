@@ -385,6 +385,22 @@ describe('Web CSS sheet', () => {
         ])
     })
 
+    it("doesn't clear the tag again once another runtime replaced the server styles", () => {
+        document.head.innerHTML = '<style id="unistyles-web">.hash{color:red;}</style>'
+
+        const host = createState()
+        const widget = createState()
+
+        add(host, 'host', { color: 'red' })
+
+        const setTextContent = jest.spyOn(getTag(), 'textContent', 'set')
+
+        add(widget, 'widget', { color: 'blue' })
+
+        expect(setTextContent).not.toHaveBeenCalled()
+        expect(describeSheet()).toEqual(['@media all{.host{color: red;}}', '@media all{.widget{color: blue;}}'])
+    })
+
     it('applies a theme update on top of the server styles until hydration', () => {
         document.head.innerHTML = '<style id="unistyles-web">.hash{color:red;}</style>'
 
@@ -419,6 +435,32 @@ describe('Web CSS sheet', () => {
         ])
     })
 
+    it('hydrates the same server state only once', () => {
+        const state = createState()
+        // useServerUnistyles hydrates with the same window.__UNISTYLES_STATE__ on every render
+        const serverState: Parameters<CSSState['hydrate']>[0] = {
+            mainState: [
+                [
+                    '',
+                    [
+                        ['hash', [['color', 'red']]],
+                        ['removed', [['color', 'black']]],
+                    ],
+                ],
+            ],
+            mqState: [],
+            config: {} as never,
+        }
+
+        state.hydrate(serverState)
+        add(state, 'hash', { color: 'green' })
+        state.remove('removed')
+        state.hydrate(serverState)
+
+        expect(describeSheet()).toEqual(['@media all{.hash{color: green;}}'])
+        expect(state.getStyles()).toBe('.hash{color:green;}')
+    })
+
     it('skips a rule the browser rejects and applies the rest', () => {
         const state = createState()
 
@@ -450,7 +492,7 @@ describe('Web CSS sheet', () => {
         })
         const getRejectedInserts = () =>
             insertRule.mock.calls.filter(([rule]) => rule.startsWith('.hash::incorrect-pseudo')).length
-        // Hydration takes class names as they come, and useServerUnistyles hydrates on every render
+        // Hydration takes class names as they come, and each call sends a new server state
         const hydrate = () =>
             state.hydrate({
                 mainState: [

@@ -5,12 +5,10 @@ type StylesMap = Map<string, Map<string, Styles>>
 type RuleParent = CSSStyleSheet | CSSGroupingRule
 type Group = {
     rule: CSSGroupingRule
-    // Mirrors rule.cssRules, so finding a rule doesn't create a CSSOM wrapper for every rule in the group.
-    // Only this runtime edits its groups, so the mirror never drifts
+    // Mirrors rule.cssRules without a CSSOM wrapper per rule, only this runtime edits the group
     rules: Array<CSSRule>
     classes: Map<string, { rule: CSSStyleRule; declarations: string }>
-    // Declarations of each class whose rule the browser rejected, for its selector or a value like `red}`, so the same
-    // style re-applied on every resize doesn't throw again. Dropped with the style, so removed styles don't pile up here
+    // Declarations a rule was rejected with, so the same style re-applied on resize doesn't throw again
     rejected: Map<string, string>
 }
 
@@ -44,13 +42,10 @@ const insertRule = (parent: RuleParent, rule: string, index = parent.cssRules.le
 
 const indexOfRule = (parent: RuleParent, rule: CSSRule) => Array.prototype.indexOf.call(parent.cssRules, rule)
 
-// Keeps the styles of CSSState in the style tag rule by rule: rewriting the tag's text reparsed the whole sheet and
-// restyled every element on each change, while a rule edited through the CSSOM restyles only what its selector matches.
-// Rules are only inserted, edited and deleted, never the text, so another runtime sharing the tag keeps its rules
+// Keeps the styles of CSSState in the style tag through the CSSOM, never its text, so another runtime keeps its rules
 export class CSSSheet {
     private tag: HTMLStyleElement | null = null
     private sheet: CSSStyleSheet | null = null
-    // In the order of the styles map: the base group first, then media queries as they first appear
     private groups = new Map<string, Group | null>()
     private themes = new Map<string, CSSRule>()
     // Server-rendered CSS stays until the first style change, which replaces it with the same styles
@@ -81,7 +76,7 @@ export class CSSSheet {
         this.sheet = this.tag.sheet
     }
 
-    // Every style change brings the rules back if the tag lost them, as rewriting the whole tag did
+    // Brings the rules back if the tag lost them, for a change that syncs no class
     refresh = () => {
         const sheet = this.getSheet()
 
@@ -115,11 +110,10 @@ export class CSSSheet {
             return true
         }
 
-        // The theme goes last on every update, even an unchanged one, so it wins over the same theme another runtime
-        // on the tag added later. Theme rules only set variables, and on one element specificity tells them apart
+        // The theme goes last on every update, so it wins over the same theme of a runtime added to the tag later
         const rule = insertRule(sheet, css)
 
-        // A theme the browser rejects, like one with a value such as `red}`, leaves the previous variables applied
+        // Inserted before the old rule goes, so a theme the browser rejects keeps the previous variables
         if (!rule) {
             return false
         }
@@ -155,9 +149,13 @@ export class CSSSheet {
             document.head.appendChild(this.tag)
         }
 
+        // Another runtime on the tag may have cleared the server text and filled the tag through the CSSOM already
         if (this.hasServerStyles) {
             this.hasServerStyles = false
-            this.tag.textContent = ''
+
+            if (this.tag.textContent) {
+                this.tag.textContent = ''
+            }
         }
 
         const sheet = this.tag.sheet
@@ -185,11 +183,11 @@ export class CSSSheet {
         this.themesCSS.forEach((_, key) => this.syncTheme(key))
         this.insertGroups(sheet)
         this.groups.forEach((group, mediaQuery) => {
-            this.styles.get(mediaQuery)?.forEach((styles, className) => {
-                if (group) {
-                    this.syncGroupClass(group, className, styles)
-                }
-            })
+            if (!group) {
+                return
+            }
+
+            this.styles.get(mediaQuery)?.forEach((styles, className) => this.syncGroupClass(group, className, styles))
         })
     }
 
@@ -230,7 +228,6 @@ export class CSSSheet {
         const declarations = getDeclarations(styles)
 
         if (current) {
-            // Re-applied styles mostly come back the same, like on every resize event
             if (current.declarations !== declarations) {
                 current.rule.style.cssText = declarations
                 current.declarations = declarations
