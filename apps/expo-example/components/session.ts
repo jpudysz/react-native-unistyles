@@ -22,7 +22,9 @@ export const useIsLoggedIn = () => useSyncExternalStore(
             listeners.delete(listener)
         }
     },
-    () => isLoggedIn
+    () => isLoggedIn,
+    // Every request starts logged in
+    () => true
 )
 
 // Gives the garbage collector something to do, so families released by React Native are really freed

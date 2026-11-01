@@ -6,14 +6,19 @@ import type { UseUpdateVariantColorConfig } from './types'
 
 import { UnistyleDependency } from '../../specs'
 import { services } from '../../web/services'
-import { getClosestBreakpointValue } from '../../web/utils'
+import { getClosestBreakpointValue, isServer } from '../../web/utils'
 
 export const useUpdateVariantColor = <T extends Record<string, any>>({
     animateCallback,
     colorKey,
     style,
 }: UseUpdateVariantColorConfig<T>) => {
+    // Resolves CSS variables to colors, there is no document on the server
     const [dummyDiv] = useState(() => {
+        if (isServer()) {
+            return undefined
+        }
+
         const div = document.createElement('div')
 
         div.style.display = 'none'
@@ -36,6 +41,11 @@ export const useUpdateVariantColor = <T extends Record<string, any>>({
                 : (getClosestBreakpointValue<string>(services.runtime, currentColor) ?? 'rgb(0, 0, 0)')
 
         if (currentColorVar.startsWith('var(--')) {
+            // The browser animates to the real color after it renders
+            if (!dummyDiv) {
+                return 'rgb(0, 0, 0)'
+            }
+
             dummyDiv.style.color = currentColorVar
 
             return getComputedStyle(dummyDiv).color
@@ -72,7 +82,7 @@ export const useUpdateVariantColor = <T extends Record<string, any>>({
         return () => dispose()
     }, [style, colorKey])
 
-    useEffect(() => () => dummyDiv.remove(), [])
+    useEffect(() => () => dummyDiv?.remove(), [])
 
     return {
         fromValue,

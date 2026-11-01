@@ -57,7 +57,9 @@ export const runnerStore = {
             listeners.delete(listener)
         }
     },
-    getSnapshot: () => state
+    getSnapshot: () => state,
+    // Runs start in the browser only, server output renders no overlay
+    getServerSnapshot: () => undefined
 }
 
 const publish = (next: Partial<RunnerState>) => {
