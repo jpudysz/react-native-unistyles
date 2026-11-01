@@ -1,6 +1,7 @@
 declare const __dirname: string
 
-const { readdirSync, readFileSync } = jest.requireActual('fs') as {
+const { existsSync, readdirSync, readFileSync } = jest.requireActual('fs') as {
+    existsSync(path: string): boolean
     readdirSync(path: string): Array<string>
     readFileSync(path: string, encoding: 'utf8'): string
 }
@@ -54,9 +55,31 @@ const platformEntries = Object.entries(packageExports).filter(
         typeof entry[1] === 'object' && 'react-native' in entry[1],
 )
 
-// Metro falls back to these package.json files when an exports target has no file, eg. `./src/components/native/*`
+const componentNames = readdirSync(join(PACKAGE_ROOT, 'components/native'))
+
+// a subpath matches its own key first, then a `*` pattern, `*` in the target is replaced with the part of the subpath it matched
+const resolveSubpath = (subpath: string, condition: string) => {
+    if (packageExports[subpath]) {
+        return resolveConditions(packageExports[subpath], [condition])
+    }
+
+    for (const [key, target] of Object.entries(packageExports)) {
+        const [prefix, suffix] = key.split('*')
+
+        if (suffix !== undefined && subpath.startsWith(prefix!) && subpath.endsWith(suffix)) {
+            return resolveConditions(target, [condition])?.replace(
+                '*',
+                subpath.slice(prefix!.length, subpath.length - suffix.length),
+            )
+        }
+    }
+
+    return undefined
+}
+
+// bundlers without exports support resolve the package.json files of these directories
 const stubDirs = [
-    ...readdirSync(join(PACKAGE_ROOT, 'components/native')).map((name) => `components/native/${name}`),
+    ...componentNames.map((name) => `components/native/${name}`),
     'server',
     'web',
     'reanimated',
@@ -83,6 +106,41 @@ describe('package exports', () => {
         it.each(platformEntries)('should resolve %s to lib/module', (_subpath, target) => {
             expect(resolveConditions(target, conditions)).toBe(target.browser)
             expect(target.browser).toMatch(/^\.\/lib\/module\//)
+        })
+    })
+
+    // #1360: Metro doesn't add extensions to exports targets, it warned and fell back to the package.json of components/native/View
+    // Metro doesn't pick platform files either, components with a .native.tsx file have their own entry
+    describe.each(componentNames)('components/native/%s', (name) => {
+        const stubDir = join(PACKAGE_ROOT, 'components/native', name)
+        const stub = readJson(join(stubDir, 'package.json')) as Record<
+            'main' | 'module' | 'browser' | 'react-native',
+            string
+        >
+        const fields = {
+            browser: 'browser',
+            'react-native': 'react-native',
+            import: 'module',
+            default: 'main',
+        } as const
+
+        it.each(Object.entries(fields))(
+            'should resolve the %s condition to the file of the %s field',
+            (condition, field) => {
+                const target = resolveSubpath(`./components/native/${name}`, condition)
+
+                expect(target).toBeDefined()
+                expect(resolve(PACKAGE_ROOT, target!)).toBe(resolve(stubDir, stub[field]))
+            },
+        )
+
+        // a stale package.json (build-components.js not rerun) kept the generic TouchableHighlight on native
+        it('should resolve the react-native condition to the native file if there is one', () => {
+            const nativeFile = join(SOURCE_DIR, 'components/native', `${name}.native.tsx`)
+            const expected = existsSync(nativeFile) ? nativeFile : join(SOURCE_DIR, 'components/native', `${name}.tsx`)
+
+            expect(existsSync(expected)).toBe(true)
+            expect(resolve(stubDir, stub['react-native'])).toBe(expected)
         })
     })
 

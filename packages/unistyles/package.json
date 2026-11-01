@@ -39,10 +39,52 @@
       "default": "./lib/commonjs/mocks.js"
     },
     "./components/native/*": {
-      "browser": "./lib/module/components/native/*",
-      "react-native": "./src/components/native/*",
-      "import": "./lib/module/components/native/*",
-      "default": "./lib/commonjs/components/native/*"
+      "browser": "./lib/module/components/native/*.js",
+      "react-native": "./src/components/native/*.tsx",
+      "import": "./lib/module/components/native/*.js",
+      "default": "./lib/commonjs/components/native/*.js"
+    },
+    "./components/native/ActivityIndicator": {
+      "browser": "./lib/module/components/native/ActivityIndicator.js",
+      "react-native": "./src/components/native/ActivityIndicator.native.tsx",
+      "import": "./lib/module/components/native/ActivityIndicator.js",
+      "default": "./lib/commonjs/components/native/ActivityIndicator.js"
+    },
+    "./components/native/Image": {
+      "browser": "./lib/module/components/native/Image.js",
+      "react-native": "./src/components/native/Image.native.tsx",
+      "import": "./lib/module/components/native/Image.js",
+      "default": "./lib/commonjs/components/native/Image.js"
+    },
+    "./components/native/ImageBackground": {
+      "browser": "./lib/module/components/native/ImageBackground.js",
+      "react-native": "./src/components/native/ImageBackground.native.tsx",
+      "import": "./lib/module/components/native/ImageBackground.js",
+      "default": "./lib/commonjs/components/native/ImageBackground.js"
+    },
+    "./components/native/NativeText": {
+      "browser": "./lib/module/components/native/NativeText.js",
+      "react-native": "./src/components/native/NativeText.native.tsx",
+      "import": "./lib/module/components/native/NativeText.js",
+      "default": "./lib/commonjs/components/native/NativeText.js"
+    },
+    "./components/native/NativeView": {
+      "browser": "./lib/module/components/native/NativeView.js",
+      "react-native": "./src/components/native/NativeView.native.tsx",
+      "import": "./lib/module/components/native/NativeView.js",
+      "default": "./lib/commonjs/components/native/NativeView.js"
+    },
+    "./components/native/Pressable": {
+      "browser": "./lib/module/components/native/Pressable.js",
+      "react-native": "./src/components/native/Pressable.native.tsx",
+      "import": "./lib/module/components/native/Pressable.js",
+      "default": "./lib/commonjs/components/native/Pressable.js"
+    },
+    "./components/native/TouchableHighlight": {
+      "browser": "./lib/module/components/native/TouchableHighlight.js",
+      "react-native": "./src/components/native/TouchableHighlight.native.tsx",
+      "import": "./lib/module/components/native/TouchableHighlight.js",
+      "default": "./lib/commonjs/components/native/TouchableHighlight.js"
     },
     "./plugin": {
       "import": "./plugin/index.js",
