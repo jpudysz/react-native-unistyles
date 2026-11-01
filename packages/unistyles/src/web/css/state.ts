@@ -36,6 +36,7 @@ export class CSSState {
         // server styles in the browser. Only while the tag holds them: once emptied, another runtime sharing it took them
         if (!isServer() && window.__UNISTYLES_STATE__ && document.getElementById('unistyles-web')?.textContent) {
             this.hydrate(window.__UNISTYLES_STATE__)
+            document.querySelector('#unistyles-script')?.remove()
         }
     }
 

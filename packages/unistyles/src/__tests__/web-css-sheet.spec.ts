@@ -483,7 +483,8 @@ describe('Web CSS sheet', () => {
 
     it('takes over the server styles on its own when nothing hydrates them', () => {
         // e.g. Expo Router's +html, which renders useServerUnistyles only on the server
-        document.head.innerHTML = '<style id="unistyles-web">.hash{color:red;}</style>'
+        document.head.innerHTML =
+            '<style id="unistyles-web">.hash{color:red;}</style><script id="unistyles-script"></script>'
 
         const serverState: Parameters<CSSState['hydrate']>[0] = {
             mainState: [['', [['hash', [['color', 'red']]]]]],
@@ -498,6 +499,7 @@ describe('Web CSS sheet', () => {
 
             expect(getTag().textContent).toBe('')
             expect(describeSheet()).toEqual(['@media all{.hash{color: red;}}'])
+            expect(document.getElementById('unistyles-script')).toBeNull()
 
             // useServerUnistyles hydrating the same state later and another runtime sharing the tag change nothing
             state.hydrate(serverState)

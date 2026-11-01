@@ -40,6 +40,27 @@ describe('StyleSheet.create on the server', () => {
         expect({ ...styles }.text).toBe(styles.text)
     })
 
+    it('behaves like the StyleSheet create returns once configured', () => {
+        const { create, services } = loadServer()
+        const styles = create((theme: any) => ({
+            text: { color: theme.colors.text },
+            box: (size: number) => ({ width: size }),
+        })) as any
+
+        services.state.init({ themes, settings: { initialTheme: 'light' } } as never)
+
+        expect('text' in styles).toBe(true)
+        expect(styles.text).toBe(styles.text)
+        expect(styles.box(10)).toBeDefined()
+        expect(Object.keys(styles.useVariants({}))).toEqual(['text', 'box', 'useVariants'])
+
+        styles.extra = 1
+
+        expect(styles.extra).toBe(1)
+        expect(() => Object.freeze(styles)).not.toThrow()
+        expect(Object.isFrozen(styles)).toBe(true)
+    })
+
     it('still tells that StyleSheet.configure is missing when such a StyleSheet is used before it', () => {
         const { create } = loadServer()
         const styles = create((theme: any) => ({ text: { color: theme.colors.text } }))
@@ -54,8 +75,9 @@ describe('StyleSheet.create on the server', () => {
 
         const stylesheet = jest.fn((theme: any) => ({ text: { color: theme.colors.text } }))
 
-        create(stylesheet)
+        const styles = create(stylesheet)
 
         expect(stylesheet).toHaveBeenCalled()
+        expect(require('util').types.isProxy(styles)).toBe(false)
     })
 })

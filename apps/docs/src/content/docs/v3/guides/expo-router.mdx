@@ -93,7 +93,7 @@ import { useServerDocumentContext } from 'expo-router/html'
 import { type PropsWithChildren } from 'react'
 import { useServerUnistyles } from 'react-native-unistyles/server'
 
-// Rendered after the page, so it collects the page's styles
+// Rendered after the page, so it collects the styles the page rendered
 const UnistylesStyles = () => <>{useServerUnistyles({ includeRNWStyles: false })}</>
 
 export default function Root({ children }: PropsWithChildren) {
@@ -114,7 +114,16 @@ export default function Root({ children }: PropsWithChildren) {
 
 <Aside type="caution">
 Render `UnistylesStyles` after `children`. `+html.tsx` renders before the page, so calling `useServerUnistyles` in `Root` would only collect the styles of the previous request.
+
+Content inside a `<Suspense>` boundary that suspends on the server (e.g. `React.lazy` or `use`) renders after `UnistylesStyles`. Its styles are applied once the JavaScript loads, and they end up in the styles of the next request.
 </Aside>
+
+If you don't use adaptive themes, add the class of your initial theme to `<html>`, so that the page uses its CSS variables before the JavaScript loads:
+
+```diff lang="tsx" title="+html.tsx"
+- <html {...htmlAttributes}>
++ <html {...htmlAttributes} className="light">
+```
 
 `useServerDocumentContext` already includes `react-native-web` styles in `headNodes`, so `includeRNWStyles` is disabled.
 In the browser, Unistyles takes over the server styles on its own, so you don't need to call `hydrateServerUnistyles`.
