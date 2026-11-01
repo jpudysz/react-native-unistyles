@@ -17,11 +17,11 @@ You are migrating a React Native codebase from react-native-unistyles v2 to v3. 
 
 ## Prerequisites
 
-- React Native 0.81.0+ with New Architecture **mandatory** (enabled by default since RN 0.76, the only architecture since RN 0.82)
+- React Native 0.85.0+ with New Architecture **mandatory** (the only architecture since RN 0.82)
 - React 19+ (enforced at runtime by Unistyles)
 - `react-native-nitro-modules` (native bridge dependency; Unistyles 3.4.0+ requires 0.37.1+)
 - `react-native-edge-to-edge` is not needed (optional since v3.1.0, now deprecated) — set `edgeToEdgeEnabled=true` in `android/gradle.properties` instead (Expo SDK 54+ enables it automatically)
-- Expo SDK 54+ (if using Expo; not compatible with Expo Go — requires dev client or prebuild)
+- Expo SDK 56+ (if using Expo; not compatible with Expo Go — requires dev client or prebuild)
 - Xcode 16.4+ (iOS, required by Nitro Modules), iOS 15.1+
 
 ## Migration Workflow
@@ -365,7 +365,7 @@ When a third-party component needs theme values or Unistyles styles:
 
 ## Critical Rules
 
-1. **New Architecture is mandatory** - it's enabled by default since RN 0.76 and is the only architecture since RN 0.82; on RN 0.81 make sure you haven't opted out
+1. **New Architecture is mandatory** - it's the only architecture since RN 0.82
 2. **NEVER spread styles** - always use array syntax `[styles.a, styles.b]`
 3. **A build-time integration is REQUIRED** - the Babel plugin (default), the experimental Metro integration (3.6.0+, never together with the Babel plugin) or `RepackUnistylePlugin` for Re.Pack; without one, styles won't be reactive. With the Metro integration, use the styles returned by `useVariants`
 4. **Import `StyleSheet` from `react-native-unistyles` only** - it polyfills all RN StyleSheet APIs (`hairlineWidth`, `compose`, `flatten`, `absoluteFill`, etc.), so remove any `import { StyleSheet } from 'react-native'`

@@ -14,9 +14,9 @@
 
 ## Requirements
 
-- React Native 0.81+ with the New Architecture
+- React Native 0.85+ with the New Architecture
 - React 19+
-- Expo SDK 54+ (if you use Expo, development builds only, Expo Go is not supported)
+- Expo SDK 56+ (if you use Expo, development builds only, Expo Go is not supported)
 
 Need support for older React Native versions or the Old Architecture? Use [Unistyles 2.0](https://v2.unistyl.es).
 
