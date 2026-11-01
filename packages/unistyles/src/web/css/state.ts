@@ -2,7 +2,7 @@ import type { UnistylesValues } from '../../types'
 import type { UnistylesServices } from '../types'
 
 import { convertUnistyles } from '../convert'
-import { hyphenate } from '../utils'
+import { hyphenate, isServer } from '../utils'
 import { convertToCSS, getClassNameHash } from './core'
 import { CSSSheet, getDeclarations, getSelector } from './sheet'
 import { safeGetMap } from './utils'
@@ -31,7 +31,13 @@ export class CSSState {
     private hydratedState?: ReturnType<CSSState['getState']>
     private sheet = new CSSSheet(this.themesCSS, this.mainMap)
 
-    constructor(private services: UnistylesServices) {}
+    constructor(private services: UnistylesServices) {
+        // Some frameworks render useServerUnistyles only on the server (e.g. Expo Router's +html), so nothing hydrates the
+        // server styles in the browser. Only while the tag holds them: once emptied, another runtime sharing it took them
+        if (!isServer() && window.__UNISTYLES_STATE__ && document.getElementById('unistyles-web')?.textContent) {
+            this.hydrate(window.__UNISTYLES_STATE__)
+        }
+    }
 
     set = ({ className, propertyKey, value, mediaQuery = '' }: SetProps) => {
         const secondLevelMap = safeGetMap(this.mainMap, mediaQuery)

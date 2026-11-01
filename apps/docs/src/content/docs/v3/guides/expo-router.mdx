@@ -82,4 +82,44 @@ export default function Root({ children }: PropsWithChildren) {
 
 This ensures that Unistyles is initialized whenever Expo Router renders the next static page.
 
+### Expo Router Web - Server rendering
+
+With server rendering (`"output": "server"`, Expo SDK 58 and later), Expo renders every page on request with the same `+html.tsx` file.
+The server doesn't run your main entry, so import the config file in `+html.tsx`, and render the page's styles with `useServerUnistyles`:
+
+```tsx title="+html.tsx"
+import '../unistyles' // <-- file that initializes Unistyles
+import { useServerDocumentContext } from 'expo-router/html'
+import { type PropsWithChildren } from 'react'
+import { useServerUnistyles } from 'react-native-unistyles/server'
+
+// Rendered after the page, so it collects the page's styles
+const UnistylesStyles = () => <>{useServerUnistyles({ includeRNWStyles: false })}</>
+
+export default function Root({ children }: PropsWithChildren) {
+    const { htmlAttributes, bodyAttributes, headNodes, bodyNodes } = useServerDocumentContext()
+
+    return (
+        <html {...htmlAttributes}>
+            <head>{headNodes}</head>
+            <body {...bodyAttributes}>
+                {children}
+                <UnistylesStyles />
+                {bodyNodes}
+            </body>
+        </html>
+    )
+}
+```
+
+<Aside type="caution">
+Render `UnistylesStyles` after `children`. `+html.tsx` renders before the page, so calling `useServerUnistyles` in `Root` would only collect the styles of the previous request.
+</Aside>
+
+`useServerDocumentContext` already includes `react-native-web` styles in `headNodes`, so `includeRNWStyles` is disabled.
+In the browser, Unistyles takes over the server styles on its own, so you don't need to call `hydrateServerUnistyles`.
+
+The server doesn't know the browser's color scheme, screen size or breakpoint. Values read during render, e.g. with `useUnistyles`, can differ between the server's HTML and the browser's first render.
+Keep styles that depend on them in `StyleSheet` (breakpoints, media queries, adaptive themes), which the server renders as CSS.
+
 </Seo>
