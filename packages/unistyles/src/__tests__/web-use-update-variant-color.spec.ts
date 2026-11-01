@@ -1,5 +1,7 @@
 // useAnimatedVariantColor rendered during SSR, eg. by Expo Router server output
 const mockParsedStyles: Record<string, unknown> = {}
+// layout effects run in the browser only
+let mockRunLayoutEffects = false
 
 // the hook is called as a plain function, outside of React
 jest.mock('react', () => {
@@ -11,7 +13,7 @@ jest.mock('react', () => {
         useMemo: (factory: () => unknown) => factory(),
         useCallback: (callback: unknown) => callback,
         useEffect: () => {},
-        useLayoutEffect: () => {},
+        useLayoutEffect: (effect: () => void) => mockRunLayoutEffects && effect(),
     }
 })
 jest.mock('react-native-reanimated', () => ({
@@ -31,13 +33,17 @@ jest.mock('../web/services', () => ({
 const { useUpdateVariantColor } =
     require('../reanimated/variant/useUpdateVariantColor.ts') as typeof import('../reanimated/variant/useUpdateVariantColor')
 
-const render = () =>
-    useUpdateVariantColor({
+const render = () => {
+    const animateCallback = jest.fn()
+    const { fromValue, toValue } = useUpdateVariantColor({
         colorKey: 'backgroundColor',
         style: {},
         secretKey: undefined,
-        animateCallback: () => {},
+        animateCallback,
     } as never)
+
+    return { animateCallback, fromValue: fromValue.get(), toValue: toValue.get() }
+}
 
 describe('useUpdateVariantColor', () => {
     const globals = globalThis as Record<string, unknown>
@@ -45,11 +51,24 @@ describe('useUpdateVariantColor', () => {
     const originalDocument = globals.document
     const originalGetComputedStyle = globals.getComputedStyle
 
+    const mockBrowser = () => {
+        const div = { style: {} as Record<string, string> }
+        const appendChild = jest.fn()
+
+        mockRunLayoutEffects = true
+        globals.window = {}
+        globals.document = { createElement: jest.fn(() => div), body: { appendChild } }
+        globals.getComputedStyle = jest.fn(() => ({ color: 'rgb(1, 2, 3)' }))
+
+        return { div, appendChild }
+    }
+
     beforeEach(() => {
         mockParsedStyles.backgroundColor = 'var(--colors-primary)'
     })
 
     afterEach(() => {
+        mockRunLayoutEffects = false
         globals.window = originalWindow
         globals.document = originalDocument
         globals.getComputedStyle = originalGetComputedStyle
@@ -59,29 +78,25 @@ describe('useUpdateVariantColor', () => {
         delete globals.window
         delete globals.document
 
-        expect(render().toValue.get()).toBe('rgb(0, 0, 0)')
+        expect(render()).toMatchObject({ fromValue: 'rgb(0, 0, 0)', toValue: 'rgb(0, 0, 0)' })
     })
 
-    it('keeps plain colors on the server', () => {
-        mockParsedStyles.backgroundColor = 'rgb(255, 0, 0)'
-        delete globals.document
+    // hydration keeps the server's inline style, Reanimated only writes a value that changed
+    it('starts from the server color in the browser and sets the resolved CSS variable before paint', () => {
+        const { div, appendChild } = mockBrowser()
+        const { animateCallback, fromValue, toValue } = render()
 
-        expect(render().toValue.get()).toBe('rgb(255, 0, 0)')
-    })
-
-    it('resolves CSS variables with a hidden element in the browser', () => {
-        const div = { style: {} as Record<string, string> }
-        const appendChild = jest.fn()
-
-        globals.window = {}
-        globals.document = { createElement: jest.fn(() => div), body: { appendChild } }
-        globals.getComputedStyle = jest.fn(() => ({ color: 'rgb(1, 2, 3)' }))
-
-        const { fromValue, toValue } = render()
-
+        expect(fromValue).toBe('rgb(0, 0, 0)')
+        expect(toValue).toBe('rgb(0, 0, 0)')
         expect(appendChild).toHaveBeenCalledWith(div)
         expect(div.style).toEqual({ display: 'none', color: 'var(--colors-primary)' })
-        expect(fromValue.get()).toBe('rgb(1, 2, 3)')
-        expect(toValue.get()).toBe('rgb(1, 2, 3)')
+        expect(animateCallback).toHaveBeenCalledWith('rgb(0, 0, 0)', 'rgb(1, 2, 3)')
+    })
+
+    it('sets plain colors before paint in the browser', () => {
+        mockParsedStyles.backgroundColor = 'rgb(255, 0, 0)'
+        mockBrowser()
+
+        expect(render().animateCallback).toHaveBeenCalledWith('rgb(0, 0, 0)', 'rgb(255, 0, 0)')
     })
 })

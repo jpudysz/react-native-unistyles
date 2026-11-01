@@ -8,6 +8,10 @@ import { UnistyleDependency } from '../../specs'
 import { services } from '../../web/services'
 import { getClosestBreakpointValue, isServer } from '../../web/utils'
 
+// The first render paints this color on the server and in the browser, then the layout effect sets the real one.
+// Matching the server lets the effect replace its HTML: Reanimated skips writing a value that didn't change
+const INITIAL_COLOR = 'rgb(0, 0, 0)'
+
 export const useUpdateVariantColor = <T extends Record<string, any>>({
     animateCallback,
     colorKey,
@@ -40,12 +44,8 @@ export const useUpdateVariantColor = <T extends Record<string, any>>({
                 ? currentColor
                 : (getClosestBreakpointValue<string>(services.runtime, currentColor) ?? 'rgb(0, 0, 0)')
 
-        if (currentColorVar.startsWith('var(--')) {
-            // The browser animates to the real color after it renders
-            if (!dummyDiv) {
-                return 'rgb(0, 0, 0)'
-            }
-
+        // Called from effects only, which don't run on the server
+        if (currentColorVar.startsWith('var(--') && dummyDiv) {
             dummyDiv.style.color = currentColorVar
 
             return getComputedStyle(dummyDiv).color
@@ -53,8 +53,8 @@ export const useUpdateVariantColor = <T extends Record<string, any>>({
 
         return currentColorVar
     }, [style, colorKey])
-    const fromValue = useSharedValue<string>(getCurrentColor())
-    const toValue = useSharedValue<string>(getCurrentColor())
+    const fromValue = useSharedValue<string>(INITIAL_COLOR)
+    const toValue = useSharedValue<string>(INITIAL_COLOR)
 
     useEffect(() => {
         const dispose = services.listener.addListeners([UnistyleDependency.Theme], () => {
