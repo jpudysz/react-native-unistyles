@@ -205,7 +205,7 @@ Check, in order: the file is processed by the Babel plugin (`debug: true`); the 
 ### iOS gradients (`backgroundImage`) cleared on theme change
 
 **Symptoms:** A `experimental_backgroundImage` / `backgroundImage` string gradient from a StyleSheet disappears on iOS after a theme change.
-**Solution:** Fixed in **3.6.0** for React Native 0.83+ (gradients follow theme changes). On older React Native versions they keep the colors React rendered last.
+**Solution:** Fixed in **3.6.0** (gradients follow theme changes).
 **Ref:** [#1030](https://github.com/jpudysz/react-native-unistyles/issues/1030)
 
 ### withUnistyles not always updating
