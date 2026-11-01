@@ -27,9 +27,13 @@ describe('Web array style values', () => {
         )
     })
 
+    it('converts transformMatrix instead of reading it as breakpoints', () => {
+        expect(getStyles({ transformMatrix: [1, 0, 0, 1, 0, 0] })).toBe('.hash{transform:matrix(1, 0, 0, 1, 0, 0);}')
+    })
+
     it('joins array values inside breakpoints', () => {
         expect(getStyles({ fontVariant: { xs: ['small-caps'], md: ['small-caps', 'oldstyle-nums'] } })).toBe(
-            '@media (min-width: 0px) and (max-width: 767px){.hash{font-variant:small-caps;}}' +
+            '@media (min-width: 0px) and (max-width: 767.98px){.hash{font-variant:small-caps;}}' +
                 '@media (min-width: 768px){.hash{font-variant:small-caps oldstyle-nums;}}',
         )
     })
