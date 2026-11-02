@@ -173,7 +173,7 @@ module.exports = {
 }
 ```
 
-Unistyles itself also handles the React Native 0.83+ root exports `import { unstable_NativeText as NativeText, unstable_NativeView as NativeView } from 'react-native'` (use a capitalized alias — lowercase JSX tags are host components; on RN 0.83–0.86 TypeScript needs `"customConditions": ["react-native-strict-api"]` or `// @ts-expect-error`).
+Unistyles itself also handles the React Native 0.83+ root exports `import { unstable_NativeText as NativeText, unstable_NativeView as NativeView } from 'react-native'` (use a capitalized alias — lowercase JSX tags are host components; on RN 0.85–0.86 TypeScript needs `"customConditions": ["react-native-strict-api"]` or `// @ts-expect-error`).
 
 It doesn't make non-RN views (e.g. SVG, icon fonts) reactive — use `withUnistyles` for those.
 

@@ -289,7 +289,7 @@ const styles = StyleSheet.create(theme => ({
 
 **Cause:** v3 requires React 19+ and the New Architecture.
 
-**Fix:** Upgrade to React Native 0.81+ (minimum supported by Unistyles), which includes React 19. The New Architecture is the only architecture since RN 0.82; on RN 0.81 make sure it isn't disabled:
+**Fix:** Upgrade to React Native 0.85+ (minimum supported by Unistyles), which includes React 19. The New Architecture is the only architecture since RN 0.82:
 
 ```js
 // For bare RN: android/gradle.properties

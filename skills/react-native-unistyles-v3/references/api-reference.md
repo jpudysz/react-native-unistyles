@@ -54,7 +54,7 @@ const styles = StyleSheet.create(theme => ({
 
 Arguments must be serializable (strings, numbers, booleans, `null`, `undefined`, plain arrays/objects): they're stored in C++ and the function is re-run natively on theme/runtime changes. Functions are dropped (shifting the remaining arguments); `Date`, `Map`, `Set` and class instances become plain objects.
 
-`boxShadow` and `filter: [{ dropShadow }]` also accept CSS-like strings (e.g. `boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'`), parsed on iOS/Android. `experimental_backgroundImage` / `backgroundImage` gradient strings follow theme changes on iOS since 3.6.0 (React Native 0.83+).
+`boxShadow` and `filter: [{ dropShadow }]` also accept CSS-like strings (e.g. `boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'`), parsed on iOS/Android. `experimental_backgroundImage` / `backgroundImage` gradient strings follow theme changes on iOS since 3.6.0.
 
 ### StyleSheet.configure(config)
 
