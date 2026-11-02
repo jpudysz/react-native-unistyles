@@ -1,10 +1,14 @@
+import { serialize } from '../server/serialize'
 import { CSSState } from '../web/css/state'
+import { UnistylesRuntime } from '../web/runtime'
 import { UnistylesState } from '../web/state'
 
 type DOM = { window: Window & typeof globalThis }
 
 // The React Native preset can't run in the jsdom environment, so the test brings its own document
-const { JSDOM } = jest.requireActual('jsdom') as { JSDOM: new (html: string) => DOM }
+const { JSDOM } = jest.requireActual('jsdom') as {
+    JSDOM: new (html: string, options?: { runScripts: 'dangerously' }) => DOM
+}
 
 jest.mock('../web/services', () => ({}))
 
@@ -80,5 +84,33 @@ describe('Server rendered page in the browser', () => {
 
         expect(getTag().textContent).toBe(SERVER_CSS)
         expect(document.getElementById('unistyles-script')).not.toBeNull()
+    })
+
+    it('hands the server theme name over to the browser', () => {
+        const createRuntimeServices = (themeName: string) => {
+            const services = {
+                state: { hasAdaptiveThemes: false, themeName, getConfig: () => ({}) },
+            } as unknown as ConstructorParameters<typeof UnistylesRuntime>[0]
+
+            services.runtime = new UnistylesRuntime(services)
+
+            return services
+        }
+
+        // @ts-expect-error the server has no window
+        delete globalThis.window
+        // @ts-expect-error the server has no document
+        delete globalThis.document
+
+        const serverState = serialize(new CSSState(createRuntimeServices('dark')).getState())
+        // The script `getServerUnistyles` renders
+        const { window } = new JSDOM(`<script>window.__UNISTYLES_STATE__ = ${serverState}</script>`, {
+            runScripts: 'dangerously',
+        })
+
+        Object.assign(window, { matchMedia: () => ({ matches: false }) })
+        Object.assign(globalThis, { window, document: window.document })
+
+        expect(createRuntimeServices('light').runtime.serverThemeName).toBe('dark')
     })
 })
