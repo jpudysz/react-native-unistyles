@@ -43,7 +43,21 @@ std::vector<InstanceHandle::Shared> shadow::ShadowTreeManager::updateShadowTree(
                 return;
             }
 
+            // children of the first attempt's clone
+            std::shared_ptr<const std::vector<std::shared_ptr<const ShadowNode>>> clonedChildren;
+
             shadowTree.commit([&](const RootShadowNode& oldRootShadowNode) -> RootShadowNode::Unshared {
+                // another thread committed during the first attempt (e.g. a Reanimated frame)
+                // cloning again keeps losing while those commits continue, until ShadowTree::commit gives up,
+                // so a retry commits like React: the newest root (e.g. layout constraints) with the cloned children,
+                // and state reconciliation carries over state committed in between
+                if (clonedChildren) {
+                    return std::make_shared<RootShadowNode>(oldRootShadowNode, ShadowNodeFragment{
+                        .props = ShadowNodeFragment::propsPlaceholder(),
+                        .children = clonedChildren,
+                    });
+                }
+
                 PropsParserContext propsParserContext{shadowTree.getSurfaceId(), *oldRootShadowNode.getContextContainer()};
                 auto newRootShadowNode = oldRootShadowNode.cloneMultiple(familiesIt->second, [&](const ShadowNode& oldShadowNode, const ShadowNodeFragment& fragment) {
                     auto propsIt = tagToProps.find(oldShadowNode.getTag());
@@ -68,8 +82,12 @@ std::vector<InstanceHandle::Shared> shadow::ShadowTreeManager::updateShadowTree(
                     });
                 });
 
+                if (newRootShadowNode) {
+                    clonedChildren = std::make_shared<const std::vector<std::shared_ptr<const ShadowNode>>>(newRootShadowNode->getChildren());
+                }
+
                 return std::static_pointer_cast<RootShadowNode>(newRootShadowNode);
-            }, {});
+            }, {.enableStateReconciliation = true});
         });
     });
 
