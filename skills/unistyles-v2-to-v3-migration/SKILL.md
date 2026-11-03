@@ -53,7 +53,7 @@ If using React Compiler, the Unistyles plugin MUST come BEFORE React Compiler in
 
 Since 3.6.0, Metro apps can use the experimental zero-config Metro integration instead: `module.exports = withUnistylesConfig(getDefaultConfig(__dirname))` with `withUnistylesConfig` from `react-native-unistyles/metro`, and no Unistyles entry in `babel.config.js` (having both throws). It needs no `root`/`autoProcess*` options, covers `node_modules` and tracks StyleSheet dependencies at runtime (no Babel transform). With it, `useVariants` must use the returned styles: `const variantStyles = styles.useVariants({ size })`. The Babel plugin stays the default.
 
-If the app is bundled with Re.Pack, don't add the plugin to `babel.config.js` — use `RepackUnistylePlugin` from `react-native-unistyles/repack-plugin` with `unistylesPluginOptions: { root: 'src' }` instead.
+If the app is bundled with Re.Pack, keep the plugin in `babel.config.js` (Re.Pack's `babel-swc-loader` runs it), or use the experimental `UnistylesPlugin` from `react-native-unistyles/repack-plugin` in `rspack.config.mjs` instead, with no options and no Babel plugin. `RepackUnistylePlugin` is removed.
 
 ### Step 2: Replace UnistylesRegistry with StyleSheet.configure
 
@@ -367,7 +367,7 @@ When a third-party component needs theme values or Unistyles styles:
 
 1. **New Architecture is mandatory** - it's the only architecture since RN 0.82
 2. **NEVER spread styles** - always use array syntax `[styles.a, styles.b]`
-3. **A build-time integration is REQUIRED** - the Babel plugin (default), the experimental Metro integration (3.6.0+, never together with the Babel plugin) or `RepackUnistylePlugin` for Re.Pack; without one, styles won't be reactive. With the Metro integration, use the styles returned by `useVariants`
+3. **A build-time integration is REQUIRED** - the Babel plugin (default), the experimental Metro integration (3.6.0+) or the experimental `UnistylesPlugin` for Re.Pack, Rspack and Rsbuild (both never together with the Babel plugin); without one, styles won't be reactive. With the Metro integration or `UnistylesPlugin`, use the styles returned by `useVariants`
 4. **Import `StyleSheet` from `react-native-unistyles` only** - it polyfills all RN StyleSheet APIs (`hairlineWidth`, `compose`, `flatten`, `absoluteFill`, etc.), so remove any `import { StyleSheet } from 'react-native'`
 5. **Prefer importing `StyleSheet` directly from `react-native-unistyles`** - if you re-export it from your own package/alias (e.g. `@myorg/design-system`), files outside `root` that use it must be listed via `autoProcessImports`
 6. **`styles.useVariants({...})` must be called before accessing styles** in the component render (always with an object)

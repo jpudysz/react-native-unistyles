@@ -661,19 +661,19 @@ module.exports = {
 
 Outside `root`, files are processed only if they import `react-native-unistyles`, contain an `autoProcessImports` import, or match `autoProcessPaths`. The plugin replaces `react-native` component imports with Unistyles component factories that borrow the native ref; it does not inject unique ids into StyleSheets. String refs (`ref="x"`) throw. The plugin is a no-op when `NODE_ENV=test`.
 
-**Re.Pack:** instead of `babel.config.js`, register the loader plugin:
+**Re.Pack:** the plugin above works in `babel.config.js`, Re.Pack's `babel-swc-loader` runs it. Without the Babel plugin, use the experimental `UnistylesPlugin` (no options, runtime dependency tracking like the Metro integration):
 
 ```js
 // rspack.config.mjs
-import { RepackUnistylePlugin } from 'react-native-unistyles/repack-plugin'
+import { UnistylesPlugin } from 'react-native-unistyles/repack-plugin'
 
 plugins: [
   new Repack.RepackPlugin(),
-  new RepackUnistylePlugin({ unistylesPluginOptions: { root: 'src' } })
+  new UnistylesPlugin()
 ]
 ```
 
-It requires `@babel/plugin-syntax-typescript` and `babel-plugin-syntax-hermes-parser` to be installed.
+`RepackUnistylePlugin` is removed.
 
 ---
 

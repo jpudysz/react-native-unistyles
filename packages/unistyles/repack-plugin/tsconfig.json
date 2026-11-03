@@ -1,0 +1,8 @@
+{
+  "extends": "../tsconfig",
+  "compilerOptions": {
+    "types": ["jest", "node"]
+  },
+  "include": ["."],
+  "exclude": ["fixtures/**/*.mjs"]
+}

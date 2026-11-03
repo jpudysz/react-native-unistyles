@@ -181,7 +181,7 @@ It doesn't make non-RN views (e.g. SVG, icon fonts) reactive — use `withUnisty
 
 ## Re.Pack
 
-Use `RepackUnistylePlugin` from `react-native-unistyles/repack-plugin` in your Rspack config instead of the Babel config entry; pass the same options as `unistylesPluginOptions` (`root` required). See [setup-guide.md](setup-guide.md#repack).
+Keep the Babel plugin in `babel.config.js` (Re.Pack's `babel-swc-loader` runs it), or use the experimental `UnistylesPlugin` from `react-native-unistyles/repack-plugin` in your Rspack config (Re.Pack, Rspack or Rsbuild) without the Babel plugin. `RepackUnistylePlugin` is removed. See [setup-guide.md](setup-guide.md#repack-rspack-rsbuild).
 
 ---
 
