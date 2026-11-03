@@ -36,7 +36,7 @@ const describeRule = (rule: CSSRule): string => {
 // Browsers serialize rules their own way, so the tests read what each rule holds
 const describeSheet = () => Array.from(getSheet().cssRules, describeRule)
 const childSelector = (hash: string, pseudo = '') =>
-    `.${hash}_child > *${pseudo},.${hash}_child > :where([style*="display:contents"],[style*="display: contents"],.unistyles-contents):where(:not([class^="unistyles_"][class$="_child"])) > :where(:only-child)${pseudo}`
+    `.${hash}_child > *${pseudo},.${hash}_child > :where([style^="display:contents"],[style^="display: contents"],[style*=";display:contents"],[style*="; display: contents"],.unistyles-contents):where(:not([class^="unistyles_"][class$="_child"])) > :where(:only-child)${pseudo}`
 
 beforeEach(() => {
     dom = new JSDOM()
@@ -568,7 +568,7 @@ describe('Web CSS sheet', () => {
 
 describe('Web CSS forChild selector', () => {
     const REACH_THROUGH =
-        '_child > :where([style*="display:contents"],[style*="display: contents"],.unistyles-contents):where(:not([class^="unistyles_"][class$="_child"])) > :where(:only-child)'
+        '_child > :where([style^="display:contents"],[style^="display: contents"],[style*=";display:contents"],[style*="; display: contents"],.unistyles-contents):where(:not([class^="unistyles_"][class$="_child"])) > :where(:only-child)'
 
     it('keeps the selector of a style that is not for a child', () => {
         expect(getSelector('hash')).toBe('.hash')

@@ -19,7 +19,7 @@ const CHILD_SELECTOR = '_child > *'
 // so also reach the only child of a display: contents view, unless it's another withUnistyles wrapper
 // React writes an inline display:contents on the server and display: contents on the client
 // :where() keeps the specificity of the original selector
-const CONTENTS_CHILD_SELECTOR = `_child > :where([style*="display:contents"],[style*="display: contents"],.${CONTENTS_CLASS_NAME}):where(:not([class^="unistyles_"][class$="_child"])) > :where(:only-child)`
+const CONTENTS_CHILD_SELECTOR = `_child > :where([style^="display:contents"],[style^="display: contents"],[style*=";display:contents"],[style*="; display: contents"],.${CONTENTS_CLASS_NAME}):where(:not([class^="unistyles_"][class$="_child"])) > :where(:only-child)`
 
 export const getSelector = (className: string) => {
     const selector = className[0] === ':' ? className : `.${className}`
