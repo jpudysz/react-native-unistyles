@@ -81,8 +81,8 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
     }
 
     // A plain object doesn't read the config, so it can be created right away
-    if (isServer() && typeof stylesheet === 'function') {
-        return createOnFirstUse(stylesheet)
+    if (isServer()) {
+        return typeof stylesheet === 'function' ? createOnFirstUse(stylesheet) : createStyleSheet(stylesheet)
     }
 
     // For SSR

@@ -42,9 +42,10 @@ describe('StyleSheet.create on the server', () => {
 
     it('behaves like the StyleSheet create returns once configured', () => {
         const { create, services } = loadServer()
+        const box = jest.fn((size: number) => ({ width: size }))
         const styles = create((theme: any) => ({
             text: { color: theme.colors.text },
-            box: (size: number) => ({ width: size }),
+            box,
         })) as any
 
         services.state.init({ themes, settings: { initialTheme: 'light' } } as never)
@@ -52,6 +53,7 @@ describe('StyleSheet.create on the server', () => {
         expect('text' in styles).toBe(true)
         expect(styles.text).toBe(styles.text)
         expect(styles.box(10)).toBeDefined()
+        expect(box).toHaveBeenCalledWith(10)
         expect(Object.keys(styles.useVariants({}))).toEqual(['text', 'box', 'useVariants'])
 
         styles.extra = 1
@@ -70,10 +72,20 @@ describe('StyleSheet.create on the server', () => {
 
     it('creates an object StyleSheet right away before StyleSheet.configure', () => {
         const { create } = loadServer()
-        const styles = create({ text: { color: 'red' } })
+        // A server has no window, the React Native preset adds one
+        const browserWindow = globalThis.window
 
-        expect(require('util').types.isProxy(styles)).toBe(false)
-        expect(styles.text).toBeDefined()
+        // @ts-expect-error the server has no window
+        delete globalThis.window
+
+        try {
+            const styles = create({ text: { color: 'red' } })
+
+            expect(require('util').types.isProxy(styles)).toBe(false)
+            expect(styles.text).toBeDefined()
+        } finally {
+            globalThis.window = browserWindow
+        }
     })
 
     it('creates a StyleSheet right away once configured', () => {

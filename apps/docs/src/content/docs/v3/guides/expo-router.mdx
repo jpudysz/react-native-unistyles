@@ -115,7 +115,7 @@ export default function Root({ children }: PropsWithChildren) {
 <Aside type="caution">
 Render `UnistylesStyles` after `children`. `+html.tsx` renders before the page, so calling `useServerUnistyles` in `Root` would only collect the styles of the previous request.
 
-Content inside a `<Suspense>` boundary that suspends on the server (e.g. `React.lazy` or `use`) renders after `UnistylesStyles`. Its styles are applied once the JavaScript loads, and they end up in the styles of the next request.
+Content inside a `<Suspense>` boundary that suspends on the server (e.g. `React.lazy` or `use`) renders after `UnistylesStyles`. Its styles are applied once the JavaScript loads, and they end up in the styles of the next request, which can come from another visitor. Keep per-request values, such as user data, out of the styles used in that boundary.
 </Aside>
 
 If you don't use adaptive themes, add the class of your initial theme to `<html>`, next to the class Expo may set, so that the page uses its CSS variables before the JavaScript loads:
