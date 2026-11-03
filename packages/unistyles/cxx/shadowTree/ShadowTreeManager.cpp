@@ -5,6 +5,24 @@ using namespace margelo::nitro::unistyles;
 using namespace facebook::react;
 using namespace facebook;
 
+namespace {
+
+RootShadowNode::Unshared withRootLayoutInfo(const RootShadowNode::Shared& rootShadowNode, const RootShadowNode& latestRootShadowNode) {
+    const auto& props = rootShadowNode->getConcreteProps();
+    const auto& latestProps = latestRootShadowNode.getConcreteProps();
+
+    if (props.layoutConstraints == latestProps.layoutConstraints && props.layoutContext == latestProps.layoutContext) {
+        return std::const_pointer_cast<RootShadowNode>(rootShadowNode);
+    }
+
+    return std::static_pointer_cast<RootShadowNode>(latestRootShadowNode.ShadowNode::clone({
+        .props = ShadowNodeFragment::propsPlaceholder(),
+        .children = std::make_shared<const std::vector<std::shared_ptr<const ShadowNode>>>(rootShadowNode->getChildren()),
+    }));
+}
+
+}
+
 std::vector<InstanceHandle::Shared> shadow::ShadowTreeManager::updateShadowTree(jsi::Runtime& rt) {
     auto& registry = core::UnistylesRegistry::get();
 
@@ -43,7 +61,19 @@ std::vector<InstanceHandle::Shared> shadow::ShadowTreeManager::updateShadowTree(
                 return;
             }
 
+            // the root of the last attempt, kept for a retry
+            RootShadowNode::Shared clonedRootShadowNode;
+
             shadowTree.commit([&](const RootShadowNode& oldRootShadowNode) -> RootShadowNode::Unshared {
+                // another thread committed while we cloned, eg. Reanimated, which commits on every frame, we can starve and hit 1024 attempts
+                if (clonedRootShadowNode) {
+                    auto rootShadowNode = withRootLayoutInfo(clonedRootShadowNode, oldRootShadowNode);
+
+                    clonedRootShadowNode = rootShadowNode;
+
+                    return rootShadowNode;
+                }
+
                 PropsParserContext propsParserContext{shadowTree.getSurfaceId(), *oldRootShadowNode.getContextContainer()};
                 auto newRootShadowNode = oldRootShadowNode.cloneMultiple(familiesIt->second, [&](const ShadowNode& oldShadowNode, const ShadowNodeFragment& fragment) {
                     auto propsIt = tagToProps.find(oldShadowNode.getTag());
@@ -67,6 +97,8 @@ std::vector<InstanceHandle::Shared> shadow::ShadowTreeManager::updateShadowTree(
                         .children = fragment.children,
                     });
                 });
+
+                clonedRootShadowNode = std::static_pointer_cast<const RootShadowNode>(newRootShadowNode);
 
                 return std::static_pointer_cast<RootShadowNode>(newRootShadowNode);
             }, {});
