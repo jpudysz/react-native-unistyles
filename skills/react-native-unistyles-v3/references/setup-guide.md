@@ -20,7 +20,7 @@ npx react-native run-android  # Android
 
 ## Babel Plugin Configuration
 
-A build-time integration is **mandatory**: the Babel plugin (default), the experimental [Metro integration](#metro-integration-experimental) (3.6.0+), or the experimental [Rspack plugin](#repack-rspack-rsbuild) for Re.Pack, Rspack and Rsbuild. It transforms `StyleSheet.create` calls at build time to enable zero-re-render reactivity.
+A build-time integration is **mandatory**: the Babel plugin (default), the experimental [Metro integration](#metro-integration-experimental) (3.6.0+), or the experimental [Rspack plugin](#repack-rspack-rsbuild) for Re.Pack, Rspack and Rsbuild. The Babel plugin transforms `StyleSheet.create` calls at build time to enable zero-re-render reactivity, the Metro and Rspack integrations have no Babel transform and record StyleSheet dependencies at runtime.
 
 ```js
 // babel.config.js
@@ -92,7 +92,7 @@ Limitations:
 
 ### Re.Pack, Rspack, Rsbuild
 
-`UnistylesPlugin` (experimental) is the Metro integration for Rspack: the same swaps, runtime dependency tracking and `useVariants` rules as above, no options. Remove `react-native-unistyles/plugin` from `babel.config.js` (having both throws):
+`UnistylesPlugin` (experimental) is the Metro integration for Rspack: the same swaps, runtime dependency tracking and `useVariants` rules as above, no options. It requires `@rspack/core` 1.7.5+, the plugin throws otherwise. Remove `react-native-unistyles/plugin` from `babel.config.js` (having both throws):
 
 ```js
 // rspack.config.mjs (Re.Pack)
@@ -105,7 +105,7 @@ export default {
 ```
 
 - Rsbuild (web): `tools: { rspack: { plugins: [new UnistylesPlugin()] } }` with `resolve.alias: { 'react-native': 'react-native-web' }`
-- Module Federation: share `react-native-unistyles` and `react-native-unistyles/` (trailing slash, the swapped components) like `react-native` in every container. Needs `@rspack/core` 1.7.5+, the plugin throws otherwise. In Rsbuild use the `moduleFederation` option, not `ModuleFederationPlugin` in `tools.rspack`
+- Module Federation: share `react-native-unistyles` and `react-native-unistyles/` (trailing slash, the swapped components) like `react-native` in every container. In Rsbuild use the `moduleFederation` option, not `ModuleFederationPlugin` in `tools.rspack`
 - `RepackUnistylePlugin` is removed. Re.Pack apps can keep the Babel plugin in `babel.config.js` instead, Re.Pack's `babel-swc-loader` runs it
 
 ### React Compiler ordering

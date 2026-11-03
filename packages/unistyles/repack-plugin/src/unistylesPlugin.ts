@@ -20,7 +20,7 @@ const DEEP_COMPONENTS_REQUEST = `${COMPONENTS_REQUEST}/deep`
 const PASSTHROUGH_PACKAGES = ['@callstack/repack', '@module-federation']
 
 // before Rspack 1.7.5 ConsumeSharedPlugin matched the original request, so a shared react-native wasn't swapped
-const MIN_RSPACK_VERSION_WITH_FEDERATION = [1, 7, 5]
+const MIN_RSPACK_VERSION = [1, 7, 5]
 
 const isOlderThan = (version: string, minimum: Array<number>) => {
     const parts = version.split(/[.-]/).map(Number)
@@ -28,9 +28,6 @@ const isOlderThan = (version: string, minimum: Array<number>) => {
 
     return index !== -1 && (parts[index] ?? 0) < minimum[index]!
 }
-
-const usesModuleFederation = (compiler: Compiler) =>
-    compiler.options.plugins.some((plugin) => /ModuleFederationPlugin/.test(plugin?.constructor?.name ?? ''))
 
 const getPackageName = (filePath: string) => {
     const segments = filePath.split(`${path.sep}node_modules${path.sep}`).at(-1)!.split(path.sep)
@@ -54,24 +51,25 @@ export class UnistylesPlugin implements RspackPluginInstance {
 
         const rspackVersion = compiler.rspack?.rspackVersion
 
-        if (
-            rspackVersion &&
-            usesModuleFederation(compiler) &&
-            isOlderThan(rspackVersion, MIN_RSPACK_VERSION_WITH_FEDERATION)
-        ) {
+        if (rspackVersion && isOlderThan(rspackVersion, MIN_RSPACK_VERSION)) {
             throw new Error(
-                `Unistyles 🦄: ${PLUGIN_NAME} with Module Federation requires @rspack/core ${MIN_RSPACK_VERSION_WITH_FEDERATION.join('.')} or newer, found ${rspackVersion}. Older versions share react-native before Unistyles can swap its components.`,
+                `Unistyles 🦄: ${PLUGIN_NAME} requires @rspack/core ${MIN_RSPACK_VERSION.join('.')} or newer, found ${rspackVersion}. Older versions share react-native before Unistyles can swap its components.`,
             )
         }
 
         const unistylesRoot = this.unistylesRoot
-        const componentsIndex = path.join(unistylesRoot, 'src', 'components', 'native', 'index.ts')
-        const deepComponentsDir = path.join(unistylesRoot, 'src', 'components', 'native', 'deep')
+        const sourceDir = path.join(unistylesRoot, 'src')
+        const componentsIndex = path.join(sourceDir, 'components', 'native', 'index.ts')
+        const deepComponentsDir = path.join(sourceDir, 'components', 'native', 'deep')
 
         compiler.options.resolve.alias = {
             ...compiler.options.resolve.alias,
-            // without package.json#exports Re.Pack resolves Unistyles to lib/module (`browser`), the components import src
-            'react-native-unistyles$': path.join(unistylesRoot, 'src', 'index.ts'),
+            // the `browser` field and export condition lead to lib/module, the components import src,
+            // aliases keep these requests as they are, so Module Federation shares them
+            'react-native-unistyles$': path.join(sourceDir, 'index.ts'),
+            'react-native-unistyles/reanimated$': path.join(sourceDir, 'reanimated', 'index.ts'),
+            'react-native-unistyles/server$': path.join(sourceDir, 'server', 'index.ts'),
+            'react-native-unistyles/web$': path.join(sourceDir, 'web-only', 'index.ts'),
             [`${COMPONENTS_REQUEST}$`]: componentsIndex,
             [DEEP_COMPONENTS_REQUEST]: deepComponentsDir,
         }

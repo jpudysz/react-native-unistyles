@@ -94,6 +94,13 @@ describe('UnistylesPlugin with Module Federation', () => {
         expect(remote.View.registryId).toBe(host.StyleSheet.id)
     })
 
+    it('should share the entry points of Unistyles from src', () => {
+        const { host, remote } = build.exports
+
+        expect(host.reanimated.source).toBe('src')
+        expect(remote.reanimated).toEqual(host.reanimated)
+    })
+
     it('should share one Unistyles registry between the host and the remote', () => {
         expect(build.globals.registries).toHaveLength(1)
         expect(build.exports.remote.StyleSheet.id).toBe(build.exports.host.StyleSheet.id)

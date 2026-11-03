@@ -81,6 +81,16 @@ const unistyles = (): Record<string, string> => {
 exports.source = 'src'
 exports.StyleSheet = require('./core/registry').registry
 `,
+        // an entry point of Unistyles, like the `browser` condition on the web it leads to lib/module
+        [`${root}/reanimated/package.json`]: JSON.stringify({
+            main: '../lib/commonjs/reanimated/index.js',
+            browser: '../lib/module/reanimated/index.js',
+        }),
+        [`${root}/src/reanimated/index.ts`]: `
+${NEXT_ID}
+exports.id = nextId()
+exports.source = 'src'
+`,
         // Unistyles imports react-native like any other package, but it gets the real one
         [`${root}/src/probe.ts`]: PROBE,
         // StyleSheet is a registry of the whole bundle
@@ -152,6 +162,10 @@ exports.StyleSheet = require('./core/registry').registry
         files[`${root}/lib/${build}/core/registry.js`] = `
 exports.registry = { id: 'lib/${build}', source: 'lib/${build}', trackDependencies: false }
 `
+        files[`${root}/lib/${build}/reanimated/index.js`] = `
+exports.id = 'lib/${build}'
+exports.source = 'lib/${build}'
+`
     }
 
     return files
@@ -197,6 +211,7 @@ module.exports = import('remote/Screen').then((remote) => ({
         ...require('../app/probe'),
         View: RN.View,
         StyleSheet,
+        reanimated: require('react-native-unistyles/reanimated'),
         library: require('some-library'),
     },
     remote: remote.default || remote,
@@ -210,6 +225,7 @@ module.exports = {
     ...require('../app/probe'),
     View: RN.View,
     StyleSheet,
+    reanimated: require('react-native-unistyles/reanimated'),
     library: require('some-library'),
 }
 `,
@@ -222,11 +238,17 @@ export const createFixture = () => {
     const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'unistyles-repack-')))
     const files = { ...reactNative(), ...packages(), ...unistyles(), ...app(), ...federation() }
 
-    for (const [file, content] of Object.entries(files)) {
-        const filePath = path.join(root, file)
+    try {
+        for (const [file, content] of Object.entries(files)) {
+            const filePath = path.join(root, file)
 
-        fs.mkdirSync(path.dirname(filePath), { recursive: true })
-        fs.writeFileSync(filePath, content.trimStart())
+            fs.mkdirSync(path.dirname(filePath), { recursive: true })
+            fs.writeFileSync(filePath, content.trimStart())
+        }
+    } catch (error) {
+        fs.rmSync(root, { recursive: true, force: true })
+
+        throw error
     }
 
     return root

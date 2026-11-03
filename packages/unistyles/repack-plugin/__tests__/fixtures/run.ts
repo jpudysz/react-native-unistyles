@@ -29,6 +29,12 @@ export type Registry = {
     trackDependenciesFromSpecs: boolean
 }
 
+// an entry point of Unistyles (eg. react-native-unistyles/reanimated), ids tell the instances apart
+export type EntryPoint = {
+    id: number
+    source: string
+}
+
 export type Bundle = {
     // files of the bundle, relative to the fixture
     modules: Array<string>
@@ -65,8 +71,8 @@ export type FederationBuild = {
     remote: Bundle
     globals: Globals
     exports: {
-        host: Probe & { StyleSheet: Registry; library: Probe }
-        remote: Probe & { StyleSheet: Registry; library: Probe }
+        host: Probe & { StyleSheet: Registry; library: Probe; reanimated: EntryPoint }
+        remote: Probe & { StyleSheet: Registry; library: Probe; reanimated: EntryPoint }
     }
 }
 

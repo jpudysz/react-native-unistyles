@@ -17,7 +17,7 @@ import Seo from '../../../../components/Seo.astro'
 This integration is experimental.
 </Aside>
 
-`UnistylesPlugin` is the [Metro integration](/v3/other/metro) for the bundlers built on Rspack: [Re.Pack](https://re-pack.dev/) on iOS and Android, and Rsbuild or Rspack on the web with React Native Web. It's an Rspack plugin, all of them take it. There is nothing to configure: no options, no `root`, `autoProcessImports`, `autoProcessPaths` or `autoRemapImports`.
+`UnistylesPlugin` is the [Metro integration](/v3/other/metro) for the bundlers built on Rspack: [Re.Pack](https://re-pack.dev/) on iOS and Android, and Rsbuild or Rspack on the web with React Native Web. It's an Rspack plugin, all of them take it, and it requires `@rspack/core` 1.7.5 or newer. There is nothing to configure: no options, no `root`, `autoProcessImports`, `autoProcessPaths` or `autoRemapImports`.
 
 It replaces `react-native-unistyles/plugin` in `babel.config.js`. The Babel plugin will be removed in Unistyles 4.0, so `react-native-unistyles/repack-plugin` exports only `UnistylesPlugin`: `RepackUnistylePlugin`, which ran the Babel plugin on your files through a loader, is removed. Until then, Re.Pack apps can keep the Babel plugin in their `babel.config.js`, see [Usage with Re.Pack](/v3/other/babel-plugin#usage-with-repack).
 
@@ -97,6 +97,16 @@ export default defineConfig({
 
 The shared modules aren't eager here, so start each app from an async boundary, eg. an `index.js` with `import('./bootstrap')`.
 
+With Reanimated, share `react-native-reanimated` and `react-native-worklets` too and set `version` to the installed one. On the web they resolve to `lib/module`, whose `package.json` has no version, so Rspack warns `No version specified` and every container gets its own copy:
+
+```ts title="rsbuild.config.ts"
+shared: {
+    // the shared keys above
+    'react-native-reanimated': { ...shared, version: '4.7.1' },
+    'react-native-worklets': { ...shared, version: '0.13.0' }
+}
+```
+
 Don't add the `ModuleFederationPlugin` of `@module-federation/enhanced` to `tools.rspack`: Rsbuild then can't load the chunks of the app (`Cannot read properties of undefined (reading 'call')`), with or without Unistyles.
 
 ### Rspack
@@ -116,13 +126,14 @@ The same as the Metro integration, see [What it does](/v3/other/metro#what-it-do
 #### When Rspack applies the plugin
 
 1. **It sets an environment flag.** The Babel plugin checks it. Re.Pack's `babel-swc-loader` runs Babel in worker threads that inherit the flag, so the Babel plugin throws if it still runs.
-2. **It checks Module Federation.** If the config has a Module Federation plugin (eg. `Repack.plugins.ModuleFederationPluginV2` or `ModuleFederationPluginV1`) and `@rspack/core` is older than 1.7.5, the plugin throws. Before 1.7.5, the `ConsumeSharedPlugin` of Rspack matched the original import string, so a shared `react-native` would skip the swap without any error.
-3. **It adds three `resolve.alias` entries.** Your app, the swapped components and every library have to use the same copy of Unistyles, so these requests resolve to the source of Unistyles:
+2. **It checks the version of Rspack.** The plugin throws if `@rspack/core` is older than 1.7.5. Before 1.7.5, the `ConsumeSharedPlugin` of Rspack matched the original import string, so a shared `react-native` would skip the swap without any error.
+3. **It adds `resolve.alias` entries.** Your app, the swapped components and every library have to use the same copy of Unistyles, so these requests resolve to the source of Unistyles:
     - `react-native-unistyles$` to `src/index.ts`
+    - `react-native-unistyles/reanimated$`, `react-native-unistyles/server$` and `react-native-unistyles/web$` to their modules in `src`
     - `react-native-unistyles/components/native$` to `src/components/native/index.ts`
     - `react-native-unistyles/components/native/deep` to `src/components/native/deep`
 
-    Unistyles resolves to its source with or without package exports (`Repack.getResolveOptions({ enablePackageExports })`). Without package exports, Re.Pack would pick `lib/module` through the `browser` field.
+    Unistyles resolves to its source with or without package exports (`Repack.getResolveOptions({ enablePackageExports })`) and on the web. Without package exports, Re.Pack would pick `lib/module` through the `browser` field, and web builds would pick it through the `browser` export condition.
 4. **It taps `normalModuleFactory.hooks.beforeResolve`.** Rspack runs this hook for every import before it resolves it, and before Module Federation decides whether the import is shared.
 
 #### What happens to each import
@@ -171,8 +182,6 @@ new Repack.plugins.ModuleFederationPluginV2({
 
 Share them in every container, the host and each remote (a remote usually with `eager: false`). A container that doesn't share `react-native-unistyles` bundles a second copy of Unistyles for its own imports (eg. `StyleSheet`), while the swapped components come from the shared one.
 
-Module Federation requires `@rspack/core` 1.7.5 or newer, `UnistylesPlugin` throws an error with an older version.
-
 ### Migrating from RepackUnistylePlugin
 
 Compared with `RepackUnistylePlugin`:
@@ -189,7 +198,8 @@ To migrate:
 2. Remove `react-native-unistyles/plugin` from `babel.config.js`, if it is there.
 3. Run the `useVariants` codemod, see [Variants](/v3/other/metro#variants).
 4. Restart Re.Pack with `--reset-cache`.
-5. With Module Federation, add the shared keys above and make sure `@rspack/core` is 1.7.5 or newer.
+5. Make sure `@rspack/core` is 1.7.5 or newer.
+6. With Module Federation, add the shared keys above.
 
 ### Troubleshooting
 
@@ -199,7 +209,7 @@ To migrate:
 - **A console warning about a second copy of `react-native-unistyles`.** Install `react-native-unistyles` once in your app.
 - **A console warning `UnistylesPlugin couldn't resolve "<import>"`.** `UnistylesPlugin` couldn't resolve that import with your resolve options, so Unistyles doesn't swap it. Rspack resolves it on its own and reports an error if it can't either. Check the import and your aliases.
 - **`Cannot read properties of undefined (reading 'call')` in Rsbuild with Module Federation.** Configure Module Federation with the `moduleFederation` option of Rsbuild, not with `ModuleFederationPlugin` in `tools.rspack`, see [Module Federation with Rsbuild](#module-federation-with-rsbuild).
-- **Your own aliases for `react-native-unistyles`, `react-native-unistyles/components/native` or `react-native-unistyles/components/native/deep`.** Don't add them. These requests have to resolve to the Unistyles that `UnistylesPlugin` comes from.
+- **Your own aliases for `react-native-unistyles` or its subpaths.** Don't add them. These requests have to resolve to the Unistyles that `UnistylesPlugin` comes from.
 
 ### Limitations
 
