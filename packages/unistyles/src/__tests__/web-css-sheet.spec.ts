@@ -1,3 +1,4 @@
+import { getSelector } from '../web/css/sheet'
 import { CSSState } from '../web/css/state'
 
 type DOM = { window: Window & typeof globalThis }
@@ -34,6 +35,8 @@ const describeRule = (rule: CSSRule): string => {
 }
 // Browsers serialize rules their own way, so the tests read what each rule holds
 const describeSheet = () => Array.from(getSheet().cssRules, describeRule)
+const childSelector = (hash: string, pseudo = '') =>
+    `.${hash}_child > *${pseudo},.${hash}_child > :where([style^="display:contents"],[style^="display: contents"],[style*=";display:contents"],[style*="; display: contents"],.unistyles-contents):where(:not([class^="unistyles_"][class$="_child"])) > :where(:only-child)${pseudo}`
 
 beforeEach(() => {
     dom = new JSDOM()
@@ -126,7 +129,7 @@ describe('Web CSS sheet', () => {
         add(state, 'child', { color: 'blue' })
         add(state, 'parent_child > *', { color: 'green' })
 
-        expect(describeSheet()).toEqual(['@media all{.parent_child > *{color: green;}.child{color: blue;}}'])
+        expect(describeSheet()).toEqual([`@media all{${childSelector('parent')}{color: green;}.child{color: blue;}}`])
     })
 
     it('deletes the right rules when styles are removed from different places in a group', () => {
@@ -225,7 +228,7 @@ describe('Web CSS sheet', () => {
         state.remove('parent_child')
 
         expect(describeSheet()).toEqual([
-            '@media all{.server_child > *{color: red;}.server_child > *:hover{color: blue;}.parent_child > *{color: red;}.parent_child > *:hover{color: blue;}}',
+            `@media all{${childSelector('server')}{color: red;}${childSelector('server', ':hover')}{color: blue;}${childSelector('parent')}{color: red;}${childSelector('parent', ':hover')}{color: blue;}}`,
         ])
     })
 
@@ -560,5 +563,35 @@ describe('Web CSS sheet', () => {
         add(state, 'hash', { color: 'green' })
 
         expect(describeSheet()).toEqual(['@media all{.other{color: black;}.hash{color: green;}}'])
+    })
+})
+
+describe('Web CSS forChild selector', () => {
+    const REACH_THROUGH =
+        '_child > :where([style^="display:contents"],[style^="display: contents"],[style*=";display:contents"],[style*="; display: contents"],.unistyles-contents):where(:not([class^="unistyles_"][class$="_child"])) > :where(:only-child)'
+
+    it('keeps the selector of a style that is not for a child', () => {
+        expect(getSelector('hash')).toBe('.hash')
+        expect(getSelector('hash:hover')).toBe('.hash:hover')
+        expect(getSelector(':where(.hash)>*')).toBe(':where(.hash)>*')
+    })
+
+    it('also reaches the only child of a display: contents first child', () => {
+        expect(getSelector('hash_child > *')).toBe(`.hash_child > *,.hash${REACH_THROUGH}`)
+    })
+
+    it('reaches through for pseudo-classes and the pointerEvents children rule', () => {
+        expect(getSelector('hash_child > *:hover')).toBe(`.hash_child > *:hover,.hash${REACH_THROUGH}:hover`)
+        expect(getSelector('hash_child > *::before')).toBe(`.hash_child > *::before,.hash${REACH_THROUGH}::before`)
+        expect(getSelector(':where(.hash_child > *)>*')).toBe(
+            `:where(.hash_child > *)>*,:where(.hash${REACH_THROUGH})>*`,
+        )
+    })
+
+    it('keeps the specificity of the first child selector', () => {
+        // .hash_child is the only class or pseudo-class outside :where(), like in .hash_child > *
+        const reachThrough = getSelector('hash_child > *').split(',.hash_child')[1] as string
+
+        expect(reachThrough.replace(/:where\((?:[^()]|\([^()]*\))*\)/g, '')).toBe(' >  > ')
     })
 })

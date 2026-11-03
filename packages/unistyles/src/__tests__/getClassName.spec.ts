@@ -33,4 +33,16 @@ describe('getClassName', () => {
         getClassName([{ injectedClassName: 'custom' }, { opacity: 0.5 }] as never)
         expect(addStyles).toHaveBeenLastCalledWith([{ injectedClassName: 'custom' }, { opacity: 0.5 }], undefined)
     })
+
+    it('marks a display: contents style, so a withUnistyles child selector can reach through it', () => {
+        const injectedClassName = (style: unknown, forChild?: boolean) =>
+            getClassName(style as never, forChild)?.[0].injectedClassName
+
+        expect(injectedClassName({ display: 'contents' })).toBe('unistyles-contents')
+        expect(injectedClassName({ display: 'contents', _web: { _classNames: ['a', 'b'] } })).toBe(
+            'a b unistyles-contents',
+        )
+        expect(injectedClassName({ display: 'flex' })).toBe('')
+        expect(injectedClassName({ display: 'contents' }, true)).toBe('')
+    })
 })

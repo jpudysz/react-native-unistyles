@@ -1,5 +1,7 @@
 import * as unistyles from '../web/services'
 
+const { getSelector } = require('../web/css/sheet') as typeof import('../web/css/sheet')
+
 // Child styles are registered under a `.hash > *` selector, while the class name
 // put on the element is that same hash without the ` > *` suffix. If the hash was
 // derived from the style value alone, an identical style used by a regular
@@ -22,7 +24,7 @@ describe('web child selector class names', () => {
         const element = registry.add({ marginTop: 7 })
         const styles = registry.css.getStyles()
 
-        expect(styles).toContain(`.${toClassName(child.hash)} > *{margin-top:7px;}`)
+        expect(styles).toContain(`${getSelector(child.hash)}{margin-top:7px;}`)
         expect(styles).toContain(`.${element.hash}{margin-top:7px;}`)
         // the leak: the element's own class must not also be a child-selector root
         expect(styles).not.toContain(`.${element.hash} > *`)
