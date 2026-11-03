@@ -68,6 +68,14 @@ describe('StyleSheet.create on the server', () => {
         expect(() => styles.text).toThrow('StyleSheet.configure')
     })
 
+    it('creates an object StyleSheet right away before StyleSheet.configure', () => {
+        const { create } = loadServer()
+        const styles = create({ text: { color: 'red' } })
+
+        expect(require('util').types.isProxy(styles)).toBe(false)
+        expect(styles.text).toBeDefined()
+    })
+
     it('creates a StyleSheet right away once configured', () => {
         const { create, services } = loadServer()
 

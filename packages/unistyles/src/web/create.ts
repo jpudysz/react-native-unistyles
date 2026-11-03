@@ -80,7 +80,8 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
         return createStyleSheet(stylesheet)
     }
 
-    if (isServer()) {
+    // A plain object doesn't read the config, so it can be created right away
+    if (isServer() && typeof stylesheet === 'function') {
         return createOnFirstUse(stylesheet)
     }
 
