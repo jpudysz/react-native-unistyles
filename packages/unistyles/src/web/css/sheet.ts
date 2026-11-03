@@ -1,3 +1,4 @@
+import { CONTENTS_CLASS_NAME } from '../types'
 import { hyphenate, isServer } from '../utils'
 
 type Styles = Map<string, any>
@@ -13,7 +14,20 @@ type Group = {
 // Styles without a media query get a group too, so every group is an ordinary child list of one top level rule
 const BASE_MEDIA_QUERY = '@media all'
 
-export const getSelector = (className: string) => (className[0] === ':' ? className : `.${className}`)
+const CHILD_SELECTOR = '_child > *'
+// withUnistyles styles its first child, but a library can put a box-less view first (Gesture Handler 3 does)
+// so also reach the only child of a display: contents view, unless it's another withUnistyles wrapper
+// React writes an inline display:contents on the server and display: contents on the client
+// :where() keeps the specificity of the original selector
+const CONTENTS_CHILD_SELECTOR = `_child > :where([style*="display:contents"],[style*="display: contents"],.${CONTENTS_CLASS_NAME}):where(:not([class^="unistyles_"][class$="_child"])) > :where(:only-child)`
+
+export const getSelector = (className: string) => {
+    const selector = className[0] === ':' ? className : `.${className}`
+
+    return selector.includes(CHILD_SELECTOR)
+        ? `${selector},${selector.replace(CHILD_SELECTOR, CONTENTS_CHILD_SELECTOR)}`
+        : selector
+}
 
 export const getDeclarations = (styles: Styles) => {
     let declarations = ''

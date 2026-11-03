@@ -16,6 +16,9 @@ export type UnistylesServices = {
 export const UNI_GENERATED_KEYS = ['$$css', 'hash', 'injectedClassName'] as const
 export type UniGeneratedKey = (typeof UNI_GENERATED_KEYS)[number]
 
+// Required for the Metro integration: marks display: contents elements for the forChild selector
+export const CONTENTS_CLASS_NAME = 'unistyles-contents'
+
 export type UniGeneratedStyle = Record<UniGeneratedKey, string> & {
     parsedStyles?: UnistylesValues
 }
