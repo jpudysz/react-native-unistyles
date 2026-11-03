@@ -20,7 +20,7 @@ npx react-native run-android  # Android
 
 ## Babel Plugin Configuration
 
-A build-time integration is **mandatory**: the Babel plugin (default), the experimental [Metro integration](#metro-integration-experimental) (3.6.0+), or the [Re.Pack plugin](#repack). It transforms `StyleSheet.create` calls at build time to enable zero-re-render reactivity.
+A build-time integration is **mandatory**: the Babel plugin (default), the experimental [Metro integration](#metro-integration-experimental) (3.6.0+), or the experimental [Rspack plugin](#repack-rspack-rsbuild) for Re.Pack, Rspack and Rsbuild. The Babel plugin transforms `StyleSheet.create` calls at build time to enable zero-re-render reactivity, the Metro and Rspack integrations have no Babel transform and record StyleSheet dependencies at runtime.
 
 ```js
 // babel.config.js
@@ -87,30 +87,26 @@ module.exports = withUnistylesConfig(getDefaultConfig(__dirname))
 - To render a raw React Native component, import it from `react-native/index.js` (not swapped)
 
 Limitations:
-- Metro only — Re.Pack, Vite, Next.js and other web bundlers keep using the Babel plugin
+- Metro only — Re.Pack, Rspack and Rsbuild have [`UnistylesPlugin`](#repack-rspack-rsbuild), Vite, Next.js and other web bundlers keep using the Babel plugin
 - Jest doesn't use Metro, so the [testing setup](#testing--mocks-setup) is unchanged
 
-### Re.Pack
+### Re.Pack, Rspack, Rsbuild
 
-With Re.Pack, don't add the plugin to `babel.config.js`; use the Rspack plugin instead (it runs the same Babel plugin through a loader):
+`UnistylesPlugin` (experimental) is the Metro integration for Rspack: the same swaps, runtime dependency tracking and `useVariants` rules as above, no options. It requires `@rspack/core` 1.7.5+, the plugin throws otherwise. Remove `react-native-unistyles/plugin` from `babel.config.js` (having both throws):
 
 ```js
-// rspack.config.mjs
+// rspack.config.mjs (Re.Pack)
 import * as Repack from '@callstack/repack'
-import { RepackUnistylePlugin } from 'react-native-unistyles/repack-plugin'
+import { UnistylesPlugin } from 'react-native-unistyles/repack-plugin'
 
 export default {
-  plugins: [
-    new Repack.RepackPlugin(),
-    new RepackUnistylePlugin({
-      unistylesPluginOptions: { root: 'src' },  // same options as the Babel plugin, `root` required
-      // ruleExcludePaths: [...BASE_REPACK_EXCLUDE_PATHS, /my-lib/]  // optional RegExp[]
-    })
-  ]
+  plugins: [new Repack.RepackPlugin(), new UnistylesPlugin()]
 }
 ```
 
-The loader needs `@babel/plugin-syntax-typescript` and `babel-plugin-syntax-hermes-parser` installed in your project.
+- Rsbuild (web): `tools: { rspack: { plugins: [new UnistylesPlugin()] } }` with `resolve.alias: { 'react-native': 'react-native-web' }`
+- Module Federation: share `react-native-unistyles` and `react-native-unistyles/` (trailing slash, the swapped components) like `react-native` in every container. In Rsbuild use the `moduleFederation` option, not `ModuleFederationPlugin` in `tools.rspack`
+- `RepackUnistylePlugin` is removed. Re.Pack apps can keep the Babel plugin in `babel.config.js` instead, Re.Pack's `babel-swc-loader` runs it
 
 ### React Compiler ordering
 
