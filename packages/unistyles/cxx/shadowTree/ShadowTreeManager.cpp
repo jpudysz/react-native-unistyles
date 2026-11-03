@@ -15,10 +15,14 @@ RootShadowNode::Unshared withRootLayoutInfo(const RootShadowNode::Shared& rootSh
         return std::const_pointer_cast<RootShadowNode>(rootShadowNode);
     }
 
-    return std::static_pointer_cast<RootShadowNode>(latestRootShadowNode.ShadowNode::clone({
+    auto newRootShadowNode = std::static_pointer_cast<RootShadowNode>(latestRootShadowNode.ShadowNode::clone({
         .props = ShadowNodeFragment::propsPlaceholder(),
         .children = std::make_shared<const std::vector<std::shared_ptr<const ShadowNode>>>(rootShadowNode->getChildren()),
     }));
+
+    newRootShadowNode->dirtyLayout();
+
+    return newRootShadowNode;
 }
 
 }
