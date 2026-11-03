@@ -26,6 +26,7 @@ module.exports = function (api) {
                         // For development, we want to alias the library to the source
                         "react-native-unistyles/reanimated": path.join(__dirname, '../../packages/unistyles/src/reanimated'),
                         "react-native-unistyles/diagnostics": path.join(__dirname, '../../packages/unistyles/src/diagnostics'),
+                        "react-native-unistyles/server": path.join(__dirname, '../../packages/unistyles/src/server'),
                         [pak.name]: path.join(__dirname, '../../packages/unistyles/', pak.source)
                     }
                 }

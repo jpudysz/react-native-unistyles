@@ -178,7 +178,7 @@ const RunnerOverlay: React.FunctionComponent<{ state: RunnerState }> = ({ state 
 
 // Rendered by the root layout, renders and subscribes to nothing else until the e2e route starts a run
 export const E2EOverlay = () => {
-    const state = useSyncExternalStore(runnerStore.subscribe, runnerStore.getSnapshot)
+    const state = useSyncExternalStore(runnerStore.subscribe, runnerStore.getSnapshot, runnerStore.getServerSnapshot)
 
     return state ? <RunnerOverlay state={state} /> : null
 }

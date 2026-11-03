@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { isUnistylesMq, isValidMq, parseMq } from '../utils'
+import { isServer } from '../web/utils'
 
 export const useMedia = (config: { mq: symbol }) => {
     const disposeRef = useRef(() => {})
@@ -31,6 +32,11 @@ export const useMedia = (config: { mq: symbol }) => {
         ]
             .filter(Boolean)
             .join(' and ')
+
+        // No viewport on the server, the content is hidden until the browser renders it
+        if (isServer()) {
+            return false
+        }
 
         const media = window.matchMedia(mediaQuery)
         const handler = (event: MediaQueryListEvent) => setIsVisible(event.matches)
