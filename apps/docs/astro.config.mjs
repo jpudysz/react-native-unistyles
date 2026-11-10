@@ -75,6 +75,7 @@ export default defineConfig({
                         defer: true,
                     },
                 },
+                { tag: 'script', attrs: { src: '/_a/s.js', defer: true } },
             ],
             customCss: ['./src/styles/docs.css'],
             logo: {
