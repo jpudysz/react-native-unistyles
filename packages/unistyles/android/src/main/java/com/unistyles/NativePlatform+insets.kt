@@ -1,6 +1,5 @@
 package com.unistyles
 
-import android.graphics.Rect
 import android.os.Build
 import android.view.View
 import android.view.Window
@@ -86,16 +85,10 @@ class NativePlatformInsets(
                 window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN != WindowManager.LayoutParams.FLAG_FULLSCREEN
             }
         }
-        // React Native is forcing insets to make status bar translucent
-        // so we need to calculate top inset manually, as WindowInsetCompat will always return 0
         val statusBarTopInset = when(isStatusBarVisible) {
-            true -> {
-                val visibleRect = Rect()
-
-                window.decorView.getWindowVisibleDisplayFrame(visibleRect)
-
-                visibleRect.top
-            }
+            true -> ViewCompat.getRootWindowInsets(window.decorView)
+                ?.getInsets(WindowInsetsCompat.Type.statusBars())
+                ?.top ?: 0
             false -> 0
         }
 
