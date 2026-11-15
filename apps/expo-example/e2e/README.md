@@ -36,7 +36,7 @@ hardware keyboard (a headless one). Start the Android emulator windowless from b
 ```
 
 Without the host, `expo-example:///e2e?scenarios=all&reps=1` runs everything (except the host only `os-appearance`,
-`touchable-highlight` and `interactions`) and shows the result on screen, which also works in a Debug build with Metro.
+`touchable-highlight`, `interactions` and `inline-override`) and shows the result on screen, which also works in a Debug build with Metro.
 
 ## Scenarios
 
@@ -64,6 +64,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `lists-scroll`        | theme changes at scrolled FlatList positions                               | virtualized rows mounted after a theme change            |
 | `touchable-highlight` | TouchableHighlight pressed after theme changes and below a ScopedTheme (host only) | its underlay re-render commits the style React rendered last |
 | `interactions`        | every component on `interactions` pressed, toggled or focused after theme changes (host only) | components re-rendering themselves below Unistyles, scoped and variant styles |
+| `inline-override`     | Pressables whose inline style overrides a StyleSheet width, pressed after theme changes and below a ScopedTheme (host only) | #1376, updates committed by `link` bring back the StyleSheet value of a prop an inline style sets last |
 | `ime`                 | the keyboard focused on `keyboard` and inside a translucent Modal, a theme change while it's up, the Modal closed with the keyboard up, a Modal below it closed (Android) | `rt.insets.ime` in a StyleSheet, `useUnistyles` and `UnistylesRuntime` agree, Android Modals get the keyboard in their own window (#810) |
 | `rn-appearance`       | `Appearance.setColorScheme` against the OS scheme with adaptive themes, on a pushed screen, then `unspecified` | adaptive themes follow RN's override on both platforms (iOS key window, Android Activity `uiMode`) |
 | `rtl`                 | `rt.rtl` read by a StyleSheet, `useUnistyles` and `UnistylesRuntime` at start, after a theme change and on a pushed screen | `rt.rtl` equals `I18nManager.isRTL` (forceRTL, allowRTL, Android `supportsRtl`, React Native's locale rule), only meaningful with an RTL device language, eg. `-AppleLanguages (ar)`, or forceRTL |

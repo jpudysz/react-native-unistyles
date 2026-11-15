@@ -21,6 +21,7 @@ export const SCENARIOS = [
     'lists-scroll',
     'touchable-highlight',
     'interactions',
+    'inline-override',
     'ime',
     'rn-appearance',
     'rtl',

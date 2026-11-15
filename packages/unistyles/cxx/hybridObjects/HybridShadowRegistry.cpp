@@ -91,12 +91,14 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
             parser.rebuildUnistyleWithScopedTheme(rt, parsedStyleSheet, unistyleData);
         }
 
+        // Inline styles are applied by React as they are. Keep them, so updates skip the props they own.
         // The shared cache can belong to another view by the time React attaches refs.
         // Restore this view's arguments and variants before saving its native styles.
         // An object style without variants is the same for every view, so it's reused unless it's stale (dirty).
-        if (!unistyleData->parsedStyle.has_value() && unistyle->parsedStyle.has_value()) {
+        if (unistyle->styleKey == helpers::EXOTIC_STYLE_KEY) {
+            unistyleData->parsedStyle = jsi::Value(rt, unistyle->rawValue).asObject(rt);
+        } else if (!unistyleData->parsedStyle.has_value() && unistyle->parsedStyle.has_value()) {
             auto isSharedStyle = unistyle->type == core::UnistyleType::Object &&
-                unistyle->styleKey != helpers::EXOTIC_STYLE_KEY &&
                 !unistyle->isDirty &&
                 !unistyle->rawValue.hasProperty(rt, "variants");
 
