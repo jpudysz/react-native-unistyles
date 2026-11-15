@@ -369,6 +369,30 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.back()
         await a.checkpoint()
     },
+    // #1376: an inline style overrides a StyleSheet prop. A press re-links the node with new arguments after a theme change
+    // committed native props, and below a ScopedTheme every link commits, the update must keep the inline value
+    'inline-override': async a => {
+        if (!a.hasHost) {
+            return
+        }
+
+        await a.push('/interactions')
+        await a.expect('interactions.inline-check')
+        await a.expect('interactions.scoped-inline-check')
+        await a.press('interactions-inline-fn')
+        await a.expect('interactions.inline-check')
+
+        for (const theme of ['dark', 'premium', 'light'] as const) {
+            await a.flip(theme)
+            await a.press('interactions-inline-fn')
+            await a.expect('interactions.inline-check')
+            await a.press('interactions-scoped-inline')
+            await a.expect('interactions.scoped-inline-check')
+        }
+
+        await a.back()
+        await a.checkpoint()
+    },
     // Needs the host to flip the OS appearance
     // Appearance.setColorScheme overrides the app's color scheme (iOS key window, Android Activity uiMode),
     // adaptive themes follow it like the OS and go back to the OS once it is unspecified

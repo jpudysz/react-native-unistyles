@@ -1,9 +1,32 @@
-import React, { useRef, useState } from 'react'
+import React, { type ComponentRef, useRef, useState } from 'react'
 import { Pressable, Switch, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native'
 import { ScopedTheme, StyleSheet } from 'react-native-unistyles'
 import { Screen, Section } from '../components'
 import { useE2EAction } from '../e2e/actions'
 import { countPress } from '../e2e/presses'
+
+// Set inline over a wider StyleSheet width, React owns it
+const INLINE_WIDTH = 56
+
+type ViewRef = ComponentRef<typeof View>
+
+const measureWidth = (view: ViewRef | null) => new Promise<number | undefined>(resolve => {
+    if (!view) {
+        resolve(undefined)
+
+        return
+    }
+
+    view.measure((_x, _y, width) => resolve(width))
+})
+
+const checkInlineWidth = async (view: ViewRef | null, styleKey: string) => {
+    const width = await measureWidth(view)
+
+    return width !== undefined && Math.round(width) === INLINE_WIDTH
+        ? undefined
+        : { styleKey, prop: 'width', expected: String(INLINE_WIDTH), actual: String(width) }
+}
 
 // Re-renders only itself, like most stateful leaves
 const LocalSwitch = () => {
@@ -43,11 +66,16 @@ const ScopedCounter = () => {
 export default function InteractionsScreen() {
     const [tone, setTone] = useState<'primary' | 'accent'>('primary')
     const inputRef = useRef<TextInput>(null)
+    const inlineRef = useRef<ViewRef>(null)
+    const scopedInlineRef = useRef<ViewRef>(null)
 
     const variantStyles = styles.useVariants({ tone })
 
     useE2EAction('interactions.tone', () => setTone(value => value === 'primary' ? 'accent' : 'primary'))
     useE2EAction('interactions.blur', () => inputRef.current?.blur())
+    // React owns the width an inline style sets last, a Unistyles update must not bring back the StyleSheet's width, #1376
+    useE2EAction('interactions.inline-check', () => checkInlineWidth(inlineRef.current, 'inlineTile'))
+    useE2EAction('interactions.scoped-inline-check', () => checkInlineWidth(scopedInlineRef.current, 'scopedInlineTile'))
 
     return (
         <Screen>
@@ -87,6 +115,14 @@ export default function InteractionsScreen() {
                     >
                         <Text style={variantStyles.tileText}>Style function</Text>
                     </Pressable>
+                    <Pressable
+                        ref={inlineRef}
+                        testID="interactions-inline-fn"
+                        style={state => [variantStyles.inlineTile(state.pressed), { width: INLINE_WIDTH }]}
+                        onPress={() => countPress('interactions-inline-fn')}
+                    >
+                        <Text style={variantStyles.tileText}>Inline</Text>
+                    </Pressable>
                 </View>
             </Section>
             <Section title="Text, inputs and switches">
@@ -125,6 +161,14 @@ export default function InteractionsScreen() {
                         >
                             <Text style={variantStyles.tileText}>Highlight</Text>
                         </TouchableHighlight>
+                        <Pressable
+                            ref={scopedInlineRef}
+                            testID="interactions-scoped-inline"
+                            style={[variantStyles.scopedInlineTile, { width: INLINE_WIDTH }]}
+                            onPress={() => countPress('interactions-scoped-inline')}
+                        >
+                            <Text style={variantStyles.tileText}>Inline</Text>
+                        </Pressable>
                     </View>
                 </ScopedTheme>
             </Section>
@@ -195,6 +239,23 @@ const styles = StyleSheet.create(theme => ({
         justifyContent: 'center',
         backgroundColor: isPressed ? theme.colors.accent : theme.colors.primary
     }),
+    // the width is overridden inline, the themed color makes a re-link after a press commit native props
+    inlineTile: (isPressed: boolean) => ({
+        width: 120,
+        height: 40,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: isPressed ? theme.colors.accent : theme.colors.primary
+    }),
+    scopedInlineTile: {
+        width: 120,
+        height: 40,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: theme.colors.primary
+    },
     textBox: {
         flex: 1
     },
