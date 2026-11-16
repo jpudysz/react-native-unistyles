@@ -332,7 +332,7 @@ std::vector<std::shared_ptr<core::StyleSheet>>core::UnistylesRegistry::getStyleS
             }
         }
 
-        if (styleSheet->type == StyleSheetType::Themable && themeDidChange) {
+        if (styleSheet->type == StyleSheetType::Themable && (themeDidChange || hasMatchingDependency(styleSheet->unistyles))) {
             stylesheetsToRefresh.emplace_back(styleSheet);
         }
     }

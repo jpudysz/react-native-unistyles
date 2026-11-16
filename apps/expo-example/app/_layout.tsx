@@ -36,6 +36,7 @@ export default function RootLayout() {
                 ))}
                 <Stack.Screen name="mount-theme" options={{ title: 'Theme on mount' }} />
                 <Stack.Screen name="frozen-list" options={{ title: 'Frozen list' }} />
+                <Stack.Screen name="mount-on-resize" options={{ title: 'Mount on resize' }} />
                 <Stack.Screen name="e2e" options={{ title: 'E2E' }} />
             </Stack>
             <E2EOverlay />

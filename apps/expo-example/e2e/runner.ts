@@ -6,7 +6,7 @@ import { restoreThemes, selectTheme, session } from '../components'
 import type { ThemeName } from '../themes'
 import { runAction } from './actions'
 import { getPresses } from './presses'
-import { type Failure, type Report, REPORTED_FAILURES, type ScenarioId, type Sync, type SyncKind } from './protocol'
+import { type Failure, type Orientation, type Report, REPORTED_FAILURES, type ScenarioId, type Sync, type SyncKind } from './protocol'
 import { type Actions, scenarios, TAP_SCENARIOS } from './scenarios'
 import { scrollTarget } from './scroll'
 import { settle, sleep } from './settle'
@@ -226,6 +226,21 @@ class E2ERun implements Actions {
             }
         })
 
+    // The host turns the device, then finds the beacon and probes again while ROTATED holds the new layout still
+    orientation = (orientation: Orientation) =>
+        this.step(`orientation ${orientation}`, async () => {
+            if (!this.config.host) {
+                throw new Error(`Orientation ${orientation} needs the host`)
+            }
+
+            if (!await this.sync('ORIENTATION', orientation, () => UnistylesRuntime.orientation === orientation)) {
+                throw new Error(`Orientation ${orientation} did not reach the app, it is ${UnistylesRuntime.orientation}`)
+            }
+
+            await settle()
+            await this.hold('ROTATED', orientation)
+        })
+
     back = () =>
         this.step('back', async () => {
             const from = this.pathname
@@ -304,6 +319,11 @@ class E2ERun implements Actions {
 
         if (!session.isLoggedIn()) {
             await this.step('reset session', session.logIn)
+        }
+
+        // left behind by a failed mount-on-resize
+        if (this.config.host && UnistylesRuntime.orientation !== 'portrait') {
+            await this.orientation('portrait')
         }
 
         await this.step('reset themes', restoreThemes)

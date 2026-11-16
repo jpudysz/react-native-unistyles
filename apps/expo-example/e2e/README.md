@@ -36,7 +36,7 @@ hardware keyboard (a headless one). Start the Android emulator windowless from b
 ```
 
 Without the host, `expo-example:///e2e?scenarios=all&reps=1` runs everything (except the host only `os-appearance`,
-`touchable-highlight`, `interactions` and `inline-override`) and shows the result on screen, which also works in a Debug build with Metro.
+`mount-on-resize`, `touchable-highlight`, `interactions` and `inline-override`) and shows the result on screen, which also works in a Debug build with Metro.
 
 ## Scenarios
 
@@ -69,6 +69,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `rn-appearance`       | `Appearance.setColorScheme` against the OS scheme with adaptive themes, on a pushed screen, then `unspecified` | adaptive themes follow RN's override on both platforms (iOS key window, Android Activity `uiMode`) |
 | `rtl`                 | `rt.rtl` read by a StyleSheet, `useUnistyles` and `UnistylesRuntime` at start, after a theme change and on a pushed screen | `rt.rtl` equals `I18nManager.isRTL` (forceRTL, allowRTL, Android `supportsRtl`, React Native's locale rule), only meaningful with an RTL device language, eg. `-AppleLanguages (ar)`, or forceRTL |
 | `os-appearance`       | OS appearance flips with adaptive themes (host only)                       | adaptive themes, inverted adaptive scopes                |
+| `mount-on-resize`     | boxes mounted after the device turned (portrait to landscape and back), from `theme =>`, `(theme, rt) =>` and static StyleSheets with a breakpoint `paddingLeft` that had no node while the window changed (host only, both orientations on other breakpoints, e.g. a phone) | #1378, a `theme =>` StyleSheet refreshed only on theme changes keeps the value of the previous breakpoint |
 | `random-walk`         | 14 seeded random theme changes, pushes, backs and screen actions           | combinations of the above                                |
 
 ## Checks
@@ -113,7 +114,9 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
 - At a sync point the runner blocks and the beacon turns magenta or yellow (by sync parity). The host polls screenshots
   until the beacon shows the next sync, only then reads the accessibility tree, and answers by tapping the beacon or the
   requested element, or flips the OS appearance (`xcrun simctl ui`, `adb shell cmd uimode night`) for `APPEARANCE`
-  syncs. Between polls it checks that the app process is alive.
+  syncs. For `ORIENTATION` it turns the device (`argent run rotate`, `adb shell settings put system user_rotation`, auto-rotate off),
+  then reads the tree until the runner holds `ROTATED` in the new layout, finds the beacon and probes again there and acknowledges.
+  Between polls it checks that the app process is alive.
 - The final report travels as URI encoded JSON in the `E2E REPORT` accessibility label, the only channel both platforms
   expose in Release without new dependencies.
 - The protocol and probe colors (`protocol.ts`) import the themes from `themes.ts`, the same objects `unistyles.ts`
@@ -122,7 +125,7 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
 ## Mutation check
 
 Each fix was reverted (or its mechanism disabled) in a Release build and the suite failed with a report pointing at
-the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 to M11 added 2026-10-03 on iOS and Android, M12 and M13 added 2026-10-05, M14 added 2026-10-06, M17 and M18 added 2026-10-22, M19 added 2026-10-23, M20 to M22 added 2026-10-22, M23 added 2026-10-30):
+the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 to M11 added 2026-10-03 on iOS and Android, M12 and M13 added 2026-10-05, M14 added 2026-10-06, M17 and M18 added 2026-10-22, M19 added 2026-10-23, M20 to M22 added 2026-10-22, M23 added 2026-10-30, M24 added 2026-11-16):
 
 | mutation                                                                                   | caught by                                                         | first failure                                                                                   |
 | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
@@ -149,6 +152,7 @@ the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 t
 | M20 RN 0.88 background layer strings (`backgroundSize`, `backgroundPosition`, `backgroundRepeat`) sent raw by shadow tree updates (2026-10-22) | checkpoints in another theme than the overlay mounted in (iOS, `shared-dynamic-fn`) | overlay probe `linear-gradient` expected `#16a085` (dark) actual `#8e44ad`, the native props read a string as no layer |
 | M21 background layer arrays read as breakpoints by the parser (2026-10-22)                 | every checkpoint (iOS, `shared-dynamic-fn`)                       | overlay probe `radial-gradient` expected `#d35400` (dark) actual `#8e44ad`, the array is dropped before React renders it |
 | M22 the `fontVariationSettings` object sent unconverted by shadow tree updates (2026-10-22) | every step after a theme change with the header rendered (iOS, `shared-dynamic-fn`) | header `Paragraph 'title' fontVariationSettings expected undefined actual 'wght' 650.5`, the native props only read a string |
+| M24 #1378 `getStyleSheetsToRefresh` refreshes a `theme =>` StyleSheet only when the theme changed (2026-11-16, Android, Pixel 9 emulator) | `mount-on-resize` (6 failures in 3 reps, every check, only the `theme =>` box) | `mount-on-resize rep 1 step 4 (expect mount-on-resize.check): paddingLeft at lg (opened at sm) expected 80 actual 9.9` and `at sm (opened at lg) expected 10 actual 80` |
 | M23 `rt.rtl` computed by Unistyles' own rule (forceRTL or an RTL locale, ignoring `allowRTL`) instead of React Native's (2026-10-30, Debug builds through the deep link) | `rtl` with an RTL device language and `allowRTL(false)` (Android emulator in `ar-EG`, 3 failures, iOS simulator with `-AppleLanguages (ar)` and an `ar` localization) | `rt rtl expected I18nManager.isRTL false actual native true StyleSheet true useUnistyles true` |
 
 #1266 can't be reverted as a whole, `verify()` reads the registry it introduced, so M4a and M4b disable its two

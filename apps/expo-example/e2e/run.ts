@@ -16,6 +16,7 @@ import {
     formatSync,
     LABELS,
     METRO_ONLY_PROBES,
+    type Orientation,
     parseReport,
     parseRunInteger,
     parseSync,
@@ -236,17 +237,49 @@ const checkProbes = (sync: Sync, frames: Record<ProbeName, Rect>) => {
     }
 }
 
+// The beacon and probes move when the device turns
+const findFrames = (elements: Array<Element>) => ({
+    beacon: findElement(elements, element => element.label === LABELS.beacon, 'beacon').frame,
+    frames: Object.fromEntries(
+        probes.map(probe => [probe, findElement(elements, element => element.label === `${LABELS.probe} ${probe}`, `${probe} probe`).frame]),
+    ) as Record<ProbeName, Rect>,
+})
+
+// After the device turned the beacon is somewhere else, so read the tree (not the beacon) until the runner holds the
+// next sync, ROTATED once the app laid out the new orientation
+const waitForSyncInTree = async (previous: Sync) => {
+    const deadline = Date.now() + READY_TIMEOUT_MS
+
+    while (Date.now() < deadline) {
+        await sleep(POLL_MS * 2)
+
+        if (!device.isRunning()) {
+            throw new Error(`The app crashed after sync #${previous.seq}`)
+        }
+
+        try {
+            const { elements, sync } = readSync()
+
+            if (sync !== undefined && sync.seq > previous.seq) {
+                return { elements, sync }
+            }
+        } catch {
+            // uiautomator may not get an idle state while the screen turns
+        }
+    }
+
+    throw new Error(`Runner stalled after ${formatSync(previous)}`)
+}
+
 // Answers sync points until the runner publishes its report
 const serve = async (): Promise<Report> => {
     let { elements, sync } = await waitForReady()
-    const beacon = findElement(elements, element => element.label === LABELS.beacon, 'beacon').frame
-    const frames = Object.fromEntries(
-        probes.map(probe => [probe, findElement(elements, element => element.label === `${LABELS.probe} ${probe}`, `${probe} probe`).frame]),
-    ) as Record<ProbeName, Rect>
+    let { beacon, frames } = findFrames(elements)
 
     while (true) {
         switch (sync.kind) {
             case 'READY':
+            case 'ROTATED':
                 acknowledge(beacon)
                 break
             case 'CHECKPOINT':
@@ -268,6 +301,18 @@ const serve = async (): Promise<Report> => {
             case 'APPEARANCE':
                 device.setAppearance(sync.detail as 'light' | 'dark')
                 break
+            case 'ORIENTATION': {
+                device.setOrientation(sync.detail as Orientation)
+
+                const next = await waitForSyncInTree(sync)
+                const moved = findFrames(next.elements)
+
+                beacon = moved.beacon
+                frames = moved.frames
+                elements = next.elements
+                sync = next.sync
+                continue
+            }
             case 'RESULT':
                 screenshot('result')
 

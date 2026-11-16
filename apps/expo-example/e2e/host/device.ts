@@ -29,6 +29,8 @@ export type Device = {
     tap: (x: number, y: number) => void,
     // The OS appearance, like the Control Center toggle
     setAppearance: (scheme: 'light' | 'dark') => void,
+    // Turns the device, describe, tap and screenshot follow the new orientation
+    setOrientation: (orientation: 'portrait' | 'landscape') => void,
     screenshot: (path: string) => void,
     // True while the app process runs, a crash ends the run early
     isRunning: () => boolean
