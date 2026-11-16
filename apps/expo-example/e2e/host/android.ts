@@ -40,7 +40,10 @@ const parseDump = (xml: string, width: number, height: number): Array<Element> =
 export const createAndroid = (serial: string): Device => {
     const adb = (...args: Array<string>) => exec([ADB, '-s', serial, ...args])
     // `Override size` wins over `Physical size` when both are listed
-    const [width, height] = adb('shell', 'wm', 'size').trim().split('\n').at(-1)!.split(': ')[1]!.split('x').map(Number) as [number, number]
+    const [naturalWidth, naturalHeight] = adb('shell', 'wm', 'size').trim().split('\n').at(-1)!.split(': ')[1]!.split('x').map(Number) as [number, number]
+    // The display rotation of the last dump, uiautomator bounds and taps are in the rotated display's pixels
+    let rotation = 0
+    const screenSize = () => rotation % 2 === 0 ? [naturalWidth, naturalHeight] as const : [naturalHeight, naturalWidth] as const
 
     return {
         // The JS bundle task does not track workspace packages, rerun it so Unistyles changes land in the bundle
@@ -62,14 +65,25 @@ export const createAndroid = (serial: string): Device => {
                 const dump = adb('exec-out', 'uiautomator', 'dump', '/dev/tty')
 
                 if (!dump.startsWith('ERROR')) {
-                    return parseDump(dump, width, height)
+                    rotation = Number(/<hierarchy rotation="(\d)"/.exec(dump)?.[1] ?? rotation)
+
+                    return parseDump(dump, ...screenSize())
                 }
             }
 
             throw new Error('uiautomator could not get an idle state, keep infinite animations off screen at sync points')
         },
-        tap: (x, y) => adb('shell', 'input', 'tap', String(Math.round(x * width)), String(Math.round(y * height))),
+        tap: (x, y) => {
+            const [width, height] = screenSize()
+
+            adb('shell', 'input', 'tap', String(Math.round(x * width)), String(Math.round(y * height)))
+        },
         setAppearance: scheme => adb('shell', 'cmd', 'uimode', 'night', scheme === 'dark' ? 'yes' : 'no'),
+        // Auto-rotate off, otherwise the emulator's sensor turns it back
+        setOrientation: orientation => {
+            adb('shell', 'settings', 'put', 'system', 'accelerometer_rotation', '0')
+            adb('shell', 'settings', 'put', 'system', 'user_rotation', orientation === 'portrait' ? '0' : '1')
+        },
         screenshot: path => {
             const output = Buffer.from(Bun.spawnSync([ADB, '-s', serial, 'exec-out', 'screencap', '-p']).stdout)
 

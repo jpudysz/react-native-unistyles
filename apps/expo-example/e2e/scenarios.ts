@@ -2,7 +2,7 @@ import { Platform } from 'react-native'
 import { UnistylesRuntime } from 'react-native-unistyles'
 import { screens } from '../consts'
 import { THEME_NAMES, type ThemeName } from '../themes'
-import type { ScenarioId } from './protocol'
+import type { Orientation, ScenarioId } from './protocol'
 
 export type Actions = {
     flip: (theme: ThemeName) => Promise<void>,
@@ -11,6 +11,8 @@ export type Actions = {
     colorScheme: (scheme: 'light' | 'dark' | 'unspecified', expected: 'light' | 'dark') => Promise<void>,
     // OS appearance via the host
     appearance: (scheme: 'light' | 'dark') => Promise<void>,
+    // The device turned by the host, waits until UnistylesRuntime.orientation follows
+    orientation: (orientation: Orientation) => Promise<void>,
     back: () => Promise<void>,
     push: (href: string) => Promise<void>,
     // Runs a screen action registered with useE2EAction, the same code its buttons run
@@ -441,6 +443,24 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.back()
         await a.push('/basics')
         await a.appearance(first)
+        await a.back()
+        await a.checkpoint()
+    },
+    // #1378: StyleSheets with no mounted node while the window changed, their nodes mount after it. Needs the host to
+    // turn the device, both orientations must be on other breakpoints for PADDING (a phone: sm and lg)
+    'mount-on-resize': async a => {
+        if (!a.hasHost) {
+            return
+        }
+
+        await a.push('/mount-on-resize')
+        await a.orientation('landscape')
+        await a.expect('mount-on-resize.check')
+        await a.back()
+        // opened in landscape, the StyleSheets were mounted and unmounted again, then the window shrinks
+        await a.push('/mount-on-resize')
+        await a.orientation('portrait')
+        await a.expect('mount-on-resize.check')
         await a.back()
         await a.checkpoint()
     },

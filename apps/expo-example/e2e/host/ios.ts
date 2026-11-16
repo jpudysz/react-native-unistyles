@@ -88,6 +88,7 @@ export const createIOS = (udid: string): Device => {
         describe,
         tap,
         setAppearance: scheme => exec(['xcrun', 'simctl', 'ui', udid, 'appearance', scheme]),
+        setOrientation: orientation => argent('rotate', '--orientation', orientation === 'portrait' ? 'Portrait' : 'LandscapeLeft'),
         screenshot: path => argent('screenshot', '--scale', '1', '--out', path),
         isRunning: () => exec(['xcrun', 'simctl', 'spawn', udid, 'launchctl', 'list'], { check: false }).includes(`UIKitApplication:${APP_ID}`)
     }
