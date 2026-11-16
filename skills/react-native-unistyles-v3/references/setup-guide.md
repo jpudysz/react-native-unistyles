@@ -205,6 +205,14 @@ This enables:
 - Type-safe breakpoint names in styles and `mq`
 - Type-safe theme names in `UnistylesRuntime.setTheme()`
 
+After registering, import the derived helper types instead of writing `UnistylesThemes[keyof UnistylesThemes]` by hand:
+
+```typescript
+import type { AppTheme, AppThemeName, AppBreakpoint } from 'react-native-unistyles'
+
+const getBorder = (theme: AppTheme) => ({ borderColor: theme.colors.primary })
+```
+
 ## Expo Router Integration
 
 Expo Router resolves routes before Unistyles can initialize. Extra steps are needed:
