@@ -64,6 +64,20 @@ declare module 'react-native-unistyles' {
 }
 ```
 
+After that, you can type props, helpers or functions that accept your theme with the exported `AppTheme` type,
+and theme names with `AppThemeName`:
+
+```tsx
+import type { AppTheme, AppThemeName } from 'react-native-unistyles'
+
+const getBorder = (theme: AppTheme) => ({
+    borderWidth: 1,
+    borderColor: theme.colors.primary
+})
+
+const themeNames: Array<AppThemeName> = ['light', 'dark']
+```
+
 Finally, to register the theme, you need to call `StyleSheet.configure`:
 
 ```tsx /name/
