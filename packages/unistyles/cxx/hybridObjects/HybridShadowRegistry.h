@@ -74,6 +74,7 @@ struct HybridShadowRegistry: public HybridUnistylesShadowRegistrySpec {
 private:
     void scheduleShadowTreeUpdate(jsi::Runtime& rt);
     static std::optional<jsi::Object> getUnistyleSecrets(jsi::Runtime& rt, jsi::Object& style, const core::Unistyle::Shared& unistyle);
+    static bool hasOutdatedMountedStyles(jsi::Runtime& rt, const jsi::Array& rawStyles, const std::vector<std::shared_ptr<core::UnistyleData>>& unistylesData);
 
     std::shared_ptr<HybridUnistylesRuntime> _unistylesRuntime;
     std::shared_ptr<std::atomic<bool>> _isShadowTreeUpdateScheduled = std::make_shared<std::atomic<bool>>(false);
