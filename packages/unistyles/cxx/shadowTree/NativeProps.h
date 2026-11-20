@@ -8,6 +8,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <type_traits>
 
 // React Native reads ShadowNodeFamily::nativeProps_DEPRECATED from any thread
 // (eg. ShadowNode::clone during main thread layout) and since 0.86.1 guards every access with nativePropsMutex
@@ -22,18 +23,52 @@ namespace margelo::nitro::unistyles::shadow {
 
 using namespace facebook::react;
 
+// React Native nightlies hold the native props in a ShadowNodeFamily::NativeProps_DEPRECATED struct,
+// next to the props that already include them, so that cloning a node doesn't apply them again
+// earlier versions hold the folly::dynamic itself, so these helpers detect the type at compile time
+using FamilyNativeProps = std::remove_reference_t<decltype(*std::declval<ShadowNodeFamily>().nativeProps_DEPRECATED)>;
+
+template <typename NativeProps>
+inline folly::dynamic& getNativePropsDynamic(NativeProps& nativeProps) {
+    if constexpr (requires { nativeProps.props; }) {
+        return nativeProps.props;
+    } else {
+        return nativeProps;
+    }
+}
+
+// React Native only skips applying native props to a clone whose props already include them,
+// after changing them every node needs them applied again (eg. frozen nodes Unistyles doesn't commit)
+template <typename NativeProps>
+inline void markNativePropsChanged(NativeProps& nativeProps) {
+    if constexpr (requires { nativeProps.appliedProps; }) {
+        nativeProps.appliedProps = nullptr;
+    }
+}
+
+inline folly::dynamic* getNativeProps(const ShadowNodeFamily* family) {
+    if (!family->nativeProps_DEPRECATED) {
+        return nullptr;
+    }
+
+    return &getNativePropsDynamic(*family->nativeProps_DEPRECATED);
+}
+
 inline void mergeNativeProps(const ShadowNodeFamily* family, const folly::dynamic& props) {
 #if UNISTYLES_HAS_NATIVE_PROPS_MUTEX
     std::lock_guard<std::mutex> lock(family->nativePropsMutex);
 #endif
 
-    if (family->nativeProps_DEPRECATED && family->nativeProps_DEPRECATED->isObject()) {
-        family->nativeProps_DEPRECATED->update(props);
+    auto nativeProps = getNativeProps(family);
+
+    if (nativeProps && nativeProps->isObject()) {
+        nativeProps->update(props);
+        markNativePropsChanged(*family->nativeProps_DEPRECATED);
 
         return;
     }
 
-    family->nativeProps_DEPRECATED = std::make_unique<folly::dynamic>(props);
+    family->nativeProps_DEPRECATED = std::make_unique<FamilyNativeProps>(props);
 }
 
 inline bool hasNativeProps(const ShadowNodeFamily* family) {
@@ -41,7 +76,9 @@ inline bool hasNativeProps(const ShadowNodeFamily* family) {
     std::lock_guard<std::mutex> lock(family->nativePropsMutex);
 #endif
 
-    return family->nativeProps_DEPRECATED && family->nativeProps_DEPRECATED->isObject();
+    auto nativeProps = getNativeProps(family);
+
+    return nativeProps && nativeProps->isObject();
 }
 
 inline bool isSamePropValue(const std::string& propName, const folly::dynamic& value, const folly::dynamic& otherValue) {
@@ -68,11 +105,13 @@ inline bool hasOutdatedNativeProps(const ShadowNodeFamily* family, const folly::
     std::lock_guard<std::mutex> lock(family->nativePropsMutex);
 #endif
 
-    if (!family->nativeProps_DEPRECATED || !family->nativeProps_DEPRECATED->isObject() || !props.isObject()) {
+    auto nativePropsPtr = getNativeProps(family);
+
+    if (!nativePropsPtr || !nativePropsPtr->isObject() || !props.isObject()) {
         return false;
     }
 
-    auto& nativeProps = *family->nativeProps_DEPRECATED;
+    auto& nativeProps = *nativePropsPtr;
 
     for (const auto& [propName, propValue] : props.items()) {
         auto it = nativeProps.find(propName);
@@ -90,11 +129,13 @@ inline bool hasCommittedNativeProps(const ShadowNodeFamily* family, const folly:
     std::lock_guard<std::mutex> lock(family->nativePropsMutex);
 #endif
 
-    if (!family->nativeProps_DEPRECATED || !family->nativeProps_DEPRECATED->isObject() || !props.isObject()) {
+    auto nativePropsPtr = getNativeProps(family);
+
+    if (!nativePropsPtr || !nativePropsPtr->isObject() || !props.isObject()) {
         return false;
     }
 
-    auto& nativeProps = *family->nativeProps_DEPRECATED;
+    auto& nativeProps = *nativePropsPtr;
 
     for (const auto& [propName, propValue] : props.items()) {
         auto it = nativeProps.find(propName);
