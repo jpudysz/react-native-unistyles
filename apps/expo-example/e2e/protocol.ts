@@ -25,6 +25,7 @@ export const SCENARIOS = [
     'ime',
     'rn-appearance',
     'rtl',
+    'status-bar',
     'os-appearance',
     'mount-on-resize',
     'random-walk'

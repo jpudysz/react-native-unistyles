@@ -82,7 +82,12 @@ class NativePlatformInsets(
             }
             else -> {
                 @Suppress("DEPRECATION")
-                window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN != WindowManager.LayoutParams.FLAG_FULLSCREEN
+                val isHiddenByWindowFlag = window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN != 0
+                // WindowInsetsControllerCompat.hide(statusBars()) (e.g. React Native's StatusBar) sets only this flag
+                @Suppress("DEPRECATION")
+                val isHiddenBySystemUi = window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_FULLSCREEN != 0
+
+                !isHiddenByWindowFlag && !isHiddenBySystemUi
             }
         }
         val statusBarTopInset = when(isStatusBarVisible) {
