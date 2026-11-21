@@ -125,6 +125,11 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
             initialScopedUpdate = std::move(update);
             shouldCommit = true;
         }
+    } else if (hasOutdatedMountedStyles(rt, args[1].asObject(rt).asArray(rt), unistylesData)) {
+        // the view mounted with a style object made before a theme or runtime change (eg. an element React kept
+        // from an earlier render): React drew those old values, so they're replaced with the current ones
+        initialScopedUpdate = parser.parseStylesToShadowTreeUpdates(rt, unistylesData);
+        shouldCommit = true;
     }
 
     registry.linkShadowNodeWithUnistyle(
@@ -140,6 +145,43 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
     }
 
     return jsi::Value::undefined();
+}
+
+// whether a view mounts with other values than the current ones of its unistyles, compared by primitive values
+// (colors, sizes): a style object keeps the values it was made with, while the unistyle now holds the current ones
+bool HybridShadowRegistry::hasOutdatedMountedStyles(jsi::Runtime& rt, const jsi::Array& rawStyles, const std::vector<std::shared_ptr<core::UnistyleData>>& unistylesData) {
+    for (size_t i = 0; i < unistylesData.size() && i < rawStyles.size(rt); i++) {
+        const auto& unistyleData = unistylesData[i];
+
+        if (unistyleData->unistyle->styleKey == helpers::EXOTIC_STYLE_KEY || !unistyleData->parsedStyle.has_value()) {
+            continue;
+        }
+
+        auto rawStyle = rawStyles.getValueAtIndex(rt, i);
+
+        if (!rawStyle.isObject()) {
+            continue;
+        }
+
+        auto mountedStyle = rawStyle.asObject(rt);
+        auto& currentStyle = unistyleData->parsedStyle.value();
+        auto propNames = currentStyle.getPropertyNames(rt);
+
+        for (size_t j = 0; j < propNames.size(rt); j++) {
+            auto propName = propNames.getValueAtIndex(rt, j).asString(rt);
+            auto currentValue = currentStyle.getProperty(rt, propName);
+
+            if (currentValue.isObject() || currentValue.isUndefined()) {
+                continue;
+            }
+
+            if (!jsi::Value::strictEquals(rt, mountedStyle.getProperty(rt, propName), currentValue)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 // a style made by Unistyles keeps its secrets (variants, arguments) under the unistyle's id,
