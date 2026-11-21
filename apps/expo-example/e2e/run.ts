@@ -28,7 +28,7 @@ import {
     type Sync,
 } from './protocol'
 
-const USAGE = 'Usage: bun e2e/run.ts <ios|android> --device <udid|serial> [--scenarios <ids|all>] [--reps <n>] [--seed <n>] [--taps] [--bundler <metro|babel>] [--skip-build]'
+const USAGE = 'Usage: bun e2e/run.ts <ios|android> --device <udid|serial> [--scenarios <ids|all>] [--skip <ids>] [--reps <n>] [--seed <n>] [--taps] [--bundler <metro|babel>] [--skip-build]'
 
 const POLL_MS = 500
 const READY_TIMEOUT_MS = 90_000
@@ -54,6 +54,8 @@ const { positionals, values } = parseArgs({
     options: {
         'device': { type: 'string' },
         'scenarios': { type: 'string', default: 'all' },
+        // scenarios a device can't run, e.g. os-appearance where the OS locks the night mode
+        'skip': { type: 'string', default: '' },
         'reps': { type: 'string', default: '20' },
         'seed': { type: 'string', default: '1' },
         'taps': { type: 'boolean', default: false },
@@ -80,7 +82,8 @@ process.env.UNISTYLES_BUNDLER = bundler
 // the Babel plugin skips node_modules, so only Metro paints the 3rd party probe
 const probes = PROBES.filter(probe => bundler === 'metro' || !METRO_ONLY_PROBES.includes(probe))
 
-const unknownScenario = values.scenarios.split(',').find(id => id !== 'all' && !SCENARIOS.includes(id as never))
+const skipped = values.skip.split(',').filter(Boolean)
+const unknownScenario = [...values.scenarios.split(','), ...skipped].find(id => id !== 'all' && !SCENARIOS.includes(id as never))
 
 if (unknownScenario !== undefined) {
     console.error(`Unknown scenario "${unknownScenario}", expected one of: all, ${SCENARIOS.join(', ')}`)
@@ -154,6 +157,9 @@ const acknowledge = (beacon: Rect) => device.tap(center(beacon).x, center(beacon
 
 const showsSync = (color: Array<number>, seq: number) => colorDistance(color, parseHex(BEACON_COLORS.waiting[seq % 2]!)) < BEACON_TOLERANCE
 
+const isBeaconPainted = (color: Array<number>) =>
+    [BEACON_COLORS.running, ...BEACON_COLORS.waiting].some(hex => colorDistance(color, parseHex(hex)) < BEACON_TOLERANCE)
+
 // Polls screenshots until the beacon shows the sync after `previous`, the tree is read only while the runner is blocked.
 // A later sync is accepted too: the runner times out syncs the screen never showed (e.g. under a stuck overlay)
 const waitForSync = async (beacon: Rect, previous: Sync) => {
@@ -162,6 +168,7 @@ const waitForSync = async (beacon: Rect, previous: Sync) => {
     const deadline = Date.now() + STALL_TIMEOUT_MS
     let seen = 'nothing'
     let stuckSince: number | undefined
+    let unpaintedSince: number | undefined
     let crashCheckedAt = Date.now()
 
     while (Date.now() < deadline) {
@@ -192,6 +199,30 @@ const waitForSync = async (beacon: Rect, previous: Sync) => {
             seen = `marker ${sync ? formatSync(sync) : 'missing'}`
             continue
         }
+
+        // The screen may stop painting the beacon (an Android 10 emulator paints the report panel over it), then only
+        // the tree tells where the runner is
+        if (!isBeaconPainted(color)) {
+            unpaintedSince ??= Date.now()
+
+            if (Date.now() - unpaintedSince > ACK_RETRY_MS) {
+                unpaintedSince = undefined
+
+                try {
+                    const { elements, sync } = readSync()
+
+                    if (sync !== undefined && sync.seq >= seq) {
+                        return { elements, sync }
+                    }
+                } catch {
+                    // uiautomator needs an idle UI, poll again
+                }
+            }
+
+            continue
+        }
+
+        unpaintedSince = undefined
 
         // An acknowledging tap can get lost, tap again once the tree confirms the runner still waits for it
         if (previous.kind === 'TAP' || previous.kind === 'APPEARANCE' || !showsSync(color, previous.seq)) {
@@ -334,7 +365,7 @@ const printSummary = (report: Report, startedAt: number) => {
     const passed = report.result === 'PASS' && probeFailures.length === 0
 
     console.log(`\nE2E ${platform} ${passed ? 'PASS' : 'FAIL'} in ${seconds(startedAt)} (runner ${Math.round(report.durationMs / 1000)}s)`)
-    console.log(`scenarios ${values.scenarios}, reps ${report.reps}, seed ${report.seed}, taps ${report.taps ? 'on' : 'off'}, bundler ${bundler}`)
+    console.log(`scenarios ${values.scenarios}${skipped.length > 0 ? ` (skipped ${skipped.join(',')})` : ''}, reps ${report.reps}, seed ${report.seed}, taps ${report.taps ? 'on' : 'off'}, bundler ${bundler}`)
     console.log(
         `steps ${report.steps}, nodes checked ${report.checked}, detached ${report.detached}, suspended ${report.suspended}, mismatches ${report.mismatches}`,
     )
@@ -367,7 +398,9 @@ const main = async () => {
 
     device.install()
 
-    const params = new URLSearchParams({ scenarios: values.scenarios, reps: values.reps, seed: values.seed, host: '1' })
+    const requested = values.scenarios.split(',').flatMap(id => id === 'all' ? [...SCENARIOS] : [id])
+    const scenarios = requested.filter(id => !skipped.includes(id)).join(',')
+    const params = new URLSearchParams({ scenarios, reps: values.reps, seed: values.seed, host: '1' })
 
     if (values.taps) {
         params.set('taps', '1')

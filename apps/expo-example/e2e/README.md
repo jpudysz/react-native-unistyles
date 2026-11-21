@@ -15,7 +15,8 @@ bun e2e/run.ts android --device <adb serial> --scenarios frozen-stack,frozen-unm
 bun e2e/run.ts ios --device <simulator udid> --scenarios all --reps 1 --bundler babel
 ```
 
-- `--scenarios` comma separated ids from `protocol.ts` or `all` (default), `--reps` default 20, `--seed` default 1.
+- `--scenarios` comma separated ids from `protocol.ts` or `all` (default), `--skip` ids left out of them, `--reps` default 20,
+  `--seed` default 1.
 - `--taps` makes the host tap the header theme pills and back button (in `TAP_SCENARIOS`) instead of calling the same
   `selectTheme` / `router.back` from JS.
 - `--bundler` picks how Unistyles is set up, `metro` (default) is `react-native-unistyles/metro` in `metro.config.js`,
@@ -34,6 +35,21 @@ hardware keyboard (a headless one). Start the Android emulator windowless from b
 ```sh
 /bin/bash -c '~/Library/Android/sdk/emulator/emulator -avd Pixel_7_Pro_API_34 -no-window -gpu host -memory 4096 -no-snapshot-load -no-audio &'
 ```
+
+### Device variants
+
+Some native code paths depend on the OS version, so run the suite on more than one device before a release. On Android
+use a current API (e.g. a Pixel 9 on API 36) and one below Android 11 (API 29): the status bar visibility (`status-bar`),
+the IME insets without the inset animation (`ime`) and the navigation bar hiding go through other APIs there.
+
+```sh
+bun e2e/run.ts android --device <API 36 serial> --scenarios all --reps 1
+bun e2e/run.ts android --device <API 29 serial> --scenarios all --skip os-appearance --reps 1 --skip-build
+```
+
+The API 29 emulator image locks the night mode (`mNightModeLocked=true` in `dumpsys uimode`), `cmd uimode night` can't
+flip it, so `os-appearance` is skipped there. It also stops painting the overlay once the report panel shows, the host
+then finds the result in the tree.
 
 Without the host, `expo-example:///e2e?scenarios=all&reps=1` runs everything (except the host only `os-appearance`,
 `mount-on-resize`, `touchable-highlight`, `interactions` and `inline-override`) and shows the result on screen, which also works in a Debug build with Metro.
@@ -68,6 +84,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `ime`                 | the keyboard focused on `keyboard` and inside a translucent Modal, a theme change while it's up, the Modal closed with the keyboard up, a Modal below it closed (Android) | `rt.insets.ime` in a StyleSheet, `useUnistyles` and `UnistylesRuntime` agree, Android Modals get the keyboard in their own window (#810) |
 | `rn-appearance`       | `Appearance.setColorScheme` against the OS scheme with adaptive themes, on a pushed screen, then `unspecified` | adaptive themes follow RN's override on both platforms (iOS key window, Android Activity `uiMode`) |
 | `rtl`                 | `rt.rtl` read by a StyleSheet, `useUnistyles` and `UnistylesRuntime` at start, after a theme change and on a pushed screen | `rt.rtl` equals `I18nManager.isRTL` (forceRTL, allowRTL, Android `supportsRtl`, React Native's locale rule), only meaningful with an RTL device language, eg. `-AppleLanguages (ar)`, or forceRTL |
+| `status-bar`          | the status bar hidden and shown by React Native's `StatusBar`, react-native-edge-to-edge's `SystemBars`, `UnistylesRuntime.statusBar` and immersive mode, hidden by one and shown by another, a theme change while hidden, shown while the screen is frozen | #1384, `rt.insets.top` in a StyleSheet, `useUnistyles` and `UnistylesRuntime` is 0 while hidden on Android and back to its value once shown, below Android 11 every API sets other window flags |
 | `os-appearance`       | OS appearance flips with adaptive themes (host only)                       | adaptive themes, inverted adaptive scopes                |
 | `mount-on-resize`     | boxes mounted after the device turned (portrait to landscape and back), from `theme =>`, `(theme, rt) =>` and static StyleSheets with a breakpoint `paddingLeft` that had no node while the window changed (host only, both orientations on other breakpoints, e.g. a phone) | #1378, a `theme =>` StyleSheet refreshed only on theme changes keeps the value of the previous breakpoint |
 | `random-walk`         | 14 seeded random theme changes, pushes, backs and screen actions           | combinations of the above                                |
@@ -125,7 +142,7 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
 ## Mutation check
 
 Each fix was reverted (or its mechanism disabled) in a Release build and the suite failed with a report pointing at
-the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 to M11 added 2026-10-03 on iOS and Android, M12 and M13 added 2026-10-05, M14 added 2026-10-06, M17 and M18 added 2026-10-22, M19 added 2026-10-23, M20 to M22 added 2026-10-22, M23 added 2026-10-30, M24 added 2026-11-16):
+the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 to M11 added 2026-10-03 on iOS and Android, M12 and M13 added 2026-10-05, M14 added 2026-10-06, M17 and M18 added 2026-10-22, M19 added 2026-10-23, M20 to M22 added 2026-10-22, M23 added 2026-10-30, M24 added 2026-11-16, M25 added 2026-11-21):
 
 | mutation                                                                                   | caught by                                                         | first failure                                                                                   |
 | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
@@ -153,6 +170,7 @@ the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 t
 | M21 background layer arrays read as breakpoints by the parser (2026-10-22)                 | every checkpoint (iOS, `shared-dynamic-fn`)                       | overlay probe `radial-gradient` expected `#d35400` (dark) actual `#8e44ad`, the array is dropped before React renders it |
 | M22 the `fontVariationSettings` object sent unconverted by shadow tree updates (2026-10-22) | every step after a theme change with the header rendered (iOS, `shared-dynamic-fn`) | header `Paragraph 'title' fontVariationSettings expected undefined actual 'wght' 650.5`, the native props only read a string |
 | M24 #1378 `getStyleSheetsToRefresh` refreshes a `theme =>` StyleSheet only when the theme changed (2026-11-16, Android, Pixel 9 emulator) | `mount-on-resize` (6 failures in 3 reps, every check, only the `theme =>` box) | `mount-on-resize rep 1 step 4 (expect mount-on-resize.check): paddingLeft at lg (opened at sm) expected 80 actual 9.9` and `at sm (opened at lg) expected 10 actual 80` |
+| M25 #1384 below Android 11 the status bar counts as hidden only with the window's `FLAG_FULLSCREEN`, not the `SYSTEM_UI_FLAG_FULLSCREEN` `WindowInsetsControllerCompat.hide(statusBars())` sets (2026-11-21, Android, API 29 emulator) | `status-bar` (2 failures in 3 reps, the `rn` and `system-bars` variants of rep 1, the bug shows only until UnistylesRuntime hid the status bar once) | `status-bar rep 1 step 5 (expect status-bar.hidden): insets.top expected 0 while hidden actual native 24 StyleSheet 24 useUnistyles 24` |
 | M23 `rt.rtl` computed by Unistyles' own rule (forceRTL or an RTL locale, ignoring `allowRTL`) instead of React Native's (2026-10-30, Debug builds through the deep link) | `rtl` with an RTL device language and `allowRTL(false)` (Android emulator in `ar-EG`, 3 failures, iOS simulator with `-AppleLanguages (ar)` and an `ar` localization) | `rt rtl expected I18nManager.isRTL false actual native true StyleSheet true useUnistyles true` |
 
 #1266 can't be reverted as a whole, `verify()` reads the registry it introduced, so M4a and M4b disable its two

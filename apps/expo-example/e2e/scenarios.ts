@@ -427,6 +427,39 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.back()
         await a.checkpoint()
     },
+    // #1384: rt.insets.top follows the status bar whichever API hides it, below Android 11 each sets other window flags,
+    // run it on API 29 too
+    'status-bar': async a => {
+        await a.push('/status-bar')
+        await a.expect('status-bar.shown')
+
+        // rn and system-bars go first: #1384 shows only until UnistylesRuntime hid the status bar once in the app's life
+        for (const variant of ['rn', 'system-bars', 'unistyles', 'immersive']) {
+            await a.act('status-bar.hide', variant)
+            await a.expect('status-bar.hidden')
+            await a.act('status-bar.show', variant)
+            await a.expect('status-bar.shown')
+        }
+
+        // hidden by one API and shown by another
+        await a.act('status-bar.hide', 'unistyles')
+        await a.expect('status-bar.hidden')
+        await a.act('status-bar.show', 'rn')
+        await a.expect('status-bar.shown')
+        await a.act('status-bar.hide', 'rn')
+        await a.expect('status-bar.hidden')
+        // styles rebuilt by a theme change read the hidden inset
+        await a.flip('dark')
+        await a.expect('status-bar.hidden')
+        // shown while the screen is frozen, it's restored with the new inset
+        await a.push('/basics')
+        await a.act('status-bar.show', 'unistyles')
+        await a.back()
+        await a.expect('status-bar.shown')
+        await a.flip('light')
+        await a.back()
+        await a.checkpoint()
+    },
     'os-appearance': async a => {
         if (!a.hasHost) {
             return
