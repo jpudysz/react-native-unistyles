@@ -28,6 +28,7 @@ struct LinkedFamily {
     std::shared_ptr<const ShadowNodeFamily> family;
     std::vector<std::shared_ptr<UnistyleData>> unistyles;
     bool isSuspended = false;
+    bool hasUpdatesWhileSuspended = false;
 };
 
 struct LinkedFamilySnapshot {
@@ -59,6 +60,7 @@ struct UnistylesRegistry: public StyleSheetRegistry {
     void unlinkShadowNodeWithUnistyles(const ShadowNodeFamily*);
     void suspendShadowNode(const ShadowNodeFamily*);
     bool isSuspended(const ShadowNodeFamily*) const noexcept;
+    bool hasUpdatesWhileSuspended(const ShadowNodeFamily*);
     std::shared_ptr<core::StyleSheet> addStyleSheet(jsi::Runtime& rt, uint64_t generation, core::StyleSheetType type, jsi::Object&& rawValue);
     DependencyMap buildDependencyMap(std::vector<UnistyleDependency>& deps);
     void shadowLeafUpdateFromUnistyle(jsi::Runtime& rt, Unistyle::Shared unistyle, jsi::Value& maybePressableId);
