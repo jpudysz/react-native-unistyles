@@ -90,6 +90,16 @@ if (unknownScenario !== undefined) {
     process.exit(2)
 }
 
+const scenarios = values.scenarios.split(',')
+    .flatMap(id => id === 'all' ? [...SCENARIOS] : [id])
+    .filter(id => !skipped.includes(id))
+
+// an empty list reaches the app as `scenarios=`, which isn't a scenario id
+if (scenarios.length === 0) {
+    console.error('No scenarios left to run after --skip')
+    process.exit(2)
+}
+
 try {
     parseRunInteger('reps', values.reps, 20)
     parseRunInteger('seed', values.seed, 1)
@@ -398,9 +408,7 @@ const main = async () => {
 
     device.install()
 
-    const requested = values.scenarios.split(',').flatMap(id => id === 'all' ? [...SCENARIOS] : [id])
-    const scenarios = requested.filter(id => !skipped.includes(id)).join(',')
-    const params = new URLSearchParams({ scenarios, reps: values.reps, seed: values.seed, host: '1' })
+    const params = new URLSearchParams({ scenarios: scenarios.join(','), reps: values.reps, seed: values.seed, host: '1' })
 
     if (values.taps) {
         params.set('taps', '1')
