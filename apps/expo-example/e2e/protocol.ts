@@ -10,6 +10,7 @@ export const SCENARIOS = [
     'activity',
     'frozen-list',
     'animated-variant',
+    'settled-fade',
     'frozen-unmount',
     'scoped',
     'variants-after-flip',
