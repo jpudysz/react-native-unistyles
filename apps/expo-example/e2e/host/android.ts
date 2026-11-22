@@ -10,6 +10,8 @@ const ANDROID_HOME = process.env.ANDROID_HOME ?? join(homedir(), 'Library/Androi
 const ADB = join(ANDROID_HOME, 'platform-tools/adb')
 const APK_PATH = join(APP_DIR, 'android/app/build/outputs/apk/release/app-release.apk')
 const DUMP_ATTEMPTS = 3
+const WINDOW_ATTEMPTS = 10
+const WINDOW_POLL_MS = 500
 
 const decodeEntities = (value: string) =>
     value
@@ -54,10 +56,29 @@ export const createAndroid = (serial: string): Device => {
                 logPath
             }),
         install: () => adb('install', '-r', APK_PATH),
-        launch: url => {
+        // Every run opens the app in the window it asks for, a desktop window (Android 15+ desktop windowing, freeform)
+        // is remembered by the OS and would come back on the next launch
+        launch: (url, window) => {
             adb('shell', 'am', 'force-stop', APP_ID)
             // adb joins arguments into one device shell command, quote the url for its `&`
-            adb('shell', 'am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', `'${url}'`, APP_ID)
+            adb('shell', 'am', 'start', '-W', '--windowingMode', window === 'desktop' ? '5' : '1', '-a', 'android.intent.action.VIEW', '-d', `'${url}'`, APP_ID)
+
+            if (window === 'fullscreen') {
+                return
+            }
+
+            // without desktop windowing the OS opens the app in full screen
+            const freeformTask = new RegExp(`A=\\d+:${APP_ID.replace(/\./g, '\\.')} [^\\n]*mode=freeform`)
+
+            for (let attempt = 0; attempt < WINDOW_ATTEMPTS; attempt++) {
+                if (freeformTask.test(adb('shell', 'dumpsys', 'activity', 'activities'))) {
+                    return
+                }
+
+                Bun.sleepSync(WINDOW_POLL_MS)
+            }
+
+            throw new Error('The app did not open in a desktop window, is desktop windowing enabled (e2e/README.md)?')
         },
         // uiautomator waits for an idle UI and sometimes gives up on a still screen, an infinite animation always fails it
         describe: () => {
@@ -79,10 +100,12 @@ export const createAndroid = (serial: string): Device => {
             adb('shell', 'input', 'tap', String(Math.round(x * width)), String(Math.round(y * height)))
         },
         setAppearance: scheme => adb('shell', 'cmd', 'uimode', 'night', scheme === 'dark' ? 'yes' : 'no'),
-        // Auto-rotate off, otherwise the emulator's sensor turns it back
+        // Auto-rotate off, otherwise the emulator's sensor turns it back. Rotation 0 is the natural orientation, landscape on a tablet
         setOrientation: orientation => {
+            const isNatural = (orientation === 'landscape') === (naturalWidth > naturalHeight)
+
             adb('shell', 'settings', 'put', 'system', 'accelerometer_rotation', '0')
-            adb('shell', 'settings', 'put', 'system', 'user_rotation', orientation === 'portrait' ? '0' : '1')
+            adb('shell', 'settings', 'put', 'system', 'user_rotation', isNatural ? '0' : '1')
         },
         screenshot: path => {
             const output = Buffer.from(Bun.spawnSync([ADB, '-s', serial, 'exec-out', 'screencap', '-p']).stdout)

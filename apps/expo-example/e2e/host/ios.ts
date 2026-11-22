@@ -68,7 +68,12 @@ export const createIOS = (udid: string): Device => {
             ], { cwd: APP_DIR, logPath }),
         install: () => exec(['xcrun', 'simctl', 'install', udid, APP_PATH]),
         // Launches first and opens the URL once home renders, so the link reaches a running app
-        launch: url => {
+        launch: (url, window) => {
+            // iPad windows (Stage Manager) can't be opened from the host
+            if (window === 'desktop') {
+                throw new Error('A desktop window is Android only')
+            }
+
             exec(['xcrun', 'simctl', 'terminate', udid, APP_ID], { check: false })
             exec(['xcrun', 'simctl', 'launch', udid, APP_ID])
             waitFor(elements => elements.some(element => element.label === HOME_TITLE), 'its home screen')

@@ -96,6 +96,7 @@ class NativePlatformInsets(
                 ?.top ?: 0
             false -> 0
         }
+        val captionBarTopInset = insetsCompat.getInsets(WindowInsetsCompat.Type.captionBar()).top
 
         val insets = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
         val imeInsetValue = insetsCompat.getInsets(WindowInsetsCompat.Type.ime()).bottom
@@ -125,7 +126,7 @@ class NativePlatformInsets(
         }
 
         this._insets = Insets(
-            statusBarTopInset.toDouble(),
+            maxOf(statusBarTopInset, captionBarTopInset).toDouble(),
             bottomInset.toDouble(),
             insets.left.toDouble(),
             insets.right.toDouble(),

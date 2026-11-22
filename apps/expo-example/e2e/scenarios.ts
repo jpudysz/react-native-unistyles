@@ -460,6 +460,18 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.back()
         await a.checkpoint()
     },
+    // #1385: rt.insets agree with react-native-safe-area-context, which reads the same window on its own. Run it with
+    // `--window desktop` too, Android 15 draws a caption bar over the top of a desktop window
+    'safe-area': async a => {
+        await a.push('/insets')
+        await a.expect('insets.safe-area')
+        // styles rebuilt by a theme change read the current insets
+        await a.flip('dark')
+        await a.expect('insets.safe-area')
+        await a.flip('light')
+        await a.back()
+        await a.checkpoint()
+    },
     'os-appearance': async a => {
         if (!a.hasHost) {
             return

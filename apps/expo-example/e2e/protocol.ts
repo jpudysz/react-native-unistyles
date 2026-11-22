@@ -26,6 +26,7 @@ export const SCENARIOS = [
     'rn-appearance',
     'rtl',
     'status-bar',
+    'safe-area',
     'os-appearance',
     'mount-on-resize',
     'random-walk'
@@ -49,6 +50,11 @@ export const parseRunInteger = (name: 'reps' | 'seed', value: string | undefined
 export type SyncKind = 'READY' | 'CHECKPOINT' | 'TAP' | 'APPEARANCE' | 'ORIENTATION' | 'ROTATED' | 'FAILURE' | 'RESULT'
 
 export type Orientation = 'portrait' | 'landscape'
+
+// Where the host opens the app, `desktop` is a freeform window of Android 15+ desktop windowing
+export type WindowMode = 'fullscreen' | 'desktop'
+
+export const WINDOW_MODES: ReadonlyArray<WindowMode> = ['fullscreen', 'desktop']
 
 export type Sync = {
     seq: number,
