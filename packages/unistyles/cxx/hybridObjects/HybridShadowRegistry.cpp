@@ -340,8 +340,17 @@ jsi::Value HybridShadowRegistry::refreshReactNodes(jsi::Runtime &rt, const jsi::
         }
 
         const auto& [parent, index] = ancestors.back();
+        const auto& committedNode = parent.get().getChildren().at(index);
 
-        wrapper->shadowNode = parent.get().getChildren().at(index);
+        if (committedNode == wrapper->shadowNode) {
+            continue;
+        }
+
+        wrapper->shadowNode = wrapper->shadowNode->clone({
+            .props = ShadowNodeFragment::propsPlaceholder(),
+            .children = std::make_shared<const std::vector<std::shared_ptr<const ShadowNode>>>(committedNode->getChildren()),
+            .state = committedNode->getState(),
+        });
     }
 
     auto result = jsi::Array(rt, unpromotedIndices.size());

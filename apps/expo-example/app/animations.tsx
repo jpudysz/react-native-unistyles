@@ -1,13 +1,42 @@
-// Animations change transforms only: verify() compares the props React rendered and the animated ones differ by design
+// Animations change transforms and opacity: verify() compares the props React rendered and the animated ones differ by design
 import React, { useRef, useState } from 'react'
-import { Animated as RNAnimated, processColor, Text } from 'react-native'
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import { Animated as RNAnimated, findNodeHandle, processColor, Text } from 'react-native'
+import Animated, { getViewProp, type SharedValue, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated'
 import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
 import { useAnimatedTheme, useAnimatedVariantColor } from 'react-native-unistyles/reanimated'
+import { PropsRegistryGarbageCollector } from 'react-native-reanimated/src/PropsRegistryGarbageCollector'
 import { runOnUISync } from 'react-native-worklets'
 import { Button, Screen, Section } from '../components'
 import { useE2EAction } from '../e2e/actions'
 import { themes, type ThemeName } from '../themes'
+
+const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
+// Reanimated re-renders views with the values that got no update for 1s from a JS interval (every 500ms) and drops them
+// from its registry on the next tick. Restarted, so its next tick is 500ms away
+const restartSettledSync = () => {
+    PropsRegistryGarbageCollector.unregisterInterval()
+    PropsRegistryGarbageCollector.registerInterval()
+}
+
+type FadeBoxProps = {
+    opacity: SharedValue<number>,
+    commits: number,
+    boxRef: React.RefObject<React.ComponentRef<typeof Animated.View> | null>
+}
+
+// Memoized, so like in #1380 only the commit after the fade renders it, not the theme change
+const FadeBox = React.memo(({ opacity, commits, boxRef }: FadeBoxProps) => {
+    const fadeStyle = useAnimatedStyle(() => ({
+        opacity: opacity.value
+    }))
+
+    return (
+        <Animated.View ref={boxRef} style={[fadeStyles.box, fadeStyle]}>
+            <Text style={fadeStyles.text}>{commits} commits after the fade</Text>
+        </Animated.View>
+    )
+})
 
 export default function AnimationsScreen() {
     const [tone, setTone] = useState<'primary' | 'accent'>('primary')
@@ -19,6 +48,10 @@ export default function AnimationsScreen() {
     const rowOffset = useSharedValue(0)
     const rnOffset = useRef(new RNAnimated.Value(0)).current
     const variantColor = useAnimatedVariantColor(variantStyles.variantBox, 'backgroundColor')
+    const fadeOpacity = useSharedValue(1)
+    const fadeRef = useRef<React.ComponentRef<typeof Animated.View>>(null)
+    const [fadeRun, setFadeRun] = useState(0)
+    const [fadeCommits, setFadeCommits] = useState(0)
 
     const animatedThemeStyle = useAnimatedStyle(() => ({
         backgroundColor: theme.value.colors.secondary
@@ -41,7 +74,39 @@ export default function AnimationsScreen() {
         setTone(current => current === 'primary' ? 'accent' : 'primary')
     }
 
+    // #1380: a theme change halfway through a fade, Unistyles commits on top of Reanimated's frame (opacity ~0.3)
+    const fadeAcrossThemeChange = async (theme: ThemeName) => {
+        setFadeRun(run => run + 1)
+        await wait(300)
+
+        // Reanimated syncs opacity 1 back to React once (the tick 1.5s after the restart), so the final sync of the fade
+        // is no update for React. A first sync would add the opacity to React's props and hide the bug
+        restartSettledSync()
+        fadeOpacity.value = withSequence(withTiming(0.5, { duration: 25 }), withTiming(1, { duration: 25 }))
+        await wait(1700)
+
+        // the fade ends before the next tick, a tick during it would hand React the in-flight opacity
+        restartSettledSync()
+        fadeOpacity.value = withSequence(withTiming(0, { duration: 150 }), withTiming(1, { duration: 150 }))
+        await wait(200)
+        UnistylesRuntime.setTheme(theme)
+
+        // synced back (no update for React) and dropped from Reanimated's registry, then an unrelated commit renders the box
+        await wait(2500)
+        setFadeCommits(commits => commits + 1)
+    }
+
     useE2EAction('animations.move', move)
+    useE2EAction('animations.fade', theme => fadeAcrossThemeChange(theme as ThemeName))
+    // Reanimated's frame must not become React's own prop, the committed view has the opacity the fade ended with
+    useE2EAction('animations.settled-fade', async () => {
+        const view = fadeRef.current
+        const actual = Number(await getViewProp(findNodeHandle(view) ?? -1, 'opacity', view as any))
+
+        return actual === 1
+            ? undefined
+            : { styleKey: 'fade', prop: 'opacity', expected: '1', actual: actual.toFixed(3) }
+    })
     // Reanimated owns the animated color, it must follow the theme even if the theme changed while the screen was frozen
     useE2EAction('animations.variant-color', () => {
         const expected = themes[UnistylesRuntime.themeName as ThemeName].colors[tone]
@@ -79,6 +144,7 @@ export default function AnimationsScreen() {
                     <Text style={variantStyles.text}>useAnimatedVariantColor</Text>
                 </Animated.View>
                 <Animated.View style={[variantStyles.box, variantStyles.moving, translateStyle]} />
+                <FadeBox key={fadeRun} opacity={fadeOpacity} commits={fadeCommits} boxRef={fadeRef} />
                 <Animated.View style={[variantStyles.box, rowStyle]}>
                     <Text style={variantStyles.text}>
                         A <Text style={variantStyles.nestedText}>nested Text</Text> in an animated row
@@ -122,5 +188,18 @@ const styles = StyleSheet.create(theme => ({
                 }
             }
         }
+    }
+}))
+
+const fadeStyles = StyleSheet.create(theme => ({
+    box: {
+        height: 48,
+        borderRadius: 8,
+        justifyContent: 'center',
+        paddingHorizontal: theme.gap(1.5),
+        backgroundColor: theme.colors.primary
+    },
+    text: {
+        color: theme.colors.typography
     }
 }))

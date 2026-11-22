@@ -291,6 +291,16 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.expect('runtime-probe.check')
         await a.checkpoint()
     },
+    // #1380: a theme change halfway through a Reanimated fade, React must not keep the opacity of that frame
+    'settled-fade': async a => {
+        await a.push('/animations')
+        await a.act('animations.fade', 'dark')
+        await a.expect('animations.settled-fade')
+        await a.act('animations.fade', 'premium')
+        await a.expect('animations.settled-fade')
+        await a.back()
+        await a.checkpoint()
+    },
     // Unistyles commits while React yields in a transition render, React's new props must survive them
     'transition': async a => {
         await a.push('/transition')
