@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 import type { UnistylesThemes } from '../global'
 
-import { UnistylesRuntime, UnistylesShadowRegistry } from '../specs'
+import { UnistylesRuntime } from '../specs'
 import { AdaptiveTheme } from './AdaptiveTheme'
 import { NamedTheme } from './NamedTheme'
+import { ScopedThemeContext } from './ScopedThemeContext'
 
 type ThemeProps =
     | {
@@ -31,7 +32,7 @@ export const ScopedTheme: React.FunctionComponent<React.PropsWithChildren<ThemeP
 }) => {
     const hasAdaptiveThemes = UnistylesRuntime.hasAdaptiveThemes
     const isAdaptiveTheme = invertedAdaptive && hasAdaptiveThemes
-    const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
+    const previousScopedTheme = useContext(ScopedThemeContext)?.name
 
     switch (true) {
         case name !== undefined:
