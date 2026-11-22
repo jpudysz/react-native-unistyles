@@ -23,7 +23,8 @@ export type Element = {
 export type Device = {
     build: (logPath: string) => void,
     install: () => void,
-    launch: (url: string) => void,
+    // `desktop` opens the app in a desktop window, a device without one throws
+    launch: (url: string, window: 'fullscreen' | 'desktop') => void,
     // Elements of expo-example only, so a found element proves the app is in the foreground
     describe: () => Array<Element>,
     tap: (x: number, y: number) => void,

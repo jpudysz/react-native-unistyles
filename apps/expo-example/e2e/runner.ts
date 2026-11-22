@@ -110,6 +110,8 @@ class E2ERun implements Actions {
     private checkpoints = 0
     private failureSyncs = 0
     private colorSchemeOverridden = false
+    // a tablet starts in landscape
+    private startOrientation: Orientation = 'portrait'
     private position = { scenario: 'tour' as ScenarioId, rep: 0, step: 0, action: '' }
     random = Math.random
     readonly report: Report
@@ -153,6 +155,7 @@ class E2ERun implements Actions {
             throw new Error('The e2e overlay is not mounted')
         }
 
+        this.startOrientation = UnistylesRuntime.orientation as Orientation
         await this.hold('READY')
 
         for (const scenario of this.config.scenarios) {
@@ -322,8 +325,8 @@ class E2ERun implements Actions {
         }
 
         // left behind by a failed mount-on-resize
-        if (this.config.host && UnistylesRuntime.orientation !== 'portrait') {
-            await this.orientation('portrait')
+        if (this.config.host && UnistylesRuntime.orientation !== this.startOrientation) {
+            await this.orientation(this.startOrientation)
         }
 
         await this.step('reset themes', restoreThemes)

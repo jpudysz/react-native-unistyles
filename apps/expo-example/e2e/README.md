@@ -17,6 +17,7 @@ bun e2e/run.ts ios --device <simulator udid> --scenarios all --reps 1 --bundler 
 
 - `--scenarios` comma separated ids from `protocol.ts` or `all` (default), `--skip` ids left out of them, `--reps` default 20,
   `--seed` default 1.
+- `--window` opens the app in `fullscreen` (default) or a `desktop` window (Android 15+ desktop windowing, see Device variants).
 - `--taps` makes the host tap the header theme pills and back button (in `TAP_SCENARIOS`) instead of calling the same
   `selectTheme` / `router.back` from JS.
 - `--bundler` picks how Unistyles is set up, `metro` (default) is `react-native-unistyles/metro` in `metro.config.js`,
@@ -46,6 +47,21 @@ the IME insets without the inset animation (`ime`) and the navigation bar hiding
 bun e2e/run.ts android --device <API 36 serial> --scenarios all --reps 1
 bun e2e/run.ts android --device <API 29 serial> --scenarios all --skip os-appearance --reps 1 --skip-build
 ```
+
+Desktop windowing needs a tablet on Android 15 (API 35, its caption bar covers the app, Android 16 lays the app out below
+it). On an emulator it is enabled with root and a restart of the system server:
+
+```sh
+adb root
+adb shell settings put global enable_freeform_support 1
+adb shell setprop persist.wm.debug.desktop_mode 1
+adb shell setprop persist.wm.debug.desktop_mode_enforce_device_restrictions false
+adb shell 'stop; start'
+bun e2e/run.ts android --device <tablet serial> --scenarios safe-area --window desktop --reps 3
+```
+
+`--window desktop` opens the app in a desktop window (`am start --windowingMode 5`), the host fails when the device opened
+it in full screen. Moving a running app into one doesn't work on the emulator, it gets no caption bar.
 
 The API 29 emulator image locks the night mode (`mNightModeLocked=true` in `dumpsys uimode`), `cmd uimode night` can't
 flip it, so `os-appearance` is skipped there. It also stops painting the overlay once the report panel shows, the host
@@ -85,6 +101,7 @@ freezes every screen below the top one (`freezeOnBlur`), like `enableFreeze(true
 | `rn-appearance`       | `Appearance.setColorScheme` against the OS scheme with adaptive themes, on a pushed screen, then `unspecified` | adaptive themes follow RN's override on both platforms (iOS key window, Android Activity `uiMode`) |
 | `rtl`                 | `rt.rtl` read by a StyleSheet, `useUnistyles` and `UnistylesRuntime` at start, after a theme change and on a pushed screen | `rt.rtl` equals `I18nManager.isRTL` (forceRTL, allowRTL, Android `supportsRtl`, React Native's locale rule), only meaningful with an RTL device language, eg. `-AppleLanguages (ar)`, or forceRTL |
 | `status-bar`          | the status bar hidden and shown by React Native's `StatusBar`, react-native-edge-to-edge's `SystemBars`, `UnistylesRuntime.statusBar` and immersive mode, hidden by one and shown by another, a theme change while hidden, shown while the screen is frozen | #1384, `rt.insets.top` in a StyleSheet, `useUnistyles` and `UnistylesRuntime` is 0 while hidden on Android and back to its value once shown, below Android 11 every API sets other window flags |
+| `safe-area`           | `rt.insets` read by a StyleSheet, `useUnistyles` and `UnistylesRuntime` against react-native-safe-area-context, before and after a theme change, with `--window desktop` in a desktop window | #1385, every edge equals what safe-area-context reads from the same window, e.g. the caption bar Android 15 draws over a desktop window |
 | `os-appearance`       | OS appearance flips with adaptive themes (host only)                       | adaptive themes, inverted adaptive scopes                |
 | `mount-on-resize`     | boxes mounted after the device turned (portrait to landscape and back), from `theme =>`, `(theme, rt) =>` and static StyleSheets with a breakpoint `paddingLeft` that had no node while the window changed (host only, both orientations on other breakpoints, e.g. a phone) | #1378, a `theme =>` StyleSheet refreshed only on theme changes keeps the value of the previous breakpoint |
 | `random-walk`         | 14 seeded random theme changes, pushes, backs and screen actions           | combinations of the above                                |
@@ -142,7 +159,7 @@ Suspense) nodes are counted, not compared, they get fresh styles when restored.
 ## Mutation check
 
 Each fix was reverted (or its mechanism disabled) in a Release build and the suite failed with a report pointing at
-the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 to M11 added 2026-10-03 on iOS and Android, M12 and M13 added 2026-10-05, M14 added 2026-10-06, M17 and M18 added 2026-10-22, M19 added 2026-10-23, M20 to M22 added 2026-10-22, M23 added 2026-10-30, M24 added 2026-11-16, M25 added 2026-11-21):
+the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 to M11 added 2026-10-03 on iOS and Android, M12 and M13 added 2026-10-05, M14 added 2026-10-06, M17 and M18 added 2026-10-22, M19 added 2026-10-23, M20 to M22 added 2026-10-22, M23 added 2026-10-30, M24 added 2026-11-16, M25 and M26 added 2026-11-21):
 
 | mutation                                                                                   | caught by                                                         | first failure                                                                                   |
 | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
@@ -171,6 +188,7 @@ the cause (2026-10-02, iOS 27 simulator, iPhone Air; M6 to M8 rechecked and M9 t
 | M22 the `fontVariationSettings` object sent unconverted by shadow tree updates (2026-10-22) | every step after a theme change with the header rendered (iOS, `shared-dynamic-fn`) | header `Paragraph 'title' fontVariationSettings expected undefined actual 'wght' 650.5`, the native props only read a string |
 | M24 #1378 `getStyleSheetsToRefresh` refreshes a `theme =>` StyleSheet only when the theme changed (2026-11-16, Android, Pixel 9 emulator) | `mount-on-resize` (6 failures in 3 reps, every check, only the `theme =>` box) | `mount-on-resize rep 1 step 4 (expect mount-on-resize.check): paddingLeft at lg (opened at sm) expected 80 actual 9.9` and `at sm (opened at lg) expected 10 actual 80` |
 | M25 #1384 below Android 11 the status bar counts as hidden only with the window's `FLAG_FULLSCREEN`, not the `SYSTEM_UI_FLAG_FULLSCREEN` `WindowInsetsControllerCompat.hide(statusBars())` sets (2026-11-21, Android, API 29 emulator) | `status-bar` (2 failures in 3 reps, the `rn` and `system-bars` variants of rep 1, the bug shows only until UnistylesRuntime hid the status bar once) | `status-bar rep 1 step 5 (expect status-bar.hidden): insets.top expected 0 while hidden actual native 24 StyleSheet 24 useUnistyles 24` |
+| M26 #1385 the top inset reads only `statusBars()`, not the `captionBar()` desktop windowing draws over the window (2026-11-21, Android, Pixel Tablet emulator on API 35, `--window desktop`) | `safe-area` (6 failures in 3 reps, every check) | `safe-area rep 1 step 3 (expect insets.safe-area): insets.top expected 42 (react-native-safe-area-context) actual native 0 StyleSheet 0 useUnistyles 0` |
 | M23 `rt.rtl` computed by Unistyles' own rule (forceRTL or an RTL locale, ignoring `allowRTL`) instead of React Native's (2026-10-30, Debug builds through the deep link) | `rtl` with an RTL device language and `allowRTL(false)` (Android emulator in `ar-EG`, 3 failures, iOS simulator with `-AppleLanguages (ar)` and an `ar` localization) | `rt rtl expected I18nManager.isRTL false actual native true StyleSheet true useUnistyles true` |
 
 #1266 can't be reverted as a whole, `verify()` reads the registry it introduced, so M4a and M4b disable its two

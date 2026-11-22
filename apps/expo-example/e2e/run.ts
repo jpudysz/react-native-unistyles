@@ -26,9 +26,11 @@ import {
     type Report,
     SCENARIOS,
     type Sync,
+    WINDOW_MODES,
+    type WindowMode,
 } from './protocol'
 
-const USAGE = 'Usage: bun e2e/run.ts <ios|android> --device <udid|serial> [--scenarios <ids|all>] [--skip <ids>] [--reps <n>] [--seed <n>] [--taps] [--bundler <metro|babel>] [--skip-build]'
+const USAGE = 'Usage: bun e2e/run.ts <ios|android> --device <udid|serial> [--scenarios <ids|all>] [--skip <ids>] [--window <fullscreen|desktop>] [--reps <n>] [--seed <n>] [--taps] [--bundler <metro|babel>] [--skip-build]'
 
 const POLL_MS = 500
 const READY_TIMEOUT_MS = 90_000
@@ -56,6 +58,8 @@ const { positionals, values } = parseArgs({
         'scenarios': { type: 'string', default: 'all' },
         // scenarios a device can't run, e.g. os-appearance where the OS locks the night mode
         'skip': { type: 'string', default: '' },
+        // desktop: an Android 15+ desktop window, enabled on the device first (README)
+        'window': { type: 'string', default: 'fullscreen' },
         'reps': { type: 'string', default: '20' },
         'seed': { type: 'string', default: '1' },
         'taps': { type: 'boolean', default: false },
@@ -76,6 +80,12 @@ if (!BUNDLERS.includes(values.bundler as Bundler)) {
     process.exit(2)
 }
 
+if (!WINDOW_MODES.includes(values.window as WindowMode)) {
+    console.error(`Unknown window "${values.window}", expected one of: ${WINDOW_MODES.join(', ')}`)
+    process.exit(2)
+}
+
+const window = values.window as WindowMode
 const bundler = values.bundler as Bundler
 // the Release build bundles the JS, with this mode
 process.env.UNISTYLES_BUNDLER = bundler
@@ -375,7 +385,7 @@ const printSummary = (report: Report, startedAt: number) => {
     const passed = report.result === 'PASS' && probeFailures.length === 0
 
     console.log(`\nE2E ${platform} ${passed ? 'PASS' : 'FAIL'} in ${seconds(startedAt)} (runner ${Math.round(report.durationMs / 1000)}s)`)
-    console.log(`scenarios ${values.scenarios}${skipped.length > 0 ? ` (skipped ${skipped.join(',')})` : ''}, reps ${report.reps}, seed ${report.seed}, taps ${report.taps ? 'on' : 'off'}, bundler ${bundler}`)
+    console.log(`scenarios ${values.scenarios}${skipped.length > 0 ? ` (skipped ${skipped.join(',')})` : ''}, reps ${report.reps}, seed ${report.seed}, taps ${report.taps ? 'on' : 'off'}, bundler ${bundler}, window ${window}`)
     console.log(
         `steps ${report.steps}, nodes checked ${report.checked}, detached ${report.detached}, suspended ${report.suspended}, mismatches ${report.mismatches}`,
     )
@@ -416,7 +426,7 @@ const main = async () => {
 
     const runStartedAt = Date.now()
 
-    device.launch(`${APP_SCHEME}:///e2e?${params}`)
+    device.launch(`${APP_SCHEME}:///e2e?${params}`, window)
 
     try {
         const report = await serve()
