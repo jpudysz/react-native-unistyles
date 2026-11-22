@@ -9,6 +9,7 @@
 #include <mutex>
 #include <string>
 #include <type_traits>
+#include <utility>
 
 // React Native reads ShadowNodeFamily::nativeProps_DEPRECATED from any thread
 // (eg. ShadowNode::clone during main thread layout) and since 0.86.1 guards every access with nativePropsMutex
@@ -23,13 +24,11 @@ namespace margelo::nitro::unistyles::shadow {
 
 using namespace facebook::react;
 
-// React Native nightlies hold the native props in a ShadowNodeFamily::NativeProps_DEPRECATED struct,
-// next to the props that already include them, so that cloning a node doesn't apply them again
-// earlier versions hold the folly::dynamic itself, so these helpers detect the type at compile time
+// React Native nightlies wrap the folly::dynamic in ShadowNodeFamily::NativeProps_DEPRECATED
 using FamilyNativeProps = std::remove_reference_t<decltype(*std::declval<ShadowNodeFamily>().nativeProps_DEPRECATED)>;
 
 template <typename NativeProps>
-inline folly::dynamic& getNativePropsDynamic(NativeProps& nativeProps) {
+inline folly::dynamic& unwrapNativeProps(NativeProps& nativeProps) {
     if constexpr (requires { nativeProps.props; }) {
         return nativeProps.props;
     } else {
@@ -37,10 +36,9 @@ inline folly::dynamic& getNativePropsDynamic(NativeProps& nativeProps) {
     }
 }
 
-// React Native only skips applying native props to a clone whose props already include them,
-// after changing them every node needs them applied again (eg. frozen nodes Unistyles doesn't commit)
+// otherwise nodes whose props match appliedProps (eg. frozen ones) are cloned with stale native props
 template <typename NativeProps>
-inline void markNativePropsChanged(NativeProps& nativeProps) {
+inline void resetAppliedProps(NativeProps& nativeProps) {
     if constexpr (requires { nativeProps.appliedProps; }) {
         nativeProps.appliedProps = nullptr;
     }
@@ -51,7 +49,9 @@ inline folly::dynamic* getNativeProps(const ShadowNodeFamily* family) {
         return nullptr;
     }
 
-    return &getNativePropsDynamic(*family->nativeProps_DEPRECATED);
+    auto& nativeProps = unwrapNativeProps(*family->nativeProps_DEPRECATED);
+
+    return nativeProps.isObject() ? &nativeProps : nullptr;
 }
 
 inline void mergeNativeProps(const ShadowNodeFamily* family, const folly::dynamic& props) {
@@ -59,11 +59,9 @@ inline void mergeNativeProps(const ShadowNodeFamily* family, const folly::dynami
     std::lock_guard<std::mutex> lock(family->nativePropsMutex);
 #endif
 
-    auto nativeProps = getNativeProps(family);
-
-    if (nativeProps && nativeProps->isObject()) {
+    if (auto nativeProps = getNativeProps(family)) {
         nativeProps->update(props);
-        markNativePropsChanged(*family->nativeProps_DEPRECATED);
+        resetAppliedProps(*family->nativeProps_DEPRECATED);
 
         return;
     }
@@ -76,9 +74,7 @@ inline bool hasNativeProps(const ShadowNodeFamily* family) {
     std::lock_guard<std::mutex> lock(family->nativePropsMutex);
 #endif
 
-    auto nativeProps = getNativeProps(family);
-
-    return nativeProps && nativeProps->isObject();
+    return getNativeProps(family) != nullptr;
 }
 
 inline bool isSamePropValue(const std::string& propName, const folly::dynamic& value, const folly::dynamic& otherValue) {
@@ -105,18 +101,16 @@ inline bool hasOutdatedNativeProps(const ShadowNodeFamily* family, const folly::
     std::lock_guard<std::mutex> lock(family->nativePropsMutex);
 #endif
 
-    auto nativePropsPtr = getNativeProps(family);
+    auto nativeProps = getNativeProps(family);
 
-    if (!nativePropsPtr || !nativePropsPtr->isObject() || !props.isObject()) {
+    if (!nativeProps || !props.isObject()) {
         return false;
     }
 
-    auto& nativeProps = *nativePropsPtr;
-
     for (const auto& [propName, propValue] : props.items()) {
-        auto it = nativeProps.find(propName);
+        auto it = nativeProps->find(propName);
 
-        if (it != nativeProps.items().end() && !isSamePropValue(propName.asString(), it->second, propValue)) {
+        if (it != nativeProps->items().end() && !isSamePropValue(propName.asString(), it->second, propValue)) {
             return true;
         }
     }
@@ -129,19 +123,17 @@ inline bool hasCommittedNativeProps(const ShadowNodeFamily* family, const folly:
     std::lock_guard<std::mutex> lock(family->nativePropsMutex);
 #endif
 
-    auto nativePropsPtr = getNativeProps(family);
+    auto nativeProps = getNativeProps(family);
 
-    if (!nativePropsPtr || !nativePropsPtr->isObject() || !props.isObject()) {
+    if (!nativeProps || !props.isObject()) {
         return false;
     }
 
-    auto& nativeProps = *nativePropsPtr;
-
     for (const auto& [propName, propValue] : props.items()) {
-        auto it = nativeProps.find(propName);
+        auto it = nativeProps->find(propName);
 
         // never pushed by Unistyles, only React knows what is committed
-        if (it == nativeProps.items().end() || !isSamePropValue(propName.asString(), it->second, propValue)) {
+        if (it == nativeProps->items().end() || !isSamePropValue(propName.asString(), it->second, propValue)) {
             return false;
         }
     }
