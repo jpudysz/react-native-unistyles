@@ -1,5 +1,6 @@
 jest.mock('react-native-nitro-modules', () => {
     const changeListeners: Array<(dependencies: Array<number>) => void> = []
+    let scopedTheme: string | undefined
 
     return {
         changeListeners,
@@ -10,6 +11,10 @@ jest.mock('react-native-nitro-modules', () => {
                     changeListeners.push(listener)
 
                     return () => {}
+                },
+                getScopedTheme: () => scopedTheme,
+                setScopedTheme: (name?: string) => {
+                    scopedTheme = name
                 },
                 link: () => {},
                 unlink: () => {},
@@ -25,7 +30,7 @@ import { UnistylesShadowRegistry } from '../specs/ShadowRegistry'
 import { Tag, chain, fiber, frozenScreen, hostFiber, refOf, root } from './fiberFixtures'
 
 const shadowRegistry = UnistylesShadowRegistry as unknown as {
-    add: (handle: object, styles: Array<unknown>) => void
+    add: (handle: object, styles: Array<unknown>, scope?: { name: string | undefined } | null) => void
     remove: (handle: object) => void
     link: jest.Mock
     unlink: jest.Mock
@@ -110,6 +115,30 @@ describe('UnistylesShadowRegistry.add', () => {
         shadowRegistry.add(handleFor(node), [inline, code, false])
 
         expect(link.mock.calls[0]).toStrictEqual([node, [inline, code]])
+    })
+})
+
+describe('UnistylesShadowRegistry.add with ScopedTheme', () => {
+    // a concurrent render can yield inside a ScopedTheme while its theme is still in the registry (#1381)
+    afterEach(() => UnistylesShadowRegistry.setScopedTheme(undefined))
+
+    const linkWithScope = (scope: { name: string | undefined } | null) => {
+        const themes: Array<string | undefined> = []
+
+        shadowRegistry.link = jest.fn(() => themes.push(UnistylesShadowRegistry.getScopedTheme()))
+        UnistylesShadowRegistry.setScopedTheme('dark')
+        shadowRegistry.add(handleFor({}), [{ fontSize: 14 }], scope)
+
+        return { linkedWith: themes[0], restored: UnistylesShadowRegistry.getScopedTheme() }
+    }
+
+    it('links a view outside any ScopedTheme without the scoped theme left in the registry', () => {
+        expect(linkWithScope(null)).toStrictEqual({ linkedWith: undefined, restored: 'dark' })
+    })
+
+    it('links a view with its own scope', () => {
+        expect(linkWithScope({ name: 'premium' })).toStrictEqual({ linkedWith: 'premium', restored: 'dark' })
+        expect(linkWithScope({ name: undefined })).toStrictEqual({ linkedWith: undefined, restored: 'dark' })
     })
 })
 
