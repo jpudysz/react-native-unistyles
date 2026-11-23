@@ -194,10 +194,12 @@ const styles = StyleSheet.create(theme => ({
 }))
 
 const Button = ({ size = 'medium', variant = 'filled', children }) => {
-  styles.useVariants({ size, variant })
-  return <TouchableOpacity style={styles.button}><Text>{children}</Text></TouchableOpacity>
+  const variantStyles = styles.useVariants({ size, variant })
+  return <TouchableOpacity style={variantStyles.button}><Text>{children}</Text></TouchableOpacity>
 }
 ```
+
+Use the returned styles (`variantStyles`): the Metro integration and `UnistylesPlugin` don't change `styles`. A bare `styles.useVariants({...})` statement only works with the deprecated Babel plugin.
 
 ### Boolean variants
 
@@ -217,7 +219,7 @@ const styles = StyleSheet.create(theme => ({
   },
 }))
 
-styles.useVariants({ elevated: true, disabled: false })
+const variantStyles = styles.useVariants({ elevated: true, disabled: false })
 ```
 
 ### Default variant values
@@ -238,7 +240,7 @@ const styles = StyleSheet.create(theme => ({
 }))
 
 // No variant selected → uses 'default'
-styles.useVariants({})
+const variantStyles = styles.useVariants({})
 ```
 
 - Always pass an object — `useVariants(undefined)` throws on native.
@@ -259,7 +261,7 @@ const styles = StyleSheet.create({
   },
 })
 
-styles.useVariants({ level: 1 })  // use whole numbers (converted to integers on native)
+const variantStyles = styles.useVariants({ level: 1 })  // use whole numbers (converted to integers on native)
 ```
 
 ### Compound variants
@@ -311,8 +313,8 @@ type ChipVariants = UnistylesVariants<typeof styles>
 type ChipProps = { label: string } & ChipVariants
 
 const Chip = ({ label, ...variants }: ChipProps) => {
-  styles.useVariants(variants)
-  return <View style={styles.chip}><Text>{label}</Text></View>
+  const variantStyles = styles.useVariants(variants)
+  return <View style={variantStyles.chip}><Text>{label}</Text></View>
 }
 ```
 
@@ -644,14 +646,14 @@ const styles = StyleSheet.create(theme => ({
 }))
 
 const AnimatedButton = ({ isActive }) => {
-  styles.useVariants({ state: isActive ? 'active' : 'inactive' })
+  const variantStyles = styles.useVariants({ state: isActive ? 'active' : 'inactive' })
   // SharedValue<string> holding the current variant color (also follows theme/breakpoint changes)
-  const color = useAnimatedVariantColor(styles.button, 'backgroundColor')
+  const color = useAnimatedVariantColor(variantStyles.button, 'backgroundColor')
   const animatedStyle = useAnimatedStyle(() => ({
     backgroundColor: withTiming(color.value, { duration: 300 }),
   }))
 
-  return <Animated.View style={[styles.button, animatedStyle]} />
+  return <Animated.View style={[variantStyles.button, animatedStyle]} />
 }
 ```
 
