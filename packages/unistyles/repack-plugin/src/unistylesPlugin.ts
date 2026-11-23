@@ -20,7 +20,8 @@ const SWAPPABLE_REQUEST = /^react-native(-web|-unistyles)?($|\/)/
 
 // Re.Pack's runtime (eg. ScriptManager) and Module Federation's load the bundles, they don't render components,
 // the Metro resolver keeps react-native, @react-native and react-native-web untouched
-const PASSTHROUGH_PACKAGES = ['@callstack/repack', '@module-federation']
+const isPassthroughPackage = (packageName: string | undefined) =>
+    packageName === '@callstack/repack' || Boolean(packageName?.startsWith('@module-federation/'))
 
 // before Rspack 1.7.5 ConsumeSharedPlugin matched the original request, so a shared react-native wasn't swapped
 const MIN_RSPACK_VERSION = [1, 7, 5]
@@ -71,13 +72,23 @@ export const getEntryPointAliases = (unistylesRoot: string) => {
     )
 }
 
-// the requests a config aliases to react-native (eg. `'@ui/native': 'react-native'`) and what they become
+// the requests a config aliases to react-native (eg. `'@ui/native': 'react-native'`) and what they become,
+// Rspack tries the targets of an array in order, react-native is the first one or the alias isn't swapped
 const getReactNativeAliases = (alias: Alias) =>
-    Object.entries(alias || {}).flatMap(([name, target]) =>
-        typeof target === 'string' && SWAPPABLE_REQUEST.test(target) && !SWAPPABLE_REQUEST.test(name)
+    Object.entries(alias || {}).flatMap(([name, targets]) => {
+        const [target] = [targets].flat()
+
+        return typeof target === 'string' && SWAPPABLE_REQUEST.test(target) && !SWAPPABLE_REQUEST.test(name)
             ? [{ exact: name.endsWith('$'), name: name.replace(/\$$/, ''), target }]
-            : [],
-    )
+            : []
+    })
+
+// `react-native/Libraries/Components/View/View?profile` -> the request and `?profile`, the query goes back on the rewritten request
+const splitQuery = (request: string): [request: string, query: string] => {
+    const index = request.search(/[?#]/)
+
+    return index === -1 ? [request, ''] : [request.slice(0, index), request.slice(index)]
+}
 
 /**
  * Experimental, the Re.Pack (Rspack) counterpart of react-native-unistyles/metro, there is no Babel plugin
@@ -96,10 +107,6 @@ export class UnistylesPlugin implements RspackPluginInstance {
                 `Unistyles 🦄: ${PLUGIN_NAME} requires @rspack/core ${MIN_RSPACK_VERSION.join('.')} or newer, found ${rspackVersion}. Older versions share react-native before Unistyles can swap its components.`,
             )
         }
-
-        // Babel runs in the loaders' workers, they inherit the env,
-        // so the Babel plugin knows that it can't be used together with this plugin
-        process.env[METRO_ENV] = RSPACK_INTEGRATION
 
         const unistylesRoot = this.unistylesRoot
         const sourceDir = path.join(unistylesRoot, 'src')
@@ -124,6 +131,10 @@ export class UnistylesPlugin implements RspackPluginInstance {
                 ? `${DEEP_COMPONENTS_REQUEST}/${path.basename(filePath, '.ts')}`
                 : filePath
         }
+
+        // set once the setup above went through, Babel runs in Rspack's process or in the loaders' workers,
+        // they inherit the env, so the Babel plugin knows that it can't be used together with this plugin
+        process.env[METRO_ENV] = RSPACK_INTEGRATION
 
         const resolveRequest = createResolveRequest({ unistylesRoot, integration: PLUGIN_NAME })
         // warned about once, every module that imports them would repeat the warning
@@ -163,7 +174,7 @@ export class UnistylesPlugin implements RspackPluginInstance {
 
             // beforeResolve runs before Module Federation's ConsumeSharedPlugin, so a shared react-native is swapped too
             normalModuleFactory.hooks.beforeResolve.tap(PLUGIN_NAME, (resolveData) => {
-                const { request } = resolveData
+                const [request, query] = splitQuery(resolveData.request)
                 const issuer = resolveData.contextInfo?.issuer ?? ''
 
                 // no issuer: an entry or the fallback of a module shared with Module Federation (eg. react-native itself)
@@ -173,7 +184,7 @@ export class UnistylesPlugin implements RspackPluginInstance {
 
                 const moduleName = getModuleName(request, issuer)
 
-                if (!moduleName || PASSTHROUGH_PACKAGES.some((name) => getPackageName(issuer)?.startsWith(name))) {
+                if (!moduleName || isPassthroughPackage(getPackageName(issuer))) {
                     return
                 }
 
@@ -214,7 +225,7 @@ export class UnistylesPlugin implements RspackPluginInstance {
                 }
 
                 if (isSourceFile(resolution) && resolution.filePath !== resolvedPath) {
-                    resolveData.request = toRequest(resolution.filePath)
+                    resolveData.request = `${toRequest(resolution.filePath)}${query}`
                 }
             })
         })

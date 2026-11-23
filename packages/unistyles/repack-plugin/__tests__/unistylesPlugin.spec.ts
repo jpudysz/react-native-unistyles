@@ -156,6 +156,13 @@ describe('UnistylesPlugin', () => {
             expect(process.env[METRO_ENV]).toBeUndefined()
         })
 
+        it('should not mark the process when the setup fails', () => {
+            const plugin = new UnistylesPlugin(path.join(UNISTYLES_ROOT, 'missing'))
+
+            expect(() => plugin.apply(createCompiler())).toThrow()
+            expect(process.env[METRO_ENV]).toBeUndefined()
+        })
+
         it('should treat a prerelease as older than its release', () => {
             expect(isOlderThan('1.7.5-beta.0', [1, 7, 5])).toBe(true)
             expect(isOlderThan('1.7.5', [1, 7, 5])).toBe(false)

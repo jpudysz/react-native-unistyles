@@ -43,6 +43,8 @@ const createConfig = (name, config) => ({
         alias: {
             '@ui/native': 'react-native',
             '@ui/view$': 'react-native/Libraries/Components/View/View',
+            // Rspack tries the targets in order, react-native first
+            '@ui/fallback': ['react-native', 'react-native-web'],
         },
         exportsFields: [],
         extensions: [
@@ -59,7 +61,13 @@ const createConfig = (name, config) => ({
         ],
     },
     // plain CommonJS in .ts files
-    module: { rules: [{ test: /\.ts$/, type: 'javascript/auto' }] },
+    module: {
+        rules: [
+            { test: /\.ts$/, type: 'javascript/auto' },
+            // a rule for a resource query, the plugin keeps the query of the requests it rewrites
+            { resourceQuery: /profile/, use: path.join(root, 'loaders', 'profile.js') },
+        ],
+    },
     plugins: [...(withPlugin ? [new UnistylesPlugin(unistylesRoot)] : []), ...config.plugins],
     entry: config.entry,
     output: { path: path.join(root, 'dist', name), clean: true, ...config.output },

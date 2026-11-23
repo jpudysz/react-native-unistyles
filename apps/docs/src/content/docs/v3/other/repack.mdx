@@ -40,7 +40,7 @@ Then remove `react-native-unistyles/plugin` from your `babel.config.js` and `Rep
 
 ### Rsbuild
 
-On the web, add `UnistylesPlugin` to the Rspack config of Rsbuild (`tools.rspack`) and resolve `react-native` to React Native Web:
+On the web, add `UnistylesPlugin` to the Rspack config of Rsbuild (`tools.rspack`), resolve `react-native` to React Native Web and define `__DEV__`, which React Native code reads and Metro defines:
 
 ```ts title="rsbuild.config.ts"
 import { defineConfig } from '@rsbuild/core'
@@ -49,6 +49,11 @@ import { UnistylesPlugin } from 'react-native-unistyles/repack-plugin'
 
 export default defineConfig({
     plugins: [pluginReact()],
+    source: {
+        define: {
+            __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production')
+        }
+    },
     resolve: {
         alias: {
             'react-native': 'react-native-web'
@@ -111,7 +116,43 @@ Don't add the `ModuleFederationPlugin` of `@module-federation/enhanced` to `tool
 
 ### Rspack
 
-With Rspack alone, add `new UnistylesPlugin()` to `plugins` of your `rspack.config.mjs`, on the web together with the `react-native` alias to React Native Web from the Rsbuild config above.
+With Rspack alone, add `new UnistylesPlugin()` to `plugins` of your `rspack.config.mjs`. Unlike Re.Pack and Rsbuild, Rspack has no defaults for React Native: Unistyles resolves to its TypeScript source, so add the `.ts` and `.tsx` extensions and transpile your files and the source of Unistyles in `node_modules`. On the web, resolve `react-native` to React Native Web and define `__DEV__`:
+
+```js title="rspack.config.mjs"
+import { rspack } from '@rspack/core'
+import { UnistylesPlugin } from 'react-native-unistyles/repack-plugin'
+
+export default {
+    entry: './src/index.tsx',
+    resolve: {
+        alias: {
+            'react-native': 'react-native-web'
+        },
+        extensions: ['.web.tsx', '.web.ts', '.web.js', '.tsx', '.ts', '.js', '.json']
+    },
+    module: {
+        rules: [
+            {
+                test: /\.[jt]sx?$/,
+                // your files and the source of Unistyles
+                exclude: /node_modules[\\/](?!react-native-unistyles[\\/])/,
+                loader: 'builtin:swc-loader',
+                options: {
+                    jsc: {
+                        parser: { syntax: 'typescript', tsx: true },
+                        transform: { react: { runtime: 'automatic' } }
+                    }
+                },
+                type: 'javascript/auto'
+            }
+        ]
+    },
+    plugins: [
+        new rspack.DefinePlugin({ __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production') }),
+        new UnistylesPlugin()
+    ]
+}
+```
 
 ### What it does
 
@@ -193,7 +234,7 @@ Compared with `RepackUnistylePlugin`:
 
 To migrate:
 
-1. Replace `new RepackUnistylePlugin({ ... })` with `new UnistylesPlugin()`. `RepackUnistylePlugin` and `BASE_REPACK_EXCLUDE_PATHS` are deprecated since 3.9.0 and will be removed from `react-native-unistyles/repack-plugin` in 4.0.
+1. Replace `new RepackUnistylePlugin({ ... })` with `new UnistylesPlugin()`. `RepackUnistylePlugin` and `BASE_REPACK_EXCLUDE_PATHS` are deprecated since 3.9.0 and will be removed from `react-native-unistyles/repack-plugin` in 4.0. Until you migrate, `RepackUnistylePlugin` keeps parsing your files with `@babel/plugin-syntax-typescript` (version 7, like `@babel/core`) and `babel-plugin-syntax-hermes-parser`, keep both installed.
 2. Remove `react-native-unistyles/plugin` from `babel.config.js`, if it is there.
 3. Run the `useVariants` codemod, see [Variants](/v3/other/metro#variants).
 4. Restart Re.Pack with `--reset-cache`.
@@ -207,6 +248,8 @@ To migrate:
 - **`UnistylesPlugin` throws an error that asks for `@rspack/core` 1.7.5.** Upgrade `@rspack/core`.
 - **A console warning about a second copy of `react-native-unistyles`.** Install `react-native-unistyles` once in your app.
 - **A console warning `UnistylesPlugin couldn't resolve "<import>"`.** `UnistylesPlugin` couldn't resolve that import with your resolve options, so Unistyles doesn't swap it. Rspack resolves it on its own and reports an error if it can't either. Check the import and your aliases.
+- **`__DEV__ is not defined` on the web.** Rsbuild and Rspack don't define it, Metro and Re.Pack do. Define it, see the [Rsbuild](#rsbuild) and [Rspack](#rspack) configs.
+- **`Cannot find package 'babel-plugin-syntax-hermes-parser'` with `RepackUnistylePlugin`.** Install it and `@babel/plugin-syntax-typescript@7`, or migrate to `UnistylesPlugin`, which doesn't need them.
 - **`Cannot read properties of undefined (reading 'call')` in Rsbuild with Module Federation.** Configure Module Federation with the `moduleFederation` option of Rsbuild, not with `ModuleFederationPlugin` in `tools.rspack`, see [Module Federation with Rsbuild](#module-federation-with-rsbuild).
 - **Your own aliases for `react-native-unistyles` or its subpaths.** Don't add them. These requests have to resolve to the Unistyles that `UnistylesPlugin` comes from.
 

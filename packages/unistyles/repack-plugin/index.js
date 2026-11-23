@@ -229,7 +229,7 @@ var PLUGIN_NAME = "UnistylesPlugin";
 var COMPONENTS_REQUEST = "react-native-unistyles/components/native";
 var DEEP_COMPONENTS_REQUEST = `${COMPONENTS_REQUEST}/deep`;
 var SWAPPABLE_REQUEST = /^react-native(-web|-unistyles)?($|\/)/;
-var PASSTHROUGH_PACKAGES2 = ["@callstack/repack", "@module-federation"];
+var isPassthroughPackage = (packageName) => packageName === "@callstack/repack" || Boolean(packageName?.startsWith("@module-federation/"));
 var MIN_RSPACK_VERSION = [1, 7, 5];
 var isOlderThan = (version, minimum) => {
   const [release = "", ...prerelease] = version.split("+")[0].split("-");
@@ -253,9 +253,14 @@ var getEntryPointAliases = (unistylesRoot) => {
     })
   );
 };
-var getReactNativeAliases = (alias) => Object.entries(alias || {}).flatMap(
-  ([name, target]) => typeof target === "string" && SWAPPABLE_REQUEST.test(target) && !SWAPPABLE_REQUEST.test(name) ? [{ exact: name.endsWith("$"), name: name.replace(/\$$/, ""), target }] : []
-);
+var getReactNativeAliases = (alias) => Object.entries(alias || {}).flatMap(([name, targets]) => {
+  const [target] = [targets].flat();
+  return typeof target === "string" && SWAPPABLE_REQUEST.test(target) && !SWAPPABLE_REQUEST.test(name) ? [{ exact: name.endsWith("$"), name: name.replace(/\$$/, ""), target }] : [];
+});
+var splitQuery = (request) => {
+  const index = request.search(/[?#]/);
+  return index === -1 ? [request, ""] : [request.slice(0, index), request.slice(index)];
+};
 var UnistylesPlugin = class {
   // replaced in tests
   constructor(unistylesRoot = import_node_fs2.default.realpathSync(import_node_path2.default.join(__dirname, ".."))) {
@@ -269,7 +274,6 @@ var UnistylesPlugin = class {
         `Unistyles \u{1F984}: ${PLUGIN_NAME} requires @rspack/core ${MIN_RSPACK_VERSION.join(".")} or newer, found ${rspackVersion}. Older versions share react-native before Unistyles can swap its components.`
       );
     }
-    process.env[METRO_ENV] = RSPACK_INTEGRATION;
     const unistylesRoot = this.unistylesRoot;
     const sourceDir = import_node_path2.default.join(unistylesRoot, "src");
     const componentsIndex = import_node_path2.default.join(sourceDir, "components", "native", "index.ts");
@@ -288,6 +292,7 @@ var UnistylesPlugin = class {
       }
       return filePath.startsWith(`${deepComponentsDir}${import_node_path2.default.sep}`) ? `${DEEP_COMPONENTS_REQUEST}/${import_node_path2.default.basename(filePath, ".ts")}` : filePath;
     };
+    process.env[METRO_ENV] = RSPACK_INTEGRATION;
     const resolveRequest = createResolveRequest({ unistylesRoot, integration: PLUGIN_NAME });
     const unresolvedRequests = /* @__PURE__ */ new Set();
     compiler.hooks.normalModuleFactory.tap(PLUGIN_NAME, (normalModuleFactory) => {
@@ -312,13 +317,13 @@ var UnistylesPlugin = class {
         return void 0;
       };
       normalModuleFactory.hooks.beforeResolve.tap(PLUGIN_NAME, (resolveData) => {
-        const { request } = resolveData;
+        const [request, query] = splitQuery(resolveData.request);
         const issuer = resolveData.contextInfo?.issuer ?? "";
         if (!issuer) {
           return;
         }
         const moduleName = getModuleName(request, issuer);
-        if (!moduleName || PASSTHROUGH_PACKAGES2.some((name) => getPackageName(issuer)?.startsWith(name))) {
+        if (!moduleName || isPassthroughPackage(getPackageName(issuer))) {
           return;
         }
         let resolvedPath;
@@ -347,7 +352,7 @@ var UnistylesPlugin = class {
           return;
         }
         if (isSourceFile(resolution) && resolution.filePath !== resolvedPath) {
-          resolveData.request = toRequest(resolution.filePath);
+          resolveData.request = `${toRequest(resolution.filePath)}${query}`;
         }
       });
     });

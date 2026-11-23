@@ -125,6 +125,20 @@ describe('UnistylesPlugin bundle', () => {
         expect(aliased.Platform).toEqual({ OS: 'ios' })
         expect(aliased.DeepView).toEqual(app.View)
         expect(aliased.PixelRatio).toEqual({ kind: 'rn-pixelratio' })
+        // the first target of an array alias
+        expect(aliased.fallback).toEqual(app.View)
+    })
+
+    it('should swap react-native for a library whose name starts like Re.Pack', () => {
+        expect(build.exports.repackagedUi.View).toEqual(build.exports.app.View)
+    })
+
+    it('should keep the resource query of a swapped import', () => {
+        const { profiled, app } = build.exports
+
+        expect(profiled.default).toEqual(app.View)
+        // the `resourceQuery: /profile/` rule ran on the swapped module
+        expect(profiled.profiled).toBe(true)
     })
 
     it('should expose the Unistyles components to the app through react-native', () => {

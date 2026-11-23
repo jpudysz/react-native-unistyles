@@ -73,6 +73,11 @@ const packages = (): Record<string, string> => ({
     'node_modules/@callstack/repack/index.js': PROBE,
     'node_modules/@module-federation/runtime-tools/package.json': packageJson('@module-federation/runtime-tools'),
     'node_modules/@module-federation/runtime-tools/index.js': PROBE,
+    // a UI library whose name starts like Re.Pack's, it's not Re.Pack
+    'node_modules/@callstack/repackaged-ui/package.json': packageJson('@callstack/repackaged-ui'),
+    'node_modules/@callstack/repackaged-ui/index.js': PROBE,
+    // marks the modules that the `resourceQuery: /profile/` rule of build.mjs loaded
+    'loaders/profile.js': `module.exports = (source) => source + '\\nexports.profiled = true\\n'`,
 })
 
 // same files as the real src, plain CommonJS
@@ -221,7 +226,11 @@ module.exports = {
         Platform: require('@ui/native').Platform,
         DeepView: require('@ui/view').default,
         PixelRatio: require('@ui/native/Libraries/Utilities/PixelRatio'),
+        fallback: require('@ui/fallback').View,
     },
+    repackagedUi: require('@callstack/repackaged-ui'),
+    // a deep import with a resource query
+    profiled: require('react-native/Libraries/Components/View/View?profile'),
 }
 `,
 })

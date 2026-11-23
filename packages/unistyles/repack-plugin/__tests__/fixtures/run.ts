@@ -63,7 +63,9 @@ export type AppBuild = {
         unistylesModuleBuild: Registry
         unistylesCommonjsBuild: Registry
         unistylesComponents: Pick<Probe, 'View' | 'Text' | 'Platform'>
-        aliased: Pick<Probe, 'View' | 'Platform' | 'DeepView' | 'PixelRatio'>
+        aliased: Pick<Probe, 'View' | 'Platform' | 'DeepView' | 'PixelRatio'> & { fallback: Component }
+        repackagedUi: Probe
+        profiled: { default: Component; profiled?: boolean }
     }
 }
 
