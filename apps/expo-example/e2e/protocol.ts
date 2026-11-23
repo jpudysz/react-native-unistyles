@@ -23,6 +23,7 @@ export const SCENARIOS = [
     'touchable-highlight',
     'interactions',
     'inline-override',
+    'undefined-reset',
     'ime',
     'rn-appearance',
     'rtl',

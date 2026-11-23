@@ -405,6 +405,24 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.back()
         await a.checkpoint()
     },
+    // A prop set in light and left undefined in the other themes, a theme change resets it like React does,
+    // also on an element made in light (kept, like the React Compiler does) that mounts after the change
+    'undefined-reset': async a => {
+        await a.push('/undefined-props')
+        await a.expect('undefined-props.check')
+        await a.flip('dark')
+        await a.expect('undefined-props.check')
+        await a.act('undefined-props.mount-kept')
+        await a.expect('undefined-props.check')
+        await a.flip('premium')
+        await a.expect('undefined-props.check')
+        await a.flip('light')
+        await a.expect('undefined-props.check')
+        await a.flip('dark')
+        await a.expect('undefined-props.check')
+        await a.back()
+        await a.checkpoint()
+    },
     // Needs the host to flip the OS appearance
     // Appearance.setColorScheme overrides the app's color scheme (iOS key window, Android Activity uiMode),
     // adaptive themes follow it like the OS and go back to the OS once it is unspecified
