@@ -2,7 +2,7 @@ import { Platform } from 'react-native'
 import { UnistylesRuntime } from 'react-native-unistyles'
 import { screens } from '../consts'
 import { THEME_NAMES, type ThemeName } from '../themes'
-import type { ScenarioId } from './protocol'
+import type { Orientation, ScenarioId } from './protocol'
 
 export type Actions = {
     flip: (theme: ThemeName) => Promise<void>,
@@ -11,6 +11,8 @@ export type Actions = {
     colorScheme: (scheme: 'light' | 'dark' | 'unspecified', expected: 'light' | 'dark') => Promise<void>,
     // OS appearance via the host
     appearance: (scheme: 'light' | 'dark') => Promise<void>,
+    // The device turned by the host, waits until UnistylesRuntime.orientation follows
+    orientation: (orientation: Orientation) => Promise<void>,
     back: () => Promise<void>,
     push: (href: string) => Promise<void>,
     // Runs a screen action registered with useE2EAction, the same code its buttons run
@@ -289,6 +291,16 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.expect('runtime-probe.check')
         await a.checkpoint()
     },
+    // #1380: a theme change halfway through a Reanimated fade, React must not keep the opacity of that frame
+    'settled-fade': async a => {
+        await a.push('/animations')
+        await a.act('animations.fade', 'dark')
+        await a.expect('animations.settled-fade')
+        await a.act('animations.fade', 'premium')
+        await a.expect('animations.settled-fade')
+        await a.back()
+        await a.checkpoint()
+    },
     // Unistyles commits while React yields in a transition render, React's new props must survive them
     'transition': async a => {
         await a.push('/transition')
@@ -369,6 +381,48 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.back()
         await a.checkpoint()
     },
+    // #1376: an inline style overrides a StyleSheet prop. A press re-links the node with new arguments after a theme change
+    // committed native props, and below a ScopedTheme every link commits, the update must keep the inline value
+    'inline-override': async a => {
+        if (!a.hasHost) {
+            return
+        }
+
+        await a.push('/interactions')
+        await a.expect('interactions.inline-check')
+        await a.expect('interactions.scoped-inline-check')
+        await a.press('interactions-inline-fn')
+        await a.expect('interactions.inline-check')
+
+        for (const theme of ['dark', 'premium', 'light'] as const) {
+            await a.flip(theme)
+            await a.press('interactions-inline-fn')
+            await a.expect('interactions.inline-check')
+            await a.press('interactions-scoped-inline')
+            await a.expect('interactions.scoped-inline-check')
+        }
+
+        await a.back()
+        await a.checkpoint()
+    },
+    // A prop set in light and left undefined in the other themes, a theme change resets it like React does,
+    // also on an element made in light (kept, like the React Compiler does) that mounts after the change
+    'undefined-reset': async a => {
+        await a.push('/undefined-props')
+        await a.expect('undefined-props.check')
+        await a.flip('dark')
+        await a.expect('undefined-props.check')
+        await a.act('undefined-props.mount-kept')
+        await a.expect('undefined-props.check')
+        await a.flip('premium')
+        await a.expect('undefined-props.check')
+        await a.flip('light')
+        await a.expect('undefined-props.check')
+        await a.flip('dark')
+        await a.expect('undefined-props.check')
+        await a.back()
+        await a.checkpoint()
+    },
     // Needs the host to flip the OS appearance
     // Appearance.setColorScheme overrides the app's color scheme (iOS key window, Android Activity uiMode),
     // adaptive themes follow it like the OS and go back to the OS once it is unspecified
@@ -401,6 +455,51 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.back()
         await a.checkpoint()
     },
+    // #1384: rt.insets.top follows the status bar whichever API hides it, below Android 11 each sets other window flags,
+    // run it on API 29 too
+    'status-bar': async a => {
+        await a.push('/status-bar')
+        await a.expect('status-bar.shown')
+
+        // rn and system-bars go first: #1384 shows only until UnistylesRuntime hid the status bar once in the app's life
+        for (const variant of ['rn', 'system-bars', 'unistyles', 'immersive']) {
+            await a.act('status-bar.hide', variant)
+            await a.expect('status-bar.hidden')
+            await a.act('status-bar.show', variant)
+            await a.expect('status-bar.shown')
+        }
+
+        // hidden by one API and shown by another
+        await a.act('status-bar.hide', 'unistyles')
+        await a.expect('status-bar.hidden')
+        await a.act('status-bar.show', 'rn')
+        await a.expect('status-bar.shown')
+        await a.act('status-bar.hide', 'rn')
+        await a.expect('status-bar.hidden')
+        // styles rebuilt by a theme change read the hidden inset
+        await a.flip('dark')
+        await a.expect('status-bar.hidden')
+        // shown while the screen is frozen, it's restored with the new inset
+        await a.push('/basics')
+        await a.act('status-bar.show', 'unistyles')
+        await a.back()
+        await a.expect('status-bar.shown')
+        await a.flip('light')
+        await a.back()
+        await a.checkpoint()
+    },
+    // #1385: rt.insets agree with react-native-safe-area-context, which reads the same window on its own. Run it with
+    // `--window desktop` too, Android 15 draws a caption bar over the top of a desktop window
+    'safe-area': async a => {
+        await a.push('/insets')
+        await a.expect('insets.safe-area')
+        // styles rebuilt by a theme change read the current insets
+        await a.flip('dark')
+        await a.expect('insets.safe-area')
+        await a.flip('light')
+        await a.back()
+        await a.checkpoint()
+    },
     'os-appearance': async a => {
         if (!a.hasHost) {
             return
@@ -417,6 +516,24 @@ export const scenarios: Record<ScenarioId, (a: Actions) => Promise<void>> = {
         await a.back()
         await a.push('/basics')
         await a.appearance(first)
+        await a.back()
+        await a.checkpoint()
+    },
+    // #1378: StyleSheets with no mounted node while the window changed, their nodes mount after it. Needs the host to
+    // turn the device, both orientations must be on other breakpoints for PADDING (a phone: sm and lg)
+    'mount-on-resize': async a => {
+        if (!a.hasHost) {
+            return
+        }
+
+        await a.push('/mount-on-resize')
+        await a.orientation('landscape')
+        await a.expect('mount-on-resize.check')
+        await a.back()
+        // opened in landscape, the StyleSheets were mounted and unmounted again, then the window shrinks
+        await a.push('/mount-on-resize')
+        await a.orientation('portrait')
+        await a.expect('mount-on-resize.check')
         await a.back()
         await a.checkpoint()
     },

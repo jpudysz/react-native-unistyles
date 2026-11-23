@@ -144,11 +144,9 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
         const [, stylesChanged] = useReducer(() => ({}), {})
 
         const getScopedSecrets = () => {
-            const previousScopedTheme = scope ? UnistylesShadowRegistry.getScopedTheme() : undefined
+            const previousScopedTheme = UnistylesShadowRegistry.getScopedTheme()
 
-            if (scope) {
-                UnistylesShadowRegistry.setScopedTheme(scope.name)
-            }
+            UnistylesShadowRegistry.setScopedTheme(scope?.name)
 
             try {
                 const styleSecrets = getSecrets(narrowedProps.style)
@@ -156,9 +154,7 @@ export const withUnistyles = <TComponent, TMappings extends GenericComponentProp
 
                 return { styleSecrets, contentContainerStyleSecrets }
             } finally {
-                if (scope) {
-                    UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
-                }
+                UnistylesShadowRegistry.setScopedTheme(previousScopedTheme)
             }
         }
 

@@ -11,7 +11,7 @@
     "react": "19.3.0",
     "react-native": "0.88.0",
     "react-native-edge-to-edge": "1.8.2",
-    "react-native-nitro-modules": "0.37.1",
+    "react-native-nitro-modules": "0.37.2",
     "react-native-reanimated": "4.7.1",
     "react-native-unistyles": "workspace:*",
     "react-native-worklets": "0.13.0"

@@ -176,22 +176,19 @@ HybridShadowRegistry.add = (handle, styles, scope) => {
             )
         }
 
-        // the view can link after its ScopedTheme rendered, when the registry is already restored
-        const previousScopedTheme = scope ? HybridShadowRegistry.getScopedTheme() : undefined
+        const previousScopedTheme = HybridShadowRegistry.getScopedTheme()
 
-        if (scope) {
-            HybridShadowRegistry.setScopedTheme(scope.name)
+        HybridShadowRegistry.setScopedTheme(scope?.name)
+
+        try {
+            HybridShadowRegistry.link(node, filteredStyles)
+            owners.link(host)
+        } finally {
+            HybridShadowRegistry.setScopedTheme(previousScopedTheme)
         }
-
-        HybridShadowRegistry.link(node, filteredStyles)
-        owners.link(host)
 
         if (!handle.__internalInstanceHandle) {
             linkedHosts.set(handle, host)
-        }
-
-        if (scope) {
-            HybridShadowRegistry.setScopedTheme(previousScopedTheme)
         }
     }
 }

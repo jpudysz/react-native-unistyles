@@ -178,7 +178,7 @@ const RunnerOverlay: React.FunctionComponent<{ state: RunnerState }> = ({ state 
 
 // Rendered by the root layout, renders and subscribes to nothing else until the e2e route starts a run
 export const E2EOverlay = () => {
-    const state = useSyncExternalStore(runnerStore.subscribe, runnerStore.getSnapshot)
+    const state = useSyncExternalStore(runnerStore.subscribe, runnerStore.getSnapshot, runnerStore.getServerSnapshot)
 
     return state ? <RunnerOverlay state={state} /> : null
 }
@@ -190,6 +190,8 @@ const styles = StyleSheet.create((theme, rt) => ({
         right: 8,
         bottom: rt.insets.bottom + 8,
         flexDirection: 'row',
+        // a narrow window (a desktop window) moves the status to its own line, the host reads it from the tree
+        flexWrap: 'wrap',
         alignItems: 'center',
         gap: 4
     },
@@ -242,6 +244,7 @@ const styles = StyleSheet.create((theme, rt) => ({
     },
     status: {
         flex: 1,
+        minWidth: 180,
         fontSize: 10,
         color: '#ffffff',
         backgroundColor: '#000000',

@@ -23,12 +23,15 @@ export type Element = {
 export type Device = {
     build: (logPath: string) => void,
     install: () => void,
-    launch: (url: string) => void,
+    // `desktop` opens the app in a desktop window, a device without one throws
+    launch: (url: string, window: 'fullscreen' | 'desktop') => void,
     // Elements of expo-example only, so a found element proves the app is in the foreground
     describe: () => Array<Element>,
     tap: (x: number, y: number) => void,
     // The OS appearance, like the Control Center toggle
     setAppearance: (scheme: 'light' | 'dark') => void,
+    // Turns the device, describe, tap and screenshot follow the new orientation
+    setOrientation: (orientation: 'portrait' | 'landscape') => void,
     screenshot: (path: string) => void,
     // True while the app process runs, a crash ends the run early
     isRunning: () => boolean

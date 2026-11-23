@@ -202,6 +202,14 @@ bool core::UnistylesRegistry::isSuspended(const ShadowNodeFamily* family) const 
     return it != this->_shadowRegistry.end() && it->second.isSuspended;
 }
 
+bool core::UnistylesRegistry::hasUpdatesWhileSuspended(const ShadowNodeFamily* family) {
+    return this->trafficController.withLock([this, family](){
+        auto it = this->_shadowRegistry.find(family);
+
+        return it != this->_shadowRegistry.end() && it->second.hasUpdatesWhileSuspended;
+    });
+}
+
 std::shared_ptr<core::StyleSheet> core::UnistylesRegistry::addStyleSheet(jsi::Runtime& rt, uint64_t generation, core::StyleSheetType type, jsi::Object&& rawValue) {
     std::lock_guard<std::mutex> lock(this->_ownershipMutex);
 
@@ -273,6 +281,10 @@ void core::UnistylesRegistry::queueShadowLeafUpdatesUnsafe(shadow::ShadowLeafUpd
             continue;
         }
 
+        if (it->second.isSuspended) {
+            it->second.hasUpdatesWhileSuspended = true;
+        }
+
         this->trafficController.setUpdate(it->second.family, std::move(props));
     }
 }
@@ -332,7 +344,7 @@ std::vector<std::shared_ptr<core::StyleSheet>>core::UnistylesRegistry::getStyleS
             }
         }
 
-        if (styleSheet->type == StyleSheetType::Themable && themeDidChange) {
+        if (styleSheet->type == StyleSheetType::Themable && (themeDidChange || hasMatchingDependency(styleSheet->unistyles))) {
             stylesheetsToRefresh.emplace_back(styleSheet);
         }
     }

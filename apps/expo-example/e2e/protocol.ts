@@ -10,6 +10,7 @@ export const SCENARIOS = [
     'activity',
     'frozen-list',
     'animated-variant',
+    'settled-fade',
     'frozen-unmount',
     'scoped',
     'variants-after-flip',
@@ -21,10 +22,15 @@ export const SCENARIOS = [
     'lists-scroll',
     'touchable-highlight',
     'interactions',
+    'inline-override',
+    'undefined-reset',
     'ime',
     'rn-appearance',
     'rtl',
+    'status-bar',
+    'safe-area',
     'os-appearance',
+    'mount-on-resize',
     'random-walk'
 ] as const
 
@@ -42,7 +48,15 @@ export const parseRunInteger = (name: 'reps' | 'seed', value: string | undefined
 }
 
 // The runner blocks at a sync point until the host acts, every other step runs without the host
-export type SyncKind = 'READY' | 'CHECKPOINT' | 'TAP' | 'APPEARANCE' | 'FAILURE' | 'RESULT'
+// ORIENTATION asks the host to turn the device, ROTATED holds the new layout still while the host finds the beacon and probes again
+export type SyncKind = 'READY' | 'CHECKPOINT' | 'TAP' | 'APPEARANCE' | 'ORIENTATION' | 'ROTATED' | 'FAILURE' | 'RESULT'
+
+export type Orientation = 'portrait' | 'landscape'
+
+// Where the host opens the app, `desktop` is a freeform window of Android 15+ desktop windowing
+export type WindowMode = 'fullscreen' | 'desktop'
+
+export const WINDOW_MODES: ReadonlyArray<WindowMode> = ['fullscreen', 'desktop']
 
 export type Sync = {
     seq: number,
@@ -54,7 +68,7 @@ export type Sync = {
 export const formatSync = ({ seq, kind, detail }: Sync) => `E2E ${kind}${detail ? ` ${detail}` : ''} #${seq}`
 
 export const parseSync = (text: string): Sync | undefined => {
-    const match = /^E2E (READY|CHECKPOINT|TAP|APPEARANCE|FAILURE|RESULT) ?(.*) #(\d+)$/.exec(text)
+    const match = /^E2E (READY|CHECKPOINT|TAP|APPEARANCE|ORIENTATION|ROTATED|FAILURE|RESULT) ?(.*) #(\d+)$/.exec(text)
 
     return match ? { kind: match[1] as SyncKind, detail: match[2]!, seq: Number(match[3]) } : undefined
 }

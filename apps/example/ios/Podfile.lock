@@ -14,7 +14,7 @@ PODS:
   - hermes-engine (260318099.0.4):
     - hermes-engine/Pre-built (= 260318099.0.4)
   - hermes-engine/Pre-built (260318099.0.4)
-  - NitroModules (0.37.1):
+  - NitroModules (0.37.2):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1944,7 +1944,7 @@ PODS:
     - Yoga
   - SocketRocket (0.7.1):
     - ReactNativeDependencies
-  - Unistyles (3.6.0):
+  - Unistyles (3.8.1):
     - hermes-engine
     - NitroModules
     - RCTRequired
@@ -2255,7 +2255,7 @@ SPEC CHECKSUMS:
   fmt: ba0886e864ebb21d14c98b2e12e164b8002f5b93
   glog: 3cf7cb46f743c4bc758ae3e6d9c15bd1b4cfd6d4
   hermes-engine: c51ccd6f11a8804c5b186773d90cc6a6abc5bac2
-  NitroModules: c32f969b7c536e0b6b401a9dfdb35bb4eba071ef
+  NitroModules: f1a11047ebbb0202a7d0033d6e99ad0527d34b00
   RCT-Folly: 82921e585c0400eda46fac1068297aa9dfb035e4
   RCTDeprecation: e134f2a2c096a6450f5fcbbe949531f913a2ff04
   RCTRequired: f1a68295837ee8f91e112ed1b5694d12e7ff1784
@@ -2336,7 +2336,7 @@ SPEC CHECKSUMS:
   RNReanimated: 957652b2b3bb8440a96647aab4610c36383ed86f
   RNWorklets: 25aafdf265b71b5007e369a8a981949dda89f974
   SocketRocket: 37aec555668fb852ec12e3c0de59a86ca58f0871
-  Unistyles: 11916cf011baa67c13dc5f74e77979a4e2dab472
+  Unistyles: 579cdc61f31ffcaa56c6b6bd748eb0e4485fa4a8
   Yoga: d1c536142c5ff8ec8cd856ab2a7c227a1d875c8e
 
 PODFILE CHECKSUM: 3aa3b5f5253be927d355cf1499f60c53140eb9a3

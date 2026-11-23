@@ -119,6 +119,18 @@ declare module 'react-native-unistyles' {
 
 ```
 
+Once the types are registered, you can import helper types instead of deriving them yourself:
+
+```tsx
+import type { AppTheme, AppThemeName, AppBreakpoint } from 'react-native-unistyles'
+
+// AppTheme      - the shape of your theme (union of all registered themes)
+// AppThemeName  - union of your theme names, e.g. 'light' | 'dark'
+// AppBreakpoint - union of your breakpoint names, e.g. 'xs' | 'sm' | 'md'
+
+const getCardColor = (theme: AppTheme) => theme.colors.primary
+```
+
 ### Set configuration
 
 The final step in the configuration is to set all the options by calling the `StyleSheet.configure` function:

@@ -402,6 +402,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(
                 );
                 unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
                 unistyle->isDirty = true;
+                unistyle->revision++;
 
                 if (unistyle->type == core::UnistyleType::Object && !unistyle->rawValue.hasProperty(rt, "variants")) {
                     sharedUnistyles.insert(unistyle);
@@ -424,6 +425,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(
                     .getProperty(rt, unistyle->styleKey.c_str())
                     .asObject(rt);
                 unistyle->isDirty = true;
+                unistyle->revision++;
             }
         }
     }
@@ -1170,6 +1172,13 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
             [this, &rt, &state, &convertedStyles, &skippedPropNames](const std::string& propertyName, jsi::Value& propertyValue) {
                 // a later style replaces a skipped value
                 skippedPropNames.erase(propertyName);
+
+                // send null like React does, folly::dynamic drops undefined and the update would keep the previous value
+                if (propertyValue.isUndefined()) {
+                    convertedStyles.setProperty(rt, propertyName.c_str(), jsi::Value::null());
+
+                    return;
+                }
 
                 if (converters::isBackgroundImagePropName(propertyName) && propertyValue.isString()) {
                     // React Native parses the raw string natively and reads an array as the unprocessed syntax

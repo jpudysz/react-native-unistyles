@@ -40,7 +40,7 @@ Deployed by Cloudflare Pages **Git integration** (not GitHub Actions).
 **None required.** The site is fully static:
 
 - `site` is hardcoded in `astro.config.mjs` (`https://unistyl.es/v3/`)
-- Fathom analytics site id is hardcoded in `astro.config.mjs` (`DNUCGBOT`)
+- Analytics is the self-hosted Unilitics tracker (`/_a/s.js`), served by a Cloudflare Worker route, so it needs no config here
 - No API keys, secrets, or `import.meta.env` usage
 
 Optional build-only vars in the CF dashboard (not app secrets):

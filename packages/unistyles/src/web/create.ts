@@ -5,14 +5,7 @@ import { assignSecrets, isServer, removeInlineStyles } from './utils'
 
 type Variants = Record<string, string | boolean | undefined>
 
-export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
-    // For SSR
-    if (!unistyles.services.state.isInitialized && !isServer()) {
-        const config = window?.__UNISTYLES_STATE__?.config
-
-        config && unistyles.services.state.init(config)
-    }
-
+const createStyleSheet = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
     const computedStylesheet = unistyles.services.registry.getComputedStylesheet(stylesheet)
     const addSecrets = (
         value: any,
@@ -54,4 +47,48 @@ export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
     ]
 
     return createStyleSheetStyles()
+}
+
+// On the server, a route can be loaded before StyleSheet.configure runs: Expo Router reads the matched route's
+// metadata before rendering the document that imports the config. Such a StyleSheet is created on first use instead
+const createOnFirstUse = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
+    const styles = {} as ReturnType<typeof createStyleSheet>
+    let isCreated = false
+    // The styles fill the proxy's own target, so it behaves like the object create returns (writes, freeze...)
+    const getStyles = () => {
+        if (!isCreated) {
+            Object.assign(styles, createStyleSheet(stylesheet))
+            isCreated = true
+        }
+
+        return styles
+    }
+    // Reflect has a method for every proxy trap
+    const traps = Object.getOwnPropertyNames(Reflect) as Array<keyof ProxyHandler<object>>
+    const handler = Object.fromEntries(
+        traps.map((trap) => [
+            trap,
+            (_: object, ...args: Array<any>) => (Reflect[trap] as Function)(getStyles(), ...args),
+        ]),
+    )
+
+    return new Proxy(styles, handler)
+}
+
+export const create = (stylesheet: StyleSheetWithSuperPowers<StyleSheet>) => {
+    if (unistyles.services.state.isInitialized) {
+        return createStyleSheet(stylesheet)
+    }
+
+    // A plain object doesn't read the config, so it can be created right away
+    if (isServer()) {
+        return typeof stylesheet === 'function' ? createOnFirstUse(stylesheet) : createStyleSheet(stylesheet)
+    }
+
+    // For SSR
+    const config = window?.__UNISTYLES_STATE__?.config
+
+    config && unistyles.services.state.init(config)
+
+    return createStyleSheet(stylesheet)
 }

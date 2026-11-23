@@ -6,7 +6,7 @@ import { restoreThemes, selectTheme, session } from '../components'
 import type { ThemeName } from '../themes'
 import { runAction } from './actions'
 import { getPresses } from './presses'
-import { type Failure, type Report, REPORTED_FAILURES, type ScenarioId, type Sync, type SyncKind } from './protocol'
+import { type Failure, type Orientation, type Report, REPORTED_FAILURES, type ScenarioId, type Sync, type SyncKind } from './protocol'
 import { type Actions, scenarios, TAP_SCENARIOS } from './scenarios'
 import { scrollTarget } from './scroll'
 import { settle, sleep } from './settle'
@@ -57,7 +57,9 @@ export const runnerStore = {
             listeners.delete(listener)
         }
     },
-    getSnapshot: () => state
+    getSnapshot: () => state,
+    // Runs start in the browser only, server output renders no overlay
+    getServerSnapshot: () => undefined
 }
 
 const publish = (next: Partial<RunnerState>) => {
@@ -108,6 +110,8 @@ class E2ERun implements Actions {
     private checkpoints = 0
     private failureSyncs = 0
     private colorSchemeOverridden = false
+    // a tablet starts in landscape
+    private startOrientation: Orientation = 'portrait'
     private position = { scenario: 'tour' as ScenarioId, rep: 0, step: 0, action: '' }
     random = Math.random
     readonly report: Report
@@ -151,6 +155,7 @@ class E2ERun implements Actions {
             throw new Error('The e2e overlay is not mounted')
         }
 
+        this.startOrientation = UnistylesRuntime.orientation as Orientation
         await this.hold('READY')
 
         for (const scenario of this.config.scenarios) {
@@ -222,6 +227,21 @@ class E2ERun implements Actions {
             if (!await this.sync('APPEARANCE', scheme, () => this.theme() === scheme)) {
                 throw new Error(`Appearance ${scheme} did not reach the app`)
             }
+        })
+
+    // The host turns the device, then finds the beacon and probes again while ROTATED holds the new layout still
+    orientation = (orientation: Orientation) =>
+        this.step(`orientation ${orientation}`, async () => {
+            if (!this.config.host) {
+                throw new Error(`Orientation ${orientation} needs the host`)
+            }
+
+            if (!await this.sync('ORIENTATION', orientation, () => UnistylesRuntime.orientation === orientation)) {
+                throw new Error(`Orientation ${orientation} did not reach the app, it is ${UnistylesRuntime.orientation}`)
+            }
+
+            await settle()
+            await this.hold('ROTATED', orientation)
         })
 
     back = () =>
@@ -302,6 +322,11 @@ class E2ERun implements Actions {
 
         if (!session.isLoggedIn()) {
             await this.step('reset session', session.logIn)
+        }
+
+        // left behind by a failed mount-on-resize
+        if (this.config.host && UnistylesRuntime.orientation !== this.startOrientation) {
+            await this.orientation(this.startOrientation)
         }
 
         await this.step('reset themes', restoreThemes)

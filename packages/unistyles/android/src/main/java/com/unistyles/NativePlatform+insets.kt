@@ -1,6 +1,5 @@
 package com.unistyles
 
-import android.graphics.Rect
 import android.os.Build
 import android.view.View
 import android.view.Window
@@ -83,21 +82,21 @@ class NativePlatformInsets(
             }
             else -> {
                 @Suppress("DEPRECATION")
-                window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN != WindowManager.LayoutParams.FLAG_FULLSCREEN
+                val isHiddenByWindowFlag = window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN != 0
+                // WindowInsetsControllerCompat.hide(statusBars()) (e.g. React Native's StatusBar) sets only this flag
+                @Suppress("DEPRECATION")
+                val isHiddenBySystemUi = window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_FULLSCREEN != 0
+
+                !isHiddenByWindowFlag && !isHiddenBySystemUi
             }
         }
-        // React Native is forcing insets to make status bar translucent
-        // so we need to calculate top inset manually, as WindowInsetCompat will always return 0
         val statusBarTopInset = when(isStatusBarVisible) {
-            true -> {
-                val visibleRect = Rect()
-
-                window.decorView.getWindowVisibleDisplayFrame(visibleRect)
-
-                visibleRect.top
-            }
+            true -> ViewCompat.getRootWindowInsets(window.decorView)
+                ?.getInsets(WindowInsetsCompat.Type.statusBars())
+                ?.top ?: 0
             false -> 0
         }
+        val captionBarTopInset = insetsCompat.getInsets(WindowInsetsCompat.Type.captionBar()).top
 
         val insets = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
         val imeInsetValue = insetsCompat.getInsets(WindowInsetsCompat.Type.ime()).bottom
@@ -127,7 +126,7 @@ class NativePlatformInsets(
         }
 
         this._insets = Insets(
-            statusBarTopInset.toDouble(),
+            maxOf(statusBarTopInset, captionBarTopInset).toDouble(),
             bottomInset.toDouble(),
             insets.left.toDouble(),
             insets.right.toDouble(),

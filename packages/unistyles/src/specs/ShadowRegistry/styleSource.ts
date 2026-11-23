@@ -50,18 +50,14 @@ export const createUnistylesStyleSource = (scopedTheme: ScopedThemeAccess) => {
 
                 hasUnistyles = true
 
-                const previousScopedTheme = scope ? scopedTheme.get() : undefined
+                const previousScopedTheme = scopedTheme.get()
 
-                if (scope) {
-                    scopedTheme.set(scope.name)
-                }
+                scopedTheme.set(scope?.name)
 
                 try {
                     Object.assign(fresh, style[key]?.uni__getStyles?.())
                 } finally {
-                    if (scope) {
-                        scopedTheme.set(previousScopedTheme)
-                    }
+                    scopedTheme.set(previousScopedTheme)
                 }
             }
         }

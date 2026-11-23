@@ -6,6 +6,7 @@ import { TRACK_DEPENDENCIES } from '../core/trackDependencies'
 import { UnistyleDependency } from '../specs/NativePlatform/NativePlatform.nitro'
 import { deepMergeObjects } from '../utils'
 import { trackDependencies } from './dependencyTracker'
+import { CONTENTS_CLASS_NAME } from './types'
 import { extractSecrets, extractUnistyleDependencies, isGeneratedUnistyle, isServer } from './utils'
 import { getVariants } from './variants'
 
@@ -114,7 +115,11 @@ export class UnistylesShadowRegistry {
         const { styles: parsedStyles, runtimeDependencies } = getParsedStylesWithDependencies()
         const { hash, existingHash } = this.services.registry.add(parsedStyles, forChild)
         const injectedClassNames = parsedStyles?._web?._classNames ?? []
-        const injectedClassName = Array.isArray(injectedClassNames) ? injectedClassNames.join(' ') : injectedClassNames
+        const userClassName = Array.isArray(injectedClassNames) ? injectedClassNames.join(' ') : injectedClassNames
+        const injectedClassName =
+            !forChild && parsedStyles?.display === 'contents'
+                ? [userClassName, CONTENTS_CLASS_NAME].filter(Boolean).join(' ')
+                : userClassName
         const filterDependencies = (dependencies: Array<UnistyleDependency>) =>
             Array.from(new Set(dependencies)).filter(
                 (dependency) => !this.services.state.CSSVars || dependency !== UnistyleDependency.Theme,

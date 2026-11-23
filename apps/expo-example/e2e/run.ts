@@ -16,6 +16,7 @@ import {
     formatSync,
     LABELS,
     METRO_ONLY_PROBES,
+    type Orientation,
     parseReport,
     parseRunInteger,
     parseSync,
@@ -25,9 +26,11 @@ import {
     type Report,
     SCENARIOS,
     type Sync,
+    WINDOW_MODES,
+    type WindowMode,
 } from './protocol'
 
-const USAGE = 'Usage: bun e2e/run.ts <ios|android> --device <udid|serial> [--scenarios <ids|all>] [--reps <n>] [--seed <n>] [--taps] [--bundler <metro|babel>] [--skip-build]'
+const USAGE = 'Usage: bun e2e/run.ts <ios|android> --device <udid|serial> [--scenarios <ids|all>] [--skip <ids>] [--window <fullscreen|desktop>] [--reps <n>] [--seed <n>] [--taps] [--bundler <metro|babel>] [--skip-build]'
 
 const POLL_MS = 500
 const READY_TIMEOUT_MS = 90_000
@@ -53,6 +56,10 @@ const { positionals, values } = parseArgs({
     options: {
         'device': { type: 'string' },
         'scenarios': { type: 'string', default: 'all' },
+        // scenarios a device can't run, e.g. os-appearance where the OS locks the night mode
+        'skip': { type: 'string', default: '' },
+        // desktop: an Android 15+ desktop window, enabled on the device first (README)
+        'window': { type: 'string', default: 'fullscreen' },
         'reps': { type: 'string', default: '20' },
         'seed': { type: 'string', default: '1' },
         'taps': { type: 'boolean', default: false },
@@ -73,16 +80,33 @@ if (!BUNDLERS.includes(values.bundler as Bundler)) {
     process.exit(2)
 }
 
+if (!WINDOW_MODES.includes(values.window as WindowMode)) {
+    console.error(`Unknown window "${values.window}", expected one of: ${WINDOW_MODES.join(', ')}`)
+    process.exit(2)
+}
+
+const window = values.window as WindowMode
 const bundler = values.bundler as Bundler
 // the Release build bundles the JS, with this mode
 process.env.UNISTYLES_BUNDLER = bundler
 // the Babel plugin skips node_modules, so only Metro paints the 3rd party probe
 const probes = PROBES.filter(probe => bundler === 'metro' || !METRO_ONLY_PROBES.includes(probe))
 
-const unknownScenario = values.scenarios.split(',').find(id => id !== 'all' && !SCENARIOS.includes(id as never))
+const skipped = values.skip.split(',').filter(Boolean)
+const unknownScenario = [...values.scenarios.split(','), ...skipped].find(id => id !== 'all' && !SCENARIOS.includes(id as never))
 
 if (unknownScenario !== undefined) {
     console.error(`Unknown scenario "${unknownScenario}", expected one of: all, ${SCENARIOS.join(', ')}`)
+    process.exit(2)
+}
+
+const scenarios = values.scenarios.split(',')
+    .flatMap(id => id === 'all' ? [...SCENARIOS] : [id])
+    .filter(id => !skipped.includes(id))
+
+// an empty list reaches the app as `scenarios=`, which isn't a scenario id
+if (scenarios.length === 0) {
+    console.error('No scenarios left to run after --skip')
     process.exit(2)
 }
 
@@ -153,6 +177,9 @@ const acknowledge = (beacon: Rect) => device.tap(center(beacon).x, center(beacon
 
 const showsSync = (color: Array<number>, seq: number) => colorDistance(color, parseHex(BEACON_COLORS.waiting[seq % 2]!)) < BEACON_TOLERANCE
 
+const isBeaconPainted = (color: Array<number>) =>
+    [BEACON_COLORS.running, ...BEACON_COLORS.waiting].some(hex => colorDistance(color, parseHex(hex)) < BEACON_TOLERANCE)
+
 // Polls screenshots until the beacon shows the sync after `previous`, the tree is read only while the runner is blocked.
 // A later sync is accepted too: the runner times out syncs the screen never showed (e.g. under a stuck overlay)
 const waitForSync = async (beacon: Rect, previous: Sync) => {
@@ -161,6 +188,7 @@ const waitForSync = async (beacon: Rect, previous: Sync) => {
     const deadline = Date.now() + STALL_TIMEOUT_MS
     let seen = 'nothing'
     let stuckSince: number | undefined
+    let unpaintedSince: number | undefined
     let crashCheckedAt = Date.now()
 
     while (Date.now() < deadline) {
@@ -191,6 +219,30 @@ const waitForSync = async (beacon: Rect, previous: Sync) => {
             seen = `marker ${sync ? formatSync(sync) : 'missing'}`
             continue
         }
+
+        // The screen may stop painting the beacon (an Android 10 emulator paints the report panel over it), then only
+        // the tree tells where the runner is
+        if (!isBeaconPainted(color)) {
+            unpaintedSince ??= Date.now()
+
+            if (Date.now() - unpaintedSince > ACK_RETRY_MS) {
+                unpaintedSince = undefined
+
+                try {
+                    const { elements, sync } = readSync()
+
+                    if (sync !== undefined && sync.seq >= seq) {
+                        return { elements, sync }
+                    }
+                } catch {
+                    // uiautomator needs an idle UI, poll again
+                }
+            }
+
+            continue
+        }
+
+        unpaintedSince = undefined
 
         // An acknowledging tap can get lost, tap again once the tree confirms the runner still waits for it
         if (previous.kind === 'TAP' || previous.kind === 'APPEARANCE' || !showsSync(color, previous.seq)) {
@@ -236,17 +288,49 @@ const checkProbes = (sync: Sync, frames: Record<ProbeName, Rect>) => {
     }
 }
 
+// The beacon and probes move when the device turns
+const findFrames = (elements: Array<Element>) => ({
+    beacon: findElement(elements, element => element.label === LABELS.beacon, 'beacon').frame,
+    frames: Object.fromEntries(
+        probes.map(probe => [probe, findElement(elements, element => element.label === `${LABELS.probe} ${probe}`, `${probe} probe`).frame]),
+    ) as Record<ProbeName, Rect>,
+})
+
+// After the device turned the beacon is somewhere else, so read the tree (not the beacon) until the runner holds the
+// next sync, ROTATED once the app laid out the new orientation
+const waitForSyncInTree = async (previous: Sync) => {
+    const deadline = Date.now() + READY_TIMEOUT_MS
+
+    while (Date.now() < deadline) {
+        await sleep(POLL_MS * 2)
+
+        if (!device.isRunning()) {
+            throw new Error(`The app crashed after sync #${previous.seq}`)
+        }
+
+        try {
+            const { elements, sync } = readSync()
+
+            if (sync !== undefined && sync.seq > previous.seq) {
+                return { elements, sync }
+            }
+        } catch {
+            // uiautomator may not get an idle state while the screen turns
+        }
+    }
+
+    throw new Error(`Runner stalled after ${formatSync(previous)}`)
+}
+
 // Answers sync points until the runner publishes its report
 const serve = async (): Promise<Report> => {
     let { elements, sync } = await waitForReady()
-    const beacon = findElement(elements, element => element.label === LABELS.beacon, 'beacon').frame
-    const frames = Object.fromEntries(
-        probes.map(probe => [probe, findElement(elements, element => element.label === `${LABELS.probe} ${probe}`, `${probe} probe`).frame]),
-    ) as Record<ProbeName, Rect>
+    let { beacon, frames } = findFrames(elements)
 
     while (true) {
         switch (sync.kind) {
             case 'READY':
+            case 'ROTATED':
                 acknowledge(beacon)
                 break
             case 'CHECKPOINT':
@@ -268,6 +352,18 @@ const serve = async (): Promise<Report> => {
             case 'APPEARANCE':
                 device.setAppearance(sync.detail as 'light' | 'dark')
                 break
+            case 'ORIENTATION': {
+                device.setOrientation(sync.detail as Orientation)
+
+                const next = await waitForSyncInTree(sync)
+                const moved = findFrames(next.elements)
+
+                beacon = moved.beacon
+                frames = moved.frames
+                elements = next.elements
+                sync = next.sync
+                continue
+            }
             case 'RESULT':
                 screenshot('result')
 
@@ -289,7 +385,7 @@ const printSummary = (report: Report, startedAt: number) => {
     const passed = report.result === 'PASS' && probeFailures.length === 0
 
     console.log(`\nE2E ${platform} ${passed ? 'PASS' : 'FAIL'} in ${seconds(startedAt)} (runner ${Math.round(report.durationMs / 1000)}s)`)
-    console.log(`scenarios ${values.scenarios}, reps ${report.reps}, seed ${report.seed}, taps ${report.taps ? 'on' : 'off'}, bundler ${bundler}`)
+    console.log(`scenarios ${values.scenarios}${skipped.length > 0 ? ` (skipped ${skipped.join(',')})` : ''}, reps ${report.reps}, seed ${report.seed}, taps ${report.taps ? 'on' : 'off'}, bundler ${bundler}, window ${window}`)
     console.log(
         `steps ${report.steps}, nodes checked ${report.checked}, detached ${report.detached}, suspended ${report.suspended}, mismatches ${report.mismatches}`,
     )
@@ -322,7 +418,7 @@ const main = async () => {
 
     device.install()
 
-    const params = new URLSearchParams({ scenarios: values.scenarios, reps: values.reps, seed: values.seed, host: '1' })
+    const params = new URLSearchParams({ scenarios: scenarios.join(','), reps: values.reps, seed: values.seed, host: '1' })
 
     if (values.taps) {
         params.set('taps', '1')
@@ -330,7 +426,7 @@ const main = async () => {
 
     const runStartedAt = Date.now()
 
-    device.launch(`${APP_SCHEME}:///e2e?${params}`)
+    device.launch(`${APP_SCHEME}:///e2e?${params}`, window)
 
     try {
         const report = await serve()

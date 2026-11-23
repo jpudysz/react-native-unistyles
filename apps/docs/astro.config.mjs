@@ -66,15 +66,7 @@ export default defineConfig({
                 { tag: 'meta', attrs: { property: 'og:image:alt', content: 'Unistyles' } },
                 { tag: 'meta', attrs: { name: 'twitter:image', content: 'https://unistyl.es/opengraph-image3.png' } },
                 { tag: 'meta', attrs: { name: 'twitter:creator', content: '@jpudysz' } },
-                {
-                    tag: 'script',
-                    attrs: {
-                        src: 'https://cdn.usefathom.com/script.js',
-                        'data-site': 'DNUCGBOT',
-                        'data-spa': 'auto',
-                        defer: true,
-                    },
-                },
+                { tag: 'script', attrs: { src: '/_a/s.js', defer: true } },
             ],
             customCss: ['./src/styles/docs.css'],
             logo: {

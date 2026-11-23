@@ -83,6 +83,9 @@ npx skills add jpudysz/react-native-unistyles
 <a href="https://github.com/andkindness">
      <img src="https://avatars.githubusercontent.com/u/143941782?v=4" height="70px" width="70px" alt="andkindness" />
 </a>
+<a href="https://github.com/BasixKOR">
+     <img src="https://avatars.githubusercontent.com/u/7413880?v=4" height="70px" width="70px" alt="BasixKOR" />
+</a>
 
 
 ## Past sponsors

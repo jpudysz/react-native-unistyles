@@ -9,8 +9,8 @@ const HOME_TITLE = 'Unistyles'
 const OPEN_PROMPT = 'Open in “expo-example”?'
 
 // argent describe lines: `  AXGroup "label" id="id" value="value"  (x, y, width, height)`, controls (switches,
-// inputs) list their value before the id
-const LINE = /^\s*\S+(?: "(.*?)")?(?: value=".*?")?(?: id="(.*?)")?(?: value=".*?")?\s+\(([\d.-]+), ([\d.-]+), ([\d.-]+), ([\d.-]+)\)$/
+// inputs) list their value before the id, newer argent prints the frame without spaces `(x,y,width,height)`
+const LINE = /^\s*\S+(?: "(.*?)")?(?: value=".*?")?(?: id="(.*?)")?(?: value=".*?")?\s+\(([\d.-]+), ?([\d.-]+), ?([\d.-]+), ?([\d.-]+)\)$/
 
 const parseDescribe = (description: string): Array<Element> =>
     description.split('\n').flatMap(line => {
@@ -68,7 +68,12 @@ export const createIOS = (udid: string): Device => {
             ], { cwd: APP_DIR, logPath }),
         install: () => exec(['xcrun', 'simctl', 'install', udid, APP_PATH]),
         // Launches first and opens the URL once home renders, so the link reaches a running app
-        launch: url => {
+        launch: (url, window) => {
+            // iPad windows (Stage Manager) can't be opened from the host
+            if (window === 'desktop') {
+                throw new Error('A desktop window is Android only')
+            }
+
             exec(['xcrun', 'simctl', 'terminate', udid, APP_ID], { check: false })
             exec(['xcrun', 'simctl', 'launch', udid, APP_ID])
             waitFor(elements => elements.some(element => element.label === HOME_TITLE), 'its home screen')
@@ -88,6 +93,7 @@ export const createIOS = (udid: string): Device => {
         describe,
         tap,
         setAppearance: scheme => exec(['xcrun', 'simctl', 'ui', udid, 'appearance', scheme]),
+        setOrientation: orientation => argent('rotate', '--orientation', orientation === 'portrait' ? 'Portrait' : 'LandscapeLeft'),
         screenshot: path => argent('screenshot', '--scale', '1', '--out', path),
         isRunning: () => exec(['xcrun', 'simctl', 'spawn', udid, 'launchctl', 'list'], { check: false }).includes(`UIKitApplication:${APP_ID}`)
     }
