@@ -134,8 +134,8 @@ export default {
         rules: [
             {
                 test: /\.[jt]sx?$/,
-                // your files and the source of Unistyles
-                exclude: /node_modules[\\/](?!react-native-unistyles[\\/])/,
+                // your files and the source of Unistyles, also from pnpm's node_modules/.pnpm
+                exclude: { and: [/node_modules/, { not: /[\\/]node_modules[\\/]react-native-unistyles[\\/]/ }] },
                 loader: 'builtin:swc-loader',
                 options: {
                     jsc: {
