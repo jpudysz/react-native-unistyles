@@ -391,7 +391,9 @@ module.exports = function (api) {
 With Rspack, use [`UnistylesPlugin`](/v3/other/repack) in `rspack.config.mjs` instead, see [Migrating from the Babel plugin](/v3/other/repack#migrating-from-the-babel-plugin). Re.Pack's webpack setup keeps the Babel plugin in 3.x, `UnistylesPlugin` isn't tested there.
 </Aside>
 
-If your app is bundled with [Re.Pack](https://re-pack.dev/), add `react-native-unistyles/plugin` to your `babel.config.js` like any other Babel plugin, with the same options (see [Extra configuration](#extra-configuration)):
+The setup below is the deprecated alternative to `UnistylesPlugin`, never use both: Unistyles throws an error if the Babel plugin runs next to `UnistylesPlugin`. It keeps working in 3.x, and it's the way to go with Re.Pack's webpack setup.
+
+If your app is bundled with [Re.Pack](https://re-pack.dev/) and keeps the Babel plugin, add `react-native-unistyles/plugin` to your `babel.config.js` like any other Babel plugin, with the same options (see [Extra configuration](#extra-configuration)):
 
 ```js title="babel.config.js"
 module.exports = {
@@ -405,7 +407,7 @@ module.exports = {
 }
 ```
 
-Re.Pack runs your `babel.config.js` through `@callstack/repack/babel-swc-loader`, the loader of the Re.Pack 5 config templates. Make sure your `rspack.config.mjs` transforms your files with it.
+Re.Pack runs your `babel.config.js` through `@callstack/repack/babel-swc-loader`, the loader of the Re.Pack 5 config templates. Make sure your Re.Pack config transforms your files with it, and that it doesn't add `UnistylesPlugin`.
 
 <Aside>
 `RepackUnistylePlugin` is deprecated since Unistyles 3.9.0 and will be removed in 4.0, like the Babel plugin. It still works and prints a warning, replace it with `UnistylesPlugin`, see [Migrating from RepackUnistylePlugin](/v3/other/repack#migrating-from-repackunistyleplugin). Don't use `UnistylesPlugin` together with the Babel plugin or `RepackUnistylePlugin`: Unistyles throws an error if the Babel plugin runs next to `UnistylesPlugin`.
