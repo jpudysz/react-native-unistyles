@@ -388,7 +388,7 @@ module.exports = function (api) {
 ### Usage with Re.Pack
 
 <Aside type="caution">
-Use [`UnistylesPlugin`](/v3/other/repack) in `rspack.config.mjs` instead, see [Migrating from the Babel plugin](/v3/other/repack#migrating-from-the-babel-plugin).
+With Rspack, use [`UnistylesPlugin`](/v3/other/repack) in `rspack.config.mjs` instead, see [Migrating from the Babel plugin](/v3/other/repack#migrating-from-the-babel-plugin). Re.Pack's webpack setup keeps the Babel plugin in 3.x, `UnistylesPlugin` isn't tested there.
 </Aside>
 
 If your app is bundled with [Re.Pack](https://re-pack.dev/), add `react-native-unistyles/plugin` to your `babel.config.js` like any other Babel plugin, with the same options (see [Extra configuration](#extra-configuration)):

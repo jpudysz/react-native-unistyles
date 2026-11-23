@@ -89,7 +89,7 @@ Add React Compiler as usual, eg. with `experiments.reactCompiler` in Expo. The M
 ### Migrating from the Babel plugin
 
 1. Wrap your `metro.config.js` with `withUnistylesConfig`, see above.
-2. Remove `react-native-unistyles/plugin` from your `babel.config.js`. Its options (`root`, `autoProcessImports`, `autoProcessPaths`, `autoRemapImports` and `debug`) have no counterpart, the Metro integration doesn't need them.
+2. Remove `react-native-unistyles/plugin` from your `babel.config.js`. The Metro integration doesn't need its `root`, `autoProcessImports`, `autoProcessPaths` and `debug` options. `autoRemapImports` rules for the `react-native` deep imports (eg. `ViewNativeComponent`) aren't needed either, the integration swaps them. A rule for any other import, eg. a library's own primitive, has no counterpart: wrap that component with [`withUnistyles`](/v3/references/with-unistyles) instead.
 3. Use the styles returned by `useVariants`, the codemod converts your components, see [Variants](#variants).
 4. Restart Metro with a clear cache (`npx expo start --clear` or `npx react-native start --reset-cache`).
 

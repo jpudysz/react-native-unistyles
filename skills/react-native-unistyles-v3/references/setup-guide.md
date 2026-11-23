@@ -80,7 +80,7 @@ export default {
 ### Migrating from the Babel plugin
 
 1. Add the integration: `withUnistylesConfig` in metro.config.js, or `new UnistylesPlugin()` in the Rspack config
-2. Remove `react-native-unistyles/plugin` from `babel.config.js` (and `RepackUnistylePlugin` from the Rspack config). Its options (`root`, `autoProcessImports`, `autoProcessPaths`, `autoRemapImports`, `debug`) have no counterpart, they aren't needed
+2. Remove `react-native-unistyles/plugin` from `babel.config.js` (and `RepackUnistylePlugin` from the Rspack config). `root`, `autoProcessImports`, `autoProcessPaths` and `debug` aren't needed. `autoRemapImports` rules for `react-native` deep imports (`ViewNativeComponent`, `TextNativeComponent`, `react-native/Libraries/...`) aren't needed either, the integration swaps them. A rule for any other import (e.g. a library's own primitive `@vendor/primitive`) has **no counterpart** — the integration doesn't apply custom mappings, so wrap that component with `withUnistyles` (or keep the deprecated Babel plugin until it's wrapped) before removing the rule
 3. Run the `useVariants` codemod (see above), so components use the returned styles
 4. Restart the bundler with a clear cache: `npx expo start --clear`, `npx react-native start --reset-cache` or Re.Pack's `--reset-cache`
 

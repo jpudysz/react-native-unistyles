@@ -207,7 +207,7 @@ The mocks must run BEFORE your `StyleSheet.configure` file and any component imp
 
 **Cause:** The deprecated Unistyles Babel plugin must process `useVariants` calls BEFORE React Compiler reorganizes the code. The Metro integration and `UnistylesPlugin` have no Babel transform, so the order doesn't matter there (use the styles returned by `useVariants`).
 
-**Fix:** Place Unistyles plugin BEFORE React Compiler in babel config:
+**Fix (Babel plugin setups only):** Place Unistyles plugin BEFORE React Compiler in babel config:
 
 ```js
 // babel.config.js
@@ -220,6 +220,8 @@ module.exports = {
   ]
 }
 ```
+
+**Fix (Metro integration / `UnistylesPlugin`):** don't add `react-native-unistyles/plugin` to `babel.config.js`, remove it if it's there (it throws next to an integration). The integrations don't need any plugin order, use the styles returned by `useVariants`.
 
 ---
 

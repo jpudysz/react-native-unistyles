@@ -225,7 +225,7 @@ Share them in every container, the host and each remote (a remote usually with `
 ### Migrating from the Babel plugin
 
 1. Add `new UnistylesPlugin()` to the plugins of your Rspack config, see above.
-2. Remove `react-native-unistyles/plugin` from your `babel.config.js`. Its options (`root`, `autoProcessImports`, `autoProcessPaths`, `autoRemapImports` and `debug`) have no counterpart, `UnistylesPlugin` doesn't need them.
+2. Remove `react-native-unistyles/plugin` from your `babel.config.js`. `UnistylesPlugin` doesn't need its `root`, `autoProcessImports`, `autoProcessPaths` and `debug` options. `autoRemapImports` rules for the `react-native` deep imports aren't needed either, but a rule for any other import, eg. a library's own primitive, has no counterpart: wrap that component with [`withUnistyles`](/v3/references/with-unistyles) instead.
 3. Run the `useVariants` codemod, see [Variants](/v3/other/metro#variants).
 4. Restart Re.Pack with `--reset-cache`.
 5. Make sure `@rspack/core` is 1.7.5 or newer.
@@ -254,7 +254,7 @@ To migrate:
 
 - **The Babel plugin throws an error that names `UnistylesPlugin`.** The Babel plugin still runs. Remove `react-native-unistyles/plugin` from `babel.config.js` and `RepackUnistylePlugin` from `rspack.config.mjs`.
 - **A console warning that `RepackUnistylePlugin` is deprecated.** It keeps working until Unistyles 4.0. Replace it with `UnistylesPlugin`, see [Migrating from RepackUnistylePlugin](#migrating-from-repackunistyleplugin).
-- **A console warning that `react-native-unistyles/plugin` is deprecated.** Your `babel.config.js` runs the Babel plugin. It keeps working until Unistyles 4.0. Replace it with `UnistylesPlugin`, see [Migrating from the Babel plugin](#migrating-from-the-babel-plugin).
+- **A console warning that `react-native-unistyles/plugin` is deprecated.** Your `babel.config.js` runs the Babel plugin. It keeps working until Unistyles 4.0. With Rspack (Re.Pack 5 templates, Rspack, Rsbuild), replace it with `UnistylesPlugin`, see [Migrating from the Babel plugin](#migrating-from-the-babel-plugin). With Re.Pack's webpack setup, keep the Babel plugin in 3.x, `UnistylesPlugin` isn't tested there.
 - **`UnistylesPlugin` throws an error that asks for `@rspack/core` 1.7.5.** Upgrade `@rspack/core`.
 - **A console warning about a second copy of `react-native-unistyles`.** Install `react-native-unistyles` once in your app.
 - **A console warning `UnistylesPlugin couldn't resolve "<import>"`.** `UnistylesPlugin` couldn't resolve that import with your resolve options, so Unistyles doesn't swap it. Rspack resolves it on its own and reports an error if it can't either. Check the import and your aliases.

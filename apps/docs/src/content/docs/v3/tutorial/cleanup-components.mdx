@@ -355,14 +355,17 @@ export function ThemedText({
   style,
 -  lightColor,
 -  darkColor,
+  type = 'default',
   ...rest
 }: ThemedTextProps) {
+  const variantStyles = styles.useVariants({ type })
+
   return (
     <Text
       style={[
--        styles.textColor(lightColor, darkColor),
-+        styles.textColor,
-        styles.textType,
+-        variantStyles.textColor(lightColor, darkColor),
++        variantStyles.textColor,
+        variantStyles.textType,
         style,
       ]}
       {...rest}
