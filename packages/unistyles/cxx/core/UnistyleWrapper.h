@@ -12,11 +12,12 @@ namespace margelo::nitro::unistyles::core {
 
 struct UnistyleWrapper: public jsi::NativeState {
     explicit UnistyleWrapper(Unistyle::Shared unistyle)
-        : unistyle(std::move(unistyle)) {}
+        : unistyle(std::move(unistyle)), revision(this->unistyle->revision) {}
 
     ~UnistyleWrapper() override;
 
     Unistyle::Shared unistyle;
+    uint64_t revision;
 };
 
 inline static Unistyle::Shared unistyleFromStaticStyleSheet(jsi::Runtime& rt, jsi::Object& value) {

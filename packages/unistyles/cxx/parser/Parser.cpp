@@ -402,6 +402,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(
                 );
                 unistyleData->parsedStyle = jsi::Value(rt, unistyle->parsedStyle.value()).asObject(rt);
                 unistyle->isDirty = true;
+                unistyle->revision++;
 
                 if (unistyle->type == core::UnistyleType::Object && !unistyle->rawValue.hasProperty(rt, "variants")) {
                     sharedUnistyles.insert(unistyle);
@@ -424,6 +425,7 @@ void parser::Parser::rebuildUnistylesInDependencyMap(
                     .getProperty(rt, unistyle->styleKey.c_str())
                     .asObject(rt);
                 unistyle->isDirty = true;
+                unistyle->revision++;
             }
         }
     }
