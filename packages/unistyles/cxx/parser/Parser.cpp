@@ -1173,6 +1173,13 @@ folly::dynamic parser::Parser::parseStylesToShadowTreeStyles(jsi::Runtime& rt, c
                 // a later style replaces a skipped value
                 skippedPropNames.erase(propertyName);
 
+                // send null like React does, folly::dynamic drops undefined and the update would keep the previous value
+                if (propertyValue.isUndefined()) {
+                    convertedStyles.setProperty(rt, propertyName.c_str(), jsi::Value::null());
+
+                    return;
+                }
+
                 if (converters::isBackgroundImagePropName(propertyName) && propertyValue.isString()) {
                     // React Native parses the raw string natively and reads an array as the unprocessed syntax
                     if (converters::canReactNativeParseBackgroundImageString()) {
