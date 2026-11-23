@@ -225,7 +225,7 @@ Share them in every container, the host and each remote (a remote usually with `
 ### Migrating from the Babel plugin
 
 1. Add `new UnistylesPlugin()` to the plugins of your Rspack config, see above.
-2. Remove `react-native-unistyles/plugin` from your `babel.config.js`. `UnistylesPlugin` doesn't need its `root`, `autoProcessImports`, `autoProcessPaths` and `debug` options. `autoRemapImports` rules for the `react-native` deep imports aren't needed either, but a rule for any other import, eg. a library's own primitive, has no counterpart: wrap that component with [`withUnistyles`](/v3/references/with-unistyles) instead.
+2. Remove `react-native-unistyles/plugin` from your `babel.config.js`. `UnistylesPlugin` doesn't need its `root`, `autoProcessImports`, `autoProcessPaths` and `debug` options. `autoRemapImports` rules aren't needed for the imports it swaps (`ViewNativeComponent`, `TextNativeComponent` and the deep imports of the supported components), but a rule for any other import, eg. `react-native/index.js` (left raw on purpose) or a library's own primitive, has no counterpart: wrap that component with [`withUnistyles`](/v3/references/with-unistyles) instead.
 3. Run the `useVariants` codemod, see [Variants](/v3/other/metro#variants).
 4. Restart Re.Pack with `--reset-cache`.
 5. Make sure `@rspack/core` is 1.7.5 or newer.
