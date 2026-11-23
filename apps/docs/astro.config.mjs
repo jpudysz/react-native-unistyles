@@ -136,9 +136,9 @@ export default defineConfig({
                 {
                     label: 'Other',
                     items: [
-                        { label: 'Babel plugin', slug: 'v3/other/babel-plugin' },
-                        { label: 'Metro integration', slug: 'v3/other/metro', badge: 'New!' },
+                        { label: 'Metro integration', slug: 'v3/other/metro', badge: 'Updated!' },
                         { label: 'Re.Pack, Rspack and Rsbuild', slug: 'v3/other/repack', badge: 'New!' },
+                        { label: 'Babel plugin', slug: 'v3/other/babel-plugin', badge: { text: 'Deprecated', variant: 'caution' } },
                         { label: 'Dependencies', slug: 'v3/other/dependencies' },
                         { label: 'For library authors', slug: 'v3/other/for-library-authors' },
                         { label: 'For sponsors', slug: 'v3/other/for-sponsors' },

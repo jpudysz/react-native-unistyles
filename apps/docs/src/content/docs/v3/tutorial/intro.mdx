@@ -51,15 +51,35 @@ Finally, generate the native project folders required for the app to run:
 yarn expo prebuild --clean
 ```
 
+### Configure Metro
+
+Unistyles plugs into Metro, the bundler of Expo. Since a `metro.config.js` file isn't created by default, we can generate it by running:
+
+```bash
+npx expo customize metro.config.js
+```
+
+Now, wrap the config with `withUnistylesConfig`:
+
+```diff lang="js" title="metro.config.js"
+const { getDefaultConfig } = require('expo/metro-config');
++const { withUnistylesConfig } = require('react-native-unistyles/metro');
+
+const config = getDefaultConfig(__dirname);
+
+-module.exports = config;
++module.exports = withUnistylesConfig(config);
+```
+
 ### Configure Babel Plugins
 
-Both `Unistyles` and `Reanimated` require a Babel plugin to work.  Since a `babel.config.js` file isn't created by default, we can generate it by running:
+`Reanimated` requires a Babel plugin to work. Since a `babel.config.js` file isn't created by default, we can generate it by running:
 
 ```bash
 npx expo customize babel.config.js
 ```
 
-Now, add the `unistyles` and `reanimated` plugins to your `babel.config.js`:
+Now, add the `reanimated` plugin to your `babel.config.js`:
 
 ```diff lang="ts"
 module.exports = function (api) {
@@ -67,9 +87,6 @@ module.exports = function (api) {
   return {
     presets: ['babel-preset-expo'],
 +    plugins: [
-+        ['react-native-unistyles/plugin', {
-+            root: 'app'
-+        }],
 +        ['react-native-reanimated/plugin']
 +    ]
   };
@@ -77,7 +94,7 @@ module.exports = function (api) {
 ```
 
 <Aside type="tip">
-To learn more about the Unistyles Babel plugin and its configuration options, check out the [documentation](/v3/other/babel-plugin).
+To learn more about the Metro integration, check out the [documentation](/v3/other/metro). Unistyles doesn't need a Babel plugin, its [Babel plugin](/v3/other/babel-plugin) is deprecated.
 </Aside>
 
 ### Modify app entry point

@@ -20,9 +20,23 @@ For Expo projects, simply follow the [official Expo guide](https://docs.expo.dev
 
 ## With Bare React Native
 
-For bare React Native projects, refer to the [official React guide](https://react.dev/learn/react-compiler#usage-with-babel) with one key adjustment:
+For bare React Native projects, refer to the [official React guide](https://react.dev/learn/react-compiler#usage-with-babel).
 
-Ensure that the React Compiler runs *after* the Unistyles Babel plugin. Failure to do so may result in errors because Unistyles needs to process `Variants` before the React Compiler does. You can read more about the Babel plugin [here](/v3/other/babel-plugin).
+## With the Metro integration or UnistylesPlugin
+
+The [Metro integration](/v3/other/metro) and [`UnistylesPlugin`](/v3/other/repack) don't run a Babel transform, so the order of your Babel plugins doesn't matter. Add `babel-plugin-react-compiler` like any other plugin and use the styles returned by `useVariants`:
+
+```tsx /variantStyles/
+const Button = ({ size }) => {
+    const variantStyles = styles.useVariants({ size })
+
+    return <View style={variantStyles.button} />
+}
+```
+
+## With the Babel plugin
+
+The [Babel plugin](/v3/other/babel-plugin) is deprecated since Unistyles 3.9.0. If you still use it, ensure that the React Compiler runs *after* the Unistyles Babel plugin. Failure to do so may result in errors because Unistyles needs to process `Variants` before the React Compiler does. You can read more about the Babel plugin [here](/v3/other/babel-plugin).
 
 Here's a sample configuration for your `babel.config.js`:
 
@@ -30,15 +44,11 @@ Here's a sample configuration for your `babel.config.js`:
 module.exports = function () {
   return {
     plugins: [
-      ['react-native-unistyles/plugin'], // Must run before react-compiler
+      ['react-native-unistyles/plugin', { root: 'src' }], // Must run before react-compiler
 +     'babel-plugin-react-compiler',
       // Add other plugins here
     ]
   }
 }
 ```
-
-<Aside type="caution">
-The experimental [Metro integration](/v3/other/metro) runs Unistyles after the plugins from your `babel.config.js`, so it can't run before `babel-plugin-react-compiler`. Keep using the Babel plugin if you add React Compiler to `plugins`.
-</Aside>
 </Seo>

@@ -87,8 +87,10 @@ Import the `useAnimatedVariantColor` hook to animate variant colors:
 ```tsx
 import { useAnimatedVariantColor } from 'react-native-unistyles/reanimated'
 
-// Select backgroundColor from styles.styleWithVariants (TypeScript will infer all possible color properties)
-const color = useAnimatedVariantColor(styles.styleWithVariants, 'backgroundColor')
+const variantStyles = styles.useVariants({ variant })
+
+// Select backgroundColor from variantStyles.styleWithVariants (TypeScript will infer all possible color properties)
+const color = useAnimatedVariantColor(variantStyles.styleWithVariants, 'backgroundColor')
 const animatedStyle = useAnimatedStyle(() => {
     return {
         // color is a SharedValue that can be animated however you want

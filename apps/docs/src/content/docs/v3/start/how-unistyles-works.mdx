@@ -38,9 +38,9 @@ What’s more important is that each `StyleSheet` is unique, tailored to the nee
     </span>
 </div>
 
-### 2. Babel plugin: dependencies
+### 2. Dependencies
 
-Unistyles needs to understand your `StyleSheet` dependencies in order to update them only when necessary. This process begins when Babel transforms your app’s code. At this stage, the Unistyles Babel plugin scans your `StyleSheets` and determines the dependencies for each style:
+Unistyles needs to understand your `StyleSheet` dependencies in order to update them only when necessary. With the [Metro integration](/v3/other/metro) or [`UnistylesPlugin`](/v3/other/repack), Unistyles records what each `StyleSheet` reads from the theme and the mini runtime while it runs. The deprecated Babel plugin scans your `StyleSheets` at build time instead and determines the dependencies for each style:
 
 ```ts
 const styles = StyleSheet.create((theme, rt) => ({
@@ -60,9 +60,9 @@ const styles = StyleSheet.create((theme, rt) => ({
 })
 ```
 
-### 3. Babel plugin: component factory
+### 3. Component factory
 
-As you already know, Unistyles has no components. This means your native view hierarchy remains exactly the same as in your original code. The Babel plugin processes your components through our component factory to borrow `refs` and bind the `ShadowNode` with `Unistyle`.
+As you already know, Unistyles has no components. This means your native view hierarchy remains exactly the same as in your original code. Your bundler swaps the `react-native` components for our component factory, which borrows `refs` and binds the `ShadowNode` with `Unistyle`. The Metro integration and `UnistylesPlugin` swap them when they resolve `react-native` imports, the deprecated Babel plugin when it transforms your files.
 
 You might be wondering, what is `Unistyle`? We refer to it as your `StyleSheet` style that has been parsed by the Unistyles compiler, and with the attached `C++` state.
 
@@ -76,7 +76,7 @@ You might be wondering, what is `Unistyle`? We refer to it as your `StyleSheet` 
     </span>
 </div>
 
-<Aside>Learn more on how the Babel plugin works [here](/v3/other/babel-plugin).</Aside>
+<Aside>Learn more on what the Metro integration does [here](/v3/other/metro#what-it-does), and how the Babel plugin works [here](/v3/other/babel-plugin).</Aside>
 
 ### 4. StyleSheet registry
 

@@ -199,12 +199,13 @@ The migration process is quite simple, but it can be tedious since you'll need t
     -       variant1: 'primary',
     -       variant2: 'secondary'
     -   })
-    +   styles.useVariants({
+    +   const variantStyles = styles.useVariants({
     +       variant1: 'primary',
     +       variant2: 'secondary'
     +   })
 
-        return <View style={styles.container} />
+    -   return <View style={styles.container} />
+    +   return <View style={variantStyles.container} />
     }
     ```
 

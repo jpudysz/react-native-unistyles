@@ -22,8 +22,12 @@ Your server components (like the root layout or pages) can still import and rend
 
 ### Next.js setup
 
-Unistyles relies on its Babel plugin, so Next.js has to compile your app with Babel and webpack instead of SWC and Turbopack.
+Next.js doesn't have a Unistyles integration yet, it relies on the Babel plugin, so Next.js has to compile your app with Babel and webpack instead of SWC and Turbopack.
 Next.js picks up a `babel.config.js` automatically. Set `root` to the folder with your components:
+
+<Aside>
+The [Babel plugin](/v3/other/babel-plugin) is deprecated since Unistyles 3.9.0 and prints a warning, but it keeps working with Next.js in Unistyles 3.x.
+</Aside>
 
 ```js title="babel.config.js"
 module.exports = api => {

@@ -53,42 +53,76 @@ We **strongly recommend** setting `edgeToEdgeEnabled=true` in your `android/grad
 You don't need `react-native-edge-to-edge` — the library is deprecated in favor of this built-in property. Learn more [here](/v3/other/dependencies).
 </Aside>
 
+### Set up your bundler
+
+Unistyles plugs into your bundler, so it can swap React Native components and track the dependencies of your StyleSheets. Pick the integration for your bundler:
+
+<Tabs>
+  <TabItem label="Metro">
+    Expo and bare React Native apps use Metro. Wrap your Metro config with `withUnistylesConfig`:
+
+    ```js title="metro.config.js"
+    const { getDefaultConfig } = require('expo/metro-config')
+    // or for bare React Native
+    // const { getDefaultConfig } = require('@react-native/metro-config')
+    const { withUnistylesConfig } = require('react-native-unistyles/metro')
+
+    const config = getDefaultConfig(__dirname)
+
+    module.exports = withUnistylesConfig(config)
+    ```
+
+    No `metro.config.js` in your Expo app? Create it with `npx expo customize metro.config.js`. Learn more about the [Metro integration](/v3/other/metro).
+  </TabItem>
+  <TabItem label="Re.Pack, Rspack, Rsbuild">
+    Add the experimental `UnistylesPlugin` to the plugins of your Rspack config:
+
+    ```js title="rspack.config.mjs"
+    import * as Repack from '@callstack/repack'
+    import { UnistylesPlugin } from 'react-native-unistyles/repack-plugin'
+
+    export default {
+        // other config
+        plugins: [
+            new Repack.RepackPlugin(),
+            new UnistylesPlugin()
+        ]
+    }
+    ```
+
+    For Rsbuild and Rspack on the web, check the [Re.Pack, Rspack and Rsbuild](/v3/other/repack) guide.
+  </TabItem>
+  <TabItem label="Other bundlers">
+    Next.js, Vite, webpack and other bundlers don't have an integration yet. Use the [Babel plugin](/v3/other/babel-plugin), it's deprecated since Unistyles 3.9.0, but keeps working in 3.x:
+
+    ```js title="babel.config.js"
+    module.exports = function (api) {
+      api.cache(true)
+
+      return {
+        // other config
+        plugins: [
+            // other plugins
+            ['react-native-unistyles/plugin', {
+                // pass root folder of your application
+                // all files under this folder will be processed by the Babel plugin
+                root: 'src'
+            }]
+        ]
+      }
+    }
+    ```
+
+    Check the Babel plugin [options](/v3/other/babel-plugin#extra-configuration).
+  </TabItem>
+</Tabs>
+
 <Aside>
-Using Metro? You can set up Unistyles in `metro.config.js` instead of the Babel plugin, without any options. Check the experimental [Metro integration](/v3/other/metro) and skip the Babel plugin step below, Unistyles throws if both are set up.
+Use the styles returned by `useVariants`: `const variantStyles = styles.useVariants({ size })`. The integrations don't change `styles`, see [Variants](/v3/references/variants#selecting-variants).
 </Aside>
 
-Add babel plugin:
-
-```js title="babel.config.js"
-module.exports = function (api) {
-  api.cache(true)
-
-  return {
-    // for bare React Native
-    // presets: ['module:@react-native/babel-preset'],
-
-    // or for Expo
-    // presets: ['babel-preset-expo'],
-
-    // other config
-    plugins: [
-        // other plugins
-        ['react-native-unistyles/plugin', {
-            // pass root folder of your application
-            // all files under this folder will be processed by the Babel plugin
-            // if you need to include more folders, or customize discovery process
-            // check available babel options
-            root: 'src'
-        }]
-    ]
-  }
-}
-```
-
-<Aside>
-See additional Babel plugin configuration options [here](/v3/other/babel-plugin#extra-configuration).
-
-Learn why you need Babel plugin [here](/v3/other/babel-plugin).
+<Aside type="caution" title="Babel plugin is deprecated">
+`react-native-unistyles/plugin` is deprecated since Unistyles 3.9.0 and will be removed in 4.0. Moving from the Babel plugin? Check [Migrating from the Babel plugin](/v3/other/metro#migrating-from-the-babel-plugin).
 </Aside>
 
 Finish installation based on your platform:
@@ -122,7 +156,7 @@ Finish installation based on your platform:
     Then follow [SSR guide](/v3/guides/server-side-rendering).
 
     <Aside type="caution" title="Babel only">
-      You need to disable SWC and rely on Babel for transpiling your code.
+      Next.js has no Unistyles integration yet, it runs the deprecated Babel plugin. Disable SWC and rely on Babel for transpiling your code.
     </Aside>
   </TabItem>
 </Tabs>

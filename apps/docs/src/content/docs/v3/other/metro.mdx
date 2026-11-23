@@ -1,6 +1,6 @@
 ---
 title: Metro integration
-description: Set up Unistyles in metro.config.js instead of the Babel plugin
+description: Set up Unistyles in metro.config.js, the replacement of the deprecated Babel plugin
 ---
 
 import { Aside } from '@astrojs/starlight/components'
@@ -9,12 +9,12 @@ import Seo from '../../../../components/Seo.astro'
 <Seo
     seo={{
         title: 'Unistyles Metro integration',
-        description: 'Set up Unistyles in metro.config.js instead of the Babel plugin'
+        description: 'Set up Unistyles in metro.config.js, the replacement of the deprecated Babel plugin'
     }}
 >
 
-<Aside type="caution" title="Experimental">
-The Metro integration is experimental. The [Babel plugin](/v3/other/babel-plugin) stays the default and keeps working as before.
+<Aside>
+Since Unistyles 3.9.0, the Metro integration is the recommended setup for apps bundled with Metro (Expo and bare React Native). The [Babel plugin](/v3/other/babel-plugin) is deprecated and will be removed in Unistyles 4.0, see [Migrating from the Babel plugin](#migrating-from-the-babel-plugin).
 </Aside>
 
 `react-native-unistyles/metro` replaces the Babel plugin with a single line in `metro.config.js`. There is nothing to configure: no `root`, `autoProcessImports`, `autoProcessPaths` or `autoRemapImports`.
@@ -82,9 +82,22 @@ The codemod adds semicolons to the lines it changes, run your formatter afterwar
 
 To render a raw React Native component, import it from `react-native/index.js`, which Unistyles doesn't swap.
 
+### React Compiler
+
+Add React Compiler as usual, eg. with `experiments.reactCompiler` in Expo. The Metro integration doesn't run a Babel transform, so the order of your Babel plugins doesn't matter. Use the styles returned by `useVariants`, see [React Compiler](/v3/guides/react-compiler).
+
+### Migrating from the Babel plugin
+
+1. Wrap your `metro.config.js` with `withUnistylesConfig`, see above.
+2. Remove `react-native-unistyles/plugin` from your `babel.config.js`. Its options (`root`, `autoProcessImports`, `autoProcessPaths`, `autoRemapImports` and `debug`) have no counterpart, the Metro integration doesn't need them.
+3. Use the styles returned by `useVariants`, the codemod converts your components, see [Variants](#variants).
+4. Restart Metro with a clear cache (`npx expo start --clear` or `npx react-native start --reset-cache`).
+
+Compared with the Babel plugin, a StyleSheet recomputes more styles, see [What it does](#what-it-does), and libraries in `node_modules` get the swapped components too.
+
 ### Limitations
 
-- Metro only. Re.Pack, Rspack and Rsbuild have [`UnistylesPlugin`](/v3/other/repack), Vite, Next.js and other web bundlers keep using the [Babel plugin](/v3/other/babel-plugin)
+- Metro only. Re.Pack, Rspack and Rsbuild have [`UnistylesPlugin`](/v3/other/repack). Next.js, Vite, webpack and other bundlers don't have an integration yet, they keep the deprecated [Babel plugin](/v3/other/babel-plugin), which works until Unistyles 4.0
 - A StyleSheet recomputes more styles than with the Babel plugin, see [What it does](#what-it-does)
 - `styles.useVariants()` has no effect when the returned styles aren't used, `styles` ignores its variants (also the default ones), see [Variants](#variants)
 - Jest doesn't use Metro, your [testing setup](/v3/start/testing) stays the same
