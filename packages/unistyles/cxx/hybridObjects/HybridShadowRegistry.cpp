@@ -59,6 +59,7 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
 
     auto parser = parser::Parser(this->_unistylesRuntime);
     std::vector<std::shared_ptr<core::UnistyleData>> unistylesData{};
+    bool hasOutdatedStyles = false;
 
     // create unistyleData based on wrappers
     for (size_t i = 0; i < unistyleWrappers.size(); i++) {
@@ -67,6 +68,11 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
         auto rawStyleObj = rawStyle.getObject(rt);
         auto secrets = getUnistyleSecrets(rt, rawStyleObj, unistyle);
         core::Variants variants{};
+
+        // a style made before a theme or runtime change, eg. from an element kept by the React Compiler
+        if (rawStyleObj.hasNativeState<core::UnistyleWrapper>(rt)) {
+            hasOutdatedStyles |= rawStyleObj.getNativeState<core::UnistyleWrapper>(rt)->revision != unistyle->revision;
+        }
 
         if (secrets.has_value()) {
             auto rawVariants = secrets->getProperty(rt, helpers::STYLESHEET_VARIANTS.c_str());
@@ -128,6 +134,10 @@ jsi::Value HybridShadowRegistry::link(jsi::Runtime &rt, const jsi::Value &thisVa
             initialScopedUpdate = std::move(update);
             shouldCommit = true;
         }
+    } else if (hasOutdatedStyles) {
+        // React mounted the view with the old values
+        initialScopedUpdate = parser.parseStylesToShadowTreeUpdates(rt, unistylesData);
+        shouldCommit = true;
     }
 
     registry.linkShadowNodeWithUnistyle(

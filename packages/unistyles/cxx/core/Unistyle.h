@@ -38,6 +38,8 @@ struct Unistyle {
     // and should be recomputed when mounting new node
     bool isDirty = false;
 
+    uint64_t revision = 0;
+
     inline void addDependency(UnistyleDependency dependency) {
         // we can't add dependencies if unistyle is sealed
         if (this->_isSealed) {
