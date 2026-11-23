@@ -4,5 +4,5 @@
     "types": ["jest", "node"]
   },
   "include": ["."],
-  "exclude": ["fixtures/**/*.mjs"]
+  "exclude": ["__tests__/fixtures/**/*.mjs"]
 }

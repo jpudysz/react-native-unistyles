@@ -40,7 +40,7 @@ describe('withUnistylesConfig', () => {
     it('should let the Babel plugin know it runs next to the Metro integration', () => {
         withUnistylesConfig(createConfig())
 
-        expect(process.env[METRO_ENV]).toBe('true')
+        expect(process.env[METRO_ENV]).toBe('metro')
     })
 
     it('should keep the rest of the config', () => {

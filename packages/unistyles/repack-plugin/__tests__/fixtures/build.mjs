@@ -39,6 +39,11 @@ const createConfig = (name, config) => ({
     // like Re.Pack's, for a platform without package.json#exports
     resolve: {
         mainFields: ['react-native', 'browser', 'main'],
+        // aliases of react-native, eg. of a design system: the plugin swaps them like react-native
+        alias: {
+            '@ui/native': 'react-native',
+            '@ui/view$': 'react-native/Libraries/Components/View/View',
+        },
         exportsFields: [],
         extensions: [
             '.ios.ts',

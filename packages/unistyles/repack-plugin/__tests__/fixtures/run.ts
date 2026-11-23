@@ -63,6 +63,7 @@ export type AppBuild = {
         unistylesModuleBuild: Registry
         unistylesCommonjsBuild: Registry
         unistylesComponents: Pick<Probe, 'View' | 'Text' | 'Platform'>
+        aliased: Pick<Probe, 'View' | 'Platform' | 'DeepView' | 'PixelRatio'>
     }
 }
 
@@ -71,8 +72,8 @@ export type FederationBuild = {
     remote: Bundle
     globals: Globals
     exports: {
-        host: Probe & { StyleSheet: Registry; library: Probe; reanimated: EntryPoint }
-        remote: Probe & { StyleSheet: Registry; library: Probe; reanimated: EntryPoint }
+        host: Probe & { StyleSheet: Registry; library: Probe; reanimated: EntryPoint; diagnostics: EntryPoint }
+        remote: Probe & { StyleSheet: Registry; library: Probe; reanimated: EntryPoint; diagnostics: EntryPoint }
     }
 }
 

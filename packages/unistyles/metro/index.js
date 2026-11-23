@@ -60,6 +60,7 @@ var REACT_NATIVE_COMPONENT_NAMES = [
   // TouchableWithoutFeedback - can't accept a ref
 ];
 var METRO_ENV = "UNISTYLES_METRO";
+var METRO_INTEGRATION = "metro";
 
 // metro/src/resolver.ts
 var import_node_fs = __toESM(require("node:fs"));
@@ -73,8 +74,10 @@ var getRealPath = (filePath) => {
     return filePath;
   }
 };
+var isSourceFile = (resolution) => resolution.type === "sourceFile" && "filePath" in resolution;
 var createResolveRequest = ({
   unistylesRoot,
+  integration,
   upstream,
   path: path2 = import_node_path.default,
   realpath = getRealPath
@@ -143,18 +146,18 @@ var createResolveRequest = ({
       copies.set(copyRoot, realCopyRoot);
       if (realCopyRoot !== unistylesRoot) {
         console.warn(
-          `Unistyles \u{1F984}: Found a second copy of react-native-unistyles at ${realCopyRoot}, withUnistylesConfig handles only ${unistylesRoot}. Styles of the second copy won't update, make sure that your app installs react-native-unistyles once.`
+          `Unistyles \u{1F984}: Found a second copy of react-native-unistyles at ${realCopyRoot}, ${integration} handles only ${unistylesRoot}. Styles of the second copy won't update, make sure that your app installs react-native-unistyles once.`
         );
       }
     }
     const copyPath = filePath.slice(copyRoot.length + 1);
     return copies.get(copyRoot) === unistylesRoot && !copyPath.startsWith(`node_modules${sep}`) ? path2.join(unistylesRoot, copyPath) : filePath;
   };
-  const withTrackedDependencies = (resolution) => resolution.type === "sourceFile" && "filePath" in resolution && resolution.filePath === trackDependencies ? { type: "sourceFile", filePath: trackDependenciesWithMetro } : resolution;
+  const withTrackedDependencies = (resolution) => isSourceFile(resolution) && resolution.filePath === trackDependencies ? { type: "sourceFile", filePath: trackDependenciesWithMetro } : resolution;
   return (context, moduleName, platform) => {
     const resolve = upstream ?? context.resolveRequest;
     const upstreamResolution = resolve(context, moduleName, platform);
-    if (upstreamResolution.type !== "sourceFile" || !("filePath" in upstreamResolution)) {
+    if (!isSourceFile(upstreamResolution)) {
       return upstreamResolution;
     }
     const filePath = toUnistylesPath(upstreamResolution.filePath);
@@ -176,13 +179,14 @@ var createResolveRequest = ({
 
 // metro/src/index.ts
 var withUnistylesConfig = (config) => {
-  process.env[METRO_ENV] = "true";
+  process.env[METRO_ENV] = METRO_INTEGRATION;
   return {
     ...config,
     resolver: {
       ...config.resolver,
       resolveRequest: createResolveRequest({
         unistylesRoot: import_node_fs2.default.realpathSync(import_node_path2.default.join(__dirname, "..")),
+        integration: "withUnistylesConfig",
         upstream: config.resolver?.resolveRequest
       })
     }

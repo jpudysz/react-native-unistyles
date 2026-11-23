@@ -99,6 +99,9 @@ describe('UnistylesPlugin with Module Federation', () => {
 
         expect(host.reanimated.source).toBe('src')
         expect(remote.reanimated).toEqual(host.reanimated)
+        // every entry point of package.json#exports, not only the ones the plugin knew about
+        expect(host.diagnostics.source).toBe('src')
+        expect(remote.diagnostics).toEqual(host.diagnostics)
     })
 
     it('should share one Unistyles registry between the host and the remote', () => {

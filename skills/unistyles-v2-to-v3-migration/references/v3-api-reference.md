@@ -673,7 +673,7 @@ plugins: [
 ]
 ```
 
-`RepackUnistylePlugin` is removed.
+`RepackUnistylePlugin` is deprecated since 3.9.0 (it still works and warns) and will be removed in 4.0.
 
 ---
 

@@ -177,7 +177,11 @@ jest.doMock(
     { virtual: true },
 )
 
-const resolveRequest = createResolveRequest({ unistylesRoot: UNISTYLES_ROOT, upstream })
+const resolveRequest = createResolveRequest({
+    unistylesRoot: UNISTYLES_ROOT,
+    integration: 'withUnistylesConfig',
+    upstream,
+})
 
 const resolveWithMetro = ({ source, imported }: ImportBinding) => {
     const resolution = resolveRequest({ originModulePath: APP_ORIGIN, resolveRequest: upstream }, source, 'ios') as {

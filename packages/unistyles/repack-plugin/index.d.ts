@@ -1,4 +1,5 @@
-import type { Compiler, RspackPluginInstance } from '@rspack/core'
+import type { Compiler, LoaderContext, RspackPluginInstance } from '@rspack/core'
+import type { UnistylesPluginOptions } from 'react-native-unistyles/plugin'
 
 /**
  * Experimental, the Re.Pack (Rspack) counterpart of react-native-unistyles/metro,
@@ -25,3 +26,35 @@ export declare class UnistylesPlugin implements RspackPluginInstance {
     constructor()
     apply(compiler: Compiler): void
 }
+
+/**
+ * @deprecated since 3.9.0, removed in 4.0, use `UnistylesPlugin` or the Babel plugin in babel.config.js
+ */
+export declare const BASE_REPACK_EXCLUDE_PATHS: Array<RegExp>
+
+interface ConstructorParams {
+    ruleExcludePaths?: Array<RegExp>
+    unistylesPluginOptions?: UnistylesPluginOptions
+}
+
+/**
+ * @deprecated since 3.9.0, removed in 4.0, use `UnistylesPlugin` or the Babel plugin in babel.config.js
+ */
+export declare class RepackUnistylePlugin implements RspackPluginInstance {
+    private ruleExcludePaths
+    private unistylesPluginOptions
+    constructor({ ruleExcludePaths, unistylesPluginOptions }?: ConstructorParams)
+    apply(compiler: Compiler): void
+}
+
+interface UnistylesLoaderOptions {
+    babelPlugins?: Array<string>
+    unistylesPluginOptions?: UnistylesPluginOptions
+}
+
+/**
+ * The loader of the deprecated `RepackUnistylePlugin`
+ */
+declare function unistylesLoader(this: LoaderContext<UnistylesLoaderOptions>, source: string): void
+
+export default unistylesLoader

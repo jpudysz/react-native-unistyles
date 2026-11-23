@@ -53,7 +53,7 @@ If using React Compiler, the Unistyles plugin MUST come BEFORE React Compiler in
 
 Since 3.6.0, Metro apps can use the experimental zero-config Metro integration instead: `module.exports = withUnistylesConfig(getDefaultConfig(__dirname))` with `withUnistylesConfig` from `react-native-unistyles/metro`, and no Unistyles entry in `babel.config.js` (having both throws). It needs no `root`/`autoProcess*` options, covers `node_modules` and tracks StyleSheet dependencies at runtime (no Babel transform). With it, `useVariants` must use the returned styles: `const variantStyles = styles.useVariants({ size })`. The Babel plugin stays the default.
 
-If the app is bundled with Re.Pack, keep the plugin in `babel.config.js` (Re.Pack's `babel-swc-loader` runs it), or use the experimental `UnistylesPlugin` from `react-native-unistyles/repack-plugin` in `rspack.config.mjs` instead, with no options and no Babel plugin. `RepackUnistylePlugin` is removed.
+If the app is bundled with Re.Pack, keep the plugin in `babel.config.js` (Re.Pack's `babel-swc-loader` runs it), or use the experimental `UnistylesPlugin` from `react-native-unistyles/repack-plugin` in `rspack.config.mjs` instead, with no options and no Babel plugin. `RepackUnistylePlugin` is deprecated since 3.9.0 (it still works and warns) and will be removed in 4.0.
 
 ### Step 2: Replace UnistylesRegistry with StyleSheet.configure
 

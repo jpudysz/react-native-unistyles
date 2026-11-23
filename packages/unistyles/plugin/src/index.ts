@@ -11,6 +11,7 @@ import {
     REACT_NATIVE_COMPONENT_NAMES,
     REPLACE_WITH_UNISTYLES_EXOTIC_PATHS,
     REPLACE_WITH_UNISTYLES_PATHS,
+    RSPACK_INTEGRATION,
 } from './consts'
 import { handleExoticImport } from './exotic'
 import { addUnistylesImport, addUnistylesRequire, isInsideNodeModules } from './import'
@@ -41,10 +42,12 @@ export default function (): PluginObj<UnistylesPluginPass> {
         visitor: {
             Program: {
                 enter(path, state) {
-                    // the Metro integration replaces this plugin, it would also process the StyleSheets and swap the imports
+                    // the Metro and Rspack integrations replace this plugin, it would also process the StyleSheets and swap the imports
                     if (process.env[METRO_ENV]) {
                         throw new Error(
-                            'Unistyles 🦄: react-native-unistyles/metro is enabled in metro.config.js, remove react-native-unistyles/plugin from babel.config.js',
+                            process.env[METRO_ENV] === RSPACK_INTEGRATION
+                                ? 'Unistyles 🦄: UnistylesPlugin of react-native-unistyles/repack-plugin is enabled in your Rspack config, remove react-native-unistyles/plugin from babel.config.js and RepackUnistylePlugin from your Rspack config'
+                                : 'Unistyles 🦄: react-native-unistyles/metro is enabled in metro.config.js, remove react-native-unistyles/plugin from babel.config.js',
                         )
                     }
 

@@ -106,7 +106,7 @@ export default {
 
 - Rsbuild (web): `tools: { rspack: { plugins: [new UnistylesPlugin()] } }` with `resolve.alias: { 'react-native': 'react-native-web' }`
 - Module Federation: share `react-native-unistyles` and `react-native-unistyles/` (trailing slash, the swapped components) like `react-native` in every container. In Rsbuild use the `moduleFederation` option, not `ModuleFederationPlugin` in `tools.rspack`
-- `RepackUnistylePlugin` is removed. Re.Pack apps can keep the Babel plugin in `babel.config.js` instead, Re.Pack's `babel-swc-loader` runs it
+- `RepackUnistylePlugin` is deprecated since 3.9.0 (it still works and warns) and will be removed in 4.0. Re.Pack apps can keep the Babel plugin in `babel.config.js` instead, Re.Pack's `babel-swc-loader` runs it
 
 ### React Compiler ordering
 

@@ -71,6 +71,10 @@ export const NATIVE_COMPONENTS_PATHS: Pick<RemapConfig, 'imports'> = {
 }
 
 /**
- * set by react-native-unistyles/metro in the Metro process, its workers inherit it
+ * set by react-native-unistyles/metro in the Metro process and by UnistylesPlugin of react-native-unistyles/repack-plugin
+ * in the Rspack process, their workers inherit it, the value names the integration
  */
 export const METRO_ENV = 'UNISTYLES_METRO'
+
+export const METRO_INTEGRATION = 'metro'
+export const RSPACK_INTEGRATION = 'rspack'

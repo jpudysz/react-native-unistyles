@@ -1,6 +1,8 @@
 // the parts of Metro's API used here, without depending on a Metro version
 
-export type Resolution = { type: 'sourceFile'; filePath: string } | { type: Exclude<string, 'sourceFile'> }
+export type SourceFileResolution = { type: 'sourceFile'; filePath: string }
+
+export type Resolution = SourceFileResolution | { type: Exclude<string, 'sourceFile'> }
 
 export type ResolutionContext = {
     originModulePath: string

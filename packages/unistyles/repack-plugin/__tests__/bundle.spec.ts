@@ -118,6 +118,15 @@ describe('UnistylesPlugin bundle', () => {
         expect(app.View.registryId).toBe(unistylesRoot.StyleSheet.id)
     })
 
+    it('should swap an alias of react-native like react-native', () => {
+        const { aliased, app } = build.exports
+
+        expect(aliased.View).toEqual(app.View)
+        expect(aliased.Platform).toEqual({ OS: 'ios' })
+        expect(aliased.DeepView).toEqual(app.View)
+        expect(aliased.PixelRatio).toEqual({ kind: 'rn-pixelratio' })
+    })
+
     it('should expose the Unistyles components to the app through react-native', () => {
         const { unistylesComponents, app } = build.exports
 

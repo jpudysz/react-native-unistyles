@@ -393,7 +393,7 @@ module.exports = {
 Re.Pack runs your `babel.config.js` through `@callstack/repack/babel-swc-loader`, the loader of the Re.Pack 5 config templates. Make sure your `rspack.config.mjs` transforms your files with it.
 
 <Aside>
-`RepackUnistylePlugin` is removed. To drop the Babel plugin, use the experimental [Re.Pack integration](/v3/other/repack) (`UnistylesPlugin` in `rspack.config.mjs`) instead. Don't use both: Unistyles throws an error if the Babel plugin runs next to `UnistylesPlugin`.
+`RepackUnistylePlugin` is deprecated since Unistyles 3.9.0 and will be removed in 4.0. It still works and prints a warning, move to the Babel plugin in `babel.config.js` above, or drop the Babel plugin with the experimental [Re.Pack integration](/v3/other/repack) (`UnistylesPlugin` in `rspack.config.mjs`). Don't use `UnistylesPlugin` together with the Babel plugin or `RepackUnistylePlugin`: Unistyles throws an error if the Babel plugin runs next to `UnistylesPlugin`.
 </Aside>
 
 </Seo>

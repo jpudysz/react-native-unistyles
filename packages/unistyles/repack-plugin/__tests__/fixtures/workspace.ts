@@ -18,6 +18,13 @@ module.exports = {
 }
 `
 
+// package.json#exports of Unistyles: subpath and module, `.` first
+const ENTRY_POINTS: Array<[subpath: string, source: string]> = [
+    ['.', 'index'],
+    ['./reanimated', 'reanimated/index'],
+    ['./diagnostics', 'diagnostics/index'],
+]
+
 const packageJson = (name: string, fields: Record<string, unknown> = {}) =>
     JSON.stringify({ name, version: '1.0.0', main: 'index.js', ...fields })
 
@@ -76,20 +83,17 @@ const unistyles = (): Record<string, string> => {
         [`${root}/package.json`]: packageJson('react-native-unistyles', {
             main: 'lib/commonjs/index.js',
             browser: 'lib/module/index.js',
+            // the plugin aliases the entry points to their `react-native` source, the builds don't read exports
+            exports: Object.fromEntries(
+                ENTRY_POINTS.map(([subpath, source]) => [
+                    subpath,
+                    { browser: `./lib/module/${source}.js`, 'react-native': `./src/${source}.ts` },
+                ]),
+            ),
         }),
         [`${root}/src/index.ts`]: `
 exports.source = 'src'
 exports.StyleSheet = require('./core/registry').registry
-`,
-        // an entry point of Unistyles, like the `browser` condition on the web it leads to lib/module
-        [`${root}/reanimated/package.json`]: JSON.stringify({
-            main: '../lib/commonjs/reanimated/index.js',
-            browser: '../lib/module/reanimated/index.js',
-        }),
-        [`${root}/src/reanimated/index.ts`]: `
-${NEXT_ID}
-exports.id = nextId()
-exports.source = 'src'
 `,
         // Unistyles imports react-native like any other package, but it gets the real one
         [`${root}/src/probe.ts`]: PROBE,
@@ -141,6 +145,19 @@ new Set(Object.keys(ReactNative).concat(Object.keys(UNISTYLES_COMPONENTS))).forE
 `,
     }
 
+    // the entry points of Unistyles, like the `browser` condition on the web their package.json leads to lib/module
+    for (const [subpath, source] of ENTRY_POINTS.slice(1)) {
+        files[`${root}/${subpath.slice(2)}/package.json`] = JSON.stringify({
+            main: `../lib/commonjs/${source}.js`,
+            browser: `../lib/module/${source}.js`,
+        })
+        files[`${root}/src/${source}.ts`] = `
+${NEXT_ID}
+exports.id = nextId()
+exports.source = 'src'
+`
+    }
+
     for (const name of ['View', 'Text']) {
         files[`${root}/src/components/native/${name}.ts`] = `
 const { ${name}: Native${name} } = require('react-native')
@@ -162,10 +179,12 @@ exports.StyleSheet = require('./core/registry').registry
         files[`${root}/lib/${build}/core/registry.js`] = `
 exports.registry = { id: 'lib/${build}', source: 'lib/${build}', trackDependencies: false }
 `
-        files[`${root}/lib/${build}/reanimated/index.js`] = `
+        for (const [, source] of ENTRY_POINTS.slice(1)) {
+            files[`${root}/lib/${build}/${source}.js`] = `
 exports.id = 'lib/${build}'
 exports.source = 'lib/${build}'
 `
+        }
     }
 
     return files
@@ -196,6 +215,13 @@ module.exports = {
     unistylesModuleBuild: require('react-native-unistyles/lib/module/core/registry').registry,
     unistylesCommonjsBuild: require('react-native-unistyles/lib/commonjs').StyleSheet,
     unistylesComponents: { View: RN.View, Text: RN.Text, Platform: RN.Platform },
+    // aliases of react-native in the config of the app, see build.mjs
+    aliased: {
+        View: require('@ui/native').View,
+        Platform: require('@ui/native').Platform,
+        DeepView: require('@ui/view').default,
+        PixelRatio: require('@ui/native/Libraries/Utilities/PixelRatio'),
+    },
 }
 `,
 })
@@ -212,6 +238,7 @@ module.exports = import('remote/Screen').then((remote) => ({
         View: RN.View,
         StyleSheet,
         reanimated: require('react-native-unistyles/reanimated'),
+        diagnostics: require('react-native-unistyles/diagnostics'),
         library: require('some-library'),
     },
     remote: remote.default || remote,
@@ -226,6 +253,7 @@ module.exports = {
     View: RN.View,
     StyleSheet,
     reanimated: require('react-native-unistyles/reanimated'),
+    diagnostics: require('react-native-unistyles/diagnostics'),
     library: require('some-library'),
 }
 `,
