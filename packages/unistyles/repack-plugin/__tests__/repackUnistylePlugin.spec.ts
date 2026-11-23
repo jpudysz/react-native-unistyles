@@ -1,6 +1,7 @@
 // the deprecated RepackUnistylePlugin keeps working until Unistyles 4.0
 import type { Compiler } from '@rspack/core'
 
+import { REPACK_LOADER_CALLER } from '../../plugin/src/consts'
 import { BASE_REPACK_EXCLUDE_PATHS, RepackUnistylePlugin } from '../src/repackUnistylePlugin'
 
 const createCompiler = () => ({ options: { module: { rules: [] as Array<any> } } }) as unknown as Compiler
@@ -41,6 +42,36 @@ describe('RepackUnistylePlugin', () => {
             expect(warn.mock.calls[0]![0]).toContain(
                 'RepackUnistylePlugin is deprecated and will be removed in Unistyles 4.0',
             )
+            expect(warn.mock.calls[0]![0]).toContain('Replace it with UnistylesPlugin')
+            // the Babel plugin is deprecated as well, the warning doesn't suggest it
+            expect(warn.mock.calls[0]![0]).not.toContain('babel.config.js')
+        })
+    })
+
+    it('should run the Babel plugin with its own caller, the Babel plugin skips its deprecation warning', () => {
+        jest.isolateModules(() => {
+            const transform = jest.fn((_code, _options, callback) => callback(null, { code: 'transformed' }))
+
+            jest.doMock('@babel/core', () => ({ transform }))
+
+            const { unistylesLoader } = require('../src/loader')
+            const callback = jest.fn()
+
+            unistylesLoader.call(
+                {
+                    cacheable: () => {},
+                    async: () => callback,
+                    getOptions: () => ({}),
+                    resourcePath: '/app/src/App.tsx',
+                },
+                `import { View } from 'react-native'`,
+            )
+
+            expect(transform.mock.calls[0]![1]).toMatchObject({
+                caller: { name: REPACK_LOADER_CALLER },
+                plugins: ['react-native-unistyles/plugin'],
+            })
+            expect(callback).toHaveBeenCalledWith(null, 'transformed', undefined)
         })
     })
 

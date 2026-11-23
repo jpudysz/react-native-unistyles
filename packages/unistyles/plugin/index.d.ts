@@ -35,6 +35,14 @@ export interface RemapConfig {
     imports: Array<RemapImport>
 }
 
+/**
+ * Options of the Babel plugin `react-native-unistyles/plugin`
+ *
+ * @deprecated since 3.9.0, removed in 4.0. With Metro use `withUnistylesConfig` from `react-native-unistyles/metro`,
+ * with Re.Pack, Rspack or Rsbuild use `UnistylesPlugin` from `react-native-unistyles/repack-plugin`, both have no options.
+ * Other bundlers (eg. Next.js, Vite or webpack) don't have a replacement yet, the Babel plugin keeps working in 3.x.
+ * See https://www.unistyl.es/v3/other/babel-plugin
+ */
 export interface UnistylesPluginOptions {
     /**
      * Required from RC.5
@@ -127,3 +135,15 @@ export interface UnistylesPluginOptions {
      */
     localPath?: string
 }
+
+/**
+ * The Babel plugin of Unistyles, add it to `plugins` of babel.config.js: `['react-native-unistyles/plugin', { root: 'src' }]`
+ *
+ * @deprecated since 3.9.0, removed in 4.0. With Metro use `withUnistylesConfig` from `react-native-unistyles/metro`,
+ * with Re.Pack, Rspack or Rsbuild use `UnistylesPlugin` from `react-native-unistyles/repack-plugin`.
+ * Other bundlers (eg. Next.js, Vite or webpack) don't have a replacement yet, the Babel plugin keeps working in 3.x.
+ * See https://www.unistyl.es/v3/other/babel-plugin
+ */
+declare function unistylesPlugin(api?: object): { name: string; visitor: object }
+
+export default unistylesPlugin

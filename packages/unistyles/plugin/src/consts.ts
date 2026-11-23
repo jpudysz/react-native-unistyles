@@ -78,3 +78,8 @@ export const METRO_ENV = 'UNISTYLES_METRO'
 
 export const METRO_INTEGRATION = 'metro'
 export const RSPACK_INTEGRATION = 'rspack'
+
+/**
+ * Babel's `caller.name` of the loader of the deprecated RepackUnistylePlugin, it warns about itself
+ */
+export const REPACK_LOADER_CALLER = 'react-native-unistyles/repack-plugin'

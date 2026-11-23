@@ -93,6 +93,35 @@ var NATIVE_COMPONENTS_PATHS = {
 };
 var METRO_ENV = "UNISTYLES_METRO";
 var RSPACK_INTEGRATION = "rspack";
+var REPACK_LOADER_CALLER = "react-native-unistyles/repack-plugin";
+
+// plugin/src/deprecation.ts
+var DEPRECATED = "Unistyles \u{1F984}: react-native-unistyles/plugin is deprecated and will be removed in Unistyles 4.0.";
+var METRO = "With Metro, remove it from babel.config.js and wrap your metro.config.js with withUnistylesConfig from react-native-unistyles/metro, see https://www.unistyl.es/v3/other/metro";
+var RSPACK = "With Re.Pack, Rspack or Rsbuild, use UnistylesPlugin from react-native-unistyles/repack-plugin, see https://www.unistyl.es/v3/other/repack";
+var NO_REPLACEMENT = "Other bundlers (eg. Next.js, Vite or webpack) don't have a replacement yet, the Babel plugin keeps working there in Unistyles 3.x.";
+var getDeprecationMessage = (callerName) => callerName === "metro" ? `${DEPRECATED} ${METRO}` : [DEPRECATED, `${METRO}.`, `${RSPACK}.`, NO_REPLACEMENT].join(" ");
+var hasWarned = false;
+var warnDeprecation = (api) => {
+  if (hasWarned) {
+    return;
+  }
+  if (process.env.NODE_ENV === "babel-test") {
+    return;
+  }
+  if (process.env[METRO_ENV]) {
+    return;
+  }
+  if (process.env.JEST_WORKER_ID && process.env.JEST_WORKER_ID !== "1") {
+    return;
+  }
+  const callerName = api?.caller?.((caller) => caller?.name);
+  if (callerName === REPACK_LOADER_CALLER) {
+    return;
+  }
+  hasWarned = true;
+  console.warn(getDeprecationMessage(callerName));
+};
 
 // plugin/src/exotic.ts
 var t2 = __toESM(require("@babel/types"));
@@ -836,13 +865,14 @@ function extractVariants(path2, state) {
 }
 
 // plugin/src/index.ts
-function index_default() {
+function index_default(api) {
   if (process.env.NODE_ENV === "test") {
     return {
       name: "babel-react-native-unistyles",
       visitor: {}
     };
   }
+  warnDeprecation(api);
   return {
     name: "babel-react-native-unistyles",
     visitor: {

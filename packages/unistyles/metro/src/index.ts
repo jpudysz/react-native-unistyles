@@ -7,7 +7,7 @@ import { METRO_ENV, METRO_INTEGRATION } from '../../plugin/src/consts'
 import { createResolveRequest } from './resolver'
 
 /**
- * Experimental, replaces `react-native-unistyles/plugin` in babel.config.js
+ * Replaces the deprecated `react-native-unistyles/plugin` in babel.config.js
  * Every `react-native` import (also from node_modules) resolves to Unistyles components
  * and Unistyles records the dependencies of every StyleSheet while it runs, there is no Babel transform
  */
