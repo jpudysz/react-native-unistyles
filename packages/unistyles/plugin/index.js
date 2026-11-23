@@ -92,6 +92,7 @@ var NATIVE_COMPONENTS_PATHS = {
   ]
 };
 var METRO_ENV = "UNISTYLES_METRO";
+var RSPACK_INTEGRATION = "rspack";
 
 // plugin/src/exotic.ts
 var t2 = __toESM(require("@babel/types"));
@@ -849,7 +850,7 @@ function index_default() {
         enter(path2, state) {
           if (process.env[METRO_ENV]) {
             throw new Error(
-              "Unistyles \u{1F984}: react-native-unistyles/metro is enabled in metro.config.js, remove react-native-unistyles/plugin from babel.config.js"
+              process.env[METRO_ENV] === RSPACK_INTEGRATION ? "Unistyles \u{1F984}: UnistylesPlugin of react-native-unistyles/repack-plugin is enabled in your Rspack config, remove react-native-unistyles/plugin from babel.config.js and RepackUnistylePlugin from your Rspack config" : "Unistyles \u{1F984}: react-native-unistyles/metro is enabled in metro.config.js, remove react-native-unistyles/plugin from babel.config.js"
             );
           }
           if (!state.opts.root) {

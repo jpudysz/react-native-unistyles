@@ -1,7 +1,5 @@
 import type { LoaderContext } from '@rspack/core'
 
-import { transform } from '@babel/core'
-
 import type { UnistylesPluginOptions } from '../../plugin'
 
 import { REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_PATHS } from '../../plugin/src/consts'
@@ -35,6 +33,15 @@ export function unistylesLoader(this: LoaderContext<UnistylesLoaderOptions>, sou
 
     const babelPlugins = options.babelPlugins ?? []
 
+    // required by the deprecated RepackUnistylePlugin only, so Rspack and Rsbuild apps without Babel can import UnistylesPlugin
+    const { transform } = require('@babel/core') as {
+        transform: (
+            code: string,
+            options: Record<string, unknown>,
+            callback: (error: Error | null, result: { code?: string | null; map?: unknown } | null) => void,
+        ) => void
+    }
+
     transform(
         source,
         {
@@ -51,8 +58,7 @@ export function unistylesLoader(this: LoaderContext<UnistylesLoaderOptions>, sou
                 return
             }
 
-            //@ts-ignore
-            callback(null, result.code, result.map)
+            callback(null, result?.code ?? undefined, result?.map as Parameters<typeof callback>[2])
             return
         },
     )

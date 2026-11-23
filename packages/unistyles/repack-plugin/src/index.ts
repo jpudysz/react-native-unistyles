@@ -1,67 +1,7 @@
-import type { Compiler, RspackPluginInstance } from '@rspack/core'
-import type { UnistylesPluginOptions } from 'react-native-unistyles/plugin'
-
-import { getModulePaths } from '@callstack/repack'
-
 import { unistylesLoader } from './loader'
 
-export const BASE_REPACK_EXCLUDE_PATHS = getModulePaths([
-    'react',
-    'react-native',
-    '@react-native',
-    'react-native-macos',
-    'react-native-windows',
-    'react-native-tvos',
-    '@callstack/react-native-visionos',
-    '@module-federation',
-    'react-native-unistyles',
-    'whatwg-fetch',
-    '@callstack',
-    'react-native-nitro-modules',
-    '@callstack/repack',
-])
+export { UnistylesPlugin } from './unistylesPlugin'
+export { BASE_REPACK_EXCLUDE_PATHS, RepackUnistylePlugin } from './repackUnistylePlugin'
 
-type RuleExcludePaths = ReturnType<typeof getModulePaths>
-
-interface ConstructorParams {
-    ruleExcludePaths?: RuleExcludePaths
-    unistylesPluginOptions?: UnistylesPluginOptions
-}
-
-const getUnistyleModuleRules = (excludePathLoader: Array<RegExp>, unistylesPluginOptions?: UnistylesPluginOptions) => {
-    const createRule = (test: RegExp, babelPlugins: Array<any>) => ({
-        test,
-        use: {
-            loader: 'react-native-unistyles/repack-plugin',
-            options: {
-                babelPlugins,
-                unistylesPluginOptions,
-            },
-        },
-    })
-
-    return {
-        exclude: excludePathLoader,
-        oneOf: [
-            createRule(/\.[cm]?ts$/, [['@babel/plugin-syntax-typescript', { isTSX: false, allowNamespaces: true }]]),
-            createRule(/\.[cm]?tsx$/, [['@babel/plugin-syntax-typescript', { isTSX: true, allowNamespaces: true }]]),
-            createRule(/\.[cm]?jsx?$/, ['babel-plugin-syntax-hermes-parser']),
-        ],
-    }
-}
-
-export class RepackUnistylePlugin implements RspackPluginInstance {
-    private ruleExcludePaths
-    private unistylesPluginOptions
-
-    constructor({ ruleExcludePaths = BASE_REPACK_EXCLUDE_PATHS, unistylesPluginOptions }: ConstructorParams = {}) {
-        this.ruleExcludePaths = ruleExcludePaths
-        this.unistylesPluginOptions = unistylesPluginOptions
-    }
-
-    apply(compiler: Compiler) {
-        compiler.options.module.rules.push(getUnistyleModuleRules(this.ruleExcludePaths, this.unistylesPluginOptions))
-    }
-}
-
+// the loader of the deprecated RepackUnistylePlugin, its rules load `react-native-unistyles/repack-plugin`
 export default unistylesLoader

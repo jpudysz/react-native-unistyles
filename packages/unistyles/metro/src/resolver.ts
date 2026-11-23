@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import nodePath from 'node:path'
 
-import type { Resolution, ResolveRequest } from './types'
+import type { Resolution, ResolveRequest, SourceFileResolution } from './types'
 
 import { REACT_NATIVE_COMPONENT_NAMES } from '../../plugin/src/consts'
 
@@ -15,6 +15,8 @@ const PASSTHROUGH_PACKAGES = ['react-native', '@react-native', 'react-native-web
 type ResolverConfig = {
     // real path of the react-native-unistyles package
     unistylesRoot: string
+    // the integration that runs the resolver, named in the warnings (eg. withUnistylesConfig, UnistylesPlugin)
+    integration: string
     // resolveRequest of the user's Metro config
     upstream?: ResolveRequest | null
     // replaced by path.win32 in tests
@@ -31,8 +33,12 @@ const getRealPath = (filePath: string) => {
     }
 }
 
+export const isSourceFile = (resolution: Resolution): resolution is SourceFileResolution =>
+    resolution.type === 'sourceFile' && 'filePath' in resolution
+
 export const createResolveRequest = ({
     unistylesRoot,
+    integration,
     upstream,
     path = nodePath,
     realpath = getRealPath,
@@ -147,7 +153,7 @@ export const createResolveRequest = ({
 
             if (realCopyRoot !== unistylesRoot) {
                 console.warn(
-                    `Unistyles 🦄: Found a second copy of react-native-unistyles at ${realCopyRoot}, withUnistylesConfig handles only ${unistylesRoot}. Styles of the second copy won't update, make sure that your app installs react-native-unistyles once.`,
+                    `Unistyles 🦄: Found a second copy of react-native-unistyles at ${realCopyRoot}, ${integration} handles only ${unistylesRoot}. Styles of the second copy won't update, make sure that your app installs react-native-unistyles once.`,
                 )
             }
         }
@@ -161,7 +167,7 @@ export const createResolveRequest = ({
     }
 
     const withTrackedDependencies = (resolution: Resolution): Resolution =>
-        resolution.type === 'sourceFile' && 'filePath' in resolution && resolution.filePath === trackDependencies
+        isSourceFile(resolution) && resolution.filePath === trackDependencies
             ? { type: 'sourceFile', filePath: trackDependenciesWithMetro }
             : resolution
 
@@ -169,12 +175,12 @@ export const createResolveRequest = ({
         const resolve = upstream ?? context.resolveRequest
         const upstreamResolution = resolve(context, moduleName, platform)
 
-        if (upstreamResolution.type !== 'sourceFile' || !('filePath' in upstreamResolution)) {
+        if (!isSourceFile(upstreamResolution)) {
             return upstreamResolution
         }
 
         const filePath = toUnistylesPath(upstreamResolution.filePath)
-        const resolution: Resolution =
+        const resolution: SourceFileResolution =
             filePath === upstreamResolution.filePath ? upstreamResolution : { type: 'sourceFile', filePath }
 
         const sourcePath = getSourcePath(resolution.filePath)

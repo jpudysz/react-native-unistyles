@@ -84,7 +84,7 @@ To render a raw React Native component, import it from `react-native/index.js`, 
 
 ### Limitations
 
-- Metro only. Re.Pack, Vite, Next.js and other web bundlers keep using the [Babel plugin](/v3/other/babel-plugin)
+- Metro only. Re.Pack, Rspack and Rsbuild have [`UnistylesPlugin`](/v3/other/repack), Vite, Next.js and other web bundlers keep using the [Babel plugin](/v3/other/babel-plugin)
 - A StyleSheet recomputes more styles than with the Babel plugin, see [What it does](#what-it-does)
 - `styles.useVariants()` has no effect when the returned styles aren't used, `styles` ignores its variants (also the default ones), see [Variants](#variants)
 - Jest doesn't use Metro, your [testing setup](/v3/start/testing) stays the same

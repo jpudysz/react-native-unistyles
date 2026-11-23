@@ -130,7 +130,12 @@ describe.each([
         return { type: 'sourceFile', filePath }
     })
 
-    const resolveRequest = createResolveRequest({ unistylesRoot, upstream, path: platformPath })
+    const resolveRequest = createResolveRequest({
+        unistylesRoot,
+        integration: 'withUnistylesConfig',
+        upstream,
+        path: platformPath,
+    })
 
     const resolve = (origin: string, moduleName: string, platform: string | null = 'ios') =>
         resolveRequest({ originModulePath: origin, resolveRequest: upstream }, moduleName, platform)
@@ -281,6 +286,7 @@ describe.each([
             const createResolver = (filePath: string) =>
                 createResolveRequest({
                     unistylesRoot,
+                    integration: 'withUnistylesConfig',
                     upstream: () => ({ type: 'sourceFile', filePath }),
                     path: platformPath,
                     realpath: (copyRoot) => (copyRoot === linked ? unistylesRoot : copyRoot),
@@ -355,6 +361,8 @@ describe.each([
 
                 expect(warn).toHaveBeenCalledTimes(1)
                 expect(warn.mock.calls[0]![0]).toContain(nested)
+                // the warning names the integration that runs the resolver
+                expect(warn.mock.calls[0]![0]).toContain('withUnistylesConfig handles only')
             })
         })
 
@@ -378,7 +386,12 @@ describe.each([
 
     it("should resolve with the user's resolveRequest", () => {
         const custom = jest.fn(() => ({ type: 'sourceFile', filePath: join('custom', 'react-native.js') }))
-        const withCustom = createResolveRequest({ unistylesRoot, upstream: custom, path: platformPath })
+        const withCustom = createResolveRequest({
+            unistylesRoot,
+            integration: 'withUnistylesConfig',
+            upstream: custom,
+            path: platformPath,
+        })
 
         withCustom({ originModulePath: REACT_NATIVE_INTERNAL, resolveRequest: upstream }, 'react-native', 'ios')
 
