@@ -167,13 +167,13 @@ export class UnistylesRegistry {
         stylesCounter.delete(ref)
 
         if (stylesCounter.size === 0) {
-            // Safe to drop now: connect creates a new Set and the cleanup below only checks the DOM
+            // Safe to drop now: connect creates a new Set, which the cleanup below checks
             this.stylesCounter.delete(hash)
 
             // Move this to the end of the event loop so the element is removed from the DOM
             return Promise.resolve().then(() => {
-                // Check if element is still in the DOM
-                if (document.querySelector(`.${hash}`)) {
+                // Keep the style while an element uses it, even one connected outside the DOM, eg. in a portal attached later
+                if (this.stylesCounter.has(hash) || document.querySelector(`.${hash}`)) {
                     return false
                 }
 
