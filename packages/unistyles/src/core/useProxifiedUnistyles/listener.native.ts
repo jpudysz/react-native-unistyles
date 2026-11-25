@@ -2,6 +2,9 @@ import type { ListenerProps } from './types'
 
 import { StyleSheet, UnistyleDependency } from '../../specs'
 
+const isThemeDependency = (dependency: UnistyleDependency) =>
+    dependency === UnistyleDependency.Theme || dependency === UnistyleDependency.ThemeName
+
 export const listener = ({ dependencies, updateTheme, updateRuntime }: ListenerProps) => {
     const listensToTheme = dependencies.includes(UnistyleDependency.Theme)
     const dispose = StyleSheet.addChangeListener((changedDependencies) => {
@@ -9,10 +12,12 @@ export const listener = ({ dependencies, updateTheme, updateRuntime }: ListenerP
             updateTheme()
         }
 
-        if (changedDependencies.some((dependency: UnistyleDependency) => dependencies.includes(dependency))) {
-            const hasThemeNameChange = changedDependencies.includes(UnistyleDependency.ThemeName)
+        const changedListenedDependencies = changedDependencies.filter((dependency: UnistyleDependency) =>
+            dependencies.includes(dependency),
+        )
 
-            updateRuntime(hasThemeNameChange)
+        if (changedListenedDependencies.length > 0) {
+            updateRuntime(changedListenedDependencies.every(isThemeDependency))
         }
     })
 
