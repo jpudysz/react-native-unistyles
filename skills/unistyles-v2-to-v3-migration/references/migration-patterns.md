@@ -133,7 +133,7 @@ The `rt` (miniRuntime) parameter provides: `colorScheme`, `contentSizeCategory`,
   }
 ```
 
-In v3, `styles` from `StyleSheet.create` are used directly. The Babel plugin adds reactivity at build time.
+In v3, `styles` from `StyleSheet.create` are used directly. The bundler integration (Metro integration or `UnistylesPlugin`) adds reactivity.
 
 ### Getting theme from useStyles
 
@@ -209,12 +209,14 @@ const styles = StyleSheet.create(theme => ({
 }))
 
 const MyComponent = ({ size, color }) => {
-  styles.useVariants({ size, color })  // call before accessing styles
-  return <View style={styles.container} />
+  const variantStyles = styles.useVariants({ size, color })  // use the returned styles
+  return <View style={variantStyles.container} />
 }
 ```
 
-If v2 code called `useStyles(stylesheet)` without variants but the stylesheet relies on `default` variants, call `styles.useVariants({})` — v3 ignores variants entirely when `useVariants` isn't called, and `useVariants(undefined)` throws on iOS/Android.
+The Metro integration and `UnistylesPlugin` don't change `styles`, read the variant styles from the returned object. A bare `styles.useVariants({...})` statement only works with the deprecated Babel plugin.
+
+If v2 code called `useStyles(stylesheet)` without variants but the stylesheet relies on `default` variants, call `const variantStyles = styles.useVariants({})` — v3 ignores variants entirely when `useVariants` isn't called, and `useVariants(undefined)` throws on iOS/Android.
 
 ### Boolean variants
 
@@ -232,7 +234,7 @@ const styles = StyleSheet.create({
 })
 
 // Usage
-styles.useVariants({ disabled: isDisabled })
+const variantStyles = styles.useVariants({ disabled: isDisabled })
 ```
 
 ### Compound variants (v3 only - new feature)
@@ -677,7 +679,8 @@ const animatedStyle = useAnimatedStyle(() => ({
 ### useAnimatedVariantColor
 
 ```tsx
-const animatedColor = useAnimatedVariantColor(styles.button, 'backgroundColor')
+const variantStyles = styles.useVariants({ state })
+const animatedColor = useAnimatedVariantColor(variantStyles.button, 'backgroundColor')
 
 const animatedStyle = useAnimatedStyle(() => ({
   backgroundColor: animatedColor.value
@@ -753,6 +756,6 @@ Remove the manual `jest.mock('react-native-unistyles', ...)` and use the built-i
 }
 ```
 
-The config file (with `StyleSheet.configure()`) must come after the mocks. The Babel plugin is a no-op when `NODE_ENV=test`. The built-in mock at `react-native-unistyles/mocks` covers `react-native-nitro-modules`, `StyleSheet`, `UnistylesRuntime`, `withUnistyles`, `useUnistyles`, `mq`, `Display`, `Hide`, `ScopedTheme`, the exported enums, and `react-native-unistyles/reanimated`.
+The config file (with `StyleSheet.configure()`) must come after the mocks. Jest doesn't run the Metro or Rspack integration, and the deprecated Babel plugin is a no-op when `NODE_ENV=test`. The built-in mock at `react-native-unistyles/mocks` covers `react-native-nitro-modules`, `StyleSheet`, `UnistylesRuntime`, `withUnistyles`, `useUnistyles`, `mq`, `Display`, `Hide`, `ScopedTheme`, the exported enums, and `react-native-unistyles/reanimated`.
 
 Mock limitations: styles always use the first registered theme (`initialTheme` / `adaptiveThemes` ignored), runtime dimensions/insets are `0`, `variants` / `compoundVariants` are stripped and `useVariants` is a no-op, `Display` / `Hide` / `ScopedTheme` render nothing, and `createUnistylesElement`, `UnistyleDependency` and the SSR helpers are `undefined`.

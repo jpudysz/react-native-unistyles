@@ -41,21 +41,21 @@ export const SettingOptionRadio: React.FunctionComponent<SettingOptionRadioProps
     isSelected,
     onPress
 }) => {
-    style.useVariants({
+    const variantStyle = style.useVariants({
         isSelected
     })
 
     return (
         <Pressable
             onPress={onPress}
-            style={style.container}
+            style={variantStyle.container}
         >
             <ThemedText type="subtitle">
                 {label}
             </ThemedText>
-            <View style={style.radio}>
+            <View style={variantStyle.radio}>
                 {isSelected && (
-                    <View style={style.radioInner} />
+                    <View style={variantStyle.radioInner} />
                 )}
             </View>
         </Pressable>
@@ -408,13 +408,13 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
     accent,
     onPress
 }) => {
-    style.useVariants({
+    const variantStyle = style.useVariants({
         accent: accent
     })
 
     return (
         <Pressable onPress={onPress}>
-            <Animated.View style={style.button}>
+            <Animated.View style={variantStyle.button}>
                 <ThemedText bold>
                     {label}
                 </ThemedText>
@@ -478,11 +478,11 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
     accent,
     onPress
 }) => {
-    style.useVariants({
+    const variantStyle = style.useVariants({
         accent: accent
     })
 
-+    const color = useAnimatedVariantColor(style.buttonColor, 'backgroundColor')
++    const color = useAnimatedVariantColor(variantStyle.buttonColor, 'backgroundColor')
 +    const animatedStyle = useAnimatedStyle(() => ({
 +        backgroundColor: withTiming(color.value, {
 +            duration: 500
@@ -491,8 +491,8 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
 
     return (
         <Pressable onPress={onPress}>
--            <Animated.View style={style.button}>
-+            <Animated.View style={[animatedStyle, style.button]}>
+-            <Animated.View style={variantStyle.button}>
++            <Animated.View style={[animatedStyle, variantStyle.button]}>
                 <ThemedText bold>
                     {label}
                 </ThemedText>
@@ -513,7 +513,7 @@ With just 5 lines of code, we connected Unistyles to Reanimated and animated the
 
 Before moving on, there's one crucial point: understanding how to merge styles created by Unistyles.
 
-In the `<Animated.View>` component, we used the syntax `[animatedStyle, style.button]` to merge styles.
+In the `<Animated.View>` component, we used the syntax `[animatedStyle, variantStyle.button]` to merge styles.
 This approach is essential when working with Unistyles. The reason for this specific merging method is that each style managed by Unistyles contains a hidden `JSI NativeState`.
 This state, stored on the object as an invisible property accessible only via a `Symbol`, is vital for Unistyles' internal operation.
 Using the spread operator or other object merging techniques will result in the loss of this state and unpredictable behavior.

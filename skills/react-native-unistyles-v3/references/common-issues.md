@@ -58,7 +58,16 @@ StyleSheet.configure({
 ### "react-native-unistyles/metro is enabled in metro.config.js, remove react-native-unistyles/plugin from babel.config.js"
 
 **Cause:** The Metro integration (3.6.0+) and the Babel plugin are both set up.
-**Solution:** Use one of them — remove `react-native-unistyles/plugin` from `babel.config.js` when using `withUnistylesConfig`. See [setup-guide.md](setup-guide.md#metro-integration-experimental).
+**Solution:** Keep the Metro integration and remove `react-native-unistyles/plugin` from `babel.config.js`, the Babel plugin is deprecated. See [setup-guide.md](setup-guide.md#migrating-from-the-babel-plugin).
+
+### "Unistyles 🦄: react-native-unistyles/plugin is deprecated and will be removed in Unistyles 4.0"
+
+**Cause:** `babel.config.js` runs the Babel plugin, deprecated since 3.9.0. The warning prints once per bundler process (never under Jest).
+**Solution:** With Metro, switch to `withUnistylesConfig` from `react-native-unistyles/metro`; with Re.Pack, Rspack or Rsbuild, switch to `UnistylesPlugin` from `react-native-unistyles/repack-plugin`. See [setup-guide.md](setup-guide.md#migrating-from-the-babel-plugin). Next.js, Vite and webpack have no replacement yet: keep the plugin, it works until 4.0. There is no option to silence the warning.
+
+### "Unistyles 🦄: RepackUnistylePlugin is deprecated and will be removed in Unistyles 4.0"
+
+**Solution:** Replace `new RepackUnistylePlugin({ ... })` with `new UnistylesPlugin()` (no options) and run the `useVariants` codemod. See [setup-guide.md](setup-guide.md#repack-rspack-rsbuild).
 
 ---
 
@@ -95,6 +104,8 @@ const animStyle = useAnimatedStyle(() => ({ ...styles.box }))
 ---
 
 ## 3. Babel Plugin Issues
+
+These apply to the deprecated Babel plugin only. In a Metro or Re.Pack/Rspack/Rsbuild app, the fix for all of them is to [migrate to the integration](setup-guide.md#migrating-from-the-babel-plugin), which processes every file without options.
 
 ### Re-exporting StyleSheet from barrel files
 
@@ -162,7 +173,7 @@ import { StyleSheet } from 'react-native-unistyles'
 
 ### Component not updating at all
 
-Check, in order: the file is processed by the Babel plugin (`debug: true`); the view is a React Native view (otherwise use `withUnistyles`); styles aren't spread; `contentContainerStyle` is passed through `withUnistyles`.
+Check, in order: a bundler integration is set up (`withUnistylesConfig` / `UnistylesPlugin`, or with the deprecated Babel plugin the file is processed: `debug: true`); variant styles come from the value returned by `useVariants`; the view is a React Native view (otherwise use `withUnistyles`); styles aren't spread; `contentContainerStyle` is passed through `withUnistyles`.
 
 ### Nested Text / Animated.Text don't fully switch themes with Reanimated
 
@@ -354,13 +365,13 @@ const UniButton = withUnistyles<typeof Button, { color: string }>(
 ### useVariants breaks with panicThreshold: 'all_errors'
 
 **Symptoms:** Build error with React Compiler `panicThreshold: 'all_errors'` in components calling `styles.useVariants()`; with the default threshold the compiler silently skips them.
-**Solution:** Fixed in **3.6.0** — upgrade (keep the Unistyles plugin before React Compiler). On older versions, avoid `'all_errors'`.
+**Solution:** Fixed in **3.6.0** — upgrade (with the deprecated Babel plugin, keep it before React Compiler). On older versions, avoid `'all_errors'`.
 **Ref:** [#1002](https://github.com/jpudysz/react-native-unistyles/issues/1002)
 
-### Plugin ordering
+### Plugin ordering (deprecated Babel plugin)
 
 **Symptoms:** Styles not reactive, build errors.
-**Cause:** React Compiler runs before Unistyles plugin. (The Metro integration has no Babel transform, so plugin order doesn't matter there.)
+**Cause:** React Compiler runs before the Unistyles Babel plugin. (The Metro integration and `UnistylesPlugin` have no Babel transform, so plugin order doesn't matter there — prefer migrating.)
 **Solution:** Unistyles plugin MUST come BEFORE React Compiler in babel.config.js:
 ```js
 plugins: [

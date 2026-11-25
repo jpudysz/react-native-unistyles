@@ -4,9 +4,13 @@ Known issues and solutions gathered from GitHub issues and migration experiences
 
 ---
 
-## 1. Babel Plugin Not Configured / Wrong Root
+## 1. No Bundler Integration / Babel Plugin With Wrong Root
 
 **Symptom:** Styles don't react to theme/breakpoint changes. Everything renders but nothing updates.
+
+**Fix (Metro, Re.Pack, Rspack, Rsbuild):** set up the bundler integration instead of the Babel plugin: `withUnistylesConfig` from `react-native-unistyles/metro` in `metro.config.js`, or `new UnistylesPlugin()` from `react-native-unistyles/repack-plugin` in the Rspack config. Neither has options, so there is no `root` to get wrong. Remove `react-native-unistyles/plugin` from `babel.config.js` (having both throws) and use the styles returned by `useVariants`.
+
+The rest of this section applies to the **deprecated** Babel plugin (Next.js, Vite, webpack).
 
 **Error (when `root` is missing):**
 ```
@@ -29,7 +33,7 @@ module.exports = {
 }
 ```
 
-After changing babel config, clear the Metro cache:
+After changing the babel or Metro config, clear the Metro cache:
 ```bash
 npx react-native start --reset-cache
 # or for Expo:
@@ -40,7 +44,7 @@ npx expo start --clear
 
 ## 2. Re-exporting StyleSheet from Barrel Files / Packages
 
-**Symptom:** Styles don't update reactively in some files. The Babel plugin doesn't process them.
+**Symptom:** Styles don't update reactively in some files. The deprecated Babel plugin doesn't process them. (The Metro integration and `UnistylesPlugin` process every file, re-exports included.)
 
 **Cause:** Every file under `root` is processed regardless of imports. Outside `root`, the plugin only processes files that import from `react-native-unistyles` (or match `autoProcessImports` / `autoProcessPaths`). A file outside `root` that gets `StyleSheet` through a re-export isn't detected:
 
@@ -201,9 +205,9 @@ The mocks must run BEFORE your `StyleSheet.configure` file and any component imp
 
 **Symptom:** Styles break or variants don't work when using React Compiler (React Forget).
 
-**Cause:** The Unistyles Babel plugin must process `useVariants` calls BEFORE React Compiler reorganizes the code.
+**Cause:** The deprecated Unistyles Babel plugin must process `useVariants` calls BEFORE React Compiler reorganizes the code. The Metro integration and `UnistylesPlugin` have no Babel transform, so the order doesn't matter there (use the styles returned by `useVariants`).
 
-**Fix:** Place Unistyles plugin BEFORE React Compiler in babel config:
+**Fix (Babel plugin setups only):** Place Unistyles plugin BEFORE React Compiler in babel config:
 
 ```js
 // babel.config.js
@@ -217,13 +221,17 @@ module.exports = {
 }
 ```
 
+**Fix (Metro integration / `UnistylesPlugin`):** don't add `react-native-unistyles/plugin` to `babel.config.js`, remove it if it's there (it throws next to an integration). The integrations don't need any plugin order, use the styles returned by `useVariants`.
+
 ---
 
 ## 9. Monorepo Issues
 
 **Symptom:** Babel plugin doesn't process files in shared packages/workspace modules.
 
-**Fix:** The `root` option resolves relative to Babel's `root` (your app directory by default). Files outside it need `autoProcessImports` (exact import source match) or `autoProcessPaths` (matched as a substring of the absolute file path, so don't use `../` relative paths). In monorepos, you may need:
+**Fix (Metro, Re.Pack, Rspack, Rsbuild):** migrate to the Metro integration or `UnistylesPlugin`, they process workspace packages without options. Make sure Metro watches the workspace (`watchFolders`) and that the app installs a single copy of `react-native-unistyles`.
+
+**Fix (deprecated Babel plugin):** The `root` option resolves relative to Babel's `root` (your app directory by default). Files outside it need `autoProcessImports` (exact import source match) or `autoProcessPaths` (matched as a substring of the absolute file path, so don't use `../` relative paths). In monorepos, you may need:
 
 ```js
 // apps/mobile/babel.config.js

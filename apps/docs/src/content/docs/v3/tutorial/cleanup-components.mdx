@@ -249,13 +249,14 @@ export function ThemedText({
   type = 'default',
   ...rest
 }: ThemedTextProps) {
-+ styles.useVariants({ type })
++ const variantStyles = styles.useVariants({ type })
 
   return (
     <Text
       style={[
-        styles.textColor(lightColor, darkColor),
-+        styles.textType,
+-        styles.textColor(lightColor, darkColor),
++        variantStyles.textColor(lightColor, darkColor),
++        variantStyles.textType,
         style,
       ]}
       {...rest}
@@ -299,7 +300,7 @@ const styles = StyleSheet.create((theme, rt) => ({
 }));
 ```
 
-Notice how much cleaner the component is! We simply pass the `type` prop to the `useVariants` hook, and Unistyles applies the correct styles from our variants block.
+Notice how much cleaner the component is! We simply pass the `type` prop to the `useVariants` hook, and it returns the styles with the selected variants from our variants block. Use the returned styles, `styles` itself doesn't change.
 
 To make this component perfectly type-safe, we can use the `UnistylesVariants` helper type. It automatically infers all possible variant props from your stylesheet.
 
@@ -354,14 +355,17 @@ export function ThemedText({
   style,
 -  lightColor,
 -  darkColor,
+  type = 'default',
   ...rest
 }: ThemedTextProps) {
+  const variantStyles = styles.useVariants({ type })
+
   return (
     <Text
       style={[
--        styles.textColor(lightColor, darkColor),
-+        styles.textColor,
-        styles.textType,
+-        variantStyles.textColor(lightColor, darkColor),
++        variantStyles.textColor,
+        variantStyles.textType,
         style,
       ]}
       {...rest}

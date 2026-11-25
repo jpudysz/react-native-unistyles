@@ -5,8 +5,8 @@ description: >
   "create stylesheet", "add theme", "breakpoints", "variants", "withUnistyles", "useUnistyles",
   "ScopedTheme", "UnistylesRuntime", "style component", "responsive styles", "media queries",
   "dynamic styles", "scoped theme", "adaptive theme", "unistyles setup", "unistyles config",
-  "withUnistylesConfig", "unistyles metro". Covers setup (Babel plugin or Metro integration), theming, responsive design, variants, web features, third-party integration,
-  and troubleshooting.
+  "withUnistylesConfig", "unistyles metro", "UnistylesPlugin", "unistyles babel plugin". Covers setup (Metro integration, UnistylesPlugin for Re.Pack/Rspack/Rsbuild,
+  the deprecated Babel plugin), theming, responsive design, variants, web features, third-party integration, and troubleshooting.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash(npx *)
@@ -14,7 +14,7 @@ allowed-tools: Read, Grep, Glob, Edit, Write, Bash(npx *)
 
 # React Native Unistyles v3 Skill
 
-You are assisting with React Native Unistyles v3 styling. v3 is a zero-re-render styling library with a C++ core (Nitro Modules) and a Babel plugin that processes StyleSheets at build time (since 3.6.0, Metro apps can use the experimental zero-config Metro integration instead, which needs no Babel transform). It replaces React Native's `StyleSheet` with a reactive, theme-aware, responsive system.
+You are assisting with React Native Unistyles v3 styling. v3 is a zero-re-render styling library with a C++ core (Nitro Modules) and a bundler integration: the zero-config Metro integration (`withUnistylesConfig`) or `UnistylesPlugin` for Re.Pack/Rspack/Rsbuild. Both swap `react-native` components and track StyleSheet dependencies at runtime, no Babel transform. The Babel plugin (`react-native-unistyles/plugin`) is **deprecated since 3.9.0** and removed in 4.0. It replaces React Native's `StyleSheet` with a reactive, theme-aware, responsive system.
 
 ## Prerequisites
 
@@ -97,7 +97,7 @@ const styles = StyleSheet.create(theme => ({
   }
 }))
 
-// In component — call useVariants BEFORE accessing styles (always pass an object, `{}` for defaults)
+// In component — use the styles returned by useVariants (always pass an object, `{}` for defaults)
 const variantStyles = styles.useVariants({ size: 'large', color: 'primary' })
 return <View style={variantStyles.button} />
 ```
@@ -122,15 +122,15 @@ const UniButton = withUnistyles(Button, (theme, rt) => ({
 ## Critical Rules
 
 1. **NEVER spread styles** — `{...styles.x}` breaks C++ proxy binding. ALWAYS use array syntax: `[styles.x, styles.y]` or `[styles.x, { marginTop: 10 }]`
-2. **NEVER re-export StyleSheet from barrel files** — import it directly from `react-native-unistyles`. Outside `root`, the Babel plugin only recognizes `StyleSheet.create` via that import (or `autoProcessImports`), so a re-export silently breaks detection. (The Metro integration has no such limitation, but direct imports work everywhere.)
-3. **A build-time integration is REQUIRED** — one of:
-   - Babel plugin (default): `['react-native-unistyles/plugin', { root: 'src' }]` in babel.config.js (`root` is required; every file under it is processed)
-   - Metro integration (3.6.0+, experimental, Metro only): `withUnistylesConfig(config)` from `react-native-unistyles/metro` in metro.config.js, no options, and remove the Babel plugin (having both throws). Dependencies are tracked at runtime, and `useVariants` must use the returned styles: `const variantStyles = styles.useVariants({ size })`
-   - Re.Pack / Rspack / Rsbuild (experimental): `new UnistylesPlugin()` from `react-native-unistyles/repack-plugin` in the Rspack plugins, no options, the Metro integration's behavior (runtime dependency tracking, returned `useVariants` styles), remove the Babel plugin (having both throws). Needs `@rspack/core` 1.7.5+. With Module Federation share `react-native-unistyles` and `react-native-unistyles/`. Re.Pack apps can keep the Babel plugin in babel.config.js instead; `RepackUnistylePlugin` is deprecated since 3.9.0 (it still works and warns) and will be removed in 4.0
+2. **NEVER re-export StyleSheet from barrel files** — import it directly from `react-native-unistyles`. With the deprecated Babel plugin, outside `root`, `StyleSheet.create` is only recognized via that import (or `autoProcessImports`), so a re-export silently breaks detection. (The Metro integration and `UnistylesPlugin` have no such limitation, but direct imports work everywhere.)
+3. **A bundler integration is REQUIRED** — pick by bundler:
+   - **Metro (Expo, bare React Native) — the default since 3.9.0**: `withUnistylesConfig(config)` from `react-native-unistyles/metro` in metro.config.js (3.6.0+), no options. Every `react-native` import (also in `node_modules`) resolves to Unistyles components, dependencies are tracked at runtime, and `useVariants` must use the returned styles: `const variantStyles = styles.useVariants({ size })`
+   - **Re.Pack / Rspack / Rsbuild (experimental, 3.9.0+)**: `new UnistylesPlugin()` from `react-native-unistyles/repack-plugin` in the Rspack plugins, no options, the Metro integration's behavior (runtime dependency tracking, returned `useVariants` styles). Needs `@rspack/core` 1.7.5+. With Module Federation share `react-native-unistyles` and `react-native-unistyles/`. `RepackUnistylePlugin` is deprecated since 3.9.0 (it still works and warns), replace it with `UnistylesPlugin`
+   - **Babel plugin — DEPRECATED since 3.9.0, removed in 4.0** (prints a warning): `['react-native-unistyles/plugin', { root: 'src' }]` in babel.config.js. Only for bundlers without an integration (Next.js, Vite, webpack), where it keeps working in 3.x. Never set it up for Metro or Re.Pack/Rspack/Rsbuild apps. When you find it in such an app, suggest migrating: add the integration, remove the plugin from babel.config.js (having both throws), run the `useVariants` codemod, restart the bundler with a clear cache
 
    Without one of them, styles won't be reactive.
 4. **Import StyleSheet from `react-native-unistyles` only** — it polyfills all RN StyleSheet APIs (`hairlineWidth`, `compose`, `flatten`, `absoluteFill`). Replace all `import { StyleSheet } from 'react-native'`.
-5. **`styles.useVariants()` must be called before accessing variant-dependent styles** — treat it like a React hook (top of component). Always pass an object: `useVariants(undefined)` throws on native, use `{}` to select `default` variants. With the Metro integration (no Babel plugin) use its return value: `const variantStyles = styles.useVariants({...})`.
+5. **Use the styles returned by `styles.useVariants()`** — `const variantStyles = styles.useVariants({...})`, then `variantStyles.button`. Treat it like a React hook (top of component). The integrations don't change `styles`, a bare `styles.useVariants({...})` statement only works with the deprecated Babel plugin. Always pass an object: `useVariants(undefined)` throws on native, use `{}` to select `default` variants. Codemod: `npx jscodeshift --parser=tsx --extensions=tsx,ts,jsx,js -t node_modules/react-native-unistyles/codemods/use-variants.js src`.
 6. **Prefer `StyleSheet.create(theme => ...)` over `useUnistyles()`** — theme functions cause zero re-renders; `useUnistyles()` re-renders whenever a `theme`/`rt` value you *read* changes (never read `rt.insets.ime` there — it re-renders every keyboard frame).
 7. **`StyleSheet.configure()` must be called before any `StyleSheet.create()`** — typically in your app entry point, before any component renders.
 8. **Dynamic function arguments must be serializable** — Unistyles stores them in C++ and re-runs the function on theme/runtime changes. Functions are dropped; `Date`/`Map`/`Set`/class instances become plain objects. Pass primitives / plain objects (e.g. `date.getTime()`).
@@ -159,22 +159,23 @@ Need theme/runtime in component logic (not just styles)?
 Passing a Unistyles style to `contentContainerStyle` (ScrollView/FlatList)?
 ├─ YES → withUnistyles(ScrollView) — auto-maps style + contentContainerStyle
 └─ NO  → react-native / react-native-reanimated view with a `style` prop?
-         ├─ YES → Pass Unistyles styles directly (Babel swaps in ref-borrowing factories)
+         ├─ YES → Pass Unistyles styles directly (the integration swaps in ref-borrowing factories)
          └─ NO  → Third-party view built on RN components (in node_modules)?
-                  ├─ YES → Metro integration: works as-is (node_modules are covered)
-                  │        Babel plugin: add its path to autoProcessPaths (e.g. 'some-lib/src/components')
+                  ├─ YES → Metro integration / UnistylesPlugin: works as-is (node_modules are covered)
+                  │        Deprecated Babel plugin: add its path to autoProcessPaths (e.g. 'some-lib/src/components')
                   └─ Still not updating / needs theme-derived props (color, size, ...)?
                      ├─ YES → withUnistyles(Component, (theme, rt) => ({ prop: theme.value }))
                      └─ Last resort → useUnistyles() (re-renders the component)
 
 Your own files outside `root` (monorepo package) not updating?
-→ autoProcessImports: ['@my-org/styles']  (force-processes any file importing it; not needed with the Metro integration)
+→ Metro integration / UnistylesPlugin: nothing to do, every file is covered
+→ Deprecated Babel plugin: autoProcessImports: ['@my-org/styles']  (force-processes any file importing it)
 ```
 
 ## Reference Files
 
-- **Setup, installation, Babel plugin, Metro integration, Re.Pack, TypeScript, testing, Expo Router**: read [references/setup-guide.md](references/setup-guide.md)
+- **Setup, installation, Metro integration, Re.Pack, migrating from the deprecated Babel plugin, TypeScript, testing, Expo Router**: read [references/setup-guide.md](references/setup-guide.md)
 - **Complete API for every export**: read [references/api-reference.md](references/api-reference.md)
 - **Code patterns: themes, variants, breakpoints, web, SSR, Reanimated**: read [references/styling-patterns.md](references/styling-patterns.md)
-- **withUnistyles, autoProcessPaths/Imports, React Compiler, Reanimated, edge-to-edge, frozen screens, FlatList**: read [references/third-party-integration.md](references/third-party-integration.md)
+- **withUnistyles, Babel plugin autoProcessPaths/Imports, React Compiler, Reanimated, edge-to-edge, frozen screens, FlatList**: read [references/third-party-integration.md](references/third-party-integration.md)
 - **Troubleshooting from 150+ GitHub issues with solutions**: read [references/common-issues.md](references/common-issues.md)

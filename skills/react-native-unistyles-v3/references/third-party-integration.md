@@ -97,7 +97,7 @@ const UniScrollView = withUnistyles(ScrollView)
 
 ## Babel Plugin: autoProcessPaths
 
-With the [Metro integration](setup-guide.md#metro-integration-experimental) (3.6.0+) you don't need this, `autoProcessImports` or `autoRemapImports` — it covers `node_modules` and files outside your app automatically.
+The Babel plugin options below apply only to the **deprecated** Babel plugin. With the [Metro integration](setup-guide.md#metro-integration) or `UnistylesPlugin` you don't need `autoProcessPaths` or `autoProcessImports` — they cover `node_modules` and files outside your app automatically. For `autoRemapImports`, check every rule before removing it: a rule is only safe to remove when the integration swaps the same import to the same component as its `mapTo` (a rule mapping `View` to `NativeView` isn't covered by the `View` swap); the integrations swap only the imports in the table of [repack.mdx "What happens to each import"](https://www.unistyl.es/v3/other/repack#what-happens-to-each-import) (`react-native`, `unstable_NativeView` / `unstable_NativeText`, `ViewNativeComponent`, only `NativeText` of `TextNativeComponent`, and the deep imports of the supported components), and they leave imports made inside `react-native`, `@react-native/*` and `react-native-web` untouched. A rule for anything else (other exports such as `NativeVirtualText`, `react-native/index.js`, a library's own primitive like `@vendor/primitive`) has **no counterpart**: wrap that component with `withUnistyles`; if the rule rewrote a private import inside a library (wrapping can't reach it), patch the library, or stay on the deprecated Babel plugin in 3.x and skip the migration (without the integration: having both throws). Prefer [migrating](setup-guide.md#migrating-from-the-babel-plugin) over adding these options in a Metro or Re.Pack app.
 
 The plugin processes every file under `root` and always ignores `node_modules`. `autoProcessPaths` opts 3rd party code in: inside these paths, `react-native` imports are replaced with Unistyles ref-borrowing factories, so the library's views update from C++:
 
@@ -181,7 +181,7 @@ It doesn't make non-RN views (e.g. SVG, icon fonts) reactive — use `withUnisty
 
 ## Re.Pack
 
-Keep the Babel plugin in `babel.config.js` (Re.Pack's `babel-swc-loader` runs it), or use the experimental `UnistylesPlugin` from `react-native-unistyles/repack-plugin` in your Rspack config (Re.Pack, Rspack or Rsbuild) without the Babel plugin. `RepackUnistylePlugin` is deprecated since 3.9.0 (it still works and warns) and will be removed in 4.0. See [setup-guide.md](setup-guide.md#repack-rspack-rsbuild).
+Use the experimental `UnistylesPlugin` from `react-native-unistyles/repack-plugin` in your Rspack config (Re.Pack, Rspack or Rsbuild), without the Babel plugin. The Babel plugin and `RepackUnistylePlugin` are deprecated since 3.9.0 (they still work and warn) and will be removed in 4.0. See [setup-guide.md](setup-guide.md#repack-rspack-rsbuild).
 
 ---
 
@@ -189,7 +189,9 @@ Keep the Babel plugin in `babel.config.js` (Re.Pack's `babel-swc-loader` runs it
 
 ### Plugin ordering
 
-The Unistyles Babel plugin **MUST come BEFORE** React Compiler (it has to process `useVariants` first):
+With the Metro integration or `UnistylesPlugin`, there is no Unistyles Babel transform: add React Compiler as usual (Expo: `experiments.reactCompiler`, bare RN: `babel-plugin-react-compiler` in `babel.config.js`) and use the styles returned by `useVariants`.
+
+With the deprecated Babel plugin, the Unistyles Babel plugin **MUST come BEFORE** React Compiler (it has to process `useVariants` first):
 
 ```js
 // babel.config.js
@@ -205,8 +207,6 @@ module.exports = {
 
 Fixed in **3.6.0**: components calling `styles.useVariants()` compile with React Compiler. Before, `panicThreshold: 'all_errors'` failed the build and with the default threshold the compiler silently skipped those components ([#1002](https://github.com/jpudysz/react-native-unistyles/issues/1002)). On older versions, upgrade or avoid `'all_errors'`.
 
-With the Metro integration in a bare RN app, `babel-plugin-react-compiler` listed in `babel.config.js` `plugins` runs before Unistyles — keep the Babel plugin there (Expo's `babel-preset-expo` setup is fine).
-
 ---
 
 ## Reanimated
@@ -217,7 +217,7 @@ With the Metro integration in a bare RN app, `babel-plugin-react-compiler` liste
 
 ### Theme in worklets
 
-Use `useAnimatedTheme()` from `react-native-unistyles/reanimated` (a `SharedValue`, no re-renders, follows `ScopedTheme`) instead of `UnistylesRuntime.getTheme()` (doesn't update worklets) or `useUnistyles()` (re-renders). Animate variant colors with `useAnimatedVariantColor(styles.x, 'backgroundColor')`, which returns a `SharedValue<string>` to use inside `useAnimatedStyle`.
+Use `useAnimatedTheme()` from `react-native-unistyles/reanimated` (a `SharedValue`, no re-renders, follows `ScopedTheme`) instead of `UnistylesRuntime.getTheme()` (doesn't update worklets) or `useUnistyles()` (re-renders). Animate variant colors with `useAnimatedVariantColor(variantStyles.x, 'backgroundColor')` (`variantStyles` returned by `useVariants`), which returns a `SharedValue<string>` to use inside `useAnimatedStyle`.
 
 ### CSS transitions
 

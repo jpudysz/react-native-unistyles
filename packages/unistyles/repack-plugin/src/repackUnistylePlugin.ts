@@ -16,7 +16,7 @@ const getModulePaths = (moduleNames: Array<string>) =>
     })
 
 /**
- * @deprecated since 3.9.0, removed in 4.0, use `UnistylesPlugin` or the Babel plugin in babel.config.js
+ * @deprecated since 3.9.0, removed in 4.0, use `UnistylesPlugin`
  */
 export const BASE_REPACK_EXCLUDE_PATHS = getModulePaths([
     'react',
@@ -64,7 +64,7 @@ const getUnistyleModuleRules = (excludePathLoader: Array<RegExp>, unistylesPlugi
 let hasWarned = false
 
 /**
- * @deprecated since 3.9.0, removed in 4.0, use `UnistylesPlugin` or the Babel plugin in babel.config.js
+ * @deprecated since 3.9.0, removed in 4.0, use `UnistylesPlugin`
  */
 export class RepackUnistylePlugin implements RspackPluginInstance {
     private ruleExcludePaths
@@ -79,7 +79,7 @@ export class RepackUnistylePlugin implements RspackPluginInstance {
         if (!hasWarned) {
             hasWarned = true
             console.warn(
-                'Unistyles 🦄: RepackUnistylePlugin is deprecated and will be removed in Unistyles 4.0. Replace it with UnistylesPlugin from react-native-unistyles/repack-plugin, or add react-native-unistyles/plugin to babel.config.js. See https://www.unistyl.es/v3/other/repack',
+                'Unistyles 🦄: RepackUnistylePlugin is deprecated and will be removed in Unistyles 4.0. Replace it with UnistylesPlugin from react-native-unistyles/repack-plugin, see https://www.unistyl.es/v3/other/repack#migrating-from-repackunistyleplugin',
             )
         }
 

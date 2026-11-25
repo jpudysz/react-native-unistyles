@@ -1,4 +1,4 @@
-import type { PluginObj } from '@babel/core'
+import type { ConfigAPI, PluginObj } from '@babel/core'
 
 import * as t from '@babel/types'
 import nodePath from 'node:path'
@@ -13,6 +13,7 @@ import {
     REPLACE_WITH_UNISTYLES_PATHS,
     RSPACK_INTEGRATION,
 } from './consts'
+import { warnDeprecation } from './deprecation'
 import { handleExoticImport } from './exotic'
 import { addUnistylesImport, addUnistylesRequire, isInsideNodeModules } from './import'
 import { toPlatformPath } from './paths'
@@ -29,13 +30,19 @@ import {
 } from './stylesheet'
 import { extractVariants } from './variants'
 
-export default function (): PluginObj<UnistylesPluginPass> {
+/**
+ * @deprecated since 3.9.0, removed in 4.0, use `withUnistylesConfig` from react-native-unistyles/metro
+ * or `UnistylesPlugin` from react-native-unistyles/repack-plugin
+ */
+export default function (api?: ConfigAPI): PluginObj<UnistylesPluginPass> {
     if (process.env.NODE_ENV === 'test') {
         return {
             name: 'babel-react-native-unistyles',
             visitor: {},
         }
     }
+
+    warnDeprecation(api)
 
     return {
         name: 'babel-react-native-unistyles',

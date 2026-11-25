@@ -3,7 +3,7 @@ import type { UnistylesPluginOptions } from 'react-native-unistyles/plugin'
 
 /**
  * Experimental, the Re.Pack (Rspack) counterpart of react-native-unistyles/metro,
- * replaces `react-native-unistyles/plugin` in babel.config.js
+ * replaces the deprecated `react-native-unistyles/plugin` in babel.config.js and the deprecated `RepackUnistylePlugin`
  *
  * Every `react-native` import (also from node_modules) resolves to Unistyles components,
  * except imports without an issuer and imports made by `@callstack/repack` and `@module-federation` packages,
@@ -28,7 +28,7 @@ export declare class UnistylesPlugin implements RspackPluginInstance {
 }
 
 /**
- * @deprecated since 3.9.0, removed in 4.0, use `UnistylesPlugin` or the Babel plugin in babel.config.js
+ * @deprecated since 3.9.0, removed in 4.0, use `UnistylesPlugin`
  */
 export declare const BASE_REPACK_EXCLUDE_PATHS: Array<RegExp>
 
@@ -38,7 +38,7 @@ interface ConstructorParams {
 }
 
 /**
- * @deprecated since 3.9.0, removed in 4.0, use `UnistylesPlugin` or the Babel plugin in babel.config.js
+ * @deprecated since 3.9.0, removed in 4.0, use `UnistylesPlugin`
  */
 export declare class RepackUnistylePlugin implements RspackPluginInstance {
     private ruleExcludePaths

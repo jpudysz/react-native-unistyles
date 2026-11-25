@@ -185,12 +185,12 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
 }) => {
 +    const { preferredAccent } = useStore()
 
-    style.useVariants({
+    const variantStyle = style.useVariants({
 +        accent: accent ?? preferredAccent
 -        accent: accent
     })
 
-    const color = useAnimatedVariantColor(style.buttonColor, 'backgroundColor')
+    const color = useAnimatedVariantColor(variantStyle.buttonColor, 'backgroundColor')
     const animatedStyle = useAnimatedStyle(() => ({
         backgroundColor: withTiming(color.value, {
             duration: 500
@@ -199,7 +199,7 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
 
     return (
         <Pressable onPress={onPress}>
-            <Animated.View style={[animatedStyle, style.button]}>
+            <Animated.View style={[animatedStyle, variantStyle.button]}>
                 <ThemedText bold>
                     {label}
                 </ThemedText>

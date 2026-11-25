@@ -1,6 +1,6 @@
 ---
 title: Babel plugin
-description: How Unistyles babel plugin works?
+description: How the deprecated Unistyles Babel plugin works
 ---
 
 import { Card, Aside } from '@astrojs/starlight/components'
@@ -9,18 +9,25 @@ import Seo from '../../../../components/Seo.astro'
 <Seo
     seo={{
         title: 'Unistyles Babel plugin',
-        description: 'Learn how Unistyles babel plugin works'
+        description: 'Learn how the deprecated Unistyles Babel plugin works'
     }}
 >
 
+<Aside type="caution" title="Deprecated">
+`react-native-unistyles/plugin` is deprecated since Unistyles 3.9.0 and will be removed in 4.0. It keeps working in 3.x and prints a warning when your bundler starts it:
+
+- Metro (Expo, bare React Native): use the [Metro integration](/v3/other/metro), see [Migrating from the Babel plugin](/v3/other/metro#migrating-from-the-babel-plugin)
+- Re.Pack, Rspack, Rsbuild: use [`UnistylesPlugin`](/v3/other/repack), see [Migrating from the Babel plugin](/v3/other/repack#migrating-from-the-babel-plugin)
+- Next.js, Vite, webpack and other bundlers don't have an integration yet, keep the Babel plugin
+
+Both integrations need no options and track the dependencies of your StyleSheets at runtime. Use the styles returned by `useVariants`, see [Variants](/v3/references/variants#selecting-variants).
+
+This page stays as a reference for Unistyles 3.x.
+</Aside>
 
 Unistyles 3.0 relies heavily on the Babel plugin, which helps convert your code in a way that allows binding the `ShadowNode` with `Unistyles`. Before reading this guide, make sure to check the [Look under the hood](/v3/start/how-unistyles-works) guide.
 
 Our golden rule is to never introduce any component that could pollute your native view hierarchy. In other words, if you use a `View`, it will be rendered as-is in the native view hierarchy.
-
-<Aside>
-With Metro, you can set up Unistyles in `metro.config.js` instead, without any options. Check the experimental [Metro integration](/v3/other/metro).
-</Aside>
 
 Let's discuss the responsibilities of the Babel plugin:
 
@@ -171,6 +178,10 @@ String based refs (eg. `ref="myView"`) are not supported. The Babel plugin will 
 
 When you use variants, each time you call `useVariants`, a new scope is created. This scope contains a local copy of stylesheet that won't affect other components.
 This feature is similar to time travel, allowing you to explore different states of your styles with different calls to `useVariants`.
+
+<Aside>
+The scopes are created by the Babel plugin only. With the [Metro integration](/v3/other/metro#variants) and `UnistylesPlugin`, use the styles returned by `useVariants`, they work with the Babel plugin too.
+</Aside>
 
 From your perspective, using variants is simple: you just need to call the `useVariants` hook:
 
@@ -376,7 +387,13 @@ module.exports = function (api) {
 
 ### Usage with Re.Pack
 
-If your app is bundled with [Re.Pack](https://re-pack.dev/), add `react-native-unistyles/plugin` to your `babel.config.js` like any other Babel plugin, with the same options (see [Extra configuration](#extra-configuration)):
+<Aside type="caution">
+With Rspack, use [`UnistylesPlugin`](/v3/other/repack) in `rspack.config.mjs` instead, see [Migrating from the Babel plugin](/v3/other/repack#migrating-from-the-babel-plugin). Re.Pack's webpack setup keeps the Babel plugin in 3.x, `UnistylesPlugin` isn't tested there.
+</Aside>
+
+The setup below is the deprecated alternative to `UnistylesPlugin`, never use both: Unistyles throws an error if the Babel plugin runs next to `UnistylesPlugin`. It keeps working in 3.x, and it's the way to go with Re.Pack's webpack setup.
+
+If your app is bundled with [Re.Pack](https://re-pack.dev/) and keeps the Babel plugin, add `react-native-unistyles/plugin` to your `babel.config.js` like any other Babel plugin, with the same options (see [Extra configuration](#extra-configuration)):
 
 ```js title="babel.config.js"
 module.exports = {
@@ -390,10 +407,10 @@ module.exports = {
 }
 ```
 
-Re.Pack runs your `babel.config.js` through `@callstack/repack/babel-swc-loader`, the loader of the Re.Pack 5 config templates. Make sure your `rspack.config.mjs` transforms your files with it.
+Re.Pack runs your `babel.config.js` through `@callstack/repack/babel-swc-loader`, the loader of the Re.Pack 5 config templates. Make sure your Re.Pack config transforms your files with it, and that it doesn't add `UnistylesPlugin`.
 
 <Aside>
-`RepackUnistylePlugin` is deprecated since Unistyles 3.9.0 and will be removed in 4.0. It still works and prints a warning, move to the Babel plugin in `babel.config.js` above, or drop the Babel plugin with the experimental [Re.Pack integration](/v3/other/repack) (`UnistylesPlugin` in `rspack.config.mjs`). Don't use `UnistylesPlugin` together with the Babel plugin or `RepackUnistylePlugin`: Unistyles throws an error if the Babel plugin runs next to `UnistylesPlugin`.
+`RepackUnistylePlugin` is deprecated since Unistyles 3.9.0 and will be removed in 4.0, like the Babel plugin. It still works and prints a warning, replace it with `UnistylesPlugin`, see [Migrating from RepackUnistylePlugin](/v3/other/repack#migrating-from-repackunistyleplugin). Don't use `UnistylesPlugin` together with the Babel plugin or `RepackUnistylePlugin`: Unistyles throws an error if the Babel plugin runs next to `UnistylesPlugin`.
 </Aside>
 
 </Seo>

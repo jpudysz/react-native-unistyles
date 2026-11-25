@@ -2,7 +2,11 @@ import type { LoaderContext } from '@rspack/core'
 
 import type { UnistylesPluginOptions } from '../../plugin'
 
-import { REACT_NATIVE_COMPONENT_NAMES, REPLACE_WITH_UNISTYLES_PATHS } from '../../plugin/src/consts'
+import {
+    REACT_NATIVE_COMPONENT_NAMES,
+    REPLACE_WITH_UNISTYLES_PATHS,
+    REPACK_LOADER_CALLER,
+} from '../../plugin/src/consts'
 
 const importName = 'react-native-unistyles'
 
@@ -46,6 +50,8 @@ export function unistylesLoader(this: LoaderContext<UnistylesLoaderOptions>, sou
         source,
         {
             filename: this.resourcePath,
+            // the Babel plugin doesn't repeat the deprecation warning of RepackUnistylePlugin
+            caller: { name: REPACK_LOADER_CALLER },
             babelrc: false,
             configFile: false,
             compact: false,

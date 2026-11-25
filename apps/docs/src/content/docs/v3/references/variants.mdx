@@ -98,28 +98,9 @@ const styles = StyleSheet.create(theme => ({
 
 With your named groups, you can now select any variant from your stylesheet using the `useVariants`:
 
-```tsx /useVariants/ /color/ /size/
+```tsx /useVariants/ /variantStyles/ /color/ /size/
 import { StyleSheet } from 'react-native-unistyles'
 
-const Component = () => {
-    styles.useVariants({
-        color: 'primary',
-        size: 'small'
-    })
-
-    return (
-        <View style={styles.container} />
-    )
-}
-
-const styles = ...
-```
-
-TypeScript will provide perfect autocompletion for your variants, ensuring accuracy!
-
-`useVariants` also returns the styles with the selected variants. With the [Metro integration](/v3/other/metro) there is no Babel plugin to scope the call, so use the returned styles instead:
-
-```tsx /variantStyles/
 const Component = () => {
     const variantStyles = styles.useVariants({
         color: 'primary',
@@ -130,9 +111,19 @@ const Component = () => {
         <View style={variantStyles.container} />
     )
 }
+
+const styles = ...
 ```
 
-This form works with the Babel plugin too. To convert existing components, run the codemod:
+TypeScript will provide perfect autocompletion for your variants, ensuring accuracy!
+
+`useVariants` returns the styles with the selected variants, use them instead of `styles`. The [Metro integration](/v3/other/metro) and [`UnistylesPlugin`](/v3/other/repack) don't change `styles`.
+
+<Aside>
+With the deprecated [Babel plugin](/v3/other/babel-plugin#3-creating-scopes-for-stateless-variants), you could also call `styles.useVariants()` as a statement and keep reading `styles`. The returned styles work with the Babel plugin too.
+</Aside>
+
+To convert existing components to the returned styles, run the codemod:
 
 ```sh
 npx jscodeshift --parser=tsx --extensions=tsx,ts,jsx,js -t node_modules/react-native-unistyles/codemods/use-variants.js src
@@ -147,7 +138,7 @@ You can also use boolean values to select variants:
 import { StyleSheet } from 'react-native-unistyles'
 
 const Component = ({ isPrimary, isDisabled }) => {
-    styles.useVariants({
+    const variantStyles = styles.useVariants({
         color: !isDisabled,
         borderColor: isPrimary
         // you can also use strings
@@ -155,7 +146,7 @@ const Component = ({ isPrimary, isDisabled }) => {
     })
 
     return (
-        <View style={styles.container} />
+        <View style={variantStyles.container} />
     )
 }
 
@@ -204,12 +195,12 @@ Variant names can also be numbers:
 
 ```tsx /level/
 const Component = ({ level }: { level: 1 | 2 }) => {
-    styles.useVariants({
+    const variantStyles = styles.useVariants({
         level
     })
 
     return (
-        <Text style={styles.heading}>
+        <Text style={variantStyles.heading}>
             Heading
         </Text>
     )
@@ -263,7 +254,7 @@ const styles = StyleSheet.create(theme => ({
 If you pass an `empty object`, Unistyles will try to find the `default` variant in your stylesheet:
 
 ```tsx /{}/
-styles.useVariants({}) // will use default variant (if any)
+const variantStyles = styles.useVariants({}) // will use default variant (if any)
 ```
 
 `useVariants` always expects an object, so don't call it with `undefined`.
@@ -273,7 +264,7 @@ If you don't explicitly call `styles.useVariants`, the Unistyles C++ parser will
 </Aside>
 
 ```tsx /undefined/
-styles.useVariants({
+const variantStyles = styles.useVariants({
     color: undefined // will use default variant (if any)
 })
 ```
@@ -283,7 +274,7 @@ At runtime, a `null` value is treated the same way as `undefined`.
 Lastly, you can pass the correct variant name for a variant group:
 
 ```tsx /secondary/
-styles.useVariants({
+const variantStyles = styles.useVariants({
     color: 'secondary' // will use secondary variant
 })
 ```
@@ -302,13 +293,13 @@ type ComponentProps = {
 }
 
 const Component: React.FunctionComponent<ComponentProps> = ({ color, size }) => {
-    styles.useVariants({
+    const variantStyles = styles.useVariants({
         color,
         size
     })
 
     return (
-        <View style={styles.container} />
+        <View style={variantStyles.container} />
     )
 }
 ```
@@ -324,13 +315,13 @@ import { StyleSheet, UnistylesVariants } from 'react-native-unistyles'
 type ComponentProps = UnistylesVariants<typeof styles>
 
 const Component: React.FunctionComponent<ComponentProps> = ({ color, size }) => {
-    styles.useVariants({
+    const variantStyles = styles.useVariants({
         color,
         size
     })
 
     return (
-        <View style={styles.container} />
+        <View style={variantStyles.container} />
     )
 }
 

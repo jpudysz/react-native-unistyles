@@ -43,7 +43,7 @@ const styles = StyleSheet.create((theme, rt) => ({
 }))
 ```
 
-**Return type:** An object with the same keys as your stylesheet, plus `useVariants(variants)` method. Each style value is a C++ proxy object.
+**Return type:** An object with the same keys as your stylesheet, plus `useVariants(variants)` method, which returns the styles with the selected variants. Each style value is a C++ proxy object.
 
 **Dynamic functions in StyleSheet.create:**
 ```tsx
@@ -211,14 +211,16 @@ const styles = StyleSheet.create(theme => ({
 
 ### styles.useVariants(selection)
 
-Call at the top of your component (before accessing variant-dependent styles):
+Call at the top of your component and use the styles it returns:
 
 ```tsx
 const MyButton = ({ size, intent }) => {
-  styles.useVariants({ size, intent })
-  return <TouchableOpacity style={styles.button} />
+  const variantStyles = styles.useVariants({ size, intent })
+  return <TouchableOpacity style={variantStyles.button} />
 }
 ```
+
+- The Metro integration and `UnistylesPlugin` don't change `styles`. A bare `styles.useVariants({...})` statement only works with the deprecated Babel plugin. Codemod: `npx jscodeshift --parser=tsx --extensions=tsx,ts,jsx,js -t node_modules/react-native-unistyles/codemods/use-variants.js src`.
 
 - Always pass an object. `styles.useVariants({})` selects `default` variants; `styles.useVariants(undefined)` throws on iOS/Android.
 - A variant value of `undefined` (or `null`) falls back to `default`.
@@ -236,8 +238,7 @@ variants: {
 }
 
 // Usage:
-styles.useVariants({ disabled: true })
-styles.useVariants({ disabled: isDisabled }) // boolean variable works
+const variantStyles = styles.useVariants({ disabled: isDisabled }) // a boolean variable or `true` / `false`
 ```
 
 ### UnistylesVariants type
@@ -609,20 +610,51 @@ const animatedStyle = useAnimatedStyle(() => ({
 Animates color changes when variants change:
 
 ```tsx
-const derivedColor = useAnimatedVariantColor(styles.button, 'backgroundColor')
+const variantStyles = styles.useVariants({ state })
+const derivedColor = useAnimatedVariantColor(variantStyles.button, 'backgroundColor')
 
 const animatedStyle = useAnimatedStyle(() => ({
   backgroundColor: derivedColor.value
 }))
 
-<Animated.View style={[styles.button, animatedStyle]} />
+<Animated.View style={[variantStyles.button, animatedStyle]} />
 ```
 
 Requirements: The style must be created by Unistyles, have variants, and the color key must contain "color" (case-insensitive).
 
 ---
 
-## Babel Plugin Configuration
+## Bundler Integration
+
+**Metro (Expo, bare React Native) — the default:**
+
+```js
+// metro.config.js
+const { getDefaultConfig } = require('expo/metro-config') // or '@react-native/metro-config'
+const { withUnistylesConfig } = require('react-native-unistyles/metro')
+
+module.exports = withUnistylesConfig(getDefaultConfig(__dirname))
+```
+
+No options: every `react-native` import (also in `node_modules`) resolves to Unistyles components and StyleSheets record their dependencies at runtime. Don't add the Babel plugin (having both throws).
+
+**Re.Pack, Rspack, Rsbuild (experimental):**
+
+```js
+// rspack.config.mjs
+import { UnistylesPlugin } from 'react-native-unistyles/repack-plugin'
+
+plugins: [
+  new Repack.RepackPlugin(),
+  new UnistylesPlugin()
+]
+```
+
+No options, needs `@rspack/core` 1.7.5+. `RepackUnistylePlugin` is deprecated since 3.9.0 (it still works and warns) and will be removed in 4.0, use `UnistylesPlugin`.
+
+## Babel Plugin Configuration (deprecated)
+
+The Babel plugin is **deprecated since 3.9.0** and removed in 4.0, it prints a warning. Use it only for bundlers without an integration (Next.js, Vite, webpack):
 
 ```js
 // babel.config.js
@@ -660,20 +692,6 @@ module.exports = {
 ```
 
 Outside `root`, files are processed only if they import `react-native-unistyles`, contain an `autoProcessImports` import, or match `autoProcessPaths`. The plugin replaces `react-native` component imports with Unistyles component factories that borrow the native ref; it does not inject unique ids into StyleSheets. String refs (`ref="x"`) throw. The plugin is a no-op when `NODE_ENV=test`.
-
-**Re.Pack:** the plugin above works in `babel.config.js`, Re.Pack's `babel-swc-loader` runs it. Without the Babel plugin, use the experimental `UnistylesPlugin` (no options, runtime dependency tracking like the Metro integration):
-
-```js
-// rspack.config.mjs
-import { UnistylesPlugin } from 'react-native-unistyles/repack-plugin'
-
-plugins: [
-  new Repack.RepackPlugin(),
-  new UnistylesPlugin()
-]
-```
-
-`RepackUnistylePlugin` is deprecated since 3.9.0 (it still works and warns) and will be removed in 4.0.
 
 ---
 

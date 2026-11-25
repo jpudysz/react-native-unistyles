@@ -65,9 +65,11 @@ If `StyleSheet.configure` is called from a design system package rather than you
 }
 ```
 
-### Babel Plugin
+### Bundler integration
 
-The Babel plugin is a no-op when `NODE_ENV === 'test'` (Jest sets this by default).
+Jest doesn't use Metro or Rspack, so the [Metro integration](/v3/other/metro) and `UnistylesPlugin` don't run in your tests, the mocks above are all you need.
+
+The deprecated Babel plugin is a no-op when `NODE_ENV === 'test'` (Jest sets this by default), and it doesn't print its deprecation warning there.
 
 ### Understanding the role of mocks
 

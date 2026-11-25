@@ -18,9 +18,75 @@ npx pod-install  # iOS
 npx react-native run-android  # Android
 ```
 
-## Babel Plugin Configuration
+## Bundler Integration
 
-A build-time integration is **mandatory**: the Babel plugin (default), the experimental [Metro integration](#metro-integration-experimental) (3.6.0+), or the experimental [Rspack plugin](#repack-rspack-rsbuild) for Re.Pack, Rspack and Rsbuild. The Babel plugin transforms `StyleSheet.create` calls at build time to enable zero-re-render reactivity, the Metro and Rspack integrations have no Babel transform and record StyleSheet dependencies at runtime.
+A bundler integration is **mandatory**, pick it by bundler:
+
+| Bundler | Integration |
+|---------|-------------|
+| Metro (Expo, bare React Native) | [Metro integration](#metro-integration) — the default since 3.9.0 |
+| Re.Pack, Rspack, Rsbuild | [`UnistylesPlugin`](#repack-rspack-rsbuild) (experimental, 3.9.0+) |
+| Next.js, Vite, webpack, other bundlers | [Babel plugin](#babel-plugin-deprecated) — **deprecated** since 3.9.0, no replacement yet, keeps working in 3.x |
+
+The Metro integration and `UnistylesPlugin` have no Babel transform and record StyleSheet dependencies at runtime. The Babel plugin transforms `StyleSheet.create` calls at build time.
+
+### Metro integration
+
+Since 3.6.0, `react-native-unistyles/metro` is the zero-config integration for apps bundled with Metro (Expo or bare React Native), the recommended setup since 3.9.0. Wrap the Metro config, and don't add `react-native-unistyles/plugin` to `babel.config.js` — Unistyles throws if both are set up:
+
+```js
+// metro.config.js
+const { getDefaultConfig } = require('expo/metro-config')
+// or for bare React Native: const { getDefaultConfig } = require('@react-native/metro-config')
+const { withUnistylesConfig } = require('react-native-unistyles/metro')
+
+module.exports = withUnistylesConfig(getDefaultConfig(__dirname))
+// no options
+```
+
+In an Expo app without `metro.config.js`, create it with `npx expo customize metro.config.js`.
+
+- No `root`, `autoProcessImports`, `autoProcessPaths` or `autoRemapImports`: every `react-native` import resolves to Unistyles components, **including in `node_modules`**, so 3rd party components that pass `style` to RN views follow theme changes without `withUnistyles` (non-style props like `color` still need it)
+- No Babel transform runs: StyleSheets record their dependencies **at runtime**, from what they read on the mini runtime (`rt.screen` → screen changes, `rt.insets.ime` → keyboard, a StyleSheet function always depends on the theme). Reads behind conditions, in helper functions and in dynamic functions count too. When anything a StyleSheet function reads changes, every style of that StyleSheet is recomputed, but only views whose styles came out different are updated. Reads inside a dynamic function (or a getter) belong to the views that use that style, so read per-frame values like `rt.insets.ime` inside a dynamic function (`keyboard: () => ({ paddingBottom: rt.insets.ime })`), not destructured in the StyleSheet's arguments. The app must install a single copy of `react-native-unistyles`, Metro warns about a second one
+- **`useVariants` must use the returned styles**: `const variantStyles = styles.useVariants({ size })`, then `variantStyles.button`. Calling `styles.useVariants()` as a statement does nothing without the Babel plugin (`styles` ignores its variants, also the defaults). The returned form works with the Babel plugin too. Codemod: `npx jscodeshift --parser=tsx --extensions=tsx,ts,jsx,js -t node_modules/react-native-unistyles/codemods/use-variants.js src` (adds semicolons to the changed lines, run the formatter afterwards)
+- The bundle contains a single copy of Unistyles
+- `withUnistylesConfig` wraps `resolver.resolveRequest`: apply it **last** (or make sure later plugins keep it)
+- To render a raw React Native component, import it from `react-native/index.js` (not swapped)
+- React Compiler: no plugin order to keep, add it as usual (Expo: `experiments.reactCompiler`)
+
+Limitations:
+- Metro only — Re.Pack, Rspack and Rsbuild have [`UnistylesPlugin`](#repack-rspack-rsbuild). Next.js, Vite, webpack and other bundlers have no integration yet and keep the deprecated Babel plugin
+- Jest doesn't use Metro, so the [testing setup](#testing--mocks-setup) is unchanged
+
+### Re.Pack, Rspack, Rsbuild
+
+`UnistylesPlugin` (experimental) is the Metro integration for Rspack: the same swaps, runtime dependency tracking and `useVariants` rules as above, no options. It requires `@rspack/core` 1.7.5+, the plugin throws otherwise. Don't add `react-native-unistyles/plugin` to `babel.config.js` (having both throws):
+
+```js
+// rspack.config.mjs (Re.Pack)
+import * as Repack from '@callstack/repack'
+import { UnistylesPlugin } from 'react-native-unistyles/repack-plugin'
+
+export default {
+  plugins: [new Repack.RepackPlugin(), new UnistylesPlugin()]
+}
+```
+
+- Rsbuild (web): `tools: { rspack: { plugins: [new UnistylesPlugin()] } }` with `resolve.alias: { 'react-native': 'react-native-web' }`
+- Module Federation: share `react-native-unistyles` and `react-native-unistyles/` (trailing slash, the swapped components) like `react-native` in every container. In Rsbuild use the `moduleFederation` option, not `ModuleFederationPlugin` in `tools.rspack`
+- `RepackUnistylePlugin` is deprecated since 3.9.0 (it still works and warns) and will be removed in 4.0. Replace `new RepackUnistylePlugin({ ... })` with `new UnistylesPlugin()`, it takes no options
+- Tested with Rspack only, not with Re.Pack's webpack setup (there, the deprecated Babel plugin keeps working in 3.x)
+
+### Migrating from the Babel plugin
+
+1. Add the integration: `withUnistylesConfig` in metro.config.js, or `new UnistylesPlugin()` in the Rspack config
+2. Remove `react-native-unistyles/plugin` from `babel.config.js` (and `RepackUnistylePlugin` from the Rspack config). `root`, `autoProcessImports`, `autoProcessPaths` and `debug` aren't needed. Check every `autoRemapImports` rule before removing it: a rule is only safe to remove when the integration swaps the same import to the same component as its `mapTo` (a rule mapping `View` to `NativeView` isn't covered by the `View` swap); the integrations swap only the imports in the table of [repack.mdx "What happens to each import"](https://www.unistyl.es/v3/other/repack#what-happens-to-each-import) (`react-native`, `unstable_NativeView` / `unstable_NativeText`, `ViewNativeComponent`, only `NativeText` of `TextNativeComponent`, and the deep imports of the supported components), and they leave imports made inside `react-native`, `@react-native/*` and `react-native-web` untouched. A rule for anything else (other exports such as `NativeVirtualText`, `react-native/index.js`, a library's own primitive like `@vendor/primitive`) has **no counterpart**: wrap that component with `withUnistyles`; if the rule rewrote a private import inside a library (wrapping can't reach it), patch the library, or stay on the deprecated Babel plugin in 3.x and skip the migration (without the integration: having both throws)
+3. Run the `useVariants` codemod (see above), so components use the returned styles
+4. Restart the bundler with a clear cache: `npx expo start --clear`, `npx react-native start --reset-cache` or Re.Pack's `--reset-cache`
+
+### Babel plugin (deprecated)
+
+`react-native-unistyles/plugin` is **deprecated since 3.9.0 and removed in 4.0**. It prints a deprecation warning once per bundler process (never under Jest, `NODE_ENV=test`). Use it only with bundlers that have no integration (Next.js, Vite, webpack), where it keeps working in 3.x:
 
 ```js
 // babel.config.js
@@ -34,7 +100,7 @@ module.exports = {
 }
 ```
 
-### Plugin options
+#### Plugin options
 
 | Option | Type | Description |
 |--------|------|-------------|
@@ -46,7 +112,7 @@ module.exports = {
 
 The plugin also throws on string refs (`ref="myView"`). Components swapped for ref-borrowing factories: `ActivityIndicator`, `View`, `Text`, `Image`, `ImageBackground`, `KeyboardAvoidingView`, `Pressable`, `ScrollView`, `FlatList`, `SectionList`, `Switch`, `TextInput`, `RefreshControl`, `TouchableHighlight`, `TouchableOpacity`, `VirtualizedList`, `Animated`, `SafeAreaView` (`Modal` and `TouchableWithoutFeedback` are not supported).
 
-### Example: Monorepo with shared packages
+#### Example: Monorepo with shared packages
 
 ```js
 // babel.config.js
@@ -65,52 +131,9 @@ module.exports = {
 
 Note: `autoProcessPaths` is a substring match against the absolute file path — relative paths like `'../shared-ui/src'` never match.
 
-### Metro integration (experimental)
+#### React Compiler ordering
 
-Since 3.6.0, `react-native-unistyles/metro` is a zero-config alternative to the Babel plugin for apps bundled with Metro (Expo or bare React Native). Wrap the Metro config and **remove** `react-native-unistyles/plugin` from `babel.config.js` — Unistyles throws if both are set up:
-
-```js
-// metro.config.js
-const { getDefaultConfig } = require('expo/metro-config')
-// or for bare React Native: const { getDefaultConfig } = require('@react-native/metro-config')
-const { withUnistylesConfig } = require('react-native-unistyles/metro')
-
-module.exports = withUnistylesConfig(getDefaultConfig(__dirname))
-// no options
-```
-
-- No `root`, `autoProcessImports`, `autoProcessPaths` or `autoRemapImports`: every `react-native` import resolves to Unistyles components, **including in `node_modules`**, so 3rd party components that pass `style` to RN views follow theme changes without `withUnistyles` (non-style props like `color` still need it)
-- No Babel transform runs: StyleSheets record their dependencies **at runtime**, from what they read on the mini runtime (`rt.screen` → screen changes, `rt.insets.ime` → keyboard, a StyleSheet function always depends on the theme). Reads behind conditions, in helper functions and in dynamic functions count too. When anything a StyleSheet function reads changes, every style of that StyleSheet is recomputed, but only views whose styles came out different are updated. Reads inside a dynamic function (or a getter) belong to the views that use that style, so read per-frame values like `rt.insets.ime` inside a dynamic function (`keyboard: () => ({ paddingBottom: rt.insets.ime })`), not destructured in the StyleSheet's arguments. The app must install a single copy of `react-native-unistyles`, Metro warns about a second one
-- **`useVariants` must use the returned styles**: `const variantStyles = styles.useVariants({ size })`, then `variantStyles.button`. Calling `styles.useVariants()` as a statement does nothing without the Babel plugin (`styles` ignores its variants, also the defaults). The returned form works with the Babel plugin too. Codemod: `npx jscodeshift --parser=tsx --extensions=tsx,ts,jsx,js -t node_modules/react-native-unistyles/codemods/use-variants.js src` (adds semicolons to the changed lines, run the formatter afterwards)
-- The bundle contains a single copy of Unistyles
-- `withUnistylesConfig` wraps `resolver.resolveRequest`: apply it **last** (or make sure later plugins keep it)
-- To render a raw React Native component, import it from `react-native/index.js` (not swapped)
-
-Limitations:
-- Metro only — Re.Pack, Rspack and Rsbuild have [`UnistylesPlugin`](#repack-rspack-rsbuild), Vite, Next.js and other web bundlers keep using the Babel plugin
-- Jest doesn't use Metro, so the [testing setup](#testing--mocks-setup) is unchanged
-
-### Re.Pack, Rspack, Rsbuild
-
-`UnistylesPlugin` (experimental) is the Metro integration for Rspack: the same swaps, runtime dependency tracking and `useVariants` rules as above, no options. It requires `@rspack/core` 1.7.5+, the plugin throws otherwise. Remove `react-native-unistyles/plugin` from `babel.config.js` (having both throws):
-
-```js
-// rspack.config.mjs (Re.Pack)
-import * as Repack from '@callstack/repack'
-import { UnistylesPlugin } from 'react-native-unistyles/repack-plugin'
-
-export default {
-  plugins: [new Repack.RepackPlugin(), new UnistylesPlugin()]
-}
-```
-
-- Rsbuild (web): `tools: { rspack: { plugins: [new UnistylesPlugin()] } }` with `resolve.alias: { 'react-native': 'react-native-web' }`
-- Module Federation: share `react-native-unistyles` and `react-native-unistyles/` (trailing slash, the swapped components) like `react-native` in every container. In Rsbuild use the `moduleFederation` option, not `ModuleFederationPlugin` in `tools.rspack`
-- `RepackUnistylePlugin` is deprecated since 3.9.0 (it still works and warns) and will be removed in 4.0. Re.Pack apps can keep the Babel plugin in `babel.config.js` instead, Re.Pack's `babel-swc-loader` runs it
-
-### React Compiler ordering
-
-If using React Compiler, the Unistyles plugin **MUST come BEFORE** React Compiler (still true in 3.6.0, which made `useVariants` compile with React Compiler):
+With the Babel plugin, the Unistyles plugin **MUST come BEFORE** React Compiler:
 
 ```js
 // babel.config.js
@@ -121,6 +144,8 @@ module.exports = {
   ]
 }
 ```
+
+The Metro integration and `UnistylesPlugin` have no Babel transform, so the order doesn't matter there.
 
 ## StyleSheet.configure
 
@@ -260,7 +285,7 @@ export default function Root({ children }: PropsWithChildren) {
 
 ## Testing / Mocks Setup
 
-The Babel plugin is a no-op when `NODE_ENV === 'test'` (Jest sets this by default). Add the mocks to Jest `setupFiles`, followed by your config file:
+Jest doesn't use Metro or Rspack, so the integrations don't run in tests. The deprecated Babel plugin is a no-op when `NODE_ENV === 'test'` (Jest sets this by default) and doesn't warn there. Add the mocks to Jest `setupFiles`, followed by your config file:
 
 ```json
 // package.json

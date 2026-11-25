@@ -18,12 +18,14 @@ Before diving into this guide, make sure you've read the other guides covering t
 
 - [Look under the hood](/v3/start/how-unistyles-works)
 - [Merging styles](/v3/guides/merging-styles)
-- [Babel plugin](/v3/other/babel-plugin)
+- [Metro integration](/v3/other/metro)
 
-### Problem 1: Babel
+### Problem 1: Bundler integration
 
 To leverage ShadowTree updates and avoid unnecessary re-renders, Unistyles must process both `StyleSheets` and your components.
-The Babel plugin processes:
+The [Metro integration](/v3/other/metro) and [`UnistylesPlugin`](/v3/other/repack) process every file that needs it, including 3rd party libraries in `node_modules`, without any options. Make sure your `metro.config.js` (or Rspack config) is wrapped, and use the styles returned by `useVariants`.
+
+The deprecated Babel plugin processes:
 - every file under the required `root` folder (no matter what it imports)
 - files outside of `root` that create a `StyleSheet` from Unistyles or import one of the `autoProcessImports` paths
 
@@ -33,13 +35,15 @@ Views usually stop updating when a component lives outside of `root` (e.g. in a 
 For such cases, use the `autoProcessPaths`, `autoProcessImports` or `autoRemapImports` options. Be sure to [check them out](/v3/other/babel-plugin#extra-configuration).
 
 <Aside>
-The experimental [Metro integration](/v3/other/metro) processes every file that needs it, including 3rd party libraries in `node_modules`, without any options.
+The [Babel plugin](/v3/other/babel-plugin) is deprecated since Unistyles 3.9.0. With Metro, move to the Metro integration, see [Migrating from the Babel plugin](/v3/other/metro#migrating-from-the-babel-plugin). With Re.Pack, Rspack or Rsbuild, move to `UnistylesPlugin`, see [Migrating from the Babel plugin](/v3/other/repack#migrating-from-the-babel-plugin).
 </Aside>
 
 ### Problem 2: Dependency detection
 
 
-Unistyles will automatically detect all your dependencies for every `StyleSheet`, but there's a chance you used custom syntax that isn't covered by the plugin.
+The Metro integration and `UnistylesPlugin` record the dependencies of every `StyleSheet` while it runs, so any syntax works. A value that a StyleSheet reads only behind a condition becomes a dependency the first time the code reads it, see [What it does](/v3/other/metro#what-it-does).
+
+The deprecated Babel plugin detects your dependencies at build time, but there's a chance you used custom syntax that isn't covered by the plugin.
 If Babel fails to detect some style dependencies, they won't be updated when necessary.
 
 You can easily debug this issue by adding the following Babel plugin configuration:
@@ -71,7 +75,7 @@ Follow our [decision algorithm](/v3/references/3rd-party-views) to help you choo
 
 ### Problem 4: Web styles are not applied
 
-This issue indicates that the Babel plugin didn't detect some of your components. Initially, it may seem like native styles are working correctly, but that's not the case.
+With the deprecated Babel plugin, this issue indicates that the plugin didn't detect some of your components. Initially, it may seem like native styles are working correctly, but that's not the case.
 
 On mobile, styles are returned the same way as in React Native. You can always `console.log` them to inspect the parsed values:
 

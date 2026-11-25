@@ -66,6 +66,7 @@ var REPLACE_WITH_UNISTYLES_PATHS = [
 ];
 var METRO_ENV = "UNISTYLES_METRO";
 var RSPACK_INTEGRATION = "rspack";
+var REPACK_LOADER_CALLER = "react-native-unistyles/repack-plugin";
 
 // repack-plugin/src/loader.ts
 var importName = "react-native-unistyles";
@@ -88,6 +89,8 @@ function unistylesLoader(source) {
     source,
     {
       filename: this.resourcePath,
+      // the Babel plugin doesn't repeat the deprecation warning of RepackUnistylePlugin
+      caller: { name: REPACK_LOADER_CALLER },
       babelrc: false,
       configFile: false,
       compact: false,
@@ -415,7 +418,7 @@ var RepackUnistylePlugin = class {
     if (!hasWarned) {
       hasWarned = true;
       console.warn(
-        "Unistyles \u{1F984}: RepackUnistylePlugin is deprecated and will be removed in Unistyles 4.0. Replace it with UnistylesPlugin from react-native-unistyles/repack-plugin, or add react-native-unistyles/plugin to babel.config.js. See https://www.unistyl.es/v3/other/repack"
+        "Unistyles \u{1F984}: RepackUnistylePlugin is deprecated and will be removed in Unistyles 4.0. Replace it with UnistylesPlugin from react-native-unistyles/repack-plugin, see https://www.unistyl.es/v3/other/repack#migrating-from-repackunistyleplugin"
       );
     }
     compiler.options.module.rules.push(getUnistyleModuleRules(this.ruleExcludePaths, this.unistylesPluginOptions));

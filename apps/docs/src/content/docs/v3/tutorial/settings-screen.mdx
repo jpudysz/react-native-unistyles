@@ -97,7 +97,7 @@ export function ThemedText({
 +  dimmed,
   ...rest
 }: ThemedTextProps) {
-  styles.useVariants({
+  const variantStyles = styles.useVariants({
     type,
 +    bold,
 +    dimmed
@@ -106,8 +106,8 @@ export function ThemedText({
   return (
     <Text
       style={[
-        styles.textColor,
-        styles.textType,
+        variantStyles.textColor,
+        variantStyles.textType,
         style,
       ]}
       {...rest}

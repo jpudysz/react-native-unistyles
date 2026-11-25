@@ -12,7 +12,7 @@ import { StyleSheet } from 'react-native-unistyles'
 
 ### StyleSheet.create(styles)
 
-Creates a reactive stylesheet. Returns an object with the same keys as your stylesheet, plus a `useVariants()` method. Each style value is a C++ proxy object.
+Creates a reactive stylesheet. Returns an object with the same keys as your stylesheet, plus a `useVariants()` method that returns the styles with the selected variants (use them, the Metro integration and `UnistylesPlugin` don't change `styles`). Each style value is a C++ proxy object.
 
 **Overload 1 — Static object:**
 ```tsx
@@ -413,8 +413,8 @@ type ButtonVariants = UnistylesVariants<typeof styles>
 type Props = { title: string } & ButtonVariants
 
 const Button = ({ title, ...variants }: Props) => {
-  styles.useVariants(variants)
-  return <TouchableOpacity style={styles.button}><Text>{title}</Text></TouchableOpacity>
+  const variantStyles = styles.useVariants(variants)
+  return <TouchableOpacity style={variantStyles.button}><Text>{title}</Text></TouchableOpacity>
 }
 ```
 
@@ -508,7 +508,8 @@ const animatedStyle = useAnimatedStyle(() => ({
 Returns a derived `SharedValue<string>` with the variant's current color (`colorKey` must contain `color`/`Color`; the style must have `variants`, otherwise it throws). Use it inside `useAnimatedStyle`:
 
 ```tsx
-const color = useAnimatedVariantColor(styles.button, 'backgroundColor')
+const variantStyles = styles.useVariants({ state })
+const color = useAnimatedVariantColor(variantStyles.button, 'backgroundColor')
 const animatedStyle = useAnimatedStyle(() => ({
   backgroundColor: withTiming(color.value, { duration: 500 }),
 }))
@@ -540,12 +541,12 @@ Settings: `{ includeRNWStyles?: boolean }` (default `true`)
 
 ---
 
-## Native Components (Babel factories)
+## Native Components (component factories)
 
-The Babel plugin (or, with the 3.6.0+ Metro integration, the Metro resolver — for every file including `node_modules`) rewrites `react-native` imports in processed files to ref-borrowing factories (no extra views, no styling of their own) so C++ can update the native views:
+The Metro integration and `UnistylesPlugin` (when they resolve `react-native` imports, for every file including `node_modules`) or the deprecated Babel plugin (in processed files) swap `react-native` imports for ref-borrowing factories (no extra views, no styling of their own) so C++ can update the native views:
 
 ```tsx
-// what the plugin generates — you don't write this yourself
+// what the import resolves to — you don't write this yourself
 import { View } from 'react-native-unistyles/components/native/View'
 ```
 
