@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 
 import type { UnistylesThemes } from '../global'
 
-import { UnistylesRuntime } from '../specs'
+import { useUnistyles } from '../core'
 import { AdaptiveTheme } from './AdaptiveTheme'
 import { NamedTheme } from './NamedTheme'
 import { ScopedThemeContext } from './ScopedThemeContext'
@@ -24,14 +24,29 @@ type ThemeProps =
           reset: boolean
       }
 
+interface InvertedAdaptiveThemeProps extends React.PropsWithChildren {
+    previousScopedTheme?: string
+}
+
+const InvertedAdaptiveTheme: React.FunctionComponent<InvertedAdaptiveThemeProps> = ({
+    children,
+    previousScopedTheme,
+}) => {
+    const { rt } = useUnistyles()
+
+    if (!rt.hasAdaptiveThemes) {
+        return children
+    }
+
+    return <AdaptiveTheme previousScopedTheme={previousScopedTheme}>{children}</AdaptiveTheme>
+}
+
 export const ScopedTheme: React.FunctionComponent<React.PropsWithChildren<ThemeProps>> = ({
     name,
     children,
     invertedAdaptive,
     reset,
 }) => {
-    const hasAdaptiveThemes = UnistylesRuntime.hasAdaptiveThemes
-    const isAdaptiveTheme = invertedAdaptive && hasAdaptiveThemes
     const previousScopedTheme = useContext(ScopedThemeContext)?.name
 
     switch (true) {
@@ -41,8 +56,8 @@ export const ScopedTheme: React.FunctionComponent<React.PropsWithChildren<ThemeP
                     {children}
                 </NamedTheme>
             )
-        case isAdaptiveTheme:
-            return <AdaptiveTheme previousScopedTheme={previousScopedTheme}>{children}</AdaptiveTheme>
+        case invertedAdaptive:
+            return <InvertedAdaptiveTheme previousScopedTheme={previousScopedTheme}>{children}</InvertedAdaptiveTheme>
         case reset:
             return (
                 <NamedTheme name={undefined} previousScopedTheme={previousScopedTheme}>
